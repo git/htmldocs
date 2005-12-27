@@ -1,0 +1,83 @@
+git-daemon(1)
+=============
+
+NAME
+----
+git-daemon - A really simple server for git repositories.
+
+SYNOPSIS
+--------
+'git-daemon' [--verbose] [--syslog] [--inetd | --port=n] [--export-all]
+             [--timeout=n] [--init-timeout=n] [--strict-paths] [directory...]
+
+DESCRIPTION
+-----------
+A really simple TCP git daemon that normally listens on port "DEFAULT_GIT_PORT"
+aka 9418. It waits for a connection, and will just execute "git-upload-pack"
+when it gets one.
+
+It's careful in that there's a magic request-line that gives the command and
+what directory to upload, and it verifies that the directory is ok.
+
+It verifies that the directory has the magic file "git-daemon-export-ok", and
+it will refuse to export any git directory that hasn't explicitly been marked
+for export this way (unless the '--export-all' parameter is specified). If you
+pass some directory paths as 'git-daemon' arguments, you can further restrict
+the offers to a whitelist comprising of those.
+
+This is ideally suited for read-only updates, ie pulling from git repositories.
+
+OPTIONS
+-------
+--strict-paths::
+	Match paths exactly (i.e. don't allow "/foo/repo" when the real path is
+	"/foo/repo.git" or "/foo/repo/.git") and don't do user-relative paths.
+	git-daemon will refuse to start when this option is enabled and no
+	whitelist is specified.
+
+--export-all::
+	Allow pulling from all directories that look like GIT repositories
+	(have the 'objects' and 'refs' subdirectories), even if they
+	do not have the 'git-daemon-export-ok' file.
+
+--inetd::
+	Have the server run as an inetd service. Implies --syslog.
+
+--port::
+	Listen on an alternative port.
+
+--init-timeout::
+	Timeout between the moment the connection is established and the
+	client request is received (typically a rather low value, since
+	that should be basically immediate).
+
+--timeout::
+	Timeout for specific client sub-requests. This includes the time
+	it takes for the server to process the sub-request and time spent
+	waiting for next client's request.
+
+--syslog::
+	Log to syslog instead of stderr. Note that this option does not imply
+	--verbose, thus by default only error conditions will be logged.
+
+--verbose::
+	Log details about the incoming connections and requested files.
+
+<directory>::
+	A directory to add to the whitelist of allowed directories. Unless
+	--strict-paths is specified this will also include subdirectories
+	of each named directory.
+
+Author
+------
+Written by Linus Torvalds <torvalds@osdl.org>, YOSHIFUJI Hideaki
+<yoshfuji@linux-ipv6.org> and the git-list <git@vger.kernel.org>
+
+Documentation
+--------------
+Documentation by Junio C Hamano and the git-list <git@vger.kernel.org>.
+
+GIT
+---
+Part of the gitlink:git[7] suite
+

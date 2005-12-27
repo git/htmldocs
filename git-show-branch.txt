@@ -1,0 +1,130 @@
+git-show-branch(1)
+==================
+
+NAME
+----
+git-show-branch - Show branches and their commits.
+
+SYNOPSIS
+--------
+'git-show-branch [--all] [--heads] [--tags] [--topo-order] [--more=<n> | --list | --independent | --merge-base] [--no-name | --sha1-name] [<rev> | <glob>]...'
+
+DESCRIPTION
+-----------
+
+Shows the commit ancestry graph starting from the commits named
+with <rev>s or <globs>s (or all refs under $GIT_DIR/refs/heads
+and/or $GIT_DIR/refs/tags) semi-visually.
+
+It cannot show more than 29 branches and commits at a time.
+
+
+OPTIONS
+-------
+<rev>::
+	Arbitrary extended SHA1 expression (see `git-rev-parse`)
+	that typically names a branch HEAD or a tag.
+
+<glob>::
+	A glob pattern that matches branch or tag names under
+	$GIT_DIR/refs.  For example, if you have many topic
+	branches under $GIT_DIR/refs/heads/topic, giving
+	`topic/*` would show all of them.
+
+--all --heads --tags::
+	Show all refs under $GIT_DIR/refs, $GIT_DIR/refs/heads,
+	and $GIT_DIR/refs/tags, respectively.
+
+--topo-order::
+        By default, the branches and their commits are shown in
+        reverse chronological order.  This option makes them
+        appear in topological order (i.e., descendant commits
+        are shown before their parents).
+
+--more=<n>::
+	Usually the command stops output upon showing the commit
+	that is the common ancestor of all the branches.  This
+	flag tells the command to go <n> more common commits
+	beyond that.  When <n> is negative, display only the
+	<reference>s given, without showing the commit ancestry
+	tree.
+
+--list::
+	Synomym to `--more=-1`
+
+--merge-base::
+	Instead of showing the commit list, just act like the
+	'git-merge-base -a' command, except that it can accept
+	more than two heads.
+
+--independent::
+	Among the <reference>s given, display only the ones that
+	cannot be reached from any other <reference>.
+
+--no-name::
+	Do not show naming strings for each commit.
+
+--sha1-name::
+	Instead of naming the commits using the path to reach
+	them from heads (e.g. "master~2" to mean the grandparent
+	of "master"), name them with the unique prefix of their
+	object names.
+
+Note that --more, --list, --independent and --merge-base options
+are mutually exclusive.
+
+
+OUTPUT
+------
+Given N <references>, the first N lines are the one-line
+description from their commit message.  The branch head that is
+pointed at by $GIT_DIR/HEAD is prefixed with an asterisk '*'
+character while other heads are prefixed with a '!' character.
+
+Following these N lines, one-line log for each commit is
+displayed, indented N places.  If a commit is on the I-th
+branch, the I-th indentation character shows a '+' sign;
+otherwise it shows a space.  Each commit shows a short name that
+can be used as an exended SHA1 to name that commit.
+
+The following example shows three branches, "master", "fixes"
+and "mhf":
+
+------------------------------------------------
+$ git show-branch master fixes mhf
+! [master] Add 'git show-branch'.
+ ! [fixes] Introduce "reset type" flag to "git reset"
+  ! [mhf] Allow "+remote:local" refspec to cause --force when fetching.
+---
+  + [mhf] Allow "+remote:local" refspec to cause --force when fetching.
+  + [mhf~1] Use git-octopus when pulling more than one heads.
+ +  [fixes] Introduce "reset type" flag to "git reset"
+  + [mhf~2] "git fetch --force".
+  + [mhf~3] Use .git/remote/origin, not .git/branches/origin.
+  + [mhf~4] Make "git pull" and "git fetch" default to origin
+  + [mhf~5] Infamous 'octopus merge'
+  + [mhf~6] Retire git-parse-remote.
+  + [mhf~7] Multi-head fetch.
+  + [mhf~8] Start adding the $GIT_DIR/remotes/ support.
++++ [master] Add 'git show-branch'.
+------------------------------------------------
+
+These three branches all forked from a common commit, [master],
+whose commit message is "Add 'git show-branch'.  "fixes" branch
+adds one commit 'Introduce "reset type"'.  "mhf" branch has many
+other commits.
+
+
+Author
+------
+Written by Junio C Hamano <junkio@cox.net>
+
+
+Documentation
+--------------
+Documentation by Junio C Hamano.
+
+
+GIT
+---
+Part of the gitlink:git[7] suite

@@ -1,0 +1,113 @@
+git-format-patch(1)
+===================
+
+NAME
+----
+git-format-patch - Prepare patches for e-mail submission.
+
+
+SYNOPSIS
+--------
+'git-format-patch' [-n | -k] [-o <dir> | --stdout] [-s] [-c] [--mbox] [--diff-options] <his> [<mine>]
+
+DESCRIPTION
+-----------
+Prepare each commit with its patch since <mine> head forked from
+<his> head, one file per patch, for e-mail submission.  Each
+output file is numbered sequentially from 1, and uses the first
+line of the commit message (massaged for pathname safety) as the
+filename.
+
+When -o is specified, output files are created in that
+directory; otherwise in the current working directory.
+
+When -n is specified, instead of "[PATCH] Subject", the first
+line is formatted as "[PATCH N/M] Subject", unless you have only
+one patch.
+
+When --mbox is specified, the output is formatted to resemble
+UNIX mailbox format, and can be concatenated together for
+processing with applymbox.
+
+
+OPTIONS
+-------
+-o|--output-directory <dir>::
+	Use <dir> to store the resulting files, instead of the
+	current working directory.
+
+-n|--numbered::
+	Name output in '[PATCH n/m]' format.
+
+-k|--keep-subject::
+	Do not strip/add '[PATCH]' from the first line of the
+	commit log message.
+
+-a|--author, -d|--date::
+	Output From: and Date: headers for commits made by
+	yourself as well.  Usually these are output only for
+	commits made by people other than yourself.
+
+-s|--signoff::
+	Add `Signed-off-by:` line to the commit message, using
+	the committer identity of yourself.
+
+-c|--check::
+        Display suspicious lines in the patch.  The definition
+        of 'suspicious lines' is currently the lines that has
+        trailing whitespaces, and the lines whose indentation
+        has a SP character immediately followed by a TAB
+        character.
+
+-m|--mbox::
+	Format the output files for closer to mbox format by
+	adding a phony Unix "From " line, so they can be
+	concatenated together and fed to `git-applymbox`.
+	Implies --author and --date.
+
+--stdout::
+	This flag generates the mbox formatted output to the
+	standard output, instead of saving them into a file per
+	patch and implies --mbox.
+
+
+EXAMPLES
+--------
+
+git-format-patch -k --stdout R1..R2 | git-am -3 -k::
+	Extract commits between revisions R1 and R2, and apply
+	them on top of the current branch using `git-am` to
+	cherry-pick them.
+
+git-format-patch origin::
+	Extract commits the current branch accumulated since it
+	pulled from origin the last time in a patch form for
+	e-mail submission.
+
+git-format-patch -M -B origin::
+	The same as the previous one, except detect and handle
+	renames and complete rewrites intelligently to produce
+	renaming patch.  A renaming patch reduces the amount of
+	text output, and generally makes it easier to review
+	it.  Note that the "patch" program does not understand
+	renaming patch well, so use it only when you know the
+	recipient uses git to apply your patch.
+
+
+See Also
+--------
+gitlink:git-am[1], gitlink:git-send-email
+
+
+Author
+------
+Written by Junio C Hamano <junkio@cox.net>
+
+Documentation
+--------------
+Documentation by Junio C Hamano and the git-list <git@vger.kernel.org>.
+
+GIT
+---
+Part of the gitlink:git[7] suite
+

@@ -1,0 +1,121 @@
+git-checkout-index(1)
+=====================
+
+NAME
+----
+git-checkout-index - Copy files from the index to the working directory
+
+
+SYNOPSIS
+--------
+'git-checkout-index' [-u] [-q] [-a] [-f] [-n] [--prefix=<string>]
+	[--stage=<number>] [--] <file>...
+
+DESCRIPTION
+-----------
+Will copy all files listed from the index to the working directory
+(not overwriting existing files).
+
+OPTIONS
+-------
+-u|--index::
+	update stat information for the checked out entries in
+	the index file.
+
+-q|--quiet::
+	be quiet if files exist or are not in the index
+
+-f|--force::
+	forces overwrite of existing files
+
+-a|--all::
+	checks out all files in the index.  Cannot be used
+	together with explicit filenames.
+
+-n|--no-create::
+	Don't checkout new files, only refresh files already checked
+	out.
+
+--prefix=<string>::
+	When creating files, prepend <string> (usually a directory
+	including a trailing /)
+
+--stage=<number>::
+	Instead of checking out unmerged entries, copy out the
+	files from named stage.  <number> must be between 1 and 3.
+
+--::
+	Do not interpret any more arguments as options.
+
+The order of the flags used to matter, but not anymore.
+
+Just doing `git-checkout-index` does nothing. You probably meant
+`git-checkout-index -a`. And if you want to force it, you want
+`git-checkout-index -f -a`.
+
+Intuitiveness is not the goal here. Repeatability is. The reason for
+the "no arguments means no work" behavior is that from scripts you are
+supposed to be able to do:
+
+----------------
+$ find . -name '*.h' -print0 | xargs -0 git-checkout-index -f --
+----------------
+
+which will force all existing `*.h` files to be replaced with their
+cached copies. If an empty command line implied "all", then this would
+force-refresh everything in the index, which was not the point.
+
+The `--` is just a good idea when you know the rest will be filenames;
+it will prevent problems with a filename of, for example,  `-a`.
+Using `--` is probably a good policy in scripts.
+
+
+EXAMPLES
+--------
+To update and refresh only the files already checked out::
++
+----------------
+$ git-checkout-index -n -f -a && git-update-index --ignore-missing --refresh
+----------------
+
+Using `git-checkout-index` to "export an entire tree"::
+	The prefix ability basically makes it trivial to use
+	`git-checkout-index` as an "export as tree" function.
+	Just read the desired tree into the index, and do:
++
+----------------
+$ git-checkout-index --prefix=git-export-dir/ -a
+----------------
++
+`git-checkout-index` will "export" the index into the specified
+directory.
++
+The final "/" is important. The exported name is literally just
+prefixed with the specified string.  Contrast this with the
+following example.
+
+Export files with a prefix::
++
+----------------
+$ git-checkout-index --prefix=.merged- Makefile
+----------------
++
+This will check out the currently cached copy of `Makefile`
+into the file `.merged-Makefile`.
+
+
+Author
+------
+Written by Linus Torvalds <torvalds@osdl.org>
+
+
+Documentation
+--------------
+Documentation by David Greaves,
+Junio C Hamano and the git-list <git@vger.kernel.org>.
+
+
+GIT
+---
+Part of the gitlink:git[7] suite
+

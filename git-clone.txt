@@ -1,0 +1,117 @@
+git-clone(1)
+============
+
+NAME
+----
+git-clone - Clones a repository.
+
+
+SYNOPSIS
+--------
+'git-clone' [-l [-s]] [-q] [-n] [-o <name>] [-u <upload-pack>] <repository> [<directory>]
+
+DESCRIPTION
+-----------
+Clones a repository into a newly created directory.  All remote
+branch heads are copied under `$GIT_DIR/refs/heads/`, except
+that the remote `master` is also copied to `origin` branch.
+
+In addition, `$GIT_DIR/remotes/origin` file is set up to have
+this line:
+
+	Pull: master:origin
+
+This is to help the typical workflow of working off of the
+remote `master` branch.  Every time `git pull` without argument
+is run, the progress on the remote `master` branch is tracked by
+copying it into the local `origin` branch, and merged into the
+branch you are currently working on.  Remote branches other than
+`master` are also added there to be tracked.
+
+
+OPTIONS
+-------
+--local::
+-l::
+	When the repository to clone from is on a local machine,
+	this flag bypasses normal "git aware" transport
+	mechanism and clones the repository by making a copy of
+	HEAD and everything under objects and refs directories.
+	The files under .git/objects/ directory are hardlinked
+	to save space when possible.
+
+--shared::
+-s::
+	When the repository to clone is on the local machine,
+	instead of using hard links, automatically setup
+	.git/objects/info/alternatives to share the objects
+	with the source repository.  The resulting repository
+	starts out without any object of its own.
+
+--quiet::
+-q::
+	Operate quietly.  This flag is passed to "rsync" and
+	"git-clone-pack" commands when given.
+
+-n::
+	No checkout of HEAD is performed after the clone is complete.
+
+-o <name>::
+	Instead of using the branch name 'origin' to keep track
+	of the upstream repository, use <name> instead.  Note
+	that the shorthand name stored in `remotes/origin` is
+	not affected, but the local branch name to pull the
+	remote `master` branch into is.
+
+--upload-pack <upload-pack>::
+-u <upload-pack>::
+	When given, and the repository to clone from is handled
+	by 'git-clone-pack', '--exec=<upload-pack>' is passed to
+	the command to specify non-default path for the command
+	run on the other end.
+
+<repository>::
+	The (possibly remote) repository to clone from.  It can
+	be any URL git-fetch supports.
+
+<directory>::
+	The name of a new directory to clone into.  The	"humanish"
+	part of the source repository is used if no directory is
+	explicitly given ("repo" for "/path/to/repo.git" and "foo"
+	for "host.xz:foo/.git").  Cloning into an existing directory
+	is not allowed.
+
+Examples
+~~~~~~~~
+
+Clone from upstream::
++
+------------
+$ git clone git://git.kernel.org/pub/scm/.../linux-2.6 my2.6
+$ cd my2.6
+$ make
+------------
+
+
+Make a local clone that borrows from the current directory, without checking things out::
++
+------------
+$ git clone -l -s -n . ../copy
+$ cd copy
+$ git show-branch
+------------
+
+Author
+------
+Written by Linus Torvalds <torvalds@osdl.org>
+
+
+Documentation
+--------------
+Documentation by Junio C Hamano and the git-list <git@vger.kernel.org>.
+
+
+GIT
+---
+Part of the gitlink:git[7] suite
+

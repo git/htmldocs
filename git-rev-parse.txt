@@ -1,0 +1,179 @@
+git-rev-parse(1)
+================
+
+NAME
+----
+git-rev-parse - Pick out and massage parameters.
+
+
+SYNOPSIS
+--------
+'git-rev-parse' [ --option ] <args>...
+
+DESCRIPTION
+-----------
+
+Many git Porcelainish commands take mixture of flags
+(i.e. parameters that begin with a dash '-') and parameters
+meant for underlying `git-rev-list` command they use internally
+and flags and parameters for other commands they use as the
+downstream of `git-rev-list`.  This command is used to
+distinguish between them.
+
+
+OPTIONS
+-------
+--revs-only::
+	Do not output flags and parameters not meant for
+	`git-rev-list` command.
+
+--no-revs::
+	Do not output flags and parameters meant for
+	`git-rev-list` command.
+
+--flags::
+	Do not output non-flag parameters.
+
+--no-flags::
+	Do not output flag parameters.
+
+--default <arg>::
+	If there is no parameter given by the user, use `<arg>`
+	instead.
+
+--verify::
+	The parameter given must be usable as a single, valid
+	object name.  Otherwise barf and abort.
+
+--sq::
+	Usually the output is made one line per flag and
+	parameter.  This option makes output a single line,
+	properly quoted for consumption by shell.  Useful when
+	you expect your parameter to contain whitespaces and
+	newlines (e.g. when using pickaxe `-S` with
+	`git-diff-\*`).
+
+--not::
+	When showing object names, prefix them with '{caret}' and
+	strip '{caret}' prefix from the object names that already have
+	one.
+
+--symbolic::
+	Usually the object names are output in SHA1 form (with
+	possible '{caret}' prefix); this option makes them output in a
+	form as close to the original input as possible.
+
+
+--all::
+	Show all refs found in `$GIT_DIR/refs`.
+
+--show-prefix::
+	When the command is invoked from a subdirectory, show the
+	path of the current directory relative to the top-level
+	directory.
+
+--show-cdup::
+	When the command is invoked from a subdirectory, show the
+	path of the top-level directory relative to the current
+	directory (typically a sequence of "../", or an empty string).
+
+--since=datestring, --after=datestring::
+	Parses the date string, and outputs corresponding
+	--max-age= parameter for git-rev-list command.
+
+--until=datestring, --before=datestring::
+	Parses the date string, and outputs corresponding
+	--min-age= parameter for git-rev-list command.
+
+<args>...::
+	Flags and parameters to be parsed.
+
+
+SPECIFYING REVISIONS
+--------------------
+
+A revision parameter typically, but not necessarily, names a
+commit object.  They use what is called an 'extended SHA1'
+syntax.
+
+* The full SHA1 object name (40-byte hexadecimal string), or
+  a substring of such that is unique within the repository.
+  E.g. dae86e1950b1277e545cee180551750029cfe735 and dae86e both
+  name the same commit object if there are no other object in
+  your repository whose object name starts with dae86e.
+
+* A symbolic ref name.  E.g. 'master' typically means the commit
+  object referenced by $GIT_DIR/refs/heads/master.  If you
+  happen to have both heads/master and tags/master, you can
+  explicitly say 'heads/master' to tell git which one you mean.
+
+* A suffix '{caret}' to a revision parameter means the first parent of
+  that commit object.  '{caret}<n>' means the <n>th parent (i.e.
+  'rev{caret}'
+  is equivalent to 'rev{caret}1').  As a special rule,
+  'rev{caret}0' means the commit itself and is used when 'rev' is the
+  object name of a tag object that refers to a commit object.
+
+* A suffix '~<n>' to a revision parameter means the commit
+  object that is the <n>th generation grand-parent of the named
+  commit object, following only the first parent.  I.e. rev~3 is
+  equivalent to rev{caret}{caret}{caret} which is equivalent to\
+  rev{caret}1{caret}1{caret}1.
+
+* A suffix '{caret}' followed by an object type name enclosed in
+  brace pair (e.g. `v0.99.8{caret}\{commit\}`) means the object
+  could be a tag, and dereference the tag recursively until an
+  object of that type is found or the object cannot be
+  dereferenced anymore (in which case, barf).  `rev{caret}0`
+  introduced earlier is a short-hand for `rev{caret}\{commit\}`.
+
+* A suffix '{caret}' followed by an empty brace pair
+  (e.g. `v0.99.8{caret}\{\}`) means the object could be a tag,
+  and dereference the tag recursively until a non-tag object is
+  found.
+
+'git-rev-parse' also accepts a prefix '{caret}' to revision parameter,
+which is passed to 'git-rev-list'.  Two revision parameters
+concatenated with '..' is a short-hand for writing a range
+between them.  I.e. 'r1..r2' is equivalent to saying '{caret}r1 r2'
+
+Here is an illustration, by Jon Loeliger.  Both node B and C are
+a commit parents of commit node A.  Parent commits are ordered
+left-to-right.
+
+    G   H   I   J
+     \ /     \ /
+      D   E   F
+       \  |  /
+        \ | /
+         \|/
+          B     C
+           \   /
+            \ /
+             A
+
+    A =      = A^0
+    B = A^   = A^1     = A~1
+    C = A^2  = A^2
+    D = A^^  = A^1^1   = A~2
+    E = B^2  = A^^2
+    F = B^3  = A^^3
+    G = A^^^ = A^1^1^1 = A~3
+    H = D^2  = B^^2    = A^^^2  = A~2^2
+    I = F^   = B^3^    = A^^3^
+    J = F^2  = B^3^2   = A^^3^2
+
+
+Author
+------
+Written by Linus Torvalds <torvalds@osdl.org> and
+Junio C Hamano <junkio@cox.net>
+
+Documentation
+--------------
+Documentation by Junio C Hamano and the git-list <git@vger.kernel.org>.
+
+GIT
+---
+Part of the gitlink:git[7] suite
+

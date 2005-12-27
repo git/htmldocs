@@ -1,0 +1,93 @@
+git-pack-objects(1)
+===================
+
+NAME
+----
+git-pack-objects - Create a packed archive of objects.
+
+
+SYNOPSIS
+--------
+'git-pack-objects' [--non-empty] [--local] [--incremental] [--window=N] [--depth=N] {--stdout | base-name} < object-list
+
+
+DESCRIPTION
+-----------
+Reads list of objects from the standard input, and writes a packed
+archive with specified base-name, or to the standard output.
+
+A packed archive is an efficient way to transfer set of objects
+between two repositories, and also is an archival format which
+is efficient to access.  The packed archive format (.pack) is
+designed to be unpackable without having anything else, but for
+random access, accompanied with the pack index file (.idx).
+
+'git-unpack-objects' command can read the packed archive and
+expand the objects contained in the pack into "one-file
+one-object" format; this is typically done by the smart-pull
+commands when a pack is created on-the-fly for efficient network
+transport by their peers.
+
+Placing both in the pack/ subdirectory of $GIT_OBJECT_DIRECTORY (or
+any of the directories on $GIT_ALTERNATE_OBJECT_DIRECTORIES)
+enables git to read from such an archive.
+
+
+OPTIONS
+-------
+base-name::
+	Write into a pair of files (.pack and .idx), using
+	<base-name> to determine the name of the created file.
+	When this option is used, the two files are written in
+	<base-name>-<SHA1>.{pack,idx} files.  <SHA1> is a hash
+	of object names (currently in random order so it does
+	not have any useful meaning) to make the resulting
+	filename reasonably unique, and written to the standard
+	output of the command.
+
+--stdout::
+	Write the pack contents (what would have been writtin to
+	.pack file) out to the standard output.
+
+--window and --depth::
+	These two options affects how the objects contained in
+	the pack are stored using delta compression.  The
+	objects are first internally sorted by type, size and
+	optionally names and compared against the other objects
+	within --window to see if using delta compression saves
+	space.  --depth limits the maximum delta depth; making
+	it too deep affects the performance on the unpacker
+	side, because delta data needs to be applied that many
+	times to get to the necessary object.
+
+--incremental::
+	This flag causes an object already in a pack ignored
+	even if it appears in the standard input.
+
+--local::
+	This flag is similar to `--incremental`; instead of
+	ignoring all packed objects, it only ignores objects
+	that are packed and not in the local object store
+	(i.e. borrowed from an alternate).
+
+--non-empty::
+        Only create a packed archive if it would contain at
+        least one object.
+
+Author
+------
+Written by Linus Torvalds <torvalds@osdl.org>
+
+Documentation
+-------------
+Documentation by Junio C Hamano
+
+See-Also
+--------
+gitlink:git-repack[1]
+gitlink:git-prune-packed[1]
+
+GIT
+---
+Part of the gitlink:git[7] suite
+

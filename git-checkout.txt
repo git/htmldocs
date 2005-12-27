@@ -1,0 +1,83 @@
+git-checkout(1)
+===============
+
+NAME
+----
+git-checkout - Checkout and switch to a branch.
+
+SYNOPSIS
+--------
+'git-checkout' [-f] [-b <new_branch>] [<branch>] [<paths>...]
+
+DESCRIPTION
+-----------
+
+When <paths> are not given, this command switches branches, by
+updating the index and working tree to reflect the specified
+branch, <branch>, and updating HEAD to be <branch> or, if
+specified, <new_branch>.
+
+When <paths> are given, this command does *not* switch
+branches.  It updates the named paths in the working tree from
+the index file (i.e. it runs `git-checkout-index -f -u`).  In
+this case, `-f` and `-b` options are meaningless and giving
+either of them results in an error.  <branch> argument can be
+used to specify a specific tree-ish to update the index for the
+given paths before updating the working tree.
+
+
+OPTIONS
+-------
+-f::
+	Force an re-read of everything.
+
+-b::
+	Create a new branch and start it at <branch>.
+
+<new_branch>::
+	Name for the new branch.
+
+<branch>::
+	Branch to checkout; may be any object ID that resolves to a
+	commit. Defaults to HEAD.
+
+
+EXAMPLE
+-------
+
+The following sequence checks out the `master` branch, reverts
+the `Makefile` to two revisions back, deletes hello.c by
+mistake, and gets it back from the index.
+
+------------
+$ git checkout master <1>
+$ git checkout master~2 Makefile <2>
+$ rm -f hello.c
+$ git checkout hello.c <3>
+
+<1> switch branch
+<2> take out a file out of other commit
+<3> or "git checkout -- hello.c", as in the next example.
+------------
+
+If you have an unfortunate branch that is named `hello.c`, the
+last step above would be confused as an instruction to switch to
+that branch.  You should instead write:
+
+------------
+$ git checkout -- hello.c
+------------
+
+
+Author
+------
+Written by Linus Torvalds <torvalds@osdl.org>
+
+Documentation
+--------------
+Documentation by Junio C Hamano and the git-list <git@vger.kernel.org>.
+
+GIT
+---
+Part of the gitlink:git[7] suite
+
