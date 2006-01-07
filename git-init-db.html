@@ -272,7 +272,7 @@ git-init-db(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-init-db</em> [--template=&lt;template_directory&gt;]</p>
+<p><em>git-init-db</em> [--template=&lt;template_directory&gt;] [--shared]</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -283,6 +283,14 @@ git-init-db(1) Manual Page
 <dd>
 <p>
         Provide the directory in from which templates will be used.
+</p>
+</dd>
+<dt>
+--shared
+</dt>
+<dd>
+<p>
+        Specify that the git repository is to be shared amongst several users.
 </p>
 </dd>
 </dl>
@@ -297,7 +305,13 @@ to use instead of <tt>./.git</tt> for the base of the repository.</p>
 <p>If the object storage directory is specified via the <tt>$GIT_OBJECT_DIRECTORY</tt>
 environment variable then the sha1 directories are created underneath -
 otherwise the default <tt>$GIT_DIR/objects</tt> directory is used.</p>
-<p><tt>git-init-db</tt> won't hurt an existing repository.</p>
+<p>A shared repository allows users belonging to the same group to push into that
+repository. When specifying <tt>--shared</tt> the config variable "core.sharedRepository"
+is set to <em>true</em> so that directories under <tt>$GIT_DIR</tt> are made group writable
+(and g+sx, since the git group may be not the primary group of all users).</p>
+<p>Running <tt>git-init-db</tt> in an existing repository is safe. It will not overwrite
+things that are already there. The primary reason for rerunning <tt>git-init-db</tt>
+is to pick up newly added templates.</p>
 </div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
@@ -332,7 +346,7 @@ $ git-add . <b>(2)</b>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:16:13 PDT
+Last updated 06-Jan-2006 17:12:38 PDT
 </div>
 </div>
 </body>
