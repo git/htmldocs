@@ -444,6 +444,34 @@ brings your index file and the working tree back to that state,
 and resets the tip of the branch to that commit.</tt></pre>
 </div></div>
 </dd>
+<dt>
+Interrupted workflow
+</dt>
+<dd>
+<p>You can get interrupted by an ungent fix request while you are
+still in the middle of a large change.  The files in your
+working tree are not in any shape to be committed yet, but you
+need to get to the other branch for a quick bugfix.</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout feature ;# you were working in "feature" branch and
+$ work work work       ;# got interrupted
+$ git commit -a -m 'snapshot WIP' <b>(1)</b>
+$ git checkout master
+$ fix fix fix
+$ git commit ;# commit with real log
+$ git checkout feature
+$ git reset --soft HEAD^ ;# go back to WIP state <b>(2)</b>
+$ git reset <b>(3)</b>
+
+<b>(1)</b> This commit will get blown away so a throw-away log message is OK.
+<b>(2)</b> This removes the 'WIP' commit from the commit history, and makes
+    your working tree in the state just before you made that snapshot.
+<b>(3)</b> After <b>(2)</b>, the index file still has all the WIP changes you
+    committed in <b>(1)</b>.  This sets it to the last commit you were
+    basing the WIP changes on.</tt></pre>
+</div></div>
+</dd>
 </dl>
 </div>
 <h2>Author</h2>
@@ -460,7 +488,7 @@ and resets the tip of the branch to that commit.</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:16:36 PDT
+Last updated 13-Jan-2006 19:58:30 PDT
 </div>
 </div>
 </body>

@@ -272,7 +272,7 @@ git-checkout(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-checkout</em> [-f] [-b &lt;new_branch&gt;] [&lt;branch&gt;] [&lt;paths&gt;&#8230;]</p>
+<p><em>git-checkout</em> [-f] [-b &lt;new_branch&gt;] [-m] [&lt;branch&gt;] [&lt;paths&gt;&#8230;]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -308,6 +308,23 @@ given paths before updating the working tree.</p>
 </p>
 </dd>
 <dt>
+-m
+</dt>
+<dd>
+<p>
+        If you have local modifications to a file that is
+        different between the current branch and the branch you
+        are switching to, the command refuses to switch
+        branches, to preserve your modifications in context.
+        With this option, a three-way merge between the current
+        branch, your working tree contents, and the new branch
+        is done, and you will be on the new branch.
+</p>
+<p>When a merge conflict happens, the index entries for conflicting
+paths are left unmerged, and you need to resolve the conflicts
+and mark the resolved paths with <tt>git update-index</tt>.</p>
+</dd>
+<dt>
 &lt;new_branch&gt;
 </dt>
 <dd>
@@ -326,11 +343,15 @@ given paths before updating the working tree.</p>
 </dd>
 </dl>
 </div>
-<h2>EXAMPLE</h2>
+<h2>EXAMPLES</h2>
 <div class="sectionbody">
-<p>The following sequence checks out the <tt>master</tt> branch, reverts
+<ol>
+<li>
+<p>
+The following sequence checks out the <tt>master</tt> branch, reverts
 the <tt>Makefile</tt> to two revisions back, deletes hello.c by
-mistake, and gets it back from the index.</p>
+mistake, and gets it back from the index.
+</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git checkout master <b>(1)</b>
@@ -349,6 +370,59 @@ that branch.  You should instead write:</p>
 <div class="content">
 <pre><tt>$ git checkout -- hello.c</tt></pre>
 </div></div>
+</li>
+<li>
+<p>
+After working in a wrong branch, switching to the correct
+branch you would want to is done with:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout mytopic</tt></pre>
+</div></div>
+<p>However, your "wrong" branch and correct "mytopic" branch may
+differ in files that you have locally modified, in which case,
+the above checkout would fail like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout mytopic
+fatal: Entry 'frotz' not uptodate. Cannot merge.</tt></pre>
+</div></div>
+<p>You can give the <tt>-m</tt> flag to the command, which would try a
+three-way merge:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout -m mytopic
+Auto-merging frotz</tt></pre>
+</div></div>
+<p>After this three-way merge, the local modifications are _not_
+registered in your index file, so <tt>git diff</tt> would show you what
+changes you made since the tip of the new branch.</p>
+</li>
+<li>
+<p>
+When a merge conflict happens during switching branches with
+the <tt>-m</tt> option, you would see something like this:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout -m mytopic
+Auto-merging frotz
+merge: warning: conflicts during merge
+ERROR: Merge conflict in frotz
+fatal: merge program failed</tt></pre>
+</div></div>
+<p>At this point, <tt>git diff</tt> shows the changes cleanly merged as in
+the previous example, as well as the changes in the conflicted
+files.  Edit and resolve the conflict and mark it resolved with
+<tt>git update-index</tt> as usual:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ edit frotz
+$ git update-index frotz</tt></pre>
+</div></div>
+</li>
+</ol>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -364,7 +438,7 @@ that branch.  You should instead write:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:15:51 PDT
+Last updated 13-Jan-2006 19:58:25 PDT
 </div>
 </div>
 </body>
