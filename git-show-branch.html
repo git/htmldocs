@@ -272,7 +272,10 @@ git-show-branch(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-show-branch [--all] [--heads] [--tags] [--topo-order] [--more=&lt;n&gt; | --list | --independent | --merge-base] [--no-name | --sha1-name] [&lt;rev&gt; | &lt;glob&gt;]&#8230;</em></p>
+<div class="verseblock">
+<div class="content">git-show-branch [--all] [--heads] [--tags] [--topo-order] [--current]
+        [--more=&lt;n&gt; | --list | --independent | --merge-base]
+        [--no-name | --sha1-name] [&lt;rev&gt; | &lt;glob&gt;]&#8230;</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -280,6 +283,8 @@ git-show-branch(1) Manual Page
 with &lt;rev&gt;s or &lt;globs&gt;s (or all refs under $GIT_DIR/refs/heads
 and/or $GIT_DIR/refs/tags) semi-visually.</p>
 <p>It cannot show more than 29 branches and commits at a time.</p>
+<p>It uses <tt>showbranch.default</tt> multi-valued configuration items if
+no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -314,6 +319,16 @@ and/or $GIT_DIR/refs/tags) semi-visually.</p>
 </p>
 </dd>
 <dt>
+--current
+</dt>
+<dd>
+<p>
+        With this option, the command includes the current
+        branch to the list of revs to be shown when it is not
+        given on the command line.
+</p>
+</dd>
+<dt>
 --topo-order
 </dt>
 <dd>
@@ -342,7 +357,7 @@ and/or $GIT_DIR/refs/tags) semi-visually.</p>
 </dt>
 <dd>
 <p>
-        Synomym to <tt>--more=-1</tt>
+        Synonym to <tt>--more=-1</tt>
 </p>
 </dd>
 <dt>
@@ -391,19 +406,20 @@ are mutually exclusive.</p>
 <div class="sectionbody">
 <p>Given N &lt;references&gt;, the first N lines are the one-line
 description from their commit message.  The branch head that is
-pointed at by $GIT_DIR/HEAD is prefixed with an asterisk <em>*</em>
-character while other heads are prefixed with a <em>!</em> character.</p>
+pointed at by $GIT_DIR/HEAD is prefixed with an asterisk <tt>*</tt>
+character while other heads are prefixed with a <tt>!</tt> character.</p>
 <p>Following these N lines, one-line log for each commit is
 displayed, indented N places.  If a commit is on the I-th
-branch, the I-th indentation character shows a <em>+</em> sign;
-otherwise it shows a space.  Each commit shows a short name that
+branch, the I-th indentation character shows a <tt>+</tt> sign;
+otherwise it shows a space.  Merge commits are denoted by
+a <tt>-</tt> sign.  Each commit shows a short name that
 can be used as an extended SHA1 to name that commit.</p>
 <p>The following example shows three branches, "master", "fixes"
 and "mhf":</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git show-branch master fixes mhf
-! [master] Add 'git show-branch'.
+* [master] Add 'git show-branch'.
  ! [fixes] Introduce "reset type" flag to "git reset"
   ! [mhf] Allow "+remote:local" refspec to cause --force when fetching.
 ---
@@ -417,12 +433,28 @@ and "mhf":</p>
   + [mhf~6] Retire git-parse-remote.
   + [mhf~7] Multi-head fetch.
   + [mhf~8] Start adding the $GIT_DIR/remotes/ support.
-+++ [master] Add 'git show-branch'.</tt></pre>
+*++ [master] Add 'git show-branch'.</tt></pre>
 </div></div>
 <p>These three branches all forked from a common commit, [master],
 whose commit message is "Add <em>git show-branch</em>.  "fixes" branch
 adds one commit <em>Introduce "reset type"</em>.  "mhf" branch has many
-other commits.</p>
+other commits.  The current branch is "master".</p>
+</div>
+<h2>EXAMPLE</h2>
+<div class="sectionbody">
+<p>If you keep your primary branches immediately under
+<tt>$GIT_DIR/refs/heads</tt>, and topic branches in subdirectories of
+it, having the following in the configuration file may help:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[showbranch]
+        default = --topo-order
+        default = heads/*
+</tt></pre>
+</div></div>
+<p>With this,<tt>git show-branch</tt> without extra parameters would show
+only the primary branches.  In addition, if you happen to be on
+your topic branch, it is shown as well.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -438,7 +470,7 @@ other commits.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-Jan-2006 17:12:45 PDT
+Last updated 15-Jan-2006 02:13:29 PDT
 </div>
 </div>
 </body>
