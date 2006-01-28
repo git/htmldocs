@@ -273,8 +273,9 @@ git-diff-tree(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-diff-tree</em> [--stdin] [-m] [-s] [-v] [--no-commit-id] [--pretty] [-t] [-r]
-              [--root] [&lt;common diff options&gt;] &lt;tree-ish&gt; [&lt;tree-ish&gt;] [&lt;path&gt;&#8230;]</div></div>
+<div class="content"><em>git-diff-tree</em> [--stdin] [-m] [-s] [-v] [--no-commit-id] [--pretty]
+              [-t] [-r] [-c | --cc] [--root] [&lt;common diff options&gt;]
+              &lt;tree-ish&gt; [&lt;tree-ish&gt;] [&lt;path&gt;&#8230;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -545,6 +546,25 @@ separated with a single space are given.</p>
 <p>
         git-diff-tree outputs a line with the commit ID when
         applicable.  This flag suppressed the commit ID output.
+</p>
+</dd>
+<dt>
+-c,--cc
+</dt>
+<dd>
+<p>
+        These flags change the way a merge commit is displayed
+        (which means it is useful only when the command is given
+        one &lt;tree-ish&gt;, or <em>--stdin</em>).  It shows the differences
+        from each of the parents to the merge result
+        simultaneously, instead of showing pairwise diff between
+        a parent and the result one at a time, which <em>-m</em> option
+        output does.  <em>--cc</em> further compresses the output by
+        omiting hunks that show differences from only one
+        parent, or show the same change from all but one parent
+        for an Octopus merge.  When this optimization makes all
+        hunks disappear, the commit itself and the commit log
+        message is not shown, unless <em>-m</em> is specified.
 </p>
 </dd>
 </dl>
@@ -854,6 +874,48 @@ TAB, LF, and backslash characters in pathnames are
 </li>
 </ol>
 </div>
+<h2>combined diff format</h2>
+<div class="sectionbody">
+<p>git-diff-tree and git-diff-files can take <em>-c</em> or <em>--cc</em> option
+to produce <em>combined diff</em>, which looks like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>diff --combined describe.c
+@@@ +98,7 @@@
+   return (a_date &gt; b_date) ? -1 : (a_date == b_date) ? 0 : 1;
+  }
+
+- static void describe(char *arg)
+ -static void describe(struct commit *cmit, int last_one)
+++static void describe(char *arg, int last_one)
+  {
+ +     unsigned char sha1[20];
+ +     struct commit *cmit;</tt></pre>
+</div></div>
+<p>Unlike the traditional <em>unified</em> diff format, which shows two
+files A and B with a single column that has <tt>-</tt> (minus &#8212;
+appears in A but removed in B), <tt>+</tt> (plus &#8212; missing in A but
+added to B), or <tt> </tt> (space &#8212; unchanged) prefix, this format
+compares two or more files file1, file2,&#8230; with one file X, and
+shows how X differs from each of fileN.  One column for each of
+fileN is prepended to the output line to note how X's line is
+different from it.</p>
+<p>A <tt>-</tt> character in the column N means that the line appears in
+fileN but it does not appear in the last file.  A <tt>+</tt> character
+in the column N means that the line appears in the last file,
+and fileN does not have that line.</p>
+<p>In the above example output, the function signature was changed
+from both files (hence two <tt>-</tt> removals from both file1 and
+file2, plus <tt>++</tt> to mean one line that was added does not appear
+in either file1 nor file2).  Also two other lines are the same
+from file1 but do not appear in file2 (hence prefixed with <tt> +</tt>).</p>
+<p>When shown by <tt>git diff-tree -c</tt>, it compares the parents of a
+merge commit with the merge result (i.e. file1..fileN are the
+parents).  When shown by <tt>git diff-files -c</tt>, it compares the
+two unresolved merge parents with the working tree file
+(i.e. file1 is stage 2 aka "our version", file2 is stage 3 aka
+"their version").</p>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
@@ -868,7 +930,7 @@ TAB, LF, and backslash characters in pathnames are
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-Jan-2006 17:12:24 PDT
+Last updated 28-Jan-2006 02:37:53 PDT
 </div>
 </div>
 </body>
