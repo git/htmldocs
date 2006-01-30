@@ -278,7 +278,8 @@ git-cvsexportcommit(1) Manual Page
 <div class="sectionbody">
 <p>Exports a commit from GIT to a CVS checkout, making it easier
 to merge patches from a git repository into a CVS repository.</p>
-<p>Execute it from the root of the CVS working copy. GIT_DIR must be defined.</p>
+<p>Execute it from the root of the CVS working copy. GIT_DIR must be defined.
+See examples below.</p>
 <p>It does its best to do the safe thing, it will check that the files are
 unchanged and up to date in the CVS checkout, and it will not autocommit
 by default.</p>
@@ -317,6 +318,34 @@ should the changeset be done against.</p>
 </dd>
 </dl>
 </div>
+<h2>EXAMPLES</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+Merge one patch into CVS
+</dt>
+<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ export GIT_DIR=~/project/.git
+$ cd ~/project_cvs_checkout
+$ git-cvsexportcommit -v &lt;commit-sha1&gt;
+$ cvs commit -F .mgs &lt;files&gt;</tt></pre>
+</div></div>
+</dd>
+<dt>
+Merge pending patches into CVS automatically &#8212; only if you really know what you are doing 
+</dt>
+<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ export GIT_DIR=~/project/.git
+$ cd ~/project_cvs_checkout
+$ git-cherry cvshead myhead | sed -n 's/^+ //p' | xargs -l1 git-cvsexportcommit -c -p -v</tt></pre>
+</div></div>
+</dd>
+</dl>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Martin Langhoff &lt;martin@catalyst.net.nz&gt;</p>
@@ -331,7 +360,7 @@ should the changeset be done against.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-Jan-2006 17:12:15 PDT
+Last updated 29-Jan-2006 23:39:07 PDT
 </div>
 </div>
 </body>
