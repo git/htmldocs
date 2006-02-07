@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -273,8 +273,8 @@ git-commit(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-commit</em> [-a] [-s] [-v] [(-c | -C) &lt;commit&gt; | -F &lt;file&gt; | -m &lt;msg&gt;]
-           [-e] [--] &lt;file&gt;&#8230;</div></div>
+<div class="content"><em>git-commit</em> [-a] [-i] [-s] [-v] [(-c | -C) &lt;commit&gt; | -F &lt;file&gt; | -m &lt;msg&gt;]
+           [-e] [--author &lt;author&gt;] [--] &lt;file&gt;&#8230;</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -318,6 +318,15 @@ information.</p>
 <p>
         Take the commit message from the given file.  Use <em>-</em> to
         read the message from the standard input.
+</p>
+</dd>
+<dt>
+--author &lt;author&gt;
+</dt>
+<dd>
+<p>
+        Override the author name used in the commit.  Use
+        <tt>A U Thor &lt;author@example.com&gt;</tt> format.
 </p>
 </dd>
 <dt>
@@ -369,6 +378,17 @@ information.</p>
 </p>
 </dd>
 <dt>
+-i|--include
+</dt>
+<dd>
+<p>
+        Instead of committing only the files specified on the
+        command line, update them in the index file and then
+        commit the whole index.  This is the traditional
+        behaviour.
+</p>
+</dd>
+<dt>
 &#8212;
 </dt>
 <dd>
@@ -381,12 +401,63 @@ information.</p>
 </dt>
 <dd>
 <p>
-        Update specified paths in the index file before committing.
+        Commit only the files specified on the command line.
+        This format cannot be used during a merge, nor when the
+        index and the latest commit does not match on the
+        specified paths to avoid confusion.
 </p>
 </dd>
 </dl>
 <p>If you make a commit and then found a mistake immediately after
 that, you can recover from it with <a href="git-reset.html">git-reset(1)</a>.</p>
+</div>
+<h2>Discussion</h2>
+<div class="sectionbody">
+<p><tt>git commit</tt> without _any_ parameter commits the tree structure
+recorded by the current index file.  This is a whole-tree commit
+even the command is invoked from a subdirectory.</p>
+<p><tt>git commit --include paths&#8230;</tt> is equivalent to</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git update-index --remove paths...
+git commit</tt></pre>
+</div></div>
+<p>That is, update the specified paths to the index and then commit
+the whole tree.</p>
+<p><tt>git commit paths&#8230;</tt> largely bypasses the index file and
+commits only the changes made to the specified paths.  It has
+however several safety valves to prevent confusion.</p>
+<ol>
+<li>
+<p>
+It refuses to run during a merge (i.e. when
+  <tt>$GIT_DIR/MERGE_HEAD</tt> exists), and reminds trained git users
+  that the traditional semantics now needs -i flag.
+</p>
+</li>
+<li>
+<p>
+It refuses to run if named <tt>paths&#8230;</tt> are different in HEAD
+  and the index (ditto about reminding).  Added paths are OK.
+  This is because an earlier <tt>git diff</tt> (not <tt>git diff HEAD</tt>)
+  would have shown the differences since the last <tt>git
+  update-index paths&#8230;</tt> to the user, and an inexperienced user
+  may mistakenly think that the changes between the index and
+  the HEAD (i.e. earlier changes made before the last <tt>git
+  update-index paths&#8230;</tt> was done) are not being committed.
+</p>
+</li>
+<li>
+<p>
+It reads HEAD commit into a temporary index file, updates the
+  specified <tt>paths&#8230;</tt> and makes a commit.  At the same time,
+  the real index file is also updated with the same <tt>paths&#8230;</tt>.
+</p>
+</li>
+</ol>
+<p><tt>git commit --all</tt> updates the index file with _all_ changes to
+the working tree, and makes a whole-tree commit, regardless of
+which subdirectory the command is invoked in.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -399,7 +470,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 21-Jan-2006 23:50:16 PDT
+Last updated 07-Feb-2006 08:04:29 UTC
 </div>
 </div>
 </body>

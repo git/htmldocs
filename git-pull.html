@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -397,10 +397,108 @@ when merging local branches into the current branch.</p>
 <dd>
 <p>
         The "remote" repository that is the source of a fetch
-        or pull operation, or the destination of a push operation.
-        One of the following notations can be used
-        to name the remote repository:
+        or pull operation.  See the section <a href="#URLS">GIT URLS</a> below.
 </p>
+</dd>
+<dt>
+&lt;refspec&gt;
+</dt>
+<dd>
+<p>
+        The canonical format of a &lt;refspec&gt; parameter is
+        <tt>+?&lt;src&gt;:&lt;dst&gt;</tt>; that is, an optional plus <tt>+</tt>, followed
+        by the source ref, followed by a colon <tt>:</tt>, followed by
+        the destination ref.
+</p>
+<p>The remote ref that matches &lt;src&gt;
+is fetched, and if &lt;dst&gt; is not empty string, the local
+ref that matches it is fast forwarded using &lt;src&gt;.
+Again, if the optional plus <tt>+</tt> is used, the local ref
+is updated even if it does not result in a fast forward
+update.</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">If the remote branch from which you want to pull is
+modified in non-linear ways such as being rewound and
+rebased frequently, then a pull will attempt a merge with
+an older version of itself, likely conflict, and fail.
+It is under these conditions that you would want to use
+the <tt>+</tt> sign to indicate non-fast-forward updates will
+be needed.  There is currently no easy way to determine
+or declare that a branch will be made available in a
+repository with this behavior; the pulling user simply
+must know this is the expected usage pattern for a branch.</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">You never do your own development on branches that appear
+on the right hand side of a &lt;refspec&gt; colon on <tt>Pull:</tt> lines;
+they are to be updated by <tt>git-fetch</tt>.  If you intend to do
+development derived from a remote branch <tt>B</tt>, have a <tt>Pull:</tt>
+line to track it (i.e. <tt>Pull: B:remote-B</tt>), and have a separate
+branch <tt>my-B</tt> to do your development on top of it.  The latter
+is created by <tt>git branch my-B remote-B</tt> (or its equivalent <tt>git
+checkout -b my-B remote-B</tt>).  Run <tt>git fetch</tt> to keep track of
+the progress of the remote side, and when you see something new
+on the remote branch, merge it into your development branch with
+<tt>git pull . remote-B</tt>, while you are on <tt>my-B</tt> branch.
+The common <tt>Pull: master:origin</tt> mapping of a remote <tt>master</tt>
+branch to a local <tt>origin</tt> branch, which is then merged to a
+local development branch, again typically named <tt>master</tt>, is made
+when you run <tt>git clone</tt> for you to follow this pattern.</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">There is a difference between listing multiple &lt;refspec&gt;
+directly on <tt>git-pull</tt> command line and having multiple
+<tt>Pull:</tt> &lt;refspec&gt; lines for a &lt;repository&gt; and running
+<tt>git-pull</tt> command without any explicit &lt;refspec&gt; parameters.
+&lt;refspec&gt; listed explicitly on the command line are always
+merged into the current branch after fetching.  In other words,
+if you list more than one remote refs, you would be making
+an Octopus.  While <tt>git-pull</tt> run without any explicit &lt;refspec&gt;
+parameter takes default &lt;refspec&gt;s from <tt>Pull:</tt> lines, it
+merges only the first &lt;refspec&gt; found into the current branch,
+after fetching all the remote refs.  This is because making an
+Octopus from remote refs is rarely done, while keeping track
+of multiple remote heads in one-go by fetching more than one
+is often useful.</td>
+</tr></table>
+</div>
+<p>Some short-cut notations are also supported.</p>
+<ul>
+<li>
+<p>
+<tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
+  it requests fetching everything up to the given tag.
+</p>
+</li>
+<li>
+<p>
+A parameter &lt;ref&gt; without a colon is equivalent to
+  &lt;ref&gt;: when pulling/fetching, so it merges &lt;ref&gt; into the current
+  branch without storing the remote branch anywhere locally
+</p>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<h2>GIT URLS<a id="URLS"></a></h2>
+<div class="sectionbody">
+<p>One of the following notations can be used
+to name the remote repository:</p>
 <div class="exampleblock">
 <div class="exampleblock-content">
 <ul>
@@ -481,6 +579,9 @@ host.xz:path/to/repo.git
 </li>
 </ul>
 </div></div>
+</div>
+<h2>REMOTES</h2>
+<div class="sectionbody">
 <p>In addition to the above, as a short-hand, the name of a
 file in <tt>$GIT_DIR/remotes</tt> directory can be given; the
 named file should be in the following format:</p>
@@ -490,7 +591,7 @@ named file should be in the following format:</p>
 Push: &lt;refspec&gt;
 Pull: &lt;refspec&gt;</tt></pre>
 </div></div>
-<p>When such a short-hand is specified in place of
+<p>Then such a short-hand is specified in place of
 &lt;repository&gt; without &lt;refspec&gt; parameters on the command
 line, &lt;refspec&gt; specified on <tt>Push:</tt> lines or <tt>Pull:</tt>
 lines are used for <tt>git-push</tt> and <tt>git-fetch</tt>/<tt>git-pull</tt>,
@@ -515,111 +616,6 @@ Pull: refs/heads/master:&lt;remote&gt;</tt></pre>
 <pre><tt>URL: &lt;url&gt;
 Pull: refs/heads/&lt;head&gt;:&lt;remote&gt;</tt></pre>
 </div></div>
-</dd>
-<dt>
-&lt;refspec&gt;
-</dt>
-<dd>
-<p>
-        The canonical format of a &lt;refspec&gt; parameter is
-        <tt>+?&lt;src&gt;:&lt;dst&gt;</tt>; that is, an optional plus <tt>+</tt>, followed
-        by the source ref, followed by a colon <tt>:</tt>, followed by
-        the destination ref.
-</p>
-<p>When used in <tt>git-push</tt>, the &lt;src&gt; side can be an
-arbitrary "SHA1 expression" that can be used as an
-argument to <tt>git-cat-file -t</tt>.  E.g. <tt>master~4</tt> (push
-four parents before the current master head).</p>
-<p>For <tt>git-push</tt>, the local ref that matches &lt;src&gt; is used
-to fast forward the remote ref that matches &lt;dst&gt;.  If
-the optional plus <tt>+</tt> is used, the remote ref is updated
-even if it does not result in a fast forward update.</p>
-<p>For <tt>git-fetch</tt> and <tt>git-pull</tt>, the remote ref that matches &lt;src&gt;
-is fetched, and if &lt;dst&gt; is not empty string, the local
-ref that matches it is fast forwarded using &lt;src&gt;.
-Again, if the optional plus <tt>+</tt> is used, the local ref
-is updated even if it does not result in a fast forward
-update.</p>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">If the remote branch from which you want to pull is
-modified in non-linear ways such as being rewound and
-rebased frequently, then a pull will attempt a merge with
-an older version of itself, likely conflict, and fail.
-It is under these conditions that you would want to use
-the <tt>+</tt> sign to indicate non-fast-forward updates will
-be needed.  There is currently no easy way to determine
-or declare that a branch will be made available in a
-repository with this behavior; the pulling user simply
-must know this is the expected usage pattern for a branch.</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">You never do your own development on branches that appear
-on the right hand side of a &lt;refspec&gt; colon on <tt>Pull:</tt> lines;
-they are to be updated by <tt>git-fetch</tt>.  If you intend to do
-development derived from a remote branch <tt>B</tt>, have a <tt>Pull:</tt>
-line to track it (i.e. <tt>Pull: B:remote-B</tt>), and have a separate
-branch <tt>my-B</tt> to do your development on top of it.  The latter
-is created by <tt>git branch my-B remote-B</tt> (or its equivalent <tt>git
-checkout -b my-B remote-B</tt>).  Run <tt>git fetch</tt> to keep track of
-the progress of the remote side, and when you see something new
-on the remote branch, merge it into your development branch with
-<tt>git pull . remote-B</tt>, while you are on <tt>my-B</tt> branch.
-The common <tt>Pull: master:origin</tt> mapping of a remote <tt>master</tt>
-branch to a local <tt>origin</tt> branch, which is then merged to a
-local development branch, again typically named <tt>master</tt>, is made
-when you run <tt>git clone</tt> for you to follow this pattern.</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">There is a difference between listing multiple &lt;refspec&gt;
-directly on <tt>git-pull</tt> command line and having multiple
-<tt>Pull:</tt> &lt;refspec&gt; lines for a &lt;repository&gt; and running
-<tt>git-pull</tt> command without any explicit &lt;refspec&gt; parameters.
-&lt;refspec&gt; listed explicitly on the command line are always
-merged into the current branch after fetching.  In other words,
-if you list more than one remote refs, you would be making
-an Octopus.  While <tt>git-pull</tt> run without any explicit &lt;refspec&gt;
-parameter takes default &lt;refspec&gt;s from <tt>Pull:</tt> lines, it
-merges only the first &lt;refspec&gt; found into the current branch,
-after fetching all the remote refs.  This is because making an
-Octopus from remote refs is rarely done, while keeping track
-of multiple remote heads in one-go by fetching more than one
-is often useful.</td>
-</tr></table>
-</div>
-<p>Some short-cut notations are also supported.</p>
-<ul>
-<li>
-<p>
-<tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
-  used with pull or fetch, it requests fetching everything up to
-  the given tag.
-</p>
-</li>
-<li>
-<p>
-A parameter &lt;ref&gt; without a colon is equivalent to
-  &lt;ref&gt;: when pulling/fetching, and &lt;ref&gt;<tt>:</tt>&lt;ref&gt; when
-  pushing.  That is, do not store it locally if
-  fetching, and update the same name if pushing.
-</p>
-</li>
-</ul>
-</dd>
-</dl>
 </div>
 <h2>MERGE STRATEGIES</h2>
 <div class="sectionbody">
@@ -798,7 +794,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 26-Jan-2006 19:38:19 PDT
+Last updated 07-Feb-2006 08:04:30 UTC
 </div>
 </div>
 </body>
