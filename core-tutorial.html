@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -329,9 +329,9 @@ three entries, among other things:</p>
 <ul>
 <li>
 <p>
-a symlink called <tt>HEAD</tt>, pointing to <tt>refs/heads/master</tt> (if your
-   platform does not have native symlinks, it is a file containing the
-   line "ref: refs/heads/master")
+a file called <tt>HEAD</tt>, that has <tt>ref: refs/heads/master</tt> in it.
+   This is similar to a symbolic link and points at
+   <tt>refs/heads/master</tt> relative to the <tt>HEAD</tt> file.
 </p>
 <p>Don't worry about the fact that the file that the <tt>HEAD</tt> link points to
 doesn't even exist yet &#8212; you haven't created the commit that will
@@ -358,7 +358,7 @@ of different <em>heads</em> of development (aka <em>branches</em>), and to any
 <em>tags</em> that you have created to name specific versions in your
 repository.</p>
 <p>One note: the special <tt>master</tt> head is the default branch, which is
-why the <tt>.git/HEAD</tt> file was created as a symlink to it even if it
+why the <tt>.git/HEAD</tt> file was created points to it even if it
 doesn't yet exist. Basically, the <tt>HEAD</tt> link is supposed to always
 point to the branch you are working on right now, and you always
 start out expecting to work on the <tt>master</tt> branch.</p>
@@ -406,8 +406,8 @@ get a feel for how this works:</p>
 <pre><tt>$ echo "Hello World" &gt;hello
 $ echo "Silly example" &gt;example</tt></pre>
 </div></div>
-<p>you have now created two files in your working tree (aka <em>working directory</em>), but to
-actually check in your hard work, you will have to go through two steps:</p>
+<p>you have now created two files in your working tree (aka <em>working directory</em>),
+but to actually check in your hard work, you will have to go through two steps:</p>
 <ul>
 <li>
 <p>
@@ -447,8 +447,8 @@ database. If you did exactly the steps above, you should now be able to do</p>
 <pre><tt>.git/objects/55/7db03de997c86a4a028e1ebd3a1ceb225be238
 .git/objects/f2/4c74a2e500f5ee1332c86b94199f52b1d1d962</tt></pre>
 </div></div>
-<p>which correspond with the objects with names of 557db&#8230; and f24c7..
-respectively.</p>
+<p>which correspond with the objects with names of <tt>557db&#8230;</tt> and
+<tt>f24c7&#8230;</tt> respectively.</p>
 <p>If you want to, you can use <tt>git-cat-file</tt> to look at those objects, but
 you'll have to use the object name, not the filename of the object:</p>
 <div class="listingblock">
@@ -462,7 +462,7 @@ regular file), and you can see the contents with</p>
 <div class="content">
 <pre><tt>$ git-cat-file "blob" 557db03</tt></pre>
 </div></div>
-<p>which will print out "Hello World". The object 557db03 is nothing
+<p>which will print out "Hello World". The object <tt>557db03</tt> is nothing
 more than the contents of your file <tt>hello</tt>.</p>
 <div class="admonitionblock">
 <table><tr>
@@ -779,8 +779,8 @@ diff-index  |    V
 </td>
 </tr></table>
 </div>
-<p>More interestingly, you can also give <tt>git-diff-tree</tt> the <tt>-v</tt> flag, which
-tells it to also show the commit message and author and date of the
+<p>More interestingly, you can also give <tt>git-diff-tree</tt> the <tt>&#8212;pretty</tt> flag,
+which tells it to also show the commit message and author and date of the
 commit, and you can tell it to show a whole series of diffs.
 Alternatively, you can tell it to be "silent", and not show the diffs at
 all, but just show the actual commit message.</p>
@@ -1051,15 +1051,10 @@ and check out the state at that time.</p>
 branch you happen to be on, a simple</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ ls -l .git/HEAD</tt></pre>
-</div></div>
-<p>will tell you where it's pointing (Note that on platforms with bad or no
-symlink support, you have to execute</p>
-<div class="listingblock">
-<div class="content">
 <pre><tt>$ cat .git/HEAD</tt></pre>
 </div></div>
-<p>instead). To get the list of branches you have, you can say</p>
+<p>will tell you where it's pointing.  To get the list of branches
+you have, you can say</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git branch</tt></pre>
@@ -1092,7 +1087,9 @@ $ git commit -m 'Some work.' hello</tt></pre>
 </div></div>
 <p>Here, we just added another line to <tt>hello</tt>, and we used a shorthand for
 doing both <tt>git-update-index hello</tt> and <tt>git commit</tt> by just giving the
-filename directly to <tt>git commit</tt>. The <tt>-m</tt> flag is to give the
+filename directly to <tt>git commit</tt>, with an <tt>-i</tt> flag (it tells
+git to <em>include</em> that file in addition to what you have done to
+the index file so far when making the commit).  The <tt>-m</tt> flag is to give the
 commit log message from the command line.</p>
 <p>Now, to make it a bit more interesting, let's assume that somebody else
 does some work in the original branch, and simulate that by going back
@@ -1145,7 +1142,7 @@ file, which had no differences in the <tt>mybranch</tt> branch), and say:</p>
         ...
         Auto-merging hello
         CONFLICT (content): Merge conflict in hello
-        Automatic merge failed/prevented; fix up by hand</tt></pre>
+        Automatic merge failed; fix up by hand</tt></pre>
 </div></div>
 <p>which is way too verbose, but it basically tells you that it failed the
 really trivial merge ("Simple merge") and did an "Automatic merge"
@@ -1179,7 +1176,7 @@ have to do _that_ merge again.</p>
 environment, is <tt>git show-branch</tt>.</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git show-branch master mybranch
+<pre><tt>$ git show-branch --topo-order master mybranch
 * [master] Merge work in mybranch
  ! [mybranch] Some work.
 --
@@ -1218,6 +1215,7 @@ would be different)</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>Updating from ae3a2da... to a80b4aa....
+Fast forward
  example |    1 +
  hello   |    1 +
  2 files changed, 2 insertions(+), 0 deletions(-)</tt></pre>
@@ -2013,7 +2011,7 @@ to follow, not easier.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 30-Jan-2006 23:10:20 PDT
+Last updated 07-Feb-2006 03:24:18 UTC
 </div>
 </div>
 </body>
