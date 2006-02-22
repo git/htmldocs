@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -272,7 +272,10 @@ git-pack-objects(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-pack-objects</em> [--non-empty] [--local] [--incremental] [--window=N] [--depth=N] {--stdout | base-name} &lt; object-list</p>
+<div class="verseblock">
+<div class="content"><em>git-pack-objects</em> [-q] [--no-reuse-delta] [--non-empty]
+        [--local] [--incremental] [--window=N] [--depth=N]
+        {--stdout | base-name} &lt; object-list</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -291,6 +294,9 @@ transport by their peers.</p>
 <p>Placing both in the pack/ subdirectory of $GIT_OBJECT_DIRECTORY (or
 any of the directories on $GIT_ALTERNATE_OBJECT_DIRECTORIES)
 enables git to read from such an archive.</p>
+<p>In a packed archive, an object is either stored as a compressed
+whole, or as a difference from some other object.  The latter is
+often called a delta.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -364,6 +370,27 @@ base-name
         least one object.
 </p>
 </dd>
+<dt>
+-q
+</dt>
+<dd>
+<p>
+        This flag makes the command not to report its progress
+        on the standard error stream.
+</p>
+</dd>
+<dt>
+--no-reuse-delta
+</dt>
+<dd>
+<p>
+        When creating a packed archive in a repository that
+        has existing packs, the command reuses existing deltas.
+        This sometimes results in a slightly suboptimal pack.
+        This flag tells the command not to reuse existing deltas
+        but compute them from scratch.
+</p>
+</dd>
 </dl>
 </div>
 <h2>Author</h2>
@@ -385,7 +412,7 @@ base-name
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-Jan-2006 17:12:41 PDT
+Last updated 22-Feb-2006 10:44:47 UTC
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -272,15 +272,64 @@ git-rebase(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-rebase</em> &lt;upstream&gt; [&lt;head&gt;]</p>
+<p><em>git-rebase</em> [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Rebases local commits to the new head of the upstream tree.</p>
+<p>git-rebase applies to &lt;upstream&gt; (or optionally to &lt;newbase&gt;) commits
+from &lt;branch&gt; that do not appear in &lt;upstream&gt;. When &lt;branch&gt; is not
+specified it defaults to the current branch (HEAD).</p>
+<p>When git-rebase is complete, &lt;branch&gt; will be updated to point to the
+newly created line of commit objects, so the previous line will not be
+accessible unless there are other references to it already.</p>
+<p>Assume the following history exists and the current branch is "topic":</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>      A---B---C topic
+     /
+D---E---F---G master</tt></pre>
+</div></div>
+<p>From this point, the result of the following commands:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git-rebase master
+git-rebase master topic</tt></pre>
+</div></div>
+<p>would be:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>              A'--B'--C' topic
+             /
+D---E---F---G master</tt></pre>
+</div></div>
+<p>While, starting from the same point, the result of the following
+commands:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git-rebase --onto master~1 master
+git-rebase --onto master~1 master topic</tt></pre>
+</div></div>
+<p>would be:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>          A'--B'--C' topic
+         /
+D---E---F---G master</tt></pre>
+</div></div>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
 <dl>
+<dt>
+&lt;newbase&gt;
+</dt>
+<dd>
+<p>
+        Starting point at which to create the new commits. If the
+        --onto option is not specified, the starting point is
+        &lt;upstream&gt;.
+</p>
+</dd>
 <dt>
 &lt;upstream&gt;
 </dt>
@@ -313,7 +362,7 @@ git-rebase(1) Manual Page
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:16:32 PDT
+Last updated 22-Feb-2006 10:44:47 UTC
 </div>
 </div>
 </body>

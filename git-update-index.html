@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -272,15 +272,18 @@ git-update-index(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-update-index</em>
+<div class="verseblock">
+<div class="content"><em>git-update-index</em>
              [--add] [--remove | --force-remove] [--replace]
              [--refresh [-q] [--unmerged] [--ignore-missing]]
              [--cacheinfo &lt;mode&gt; &lt;object&gt; &lt;file&gt;]*
              [--chmod=(+|-)x]
+             [--assume-unchanged | --no-assume-unchanged]
+             [--really-refresh]
              [--info-only] [--index-info]
              [-z] [--stdin]
              [--verbose]
-             [--] [&lt;file&gt;]*</p>
+             [--] [&lt;file&gt;]*</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -372,6 +375,23 @@ using the various options:</p>
 <dd>
 <p>
         Set the execute permissions on the updated files.
+</p>
+</dd>
+<dt>
+--assume-unchanged, --no-assume-unchanged
+</dt>
+<dd>
+<p>
+        When these flags are specified, the object name recorded
+        for the paths are not updated.  Instead, these options
+        sets and unsets the "assume unchanged" bit for the
+        paths.  When the "assume unchanged" bit is on, git stops
+        checking the working tree files for possible
+        modifications, so you need to manually unset the bit to
+        tell git when you change the working tree file. This is
+        sometimes helpful when working with a big project on a
+        filesystem that has very slow lstat(2) system call
+        (e.g. cifs).
 </p>
 </dd>
 <dt>
@@ -541,12 +561,67 @@ for that path.  After the above, we would end up with this:</p>
 100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</tt></pre>
 </div></div>
 </div>
+<h2>Using "assume unchanged" bit</h2>
+<div class="sectionbody">
+<p>Many operations in git depend on your filesystem to have an
+efficient <tt>lstat(2)</tt> implementation, so that <tt>st_mtime</tt>
+information for working tree files can be cheaply checked to see
+if the file contents have changed from the version recorded in
+the index file.  Unfortunately, some filesystems have
+inefficient <tt>lstat(2)</tt>.  If your filesystem is one of them, you
+can set "assume unchanged" bit to paths you have not changed to
+cause git not to do this check.  Note that setting this bit on a
+path does not mean git will check the contents of the file to
+see if it has changed &#8212; it makes git to omit any checking and
+assume it has <strong>not</strong> changed.  When you make changes to working
+tree files, you have to explicitly tell git about it by dropping
+"assume unchanged" bit, either before or after you modify them.</p>
+<p>In order to set "assume unchanged" bit, use <tt>--assume-unchanged</tt>
+option.  To unset, use <tt>--no-assume-unchanged</tt>.</p>
+<p>The command looks at <tt>core.ignorestat</tt> configuration variable.  When
+this is true, paths updated with <tt>git-update-index paths&#8230;</tt> and
+paths updated with other git commands that update both index and
+working tree (e.g. <tt>git-apply --index</tt>, <tt>git-checkout-index -u</tt>,
+and <tt>git-read-tree -u</tt>) are automatically marked as "assume
+unchanged".  Note that "assume unchanged" bit is <strong>not</strong> set if
+<tt>git-update-index --refresh</tt> finds the working tree file matches
+the index (use <tt>git-update-index --really-refresh</tt> if you want
+to mark them as "assume unchanged").</p>
+</div>
 <h2>Examples</h2>
 <div class="sectionbody">
 <p>To update and refresh only the files already checked out:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git-checkout-index -n -f -a &amp;&amp; git-update-index --ignore-missing --refresh</tt></pre>
+</div></div>
+<p>On an inefficient filesystem with <tt>core.ignorestat</tt> set:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git update-index --really-refresh <b>(1)</b>
+$ git update-index --no-assume-unchanged foo.c <b>(2)</b>
+$ git diff --name-only <b>(3)</b>
+$ edit foo.c
+$ git diff --name-only <b>(4)</b>
+M foo.c
+$ git update-index foo.c <b>(5)</b>
+$ git diff --name-only <b>(6)</b>
+$ edit foo.c
+$ git diff --name-only <b>(7)</b>
+$ git update-index --no-assume-unchanged foo.c <b>(8)</b>
+$ git diff --name-only <b>(9)</b>
+M foo.c
+
+<b>(1)</b> forces lstat(2) to set "assume unchanged" bits for paths
+    that match index.
+<b>(2)</b> mark the path to be edited.
+<b>(3)</b> this does lstat(2) and finds index matches the path.
+<b>(4)</b> this does lstat(2) and finds index does not match the path.
+<b>(5)</b> registering the new version to index sets "assume unchanged" bit.
+<b>(6)</b> and it is assumed unchanged.
+<b>(7)</b> even after you edit it.
+<b>(8)</b> you can tell about the change after the fact.
+<b>(9)</b> now it checks with lstat(2) and finds it has been changed.</tt></pre>
 </div></div>
 </div>
 <h2>Configuration</h2>
@@ -558,6 +633,8 @@ This causes the command to ignore differences in file modes recorded
 in the index and the file mode on the filesystem if they differ only on
 executable bit.   On such an unfortunate filesystem, you may
 need to use <tt>git-update-index --chmod=</tt>.</p>
+<p>The command looks at <tt>core.ignorestat</tt> configuration variable.  See
+<em>Using "assume unchanged" bit</em> section above.</p>
 </div>
 <h2>See Also</h2>
 <div class="sectionbody">
@@ -577,7 +654,7 @@ need to use <tt>git-update-index --chmod=</tt>.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:16:52 PDT
+Last updated 22-Feb-2006 10:44:48 UTC
 </div>
 </div>
 </body>
