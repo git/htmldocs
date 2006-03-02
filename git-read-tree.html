@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -272,7 +272,7 @@ git-read-tree(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-read-tree</em> (&lt;tree-ish&gt; | [[-m | --reset] [-u | -i]] &lt;tree-ish1&gt; [&lt;tree-ish2&gt; [&lt;tree-ish3&gt;]])</p>
+<p><em>git-read-tree</em> (&lt;tree-ish&gt; | [[-m [--aggressive]| --reset] [-u | -i]] &lt;tree-ish1&gt; [&lt;tree-ish2&gt; [&lt;tree-ish3&gt;]])</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -331,6 +331,37 @@ will be in unmerged state when <tt>git-read-tree</tt> returns.</p>
         trees that are not directly related to the current
         working tree status into a temporary index file.
 </p>
+</dd>
+<dt>
+--aggressive
+</dt>
+<dd>
+<p>
+        Usually a three-way merge by <tt>git-read-tree</tt> resolves
+        the merge for really trivial cases and leaves other
+        cases unresolved in the index, so that Porcelains can
+        implement different merge policies.  This flag makes the
+        command to resolve a few more cases internally:
+</p>
+<ul>
+<li>
+<p>
+when one side removes a path and the other side leaves the path
+  unmodified.  The resolution is to remove that path.
+</p>
+</li>
+<li>
+<p>
+when both sides remove a path.  The resolution is to remove that path.
+</p>
+</li>
+<li>
+<p>
+when both sides adds a path identically.  The resolution
+  is to add that path.
+</p>
+</li>
+</ul>
 </dd>
 <dt>
 &lt;tree-ish#&gt;
@@ -618,7 +649,7 @@ have finished your work-in-progress), attempt the merge again.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:16:31 PDT
+Last updated 02-Mar-2006 09:14:48 UTC
 </div>
 </div>
 </body>
