@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -274,7 +274,9 @@ git-checkout-index(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git-checkout-index</em> [-u] [-q] [-a] [-f] [-n] [--prefix=&lt;string&gt;]
-                   [--stage=&lt;number&gt;] [--] &lt;file&gt;&#8230;</div></div>
+                   [--stage=&lt;number&gt;]
+                   [-z] [--stdin]
+                   [--] [&lt;file&gt;]*</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -346,6 +348,25 @@ git-checkout-index(1) Manual Page
 </p>
 </dd>
 <dt>
+--stdin
+</dt>
+<dd>
+<p>
+        Instead of taking list of paths from the command line,
+        read list of paths from the standard input.  Paths are
+        separated by LF (i.e. one path per line) by default.
+</p>
+</dd>
+<dt>
+-z
+</dt>
+<dd>
+<p>
+        Only meaningful with <tt>--stdin</tt>; paths are separated with
+        NUL character instead of LF.
+</p>
+</dd>
+<dt>
 &#8212;
 </dt>
 <dd>
@@ -367,7 +388,12 @@ supposed to be able to do:</p>
 </div></div>
 <p>which will force all existing <tt>*.h</tt> files to be replaced with their
 cached copies. If an empty command line implied "all", then this would
-force-refresh everything in the index, which was not the point.</p>
+force-refresh everything in the index, which was not the point.  But
+since git-checkout-index accepts --stdin it would be faster to use:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ find . -name '*.h' -print0 | git-checkout-index -f -z --stdin</tt></pre>
+</div></div>
 <p>The <tt>--</tt> is just a good idea when you know the rest will be filenames;
 it will prevent problems with a filename of, for example,  <tt>-a</tt>.
 Using <tt>--</tt> is probably a good policy in scripts.</p>
@@ -431,7 +457,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-Jan-2006 17:12:07 PDT
+Last updated 05-Mar-2006 01:54:46 UTC
 </div>
 </div>
 </body>

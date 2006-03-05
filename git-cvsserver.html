@@ -287,15 +287,37 @@ plugin. Most functionality works fine with both of these clients.</p>
 </div>
 <h2>LIMITATIONS</h2>
 <div class="sectionbody">
-<p>Currently gitcvs only works over ssh connections.</p>
+<p>Currently cvsserver works over SSH connections for read/write clients, and
+over pserver for anonymous CVS access.</p>
+<p>CVS clients cannot tag, branch or perform GIT merges.</p>
 </div>
 <h2>INSTALLATION</h2>
 <div class="sectionbody">
 <ol>
 <li>
 <p>
-Put server.pl somewhere useful on the same machine that is hosting your git repos
+If you are going to offer anonymous CVS access via pserver, add a line in
+   /etc/inetd.conf like
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>cvspserver stream tcp nowait nobody git-cvsserver pserver</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Note: In some cases, you need to pass the 'pserver' argument twice for
+git-cvsserver to see it. So the line would look like</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>cvspserver stream tcp nowait nobody git-cvsserver pserver pserver</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>No special setup is needed for SSH access, other than having GIT tools
+in the PATH. If you have clients that do not accept the CVS_SERVER
+env variable, you can rename git-cvsserver to cvs.</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
@@ -306,29 +328,52 @@ For each repo that you want accessible from CVS you need to edit config in
 <div class="content">
 <pre><tt>[gitcvs]
      enabled=1
+     # optional for debugging
      logfile=/path/to/logfile</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>n.b. you need to ensure each user that is going to invoke server.pl has
-write access to the log file.</tt></pre>
+<pre><tt>Note: you need to ensure each user that is going to invoke git-cvsserver has
+write access to the log file and to the git repository. When offering anon
+access via pserver, this means that the nobody user should have write access
+to at least the sqlite database at the root of the repository.</tt></pre>
 </div></div>
 </li>
 <li>
 <p>
-On each client machine you need to set the following variables.
-     CVSROOT should be set as per normal, but the directory should point at the
-             appropriate git repo.
-     CVS_SERVER should be set to the server.pl script that has been put on the
-                remote machine.
+On the client machine you need to set the following variables.
+   CVSROOT should be set as per normal, but the directory should point at the
+   appropriate git repo. For example:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>For SSH access, CVS_SERVER should be set to git-cvsserver</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Example:</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>export CVSROOT=:ext:user@server:/var/git/project.git
+export CVS_SERVER=git-cvsserver</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+For SSH clients that will make commits, make sure their .bashrc file
+   sets the GIT_AUTHOR and GIT_COMMITTER variables.
 </p>
 </li>
 <li>
 <p>
-Clients should now be able to check out modules (where modules are the names
-   of branches in git).
-     $ cvs co -d mylocaldir master
+Clients should now be able to check out the project. Use the CVS <em>module</em>
+   name to indicate what GIT <em>head</em> you want to check out. Example:
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>cvs co -d project-master master</tt></pre>
+</div></div>
 </li>
 </ol>
 </div>
@@ -338,30 +383,38 @@ Clients should now be able to check out modules (where modules are the names
 <ol>
 <li>
 <p>
-Create a new project from CVS checkout, giving it repository and module
+Select "Create a new project -&gt; From CVS checkout"
 </p>
 </li>
 <li>
 <p>
-Context Menu-&gt;Team-&gt;Share Project&#8230;
+Create a new location. See the notes below for details on how to choose the
+   right protocol.
 </p>
 </li>
 <li>
 <p>
-Enter the repository and module information again and click Finish
+Browse the <em>modules</em> available. It will give you a list of the heads in
+   the repository. You will not be able to browse the tree from there. Only
+   the heads.
 </p>
 </li>
 <li>
 <p>
-The Synchronize view appears. Untick  "launch commit wizard" to avoid
-committing the .project file, and select HEAD as the tag to synchronize to.
-Update all incoming changes.
+Pick <em>HEAD</em> when it asks what branch/tag to check out. Untick the
+   "launch commit wizard" to avoid committing the .project file.
 </p>
 </li>
 </ol>
-<p>Note that most versions of Eclipse ignore CVS_SERVER (which you can set in
-the Preferences-&gt;Team-&gt;CVS-&gt;ExtConnection pane), so you may have to
-rename, alias or symlink git-cvsserver to <em>cvs</em> on the server.</p>
+<p>Protocol notes: If you are using anonymous acces via pserver, just select that.
+Those using SSH access should choose the <em>ext</em> protocol, and configure <em>ext</em>
+access on the Preferences-&gt;Team-&gt;CVS-&gt;ExtConnection pane. Set CVS_SERVER to
+<em>git-cvsserver</em>. Not that password support is not good when using <em>ext</em>,
+you will definitely want to have SSH keys setup.</p>
+<p>Alternatively, you can just use the non-standard extssh protocol that Eclipse
+offer. In that case CVS_SERVER is ignored, and you will have to replace
+the cvs utility on the server with git-cvsserver or manipulate your .bashrc
+so that calling <em>cvs</em> effectively calls git-cvsserver.</p>
 </div>
 <h2>Clients known to work</h2>
 <div class="sectionbody">
@@ -393,7 +446,7 @@ No keyword expansion or newline munging is supported.</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Martyn Smith &lt;martyn@catalyst.net.nz&gt; and Martin Langhoff &lt;martin@catalyst.net.nz&gt;Matthias Urlichs &lt;smurf@smurf.noris.de&gt;.</p>
+<p>Documentation by Martyn Smith &lt;martyn@catalyst.net.nz&gt; and Martin Langhoff &lt;martin@catalyst.net.nz&gt; Matthias Urlichs &lt;smurf@smurf.noris.de&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -401,7 +454,7 @@ No keyword expansion or newline munging is supported.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 01-Mar-2006 12:05:10 UTC
+Last updated 05-Mar-2006 10:51:09 UTC
 </div>
 </div>
 </body>
