@@ -274,7 +274,8 @@ git-checkout-index(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git-checkout-index</em> [-u] [-q] [-a] [-f] [-n] [--prefix=&lt;string&gt;]
-                   [--stage=&lt;number&gt;]
+                   [--stage=&lt;number&gt;|all]
+                   [--temp]
                    [-z] [--stdin]
                    [--] [&lt;file&gt;]*</div></div>
 </div>
@@ -339,12 +340,23 @@ git-checkout-index(1) Manual Page
 </p>
 </dd>
 <dt>
---stage=&lt;number&gt;
+--stage=&lt;number&gt;|all
 </dt>
 <dd>
 <p>
         Instead of checking out unmerged entries, copy out the
         files from named stage.  &lt;number&gt; must be between 1 and 3.
+        Note: --stage=all automatically implies --temp.
+</p>
+</dd>
+<dt>
+--temp
+</dt>
+<dd>
+<p>
+        Instead of copying the files to the working directory
+        write the content to temporary files.  The temporary name
+        associations will be written to stdout.
 </p>
 </dd>
 <dt>
@@ -397,6 +409,48 @@ since git-checkout-index accepts --stdin it would be faster to use:</p>
 <p>The <tt>--</tt> is just a good idea when you know the rest will be filenames;
 it will prevent problems with a filename of, for example,  <tt>-a</tt>.
 Using <tt>--</tt> is probably a good policy in scripts.</p>
+</div>
+<h2>Using --temp or --stage=all</h2>
+<div class="sectionbody">
+<p>When <tt>--temp</tt> is used (or implied by <tt>--stage=all</tt>)
+<tt>git-checkout-index</tt> will create a temporary file for each index
+entry being checked out.  The index will not be updated with stat
+information.  These options can be useful if the caller needs all
+stages of all unmerged entries so that the unmerged files can be
+processed by an external merge tool.</p>
+<p>A listing will be written to stdout providing the association of
+temporary file names to tracked path names.  The listing format
+has two variations:</p>
+<ol>
+<li>
+<p>
+tempname TAB path RS
+</p>
+<p>The first format is what gets used when <tt>--stage</tt> is omitted or
+is not <tt>--stage=all</tt>. The field tempname is the temporary file
+name holding the file content and path is the tracked path name in
+the index.  Only the requested entries are output.</p>
+</li>
+<li>
+<p>
+stage1temp SP stage2temp SP stage3tmp TAB path RS
+</p>
+<p>The second format is what gets used when <tt>--stage=all</tt>.  The three
+stage temporary fields (stage1temp, stage2temp, stage3temp) list the
+name of the temporary file if there is a stage entry in the index
+or <tt>.</tt> if there is no stage entry.  Paths which only have a stage 0
+entry will always be omitted from the output.</p>
+</li>
+</ol>
+<p>In both formats RS (the record separator) is newline by default
+but will be the null byte if -z was passed on the command line.
+The temporary file names are always safe strings; they will never
+contain directory separators or whitespace characters.  The path
+field is always relative to the current directory and the temporary
+file names are always relative to the top level directory.</p>
+<p>If the object being copied out to a temporary file is a symbolic
+link the content of the link will be written to a normal file.  It is
+up to the end-user or the Porcelain to make use of this information.</p>
 </div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
@@ -457,7 +511,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 05-Mar-2006 01:54:46 UTC
+Last updated 07-Mar-2006 05:16:20 UTC
 </div>
 </div>
 </body>
