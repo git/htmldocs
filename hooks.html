@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.1" />
+<meta name="generator" content="AsciiDoc 7.0.2" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -342,16 +342,27 @@ send out a commit notification e-mail.</p>
 </div>
 <h2>update</h2>
 <div class="sectionbody">
-<p>This hook is invoked by <tt>git-receive-pack</tt>, which is invoked
-when a <tt>git push</tt> is done against the repository.  It takes
-three parameters, name of the ref being updated, old object name
-stored in the ref, and the new objectname to be stored in the
-ref.  Exiting with non-zero status from this hook prevents
-<tt>git-receive-pack</tt> from updating the ref.</p>
-<p>This can be used to prevent <em>forced</em> update on certain refs by
+<p>This hook is invoked by <tt>git-receive-pack</tt> on the remote repository,
+which is happens when a <tt>git push</tt> is done on a local repository.
+Just before updating the ref on the remote repository, the update hook
+is invoked.  It's exit status determins the success or failure of
+the ref update.</p>
+<p>The hook executes once for each ref to be updated, and takes
+three parameters:
+    - the name of the ref being updated,
+    - the old object name stored in the ref,
+    - and the new objectname to be stored in the ref.</p>
+<p>A zero exit from the update hook allows the ref to be updated.
+Exiting with a non-zero status prevents <tt>git-receive-pack</tt>
+from updating the ref.</p>
+<p>This hook can be used to prevent <em>forced</em> update on certain refs by
 making sure that the object name is a commit object that is a
 descendant of the commit object named by the old object name.
-Another use suggested on the mailing list is to use this hook to
+That is, to enforce a "fast forward only" policy.</p>
+<p>It could also be used to log the old..new status.  However, it
+does not know the entire set of branches, so it would end up
+firing one e-mail per ref when used naively, though.</p>
+<p>Another use suggested on the mailing list is to use this hook to
 implement access control which is finer grained than the one
 based on filesystem group.</p>
 <p>The standard output of this hook is sent to /dev/null; if you
@@ -360,22 +371,29 @@ you can redirect your output to your stderr.</p>
 </div>
 <h2>post-update</h2>
 <div class="sectionbody">
-<p>This hook is invoked by <tt>git-receive-pack</tt>, which is invoked
-when a <tt>git push</tt> is done against the repository.  It takes
-variable number of parameters; each of which is the name of ref
-that was actually updated.</p>
+<p>This hook is invoked by <tt>git-receive-pack</tt> on the remote repository,
+which is happens when a <tt>git push</tt> is done on a local repository.
+It executes on the remote repository once after all the refs have
+been updated.</p>
+<p>It takes a variable number of parameters, each of which is the
+name of ref that was actually updated.</p>
 <p>This hook is meant primarily for notification, and cannot affect
 the outcome of <tt>git-receive-pack</tt>.</p>
+<p>The post-update hook can tell what are the heads that were pushed,
+but it does not know what their original and updated values are,
+so it is a poor place to do log old..new.</p>
 <p>The default post-update hook, when enabled, runs
 <tt>git-update-server-info</tt> to keep the information used by dumb
-transport up-to-date.</p>
+transports (eg, http) up-to-date.  If you are publishing
+a git repository that is accessible via http, you should
+probably enable this hook.</p>
 <p>The standard output of this hook is sent to /dev/null; if you
 want to report something to the git-send-pack on the other end,
 you can redirect your output to your stderr.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Dec-2005 00:17:09 PDT
+Last updated 26-Mar-2006 01:49:03 UTC
 </div>
 </div>
 </body>
