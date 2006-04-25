@@ -404,11 +404,11 @@ you try to unset/set an option for which multiple lines match.
 <div class="literalblock">
 <div class="content">
 <pre><tt>; Proxy settings
-[proxy]
-        command="ssh" for "ssh://kernel.org/"
-        command="proxy-command" for kernel.org
-        command="myprotocol-command" for "my://"
-        command=default-proxy ; for all the rest</tt></pre>
+[core]
+        gitproxy="ssh" for "ssh://kernel.org/"
+        gitproxy="proxy-command" for kernel.org
+        gitproxy="myprotocol-command" for "my://"
+        gitproxy=default-proxy ; for all the rest</tt></pre>
 </div></div>
 <p>you can set the filemode to true with</p>
 <div class="listingblock">
@@ -420,7 +420,7 @@ to what URL they apply. Here is how to change the entry for kernel.org
 to "ssh".</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git repo-config proxy.command '"ssh" for kernel.org' 'for kernel.org$'</tt></pre>
+<pre><tt>% git repo-config core.gitproxy '"ssh" for kernel.org' 'for kernel.org$'</tt></pre>
 </div></div>
 <p>This makes sure that only the key/value pair for kernel.org is replaced.</p>
 <p>To delete the entry for renames, do</p>
@@ -428,7 +428,7 @@ to "ssh".</p>
 <div class="content">
 <pre><tt>% git repo-config --unset diff.renames</tt></pre>
 </div></div>
-<p>If you want to delete an entry for a multivar (like proxy.command above),
+<p>If you want to delete an entry for a multivar (like core.gitproxy above),
 you have to provide a regex matching the value of exactly one line.</p>
 <p>To query the value for a given key, do</p>
 <div class="listingblock">
@@ -443,24 +443,24 @@ you have to provide a regex matching the value of exactly one line.</p>
 <p>or, to query a multivar:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git repo-config --get proxy.command "for kernel.org$"</tt></pre>
+<pre><tt>% git repo-config --get core.gitproxy "for kernel.org$"</tt></pre>
 </div></div>
 <p>If you want to know all the values for a multivar, do:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git repo-config --get-all proxy.command</tt></pre>
+<pre><tt>% git repo-config --get-all core.gitproxy</tt></pre>
 </div></div>
-<p>If you like to live dangerous, you can replace <strong>all</strong> proxy.commands by a
+<p>If you like to live dangerous, you can replace <strong>all</strong> core.gitproxy by a
 new one with</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git repo-config --replace-all proxy.command ssh</tt></pre>
+<pre><tt>% git repo-config --replace-all core.gitproxy ssh</tt></pre>
 </div></div>
 <p>However, if you really only want to replace the line for the default proxy,
 i.e. the one without a "for &#8230;" postfix, do something like this:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git repo-config proxy.command ssh '! for '</tt></pre>
+<pre><tt>% git repo-config core.gitproxy ssh '! for '</tt></pre>
 </div></div>
 <p>To actually match only values with an exclamation mark, you have to</p>
 <div class="listingblock">
@@ -468,13 +468,341 @@ i.e. the one without a "for &#8230;" postfix, do something like this:</p>
 <pre><tt>% git repo-config section.key value '[!]'</tt></pre>
 </div></div>
 </div>
+<h2>CONFIGURATION FILE</h2>
+<div class="sectionbody">
+<p>The git configuration file contains a number of variables that affect
+the git commands behaviour. They can be used by both the git plumbing
+and the porcelains. The variables are divided to sections, where
+in the fully qualified variable name the variable itself is the last
+dot-separated segment and the section name is everything before the last
+dot. The variable names are case-insensitive and only alphanumeric
+characters are allowed. Some variables may appear multiple times.</p>
+<p>The syntax is fairly flexible and permissive; whitespaces are mostly
+ignored. The <em>#</em> and <em>;</em> characters begin commends to the end of line,
+blank lines are ignored, lines containing strings enclosed in square
+brackets start sections and all the other lines are recognized
+as setting variables, in the form <em>name = value</em>. If there is no equal
+sign on the line, the entire line is taken as <em>name</em> and the variable
+is recognized as boolean "true". String values may be entirely or partially
+enclosed in double quotes; some variables may require special value format.</p>
+<h3>Example</h3>
+<div class="literalblock">
+<div class="content">
+<pre><tt># Core variables
+[core]
+        ; Don't trust file modes
+        filemode = false</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt># Our diff algorithm
+[diff]
+        external = "/usr/local/bin/gnu-diff -u"
+        renames = true</tt></pre>
+</div></div>
+<h3>Variables</h3>
+<p>Note that this list is non-comprehensive and not necessarily complete.
+For command-specific variables, you will find more detailed description
+in the appropriate manual page. You will find description of non-core
+porcelain configuration variables in the respective porcelain documentation.</p>
+<dl>
+<dt>
+core.fileMode
+</dt>
+<dd>
+<p>
+        If false, the executable bit differences between the index and
+        the working copy are ignored; useful on broken filesystems like FAT.
+        See <a href="git-update-index.html">git-update-index(1)</a>. True by default.
+</p>
+</dd>
+<dt>
+core.gitProxy
+</dt>
+<dd>
+<p>
+        A "proxy command" to execute (as <em>command host port</em>) instead
+        of establishing direct connection to the remote server when
+        using the git protocol for fetching. If the variable value is
+        in the "COMMAND for DOMAIN" format, the command is applied only
+        on hostnames ending with the specified domain string. This variable
+        may be set multiple times and is matched in the given order;
+        the first match wins.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Can be overriden by the 'GIT_PROXY_COMMAND' environment variable
+(which always applies universally, without the special "for"
+handling).</tt></pre>
+</div></div>
+</dd>
+<dt>
+core.ignoreStat
+</dt>
+<dd>
+<p>
+        The working copy files are assumed to stay unchanged until you
+        mark them otherwise manually - Git will not detect the file changes
+        by lstat() calls. This is useful on systems where those are very
+        slow, such as Microsoft Windows.  See <a href="git-update-index.html">git-update-index(1)</a>.
+        False by default.
+</p>
+</dd>
+<dt>
+core.onlyUseSymrefs
+</dt>
+<dd>
+<p>
+        Always use the "symref" format instead of symbolic links for HEAD
+        and other symbolic reference files. True by default.
+</p>
+</dd>
+<dt>
+core.repositoryFormatVersion
+</dt>
+<dd>
+<p>
+        Internal variable identifying the repository format and layout
+        version.
+</p>
+</dd>
+<dt>
+core.sharedRepository
+</dt>
+<dd>
+<p>
+        If true, the repository is made shareable between several users
+        in a group (making sure all the files and objects are group-writable).
+        See <a href="git-init-db.html">git-init-db(1)</a>. False by default.
+</p>
+</dd>
+<dt>
+core.warnAmbiguousRefs
+</dt>
+<dd>
+<p>
+        If true, git will warn you if the ref name you passed it is ambiguous
+        and might match multiple refs in the .git/refs/ tree. True by default.
+</p>
+</dd>
+<dt>
+apply.whitespace
+</dt>
+<dd>
+<p>
+        Tells <tt>git-apply</tt> how to handle whitespaces, in the same way
+        as the <em>--whitespace</em> option. See <a href="git-apply.html">git-apply(1)</a>.
+</p>
+</dd>
+<dt>
+diff.renameLimit
+</dt>
+<dd>
+<p>
+        The number of files to consider when performing the copy/rename
+        detection; equivalent to the git diff option <em>-l</em>.
+</p>
+</dd>
+<dt>
+format.headers
+</dt>
+<dd>
+<p>
+        Additional email headers to include in a patch to be submitted
+        by mail.  See <a href="git-format-patch.html">git-format-patch(1)</a>.
+</p>
+</dd>
+<dt>
+gitcvs.enabled
+</dt>
+<dd>
+<p>
+        Whether the cvs pserver interface is enabled for this repository.
+        See <a href="git-cvsserver.html">git-cvsserver(1)</a>.
+</p>
+</dd>
+<dt>
+gitcvs.logfile
+</dt>
+<dd>
+<p>
+        Path to a log file where the cvs pserver interface well&#8230; logs
+        various stuff. See <a href="git-cvsserver.html">git-cvsserver(1)</a>.
+</p>
+</dd>
+<dt>
+http.sslVerify
+</dt>
+<dd>
+<p>
+        Whether to verify the SSL certificate when fetching or pushing
+        over HTTPS. Can be overriden by the <em>GIT_SSL_NO_VERIFY</em> environment
+        variable.
+</p>
+</dd>
+<dt>
+http.sslCert
+</dt>
+<dd>
+<p>
+        File containing the SSL certificate when fetching or pushing
+        over HTTPS. Can be overriden by the <em>GIT_SSL_CERT</em> environment
+        variable.
+</p>
+</dd>
+<dt>
+http.sslKey
+</dt>
+<dd>
+<p>
+        File containing the SSL private key when fetching or pushing
+        over HTTPS. Can be overriden by the <em>GIT_SSL_KEY</em> environment
+        variable.
+</p>
+</dd>
+<dt>
+http.sslCAInfo
+</dt>
+<dd>
+<p>
+        File containing the certificates to verify the peer with when
+        fetching or pushing over HTTPS. Can be overriden by the
+        <em>GIT_SSL_CAINFO</em> environment variable.
+</p>
+</dd>
+<dt>
+http.sslCAPath
+</dt>
+<dd>
+<p>
+        Path containing files with the CA certificates to verify the peer
+        with when fetching or pushing over HTTPS. Can be overriden
+        by the <em>GIT_SSL_CAPATH</em> environment variable.
+</p>
+</dd>
+<dt>
+http.maxRequests
+</dt>
+<dd>
+<p>
+        How many HTTP requests to launch in parallel. Can be overriden
+        by the <em>GIT_HTTP_MAX_REQUESTS</em> environment variable. Default is 5.
+</p>
+</dd>
+<dt>
+http.lowSpeedLimit, http.lowSpeedTime
+</dt>
+<dd>
+<p>
+        If the HTTP transfer speed is less than <em>http.lowSpeedLimit</em>
+        for longer than <em>http.lowSpeedTime</em> seconds, the transfer is aborted.
+        Can be overriden by the <em>GIT_HTTP_LOW_SPEED_LIMIT</em> and
+        <em>GIT_HTTP_LOW_SPEED_TIME</em> environment variables.
+</p>
+</dd>
+<dt>
+i18n.commitEncoding
+</dt>
+<dd>
+<p>
+        Character encoding the commit messages are stored in; git itself
+        does not care per se, but this information is necessary e.g. when
+        importing commits from emails or in the gitk graphical history
+        browser (and possibly at other places in the future or in other
+        porcelains). See e.g. <a href="git-mailinfo.html">git-mailinfo(1)</a>. Defaults to <em>utf-8</em>.
+</p>
+</dd>
+<dt>
+merge.summary
+</dt>
+<dd>
+<p>
+        Whether to include summaries of merged commits in newly created
+        merge commit messages. False by default.
+</p>
+</dd>
+<dt>
+pull.octopus
+</dt>
+<dd>
+<p>
+        The default merge strategy to use when pulling multiple branches
+        at once.
+</p>
+</dd>
+<dt>
+pull.twohead
+</dt>
+<dd>
+<p>
+        The default merge strategy to use when pulling a single branch.
+</p>
+</dd>
+<dt>
+show.difftree
+</dt>
+<dd>
+<p>
+        The default <a href="git-diff-tree.html">git-diff-tree(1)</a> arguments to be used
+        for <a href="git-show.html">git-show(1)</a>.
+</p>
+</dd>
+<dt>
+showbranch.default
+</dt>
+<dd>
+<p>
+        The default set of branches for <a href="git-show-branch.html">git-show-branch(1)</a>.
+        See <a href="git-show-branch.html">git-show-branch(1)</a>.
+</p>
+</dd>
+<dt>
+user.email
+</dt>
+<dd>
+<p>
+        Your email address to be recorded in any newly created commits.
+        Can be overriden by the <em>GIT_AUTHOR_EMAIL</em> and <em>GIT_COMMITTER_EMAIL</em>
+        environment variables.  See <a href="git-commit-tree.html">git-commit-tree(1)</a>.
+</p>
+</dd>
+<dt>
+user.name
+</dt>
+<dd>
+<p>
+        Your full name to be recorded in any newly created commits.
+        Can be overriden by the <em>GIT_AUTHOR_NAME</em> and <em>GIT_COMMITTER_NAME</em>
+        environment variables.  See <a href="git-commit-tree.html">git-commit-tree(1)</a>.
+</p>
+</dd>
+<dt>
+whatchanged.difftree
+</dt>
+<dd>
+<p>
+        The default <a href="git-diff-tree.html">git-diff-tree(1)</a> arguments to be used
+        for <a href="git-whatchanged.html">git-whatchanged(1)</a>.
+</p>
+</dd>
+<dt>
+imap
+</dt>
+<dd>
+<p>
+        The configuration variables in the <em>imap</em> section are described
+        in <a href="git-imap-send.html">git-imap-send(1)</a>.
+</p>
+</dd>
+</dl>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Johannes Schindelin &lt;Johannes.Schindelin@gmx.de&gt;</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Johannes Schindelin.</p>
+<p>Documentation by Johannes Schindelin, Petr Baudis and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -482,7 +810,7 @@ i.e. the one without a "for &#8230;" postfix, do something like this:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 10-Mar-2006 00:31:33 UTC
+Last updated 25-Apr-2006 07:36:44 UTC
 </div>
 </div>
 </body>
