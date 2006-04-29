@@ -336,18 +336,31 @@ Undo a commit and redo
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit ...
-$ git reset --soft HEAD^ <b>(1)</b>
-$ edit <b>(2)</b>
-$ git commit -a -c ORIG_HEAD <b>(3)</b>
-
-<b>(1)</b> This is most often done when you remembered what you
+$ git reset --soft HEAD^      <b>(1)</b>
+$ edit                        <b>(2)</b>
+$ git commit -a -c ORIG_HEAD  <b>(3)</b></tt></pre>
+</div></div>
+<ol>
+<li>
+<p>
+This is most often done when you remembered what you
 just committed is incomplete, or you misspelled your commit
 message, or both.  Leaves working tree as it was before "reset".
-<b>(2)</b> make corrections to working tree files.
-<b>(3)</b> "reset" copies the old head to .git/ORIG_HEAD; redo the
+</p>
+</li>
+<li>
+<p>
+make corrections to working tree files.
+</p>
+</li>
+<li>
+<p>
+"reset" copies the old head to .git/ORIG_HEAD; redo the
 commit by starting with its log message.  If you do not need to
-edit the message further, you can give -C option instead.</tt></pre>
-</div></div>
+edit the message further, you can give -C option instead.
+</p>
+</li>
+</ol>
 </dd>
 <dt>
 Undo commits permanently
@@ -356,12 +369,17 @@ Undo commits permanently
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit ...
-$ git reset --hard HEAD~3 <b>(1)</b>
-
-<b>(1)</b> The last three commits (HEAD, HEAD^, and HEAD~2) were bad
-and you do not want to ever see them again.  Do *not* do this if
-you have already given these commits to somebody else.</tt></pre>
+$ git reset --hard HEAD~3   <b>(1)</b></tt></pre>
 </div></div>
+<ol>
+<li>
+<p>
+The last three commits (HEAD, HEAD^, and HEAD~2) were bad
+and you do not want to ever see them again.  Do <strong>not</strong> do this if
+you have already given these commits to somebody else.
+</p>
+</li>
+</ol>
 </dd>
 <dt>
 Undo a commit, making it a topic branch
@@ -369,17 +387,30 @@ Undo a commit, making it a topic branch
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git branch topic/wip <b>(1)</b>
-$ git reset --hard HEAD~3 <b>(2)</b>
-$ git checkout topic/wip <b>(3)</b>
-
-<b>(1)</b> You have made some commits, but realize they were premature
+<pre><tt>$ git branch topic/wip     <b>(1)</b>
+$ git reset --hard HEAD~3  <b>(2)</b>
+$ git checkout topic/wip   <b>(3)</b></tt></pre>
+</div></div>
+<ol>
+<li>
+<p>
+You have made some commits, but realize they were premature
 to be in the "master" branch.  You want to continue polishing
 them in a topic branch, so create "topic/wip" branch off of the
 current HEAD.
-<b>(2)</b> Rewind the master branch to get rid of those three commits.
-<b>(3)</b> Switch to "topic/wip" branch and keep working.</tt></pre>
-</div></div>
+</p>
+</li>
+<li>
+<p>
+Rewind the master branch to get rid of those three commits.
+</p>
+</li>
+<li>
+<p>
+Switch to "topic/wip" branch and keep working.
+</p>
+</li>
+</ol>
 </dd>
 <dt>
 Undo update-index
@@ -387,25 +418,42 @@ Undo update-index
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ edit <b>(1)</b>
+<pre><tt>$ edit                                     <b>(1)</b>
 $ git-update-index frotz.c filfre.c
-$ mailx <b>(2)</b>
-$ git reset <b>(3)</b>
-$ git pull git://info.example.com/ nitfol <b>(4)</b>
-
-<b>(1)</b> you are happily working on something, and find the changes
+$ mailx                                    <b>(2)</b>
+$ git reset                                <b>(3)</b>
+$ git pull git://info.example.com/ nitfol  <b>(4)</b></tt></pre>
+</div></div>
+<ol>
+<li>
+<p>
+you are happily working on something, and find the changes
 in these files are in good order.  You do not want to see them
 when you run "git diff", because you plan to work on other files
 and changes with these files are distracting.
-<b>(2)</b> somebody asks you to pull, and the changes sounds worthy of merging.
-<b>(3)</b> however, you already dirtied the index (i.e. your index does
+</p>
+</li>
+<li>
+<p>
+somebody asks you to pull, and the changes sounds worthy of merging.
+</p>
+</li>
+<li>
+<p>
+however, you already dirtied the index (i.e. your index does
 not match the HEAD commit).  But you know the pull you are going
 to make does not affect frotz.c nor filfre.c, so you revert the
 index changes for these two files.  Your changes in working tree
 remain there.
-<b>(4)</b> then you can pull and merge, leaving frotz.c and filfre.c
-changes still in the working tree.</tt></pre>
-</div></div>
+</p>
+</li>
+<li>
+<p>
+then you can pull and merge, leaving frotz.c and filfre.c
+changes still in the working tree.
+</p>
+</li>
+</ol>
 </dd>
 <dt>
 Undo a merge or pull
@@ -413,7 +461,7 @@ Undo a merge or pull
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull <b>(1)</b>
+<pre><tt>$ git pull                         <b>(1)</b>
 Trying really trivial in-index merge...
 fatal: Merge requires file-level merging
 Nope.
@@ -421,28 +469,43 @@ Nope.
 Auto-merging nitfol
 CONFLICT (content): Merge conflict in nitfol
 Automatic merge failed/prevented; fix up by hand
-$ git reset --hard <b>(2)</b>
-
-<b>(1)</b> try to update from the upstream resulted in a lot of
-conflicts; you were not ready to spend a lot of time merging
-right now, so you decide to do that later.
-<b>(2)</b> "pull" has not made merge commit, so "git reset --hard"
-which is a synonym for "git reset --hard HEAD" clears the mess
-from the index file and the working tree.
-
-$ git pull . topic/branch <b>(3)</b>
+$ git reset --hard                 <b>(2)</b>
+$ git pull . topic/branch          <b>(3)</b>
 Updating from 41223... to 13134...
 Fast forward
-$ git reset --hard ORIG_HEAD <b>(4)</b>
-
-<b>(3)</b> merge a topic branch into the current branch, which resulted
+$ git reset --hard ORIG_HEAD       <b>(4)</b></tt></pre>
+</div></div>
+<ol>
+<li>
+<p>
+try to update from the upstream resulted in a lot of
+conflicts; you were not ready to spend a lot of time merging
+right now, so you decide to do that later.
+</p>
+</li>
+<li>
+<p>
+"pull" has not made merge commit, so "git reset --hard"
+which is a synonym for "git reset --hard HEAD" clears the mess
+from the index file and the working tree.
+</p>
+</li>
+<li>
+<p>
+merge a topic branch into the current branch, which resulted
 in a fast forward.
-<b>(4)</b> but you decided that the topic branch is not ready for public
+</p>
+</li>
+<li>
+<p>
+but you decided that the topic branch is not ready for public
 consumption yet.  "pull" or "merge" always leaves the original
 tip of the current branch in ORIG_HEAD, so resetting hard to it
 brings your index file and the working tree back to that state,
-and resets the tip of the branch to that commit.</tt></pre>
-</div></div>
+and resets the tip of the branch to that commit.
+</p>
+</li>
+</ol>
 </dd>
 <dt>
 Interrupted workflow
@@ -456,21 +519,34 @@ need to get to the other branch for a quick bugfix.</p>
 <div class="content">
 <pre><tt>$ git checkout feature ;# you were working in "feature" branch and
 $ work work work       ;# got interrupted
-$ git commit -a -m 'snapshot WIP' <b>(1)</b>
+$ git commit -a -m 'snapshot WIP'                 <b>(1)</b>
 $ git checkout master
 $ fix fix fix
 $ git commit ;# commit with real log
 $ git checkout feature
-$ git reset --soft HEAD^ ;# go back to WIP state <b>(2)</b>
-$ git reset <b>(3)</b>
-
-<b>(1)</b> This commit will get blown away so a throw-away log message is OK.
-<b>(2)</b> This removes the 'WIP' commit from the commit history, and sets
-    your working tree to the state just before you made that snapshot.
-<b>(3)</b> After <b>(2)</b>, the index file still has all the WIP changes you
-    committed in <b>(1)</b>.  This sets it to the last commit you were
-    basing the WIP changes on.</tt></pre>
+$ git reset --soft HEAD^ ;# go back to WIP state  <b>(2)</b>
+$ git reset                                       <b>(3)</b></tt></pre>
 </div></div>
+<ol>
+<li>
+<p>
+This commit will get blown away so a throw-away log message is OK.
+</p>
+</li>
+<li>
+<p>
+This removes the <em>WIP</em> commit from the commit history, and sets
+    your working tree to the state just before you made that snapshot.
+</p>
+</li>
+<li>
+<p>
+At this point the index file still has all the WIP changes you
+    committed as <em>snapshot WIP</em>.  This updates the index to show your
+    WIP files as uncommitted.
+</p>
+</li>
+</ol>
 </dd>
 </dl>
 </div>
@@ -488,7 +564,7 @@ $ git reset <b>(3)</b>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 10-Mar-2006 00:31:34 UTC
+Last updated 29-Apr-2006 07:01:34 UTC
 </div>
 </div>
 </body>
