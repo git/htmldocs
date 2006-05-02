@@ -266,28 +266,36 @@ git-rebase(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-rebase -
-   Rebase local commits to new upstream head
+   Rebase local commits to a new head
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <p><em>git-rebase</em> [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]</p>
+<p><em>git-rebase</em> --continue</p>
+<p><em>git-rebase</em> --abort</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>git-rebase applies to &lt;upstream&gt; (or optionally to &lt;newbase&gt;) commits
-from &lt;branch&gt; that do not appear in &lt;upstream&gt;. When &lt;branch&gt; is not
-specified it defaults to the current branch (HEAD).</p>
-<p>When git-rebase is complete, &lt;branch&gt; will be updated to point to the
-newly created line of commit objects, so the previous line will not be
-accessible unless there are other references to it already.</p>
+<p>git-rebase replaces &lt;branch&gt; with a new branch of the same name.  When
+the --onto option is provided the new branch starts out with a HEAD equal
+to &lt;newbase&gt;, otherwise it is equal to &lt;upstream&gt;.  It then attempts to
+create a new commit for each commit from the original &lt;branch&gt; that does
+not exist in the &lt;upstream&gt; branch.</p>
+<p>It is possible that a merge failure will prevent this process from being
+completely automatic.  You will have to resolve any such merge failure
+and run <tt>git rebase --continue</tt>.  If you can not resolve the merge
+failure, running <tt>git rebase --abort</tt> will restore the original &lt;branch&gt;
+and remove the working files found in the .dotest directory.</p>
+<p>Note that if &lt;branch&gt; is not specified on the command line, the currently
+checked out branch is used.</p>
 <p>Assume the following history exists and the current branch is "topic":</p>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre><tt>      A---B---C topic
-     /
-D---E---F---G master</tt></pre>
+<pre><tt>          A---B---C topic
+         /
+    D---E---F---G master</tt></pre>
 </div></div>
 <p>From this point, the result of either of the following commands:</p>
 <div class="literalblock">
@@ -296,11 +304,11 @@ D---E---F---G master</tt></pre>
 git-rebase master topic</tt></pre>
 </div></div>
 <p>would be:</p>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre><tt>              A'--B'--C' topic
-             /
-D---E---F---G master</tt></pre>
+<pre><tt>                  A'--B'--C' topic
+                 /
+    D---E---F---G master</tt></pre>
 </div></div>
 <p>While, starting from the same point, the result of either of the following
 commands:</p>
@@ -310,25 +318,31 @@ commands:</p>
 git-rebase --onto master~1 master topic</tt></pre>
 </div></div>
 <p>would be:</p>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre><tt>          A'--B'--C' topic
-         /
-D---E---F---G master</tt></pre>
+<pre><tt>              A'--B'--C' topic
+             /
+    D---E---F---G master</tt></pre>
 </div></div>
 <p>In case of conflict, git-rebase will stop at the first problematic commit
-and leave conflict markers in the tree.  After resolving the conflict manually
-and updating the index with the desired resolution, you can continue the
-rebasing process with</p>
+and leave conflict markers in the tree.  You can use git diff to locate
+the markers (&lt;&lt;&lt;&lt;&lt;&lt;) and make edits to resolve the conflict.  For each
+file you edit, you need to tell git that the conflict has been resolved,
+typically this would be done with</p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git am --resolved --3way</tt></pre>
+<pre><tt>git update-index &lt;filename&gt;</tt></pre>
+</div></div>
+<p>After resolving the conflict manually and updating the index with the
+desired resolution, you can continue the rebasing process with</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git rebase --continue</tt></pre>
 </div></div>
 <p>Alternatively, you can undo the git-rebase with</p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git reset --hard ORIG_HEAD
-rm -r .dotest</tt></pre>
+<pre><tt>git rebase --abort</tt></pre>
 </div></div>
 </div>
 <h2>OPTIONS</h2>
@@ -360,7 +374,37 @@ rm -r .dotest</tt></pre>
         Working branch; defaults to HEAD.
 </p>
 </dd>
+<dt>
+--continue
+</dt>
+<dd>
+<p>
+        Restart the rebasing process after having resolved a merge conflict.
+</p>
+</dd>
+<dt>
+--abort
+</dt>
+<dd>
+<p>
+        Restore the original branch and abort the rebase operation.
+</p>
+</dd>
 </dl>
+</div>
+<h2>NOTES</h2>
+<div class="sectionbody">
+<p>When you rebase a branch, you are changing its history in a way that
+will cause problems for anyone who already has a copy of the branch
+in their repository and tries to pull updates from you.  You should
+understand the implications of using <em>git rebase</em> on a repository that
+you share.</p>
+<p>When the git rebase command is run, it will first execute a "pre-rebase"
+hook if one exists.  You can use this hook to do sanity checks and
+reject the rebase if it isn't appropriate.  Please see the template
+pre-rebase hook script for an example.</p>
+<p>You must be in the top directory of your project to start (or continue)
+a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -376,7 +420,7 @@ rm -r .dotest</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Mar-2006 07:50:56 UTC
+Last updated 02-May-2006 07:27:57 UTC
 </div>
 </div>
 </body>
