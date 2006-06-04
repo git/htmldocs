@@ -272,7 +272,7 @@ git-update-ref(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-update-ref</em> &lt;ref&gt; &lt;newvalue&gt; [&lt;oldvalue&gt;]</p>
+<p><em>git-update-ref</em> [-m &lt;reason&gt;] &lt;ref&gt; &lt;newvalue&gt; [&lt;oldvalue&gt;]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -312,6 +312,38 @@ for reading but not for writing (so we'll never write through a
 ref symlink to some other tree, if you have copied a whole
 archive by creating a symlink tree).</p>
 </div>
+<h2>Logging Updates</h2>
+<div class="sectionbody">
+<p>If config parameter "core.logAllRefUpdates" is true or the file
+"$GIT_DIR/logs/&lt;ref&gt;" exists then <tt>git-update-ref</tt> will append
+a line to the log file "$GIT_DIR/logs/&lt;ref&gt;" (dereferencing all
+symbolic refs before creating the log name) describing the change
+in ref value.  Log lines are formatted as:</p>
+<ol>
+<li>
+<p>
+oldsha1 SP newsha1 SP committer LF
+</p>
+<p>Where "oldsha1" is the 40 character hexadecimal value previously
+stored in &lt;ref&gt;, "newsha1" is the 40 character hexadecimal value of
+&lt;newvalue&gt; and "committer" is the committer's name, email address
+and date in the standard GIT committer ident format.</p>
+</li>
+</ol>
+<p>Optionally with -m:</p>
+<ol>
+<li>
+<p>
+oldsha1 SP newsha1 SP committer TAB message LF
+</p>
+<p>Where all fields are as described above and "message" is the
+value supplied to the -m option.</p>
+</li>
+</ol>
+<p>An update will fail (without changing &lt;ref&gt;) if the current user is
+unable to create a new log file, append to the existing log file
+or does not have committer information available.</p>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;.</p>
@@ -322,7 +354,7 @@ archive by creating a symlink tree).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-Mar-2006 07:10:16 UTC
+Last updated 04-Jun-2006 07:24:34 UTC
 </div>
 </div>
 </body>

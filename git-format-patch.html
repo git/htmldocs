@@ -273,23 +273,26 @@ git-format-patch(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-format-patch</em> [-n | -k] [-o &lt;dir&gt; | --stdout] [--attach] [-s] [-c]
-                 [--diff-options] &lt;his&gt; [&lt;mine&gt;]</div></div>
+<div class="content"><em>git-format-patch</em> [-n | -k] [-o &lt;dir&gt; | --stdout] [--attach]
+                   [-s | --signoff] [--diff-options] [--start-number &lt;n&gt;]
+                   &lt;since&gt;[..&lt;until&gt;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Prepare each commit with its patch since &lt;mine&gt; head forked from
-&lt;his&gt; head, one file per patch formatted to resemble UNIX mailbox
-format, for e-mail submission or use with <a href="git-am.html">git-am(1)</a>.</p>
+<p>Prepare each commit between &lt;since&gt; and &lt;until&gt; with its patch in
+one file per commit, formatted to resemble UNIX mailbox format.
+If ..&lt;until&gt; is not specified, the head of the current working
+tree is implied.</p>
+<p>The output of this command is convenient for e-mail submission or
+for use with <a href="git-am.html">git-am(1)</a>.</p>
 <p>Each output file is numbered sequentially from 1, and uses the
-first line of the commit message (massaged for pathname safety)
-as the filename.</p>
-<p>When -o is specified, output files are created in &lt;dir&gt;; otherwise
-they are created in the current working directory.  This option
-is ignored if --stdout is specified.</p>
-<p>When -n is specified, instead of "[PATCH] Subject", the first
-line is formatted as "[PATCH N/M] Subject", unless you have only
-one patch.</p>
+first line of the commit message (massaged for pathname safety) as
+the filename. The names of the output files are printed to standard
+output, unless the --stdout option is specified.</p>
+<p>If -o is specified, output files are created in &lt;dir&gt;.  Otherwise
+they are created in the current working directory.</p>
+<p>If -n is specified, instead of "[PATCH] Subject", the first line
+is formatted as "[PATCH n/m] Subject".</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -300,7 +303,8 @@ one patch.</p>
 <dd>
 <p>
         Use &lt;dir&gt; to store the resulting files, instead of the
-        current working directory.
+        current working directory. This option is ignored if
+        --stdout is specified.
 </p>
 </dd>
 <dt>
@@ -309,6 +313,14 @@ one patch.</p>
 <dd>
 <p>
         Name output in <em>[PATCH n/m]</em> format.
+</p>
+</dd>
+<dt>
+--start-number &lt;n&gt;
+</dt>
+<dd>
+<p>
+        Start numbering the patches at &lt;n&gt; instead of 1.
 </p>
 </dd>
 <dt>
@@ -330,25 +342,12 @@ one patch.</p>
 </p>
 </dd>
 <dt>
--c|--check
-</dt>
-<dd>
-<p>
-        Display suspicious lines in the patch.  The definition
-        of <em>suspicious lines</em> is currently the lines that has
-        trailing whitespaces, and the lines whose indentation
-        has a SP character immediately followed by a TAB
-        character.
-</p>
-</dd>
-<dt>
 --stdout
 </dt>
 <dd>
 <p>
-        This flag generates the mbox formatted output to the
-        standard output, instead of saving them into a file per
-        patch and implies --mbox.
+        Print all commits to the standard output in mbox format,
+        instead of creating a file for each one.
 </p>
 </dd>
 <dt>
@@ -388,9 +387,9 @@ git-format-patch origin
 </dt>
 <dd>
 <p>
-        Extract commits the current branch accumulated since it
-        pulled from origin the last time in a patch form for
-        e-mail submission.
+        Extract all commits which are in the current branch but
+        not in the origin branch.  For each commit a separate file
+        is created in the current directory.
 </p>
 </dd>
 <dt>
@@ -398,13 +397,13 @@ git-format-patch -M -B origin
 </dt>
 <dd>
 <p>
-        The same as the previous one, except detect and handle
-        renames and complete rewrites intelligently to produce
-        renaming patch.  A renaming patch reduces the amount of
-        text output, and generally makes it easier to review
-        it.  Note that the "patch" program does not understand
-        renaming patch well, so use it only when you know the
-        recipient uses git to apply your patch.
+        The same as the previous one.  Additionally, it detects
+        and handles renames and complete rewrites intelligently to
+        produce a renaming patch.  A renaming patch reduces the
+        amount of text output, and generally makes it easier to
+        review it.  Note that the "patch" program does not
+        understand renaming patches, so use it only when you know
+        the recipient uses git to apply your patch.
 </p>
 </dd>
 </dl>
@@ -427,7 +426,7 @@ git-format-patch -M -B origin
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 11-Mar-2006 08:04:28 UTC
+Last updated 04-Jun-2006 07:24:26 UTC
 </div>
 </div>
 </body>
