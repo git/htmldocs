@@ -870,16 +870,19 @@ create a signed tag.
 make sure I did not accidentally rewind master beyond what I
 already pushed out.  "ko" shorthand points at the repository I have
 at kernel.org, and looks like this:
-    $ cat .git/remotes/ko
-    URL: kernel.org:/pub/scm/git/git.git
-    Pull: master:refs/tags/ko-master
-    Pull: maint:refs/tags/ko-maint
-    Push: master
-    Push: +pu
-    Push: maint
-In the output from "git show-branch", "master" should have
-everything "ko-master" has.
 </p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cat .git/remotes/ko
+URL: kernel.org:/pub/scm/git/git.git
+Pull: master:refs/tags/ko-master
+Pull: maint:refs/tags/ko-maint
+Push: master
+Push: +pu
+Push: maint</tt></pre>
+</div></div>
+<p>In the output from "git show-branch", "master" should have
+everything "ko-master" has.</p>
 </li>
 <li>
 <p>
@@ -928,6 +931,31 @@ git     stream  tcp     nowait  nobody \
   /usr/bin/git-daemon git-daemon --inetd --syslog --export-all /pub/scm</tt></pre>
 </div></div>
 <p>The actual configuration line should be on one line.</p>
+</dd>
+<dt>
+Run git-daemon to serve /pub/scm from xinetd.
+</dt>
+<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cat /etc/xinetd.d/git-daemon
+# default: off
+# description: The git server offers access to git repositories
+service git
+{
+        disable = no
+        type            = UNLISTED
+        port            = 9418
+        socket_type     = stream
+        wait            = no
+        user            = nobody
+        server          = /usr/bin/git-daemon
+        server_args     = --inetd --syslog --export-all --base-path=/pub/scm
+        log_on_failure  += USERID
+}</tt></pre>
+</div></div>
+<p>Check your xinetd(8) documentation and setup, this is from a Fedora system.
+Others might be different.</p>
 </dd>
 <dt>
 Give push/pull only access to developers.
@@ -1039,7 +1067,7 @@ upload to public HTTP server hosted by your ISP.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 30-May-2006 07:20:54 UTC
+Last updated 06-Jun-2006 01:23:29 UTC
 </div>
 </div>
 </body>
