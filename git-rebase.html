@@ -272,7 +272,7 @@ git-rebase(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-rebase</em> [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]</p>
+<p><em>git-rebase</em> [--merge] [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]</p>
 <p><em>git-rebase</em> --continue | --skip | --abort</p>
 </div>
 <h2>DESCRIPTION</h2>
@@ -390,6 +390,95 @@ desired resolution, you can continue the rebasing process with</p>
         Restore the original branch and abort the rebase operation.
 </p>
 </dd>
+<dt>
+--skip
+</dt>
+<dd>
+<p>
+        Restart the rebasing process by skipping the current patch.
+        This does not work with the --merge option.
+</p>
+</dd>
+<dt>
+--merge
+</dt>
+<dd>
+<p>
+        Use merging strategies to rebase.  When the recursive (default) merge
+        strategy is used, this allows rebase to be aware of renames on the
+        upstream side.
+</p>
+</dd>
+<dt>
+-s &lt;strategy&gt;, --strategy=&lt;strategy&gt;
+</dt>
+<dd>
+<p>
+        Use the given merge strategy; can be supplied more than
+        once to specify them in the order they should be tried.
+        If there is no <tt>-s</tt> option, a built-in list of strategies
+        is used instead (<tt>git-merge-recursive</tt> when merging a single
+        head, <tt>git-merge-octopus</tt> otherwise).  This implies --merge.
+</p>
+</dd>
+</dl>
+</div>
+<h2>MERGE STRATEGIES</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+resolve
+</dt>
+<dd>
+<p>
+        This can only resolve two heads (i.e. the current branch
+        and another branch you pulled from) using 3-way merge
+        algorithm.  It tries to carefully detect criss-cross
+        merge ambiguities and is considered generally safe and
+        fast.
+</p>
+</dd>
+<dt>
+recursive
+</dt>
+<dd>
+<p>
+        This can only resolve two heads using 3-way merge
+        algorithm.  When there are more than one common
+        ancestors that can be used for 3-way merge, it creates a
+        merged tree of the common ancestors and uses that as
+        the reference tree for the 3-way merge.  This has been
+        reported to result in fewer merge conflicts without
+        causing mis-merges by tests done on actual merge commits
+        taken from Linux 2.6 kernel development history.
+        Additionally this can detect and handle merges involving
+        renames.  This is the default merge strategy when
+        pulling or merging one branch.
+</p>
+</dd>
+<dt>
+octopus
+</dt>
+<dd>
+<p>
+        This resolves more than two-head case, but refuses to do
+        complex merge that needs manual resolution.  It is
+        primarily meant to be used for bundling topic branch
+        heads together.  This is the default merge strategy when
+        pulling or merging more than one branches.
+</p>
+</dd>
+<dt>
+ours
+</dt>
+<dd>
+<p>
+        This resolves any number of heads, but the result of the
+        merge is always the current branch head.  It is meant to
+        be used to supersede old development history of side
+        branches.
+</p>
+</dd>
 </dl>
 </div>
 <h2>NOTES</h2>
@@ -420,7 +509,7 @@ a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 17-May-2006 10:34:04 UTC
+Last updated 22-Jun-2006 19:49:25 UTC
 </div>
 </div>
 </body>
