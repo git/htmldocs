@@ -539,10 +539,6 @@ A suffix <em>^</em> followed by an empty brace pair
 </p>
 </li>
 </ul>
-<p><em>git-rev-parse</em> also accepts a prefix <em>^</em> to revision parameter,
-which is passed to <em>git-rev-list</em>.  Two revision parameters
-concatenated with <em>..</em> is a short-hand for writing a range
-between them.  I.e. <em>r1..r2</em> is equivalent to saying <em>^r1 r2</em></p>
 <p>Here is an illustration, by Jon Loeliger.  Both node B and C are
 a commit parents of commit node A.  Parent commits are ordered
 left-to-right.</p>
@@ -551,9 +547,8 @@ left-to-right.</p>
 <pre><tt>G   H   I   J
  \ /     \ /
   D   E   F
-   \  |  /
-    \ | /
-     \|/
+   \  |  /         \ | /   |
+     \|/    |
       B     C
        \   /
         \ /
@@ -573,6 +568,37 @@ I = F^   = B^3^    = A^^3^
 J = F^2  = B^3^2   = A^^3^2</tt></pre>
 </div></div>
 </div>
+<h2>SPECIFYING RANGES</h2>
+<div class="sectionbody">
+<p>History traversing commands such as <tt>git-log</tt> operate on a set
+of commits, not just a single commit.  To these commands,
+specifying a single revision with the notation described in the
+previous section means the set of commits reachable from that
+commit, following the commit ancestry chain.</p>
+<p>To exclude commits reachable from a commit, a prefix <tt>^</tt>
+notation is used.  E.g. "<tt>^r1 r2</tt>" means commits reachable
+from <tt>r2</tt> but exclude the ones reachable from <tt>r1</tt>.</p>
+<p>This set operation appears so often that there is a shorthand
+for it.  "<tt>r1..r2</tt>" is equivalent to "<tt>^r1 r2</tt>".  It is
+the difference of two sets (subtract the set of commits
+reachable from <tt>r1</tt> from the set of commits reachable from
+<tt>r2</tt>).</p>
+<p>A similar notation "<tt>r1...r2</tt>" is called symmetric difference
+of <tt>r1</tt> and <tt>r2</tt> and is defined as
+"<tt>r1 r2 --not $(git-merge-base --all r1 r2)</tt>".
+It it the set of commits that are reachable from either one of
+<tt>r1</tt> or <tt>r2</tt> but not from both.</p>
+<p>Here are a few examples:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>D                A B D
+D F              A B C D F
+^A G             B D
+^A F             B C F
+G...I            C D F G I
+^B G I           C D F G I</tt></pre>
+</div></div>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and
@@ -588,7 +614,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Jun-2006 07:24:31 UTC
+Last updated 07-Jul-2006 06:05:13 UTC
 </div>
 </div>
 </body>
