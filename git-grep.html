@@ -280,7 +280,7 @@ git-grep(1) Manual Page
            [-n] [-l | --files-with-matches] [-L | --files-without-match]
            [-c | --count]
            [-A &lt;post-context&gt;] [-B &lt;pre-context&gt;] [-C &lt;context&gt;]
-           [-f &lt;file&gt;] [-e] &lt;pattern&gt;
+           [-f &lt;file&gt;] [-e] &lt;pattern&gt; [--and|--or|--not|(|)|-e &lt;pattern&gt;&#8230;]
            [&lt;tree&gt;&#8230;]
            [--] [&lt;path&gt;&#8230;]</div></div>
 </div>
@@ -397,7 +397,19 @@ registered in the index file, or given tree objects.</p>
 <p>
         The next parameter is the pattern. This option has to be
         used for patterns starting with - and should be used in
-        scripts passing user input to grep.
+        scripts passing user input to grep.  Multiple patterns are
+        combined by <em>or</em>.
+</p>
+</dd>
+<dt>
+--and | --or | --not | ( | )
+</dt>
+<dd>
+<p>
+        Specify how multiple patterns are combined using boolean
+        expressions.  <tt>--or</tt> is the default operator.  <tt>--and</tt> has
+        higher precedence than <tt>--or</tt>.  <tt>-e</tt> has to be used for all
+        patterns.
 </p>
 </dd>
 <dt>
@@ -409,12 +421,26 @@ registered in the index file, or given tree objects.</p>
 </p>
 </dd>
 <dt>
-<tt>--</tt>
+--
 </dt>
 <dd>
 <p>
         Signals the end of options; the rest of the parameters
         are &lt;path&gt; limiters.
+</p>
+</dd>
+</dl>
+</div>
+<h2>Example</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+git grep -e '#define' --and \( -e MAX_PATH -e PATH_MAX \)
+</dt>
+<dd>
+<p>
+        Looks for a line that has <tt>#define</tt> and either <tt>MAX_PATH</tt> or
+        <tt>PATH_MAX</tt>.
 </p>
 </dd>
 </dl>
@@ -434,7 +460,7 @@ revamped by Junio C Hamano.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Jul-2006 01:37:48 UTC
+Last updated 03-Aug-2006 00:29:31 UTC
 </div>
 </div>
 </body>
