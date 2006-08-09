@@ -272,7 +272,7 @@ git-init-db(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-init-db</em> [--template=&lt;template_directory&gt;] [--shared]</p>
+<p><em>git-init-db</em> [--template=&lt;template_directory&gt;] [--shared[=&lt;permissions&gt;]]</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -282,17 +282,49 @@ git-init-db(1) Manual Page
 </dt>
 <dd>
 <p>
-        Provide the directory from which templates will be used.
-        The default template directory is <tt>/usr/share/git-core/templates</tt>.
+Provide the directory from which templates will be used.  The default template
+directory is <tt>/usr/share/git-core/templates</tt>.
 </p>
+<p>When specified, <tt>&lt;template_directory&gt;</tt> is used as the source of the template
+files rather than the default.  The template files include some directory
+structure, some suggested "exclude patterns", and copies of non-executing
+"hook" files.  The suggested patterns and hook files are all modifiable and
+extensible.</p>
 </dd>
 <dt>
---shared
+--shared[={false|true|umask|group|all|world|everybody}]
 </dt>
 <dd>
 <p>
-        Specify that the git repository is to be shared amongst several users.
+Specify that the git repository is to be shared amongst several users.  This
+allows users belonging to the same group to push into that
+repository.  When specified, the config variable "core.sharedRepository" is
+set so that files and directories under <tt>$GIT_DIR</tt> are created with the
+requested permissions.  When not specified, git will use permissions reported
+by umask(2).
 </p>
+<p>The option can have the following values, defaulting to <em>group</em> if no value
+is given:</p>
+<ul>
+<li>
+<p>
+<em>umask</em> (or <em>false</em>): Use permissions reported by umask(2). The default,
+   when <tt>--shared</tt> is not specified.
+</p>
+</li>
+<li>
+<p>
+<em>group</em> (or <em>true</em>): Make the repository group-writable, (and g+sx, since
+   the git group may be not the primary group of all users).
+</p>
+</li>
+<li>
+<p>
+<em>all</em> (or <em>world</em> or <em>everybody</em>): Same as <em>group</em>, but make the repository
+   readable by all users.
+</p>
+</li>
+</ul>
 </dd>
 </dl>
 </div>
@@ -303,20 +335,11 @@ with subdirectories for <tt>objects</tt>, <tt>refs/heads</tt>, <tt>refs/tags</tt
 template files.
 An initial <tt>HEAD</tt> file that references the HEAD of the master branch
 is also created.</p>
-<p>If <tt>--template=&lt;template_directory&gt;</tt> is specified, <tt>&lt;template_directory&gt;</tt>
-is used as the source of the template files rather than the default.
-The template files include some directory structure, some suggested
-"exclude patterns", and copies of non-executing "hook" files.  The
-suggested patterns and hook files are all modifiable and extensible.</p>
 <p>If the <tt>$GIT_DIR</tt> environment variable is set then it specifies a path
 to use instead of <tt>./.git</tt> for the base of the repository.</p>
 <p>If the object storage directory is specified via the <tt>$GIT_OBJECT_DIRECTORY</tt>
 environment variable then the sha1 directories are created underneath -
 otherwise the default <tt>$GIT_DIR/objects</tt> directory is used.</p>
-<p>A shared repository allows users belonging to the same group to push into that
-repository. When specifying <tt>--shared</tt> the config variable "core.sharedRepository"
-is set to <em>true</em> so that directories under <tt>$GIT_DIR</tt> are made group writable
-(and g+sx, since the git group may be not the primary group of all users).</p>
 <p>Running <tt>git-init-db</tt> in an existing repository is safe. It will not overwrite
 things that are already there. The primary reason for rerunning <tt>git-init-db</tt>
 is to pick up newly added templates.</p>
@@ -363,7 +386,7 @@ add all existing file to the index
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Jul-2006 01:37:50 UTC
+Last updated 09-Aug-2006 01:00:28 UTC
 </div>
 </div>
 </body>
