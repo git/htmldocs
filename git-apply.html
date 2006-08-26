@@ -274,9 +274,10 @@ git-apply(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git-apply</em> [--stat] [--numstat] [--summary] [--check] [--index] [--apply]
-          [--no-add] [--index-info] [--allow-binary-replacement] [-z] [-pNUM]
-          [-CNUM] [--whitespace=&lt;nowarn|warn|error|error-all|strip&gt;]
-          [&lt;patch&gt;&#8230;]</div></div>
+          [--no-add] [--index-info] [--allow-binary-replacement | --binary]
+          [-R | --reverse] [--reject] [-z] [-pNUM] [-CNUM] [--inaccurate-eof]
+          [--whitespace=&lt;nowarn|warn|error|error-all|strip&gt;] [--exclude=PATH]
+          [--cached] [--verbose] [&lt;patch&gt;&#8230;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -351,6 +352,16 @@ and a work tree.</p>
 </p>
 </dd>
 <dt>
+--cached
+</dt>
+<dd>
+<p>
+        Apply a patch without touching the working tree. Instead, take the
+        cached data, apply the patch, and store the result in the index,
+        without using the working tree. This implies <em>--index</em>.
+</p>
+</dd>
+<dt>
 --index-info
 </dt>
 <dd>
@@ -360,6 +371,26 @@ and a work tree.</p>
         the patch applies to.  When this flag is given, and if
         the original version of the blob is available locally,
         outputs information about them to the standard output.
+</p>
+</dd>
+<dt>
+-R, --reverse
+</dt>
+<dd>
+<p>
+        Apply the patch in reverse.
+</p>
+</dd>
+<dt>
+--reject
+</dt>
+<dd>
+<p>
+        For atomicity, <a href="git-apply.html">git-apply(1)</a> by default fails the whole patch and
+        does not touch the working tree when some of the hunks
+        do not apply.  This option makes it apply
+        the parts of the patch that are applicable, and send the
+        rejected hunks to the standard output of the command.
 </p>
 </dd>
 <dt>
@@ -399,8 +430,8 @@ and a work tree.</p>
 </dt>
 <dd>
 <p>
-        If you use any of the options marked &#8220;Turns off
-        "apply"&#8221; above, git-apply reads and outputs the
+        If you use any of the options marked "Turns off
+        <em>apply</em>" above, <a href="git-apply.html">git-apply(1)</a> reads and outputs the
         information you asked without actually applying the
         patch.  Give this flag after those flags to also apply
         the patch.
@@ -419,7 +450,7 @@ and a work tree.</p>
 </p>
 </dd>
 <dt>
---allow-binary-replacement
+--allow-binary-replacement, --binary
 </dt>
 <dd>
 <p>
@@ -435,6 +466,16 @@ and a work tree.</p>
 </p>
 </dd>
 <dt>
+--exclude=&lt;path-pattern&gt;
+</dt>
+<dd>
+<p>
+        Don't apply changes to files matching the given path pattern. This can
+        be useful when importing patchsets, where you want to exclude certain
+        files or directories.
+</p>
+</dd>
+<dt>
 --whitespace=&lt;option&gt;
 </dt>
 <dd>
@@ -444,7 +485,7 @@ and a work tree.</p>
         line that solely consists of whitespaces).  By default,
         the command outputs warning messages and applies the
         patch.
-        When <tt>git-apply</tt> is used for statistics and not applying a
+        When <a href="git-apply.html">git-apply(1)</a> is used for statistics and not applying a
         patch, it defaults to <tt>nowarn</tt>.
         You can use different <tt>&lt;option&gt;</tt> to control this
         behavior:
@@ -480,6 +521,28 @@ and a work tree.</p>
 </li>
 </ul>
 </dd>
+<dt>
+--inacurate-eof
+</dt>
+<dd>
+<p>
+        Under certain circumstances, some versions of diff do not correctly
+        detect a missing new-line at the end of the file. As a result, patches
+        created by such diff programs do not record incomplete lines
+        correctly. This option adds support for applying such patches by
+        working around this bug.
+</p>
+</dd>
+<dt>
+--verbose
+</dt>
+<dd>
+<p>
+        Report progress to stderr. By default, only a message about the
+        current patch being applied will be printed. This option will cause
+        additional information to be reported.
+</p>
+</dd>
 </dl>
 </div>
 <h2>Configuration</h2>
@@ -510,7 +573,7 @@ apply.whitespace
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Jul-2006 01:37:31 UTC
+Last updated 26-Aug-2006 08:43:06 UTC
 </div>
 </div>
 </body>

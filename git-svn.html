@@ -277,9 +277,8 @@ git-svn(1) Manual Page
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
 <p>git-svn is a simple conduit for changesets between a single Subversion
-branch and git.</p>
-<p>git-svn is not to be confused with git-svnimport.  The were designed
-with very different goals in mind.</p>
+branch and git. It is not to be confused with <a href="git-svnimport.html">git-svnimport(1)</a>.
+They were designed with very different goals in mind.</p>
 <p>git-svn is designed for an individual developer who wants a
 bidirectional flow of changesets between a single branch in Subversion
 and an arbitrary number of branches in git.  git-svnimport is designed
@@ -297,7 +296,7 @@ git-svnimport is designed for.</p>
 <div class="sectionbody">
 <dl>
 <dt>
-init
+<em>init</em>
 </dt>
 <dd>
 <p>
@@ -307,30 +306,38 @@ init
 </p>
 </dd>
 <dt>
-fetch
+<em>fetch</em>
 </dt>
 <dd>
 <p>
-        Fetch unfetched revisions from the Subversion URL we are
-        tracking.  refs/remotes/git-svn will be updated to the
-        latest revision.
+Fetch unfetched revisions from the Subversion URL we are
+tracking.  refs/remotes/git-svn will be updated to the
+latest revision.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Note: You should never attempt to modify the remotes/git-svn
+<p>Note: You should never attempt to modify the remotes/git-svn
 branch outside of git-svn.  Instead, create a branch from
-remotes/git-svn and work on that branch.  Use the 'commit'
+remotes/git-svn and work on that branch.  Use the <em>commit</em>
 command (see below) to write git commits back to
-remotes/git-svn.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>See 'Additional Fetch Arguments' if you are interested in
-manually joining branches on commit.</tt></pre>
-</div></div>
+remotes/git-svn.</p>
+<p>See <em><a href="#fetch-args">Additional Fetch Arguments</a></em> if you are interested in
+manually joining branches on commit.</p>
 </dd>
 <dt>
-commit
+<em>dcommit</em>
+</dt>
+<dd>
+<p>
+        Commit all diffs from the current HEAD directly to the SVN
+        repository, and then rebase or reset (depending on whether or
+        not there is a diff between SVN and HEAD).  It is recommended
+        that you run git-svn fetch and rebase (not pull) your commits
+        against the latest changes in the SVN repository.
+        This is advantageous over <em>commit</em> (below) because it produces
+        cleaner, more linear history.
+</p>
+</dd>
+<dt>
+<em>commit</em>
 </dt>
 <dd>
 <p>
@@ -343,12 +350,12 @@ commit
 </p>
 </dd>
 <dt>
-rebuild
+<em>rebuild</em>
 </dt>
 <dd>
 <p>
         Not a part of daily usage, but this is a useful command if
-        you've just cloned a repository (using git-clone) that was
+        you've just cloned a repository (using <a href="git-clone.html">git-clone(1)</a>) that was
         tracked with git-svn.  Unfortunately, git-clone does not clone
         git-svn metadata and the svn working tree that git-svn uses for
         its operations.  This rebuilds the metadata so git-svn can
@@ -358,7 +365,7 @@ rebuild
 </p>
 </dd>
 <dt>
-show-ignore
+<em>show-ignore</em>
 </dt>
 <dd>
 <p>
@@ -380,19 +387,13 @@ show-ignore
 </dt>
 <dd>
 <p>
-        Only used with the <em>fetch</em> command.
+Only used with the <em>fetch</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Takes any valid -r&lt;argument&gt; svn would accept and passes it
+<p>Takes any valid -r&lt;argument&gt; svn would accept and passes it
 directly to svn. -r&lt;ARG1&gt;:&lt;ARG2&gt; ranges and "{" DATE "}" syntax
 is also supported.  This is passed directly to svn, see svn
-documentation for more details.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>This can allow you to make partial mirrors when running fetch.</tt></pre>
-</div></div>
+documentation for more details.</p>
+<p>This can allow you to make partial mirrors when running fetch.</p>
 </dd>
 <dt>
 -
@@ -402,34 +403,25 @@ documentation for more details.</tt></pre>
 </dt>
 <dd>
 <p>
-        Only used with the <em>commit</em> command.
+Only used with the <em>commit</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Read a list of commits from stdin and commit them in reverse
+<p>Read a list of commits from stdin and commit them in reverse
 order.  Only the leading sha1 is read from each line, so
-git-rev-list --pretty=oneline output can be used.</tt></pre>
-</div></div>
+git-rev-list --pretty=oneline output can be used.</p>
 </dd>
 <dt>
 --rmdir
 </dt>
 <dd>
 <p>
-        Only used with the <em>commit</em> command.
+Only used with the <em>commit</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Remove directories from the SVN tree if there are no files left
+<p>Remove directories from the SVN tree if there are no files left
 behind.  SVN can version empty directories, and they are not
 removed by default if there are no files left in them.  git
 cannot version empty directories.  Enabling this flag will make
-the commit to SVN act like git.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>repo-config key: svn.rmdir</tt></pre>
-</div></div>
+the commit to SVN act like git.</p>
+<p>repo-config key: svn.rmdir</p>
 </dd>
 <dt>
 -e
@@ -439,18 +431,12 @@ the commit to SVN act like git.</tt></pre>
 </dt>
 <dd>
 <p>
-        Only used with the <em>commit</em> command.
+Only used with the <em>commit</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Edit the commit message before committing to SVN.  This is off by
+<p>Edit the commit message before committing to SVN.  This is off by
 default for objects that are commits, and forced on when committing
-tree objects.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>repo-config key: svn.edit</tt></pre>
-</div></div>
+tree objects.</p>
+<p>repo-config key: svn.edit</p>
 </dd>
 <dt>
 -l&lt;num&gt;
@@ -460,18 +446,13 @@ tree objects.</tt></pre>
 </dt>
 <dd>
 <p>
-        Both of these are only used with the <em>commit</em> command.
+Both of these are only used with the <em>commit</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>They are both passed directly to git-diff-tree see
-git-diff-tree(1) for more information.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>repo-config key: svn.l
-repo-config key: svn.findcopiesharder</tt></pre>
-</div></div>
+<p>They are both passed directly to git-diff-tree see
+<a href="git-diff-tree.html">git-diff-tree(1)</a> for more information.</p>
+<div class="verseblock">
+<div class="content">repo-config key: svn.l
+repo-config key: svn.findcopiesharder</div></div>
 </dd>
 <dt>
 -A&lt;filename&gt;
@@ -481,27 +462,53 @@ repo-config key: svn.findcopiesharder</tt></pre>
 </dt>
 <dd>
 <p>
-        Syntax is compatible with the files used by git-svnimport and
-        git-cvsimport:
+Syntax is compatible with the files used by git-svnimport and
+git-cvsimport:
 </p>
-</dd>
-</dl>
 <div class="listingblock">
 <div class="content">
-<pre><tt>loginname = Joe User &lt;user@example.com&gt;</tt></pre>
+<pre><tt>        loginname = Joe User &lt;user@example.com&gt;</tt></pre>
 </div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>If this option is specified and git-svn encounters an SVN
+<p>If this option is specified and git-svn encounters an SVN
 committer name that does not exist in the authors-file, git-svn
 will abort operation. The user will then have to add the
 appropriate entry.  Re-running the previous git-svn command
-after the authors-file is modified should continue operation.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>repo-config key: svn.authors-file</tt></pre>
-</div></div>
+after the authors-file is modified should continue operation.</p>
+<p>repo-config key: svn.authors-file</p>
+</dd>
+<dt>
+-m
+</dt>
+<dt>
+--merge
+</dt>
+<dt>
+-s&lt;strategy&gt;
+</dt>
+<dt>
+--strategy=&lt;strategy&gt;
+</dt>
+<dd>
+<p>
+These are only used with the <em>dcommit</em> command.
+</p>
+<p>Passed directly to git-rebase when using <em>dcommit</em> if a
+<em>git-reset</em> cannot be used (see dcommit).</p>
+</dd>
+<dt>
+-n
+</dt>
+<dt>
+--dry-run
+</dt>
+<dd>
+<p>
+This is only used with the <em>dcommit</em> command.
+</p>
+<p>Print out the series of git arguments that would show
+which diffs would be committed to SVN.</p>
+</dd>
+</dl>
 </div>
 <h2>ADVANCED OPTIONS</h2>
 <div class="sectionbody">
@@ -514,29 +521,17 @@ after the authors-file is modified should continue operation.</tt></pre>
 </dt>
 <dd>
 <p>
-        Used with <em>fetch</em> or <em>commit</em>.
+Used with <em>fetch</em> or <em>commit</em>.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>This can be used to join arbitrary git branches to remotes/git-svn
-on new commits where the tree object is equivalent.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>When used with different GIT_SVN_ID values, tags and branches in
+<p>This can be used to join arbitrary git branches to remotes/git-svn
+on new commits where the tree object is equivalent.</p>
+<p>When used with different GIT_SVN_ID values, tags and branches in
 SVN can be tracked this way, as can some merges where the heads
 end up having completely equivalent content.  This can even be
-used to track branches across multiple SVN _repositories_.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>This option may be specified multiple times, once for each
-branch.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>repo-config key: svn.branch</tt></pre>
-</div></div>
+used to track branches across multiple SVN _repositories_.</p>
+<p>This option may be specified multiple times, once for each
+branch.</p>
+<p>repo-config key: svn.branch</p>
 </dd>
 <dt>
 -i&lt;GIT_SVN_ID&gt;
@@ -546,9 +541,10 @@ branch.</tt></pre>
 </dt>
 <dd>
 <p>
-        This sets GIT_SVN_ID (instead of using the environment).  See
-        the section on "Tracking Multiple Repositories or Branches" for
-        more information on using GIT_SVN_ID.
+This sets GIT_SVN_ID (instead of using the environment).  See the
+section on
+<em><a href="#tracking-multiple-repos">Tracking Multiple Repositories or Branches</a></em>
+for more information on using GIT_SVN_ID.
 </p>
 </dd>
 </dl>
@@ -561,43 +557,28 @@ branch.</tt></pre>
 </dt>
 <dd>
 <p>
-        Only used with the <em>rebuild</em> command.
+Only used with the <em>rebuild</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Run this if you used an old version of git-svn that used
+<p>Run this if you used an old version of git-svn that used
 "git-svn-HEAD" instead of "remotes/git-svn" as the branch
-for tracking the remote.</tt></pre>
-</div></div>
+for tracking the remote.</p>
 </dd>
 <dt>
 --no-ignore-externals
 </dt>
 <dd>
 <p>
-        Only used with the <em>fetch</em> and <em>rebuild</em> command.
+Only used with the <em>fetch</em> and <em>rebuild</em> command.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>By default, git-svn passes --ignore-externals to svn to avoid
+<p>By default, git-svn passes --ignore-externals to svn to avoid
 fetching svn:external trees into git.  Pass this flag to enable
-externals tracking directly via git.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Versions of svn that do not support --ignore-externals are
+externals tracking directly via git.</p>
+<p>Versions of svn that do not support --ignore-externals are
 automatically detected and this flag will be automatically
-enabled for them.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Otherwise, do not enable this flag unless you know what you're
-doing.</tt></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>repo-config key: svn.noignoreexternals</tt></pre>
-</div></div>
+enabled for them.</p>
+<p>Otherwise, do not enable this flag unless you know what you're
+doing.</p>
+<p>repo-config key: svn.noignoreexternals</p>
 </dd>
 </dl>
 <h3>Basic Examples</h3>
@@ -614,11 +595,23 @@ doing.</tt></pre>
         git-svn commit &lt;tree-ish&gt; [&lt;tree-ish_2&gt; ...]
 # Commit all the git commits from my-branch that don't exist in SVN:
         git-svn commit remotes/git-svn..my-branch
-# Something is committed to SVN, pull the latest into your branch:
-        git-svn fetch &amp;&amp; git pull . remotes/git-svn
+# Something is committed to SVN, rebase the latest into your branch:
+        git-svn fetch &amp;&amp; git rebase remotes/git-svn
 # Append svn:ignore settings to the default git exclude file:
         git-svn show-ignore &gt;&gt; .git/info/exclude</tt></pre>
 </div></div>
+</div>
+<h2>REBASE VS. PULL</h2>
+<div class="sectionbody">
+<p>Originally, git-svn recommended that the remotes/git-svn branch be
+pulled from.  This is because the author favored <em>git-svn commit B</em>
+to commit a single head rather than the <em>git-svn commit A..B</em> notation
+to commit multiple commits.</p>
+<p>If you use <em>git-svn commit A..B</em> to commit several diffs and you do not
+have the latest remotes/git-svn merged into my-branch, you should use
+<em>git rebase</em> to update your work branch instead of <em>git pull</em>.  <em>pull</em>
+can cause non-linear history to be flattened when committing into SVN,
+which can lead to merge commits reversing previous commits in SVN.</p>
 </div>
 <h2>DESIGN PHILOSOPHY</h2>
 <div class="sectionbody">
@@ -628,7 +621,7 @@ any automated merge/branch tracking on the Subversion side and leaves it
 entirely up to the user on the git side.  It's simply not worth it to do
 a useful translation when the original signal is weak.</p>
 </div>
-<h2>TRACKING MULTIPLE REPOSITORIES OR BRANCHES</h2>
+<h2><a id="tracking-multiple-repos"></a>TRACKING MULTIPLE REPOSITORIES OR BRANCHES</h2>
 <div class="sectionbody">
 <p>This is for advanced users, most users should ignore this section.</p>
 <p>Because git-svn does not care about relationships between different
@@ -642,7 +635,7 @@ invocation.  The interface branch will be remotes/$GIT_SVN_ID, instead of
 remotes/git-svn.  Any remotes/$GIT_SVN_ID branch should never be modified
 by the user outside of git-svn commands.</p>
 </div>
-<h2>ADDITIONAL FETCH ARGUMENTS</h2>
+<h2><a id="fetch-args"></a>ADDITIONAL FETCH ARGUMENTS</h2>
 <div class="sectionbody">
 <p>This is for advanced users, most users should ignore this section.</p>
 <p>Unfetched SVN revisions may be imported as children of existing commits
@@ -650,20 +643,15 @@ by specifying additional arguments to <em>fetch</em>.  Additional parents may
 optionally be specified in the form of sha1 hex sums at the
 command-line.  Unfetched SVN revisions may also be tied to particular
 git commits with the following syntax:</p>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre><tt>svn_revision_number=git_commit_sha1</tt></pre>
+<pre><tt>        svn_revision_number=git_commit_sha1</tt></pre>
 </div></div>
-<dl>
-<dt>
-This allows you to tie unfetched SVN revision 375 to your current HEAD
-</dt>
-<dd>
-<p>
-        <tt>git-svn fetch 375=$(git-rev-parse HEAD)</tt>
-</p>
-</dd>
-</dl>
+<p>This allows you to tie unfetched SVN revision 375 to your current HEAD:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        git-svn fetch 375=$(git-rev-parse HEAD)</tt></pre>
+</div></div>
 <h3>Advanced Example: Tracking a Reorganized Repository</h3>
 <p>If you're tracking a directory that has moved, or otherwise been
 branched or tagged off of another directory in the repository and you
@@ -712,6 +700,10 @@ the possible corner cases (git doesn't do it, either).  Renamed and
 copied files are fully supported if they're similar enough for git to
 detect them.</p>
 </div>
+<h2>SEE ALSO</h2>
+<div class="sectionbody">
+<p><a href="git-rebase.html">git-rebase(1)</a></p>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Eric Wong &lt;normalperson@yhbt.net&gt;.</p>
@@ -722,7 +714,7 @@ detect them.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Jul-2006 01:38:16 UTC
+Last updated 26-Aug-2006 08:43:07 UTC
 </div>
 </div>
 </body>
