@@ -294,30 +294,62 @@ git-rev-list(1) Manual Page
 <p>Lists commit objects in reverse chronological order starting at the
 given commit(s), taking ancestry relationship into account.  This is
 useful to produce human-readable log output.</p>
-<p>Commits which are stated with a preceding <em>^</em> cause listing to stop at
-that point. Their parents are implied. "git-rev-list foo bar ^baz" thus
-means "list all the commits which are included in <em>foo</em> and <em>bar</em>, but
+<p>Commits which are stated with a preceding <em>^</em> cause listing to
+stop at that point. Their parents are implied. Thus the following
+command:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        $ git-rev-list foo bar ^baz</tt></pre>
+</div></div>
+<p>means "list all the commits which are included in <em>foo</em> and <em>bar</em>, but
 not in <em>baz</em>".</p>
-<p>A special notation &lt;commit1&gt;..&lt;commit2&gt; can be used as a
-short-hand for ^&lt;commit1&gt; &lt;commit2&gt;.</p>
-<p>Another special notation is &lt;commit1&gt;&#8230;&lt;commit2&gt; which is useful for
-merges.  The resulting set of commits is the symmetric difference
+<p>A special notation "<em>&lt;commit1&gt;</em>..<em>&lt;commit2&gt;</em>" can be used as a
+short-hand for "^<em>&lt;commit1&gt;</em> <em>&lt;commit2&gt;</em>". For example, either of
+the following may be used interchangeably:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        $ git-rev-list origin..HEAD
+        $ git-rev-list HEAD ^origin</tt></pre>
+</div></div>
+<p>Another special notation is "<em>&lt;commit1&gt;</em>&#8230;<em>&lt;commit2&gt;</em>" which is useful
+for merges.  The resulting set of commits is the symmetric difference
 between the two operands.  The following two commands are equivalent:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git-rev-list A B --not $(git-merge-base --all A B)
-$ git-rev-list A...B</tt></pre>
+<pre><tt>        $ git-rev-list A B --not $(git-merge-base --all A B)
+        $ git-rev-list A...B</tt></pre>
 </div></div>
+<p><a href="git-rev-list.html">git-rev-list(1)</a> is a very essential git program, since it
+provides the ability to build and traverse commit ancestry graphs. For
+this reason, it has a lot of different options that enables it to be
+used by commands as different as <a href="git-bisect.html">git-bisect(1)</a> and
+<a href="git-repack.html">git-repack(1)</a>.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
+<h3>Commit Formatting</h3>
+<p>Using these options, <a href="git-rev-list.html">git-rev-list(1)</a> will act similar to the
+more specialized family of commit log tools: <a href="git-log.html">git-log(1)</a>,
+<a href="git-show.html">git-show(1)</a>, and <a href="git-whatchanged.html">git-whatchanged(1)</a></p>
 <dl>
 <dt>
---pretty
+--pretty[=<em>&lt;format&gt;</em>]
 </dt>
 <dd>
 <p>
-        Print the contents of the commit changesets in human-readable form.
+        Pretty print the contents of the commit logs in a given format,
+        where <em>&lt;format&gt;</em> can be one of <em>raw</em>, <em>medium</em>, <em>short</em>, <em>full</em>,
+        and <em>oneline</em>. When left out the format default to <em>medium</em>.
+</p>
+</dd>
+<dt>
+--relative-date
+</dt>
+<dd>
+<p>
+        Show dates relative to the current time, e.g. "2 hours ago".
+        Only takes effect for dates shown in human-readable format, such
+        as when using "--pretty".
 </p>
 </dd>
 <dt>
@@ -325,8 +357,8 @@ $ git-rev-list A...B</tt></pre>
 </dt>
 <dd>
 <p>
-        Print the contents of the commit in raw-format; each
-        record is separated with a NUL character.
+        Print the contents of the commit in raw-format; each record is
+        separated with a NUL character.
 </p>
 </dd>
 <dt>
@@ -337,57 +369,59 @@ $ git-rev-list A...B</tt></pre>
         Print the parents of the commit.
 </p>
 </dd>
+</dl>
+<h3>Diff Formatting</h3>
+<p>Below are listed options that control the formatting of diff output.
+Some of them are specific to <a href="git-rev-list.html">git-rev-list(1)</a>, however other diff
+options may be given. See <a href="git-diff-files.html">git-diff-files(1)</a> for more options.</p>
+<dl>
 <dt>
---objects
+-c
 </dt>
 <dd>
 <p>
-        Print the object IDs of any object referenced by the listed commits.
-        <em>git-rev-list --objects foo ^bar</em> thus means "send me all object IDs
-        which I need to download if I have the commit object <em>bar</em>, but
-        not <em>foo</em>".
+        This flag changes the way a merge commit is displayed.  It shows
+        the differences from each of the parents to the merge result
+        simultaneously instead of showing pairwise diff between a parent
+        and the result one at a time. Furthermore, it lists only files
+        which were modified from all parents.
 </p>
 </dd>
 <dt>
---objects-edge
+--cc
 </dt>
 <dd>
 <p>
-        Similar to <tt>--objects</tt>, but also print the IDs of
-        excluded commits prefixed with a <tt>-</tt> character.  This is
-        used by <tt>git-pack-objects</tt> to build <em>thin</em> pack, which
-        records objects in deltified form based on objects
-        contained in these excluded commits to reduce network
-        traffic.
+        This flag implies the <em>-c</em> options and further compresses the
+        patch output by omitting hunks that show differences from only
+        one parent, or show the same change from all but one parent for
+        an Octopus merge.
 </p>
 </dd>
 <dt>
---unpacked
+-r
 </dt>
 <dd>
 <p>
-        Only useful with <tt>--objects</tt>; print the object IDs that
-        are not in packs.
+        Show recursive diffs.
 </p>
 </dd>
 <dt>
---bisect
+-t
 </dt>
 <dd>
 <p>
-        Limit output to the one commit object which is roughly halfway
-        between the included and excluded commits. Thus, if <em>git-rev-list
-        --bisect foo ^bar ^baz</em> outputs <em>midpoint</em>, the output
-        of <em>git-rev-list foo ^midpoint</em> and <em>git-rev-list midpoint
-        ^bar ^baz</em> would be of roughly the same length.
-        Finding the change
-        which introduces a regression is thus reduced to a binary search:
-        repeatedly generate and test new 'midpoint's until the commit chain
-        is of length one.
+        Show the tree objects in the diff output. This implies <em>-r</em>.
 </p>
 </dd>
+</dl>
+<h3>Commit Limiting</h3>
+<p>Besides specifying a range of commits that should be listed using the
+special notations explained in the description, additional commit
+limiting may be applied.</p>
+<dl>
 <dt>
---max-count
+-n <em>number</em>, --max-count=<em>number</em>
 </dt>
 <dd>
 <p>
@@ -395,24 +429,27 @@ $ git-rev-list A...B</tt></pre>
 </p>
 </dd>
 <dt>
---max-age=timestamp, --min-age=timestamp
+--since=<em>date</em>, --after=<em>date</em>
+</dt>
+<dd>
+<p>
+        Show commits more recent than a specific date.
+</p>
+</dd>
+<dt>
+--until=<em>date</em>, --before=<em>date</em>
+</dt>
+<dd>
+<p>
+        Show commits older than a specific date.
+</p>
+</dd>
+<dt>
+--max-age=<em>timestamp</em>, --min-age=<em>timestamp</em>
 </dt>
 <dd>
 <p>
         Limit the commits output to specified time range.
-</p>
-</dd>
-<dt>
---sparse
-</dt>
-<dd>
-<p>
-        When optional paths are given, the command outputs only
-        the commits that changes at least one of them, and also
-        ignores merges that do not touch the given paths.  This
-        flag makes the command output all eligible commits
-        (still subject to count and age limitation), but apply
-        merge simplification nevertheless.
 </p>
 </dd>
 <dt>
@@ -436,9 +473,8 @@ $ git-rev-list A...B</tt></pre>
 </dt>
 <dd>
 <p>
-        Reverses the meaning of the <em>^</em> prefix (or lack
-        thereof) for all following revision specifiers, up to
-        the next <tt>--not</tt>.
+        Reverses the meaning of the <em>^</em> prefix (or lack thereof)
+        for all following revision specifiers, up to the next <em>--not</em>.
 </p>
 </dd>
 <dt>
@@ -446,19 +482,8 @@ $ git-rev-list A...B</tt></pre>
 </dt>
 <dd>
 <p>
-        Pretend as if all the refs in <tt>$GIT_DIR/refs/</tt> are
-        listed on the command line as &lt;commit&gt;.
-</p>
-</dd>
-<dt>
---topo-order
-</dt>
-<dd>
-<p>
-        By default, the commits are shown in reverse
-        chronological order.  This option makes them appear in
-        topological order (i.e. descendant commits are shown
-        before their parents).
+        Pretend as if all the refs in <tt>$GIT_DIR/refs/</tt> are listed on the
+        command line as <em>&lt;commit&gt;</em>.
 </p>
 </dd>
 <dt>
@@ -471,13 +496,107 @@ $ git-rev-list A...B</tt></pre>
 </p>
 </dd>
 <dt>
---relative-date
+--boundary
 </dt>
 <dd>
 <p>
-        Show dates relative to the current time, e.g. "2 hours ago".
-        Only takes effect for dates shown in human-readable format,
-        such as when using "--pretty".
+        Output uninteresting commits at the boundary, which are usually
+        not shown.
+</p>
+</dd>
+<dt>
+--dense, --sparse
+</dt>
+<dd>
+<p>
+When optional paths are given, the default behaviour (<em>--dense</em>) is to
+only output commits that changes at least one of them, and also ignore
+merges that do not touch the given paths.
+</p>
+<p>Use the <em>--sparse</em> flag to makes the command output all eligible commits
+(still subject to count and age limitation), but apply merge
+simplification nevertheless.</p>
+</dd>
+<dt>
+--bisect
+</dt>
+<dd>
+<p>
+Limit output to the one commit object which is roughly halfway between
+the included and excluded commits. Thus, if
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        $ git-rev-list --bisect foo ^bar ^baz</tt></pre>
+</div></div>
+<p>outputs <em>midpoint</em>, the output of the two commands</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        $ git-rev-list foo ^midpoint
+        $ git-rev-list midpoint ^bar ^baz</tt></pre>
+</div></div>
+<p>would be of roughly the same length.  Finding the change which
+introduces a regression is thus reduced to a binary search: repeatedly
+generate and test new 'midpoint's until the commit chain is of length
+one.</p>
+</dd>
+</dl>
+<h3>Commit Ordering</h3>
+<p>By default, the commits are shown in reverse chronological order.</p>
+<dl>
+<dt>
+--topo-order
+</dt>
+<dd>
+<p>
+        This option makes them appear in topological order (i.e.
+        descendant commits are shown before their parents).
+</p>
+</dd>
+<dt>
+--date-order
+</dt>
+<dd>
+<p>
+        This option is similar to <em>--topo-order</em> in the sense that no
+        parent comes before all of its children, but otherwise things
+        are still ordered in the commit timestamp order.
+</p>
+</dd>
+</dl>
+<h3>Object Traversal</h3>
+<p>These options are mostly targeted for packing of git repositories.</p>
+<dl>
+<dt>
+--objects
+</dt>
+<dd>
+<p>
+        Print the object IDs of any object referenced by the listed
+        commits.  <em>git-rev-list --objects foo ^bar</em> thus means "send me
+        all object IDs which I need to download if I have the commit
+        object <em>bar</em>, but not <em>foo</em>".
+</p>
+</dd>
+<dt>
+--objects-edge
+</dt>
+<dd>
+<p>
+        Similar to <em>--objects</em>, but also print the IDs of excluded
+        commits prefixed with a "-" character.  This is used by
+        <a href="git-pack-objects.html">git-pack-objects(1)</a> to build "thin" pack, which records
+        objects in deltified form based on objects contained in these
+        excluded commits to reduce network traffic.
+</p>
+</dd>
+<dt>
+--unpacked
+</dt>
+<dd>
+<p>
+        Only useful with <em>--objects</em>; print the object IDs that are not
+        in packs.
 </p>
 </dd>
 </dl>
@@ -488,7 +607,8 @@ $ git-rev-list A...B</tt></pre>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<p>Documentation by David Greaves, Junio C Hamano, Jonas Fonseca
+and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -496,7 +616,7 @@ $ git-rev-list A...B</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 29-Aug-2006 04:02:36 UTC
+Last updated 03-Sep-2006 06:18:19 UTC
 </div>
 </div>
 </body>
