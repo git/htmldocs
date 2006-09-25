@@ -276,6 +276,7 @@ git-daemon(1) Manual Page
 <div class="content"><em>git-daemon</em> [--verbose] [--syslog] [--inetd | --port=n] [--export-all]
              [--timeout=n] [--init-timeout=n] [--strict-paths]
              [--base-path=path] [--user-path | --user-path=path]
+             [--interpolated-path=pathtemplate]
              [--enable=service] [--disable=service]
              [--allow-override=service] [--forbid-override=service]
              [--reuseaddr] [--detach] [--pid-file=file]
@@ -321,6 +322,17 @@ git repositories.</p>
         <em>--base-path=/srv/git</em> on example.com, then if you later try to pull
         <em>git://example.com/hello.git</em>, <tt>git-daemon</tt> will interpret the path
         as <em>/srv/git/hello.git</em>.
+</p>
+</dd>
+<dt>
+--interpolated-path=pathtemplate
+</dt>
+<dd>
+<p>
+        To support virtual hosting, an interpolated path template can be
+        used to dynamically construct alternate paths.  The template
+        supports %H for the target hostname as supplied by the client,
+        and %D for the absolute path of the named repository.
 </p>
 </dd>
 <dt>
@@ -491,6 +503,56 @@ upload-pack
 </dd>
 </dl>
 </div>
+<h2>EXAMPLES</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+git-daemon as inetd server
+</dt>
+<dd>
+<p>
+        To set up <tt>git-daemon</tt> as an inetd service that handles any
+        repository under the whitelisted set of directories, /pub/foo
+        and /pub/bar, place an entry like the following into
+        /etc/inetd all on one line:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        git stream tcp nowait nobody  /usr/bin/git-daemon
+                git-daemon --inetd --verbose
+                --syslog --export-all
+                /pub/foo /pub/bar</tt></pre>
+</div></div>
+</dd>
+<dt>
+git-daemon as inetd server for virtual hosts
+</dt>
+<dd>
+<p>
+        To set up <tt>git-daemon</tt> as an inetd service that handles
+        repositories for different virtual hosts, <tt>www.example.com</tt>
+        and <tt>www.example.org</tt>, place an entry like the following into
+        <tt>/etc/inetd</tt> all on one line:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        git stream tcp nowait nobody /usr/bin/git-daemon
+                git-daemon --inetd --verbose
+                --syslog --export-all
+                --interpolated-path=/pub/%H%D
+                /pub/www.example.org/software
+                /pub/www.example.com/software
+                /software</tt></pre>
+</div></div>
+<p>In this example, the root-level directory <tt>/pub</tt> will contain
+a subdirectory for each virtual host name supported.
+Further, both hosts advertise repositories simply as
+<tt>git://www.example.com/software/repo.git</tt>.  For pre-1.4.0
+clients, a symlink from <tt>/software</tt> into the appropriate
+default repository could be made as well.</p>
+</dd>
+</dl>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;, YOSHIFUJI Hideaki
@@ -506,7 +568,7 @@ upload-pack
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Sep-2006 11:44:00 UTC
+Last updated 25-Sep-2006 04:45:33 UTC
 </div>
 </div>
 </body>
