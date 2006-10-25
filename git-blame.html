@@ -272,7 +272,7 @@ git-blame(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-blame</em> [-c] [-l] [-t] [-S &lt;revs-file&gt;] [--] &lt;file&gt; [&lt;rev&gt;]</p>
+<p><em>git-blame</em> [-c] [-l] [-t] [-f] [-n] [-p] [-S &lt;revs-file&gt;] [--] &lt;file&gt; [&lt;rev&gt;]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -329,6 +329,32 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </p>
 </dd>
 <dt>
+-f, --show-name
+</dt>
+<dd>
+<p>
+        Show filename in the original commit.  By default
+        filename is shown if there is any line that came from a
+        file with different name, due to rename detection.
+</p>
+</dd>
+<dt>
+-n, --show-number
+</dt>
+<dd>
+<p>
+        Show line number in the original commit (Default: off).
+</p>
+</dd>
+<dt>
+-p, --porcelain
+</dt>
+<dd>
+<p>
+        Show in a format designed for machine consumption.
+</p>
+</dd>
+<dt>
 -h, --help
 </dt>
 <dd>
@@ -337,6 +363,59 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </p>
 </dd>
 </dl>
+</div>
+<h2>THE PORCELAIN FORMAT</h2>
+<div class="sectionbody">
+<p>In this format, each line is output after a header; the
+header at the minumum has the first line which has:</p>
+<ul>
+<li>
+<p>
+40-byte SHA-1 of the commit the line is attributed to;
+</p>
+</li>
+<li>
+<p>
+the line number of the line in the original file;
+</p>
+</li>
+<li>
+<p>
+the line number of the line in the final file;
+</p>
+</li>
+<li>
+<p>
+on a line that starts a group of line from a different
+  commit than the previous one, the number of lines in this
+  group.  On subsequent lines this field is absent.
+</p>
+</li>
+</ul>
+<p>This header line is followed by the following information
+at least once for each commit:</p>
+<ul>
+<li>
+<p>
+author name ("author"), email ("author-mail"), time
+  ("author-time"), and timezone ("author-tz"); similarly
+  for committer.
+</p>
+</li>
+<li>
+<p>
+filename in the commit the line is attributed to.
+</p>
+</li>
+<li>
+<p>
+the first line of the commit log message ("summary").
+</p>
+</li>
+</ul>
+<p>The contents of the actual line is output after the above
+header, prefixed by a TAB. This is to allow adding more
+header elements later.</p>
 </div>
 <h2>SEE ALSO</h2>
 <div class="sectionbody">
@@ -352,7 +431,7 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:40:53 UTC
+Last updated 25-Oct-2006 22:55:21 UTC
 </div>
 </div>
 </body>
