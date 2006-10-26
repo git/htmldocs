@@ -263,37 +263,24 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>GIT suite has over 100 commands, and the manual page for each of
-them discusses what the command does and how it is used in
-detail, but until you know what command should be used in order
-to achieve what you want to do, you cannot tell which manual
-page to look at, and if you know that already you do not need
-the manual.</p>
-<p>Does that mean you need to know all of them before you can use
-git?  Not at all.  Depending on the role you play, the set of
-commands you need to know is slightly different, but in any case
-what you need to learn is far smaller than the full set of
-commands to carry out your day-to-day work.  This document is to
-serve as a cheat-sheet and a set of pointers for people playing
-various roles.</p>
-<p><a href="#Basic Repository">[Basic Repository]</a> commands are needed by people who has a
+<p><a href="#Basic Repository">[Basic Repository]</a> commands are needed by people who have a
 repository --- that is everybody, because every working tree of
 git is a repository.</p>
 <p>In addition, <a href="#Individual Developer (Standalone)">[Individual Developer (Standalone)]</a> commands are
 essential for anybody who makes a commit, even for somebody who
 works alone.</p>
 <p>If you work with other people, you will need commands listed in
-<a href="#Individual Developer (Participant)">[Individual Developer (Participant)]</a> section as well.</p>
-<p>People who play <a href="#Integrator">[Integrator]</a> role need to learn some more
+the <a href="#Individual Developer (Participant)">[Individual Developer (Participant)]</a> section as well.</p>
+<p>People who play the <a href="#Integrator">[Integrator]</a> role need to learn some more
 commands in addition to the above.</p>
 <p><a href="#Repository Administration">[Repository Administration]</a> commands are for system
-administrators who are responsible to care and feed git
-repositories to support developers.</p>
+administrators who are responsible for the care and feeding
+of git repositories.</p>
 </div>
 </div>
 <h2>Basic Repository<a id="Basic Repository"></a></h2>
 <div class="sectionbody">
-<p>Everybody uses these commands to feed and care git repositories.</p>
+<p>Everybody uses these commands to maintain git repositories.</p>
 <ul>
 <li>
 <p>
@@ -303,13 +290,12 @@ repositories to support developers.</p>
 </li>
 <li>
 <p>
-<a href="git-fsck-objects.html">git-fsck-objects(1)</a> to validate the repository.
+<a href="git-fsck-objects.html">git-fsck-objects(1)</a> to check the repository for errors.
 </p>
 </li>
 <li>
 <p>
-<a href="git-prune.html">git-prune(1)</a> to garbage collect cruft in the
-    repository.
+<a href="git-prune.html">git-prune(1)</a> to remove unused objects in the repository.
 </p>
 </li>
 <li>
@@ -370,8 +356,8 @@ $ git prune</tt></pre>
 <ol>
 <li>
 <p>
-pack all the objects reachable from the refs into one pack
-and remove unneeded other packs
+pack all the objects reachable from the refs into one pack,
+then remove the other packs.
 </p>
 </li>
 </ol>
@@ -392,12 +378,6 @@ following commands.</p>
 <li>
 <p>
 <a href="git-log.html">git-log(1)</a> to see what happened.
-</p>
-</li>
-<li>
-<p>
-<a href="git-whatchanged.html">git-whatchanged(1)</a> to find out where things have
-    come from.
 </p>
 </li>
 <li>
@@ -447,11 +427,8 @@ following commands.</p>
 </li>
 </ul>
 <h3>Examples</h3>
-<dl>
-<dt>
-Extract a tarball and create a working tree and a new repository to keep track of it.
-</dt>
-<dd>
+<p>Use a tarball as a starting point for a new repository:</p>
+<p>+</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ tar zxf frotz.tar.gz
@@ -461,19 +438,10 @@ $ git add . <b>(1)</b>
 $ git commit -m 'import of frotz source tree.'
 $ git tag v2.43 <b>(2)</b></tt></pre>
 </div></div>
-<ol>
-<li>
-<p>
-add everything under the current directory.
-</p>
-</li>
-<li>
-<p>
-make a lightweight, unannotated tag.
-</p>
-</li>
-</ol>
-</dd>
+<p>+
+&lt;1&gt; add everything under the current directory.
+&lt;2&gt; make a lightweight, unannotated tag.</p>
+<dl>
 <dt>
 Create a topic branch and develop.
 </dt>
@@ -610,7 +578,7 @@ $ cd my2.6
 $ edit/compile/test; git commit -a -s <b>(1)</b>
 $ git format-patch origin <b>(2)</b>
 $ git pull <b>(3)</b>
-$ git whatchanged -p ORIG_HEAD.. arch/i386 include/asm-i386 <b>(4)</b>
+$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <b>(4)</b>
 $ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <b>(5)</b>
 $ git reset --hard ORIG_HEAD <b>(6)</b>
 $ git prune <b>(7)</b>
@@ -928,7 +896,7 @@ Run git-daemon to serve /pub/scm from inetd.
 <div class="content">
 <pre><tt>$ grep git /etc/inetd.conf
 git     stream  tcp     nowait  nobody \
-  /usr/bin/git-daemon git-daemon --inetd --syslog --export-all /pub/scm</tt></pre>
+  /usr/bin/git-daemon git-daemon --inetd --export-all /pub/scm</tt></pre>
 </div></div>
 <p>The actual configuration line should be on one line.</p>
 </dd>
@@ -950,7 +918,7 @@ service git
         wait            = no
         user            = nobody
         server          = /usr/bin/git-daemon
-        server_args     = --inetd --syslog --export-all --base-path=/pub/scm
+        server_args     = --inetd --export-all --base-path=/pub/scm
         log_on_failure  += USERID
 }</tt></pre>
 </div></div>
@@ -1067,7 +1035,7 @@ upload to public HTTP server hosted by your ISP.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:41:48 UTC
+Last updated 26-Oct-2006 08:47:21 UTC
 </div>
 </div>
 </body>

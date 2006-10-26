@@ -489,7 +489,7 @@ The full SHA1 object name (40-byte hexadecimal string), or
 <li>
 <p>
 An output from <tt>git-describe</tt>; i.e. a closest tag, followed by a
-  dash, a <em>g</em>, and an abbreviated object name.
+  dash, a <tt>g</tt>, and an abbreviated object name.
 </p>
 </li>
 <li>
@@ -498,11 +498,47 @@ A symbolic ref name.  E.g. <em>master</em> typically means the commit
   object referenced by $GIT_DIR/refs/heads/master.  If you
   happen to have both heads/master and tags/master, you can
   explicitly say <em>heads/master</em> to tell git which one you mean.
+  When ambiguous, a <tt>&lt;name&gt;</tt> is disambiguated by taking the
+  first match in the following rules:
+</p>
+<ol>
+<li>
+<p>
+if <tt>$GIT_DIR/&lt;name&gt;</tt> exists, that is what you mean (this is usually
+    useful only for <tt>HEAD</tt>, <tt>FETCH_HEAD</tt> and <tt>MERGE_HEAD</tt>);
 </p>
 </li>
 <li>
 <p>
-A suffix <em>@</em> followed by a date specification enclosed in a brace
+otherwise, <tt>$GIT_DIR/refs/&lt;name&gt;</tt> if exists;
+</p>
+</li>
+<li>
+<p>
+otherwise, <tt>$GIT_DIR/refs/tags/&lt;name&gt;</tt> if exists;
+</p>
+</li>
+<li>
+<p>
+otherwise, <tt>$GIT_DIR/refs/heads/&lt;name&gt;</tt> if exists;
+</p>
+</li>
+<li>
+<p>
+otherwise, <tt>$GIT_DIR/refs/remotes/&lt;name&gt;</tt> if exists;
+</p>
+</li>
+<li>
+<p>
+otherwise, <tt>$GIT_DIR/refs/remotes/&lt;name&gt;/HEAD</tt> if exists.
+</p>
+</li>
+</ol>
+</li>
+<li>
+<p>
+A ref followed by the suffix <em>@</em> with a date specification
+  enclosed in a brace
   pair (e.g. <em>{yesterday}</em>, <em>{1 month 2 weeks 3 days 1 hour 1
   second ago}</em> or <em>{1979-02-26 18:30:00}</em>) to specify the value
   of the ref at a prior point in time.  This suffix may only be
@@ -525,7 +561,9 @@ A suffix <em>^</em> to a revision parameter means the first parent of
 A suffix <em>&#126;&lt;n&gt;</em> to a revision parameter means the commit
   object that is the &lt;n&gt;th generation grand-parent of the named
   commit object, following only the first parent.  I.e. rev~3 is
-  equivalent to rev^^^ which is equivalent to  rev^1^1^1.
+  equivalent to rev^^^ which is equivalent to
+  rev^1^1^1.  See below for a illustration of
+  the usage of this form.
 </p>
 </li>
 <li>
@@ -637,7 +675,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Oct-2006 05:58:41 UTC
+Last updated 26-Oct-2006 08:47:20 UTC
 </div>
 </div>
 </body>
