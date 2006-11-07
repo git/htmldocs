@@ -310,20 +310,63 @@ git-rebase master topic</tt></pre>
                  /
     D---E---F---G master</tt></pre>
 </div></div>
-<p>While, starting from the same point, the result of either of the following
-commands:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-rebase --onto master~1 master
-git-rebase --onto master~1 master topic</tt></pre>
-</div></div>
-<p>would be:</p>
+<p>The latter form is just a short-hand of <tt>git checkout topic</tt>
+followed by <tt>git rebase master</tt>.</p>
+<p>Here is how you would transplant a topic branch based on one
+branch to another, to pretend that you forked the topic branch
+from the latter branch, using <tt>rebase --onto</tt>.</p>
+<p>First let's assume your <em>topic</em> is based on branch <em>next</em>.
+For example feature developed in <em>topic</em> depends on some
+functionality which is found in <em>next</em>.</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>              A'--B'--C' topic
-             /
-    D---E---F---G master</tt></pre>
+<pre><tt>    o---o---o---o---o  master
+         \
+          o---o---o---o---o  next
+                           \
+                            o---o---o  topic</tt></pre>
 </div></div>
+<p>We would want to make <em>topic</em> forked from branch <em>master</em>,
+for example because the functionality <em>topic</em> branch depend on
+got merged into more stable <em>master</em> branch, like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    o---o---o---o---o  master
+        |            \
+        |             o'--o'--o'  topic
+         \
+          o---o---o---o---o  next</tt></pre>
+</div></div>
+<p>We can get this using the following command:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git-rebase --onto master next topic</tt></pre>
+</div></div>
+<p>Another example of --onto option is to rebase part of a
+branch.  If we have the following situation:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                            H---I---J topicB
+                           /
+                  E---F---G  topicA
+                 /
+    A---B---C---D  master</tt></pre>
+</div></div>
+<p>then the command</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git-rebase --onto master topicA topicB</tt></pre>
+</div></div>
+<p>would result in:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                 H'--I'--J'  topicB
+                /
+                | E---F---G  topicA
+                |/
+    A---B---C---D  master</tt></pre>
+</div></div>
+<p>This is useful when topicB does not depend on topicA.</p>
 <p>In case of conflict, git-rebase will stop at the first problematic commit
 and leave conflict markers in the tree.  You can use git diff to locate
 the markers (&lt;&lt;&lt;&lt;&lt;&lt;) and make edits to resolve the conflict.  For each
@@ -516,7 +559,7 @@ a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Oct-2006 05:58:40 UTC
+Last updated 07-Nov-2006 07:19:02 UTC
 </div>
 </div>
 </body>
