@@ -272,7 +272,8 @@ git-index-pack(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-index-pack</em> [-o &lt;index-file&gt;] &lt;pack-file&gt;</p>
+<p><em>git-index-pack</em> [-v] [-o &lt;index-file&gt;] &lt;pack-file&gt;
+<em>git-index-pack</em> --stdin [--fix-thin] [--keep] [-v] [-o &lt;index-file&gt;] [&lt;pack-file&gt;]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -284,6 +285,14 @@ objects/pack/ directory of a git repository.</p>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
 <dl>
+<dt>
+-v
+</dt>
+<dd>
+<p>
+        Be verbose about what is going on, including progress status.
+</p>
+</dd>
 <dt>
 -o &lt;index-file&gt;
 </dt>
@@ -297,7 +306,71 @@ objects/pack/ directory of a git repository.</p>
         with .pack).
 </p>
 </dd>
+<dt>
+--stdin
+</dt>
+<dd>
+<p>
+        When this flag is provided, the pack is read from stdin
+        instead and a copy is then written to &lt;pack-file&gt;. If
+        &lt;pack-file&gt; is not specified, the pack is written to
+        objects/pack/ directory of the current git repository with
+        a default name determined from the pack content.  If
+        &lt;pack-file&gt; is not specified consider using --keep to
+        prevent a race condition between this process and
+        <a href=":git-repack.html">:git-repack(1)</a> .
+</p>
+</dd>
+<dt>
+--fix-thin
+</dt>
+<dd>
+<p>
+        It is possible for <a href="git-pack-objects.html">git-pack-objects(1)</a> to build
+        "thin" pack, which records objects in deltified form based on
+        objects not included in the pack to reduce network traffic.
+        Those objects are expected to be present on the receiving end
+        and they must be included in the pack for that pack to be self
+        contained and indexable. Without this option any attempt to
+        index a thin pack will fail. This option only makes sense in
+        conjunction with --stdin.
+</p>
+</dd>
+<dt>
+--keep
+</dt>
+<dd>
+<p>
+        Before moving the index into its final destination
+        create an empty .keep file for the associated pack file.
+        This option is usually necessary with --stdin to prevent a
+        simultaneous <a href="git-repack.html">git-repack(1)</a> process from deleting
+        the newly constructed pack and index before refs can be
+        updated to use objects contained in the pack.
+</p>
+</dd>
+<dt>
+--keep=<em>why</em>
+</dt>
+<dd>
+<p>
+        Like --keep create a .keep file before moving the index into
+        its final destination, but rather than creating an empty file
+        place <em>why</em> followed by an LF into the .keep file.  The <em>why</em>
+        message can later be searched for within all .keep files to
+        locate any which have outlived their usefulness.
+</p>
+</dd>
 </dl>
+</div>
+<h2>Note</h2>
+<div class="sectionbody">
+<p>Once the index has been created, the list of object names is sorted
+and the SHA1 hash of that list is printed to stdout. If --stdin was
+also used then this is prefixed by either "pack\t", or "keep\t" if a
+new .keep file was successfully created. This is useful to remove a
+.keep file used as a lock to prevent the race with <a href="git-repack.html">git-repack(1)</a>
+mentioned above.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -313,7 +386,7 @@ objects/pack/ directory of a git repository.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:41:08 UTC
+Last updated 08-Nov-2006 01:33:28 UTC
 </div>
 </div>
 </body>
