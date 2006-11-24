@@ -275,7 +275,8 @@ git-clone(1) Manual Page
 <div class="verseblock">
 <div class="content"><em>git-clone</em> [--template=&lt;template_directory&gt;] [-l [-s]] [-q] [-n] [--bare]
           [-o &lt;name&gt;] [-u &lt;upload-pack&gt;] [--reference &lt;repository&gt;]
-          [--use-separate-remote] &lt;repository&gt; [&lt;directory&gt;]</div></div>
+          [--use-separate-remote | --use-immingled-remote] &lt;repository&gt;
+          [&lt;directory&gt;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -370,9 +371,13 @@ branch you are currently working on.  Remote branches other than
         Make a <em>bare</em> GIT repository.  That is, instead of
         creating <tt>&lt;directory&gt;</tt> and placing the administrative
         files in <tt>&lt;directory&gt;/.git</tt>, make the <tt>&lt;directory&gt;</tt>
-        itself the <tt>$GIT_DIR</tt>. This implies <tt>-n</tt> option.  When
-        this option is used, neither the <tt>origin</tt> branch nor the
-        default <tt>remotes/origin</tt> file is created.
+        itself the <tt>$GIT_DIR</tt>. This obviously implies the <tt>-n</tt>
+        because there is nowhere to check out the working tree.
+        Also the branch heads at the remote are copied directly
+        to corresponding local branch heads, without mapping
+        them to <tt>refs/remotes/origin/</tt>.  When this option is
+        used, neither the <tt>origin</tt> branch nor the default
+        <tt>remotes/origin</tt> file is created.
 </p>
 </dd>
 <dt>
@@ -420,8 +425,20 @@ branch you are currently working on.  Remote branches other than
 <dd>
 <p>
         Save remotes heads under <tt>$GIT_DIR/remotes/origin/</tt> instead
-        of <tt>$GIT_DIR/refs/heads/</tt>.  Only the master branch is saved
-        in the latter.
+        of <tt>$GIT_DIR/refs/heads/</tt>.  Only the local master branch is
+        saved in the latter. This is the default.
+</p>
+</dd>
+<dt>
+--use-immingled-remote
+</dt>
+<dd>
+<p>
+        Save remotes heads in the same namespace as the local
+        heads, `$GIT_DIR/refs/heads/'.  In regular repositories,
+        this is a legacy setup git-clone created by default in
+        older Git versions, and will be removed before the next
+        major release.
 </p>
 </dd>
 <dt>
@@ -519,7 +536,7 @@ Create a repository on the kernel.org machine that borrows from Linus
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Nov-2006 02:39:57 UTC
+Last updated 24-Nov-2006 11:37:02 UTC
 </div>
 </div>
 </body>
