@@ -439,33 +439,32 @@ at /home/bob/myrepo.  She does this with:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ cd /home/alice/project
-$ git pull /home/bob/myrepo</tt></pre>
+$ git pull /home/bob/myrepo master</tt></pre>
 </div></div>
-<p>This actually pulls changes from the branch in Bob's repository named
-"master".  Alice could request a different branch by adding the name
-of the branch to the end of the git pull command line.</p>
-<p>This merges Bob's changes into her repository; "git log" will
-now show the new commits.  If Alice has made her own changes in the
-meantime, then Bob's changes will be merged in, and she will need to
-manually fix any conflicts.</p>
-<p>A more cautious Alice might wish to examine Bob's changes before
-pulling them.  She can do this by creating a temporary branch just
-for the purpose of studying Bob's changes:</p>
+<p>This merges the changes from Bob's "master" branch into Alice's
+current branch.  If Alice has made her own changes in the meantime,
+then she may need to manually fix any conflicts.  (Note that the
+"master" argument in the above command is actually unnecessary, as it
+is the default.)</p>
+<p>The "pull" command thus performs two operations: it fetches changes
+from a remote branch, then merges them into the current branch.</p>
+<p>You can perform the first operation alone using the "git fetch"
+command.  For example, Alice could create a temporary branch just to
+track Bob's changes, without merging them with her own, using:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git fetch /home/bob/myrepo master:bob-incoming</tt></pre>
 </div></div>
 <p>which fetches the changes from Bob's master branch into a new branch
-named bob-incoming.  (Unlike git pull, git fetch just fetches a copy
-of Bob's line of development without doing any merging).  Then</p>
+named bob-incoming.  Then</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git log -p master..bob-incoming</tt></pre>
 </div></div>
 <p>shows a list of all the changes that Bob made since he branched from
 Alice's master branch.</p>
-<p>After examining those changes, and possibly fixing things, Alice can
-pull the changes into her master branch:</p>
+<p>After examining those changes, and possibly fixing things, Alice
+could pull the changes into her master branch:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git checkout master
@@ -473,6 +472,16 @@ $ git pull . bob-incoming</tt></pre>
 </div></div>
 <p>The last command is a pull from the "bob-incoming" branch in Alice's
 own repository.</p>
+<p>Alice could also perform both steps at once with:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull /home/bob/myrepo master:bob-incoming</tt></pre>
+</div></div>
+<p>This is just like the "git pull /home/bob/myrepo master" that we saw
+before, except that it also stores the unmerged changes from bob's
+master branch in bob-incoming before merging them into Alice's
+current branch.  Note that git pull always merges into the current
+branch, regardless of what else is given on the commandline.</p>
 <p>Later, Bob can update his repo with Alice's latest changes using</p>
 <div class="listingblock">
 <div class="content">
@@ -701,7 +710,7 @@ digressions that may be interesting at this point are:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 22-Nov-2006 08:28:42 UTC
+Last updated 26-Nov-2006 07:28:21 UTC
 </div>
 </div>
 </body>
