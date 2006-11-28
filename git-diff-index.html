@@ -747,82 +747,11 @@ respectively.</p>
 <div class="sectionbody">
 <p>When "git-diff-index", "git-diff-tree", or "git-diff-files" are run
 with a <em>-p</em> option, they do not produce the output described above;
-instead they produce a patch file.</p>
-<p>The patch generation can be customized at two levels.</p>
-<ol>
-<li>
-<p>
-When the environment variable <em>GIT_EXTERNAL_DIFF</em> is not set,
-   these commands internally invoke "diff" like this:
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>diff -L a/&lt;path&gt; -L b/&lt;path&gt; -pu &lt;old&gt; &lt;new&gt;</tt></pre>
-</div></div>
-<p>For added files, <tt>/dev/null</tt> is used for &lt;old&gt;.  For removed
-files, <tt>/dev/null</tt> is used for &lt;new&gt;</p>
-<p>The "diff" formatting options can be customized via the
-environment variable <em>GIT_DIFF_OPTS</em>.  For example, if you
-prefer context diff:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>GIT_DIFF_OPTS=-c git-diff-index -p HEAD</tt></pre>
-</div></div>
-</li>
-<li>
-<p>
-When the environment variable <em>GIT_EXTERNAL_DIFF</em> is set, the
-   program named by it is called, instead of the diff invocation
-   described above.
-</p>
-<p>For a path that is added, removed, or modified,
-<em>GIT_EXTERNAL_DIFF</em> is called with 7 parameters:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>path old-file old-hex old-mode new-file new-hex new-mode</tt></pre>
-</div></div>
-<p>where:</p>
-<div class="hlist"><table>
-<tr>
-<td class="hlist1">
-&lt;old|new&gt;-file
-</td>
-<td class="hlist2">
-are files GIT_EXTERNAL_DIFF can use to read the
-                      contents of &lt;old|new&gt;,
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-&lt;old|new&gt;-hex
-</td>
-<td class="hlist2">
-are the 40-hexdigit SHA1 hashes,
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-&lt;old|new&gt;-mode
-</td>
-<td class="hlist2">
-are the octal representation of the file modes.
-</td>
-</tr>
-</table></div>
-<p>The file parameters can point at the user's working file
-(e.g. <tt>new-file</tt> in "git-diff-files"), <tt>/dev/null</tt> (e.g. <tt>old-file</tt>
-when a new file is added), or a temporary file (e.g. <tt>old-file</tt> in the
-index).  <em>GIT_EXTERNAL_DIFF</em> should not worry about unlinking the
-temporary file --- it is removed when <em>GIT_EXTERNAL_DIFF</em> exits.</p>
-</li>
-</ol>
-<p>For a path that is unmerged, <em>GIT_EXTERNAL_DIFF</em> is called with 1
-parameter, &lt;path&gt;.</p>
-</div>
-<h2>git specific extension to diff format</h2>
-<div class="sectionbody">
-<p>What -p option produces is slightly different from the
-traditional diff format.</p>
+instead they produce a patch file.  You can customize the creation
+of such patches via the GIT_EXTERNAL_DIFF and the GIT_DIFF_OPTS
+environment variables.</p>
+<p>What the -p option produces is slightly different from the traditional
+diff format.</p>
 <ol>
 <li>
 <p>
@@ -1099,7 +1028,7 @@ always have the special all-zero sha1.</td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Nov-2006 02:39:57 UTC
+Last updated 28-Nov-2006 02:22:12 UTC
 </div>
 </div>
 </body>

@@ -1617,16 +1617,63 @@ git so take care if using Cogito etc.</p>
 <dt>
 <em>GIT_DIFF_OPTS</em>
 </dt>
+<dd>
+<p>
+        Only valid setting is "--unified=??" or "-u??" to set the
+        number of context lines shown when a unified diff is created.
+        This takes precedence over any "-U" or "--unified" option
+        value passed on the git diff command line.
+</p>
+</dd>
 <dt>
 <em>GIT_EXTERNAL_DIFF</em>
 </dt>
 <dd>
 <p>
-        see the "generating patches" section in :
-        <a href="git-diff-index.html">git-diff-index(1)</a>;
-        <a href="git-diff-files.html">git-diff-files(1)</a>;
-        <a href="git-diff-tree.html">git-diff-tree(1)</a>
+        When the environment variable <em>GIT_EXTERNAL_DIFF</em> is set, the
+        program named by it is called, instead of the diff invocation
+        described above.  For a path that is added, removed, or modified,
+        <em>GIT_EXTERNAL_DIFF</em> is called with 7 parameters:
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>path old-file old-hex old-mode new-file new-hex new-mode</tt></pre>
+</div></div>
+<p>where:</p>
+<div class="hlist"><table>
+<tr>
+<td class="hlist1">
+&lt;old|new&gt;-file
+</td>
+<td class="hlist2">
+are files GIT_EXTERNAL_DIFF can use to read the
+                         contents of &lt;old|new&gt;,
+</td>
+</tr>
+<tr>
+<td class="hlist1">
+&lt;old|new&gt;-hex
+</td>
+<td class="hlist2">
+are the 40-hexdigit SHA1 hashes,
+</td>
+</tr>
+<tr>
+<td class="hlist1">
+&lt;old|new&gt;-mode
+</td>
+<td class="hlist2">
+are the octal representation of the file modes.
+</td>
+</tr>
+</table></div>
+<p>The file parameters can point at the user's working file
+(e.g. <tt>new-file</tt> in "git-diff-files"), <tt>/dev/null</tt> (e.g. <tt>old-file</tt>
+when a new file is added), or a temporary file (e.g. <tt>old-file</tt> in the
+index).  <em>GIT_EXTERNAL_DIFF</em> should not worry about unlinking the
+temporary file --- it is removed when <em>GIT_EXTERNAL_DIFF</em> exits.</p>
+<p>For a path that is unmerged, <em>GIT_EXTERNAL_DIFF</em> is called with 1
+parameter, &lt;path&gt;.</p>
 </dd>
 </dl>
 <h3>other</h3>
@@ -2214,7 +2261,7 @@ contributors on the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 18-Nov-2006 22:17:48 UTC
+Last updated 28-Nov-2006 02:22:15 UTC
 </div>
 </div>
 </body>
