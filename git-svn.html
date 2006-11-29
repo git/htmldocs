@@ -318,7 +318,7 @@ latest revision.
 </p>
 <p>Note: You should never attempt to modify the remotes/git-svn
 branch outside of git-svn.  Instead, create a branch from
-remotes/git-svn and work on that branch.  Use the <em>commit</em>
+remotes/git-svn and work on that branch.  Use the <em>dcommit</em>
 command (see below) to write git commits back to
 remotes/git-svn.</p>
 <p>See <em><a href="#fetch-args">Additional Fetch Arguments</a></em> if you are interested in
@@ -660,7 +660,7 @@ which diffs would be committed to SVN.</p>
 </dt>
 <dd>
 <p>
-Used with <em>fetch</em> or <em>commit</em>.
+Used with <em>fetch</em>, <em>dcommit</em> or <em>commit</em>.
 </p>
 <p>This can be used to join arbitrary git branches to remotes/git-svn
 on new commits where the tree object is equivalent.</p>
@@ -774,7 +774,7 @@ SVN was very wrong.</p>
 </dd>
 </dl>
 <h3>Basic Examples</h3>
-<p>Tracking and contributing to an Subversion managed-project:</p>
+<p>Tracking and contributing to a Subversion-managed project:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt># Initialize a repo (like git init-db):
@@ -783,10 +783,9 @@ SVN was very wrong.</p>
         git-svn fetch
 # Create your own branch to hack on:
         git checkout -b my-branch remotes/git-svn
-# Commit only the git commits you want to SVN:
-        git-svn commit &lt;tree-ish&gt; [&lt;tree-ish_2&gt; ...]
-# Commit all the git commits from my-branch that don't exist in SVN:
-        git-svn commit remotes/git-svn..my-branch
+# Do some work, and then commit your new changes to SVN, as well as
+# automatically updating your working HEAD:
+        git-svn dcommit
 # Something is committed to SVN, rebase the latest into your branch:
         git-svn fetch &amp;&amp; git rebase remotes/git-svn
 # Append svn:ignore settings to the default git exclude file:
@@ -808,24 +807,23 @@ which can lead to merge commits reversing previous commits in SVN.</p>
 <h2>DESIGN PHILOSOPHY</h2>
 <div class="sectionbody">
 <p>Merge tracking in Subversion is lacking and doing branched development
-with Subversion is cumbersome as a result.  git-svn completely forgoes
-any automated merge/branch tracking on the Subversion side and leaves it
-entirely up to the user on the git side.  It's simply not worth it to do
-a useful translation when the original signal is weak.</p>
+with Subversion is cumbersome as a result.  git-svn does not do
+automated merge/branch tracking by default and leaves it entirely up to
+the user on the git side.</p>
 </div>
 <h2><a id="tracking-multiple-repos"></a>TRACKING MULTIPLE REPOSITORIES OR BRANCHES</h2>
 <div class="sectionbody">
-<p>This is for advanced users, most users should ignore this section.</p>
 <p>Because git-svn does not care about relationships between different
 branches or directories in a Subversion repository, git-svn has a simple
 hack to allow it to track an arbitrary number of related _or_ unrelated
-SVN repositories via one git repository.  Simply set the GIT_SVN_ID
-environment variable to a name other other than "git-svn" (the default)
-and git-svn will ignore the contents of the $GIT_DIR/svn/git-svn directory
-and instead do all of its work in $GIT_DIR/svn/$GIT_SVN_ID for that
-invocation.  The interface branch will be remotes/$GIT_SVN_ID, instead of
-remotes/git-svn.  Any remotes/$GIT_SVN_ID branch should never be modified
-by the user outside of git-svn commands.</p>
+SVN repositories via one git repository.  Simply use the --id/-i flag or
+set the GIT_SVN_ID environment variable to a name other other than
+"git-svn" (the default) and git-svn will ignore the contents of the
+$GIT_DIR/svn/git-svn directory and instead do all of its work in
+$GIT_DIR/svn/$GIT_SVN_ID for that invocation.  The interface branch will
+be remotes/$GIT_SVN_ID, instead of remotes/git-svn.  Any
+remotes/$GIT_SVN_ID branch should never be modified by the user outside
+of git-svn commands.</p>
 </div>
 <h2><a id="fetch-args"></a>ADDITIONAL FETCH ARGUMENTS</h2>
 <div class="sectionbody">
@@ -880,7 +878,8 @@ he needed to continue tracking /ufoai/trunk where /trunk left off.</p>
 conflicting changeset to SVN at a bad moment (right before you commit)
 causing a conflict and your commit to fail, your svn working tree
 ($GIT_DIR/git-svn/tree) may be dirtied.  The easiest thing to do is
-probably just to rm -rf $GIT_DIR/git-svn/tree and run <em>rebuild</em>.</p>
+probably just to rm -rf $GIT_DIR/git-svn/tree and run <em>rebuild</em>.   You
+can avoid this problem entirely by using <em>dcommit</em>.</p>
 <p>We ignore all SVN properties except svn:executable.  Too difficult to
 map them since we rely heavily on git write-tree being _exactly_ the
 same on both the SVN and git working trees and I prefer not to clutter
@@ -906,7 +905,7 @@ detect them.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 09-Nov-2006 23:35:41 UTC
+Last updated 29-Nov-2006 07:59:33 UTC
 </div>
 </div>
 </body>
