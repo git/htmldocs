@@ -282,27 +282,22 @@ directory.  Typically you would give <tt>HEAD</tt> as the &lt;name&gt;
 argument to see on which branch your working tree is on.</p>
 <p>Give two arguments, create or update a symbolic ref &lt;name&gt; to
 point at the given branch &lt;ref&gt;.</p>
-<p>Traditionally, <tt>.git/HEAD</tt> is a symlink pointing at
-<tt>refs/heads/master</tt>.  When we want to switch to another branch,
-we did <tt>ln -sf refs/heads/newbranch .git/HEAD</tt>, and when we want
+<p>A symbolic ref is a regular file that stores a string that
+begins with <tt>ref: refs/</tt>.  For example, your <tt>.git/HEAD</tt> is
+a regular file whose contents is <tt>ref: refs/heads/master</tt>.</p>
+</div>
+<h2>NOTES</h2>
+<div class="sectionbody">
+<p>In the past, <tt>.git/HEAD</tt> was a symbolic link pointing at
+<tt>refs/heads/master</tt>.  When we wanted to switch to another branch,
+we did <tt>ln -sf refs/heads/newbranch .git/HEAD</tt>, and when we wanted
 to find out which branch we are on, we did <tt>readlink .git/HEAD</tt>.
 This was fine, and internally that is what still happens by
 default, but on platforms that do not have working symlinks,
 or that do not have the <tt>readlink(1)</tt> command, this was a bit
 cumbersome.  On some platforms, <tt>ln -sf</tt> does not even work as
-advertised (horrors).</p>
-<p>A symbolic ref can be a regular file that stores a string that
-begins with <tt>ref: refs/</tt>.  For example, your <tt>.git/HEAD</tt> <strong>can</strong>
-be a regular file whose contents is <tt>ref: refs/heads/master</tt>.
-This can be used on a filesystem that does not support symbolic
-links.  Instead of doing <tt>readlink .git/HEAD</tt>, <tt>git-symbolic-ref
-HEAD</tt> can be used to find out which branch we are on.  To point
-the HEAD to <tt>newbranch</tt>, instead of <tt>ln -sf refs/heads/newbranch
-.git/HEAD</tt>, <tt>git-symbolic-ref HEAD refs/heads/newbranch</tt> can be
-used.</p>
-<p>Currently, .git/HEAD uses a regular file symbolic ref on Cygwin,
-and everywhere else it is implemented as a symlink.  This can be
-changed at compilation time.</p>
+advertised (horrors).  Therefore symbolic links are now deprecated
+and symbolic refs are used by default.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -314,7 +309,7 @@ changed at compilation time.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:41:33 UTC
+Last updated 03-Dec-2006 01:53:20 UTC
 </div>
 </div>
 </body>
