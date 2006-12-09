@@ -307,8 +307,8 @@ Pull: refs/heads/master:refs/remotes/origin/master</tt></pre>
 </td>
 </tr></table>
 </div>
-<p>You can update the shared repository with your changes by first commiting
-your changes, and then using:</p>
+<p>You can update the shared repository with your changes by first committing
+your changes, and then using the <a href="git-push.html">git-push(1)</a> command:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git push origin master</tt></pre>
@@ -335,11 +335,15 @@ other than <tt>master</tt>.</p>
 possibly created from scratch or from a tarball (see the
 <a href="tutorial.html">tutorial</a>), or imported from an already existing CVS
 repository (see the next section).</p>
-<p>If your project's working directory is /home/alice/myproject, you can
-create a shared repository at /pub/repo.git with:</p>
+<p>Assume your existing repo is at /home/alice/myproject.  Create a new "bare"
+repository (a repository without a working tree) and fetch your project into
+it:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git clone -bare /home/alice/myproject /pub/repo.git</tt></pre>
+<pre><tt>$ mkdir /pub/my-repo.git
+$ cd /pub/my-repo.git
+$ git --bare init-db --shared
+$ git --bare fetch /home/alice/myproject master:master</tt></pre>
 </div></div>
 <p>Next, give every team member read/write access to this repository.  One
 easy way to do this is to give all the team members ssh access to the
@@ -350,10 +354,7 @@ users to do git pushes and pulls; see <a href="git-shell.html">git-shell(1)</a>.
 writable by that group:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ cd /pub
-$ chgrp -R $group repo.git
-$ find repo.git -mindepth 1 -type d |xargs chmod ug+rwx,g+s
-$ GIT_DIR=repo.git git repo-config core.sharedrepository true</tt></pre>
+<pre><tt>$ chgrp -R $group /pub/my-repo.git</tt></pre>
 </div></div>
 <p>Make sure committers have a umask of at most 027, so that the directories
 they create are writable and searchable by other group members.</p>
@@ -362,14 +363,14 @@ they create are writable and searchable by other group members.</p>
 <div class="sectionbody">
 <p>First, install version 2.1 or higher of cvsps from
 <a href="http://www.cobite.com/cvsps/">http://www.cobite.com/cvsps/</a> and make
-sure it is in your path.  The magic command line is then</p>
+sure it is in your path.  Then cd to a checked out CVS working directory
+of the project you are interested in and run <a href="git-cvsimport.html">git-cvsimport(1)</a>:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git cvsimport -v -d &lt;cvsroot&gt; -C &lt;destination&gt; &lt;module&gt;</tt></pre>
+<pre><tt>$ git cvsimport -C &lt;destination&gt;</tt></pre>
 </div></div>
 <p>This puts a git archive of the named CVS module in the directory
-&lt;destination&gt;, which will be created if necessary.  The -v option makes
-the conversion script very chatty.</p>
+&lt;destination&gt;, which will be created if necessary.</p>
 <p>The import checks out from CVS every revision of every file.  Reportedly
 cvsimport can average some twenty revisions per second, so for a
 medium-sized project this should not take more than a couple of minutes.
@@ -419,7 +420,7 @@ repositories without the need for a central maintainer.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Dec-2006 07:23:38 UTC
+Last updated 09-Dec-2006 21:15:38 UTC
 </div>
 </div>
 </body>
