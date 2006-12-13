@@ -279,15 +279,45 @@ git-commit(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Updates the index file for given paths, or all modified files if
-<em>-a</em> is specified, and makes a commit object.  The command specified
-by either the VISUAL or EDITOR environment variables are used to edit
-the commit log message.</p>
-<p>Several environment variable are used during commits.  They are
-documented in <a href="git-commit-tree.html">git-commit-tree(1)</a>.</p>
-<p>This command can run <tt>commit-msg</tt>, <tt>pre-commit</tt>, and
-<tt>post-commit</tt> hooks.  See <a href="hooks.html">hooks</a> for more
-information.</p>
+<p>Use <em>git commit</em> when you want to record your changes into the repository
+along with a log message describing what the commit is about. All changes
+to be committed must be explicitly identified using one of the following
+methods:</p>
+<ol>
+<li>
+<p>
+by using <a href="git-add.html">git-add(1)</a> to incrementally "add" changes to the
+   next commit before using the <em>commit</em> command (Note: even modified
+   files must be "added");
+</p>
+</li>
+<li>
+<p>
+by using <a href="git-rm.html">git-rm(1)</a> to identify content removal for the next
+   commit, again before using the <em>commit</em> command;
+</p>
+</li>
+<li>
+<p>
+by directly listing files containing changes to be committed as arguments
+   to the <em>commit</em> command, in which cases only those files alone will be
+   considered for the commit;
+</p>
+</li>
+<li>
+<p>
+by using the -a switch with the <em>commit</em> command to automatically "add"
+   changes from all known files i.e. files that have already been committed
+   before, and perform the actual commit.
+</p>
+</li>
+</ol>
+<p>The <a href="git-status.html">git-status(1)</a> command can be used to obtain a
+summary of what is included by any of the above for the next
+commit by giving the same set of parameters you would give to
+this command.</p>
+<p>If you make a commit and then found a mistake immediately after
+that, you can recover from it with <a href="git-reset.html">git-reset(1)</a>.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -297,9 +327,9 @@ information.</p>
 </dt>
 <dd>
 <p>
-        Update all paths in the index file.  This flag notices
-        files that have been modified and deleted, but new files
-        you have not told git about are not affected.
+        Tell the command to automatically stage files that have
+        been modified and deleted, but new files you have not
+        told git about are not affected.
 </p>
 </dd>
 <dt>
@@ -349,24 +379,16 @@ information.</p>
 </p>
 </dd>
 <dt>
--v|--verify
+--no-verify
 </dt>
 <dd>
 <p>
-        Look for suspicious lines the commit introduces, and
-        abort committing if there is one.  The definition of
-        <em>suspicious lines</em> is currently the lines that has
-        trailing whitespaces, and the lines whose indentation
-        has a SP character immediately followed by a TAB
-        character.  This is the default.
-</p>
-</dd>
-<dt>
--n|--no-verify
-</dt>
-<dd>
-<p>
-        The opposite of <tt>--verify</tt>.
+        By default, the command looks for suspicious lines the
+        commit introduces, and aborts committing if there is one.
+        The definition of <em>suspicious lines</em> is currently the
+        lines that has trailing whitespaces, and the lines whose
+        indentation has a SP character immediately followed by a
+        TAB character.  This option turns off the check.
 </p>
 </dd>
 <dt>
@@ -409,21 +431,10 @@ information.</p>
 </dt>
 <dd>
 <p>
-        Instead of committing only the files specified on the
-        command line, update them in the index file and then
-        commit the whole index.  This is the traditional
-        behavior.
-</p>
-</dd>
-<dt>
--o|--only
-</dt>
-<dd>
-<p>
-        Commit only the files specified on the command line.
-        This format cannot be used during a merge, nor when the
-        index and the latest commit does not match on the
-        specified paths to avoid confusion.
+        Before making a commit out of staged contents so far,
+        stage the contents of paths given on the command line
+        as well.  This is usually not what you want unless you
+        are concluding a conflicted merge.
 </p>
 </dd>
 <dt>
@@ -439,62 +450,115 @@ information.</p>
 </dt>
 <dd>
 <p>
-        Files to be committed.  The meaning of these is
-        different between <tt>--include</tt> and <tt>--only</tt>.  Without
-        either, it defaults <tt>--only</tt> semantics.
+        When files are given on the command line, the command
+        commits the contents of the named files, without
+        recording the changes already staged.  The contents of
+        these files are also staged for the next commit on top
+        of what have been staged before.
 </p>
 </dd>
 </dl>
-<p>If you make a commit and then found a mistake immediately after
-that, you can recover from it with <a href="git-reset.html">git-reset(1)</a>.</p>
 </div>
-<h2>Discussion</h2>
+<h2>EXAMPLES</h2>
 <div class="sectionbody">
-<p><tt>git commit</tt> without _any_ parameter commits the tree structure
-recorded by the current index file.  This is a whole-tree commit
-even the command is invoked from a subdirectory.</p>
-<p><tt>git commit --include paths&#8230;</tt> is equivalent to</p>
-<div class="literalblock">
+<p>When recording your own work, the contents of modified files in
+your working tree are temporarily stored to a staging area
+called the "index" with <a href="git-add.html">git-add(1)</a>.  Removal
+of a file is staged with <a href="git-rm.html">git-rm(1)</a>.  After building the
+state to be committed incrementally with these commands, <tt>git
+commit</tt> (without any pathname parameter) is used to record what
+has been staged so far.  This is the most basic form of the
+command.  An example:</p>
+<div class="listingblock">
 <div class="content">
-<pre><tt>git update-index --remove paths...
-git commit</tt></pre>
+<pre><tt>$ edit hello.c
+$ git rm goodbye.c
+$ git add hello.c
+$ git commit</tt></pre>
 </div></div>
-<p>That is, update the specified paths to the index and then commit
-the whole tree.</p>
-<p><tt>git commit paths&#8230;</tt> largely bypasses the index file and
-commits only the changes made to the specified paths.  It has
-however several safety valves to prevent confusion.</p>
-<ol>
-<li>
-<p>
-It refuses to run during a merge (i.e. when
-  <tt>$GIT_DIR/MERGE_HEAD</tt> exists), and reminds trained git users
-  that the traditional semantics now needs -i flag.
-</p>
-</li>
-<li>
-<p>
-It refuses to run if named <tt>paths&#8230;</tt> are different in HEAD
-  and the index (ditto about reminding).  Added paths are OK.
-  This is because an earlier <tt>git diff</tt> (not <tt>git diff HEAD</tt>)
-  would have shown the differences since the last <tt>git
-  update-index paths&#8230;</tt> to the user, and an inexperienced user
-  may mistakenly think that the changes between the index and
-  the HEAD (i.e. earlier changes made before the last <tt>git
-  update-index paths&#8230;</tt> was done) are not being committed.
-</p>
-</li>
-<li>
-<p>
-It reads HEAD commit into a temporary index file, updates the
-  specified <tt>paths&#8230;</tt> and makes a commit.  At the same time,
-  the real index file is also updated with the same <tt>paths&#8230;</tt>.
-</p>
-</li>
-</ol>
-<p><tt>git commit --all</tt> updates the index file with _all_ changes to
-the working tree, and makes a whole-tree commit, regardless of
-which subdirectory the command is invoked in.</p>
+<p>Instead of staging files after each individual change, you can
+tell <tt>git commit</tt> to notice the changes to the files whose
+contents are tracked in
+your working tree and do corresponding <tt>git add</tt> and <tt>git rm</tt>
+for you.  That is, this example does the same as the earlier
+example if there is no other change in your working tree:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ edit hello.c
+$ rm goodbye.c
+$ git commit -a</tt></pre>
+</div></div>
+<p>The command <tt>git commit -a</tt> first looks at your working tree,
+notices that you have modified hello.c and removed goodbye.c,
+and performs necessary <tt>git add</tt> and <tt>git rm</tt> for you.</p>
+<p>After staging changes to many files, you can alter the order the
+changes are recorded in, by giving pathnames to <tt>git commit</tt>.
+When pathnames are given, the command makes a commit that
+only records the changes made to the named paths:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ edit hello.c hello.h
+$ git add hello.c hello.h
+$ edit Makefile
+$ git commit Makefile</tt></pre>
+</div></div>
+<p>This makes a commit that records the modification to <tt>Makefile</tt>.
+The changes staged for <tt>hello.c</tt> and <tt>hello.h</tt> are not included
+in the resulting commit.  However, their changes are not lost &#8212;
+they are still staged and merely held back.  After the above
+sequence, if you do:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git commit</tt></pre>
+</div></div>
+<p>this second commit would record the changes to <tt>hello.c</tt> and
+<tt>hello.h</tt> as expected.</p>
+<p>After a merge (initiated by either <a href="git-merge.html">git-merge(1)</a> or
+<a href="git-pull.html">git-pull(1)</a>) stops because of conflicts, cleanly merged
+paths are already staged to be committed for you, and paths that
+conflicted are left in unmerged state.  You would have to first
+check which paths are conflicting with <a href="git-status.html">git-status(1)</a>
+and after fixing them manually in your working tree, you would
+stage the result as usual with <a href="git-add.html">git-add(1)</a>:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git status | grep unmerged
+unmerged: hello.c
+$ edit hello.c
+$ git add hello.c</tt></pre>
+</div></div>
+<p>After resolving conflicts and staging the result, <tt>git ls-files -u</tt>
+would stop mentioning the conflicted path.  When you are done,
+run <tt>git commit</tt> to finally record the merge:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git commit</tt></pre>
+</div></div>
+<p>As with the case to record your own changes, you can use <tt>-a</tt>
+option to save typing.  One difference is that during a merge
+resolution, you cannot use <tt>git commit</tt> with pathnames to
+alter the order the changes are committed, because the merge
+should be recorded as a single commit.  In fact, the command
+refuses to run when given pathnames (but see <tt>-i</tt> option).</p>
+</div>
+<h2>ENVIRONMENT VARIABLES</h2>
+<div class="sectionbody">
+<p>The command specified by either the VISUAL or EDITOR environment
+variables is used to edit the commit log message.</p>
+</div>
+<h2>HOOKS</h2>
+<div class="sectionbody">
+<p>This command can run <tt>commit-msg</tt>, <tt>pre-commit</tt>, and
+<tt>post-commit</tt> hooks.  See <a href="hooks.html">hooks</a> for more
+information.</p>
+</div>
+<h2>SEE ALSO</h2>
+<div class="sectionbody">
+<p><a href="git-add.html">git-add(1)</a>,
+<a href="git-rm.html">git-rm(1)</a>,
+<a href="git-mv.html">git-mv(1)</a>,
+<a href="git-merge.html">git-merge(1)</a>,
+<a href="git-commit-tree.html">git-commit-tree(1)</a></p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -507,7 +571,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:40:57 UTC
+Last updated 13-Dec-2006 21:32:05 UTC
 </div>
 </div>
 </body>

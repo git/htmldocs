@@ -266,7 +266,7 @@ git-add(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-add -
-   Add files to the index file
+   Add file contents to the changeset to be committed next
 </p>
 </div>
 </div>
@@ -276,10 +276,21 @@ git-add(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>A simple wrapper for git-update-index to add files to the index,
-for people used to do "cvs add".</p>
-<p>It only adds non-ignored files, to add ignored files use
+<p>All the changed file contents to be committed together in a single set
+of changes must be "added" with the <em>add</em> command before using the
+<em>commit</em> command.  This is not only for adding new files.  Even modified
+files must be added to the set of changes about to be committed.</p>
+<p>This command can be performed multiple times before a commit. The added
+content corresponds to the state of specified file(s) at the time the
+<em>add</em> command is used. This means the <em>commit</em> command will not consider
+subsequent changes to already added content if it is not added again before
+the commit.</p>
+<p>The <em>git status</em> command can be used to obtain a summary of what is included
+for the next commit.</p>
+<p>This command only adds non-ignored files, to add ignored files use
 "git update-index --add".</p>
+<p>Please see <a href="git-commit.html">git-commit(1)</a> for alternative ways to add content to a
+commit.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -289,7 +300,7 @@ for people used to do "cvs add".</p>
 </dt>
 <dd>
 <p>
-        Files to add to the index (see <a href="git-ls-files.html">git-ls-files(1)</a>).
+        Files to add content from.
 </p>
 </dd>
 <dt>
@@ -320,27 +331,6 @@ for people used to do "cvs add".</p>
 </dd>
 </dl>
 </div>
-<h2>DISCUSSION</h2>
-<div class="sectionbody">
-<p>The list of &lt;file&gt; given to the command is fed to <tt>git-ls-files</tt>
-command to list files that are not registered in the index and
-are not ignored/excluded by <tt>$GIT_DIR/info/exclude</tt> file or
-<tt>.gitignore</tt> file in each directory.  This means two things:</p>
-<ol>
-<li>
-<p>
-You can put the name of a directory on the command line, and
-  the command will add all files in it and its subdirectories;
-</p>
-</li>
-<li>
-<p>
-Giving the name of a file that is already in index does not
-  run <tt>git-update-index</tt> on that path.
-</p>
-</li>
-</ol>
-</div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
 <dl>
@@ -349,8 +339,8 @@ git-add Documentation/\*.txt
 </dt>
 <dd>
 <p>
-        Adds all <tt>*.txt</tt> files that are not in the index under
-        <tt>Documentation</tt> directory and its subdirectories.
+        Adds content from all <tt>*.txt</tt> files under <tt>Documentation</tt>
+        directory and its subdirectories.
 </p>
 <p>Note that the asterisk <tt>*</tt> is quoted from the shell in this
 example; this lets the command to include the files from
@@ -361,18 +351,21 @@ git-add git-*.sh
 </dt>
 <dd>
 <p>
-        Adds all git-*.sh scripts that are not in the index.
+        Considers adding content from all git-*.sh scripts.
         Because this example lets shell expand the asterisk
         (i.e. you are listing the files explicitly), it does not
-        add <tt>subdir/git-foo.sh</tt> to the index.
+        consider <tt>subdir/git-foo.sh</tt>.
 </p>
 </dd>
 </dl>
 </div>
 <h2>See Also</h2>
 <div class="sectionbody">
-<p><a href="git-rm.html">git-rm(1)</a>
-<a href="git-ls-files.html">git-ls-files(1)</a></p>
+<p><a href="git-status.html">git-status(1)</a>
+<a href="git-rm.html">git-rm(1)</a>
+<a href="git-mv.html">git-mv(1)</a>
+<a href="git-commit.html">git-commit(1)</a>
+<a href="git-update-index.html">git-update-index(1)</a></p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -388,7 +381,7 @@ git-add git-*.sh
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:40:49 UTC
+Last updated 13-Dec-2006 21:32:04 UTC
 </div>
 </div>
 </body>

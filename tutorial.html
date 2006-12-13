@@ -337,13 +337,48 @@ line summarizing the change, followed by a blank line and then a more
 thorough description.  Tools that turn commits into email, for
 example, use the first line on the Subject line and the rest of the
 commit in the body.</p>
-<p>To add a new file, first create the file, then</p>
-<div class="listingblock">
+</div>
+<h2>Git tracks content not files</h2>
+<div class="sectionbody">
+<p>With git you have to explicitly "add" all the changed _content_ you
+want to commit together. This can be done in a few different ways:</p>
+<p>1) By using <em>git add &lt;file_spec&gt;&#8230;</em></p>
+<div class="literalblock">
 <div class="content">
-<pre><tt>$ git add path/to/new/file</tt></pre>
+<pre><tt>This can be performed multiple times before a commit.  Note that this
+is not only for adding new files.  Even modified files must be
+added to the set of changes about to be committed.  The "git status"
+command gives you a summary of what is included so far for the
+next commit.  When done you should use the 'git commit' command to
+make it real.</tt></pre>
 </div></div>
-<p>then commit as usual.  No special command is required when removing a
-file; just remove it, then tell <tt>commit</tt> about the file as usual.</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Note: don't forget to 'add' a file again if you modified it after the
+first 'add' and before 'commit'. Otherwise only the previous added
+state of that file will be committed. This is because git tracks
+content, so what you're really 'add'ing to the commit is the *content*
+of the file in the state it is in when you 'add' it.</tt></pre>
+</div></div>
+<p>2) By using <em>git commit -a</em> directly</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>This is a quick way to automatically 'add' the content from all files
+that were modified since the previous commit, and perform the actual
+commit without having to separately 'add' them beforehand.  This will
+not add content from new files i.e. files that were never added before.
+Those files still have to be added explicitly before performing a
+commit.</tt></pre>
+</div></div>
+<p>But here's a twist. If you do <em>git commit &lt;file1&gt; &lt;file2&gt; &#8230;</em> then only
+the  changes belonging to those explicitly specified files will be
+committed, entirely bypassing the current "added" changes. Those "added"
+changes will still remain available for a subsequent commit though.</p>
+<p>However, for normal usage you only have to remember <em>git add</em> + <em>git commit</em>
+and/or <em>git commit -a</em>.</p>
+</div>
+<h2>Viewing the changelog</h2>
+<div class="sectionbody">
 <p>At any point you can view the history of your changes using</p>
 <div class="listingblock">
 <div class="content">
@@ -727,7 +762,7 @@ digressions that may be interesting at this point are:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 29-Nov-2006 20:40:00 UTC
+Last updated 13-Dec-2006 21:32:08 UTC
 </div>
 </div>
 </body>
