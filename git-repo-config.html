@@ -274,6 +274,7 @@ git-repo-config(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git-repo-config</em> [--global] [type] name [value [value_regex]]
+<em>git-repo-config</em> [--global] [type] --add name value
 <em>git-repo-config</em> [--global] [type] --replace-all name [value [value_regex]]
 <em>git-repo-config</em> [--global] [type] --get name [value_regex]
 <em>git-repo-config</em> [--global] [type] --get-all name [value_regex]
@@ -286,7 +287,8 @@ git-repo-config(1) Manual Page
 <p>You can query/set/replace/unset options with this command. The name is
 actually the section and the key separated by a dot, and the value will be
 escaped.</p>
-<p>If you want to set/unset an option which can occur on multiple
+<p>Multiple lines can be added to an option by using the <em>--add</em> option.
+If you want to update or unset an option which can occur on multiple
 lines, a POSIX regexp <tt>value_regex</tt> needs to be given.  Only the
 existing values that match the regexp are updated or unset.  If
 you want to handle the lines that do <strong>not</strong> match the regex, just
@@ -345,6 +347,15 @@ you use --global option without $HOME being properly set.
 <p>
         Default behavior is to replace at most one line. This replaces
         all lines matching the key (and optionally the value_regex).
+</p>
+</dd>
+<dt>
+--add
+</dt>
+<dd>
+<p>
+        Adds a new line to the option without altering any existing
+        values.  This is the same as providing <em>^$</em> as the value_regex.
 </p>
 </dd>
 <dt>
@@ -539,6 +550,11 @@ i.e. the one without a "for &#8230;" postfix, do something like this:</p>
 <div class="content">
 <pre><tt>% git repo-config section.key value '[!]'</tt></pre>
 </div></div>
+<p>To add a new proxy, without altering any of the existing ones, use</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>% git repo-config core.gitproxy '"proxy" for example.com'</tt></pre>
+</div></div>
 </div>
 <h2>CONFIGURATION FILE</h2>
 <div class="sectionbody">
@@ -643,8 +659,13 @@ core.logAllRefUpdates
 <div class="literalblock">
 <div class="content">
 <pre><tt>This information can be used to determine what commit
-was the tip of a branch "2 days ago".  This value is
-false by default (no automated creation of log files).</tt></pre>
+was the tip of a branch "2 days ago".</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>This value is true by default in a repository that has
+a working directory associated with it, and false by
+default in a bare repository.</tt></pre>
 </div></div>
 </dd>
 <dt>
@@ -800,8 +821,8 @@ color.status.&lt;slot&gt;
 <p>
         Use customized color for status colorization. <tt>&lt;slot&gt;</tt> is
         one of <tt>header</tt> (the header text of the status message),
-        <tt>updated</tt> (files which are updated but not committed),
-        <tt>changed</tt> (files which are changed but not updated in the index),
+        <tt>added</tt> or <tt>updated</tt> (files which are added but not committed),
+        <tt>changed</tt> (files which are changed but not added in the index),
         or <tt>untracked</tt> (files which are not tracked by git). The values of
         these variables may be specified as in color.diff.&lt;slot&gt;.
 </p>
@@ -1140,7 +1161,7 @@ receive.denyNonFastForwards
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 13-Dec-2006 21:32:06 UTC
+Last updated 16-Dec-2006 07:43:51 UTC
 </div>
 </div>
 </body>

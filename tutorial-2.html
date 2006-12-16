@@ -279,17 +279,17 @@ of the git documentation.</p>
 <pre><tt>$ mkdir test-project
 $ cd test-project
 $ git init-db
-defaulting to local storage area
+Initialized empty Git repository in .git/
 $ echo 'hello world' &gt; file.txt
 $ git add .
 $ git commit -a -m "initial commit"
-Committing initial tree 92b8b694ffb1675e5975148e1121810081dbdffe
+Created initial commit 54196cc2703dc165cbd373a65a4dcf22d50ae7f7
  create mode 100644 file.txt
 $ echo 'hello world!' &gt;file.txt
-$ git commit -a -m "add emphasis"</tt></pre>
+$ git commit -a -m "add emphasis"
+Created commit c4d59f390b9cfd4318117afde11d601c1085f241</tt></pre>
 </div></div>
-<p>What are the 40 digits of hex that git responded to the first commit
-with?</p>
+<p>What are the 40 digits of hex that git responded to the commit with?</p>
 <p>We saw in part one of the tutorial that commits have names like this.
 It turns out that every object in the git history is stored under
 such a 40-digit hex name.  That name is the SHA1 hash of the object's
@@ -297,13 +297,24 @@ contents; among other things, this ensures that git will never store
 the same data twice (since identical data is given an identical SHA1
 name), and that the contents of a git object will never change (since
 that would change the object's name as well).</p>
+<p>It is expected that the content of the commit object you created while
+following the example above generates a different SHA1 hash than
+the one shown above because the commit object records the time when
+it was created and the name of the person performing the commit.</p>
 <p>We can ask git about this particular object with the cat-file
-command&#8212;just cut-and-paste from the reply to the initial commit, to
-save yourself typing all 40 hex digits:</p>
+command. Don't copy the 40 hex digits from this example but use those
+from your own version. Note that you can shorten it to only a few
+characters to save yourself typing all 40 hex digits:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git cat-file -t 92b8b694ffb1675e5975148e1121810081dbdffe
-tree</tt></pre>
+<pre><tt>$ git-cat-file -t 54196cc2
+commit
+$ git-cat-file commit 54196cc2
+tree 92b8b694ffb1675e5975148e1121810081dbdffe
+author J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
+committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
+
+initial commit</tt></pre>
 </div></div>
 <p>A tree can refer to one or more "blob" objects, each corresponding to
 a file.  In addition, a tree can also refer to other tree objects,
@@ -354,8 +365,7 @@ directory:</p>
 </div></div>
 <p>and the contents of these files is just the compressed data plus a
 header identifying their length and their type.  The type is either a
-blob, a tree, a commit, or a tag.  We've seen a blob and a tree now,
-so next we should look at a commit.</p>
+blob, a tree, a commit, or a tag.</p>
 <p>The simplest commit to find is the HEAD commit, which we can find
 from .git/HEAD:</p>
 <div class="listingblock">
@@ -591,22 +601,22 @@ situation:</p>
 <div class="content">
 <pre><tt>$ git status
 #
-# Updated but not checked in:
+# Added but not yet committed:
 #   (will commit)
 #
 #       new file: closing.txt
 #
 #
-# Changed but not updated:
-#   (use git-update-index to mark for commit)
+# Changed but not added:
+#   (use "git add file1 file2" to include for commit)
 #
 #       modified: file.txt
 #</tt></pre>
 </div></div>
 <p>Since the current state of closing.txt is cached in the index file,
-it is listed as "updated but not checked in".  Since file.txt has
+it is listed as "added but not yet committed".  Since file.txt has
 changes in the working directory that aren't reflected in the index,
-it is marked "changed but not updated".  At this point, running "git
+it is marked "changed but not added".  At this point, running "git
 commit" would create a commit that added closing.txt (with its new
 contents), but that didn't modify file.txt.</p>
 <p>Also, note that a bare "git diff" shows the changes to file.txt, but
@@ -636,7 +646,7 @@ example, creating a new commit.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 13-Dec-2006 21:32:09 UTC
+Last updated 16-Dec-2006 07:43:54 UTC
 </div>
 </div>
 </body>
