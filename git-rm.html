@@ -272,13 +272,14 @@ git-rm(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-rm</em> [-f] [-n] [-v] [--] &lt;file&gt;&#8230;</p>
+<p><em>git-rm</em> [-f] [-n] [-r] [--cached] [--] &lt;file&gt;&#8230;</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>A convenience wrapper for git-update-index --remove. For those coming
-from cvs, git-rm provides an operation similar to "cvs rm" or "cvs
-remove".</p>
+<p>Remove files from the working tree and from the index.  The
+files have to be identical to the tip of the branch, and no
+updates to its contents must have been placed in the staging
+area (aka index).</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -288,8 +289,11 @@ remove".</p>
 </dt>
 <dd>
 <p>
-        Files to remove from the index and optionally, from the
-        working tree as well.
+        Files to remove.  Fileglobs (e.g. <tt>*.c</tt>) can be given to
+        remove all matching files.  Also a leading directory name
+        (e.g. <tt>dir</tt> to add <tt>dir/file1</tt> and <tt>dir/file2</tt>) can be
+        given to remove all files in the directory, recursively,
+        but this requires <tt>-r</tt> option to be given for safety.
 </p>
 </dd>
 <dt>
@@ -297,7 +301,7 @@ remove".</p>
 </dt>
 <dd>
 <p>
-        Remove files from the working tree as well as from the index.
+        Override the up-to-date check.
 </p>
 </dd>
 <dt>
@@ -310,11 +314,12 @@ remove".</p>
 </p>
 </dd>
 <dt>
--v
+-r
 </dt>
 <dd>
 <p>
-        Be verbose.
+        Allow recursive removal when a leading directory name is
+        given.
 </p>
 </dd>
 <dt>
@@ -327,29 +332,24 @@ remove".</p>
         for command-line options).
 </p>
 </dd>
+<dt>
+--cached
+</dt>
+<dd>
+<p>
+        This option can be used to tell the command to remove
+        the paths only from the index, leaving working tree
+        files.
+</p>
+</dd>
 </dl>
 </div>
 <h2>DISCUSSION</h2>
 <div class="sectionbody">
-<p>The list of &lt;file&gt; given to the command is fed to <tt>git-ls-files</tt>
-command to list files that are registered in the index and
-are not ignored/excluded by <tt>$GIT_DIR/info/exclude</tt> file or
-<tt>.gitignore</tt> file in each directory.  This means two things:</p>
-<ol>
-<li>
-<p>
-You can put the name of a directory on the command line, and the
-  command will remove all files in it and its subdirectories (the
-  directories themselves are never removed from the working tree);
-</p>
-</li>
-<li>
-<p>
-Giving the name of a file that is not in the index does not
-  remove that file.
-</p>
-</li>
-</ol>
+<p>The list of &lt;file&gt; given to the command can be exact pathnames,
+file glob patterns, or leading directory name.  The command
+removes only the paths that is known to git.  Giving the name of
+a file that you have not told git about does not remove that file.</p>
 </div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
@@ -373,10 +373,10 @@ git-rm -f git-*.sh
 <dd>
 <p>
         Remove all git-*.sh scripts that are in the index. The files
-        are removed from the index, and (because of the -f option),
-        from the working tree as well. Because this example lets the
-        shell expand the asterisk (i.e. you are listing the files
-        explicitly), it does not remove <tt>subdir/git-foo.sh</tt>.
+        are removed from the index, and from the working
+        tree. Because this example lets the shell expand the
+        asterisk (i.e. you are listing the files explicitly), it
+        does not remove <tt>subdir/git-foo.sh</tt>.
 </p>
 </dd>
 </dl>
@@ -399,7 +399,7 @@ git-rm -f git-*.sh
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:41:26 UTC
+Last updated 26-Dec-2006 03:21:38 UTC
 </div>
 </div>
 </body>
