@@ -321,7 +321,7 @@ $ git prune <b>(4)</b></tt></pre>
 <ol>
 <li>
 <p>
-running without "&#8212;full" is usually cheap and assures the
+running without <tt>--full</tt> is usually cheap and assures the
 repository health reasonably well.
 </p>
 </li>
@@ -333,7 +333,7 @@ disk space is wasted by not repacking.
 </li>
 <li>
 <p>
-without "-a" repacks incrementally.  repacking every 4-5MB
+without <tt>-a</tt> repacks incrementally.  repacking every 4-5MB
 of loose objects accumulation may be a good rule of thumb.
 </p>
 </li>
@@ -388,8 +388,7 @@ following commands.</p>
 </li>
 <li>
 <p>
-<a href="git-add.html">git-add(1)</a> and <a href="git-update-index.html">git-update-index(1)</a> to manage
-    the index file.
+<a href="git-add.html">git-add(1)</a> to manage the index file.
 </p>
 </li>
 <li>
@@ -411,8 +410,7 @@ following commands.</p>
 </li>
 <li>
 <p>
-<a href="git-pull.html">git-pull(1)</a> with "." as the remote to merge between
-    local branches.
+<a href="git-merge.html">git-merge(1)</a> to merge between local branches.
 </p>
 </li>
 <li>
@@ -427,8 +425,11 @@ following commands.</p>
 </li>
 </ul>
 <h3>Examples</h3>
-<p>Use a tarball as a starting point for a new repository:</p>
-<p>+</p>
+<dl>
+<dt>
+Use a tarball as a starting point for a new repository.
+</dt>
+<dd>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ tar zxf frotz.tar.gz
@@ -438,10 +439,19 @@ $ git add . <b>(1)</b>
 $ git commit -m 'import of frotz source tree.'
 $ git tag v2.43 <b>(2)</b></tt></pre>
 </div></div>
-<p>+
-&lt;1&gt; add everything under the current directory.
-&lt;2&gt; make a lightweight, unannotated tag.</p>
-<dl>
+<ol>
+<li>
+<p>
+add everything under the current directory.
+</p>
+</li>
+<li>
+<p>
+make a lightweight, unannotated tag.
+</p>
+</li>
+</ol>
+</dd>
 <dt>
 Create a topic branch and develop.
 </dt>
@@ -453,7 +463,7 @@ $ edit/compile/test
 $ git checkout -- curses/ux_audio_oss.c <b>(2)</b>
 $ git add curses/ux_audio_alsa.c <b>(3)</b>
 $ edit/compile/test
-$ git diff <b>(4)</b>
+$ git diff HEAD <b>(4)</b>
 $ git commit -a -s <b>(5)</b>
 $ edit/compile/test
 $ git reset --soft HEAD^ <b>(6)</b>
@@ -461,7 +471,7 @@ $ edit/compile/test
 $ git diff ORIG_HEAD <b>(7)</b>
 $ git commit -a -c ORIG_HEAD <b>(8)</b>
 $ git checkout master <b>(9)</b>
-$ git pull . alsa-audio <b>(10)</b>
+$ git merge alsa-audio <b>(10)</b>
 $ git log --since='3 days ago' <b>(11)</b>
 $ git log v2.43.. curses/ <b>(12)</b></tt></pre>
 </div></div>
@@ -473,13 +483,13 @@ create a new topic branch.
 </li>
 <li>
 <p>
-revert your botched changes in "curses/ux_audio_oss.c".
+revert your botched changes in <tt>curses/ux_audio_oss.c</tt>.
 </p>
 </li>
 <li>
 <p>
 you need to tell git if you added a new file; removal and
-modification will be caught if you do "commit -a" later.
+modification will be caught if you do <tt>git commit -a</tt> later.
 </p>
 </li>
 <li>
@@ -515,19 +525,21 @@ switch to the master branch.
 </li>
 <li>
 <p>
-merge a topic branch into your master branch
+merge a topic branch into your master branch.  You can also use
+<tt>git pull . alsa-audio</tt>, i.e. pull from the local repository.
 </p>
 </li>
 <li>
 <p>
 review commit logs; other forms to limit output can be
-combined and include &#8212;max-count=10 (show 10 commits), &#8212;until=<em>2005-12-10</em>.
+combined and include <tt>--max-count=10</tt> (show 10 commits),
+<tt>--until=2005-12-10</tt>, etc.
 </p>
 </li>
 <li>
 <p>
-view only the changes that touch what's in curses/
-directory, since v2.43 tag.
+view only the changes that touch what's in <tt>curses/</tt>
+directory, since <tt>v2.43</tt> tag.
 </p>
 </li>
 </ol>
@@ -597,7 +609,7 @@ extract patches from your branch for e-mail submission.
 </li>
 <li>
 <p>
-"pull" fetches from "origin" by default and merges into the
+<tt>git pull</tt> fetches from <tt>origin</tt> by default and merges into the
 current branch.
 </p>
 </li>
@@ -625,8 +637,8 @@ garbage collect leftover objects from reverted pull.
 </li>
 <li>
 <p>
-from time to time, obtain official tags from the "origin"
-and store them under .git/refs/tags/.
+from time to time, obtain official tags from the <tt>origin</tt>
+and store them under <tt>.git/refs/tags/</tt>.
 </p>
 </li>
 </ol>
@@ -637,18 +649,21 @@ Push into another repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>satellite$ git clone mothership:frotz/.git frotz <b>(1)</b>
+<pre><tt>satellite$ git clone mothership:frotz frotz <b>(1)</b>
 satellite$ cd frotz
-satellite$ cat .git/remotes/origin <b>(2)</b>
-URL: mothership:frotz/.git
-Pull: master:origin
-satellite$ echo 'Push: master:satellite' &gt;&gt;.git/remotes/origin <b>(3)</b>
+satellite$ git repo-config --get-regexp '^(remote|branch)\.' <b>(2)</b>
+remote.origin.url mothership:frotz
+remote.origin.fetch refs/heads/*:refs/remotes/origin/*
+branch.master.remote origin
+branch.master.merge refs/heads/master
+satellite$ git repo-config remote.origin.push \
+           master:refs/remotes/satellite/master <b>(3)</b>
 satellite$ edit/compile/test/commit
 satellite$ git push origin <b>(4)</b>
 
 mothership$ cd frotz
 mothership$ git checkout master
-mothership$ git pull . satellite <b>(5)</b></tt></pre>
+mothership$ git merge satellite/master <b>(5)</b></tt></pre>
 </div></div>
 <ol>
 <li>
@@ -660,21 +675,22 @@ machine.
 </li>
 <li>
 <p>
-clone creates this file by default.  It arranges "git pull"
-to fetch and store the master branch head of mothership machine
-to local "origin" branch.
+clone sets these configuration variables by default.
+It arranges <tt>git pull</tt> to fetch and store the branches of mothership
+machine to local <tt>remotes/origin/*</tt> tracking branches.
 </p>
 </li>
 <li>
 <p>
-arrange "git push" to push local "master" branch to
-"satellite" branch of the mothership machine.
+arrange <tt>git push</tt> to push local <tt>master</tt> branch to
+<tt>remotes/satellite/master</tt> branch of the mothership machine.
 </p>
 </li>
 <li>
 <p>
-push will stash our work away on "satellite" branch on the
-mothership machine.  You could use this as a back-up method.
+push will stash our work away on <tt>remotes/satellite/master</tt>
+tracking branch on the mothership machine.  You could use this as
+a back-up method.
 </p>
 </li>
 <li>
@@ -706,7 +722,7 @@ tag.
 </li>
 <li>
 <p>
-forward port all changes in private2.6.14 branch to master branch
+forward port all changes in <tt>private2.6.14</tt> branch to <tt>master</tt> branch
 without a formal "merging".
 </p>
 </li>
@@ -763,13 +779,13 @@ $ mailx <b>(3)</b>
 &amp; s 2 3 4 5 ./+to-apply
 &amp; s 7 8 ./+hold-linus
 &amp; q
-$ git checkout master
+$ git checkout -b topic/one master
 $ git am -3 -i -s -u ./+to-apply <b>(4)</b>
 $ compile/test
 $ git checkout -b hold/linus &amp;&amp; git am -3 -i -s -u ./+hold-linus <b>(5)</b>
 $ git checkout topic/one &amp;&amp; git rebase master <b>(6)</b>
-$ git checkout pu &amp;&amp; git reset --hard master <b>(7)</b>
-$ git pull . topic/one topic/two &amp;&amp; git pull . hold/linus <b>(8)</b>
+$ git checkout pu &amp;&amp; git reset --hard next <b>(7)</b>
+$ git merge topic/one topic/two &amp;&amp; git merge hold/linus <b>(8)</b>
 $ git checkout maint
 $ git cherry-pick master~4 <b>(9)</b>
 $ compile/test
@@ -815,7 +831,7 @@ master, nor exposed as a part of a stable branch.
 </li>
 <li>
 <p>
-restart "pu" every time from the master.
+restart <tt>pu</tt> every time from the next.
 </p>
 </li>
 <li>
@@ -836,7 +852,7 @@ create a signed tag.
 <li>
 <p>
 make sure I did not accidentally rewind master beyond what I
-already pushed out.  "ko" shorthand points at the repository I have
+already pushed out.  <tt>ko</tt> shorthand points at the repository I have
 at kernel.org, and looks like this:
 </p>
 <div class="listingblock">
@@ -844,13 +860,16 @@ at kernel.org, and looks like this:
 <pre><tt>$ cat .git/remotes/ko
 URL: kernel.org:/pub/scm/git/git.git
 Pull: master:refs/tags/ko-master
+Pull: next:refs/tags/ko-next
 Pull: maint:refs/tags/ko-maint
 Push: master
+Push: next
 Push: +pu
 Push: maint</tt></pre>
 </div></div>
-<p>In the output from "git show-branch", "master" should have
-everything "ko-master" has.</p>
+<p>In the output from <tt>git show-branch</tt>, <tt>master</tt> should have
+everything <tt>ko-master</tt> has, and <tt>next</tt> should have
+everything <tt>ko-next</tt> has.</p>
 </li>
 <li>
 <p>
@@ -953,7 +972,7 @@ $ grep git /etc/shells <b>(2)</b>
 <li>
 <p>
 log-in shell is set to /usr/bin/git-shell, which does not
-allow anything but "git push" and "git pull".  The users should
+allow anything but <tt>git push</tt> and <tt>git pull</tt>.  The users should
 get an ssh access to the machine.
 </p>
 </li>
@@ -1045,7 +1064,7 @@ upload to public HTTP server hosted by your ISP.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Oct-2006 09:29:03 UTC
+Last updated 27-Dec-2006 10:59:46 UTC
 </div>
 </div>
 </body>
