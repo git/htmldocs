@@ -549,6 +549,81 @@ alter the order the changes are committed, because the merge
 should be recorded as a single commit.  In fact, the command
 refuses to run when given pathnames (but see <tt>-i</tt> option).</p>
 </div>
+<h2>DISCUSSION</h2>
+<div class="sectionbody">
+<p>At the core level, git is character encoding agnostic.</p>
+<ul>
+<li>
+<p>
+The pathnames recorded in the index and in the tree objects
+   are treated as uninterpreted sequences of non-NUL bytes.
+   What readdir(2) returns are what are recorded and compared
+   with the data git keeps track of, which in turn are expected
+   to be what lstat(2) and creat(2) accepts.  There is no such
+   thing as pathname encoding translation.
+</p>
+</li>
+<li>
+<p>
+The contents of the blob objects are uninterpreted sequence
+   of bytes.  There is no encoding translation at the core
+   level.
+</p>
+</li>
+<li>
+<p>
+The commit log messages are uninterpreted sequence of non-NUL
+   bytes.
+</p>
+</li>
+</ul>
+<p>Although we encourage that the commit log messages are encoded
+in UTF-8, both the core and git Porcelain are designed not to
+force UTF-8 on projects.  If all participants of a particular
+project find it more convenient to use legacy encodings, git
+does not forbid it.  However, there are a few things to keep in
+mind.</p>
+<ol>
+<li>
+<p>
+<tt>git-commit-tree</tt> (hence, <tt>git-commit</tt> which uses it) issues
+  an warning if the commit log message given to it does not look
+  like a valid UTF-8 string, unless you explicitly say your
+  project uses a legacy encoding.  The way to say this is to
+  have core.commitencoding in <tt>.git/config</tt> file, like this:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[core]
+        commitencoding = ISO-8859-1</tt></pre>
+</div></div>
+<p>Commit objects created with the above setting record the value
+of <tt>core.commitencoding</tt> in its <tt>encoding</tt> header.  This is to
+help other people who look at them later.  Lack of this header
+implies that the commit log message is encoded in UTF-8.</p>
+</li>
+<li>
+<p>
+<tt>git-log</tt>, <tt>git-show</tt> and friends looks at the <tt>encoding</tt>
+  header of a commit object, and tries to re-code the log
+  message into UTF-8 unless otherwise specified.  You can
+  specify the desired output encoding with
+  <tt>core.logoutputencoding</tt> in <tt>.git/config</tt> file, like this:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[core]
+        logoutputencoding = ISO-8859-1</tt></pre>
+</div></div>
+<p>If you do not have this configuration variable, the value of
+<tt>core.commitencoding</tt> is used instead.</p>
+</li>
+</ol>
+<p>Note that we deliberately chose not to re-code the commit log
+message when a commit is made to force UTF-8 at the commit
+object level, because re-coding to UTF-8 is not necessarily a
+reversible operation.</p>
+</div>
 <h2>ENVIRONMENT VARIABLES</h2>
 <div class="sectionbody">
 <p>The command specified by either the VISUAL or EDITOR environment
@@ -579,7 +654,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 16-Dec-2006 07:43:46 UTC
+Last updated 31-Dec-2006 01:19:02 UTC
 </div>
 </div>
 </body>
