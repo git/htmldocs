@@ -401,8 +401,20 @@ when merging local branches into the current branch.</p>
 <p>
         By default <tt>git-fetch</tt> refuses to update the head which
         corresponds to the current branch.  This flag disables the
-        check.  Note that fetching into the current branch will not
-        update the index and working directory, so use it with care.
+        check.  This is purely for the internal use for <tt>git-pull</tt>
+        to communicate with <tt>git-fetch</tt>, and unless you are
+        implementing your own Porcelain you are not supposed to
+        use it.
+</p>
+</dd>
+<dt>
+--depth=&lt;depth&gt;
+</dt>
+<dd>
+<p>
+        Deepen the history of a <em>shallow</em> repository created by
+        <tt>git clone</tt> with <tt>--depth=&lt;depth&gt;</tt> option (see <a href="git-clone.html">git-clone(1)</a>)
+        by the specified number of commits.
 </p>
 </dd>
 <dt>
@@ -462,11 +474,7 @@ is created by <tt>git branch my-B remote-B</tt> (or its equivalent <tt>git
 checkout -b my-B remote-B</tt>).  Run <tt>git fetch</tt> to keep track of
 the progress of the remote side, and when you see something new
 on the remote branch, merge it into your development branch with
-<tt>git pull . remote-B</tt>, while you are on <tt>my-B</tt> branch.
-The common <tt>Pull: master:origin</tt> mapping of a remote <tt>master</tt>
-branch to a local <tt>origin</tt> branch, which is then merged to a
-local development branch, again typically named <tt>master</tt>, is made
-when you run <tt>git clone</tt> for you to follow this pattern.</td>
+<tt>git pull . remote-B</tt>, while you are on <tt>my-B</tt> branch.</td>
 </tr></table>
 </div>
 <div class="admonitionblock">
@@ -710,17 +718,23 @@ git pull, git pull origin
 </dt>
 <dd>
 <p>
-        Fetch the default head from the repository you cloned
-        from and merge it into your current branch.
+        Update the remote-tracking branches for the repository
+        you cloned from, then merge one of them into your
+        current branch.  Normally the branch merged in is
+        the HEAD of the remote repository, but the choice is
+        determined by the branch.&lt;name&gt;.remote and
+        branch.&lt;name&gt;.merge options; see <a href="git-repo-config.html">git-repo-config(1)</a>
+        for details.
 </p>
 </dd>
 <dt>
-git pull -s ours . obsolete
+git pull origin next
 </dt>
 <dd>
 <p>
-        Merge local branch <tt>obsolete</tt> into the current branch,
-        using <tt>ours</tt> merge strategy.
+        Merge into the current branch the remote branch <tt>next</tt>;
+        leaves a copy of <tt>next</tt> temporarily in FETCH_HEAD, but
+        does not update any remote-tracking branches.
 </p>
 </dd>
 <dt>
@@ -730,6 +744,15 @@ git pull . fixes enhancements
 <p>
         Bundle local branch <tt>fixes</tt> and <tt>enhancements</tt> on top of
         the current branch, making an Octopus merge.
+</p>
+</dd>
+<dt>
+git pull -s ours . obsolete
+</dt>
+<dd>
+<p>
+        Merge local branch <tt>obsolete</tt> into the current branch,
+        using <tt>ours</tt> merge strategy.
 </p>
 </dd>
 <dt>
@@ -752,48 +775,16 @@ Command line pull of multiple branches from one repository
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ cat .git/remotes/origin
-URL: git://git.kernel.org/pub/scm/git/git.git
-Pull: master:origin
-
-$ git checkout master
-$ git fetch origin master:origin +pu:pu maint:maint
-$ git pull . origin</tt></pre>
+<pre><tt>$ git checkout master
+$ git fetch origin +pu:pu maint:tmp
+$ git pull . tmp</tt></pre>
 </div></div>
-<p>Here, a typical <tt>.git/remotes/origin</tt> file from a
-<tt>git-clone</tt> operation is used in combination with
-command line options to <tt>git-fetch</tt> to first update
-multiple branches of the local repository and then
-to merge the remote <tt>origin</tt> branch into the local
-<tt>master</tt> branch.  The local <tt>pu</tt> branch is updated
-even if it does not result in a fast forward update.
-Here, the pull can obtain its objects from the local
-repository using <tt>.</tt>, as the previous <tt>git-fetch</tt> is
-known to have already obtained and made available
-all the necessary objects.</p>
-</dd>
-<dt>
-Pull of multiple branches from one repository using <tt>.git/remotes</tt> file
-</dt>
-<dd>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ cat .git/remotes/origin
-URL: git://git.kernel.org/pub/scm/git/git.git
-Pull: master:origin
-Pull: +pu:pu
-Pull: maint:maint
-
-$ git checkout master
-$ git pull origin</tt></pre>
-</div></div>
-<p>Here, a typical <tt>.git/remotes/origin</tt> file from a
-<tt>git-clone</tt> operation has been hand-modified to include
-the branch-mapping of additional remote and local
-heads directly.  A single <tt>git-pull</tt> operation while
-in the <tt>master</tt> branch will fetch multiple heads and
-merge the remote <tt>origin</tt> head into the current,
-local <tt>master</tt> branch.</p>
+<p>This updates (or creates, as necessary) branches <tt>pu</tt> and <tt>tmp</tt>
+in the local repository by fetching from the branches
+(respectively) <tt>pu</tt> and <tt>maint</tt> from the remote repository.</p>
+<p>The <tt>pu</tt> branch will be updated even if it is does not
+fast-forward; the others will not be.</p>
+<p>The final command then merges the newly fetched <tt>tmp</tt> into master.</p>
 </dd>
 </dl>
 <p>If you tried a pull which resulted in a complex conflicts and
@@ -802,7 +793,7 @@ would want to start over, you can recover with
 </div>
 <h2>SEE ALSO</h2>
 <div class="sectionbody">
-<p><a href="git-fetch.html">git-fetch(1)</a>, <a href="git-merge.html">git-merge(1)</a></p>
+<p><a href="git-fetch.html">git-fetch(1)</a>, <a href="git-merge.html">git-merge(1)</a>, <a href="git-repo-config.html">git-repo-config(1)</a></p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -821,7 +812,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 01-Jan-2007 03:20:14 UTC
+Last updated 02-Jan-2007 00:04:08 UTC
 </div>
 </div>
 </body>
