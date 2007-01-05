@@ -266,7 +266,7 @@ git-svn(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-svn -
-   bidirectional operation between a single Subversion branch and git
+   bidirectional operation between Subversion and git
 </p>
 </div>
 </div>
@@ -276,21 +276,18 @@ git-svn(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>git-svn is a simple conduit for changesets between a single Subversion
-branch and git. It is not to be confused with <a href="git-svnimport.html">git-svnimport(1)</a>.
-They were designed with very different goals in mind.</p>
-<p>git-svn is designed for an individual developer who wants a
+<p>git-svn is a simple conduit for changesets between Subversion and git.
+It is not to be confused with <a href="git-svnimport.html">git-svnimport(1)</a>, which is
+read-only and geared towards tracking multiple branches.</p>
+<p>git-svn was originally designed for an individual developer who wants a
 bidirectional flow of changesets between a single branch in Subversion
-and an arbitrary number of branches in git.  git-svnimport is designed
-for read-only operation on repositories that match a particular layout
-(albeit the recommended one by SVN developers).</p>
-<p>For importing svn, git-svnimport is potentially more powerful when
-operating on repositories organized under the recommended
-trunk/branch/tags structure, and should be faster, too.</p>
-<p>git-svn mostly ignores the very limited view of branching that
-Subversion has.  This allows git-svn to be much easier to use,
-especially on repositories that are not organized in a manner that
-git-svnimport is designed for.</p>
+and an arbitrary number of branches in git.  Since its inception,
+git-svn has gained the ability to track multiple branches in a manner
+similar to git-svnimport; but it cannot (yet) automatically detect new
+branches and tags like git-svnimport does.</p>
+<p>git-svn is especially useful when it comes to tracking repositories
+not organized in the way Subversion developers recommend (trunk,
+branches, tags directories).</p>
 </div>
 <h2>COMMANDS</h2>
 <div class="sectionbody">
@@ -776,7 +773,7 @@ SVN was very wrong.</p>
 </dd>
 </dl>
 <h3>Basic Examples</h3>
-<p>Tracking and contributing to a Subversion-managed project:</p>
+<p>Tracking and contributing to a the trunk of a Subversion-managed project:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt># Initialize a repo (like git init-db):
@@ -792,6 +789,29 @@ SVN was very wrong.</p>
         git-svn fetch &amp;&amp; git rebase remotes/git-svn
 # Append svn:ignore settings to the default git exclude file:
         git-svn show-ignore &gt;&gt; .git/info/exclude</tt></pre>
+</div></div>
+<p>Tracking and contributing to an entire Subversion-managed project
+(complete with a trunk, tags and branches):
+See also:
+<em><a href="#tracking-multiple-repos">Tracking Multiple Repositories or Branches</a></em></p>
+<div class="listingblock">
+<div class="content">
+<pre><tt># Initialize a repo (like git init-db):
+        git-svn multi-init http://svn.foo.org/project \
+                -T trunk -b branches -t tags
+# Fetch remote revisions:
+        git-svn multi-fetch
+# Create your own branch of trunk to hack on:
+        git checkout -b my-trunk remotes/trunk
+# Do some work, and then commit your new changes to SVN, as well as
+# automatically updating your working HEAD:
+        git-svn dcommit -i trunk
+# Something has been committed to trunk, rebase the latest into your branch:
+        git-svn multi-fetch &amp;&amp; git rebase remotes/trunk
+# Append svn:ignore settings of trunk to the default git exclude file:
+        git-svn show-ignore -i trunk &gt;&gt; .git/info/exclude
+# Check for new branches and tags (no arguments are needed):
+        git-svn multi-init</tt></pre>
 </div></div>
 </div>
 <h2>REBASE VS. PULL</h2>
@@ -907,7 +927,7 @@ detect them.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 21-Dec-2006 02:25:50 UTC
+Last updated 05-Jan-2007 07:46:19 UTC
 </div>
 </div>
 </body>
