@@ -319,6 +319,27 @@ object name of the commit.</p>
         abbreviated object name, use &lt;n&gt; digits.
 </p>
 </dd>
+<dt>
+--candidates=&lt;n&gt;
+</dt>
+<dd>
+<p>
+        Instead of considering only the 10 most recent tags as
+        candidates to describe the input committish consider
+        up to &lt;n&gt; candidates.  Increasing &lt;n&gt; above 10 will take
+        slightly longer but may produce a more accurate result.
+</p>
+</dd>
+<dt>
+--debug
+</dt>
+<dd>
+<p>
+        Verbosely display information about the searching strategy
+        being employed to standard error.  The tag name will still
+        be printed to standard out.
+</p>
+</dd>
 </dl>
 </div>
 <h2>EXAMPLES</h2>
@@ -352,6 +373,23 @@ tags/v1.0.0-g975b</tt></pre>
 heads/lt/describe-g975b</tt></pre>
 </div></div>
 </div>
+<h2>SEARCH STRATEGY</h2>
+<div class="sectionbody">
+<p>For each committish supplied "git describe" will first look for
+a tag which tags exactly that commit.  Annotated tags will always
+be preferred over lightweight tags, and tags with newer dates will
+always be preferred over tags with older dates.  If an exact match
+is found, its name will be output and searching will stop.</p>
+<p>If an exact match was not found "git describe" will walk back
+through the commit history to locate an ancestor commit which
+has been tagged.  The ancestor's tag will be output along with an
+abbreviation of the input committish's SHA1.</p>
+<p>If multiple tags were found during the walk then the tag which
+has the fewest commits different from the input committish will be
+selected and output.  Here fewest commits different is defined as
+the number of commits which would be shown by "git log tag..input"
+will be the smallest number of commits possible.</p>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;, but somewhat
@@ -367,7 +405,7 @@ butchered by Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:41:00 UTC
+Last updated 15-Jan-2007 06:12:30 UTC
 </div>
 </div>
 </body>

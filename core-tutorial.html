@@ -1129,17 +1129,12 @@ of it as it can automatically (which in this case is just merge the <tt>example<
 file, which had no differences in the <tt>mybranch</tt> branch), and say:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        Trying really trivial in-index merge...
-        fatal: Merge requires file-level merging
-        Nope.
-        ...
-        Auto-merging hello
+<pre><tt>        Auto-merging hello
         CONFLICT (content): Merge conflict in hello
         Automatic merge failed; fix up by hand</tt></pre>
 </div></div>
-<p>which is way too verbose, but it basically tells you that it failed the
-really trivial merge ("Simple merge") and did an "Automatic merge"
-instead, but that too failed due to conflicts in <tt>hello</tt>.</p>
+<p>It tells you that it did an "Automatic merge", which
+failed due to conflicts in <tt>hello</tt>.</p>
 <p>Not to worry. It left the (trivial) conflict in <tt>hello</tt> in the same form you
 should already be well used to if you've ever used CVS, so let's just
 open <tt>hello</tt> in our editor (whatever that may be), and fix it up somehow.
@@ -1357,37 +1352,15 @@ course, you will pay the price of more disk usage to hold
 multiple working trees, but disk space is cheap these days.</td>
 </tr></table>
 </div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">You could even pull from your own repository by
-giving <em>.</em> as &lt;remote-repository&gt; parameter to <tt>git pull</tt>.  This
-is useful when you want to merge a local branch (or more, if you
-are making an Octopus) into the current branch.</td>
-</tr></table>
-</div>
 <p>It is likely that you will be pulling from the same remote
 repository from time to time. As a short hand, you can store
-the remote repository URL in a file under .git/remotes/
-directory, like this:</p>
+the remote repository URL in the local repository's config file
+like this:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ mkdir -p .git/remotes/
-$ cat &gt;.git/remotes/linus &lt;&lt;\EOF
-URL: http://www.kernel.org/pub/scm/git/git.git/
-EOF</tt></pre>
+<pre><tt>$ git repo-config remote.linus.url http://www.kernel.org/pub/scm/git/git.git/</tt></pre>
 </div></div>
-<p>and use the filename to <tt>git pull</tt> instead of the full URL.
-The URL specified in such file can even be a prefix
-of a full URL, like this:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ cat &gt;.git/remotes/jgarzik &lt;&lt;\EOF
-URL: http://www.kernel.org/pub/scm/linux/git/jgarzik/
-EOF</tt></pre>
-</div></div>
+<p>and use the "linus" keyword with <tt>git pull</tt> instead of the full URL.</p>
 <p>Examples.</p>
 <ol>
 <li>
@@ -1398,11 +1371,6 @@ EOF</tt></pre>
 <li>
 <p>
 <tt>git pull linus tag v0.99.1</tt>
-</p>
-</li>
-<li>
-<p>
-<tt>git pull jgarzik/netdev-2.6.git/ e100</tt>
 </p>
 </li>
 </ol>
@@ -1416,11 +1384,6 @@ EOF</tt></pre>
 <li>
 <p>
 <tt>git pull http://www.kernel.org/pub/scm/git/git.git/ tag v0.99.1</tt>
-</p>
-</li>
-<li>
-<p>
-<tt>git pull http://www.kernel.org/pub/&#8230;/jgarzik/netdev-2.6.git e100</tt>
 </p>
 </li>
 </ol>
@@ -1812,7 +1775,8 @@ on that project and has an own "public repository" goes like this:</p>
 <p>
 Prepare your work repository, by <tt>git clone</tt> the public
    repository of the "project lead". The URL used for the
-   initial cloning is stored in <tt>.git/remotes/origin</tt>.
+   initial cloning is stored in the remote.origin.url
+   configuration variable.
 </p>
 </li>
 <li>
@@ -1872,7 +1836,8 @@ like this:</p>
 Prepare your work repository, by <tt>git clone</tt> the public
    repository of the "project lead" (or a "subsystem
    maintainer", if you work on a subsystem). The URL used for
-   the initial cloning is stored in <tt>.git/remotes/origin</tt>.
+   the initial cloning is stored in the remote.origin.url
+   configuration variable.
 </p>
 </li>
 <li>
@@ -1885,7 +1850,7 @@ Do your work in your repository on <em>master</em> branch.
 Run <tt>git fetch origin</tt> from the public repository of your
    upstream every once in a while. This does only the first
    half of <tt>git pull</tt> but does not merge. The head of the
-   public repository is stored in <tt>.git/refs/heads/origin</tt>.
+   public repository is stored in <tt>.git/refs/remotes/origin/master</tt>.
 </p>
 </li>
 <li>
@@ -1973,11 +1938,11 @@ branch before these two merges by resetting it to <em>master~2</em>:</p>
 </div></div>
 <p>You can make sure <em>git show-branch</em> matches the state before
 those two <em>git merge</em> you just did.  Then, instead of running
-two <em>git merge</em> commands in a row, you would pull these two
+two <em>git merge</em> commands in a row, you would merge these two
 branch heads (this is known as <em>making an Octopus</em>):</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull . commit-fix diff-fix
+<pre><tt>$ git merge commit-fix diff-fix
 $ git show-branch
 ! [commit-fix] Fix commit message normalization.
  ! [diff-fix] Fix rename detection.
@@ -1992,7 +1957,7 @@ $ git show-branch
 </div></div>
 <p>Note that you should not do Octopus because you can.  An octopus
 is a valid thing to do and often makes it easier to view the
-commit history if you are pulling more than two independent
+commit history if you are merging more than two independent
 changes at the same time.  However, if you have merge conflicts
 with any of the branches you are merging in and need to hand
 resolve, that is an indication that the development happened in
@@ -2004,7 +1969,7 @@ to follow, not easier.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 13-Jan-2007 08:09:05 UTC
+Last updated 15-Jan-2007 06:12:35 UTC
 </div>
 </div>
 </body>
