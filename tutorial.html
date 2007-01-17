@@ -516,40 +516,45 @@ then she may need to manually fix any conflicts.  (Note that the
 is the default.)</p>
 <p>The "pull" command thus performs two operations: it fetches changes
 from a remote branch, then merges them into the current branch.</p>
-<p>You can perform the first operation alone using the "git fetch"
-command.  For example, Alice could create a temporary branch just to
-track Bob's changes, without merging them with her own, using:</p>
+<p>When you are working in a small closely knit group, it is not
+unusual to interact with the same repository over and over
+again.  By defining <em>remote</em> repository shorthand, you can make
+it easier:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch /home/bob/myrepo master:bob-incoming</tt></pre>
+<pre><tt>$ git remote add bob /home/bob/myrepo</tt></pre>
 </div></div>
-<p>which fetches the changes from Bob's master branch into a new branch
-named bob-incoming.  Then</p>
+<p>With this, you can perform the first operation alone using the
+"git fetch" command without merging them with her own branch,
+using:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log -p master..bob-incoming</tt></pre>
+<pre><tt>$ git fetch bob</tt></pre>
+</div></div>
+<p>Unlike the longhand form, when Alice fetches from Bob using a
+remote repository shorthand set up with <tt>git remote</tt>, what was
+fetched is stored in a remote tracking branch, in this case
+<tt>bob/master</tt>.  So after this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git log -p master..bob/master</tt></pre>
 </div></div>
 <p>shows a list of all the changes that Bob made since he branched from
 Alice's master branch.</p>
-<p>After examining those changes, and possibly fixing things, Alice
+<p>After examining those changes, Alice
 could merge the changes into her master branch:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout master
-$ git merge bob-incoming</tt></pre>
+<pre><tt>$ git merge bob/master</tt></pre>
 </div></div>
-<p>The last command is a merge from the "bob-incoming" branch in Alice's
-own repository.</p>
-<p>Alice could also perform both steps at once with:</p>
+<p>This <tt>merge</tt> can also be done by <em>pulling from her own remote
+tracking branch</em>, like this:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull /home/bob/myrepo master:bob-incoming</tt></pre>
+<pre><tt>$ git pull . remotes/bob/master</tt></pre>
 </div></div>
-<p>This is just like the "git pull /home/bob/myrepo master" that we saw
-before, except that it also stores the unmerged changes from bob's
-master branch in bob-incoming before merging them into Alice's
-current branch.  Note that git pull always merges into the current
-branch, regardless of what else is given on the commandline.</p>
+<p>Note that git pull always merges into the current branch,
+regardless of what else is given on the commandline.</p>
 <p>Later, Bob can update his repo with Alice's latest changes using</p>
 <div class="listingblock">
 <div class="content">
@@ -783,7 +788,7 @@ digressions that may be interesting at this point are:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Jan-2007 06:12:34 UTC
+Last updated 17-Jan-2007 05:40:14 UTC
 </div>
 </div>
 </body>
