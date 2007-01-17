@@ -274,7 +274,7 @@ git-checkout(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git-checkout</em> [-f] [-b &lt;new_branch&gt; [-l]] [-m] [&lt;branch&gt;]
-<em>git-checkout</em> [-m] [&lt;branch&gt;] &lt;paths&gt;&#8230;</div></div>
+<em>git-checkout</em> [&lt;branch&gt;] &lt;paths&gt;&#8230;</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -353,10 +353,53 @@ and mark the resolved paths with <tt>git update-index</tt>.</p>
 <dd>
 <p>
         Branch to checkout; may be any object ID that resolves to a
-        commit. Defaults to HEAD.
+        commit.  Defaults to HEAD.
 </p>
+<p>When this parameter names a non-branch (but still a valid commit object),
+your HEAD becomes <em>detached</em>.</p>
 </dd>
 </dl>
+</div>
+<h2>Detached HEAD</h2>
+<div class="sectionbody">
+<p>It is sometimes useful to be able to <em>checkout</em> a commit that is
+not at the tip of one of your branches.  The most obvious
+example is to check out the commit at a tagged official release
+point, like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout v2.6.18</tt></pre>
+</div></div>
+<p>Earlier versions of git did not allow this and asked you to
+create a temporary branch using <tt>-b</tt> option, but starting from
+version 1.5.0, the above command <em>detaches</em> your HEAD from the
+current branch and directly point at the commit named by the tag
+(<tt>v2.6.18</tt> in the above example).</p>
+<p>You can use usual git commands while in this state.  You can use
+<tt>git-reset --hard $othercommit</tt> to further move around, for
+example.  You can make changes and create a new commit on top of
+a detached HEAD.  You can even create a merge by using <tt>git
+merge $othercommit</tt>.</p>
+<p>The state you are in while your HEAD is detached is not recorded
+by any branch (which is natural --- you are not on any branch).
+What this means is that you can discard your temporary commits
+and merges by switching back to an existing branch (e.g. <tt>git
+checkout master</tt>), and a later <tt>git prune</tt> or <tt>git gc</tt> would
+garbage-collect them.</p>
+<p>The command would refuse to switch back to make sure that you do
+not discard your temporary state by mistake when your detached
+HEAD is not pointed at by any existing ref.  If you did want to
+save your state (e.g. "I was interested in the fifth commit from
+the top of <em>master</em> branch", or "I made two commits to fix minor
+bugs while on a detached HEAD" &#8212; and if you do not want to lose
+these facts), you can create a new branch and switch to it with
+<tt>git checkout -b newbranch</tt> so that you can keep building on
+that state, or tag it first so that you can come back to it
+later and switch to the branch you wanted to switch to with <tt>git
+tag that_state; git checkout master</tt>.  On the other hand, if you
+did want to discard the temporary state, you can give <tt>-f</tt>
+option (e.g. <tt>git checkout -f master</tt>) to override this
+behaviour.</p>
 </div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
@@ -466,7 +509,7 @@ $ git update-index frotz</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:40:55 UTC
+Last updated 17-Jan-2007 20:25:05 UTC
 </div>
 </div>
 </body>
