@@ -276,14 +276,79 @@ git-sh-setup(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Sets up the normal git environment variables and a few helper functions
-(currently just "die()"), and returns OK if it all looks like a git archive.
-So, to make the rest of the git scripts more careful and readable,
-use it as follows:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>. git-sh-setup || die "Not a git archive"</tt></pre>
-</div></div>
+<p>This is not a command the end user would want to run.  Ever.
+This documentation is meant for people who are studying the
+Porcelain-ish scripts and/or are writing new ones.</p>
+<p>The <tt>git-sh-setup</tt> scriptlet is designed to be sourced (using
+<tt>.</tt>) by other shell scripts to set up some variables pointing at
+the normal git directories and a few helper shell functions.</p>
+<p>Before sourcing it, your script should set up a few variables;
+<tt>USAGE</tt> (and <tt>LONG_USAGE</tt>, if any) is used to define message
+given by <tt>usage()</tt> shell function.  <tt>SUBDIRECTORY_OK</tt> can be set
+if the script can run from a subdirectory of the working tree
+(some commands do not).</p>
+<p>The scriptlet sets <tt>GIT_DIR</tt> and <tt>GIT_OBJECT_DIRECTORY</tt> shell
+variables, but does <strong>not</strong> export them to the environment.</p>
+</div>
+<h2>FUNCTIONS</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+die
+</dt>
+<dd>
+<p>
+        exit after emitting the supplied error message to the
+        standard error stream.
+</p>
+</dd>
+<dt>
+usage
+</dt>
+<dd>
+<p>
+        die with the usage message.
+</p>
+</dd>
+<dt>
+set_reflog_action
+</dt>
+<dd>
+<p>
+        set the message that will be recorded to describe the
+        end-user action in the reflog, when the script updates a
+        ref.
+</p>
+</dd>
+<dt>
+is_bare_repository
+</dt>
+<dd>
+<p>
+        outputs <tt>true</tt> or <tt>false</tt> to the standard output stream
+        to indicate if the repository is a bare repository
+        (i.e. without an associated working tree).
+</p>
+</dd>
+<dt>
+cd_to_toplevel
+</dt>
+<dd>
+<p>
+        runs chdir to the toplevel of the working tree.
+</p>
+</dd>
+<dt>
+require_work_tree
+</dt>
+<dd>
+<p>
+        checks if the repository is a bare repository, and dies
+        if so.  Used by scripts that require working tree
+        (e.g. <tt>checkout</tt>).
+</p>
+</dd>
+</dl>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -299,7 +364,7 @@ use it as follows:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2006 08:41:30 UTC
+Last updated 17-Jan-2007 17:42:17 UTC
 </div>
 </div>
 </body>
