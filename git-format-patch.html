@@ -276,6 +276,7 @@ git-format-patch(1) Manual Page
 <div class="content"><em>git-format-patch</em> [-n | -k] [-o &lt;dir&gt; | --stdout] [--attach] [--thread]
                    [-s | --signoff] [--diff-options] [--start-number &lt;n&gt;]
                    [--in-reply-to=Message-Id] [--suffix=.&lt;sfx&gt;]
+                   [--ignore-if-in-upstream]
                    &lt;since&gt;[..&lt;until&gt;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
@@ -385,13 +386,25 @@ reference.</p>
 </p>
 </dd>
 <dt>
+--ignore-if-in-upstream
+</dt>
+<dd>
+<p>
+        Do not include a patch that matches a commit in
+        &lt;until&gt;..&lt;since&gt;.  This will examine all patches reachable
+        from &lt;since&gt; but not from &lt;until&gt; and compare them with the
+        patches being generated, and any patch that matches is
+        ignored.
+</p>
+</dd>
+<dt>
 --suffix=.&lt;sfx&gt;
 </dt>
 <dd>
 <p>
-        Instead of using <tt>.txt</tt> as the suffix for generated
+        Instead of using <tt>.patch</tt> as the suffix for generated
         filenames, use specifed suffix.  A common alternative is
-        <tt>--suffix=.patch</tt>.
+        <tt>--suffix=.txt</tt>.
 </p>
 <p>Note that you would need to include the leading dot <tt>.</tt> if you
 want a filename like <tt>0001-description-of-my-change.patch</tt>, and
@@ -403,15 +416,13 @@ not add any suffix.</p>
 <h2>CONFIGURATION</h2>
 <div class="sectionbody">
 <p>You can specify extra mail header lines to be added to each
-message in the repository configuration as follows:</p>
-<div class="literalblock">
+message in the repository configuration.  Also you can specify
+the default suffix different from the built-in one:</p>
+<div class="listingblock">
 <div class="content">
-<pre><tt>headers = "Organization: git-foo\n"</tt></pre>
-</div></div>
-<p>You can specify default suffix used:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>suffix = .patch</tt></pre>
+<pre><tt>[format]
+        headers = "Organization: git-foo\n"
+        suffix = .txt</tt></pre>
 </div></div>
 </div>
 <h2>EXAMPLES</h2>
@@ -451,6 +462,15 @@ git-format-patch -M -B origin
         the recipient uses git to apply your patch.
 </p>
 </dd>
+<dt>
+git-format-patch -3
+</dt>
+<dd>
+<p>
+        Extract three topmost commits from the current branch
+        and format them as e-mailable patches.
+</p>
+</dd>
 </dl>
 </div>
 <h2>See Also</h2>
@@ -471,7 +491,7 @@ git-format-patch -M -B origin
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 18-Jan-2007 06:23:59 UTC
+Last updated 19-Jan-2007 00:37:19 UTC
 </div>
 </div>
 </body>
