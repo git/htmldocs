@@ -572,14 +572,59 @@ in the fully qualified variable name the variable itself is the last
 dot-separated segment and the section name is everything before the last
 dot. The variable names are case-insensitive and only alphanumeric
 characters are allowed. Some variables may appear multiple times.</p>
+<h3>Syntax</h3>
 <p>The syntax is fairly flexible and permissive; whitespaces are mostly
-ignored. The <em>#</em> and <em>;</em> characters begin comments to the end of line,
-blank lines are ignored, lines containing strings enclosed in square
-brackets start sections and all the other lines are recognized
-as setting variables, in the form <em>name = value</em>. If there is no equal
-sign on the line, the entire line is taken as <em>name</em> and the variable
-is recognized as boolean "true". String values may be entirely or partially
-enclosed in double quotes; some variables may require special value format.</p>
+ignored.  The <em>#</em> and <em>;</em> characters begin comments to the end of line,
+blank lines are ignored.</p>
+<p>The file consists of sections and variables.  A section begins with
+the name of the section in square brackets and continues until the next
+section begins.  Section names are not case sensitive.  Only alphanumeric
+characters, <em><tt>-</tt></em> and <em><tt>.</tt></em> are allowed in section names.  Each variable
+must belong to some section, which means that there must be section
+header before first setting of a variable.</p>
+<p>Sections can be further divided into subsections.  To begin a subsection
+put its name in double quotes, separated by space from the section name,
+in the section header, like in example below:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        [section "subsection"]
+</tt></pre>
+</div></div>
+<p>Subsection names can contain any characters (doublequote <em><tt>"</tt></em>, backslash
+<em><tt>\</tt></em> and newline have to be entered escaped as <em><tt>\"</tt></em>, <em><tt>\\</tt></em> and <em><tt>\n</tt></em>,
+respecitvely) and are case sensitive.  Section header cannot span multiple
+lines.  Variables may belong directly to a section or to a given subsection.
+You can have <tt>[section]</tt> if you have <tt>[section "subsection"]</tt>, but you
+don't need to.</p>
+<p>There is also (case insensitive) alternative <tt>[section.subsection]</tt> syntax.
+In this syntax subsection names follow the same restrictions as for section
+name.</p>
+<p>All the other lines are recognized as setting variables, in the form
+<em>name = value</em>.  If there is no equal sign on the line, the entire line
+is taken as <em>name</em> and the variable is recognized as boolean "true".
+The variable names are case-insensitive and only alphanumeric
+characters and <em><tt>-</tt></em> are allowed.  There can be more than one value
+for a given variable; we say then that variable is multivalued.</p>
+<p>Leading and trailing whitespace in a variable value is discarded.
+Internal whitespace within a variable value is retained verbatim.</p>
+<p>The values following the equals sign in variable assign are all either
+a string, an integer, or a boolean.  Boolean values may be given as yes/no,
+0/1 or true/false.  Case is not significant in boolean values, when
+converting value to the canonical form using <em>--bool</em> type specifier;
+<tt>git-repo-config</tt> will ensure that the output is "true" or "false".</p>
+<p>String values may be entirely or partially enclosed in double quotes.
+You need to enclose variable value in double quotes if you want to
+preserve leading or trailing whitespace, or if variable value contains
+beginning of comment characters (if it contains <em>#</em> or <em>;</em>).
+Double quote <em><tt>"</tt></em> and backslash <em><tt>\</tt></em> characters in variable value must
+be escaped: use <em><tt>\"</tt></em> for <em><tt>"</tt></em> and <em><tt>\\</tt></em> for <em><tt>\</tt></em>.</p>
+<p>The following escape sequences (beside <em><tt>\"</tt></em> and <em><tt>\\</tt></em>) are recognized:
+<em><tt>\n</tt></em> for newline character (NL), <em><tt>\t</tt></em> for horizontal tabulation (HT, TAB)
+and <em><tt>\b</tt></em> for backspace (BS).  No other char escape sequence, nor octal
+char sequences are valid.</p>
+<p>Variable value ending in a <em><tt>\</tt></em> is continued on the next line in the
+customary UNIX fashion.</p>
+<p>Some variables may require special value format.</p>
 <h3>Example</h3>
 <div class="literalblock">
 <div class="content">
@@ -600,6 +645,13 @@ enclosed in double quotes; some variables may require special value format.</p>
 <pre><tt>[branch "devel"]
         remote = origin
         merge = refs/heads/devel</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt># Proxy settings
+[core]
+        gitProxy="ssh" for "ssh://kernel.org/"
+        gitProxy=default-proxy ; for the rest</tt></pre>
 </div></div>
 <h3>Variables</h3>
 <p>Note that this list is non-comprehensive and not necessarily complete.
@@ -1293,7 +1345,7 @@ receive.denyNonFastForwards
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 20-Jan-2007 02:22:39 UTC
+Last updated 23-Jan-2007 08:44:10 UTC
 </div>
 </div>
 </body>
