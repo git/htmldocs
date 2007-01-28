@@ -273,7 +273,7 @@ git-blame(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-blame</em> [-c] [-l] [-t] [-f] [-n] [-p] [-L n,m] [-S &lt;revs-file&gt;]
+<div class="content"><em>git-blame</em> [-c] [-l] [-t] [-f] [-n] [-p] [--incremental] [-L n,m] [-S &lt;revs-file&gt;]
             [-M] [-C] [-C] [--since=&lt;date&gt;] [&lt;rev&gt;] [--] &lt;file&gt;</div></div>
 </div>
 <h2>DESCRIPTION</h2>
@@ -363,6 +363,15 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 <dd>
 <p>
         Show in a format designed for machine consumption.
+</p>
+</dd>
+<dt>
+--incremental
+</dt>
+<dd>
+<p>
+        Show the result incrementally in a format designed for
+        machine consumption.
 </p>
 </dd>
 <dt>
@@ -504,6 +513,62 @@ parents, using <tt>commit^!</tt> notation:</p>
 <pre><tt>git blame -C -C -f $commit^! -- foo</tt></pre>
 </div></div>
 </div>
+<h2>INCREMENTAL OUTPUT</h2>
+<div class="sectionbody">
+<p>When called with <tt>--incremental</tt> option, the command outputs the
+result as it is built.  The output generally will talk about
+lines touched by more recent commits first (i.e. the lines will
+be annotated out of order) and is meant to be used by
+interactive viewers.</p>
+<p>The output format is similar to the Porcelain format, but it
+does not contain the actual lines from the file that is being
+annotated.</p>
+<ol>
+<li>
+<p>
+Each blame entry always starts with a line of:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;40-byte hex sha1&gt; &lt;sourceline&gt; &lt;resultline&gt; &lt;num_lines&gt;</tt></pre>
+</div></div>
+<p>Line numbers count from 1.</p>
+</li>
+<li>
+<p>
+The first time that commit shows up in the stream, it has various
+  other information about it printed out with a one-word tag at the
+  beginning of each line about that "extended commit info" (author,
+  email, committer, dates, summary etc).
+</p>
+</li>
+<li>
+<p>
+Unlike Porcelain format, the filename information is always
+  given and terminates the entry:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>"filename" &lt;whitespace-quoted-filename-goes-here&gt;</tt></pre>
+</div></div>
+<p>and thus it's really quite easy to parse for some line- and word-oriented
+parser (which should be quite natural for most scripting languages).</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">For people who do parsing: to make it more robust, just ignore any
+lines in between the first and last one ("&lt;sha1&gt;" and "filename" lines)
+where you don't recognize the tag-words (or care about that particular
+one) at the beginning of the "extended information" lines. That way, if
+there is ever added information (like the commit encoding or extended
+commit commentary), a blame viewer won't ever care.</td>
+</tr></table>
+</div>
+</li>
+</ol>
+</div>
 <h2>SEE ALSO</h2>
 <div class="sectionbody">
 <p><a href="git-annotate.html">git-annotate(1)</a></p>
@@ -518,7 +583,7 @@ parents, using <tt>commit^!</tt> notation:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 17-Jan-2007 23:27:38 UTC
+Last updated 28-Jan-2007 20:55:10 UTC
 </div>
 </div>
 </body>
