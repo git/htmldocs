@@ -367,6 +367,25 @@ branch.  If we have the following situation:</p>
     A---B---C---D  master</tt></pre>
 </div></div>
 <p>This is useful when topicB does not depend on topicA.</p>
+<p>A range of commits could also be removed with rebase.  If we have
+the following situation:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    E---F---G---H---I---J  topicA</tt></pre>
+</div></div>
+<p>then the command</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git-rebase --onto topicA~5 topicA~2 topicA</tt></pre>
+</div></div>
+<p>would result in the removal of commits F and G:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    E---H'---I'---J'  topicA</tt></pre>
+</div></div>
+<p>This is useful if F and G were flawed in some way, or should not be
+part of topicA.  Note that the argument to --onto and the &lt;upstream&gt;
+parameter can be any valid commit-ish.</p>
 <p>In case of conflict, git-rebase will stop at the first problematic commit
 and leave conflict markers in the tree.  You can use git diff to locate
 the markers (&lt;&lt;&lt;&lt;&lt;&lt;) and make edits to resolve the conflict.  For each
@@ -398,7 +417,8 @@ desired resolution, you can continue the rebasing process with</p>
 <p>
         Starting point at which to create the new commits. If the
         --onto option is not specified, the starting point is
-        &lt;upstream&gt;.
+        &lt;upstream&gt;.  May be any valid commit, and not just an
+        existing branch name.
 </p>
 </dd>
 <dt>
@@ -406,7 +426,8 @@ desired resolution, you can continue the rebasing process with</p>
 </dt>
 <dd>
 <p>
-        Upstream branch to compare against.
+        Upstream branch to compare against.  May be any valid commit,
+        not just an existing branch name.
 </p>
 </dd>
 <dt>
@@ -559,7 +580,7 @@ a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jan-2007 00:37:29 UTC
+Last updated 06-Feb-2007 00:09:25 UTC
 </div>
 </div>
 </body>
