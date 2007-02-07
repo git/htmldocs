@@ -356,6 +356,27 @@ the frontend program in use.</p>
         have been completed.
 </p>
 </dd>
+<dt>
+--quiet
+</dt>
+<dd>
+<p>
+        Disable all non-fatal output, making gfi silent when it
+        is successful.  This option disables the output shown by
+        --stats.
+</p>
+</dd>
+<dt>
+--stats
+</dt>
+<dd>
+<p>
+        Display some basic statistics about the objects gfi has
+        created, the packfiles they were stored into, and the
+        memory used by gfi during this run.  Showing this output
+        is currently the default, but can be disabled with --quiet.
+</p>
+</dd>
 </dl>
 </div>
 <h2>Performance</h2>
@@ -395,8 +416,8 @@ history of the commit to be written).  If the update is not a
 fast-forward update, gfi will skip updating that ref and instead
 prints a warning message.  gfi will always attempt to update all
 branch refs, and does not stop on the first failure.</p>
-<p>Branch updates can be forced with <tt>--force</tt>, but its recommended that
-this only be used on an otherwise quiet repository.  Using <tt>--force</tt>
+<p>Branch updates can be forced with --force, but its recommended that
+this only be used on an otherwise quiet repository.  Using --force
 is not necessary for an initial import into an empty repository.</p>
 </div>
 <h2>Technical Discussion</h2>
@@ -432,28 +453,30 @@ unexpected input.</p>
 <h3>Date Formats</h3>
 <p>The following date formats are supported.  A frontend should select
 the format it will use for this import by passing the format name
-in the <tt>--date-format=&lt;fmt&gt;</tt> command line option.</p>
+in the --date-format=&lt;fmt&gt; command line option.</p>
 <dl>
 <dt>
 <tt>raw</tt>
 </dt>
 <dd>
 <p>
-        This is the Git native format and is <tt>&lt;time&gt; SP &lt;tz&gt;</tt>.
-        It is also gfi's default format, if <tt>--date-format</tt> was
+        This is the Git native format and is <tt>&lt;time&gt; SP &lt;offutc&gt;</tt>.
+        It is also gfi's default format, if --date-format was
         not specified.
 </p>
 <p>The time of the event is specified by <tt>&lt;time&gt;</tt> as the number of
 seconds since the UNIX epoch (midnight, Jan 1, 1970, UTC) and is
 written as an ASCII decimal integer.</p>
-<p>The timezone is specified by <tt>&lt;tz&gt;</tt> as a positive or negative offset
-from UTC.  For example EST (which is typically 5 hours behind GMT)
-would be expressed in <tt>&lt;tz&gt;</tt> by &#8220;-0500&#8221; while GMT is &#8220;+0000&#8221;.</p>
-<p>If the timezone is not available in the source material, use
-&#8220;+0000&#8221;, or the most common local timezone.  For example many
+<p>The local offset is specified by <tt>&lt;offutc&gt;</tt> as a positive or negative
+offset from UTC.  For example EST (which is 5 hours behind UTC)
+would be expressed in <tt>&lt;tz&gt;</tt> by &#8220;-0500&#8221; while UTC is &#8220;+0000&#8221;.
+The local offset does not affect <tt>&lt;time&gt;</tt>; it is used only as an
+advisement to help formatting routines display the timestamp.</p>
+<p>If the local offset is not available in the source material, use
+&#8220;+0000&#8221;, or the most common local offset.  For example many
 organizations have a CVS repository which has only ever been accessed
 by users who are located in the same location and timezone.  In this
-case the user's timezone can be easily assumed.</p>
+case the offset from UTC can be easily assumed.</p>
 <p>Unlike the <tt>rfc2822</tt> format, this format is very strict.  Any
 variation in formatting will cause gfi to reject the value.</p>
 </dd>
@@ -473,6 +496,10 @@ these cases Git will still be able to obtain the correct date from
 the malformed string.  There are also some types of malformed
 strings which Git will parse wrong, and yet consider valid.
 Seriously malformed strings will be rejected.</p>
+<p>Unlike the <tt>raw</tt> format above, the timezone/UTC offset information
+contained in an RFC 2822 date string is used to adjust the date
+value to UTC prior to storage.  Therefore it is important that
+this information be as accurate as possible.</p>
 <p>If the source material is formatted in RFC 2822 style dates,
 the frontend should let gfi handle the parsing and conversion
 (rather than attempting to do it itself) as the Git parser has
@@ -575,7 +602,7 @@ change to the project.</p>
         data
         ('from' SP &lt;committish&gt; LF)?
         ('merge' SP &lt;committish&gt; LF)?
-        (filemodify | filedelete)*
+        (filemodify | filedelete | filedeleteall)*
         LF</tt></pre>
 </div></div>
 <p>where <tt>&lt;ref&gt;</tt> is the name of the branch to make the commit on.
@@ -594,10 +621,12 @@ message (see below for <tt>data</tt> command syntax).  To import an empty
 commit message use a 0 length data.  Commit messages are free-form
 and are not interpreted by Git.  Currently they must be encoded in
 UTF-8, as gfi does not permit other encodings to be specified.</p>
-<p>Zero or more <tt>filemodify</tt> and <tt>filedelete</tt> commands may be
-included to update the contents of the branch prior to the commit.
-These commands can be supplied in any order, gfi is not sensitive
-to pathname or operation ordering.</p>
+<p>Zero or more <tt>filemodify</tt>, <tt>filedelete</tt> and <tt>filedeleteall</tt> commands
+may be included to update the contents of the branch prior to
+creating the commit.  These commands may be supplied in any order.
+However it is recommended that a <tt>filedeleteall</tt> command preceed
+all <tt>filemodify</tt> commands in the same commit, as <tt>filedeleteall</tt>
+wipes the branch clean (see below).</p>
 <h4><tt>author</tt></h4>
 <p>An <tt>author</tt> command may optionally appear, if the author information
 might differ from the committer information.  If <tt>author</tt> is omitted
@@ -615,7 +644,7 @@ the email address from the other fields in the line.  Note that
 <tt>&lt;name&gt;</tt> is free-form and may contain any sequence of bytes, except
 <tt>LT</tt> and <tt>LF</tt>.  It is typically UTF-8 encoded.</p>
 <p>The time of the change is specified by <tt>&lt;when&gt;</tt> using the date format
-that was selected by the <tt>--date-format=&lt;fmt&gt;</tt> command line option.
+that was selected by the --date-format=&lt;fmt&gt; command line option.
 See &#8220;Date Formats&#8221; above for the set of supported formats, and
 their syntax.</p>
 <h4><tt>from</tt></h4>
@@ -787,6 +816,26 @@ first non-empty directory or the root is reached.</p>
 </div></div>
 <p>here <tt>&lt;path&gt;</tt> is the complete path of the file to be removed.
 See <tt>filemodify</tt> above for a detailed description of <tt>&lt;path&gt;</tt>.</p>
+<h4><tt>filedeleteall</tt></h4>
+<p>Included in a <tt>commit</tt> command to remove all files (and also all
+directories) from the branch.  This command resets the internal
+branch structure to have no files in it, allowing the frontend
+to subsequently add all interesting files from scratch.</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'deleteall' LF</tt></pre>
+</div></div>
+<p>This command is extremely useful if the frontend does not know
+(or does not care to know) what files are currently on the branch,
+and therefore cannot generate the proper <tt>filedelete</tt> commands to
+update the content.</p>
+<p>Issuing a <tt>filedeleteall</tt> followed by the needed <tt>filemodify</tt>
+commands to set the correct content will produce the same results
+as sending only the needed <tt>filemodify</tt> and <tt>filedelete</tt> commands.
+The <tt>filedeleteall</tt> approach may however require gfi to use slightly
+more memory per active branch (less than 1 MiB for even most large
+projects); so frontends that can easily obtain only the affected
+paths for a commit are encouraged to do so.</p>
 <h3><tt>mark</tt></h3>
 <p>Arranges for gfi to save a reference to the current object, allowing
 the frontend to recall this object at a future point in time, without
@@ -929,16 +978,93 @@ a data chunk which does not have an LF as its last byte.</p>
 </dd>
 </dl>
 <h3><tt>checkpoint</tt></h3>
-<p>Forces gfi to close the current packfile and start a new one.
-As this requires a significant amount of CPU time and disk IO
-(to compute the overall pack SHA-1 checksum and generate the
-corresponding index file) it can easily take several minutes for
-a single <tt>checkpoint</tt> command to complete.</p>
+<p>Forces gfi to close the current packfile, start a new one, and to
+save out all current branch refs, tags and marks.</p>
 <div class="literalblock">
 <div class="content">
 <pre><tt>        'checkpoint' LF
         LF</tt></pre>
 </div></div>
+<p>Note that gfi automatically switches packfiles when the current
+packfile reaches --max-pack-size, or 4 GiB, whichever limit is
+smaller.  During an automatic packfile switch gfi does not update
+the branch refs, tags or marks.</p>
+<p>As a <tt>checkpoint</tt> can require a significant amount of CPU time and
+disk IO (to compute the overall pack SHA-1 checksum, generate the
+corresponding index file, and update the refs) it can easily take
+several minutes for a single <tt>checkpoint</tt> command to complete.</p>
+<p>Frontends may choose to issue checkpoints during extremely large
+and long running imports, or when they need to allow another Git
+process access to a branch.  However given that a 30 GiB Subversion
+repository can be loaded into Git through gfi in about 3 hours,
+explicit checkpointing may not be necessary.</p>
+</div>
+<h2>Tips and Tricks</h2>
+<div class="sectionbody">
+<p>The following tips and tricks have been collected from various
+users of gfi, and are offered here as suggestions.</p>
+<h3>Use One Mark Per Commit</h3>
+<p>When doing a repository conversion, use a unique mark per commit
+(<tt>mark :&lt;n&gt;</tt>) and supply the --export-marks option on the command
+line.  gfi will dump a file which lists every mark and the Git
+object SHA-1 that corresponds to it.  If the frontend can tie
+the marks back to the source repository, it is easy to verify the
+accuracy and completeness of the import by comparing each Git
+commit to the corresponding source revision.</p>
+<p>Coming from a system such as Perforce or Subversion this should be
+quite simple, as the gfi mark can also be the Perforce changeset
+number or the Subversion revision number.</p>
+<h3>Freely Skip Around Branches</h3>
+<p>Don't bother trying to optimize the frontend to stick to one branch
+at a time during an import.  Although doing so might be slightly
+faster for gfi, it tends to increase the complexity of the frontend
+code considerably.</p>
+<p>The branch LRU builtin to gfi tends to behave very well, and the
+cost of activating an inactive branch is so low that bouncing around
+between branches has virtually no impact on import performance.</p>
+<h3>Use Tag Fixup Branches</h3>
+<p>Some other SCM systems let the user create a tag from multiple
+files which are not from the same commit/changeset.  Or to create
+tags which are a subset of the files available in the repository.</p>
+<p>Importing these tags as-is in Git is impossible without making at
+least one commit which &#8220;fixes up&#8221; the files to match the content
+of the tag.  Use gfi's <tt>reset</tt> command to reset a dummy branch
+outside of your normal branch space to the base commit for the tag,
+then commit one or more file fixup commits, and finally tag the
+dummy branch.</p>
+<p>For example since all normal branches are stored under <tt>refs/heads/</tt>
+name the tag fixup branch <tt>TAG_FIXUP</tt>.  This way it is impossible for
+the fixup branch used by the importer to have namespace conflicts
+with real branches imported from the source (the name <tt>TAG_FIXUP</tt>
+is not <tt>refs/heads/TAG_FIXUP</tt>).</p>
+<p>When committing fixups, consider using <tt>merge</tt> to connect the
+commit(s) which are supplying file revisions to the fixup branch.
+Doing so will allow tools such as <a href="git-blame.html">git-blame(1)</a> to track
+through the real commit history and properly annotate the source
+files.</p>
+<p>After gfi terminates the frontend will need to do <tt>rm .git/TAG_FIXUP</tt>
+to remove the dummy branch.</p>
+<h3>Import Now, Repack Later</h3>
+<p>As soon as gfi completes the Git repository is completely valid
+and ready for use.  Typicallly this takes only a very short time,
+even for considerably large projects (100,000+ commits).</p>
+<p>However repacking the repository is necessary to improve data
+locality and access performance.  It can also take hours on extremely
+large projects (especially if -f and a large --window parameter is
+used).  Since repacking is safe to run alongside readers and writers,
+run the repack in the background and let it finish when it finishes.
+There is no reason to wait to explore your new Git project!</p>
+<p>If you choose to wait for the repack, don't try to run benchmarks
+or performance tests until repacking is completed.  gfi outputs
+suboptimal packfiles that are simply never seen in real use
+situations.</p>
+<h3>Repacking Historical Data</h3>
+<p>If you are repacking very old imported data (e.g. older than the
+last year), consider expending some extra CPU time and supplying
+--window=50 (or higher) when you run <a href="git-repack.html">git-repack(1)</a>.
+This will take longer, but will also produce a smaller packfile.
+You only need to expend the effort once, and everyone using your
+project will benefit from the smaller repository.</p>
 </div>
 <h2>Packfile Optimization</h2>
 <div class="sectionbody">
@@ -1012,7 +1138,7 @@ branch, their in-memory storage size can grow to a considerable size
 <p>gfi automatically moves active branches to inactive status based on
 a simple least-recently-used algorithm.  The LRU chain is updated on
 each <tt>commit</tt> command.  The maximum number of active branches can be
-increased or decreased on the command line with <tt>--active-branches=</tt>.</p>
+increased or decreased on the command line with --active-branches=.</p>
 <h3>per active tree</h3>
 <p>Trees (aka directories) use just 12 bytes of memory on top of the
 memory required for their entries (see &#8220;per active file&#8221; below).
@@ -1043,7 +1169,7 @@ memory footprint (less than 2.7 MiB per active branch).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Feb-2007 05:52:25 UTC
+Last updated 07-Feb-2007 23:17:17 UTC
 </div>
 </div>
 </body>
