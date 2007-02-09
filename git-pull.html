@@ -710,6 +710,63 @@ ours
 </dd>
 </dl>
 </div>
+<h2>DEFAULT BEHAVIOUR</h2>
+<div class="sectionbody">
+<p>Often people use <tt>git pull</tt> without giving any parameter.
+Traditionally, this has been equivalent to saying <tt>git pull
+origin</tt>.  However, when configuration <tt>branch.&lt;name&gt;.remote</tt> is
+present while on branch <tt>&lt;name&gt;</tt>, that value is used instead of
+<tt>origin</tt>.</p>
+<p>In order to determine what URL to use to fetch from, the value
+of the configuration <tt>remote.&lt;origin&gt;.url</tt> is consulted
+and if there is not any such variable, the value on <tt>URL: </tt> line
+in <tt>$GIT_DIR/remotes/&lt;origin&gt;</tt> file is used.</p>
+<p>In order to determine what remote branches to fetch (and
+optionally store in the tracking branches) when the command is
+run without any refspec parameters on the command line, values
+of the configuration variable <tt>remote.&lt;origin&gt;.fetch</tt> are
+consulted, and if there aren't any, <tt>$GIT_DIR/remotes/&lt;origin&gt;</tt>
+file is consulted and its <tt>Pull: </tt> lines are used.
+In addition to the refspec formats described in the OPTIONS
+section, you can have a globbing refspec that looks like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>refs/heads/*:refs/remotes/origin/*</tt></pre>
+</div></div>
+<p>A globbing refspec must have a non-empty RHS (i.e. must store
+what were fetched in tracking branches), and its LHS and RHS
+must end with <tt>/*</tt>.  The above specifies that all remote
+branches are tracked using tracking branches in
+<tt>refs/remotes/origin/</tt> hierarchy under the same name.</p>
+<p>The rule to determine which remote branch to merge after
+fetching is a bit involved, in order not to break backward
+compatibility.</p>
+<p>If explicit refspecs were given on the command
+line of <tt>git pull</tt>, they are all merged.</p>
+<p>When no refspec was given on the command line, then <tt>git pull</tt>
+uses the refspec from the configuration or
+<tt>$GIT_DIR/remotes/&lt;origin&gt;</tt>.  In such cases, the following
+rules apply:</p>
+<ol>
+<li>
+<p>
+If <tt>branch.&lt;name&gt;.merge</tt> configuration for the current
+  branch <tt>&lt;name&gt;</tt> exists, that is the name of the branch at the
+  remote site that is merged.
+</p>
+</li>
+<li>
+<p>
+If the refspec is a globbing one, nothing is merged.
+</p>
+</li>
+<li>
+<p>
+Otherwise the remote branch of the first refspec is merged.
+</p>
+</li>
+</ol>
+</div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
 <dl>
@@ -813,7 +870,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 29-Jan-2007 02:55:09 UTC
+Last updated 09-Feb-2007 08:38:36 UTC
 </div>
 </div>
 </body>
