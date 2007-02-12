@@ -386,6 +386,124 @@ it in the repository configuration as follows:</p>
 <pre><tt>signingkey = &lt;gpg-key-id&gt;</tt></pre>
 </div></div>
 </div>
+<h2>DISCUSSION</h2>
+<div class="sectionbody">
+<h3>On Re-tagging</h3>
+<p>What should you do when you tag a wrong commit and you would
+want to re-tag?</p>
+<p>If you never pushed anything out, just re-tag it. Use "-f" to
+replace the old one. And you're done.</p>
+<p>But if you have pushed things out (or others could just read
+your repository directly), then others will have already seen
+the old tag. In that case you can do one of two things:</p>
+<ol>
+<li>
+<p>
+The sane thing.
+Just admit you screwed up, and use a different name. Others have
+already seen one tag-name, and if you keep the same name, you
+may be in the situation that two people both have "version X",
+but they actually have <em>different</em> "X"'s.  So just call it "X.1"
+and be done with it.
+</p>
+</li>
+<li>
+<p>
+The insane thing.
+You really want to call the new version "X" too, <em>even though</em>
+others have already seen the old one. So just use "git tag -f"
+again, as if you hadn't already published the old one.
+</p>
+</li>
+</ol>
+<p>However, Git does <strong>not</strong> (and it should not)change tags behind
+users back. So if somebody already got the old tag, doing a "git
+pull" on your tree shouldn't just make them overwrite the old
+one.</p>
+<p>If somebody got a release tag from you, you cannot just change
+the tag for them by updating your own one. This is a big
+security issue, in that people MUST be able to trust their
+tag-names.  If you really want to do the insane thing, you need
+to just fess up to it, and tell people that you messed up. You
+can do that by making a very public announcement saying:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Ok, I messed up, and I pushed out an earlier version tagged as X. I
+then fixed something, and retagged the *fixed* tree as X again.
+
+If you got the wrong tag, and want the new one, please delete
+the old one and fetch the new one by doing:
+
+        git tag -d X
+        git fetch origin tag X
+
+to get my updated tag.
+
+You can test which tag you have by doing
+
+        git rev-parse X
+
+which should return 0123456789abcdef.. if you have the new version.
+
+Sorry for inconvenience.</tt></pre>
+</div></div>
+<p>Does this seem a bit complicated?  It <strong>should</strong> be. There is no
+way that it would be correct to just "fix" it behind peoples
+backs. People need to know that their tags might have been
+changed.</p>
+<h3>On Automatic following</h3>
+<p>If you are following somebody else's tree, you are most likely
+using tracking branches (<tt>refs/heads/origin</tt> in traditional
+layout, or <tt>refs/remotes/origin/master</tt> in the separate-remote
+layout).  You usually want the tags from the other end.</p>
+<p>On the other hand, if you are fetching because you would want a
+one-shot merge from somebody else, you typically do not want to
+get tags from there.  This happens more often for people near
+the toplevel but not limited to them.  Mere mortals when pulling
+from each other do not necessarily want to automatically get
+private anchor point tags from the other person.</p>
+<p>You would notice "please pull" messages on the mailing list says
+repo URL and branch name alone.  This is designed to be easily
+cut&amp;pasted to "git fetch" command line:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Linus, please pull from
+
+        git://git..../proj.git master
+
+to get the following updates...</tt></pre>
+</div></div>
+<p>becomes:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull git://git..../proj.git master</tt></pre>
+</div></div>
+<p>In such a case, you do not want to automatically follow other's
+tags.</p>
+<p>One important aspect of git is it is distributed, and being
+distributed largely means there is no inherent "upstream" or
+"downstream" in the system.  On the face of it, the above
+example might seem to indicate that the tag namespace is owned
+by upper echelon of people and tags only flow downwards, but
+that is not the case.  It only shows that the usage pattern
+determines who are interested in whose tags.</p>
+<p>A one-shot pull is a sign that a commit history is now crossing
+the boundary between one circle of people (e.g. "people who are
+primarily interested in networking part of the kernel") who may
+have their own set of tags (e.g. "this is the third release
+candidate from the networking group to be proposed for general
+consumption with 2.6.21 release") to another circle of people
+(e.g. "people who integrate various subsystem improvements").
+The latter are usually not interested in the detailed tags used
+internally in the former group (that is what "internal" means).
+That is why it is desirable not to follow tags automatically in
+this case.</p>
+<p>It may well be that among networking people, they may want to
+exchange the tags internal to their group, but in that workflow
+they are most likely tracking with each other's progress by
+having tracking branches.  Again, the heuristic to automatically
+follow such tags is a good thing.</p>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;,
@@ -401,7 +519,7 @@ Junio C Hamano &lt;junkio@cox.net&gt; and Chris Wright &lt;chrisw@osdl.org&gt;.<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 28-Jan-2007 10:29:11 UTC
+Last updated 12-Feb-2007 07:15:21 UTC
 </div>
 </div>
 </body>
