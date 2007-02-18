@@ -277,19 +277,23 @@ git-rebase(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>git-rebase replaces &lt;branch&gt; with a new branch of the same name.  When
-the --onto option is provided the new branch starts out with a HEAD equal
-to &lt;newbase&gt;, otherwise it is equal to &lt;upstream&gt;.  It then attempts to
-create a new commit for each commit from the original &lt;branch&gt; that does
-not exist in the &lt;upstream&gt; branch.</p>
+<p>If &lt;branch&gt; is specified, git-rebase will perform an automatic
+<tt>git checkout &lt;branch&gt;</tt> before doing anything else.  Otherwise
+it remains on the current branch.</p>
+<p>All changes made by commits in the current branch but that are not
+in &lt;upstream&gt; are saved to a temporary area.  This is the same set
+of commits that would be shown by <tt>git log &lt;upstream&gt;..HEAD</tt>.</p>
+<p>The current branch is reset to &lt;upstream&gt;, or &lt;newbase&gt; if the
+--onto option was supplied.  This has the exact same effect as
+<tt>git reset --hard &lt;upstream&gt;</tt> (or &lt;newbase&gt;).</p>
+<p>The commits that were previously saved into the temporary area are
+then reapplied to the current branch, one by one, in order.</p>
 <p>It is possible that a merge failure will prevent this process from being
 completely automatic.  You will have to resolve any such merge failure
 and run <tt>git rebase --continue</tt>.  Another option is to bypass the commit
 that caused the merge failure with <tt>git rebase --skip</tt>.  To restore the
 original &lt;branch&gt; and remove the .dotest working files, use the command
 <tt>git rebase --abort</tt> instead.</p>
-<p>Note that if &lt;branch&gt; is not specified on the command line, the currently
-checked out branch is used.</p>
 <p>Assume the following history exists and the current branch is "topic":</p>
 <div class="listingblock">
 <div class="content">
@@ -393,7 +397,7 @@ file you edit, you need to tell git that the conflict has been resolved,
 typically this would be done with</p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git update-index &lt;filename&gt;</tt></pre>
+<pre><tt>git add &lt;filename&gt;</tt></pre>
 </div></div>
 <p>After resolving the conflict manually and updating the index with the
 desired resolution, you can continue the rebasing process with</p>
@@ -591,7 +595,7 @@ a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 12-Feb-2007 07:15:21 UTC
+Last updated 18-Feb-2007 00:34:42 UTC
 </div>
 </div>
 </body>
