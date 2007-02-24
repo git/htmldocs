@@ -565,7 +565,8 @@ i.e. the one without a "for &#8230;" postfix, do something like this:</p>
 the git command's behavior. <tt>.git/config</tt> file for each repository
 is used to store the information for that repository, and
 <tt>$HOME/.gitconfig</tt> is used to store per user information to give
-fallback values for <tt>.git/config</tt> file.</p>
+fallback values for <tt>.git/config</tt> file. The file <tt>/etc/gitconfig</tt>
+can be used to store system-wide defaults.</p>
 <p>They can be used by both the git plumbing
 and the porcelains. The variables are divided into sections, where
 in the fully qualified variable name the variable itself is the last
@@ -790,11 +791,17 @@ core.legacyheaders
 </dt>
 <dd>
 <p>
-        A boolean which enables the legacy object header format in case
-        you want to interoperate with old clients accessing the object
-        database directly (where the "http://" and "rsync://" protocols
-        count as direct access).
+        A boolean which
+        changes the format of loose objects so that they are more
+        efficient to pack and to send out of the repository over git
+        native protocol, since v1.4.2.  However, loose objects
+        written in the new format cannot be read by git older than
+        that version; people fetching from your repository using
+        older versions of git over dumb transports (e.g. http)
+        will also be affected.
 </p>
+<p>To let git use the new loose object format, you have to
+set core.legacyheaders to false.</p>
 </dd>
 <dt>
 core.packedGitWindowSize
@@ -1453,7 +1460,7 @@ transfer.unpackLimit
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 23-Feb-2007 07:21:12 UTC
+Last updated 24-Feb-2007 11:15:45 UTC
 </div>
 </div>
 </body>

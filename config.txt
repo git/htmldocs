@@ -5,7 +5,8 @@ The git configuration file contains a number of variables that affect
 the git command's behavior. `.git/config` file for each repository
 is used to store the information for that repository, and
 `$HOME/.gitconfig` is used to store per user information to give
-fallback values for `.git/config` file.
+fallback values for `.git/config` file. The file `/etc/gitconfig`
+can be used to store system-wide defaults.
 
 They can be used by both the git plumbing
 and the porcelains. The variables are divided into sections, where
@@ -192,10 +193,17 @@ core.compression::
 	slowest.
 
 core.legacyheaders::
-	A boolean which enables the legacy object header format in case
-	you want to interoperate with old clients accessing the object
-	database directly (where the "http://" and "rsync://" protocols
-	count as direct access).
+	A boolean which
+	changes the format of loose objects so that they are more
+	efficient to pack and to send out of the repository over git
+	native protocol, since v1.4.2.  However, loose objects
+	written in the new format cannot be read by git older than
+	that version; people fetching from your repository using
+	older versions of git over dumb transports (e.g. http)
+	will also be affected.
++
+To let git use the new loose object format, you have to
+set core.legacyheaders to false.
 
 core.packedGitWindowSize::
 	Number of bytes of a pack file to map into memory in a
