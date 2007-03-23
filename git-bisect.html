@@ -286,7 +286,8 @@ git bisect good &lt;rev&gt;
 git bisect reset [&lt;branch&gt;]
 git bisect visualize
 git bisect replay &lt;logfile&gt;
-git bisect log</tt></pre>
+git bisect log
+git bisect run &lt;cmd&gt;...</tt></pre>
 </div></div>
 <p>This command uses <em>git-rev-list --bisect</em> option to help drive
 the binary search process to find which change introduced a bug,
@@ -370,6 +371,31 @@ like this:</p>
 <div class="content">
 <pre><tt>$ git bisect start arch/i386 include/asm-i386</tt></pre>
 </div></div>
+<p>If you have a script that can tell if the current
+source code is good or bad, you can automatically bisect using:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bisect run my_script</tt></pre>
+</div></div>
+<p>Note that the "run" script (<tt>my_script</tt> in the above example)
+should exit with code 0 in
+case the current source code is good and with a code between 1 and 127
+(included) in case the current source code is bad.</p>
+<p>Any other exit code (a program that does "exit(-1)" leaves $? = 255,
+see exit(3) manual page, the value is chopped with "&amp; 0377") will
+abort the automatic bisect process.</p>
+<p>You may often find that during bisect you want to have near-constant
+tweaks (e.g., s/#define DEBUG 0/#define DEBUG 1/ in a header file, or
+"revision that does not have this commit needs this patch applied to
+work around other problem this bisection is not interested in")
+applied to the revision being tested.</p>
+<p>To cope with such a situation, after the inner git-bisect finds the
+next revision to test, with the "run" script, you can apply that tweak
+before compiling, run the real test, and after the test decides if the
+revision (possibly with the needed tweaks) passed the test, rewind the
+tree to the pristine state.  Finally the "run" script can exit with
+the status of the real test to let "git bisect run" command loop to
+know the outcome.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -385,7 +411,7 @@ like this:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jan-2007 00:37:12 UTC
+Last updated 23-Mar-2007 10:46:02 UTC
 </div>
 </div>
 </body>
