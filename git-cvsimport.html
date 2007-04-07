@@ -273,9 +273,11 @@ git-cvsimport(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-cvsimport</em> [-o &lt;branch-for-HEAD&gt;] [-h] [-v] [-d &lt;CVSROOT&gt;] [-s &lt;subst&gt;]
-              [-p &lt;options-for-cvsps&gt;] [-C &lt;git_repository&gt;] [-i] [-P &lt;file&gt;]
-              [-m] [-M regex] [&lt;CVS_module&gt;]</div></div>
+<div class="content"><em>git-cvsimport</em> [-o &lt;branch-for-HEAD&gt;] [-h] [-v] [-d &lt;CVSROOT&gt;]
+              [-A &lt;author-conv-file&gt;] [-p &lt;options-for-cvsps&gt;] [-P &lt;file&gt;]
+              [-C &lt;git_repository&gt;] [-z &lt;fuzz&gt;] [-i] [-k] [-u] [-s &lt;subst&gt;]
+              [-a] [-m] [-M &lt;regex&gt;] [-S &lt;regex&gt;] [-L &lt;commitlimit&gt;]
+              [&lt;CVS_module&gt;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -293,13 +295,33 @@ any CVS branches, yourself.</p>
 <div class="sectionbody">
 <dl>
 <dt>
+-v
+</dt>
+<dd>
+<p>
+        Verbosity: let <em>cvsimport</em> report what it is doing.
+</p>
+</dd>
+<dt>
 -d &lt;CVSROOT&gt;
 </dt>
 <dd>
 <p>
         The root of the CVS archive. May be local (a simple path) or remote;
         currently, only the :local:, :ext: and :pserver: access methods
-        are supported.
+        are supported. If not given, git-cvsimport will try to read it
+        from <tt>CVS/Root</tt>. If no such file exists, it checks for the
+        <tt>CVSROOT</tt> environment variable.
+</p>
+</dd>
+<dt>
+&lt;CVS_module&gt;
+</dt>
+<dd>
+<p>
+        The CVS module you want to import. Relative to &lt;CVSROOT&gt;.
+        If not given, git-cvsimport tries to read it from
+        <tt>CVS/Repository</tt>.
 </p>
 </dd>
 <dt>
@@ -310,6 +332,18 @@ any CVS branches, yourself.</p>
         The git repository to import to.  If the directory doesn't
         exist, it will be created.  Default is the current directory.
 </p>
+</dd>
+<dt>
+-o &lt;branch-for-HEAD&gt;
+</dt>
+<dd>
+<p>
+        The <em>HEAD</em> branch from CVS is imported to the <em>origin</em> branch within
+        the git repository, as <em>HEAD</em> already has a special meaning for git.
+        Use this option if you want to import into a different branch.
+</p>
+<p>Use <em>-o master</em> for continuing an import that was initially done by
+the old cvs2git tool.</p>
 </dd>
 <dt>
 -i
@@ -326,7 +360,7 @@ any CVS branches, yourself.</p>
 </dt>
 <dd>
 <p>
-        Kill keywords: will extract files with -kk from the CVS archive
+        Kill keywords: will extract files with <em>-kk</em> from the CVS archive
         to avoid noisy changesets. Highly recommended, but off by default
         to preserve compatibility with early imported trees.
 </p>
@@ -340,16 +374,12 @@ any CVS branches, yourself.</p>
 </p>
 </dd>
 <dt>
--o &lt;branch-for-HEAD&gt;
+-s &lt;subst&gt;
 </dt>
 <dd>
 <p>
-        The <em>HEAD</em> branch from CVS is imported to the <em>origin</em> branch within
-        the git repository, as <em>HEAD</em> already has a special meaning for git.
-        Use this option if you want to import into a different branch.
+        Substitute the character "/" in branch names with &lt;subst&gt;
 </p>
-<p>Use <em>-o master</em> for continuing an import that was initially done by
-the old cvs2git tool.</p>
 </dd>
 <dt>
 -p &lt;options-for-cvsps&gt;
@@ -360,6 +390,15 @@ the old cvs2git tool.</p>
         The options <em>-u</em> and <em>-A</em> are implicit and should not be used here.
 </p>
 <p>If you need to pass multiple options, separate them with a comma.</p>
+</dd>
+<dt>
+-z &lt;fuzz&gt;
+</dt>
+<dd>
+<p>
+        Pass the timestamp fuzz factor to cvsps, in seconds. If unset,
+        cvsps defaults to 300s.
+</p>
 </dd>
 <dt>
 -P &lt;cvsps-output-file&gt;
@@ -386,49 +425,16 @@ the old cvs2git tool.</p>
 <dd>
 <p>
         Attempt to detect merges based on the commit message with a custom
-        regex. It can be used with -m to also see the default regexes.
+        regex. It can be used with <em>-m</em> to also see the default regexes.
         You must escape forward slashes.
 </p>
 </dd>
 <dt>
--v
+-S &lt;regex&gt;
 </dt>
 <dd>
 <p>
-        Verbosity: let <em>cvsimport</em> report what it is doing.
-</p>
-</dd>
-<dt>
-&lt;CVS_module&gt;
-</dt>
-<dd>
-<p>
-        The CVS module you want to import. Relative to &lt;CVSROOT&gt;.
-</p>
-</dd>
-<dt>
--h
-</dt>
-<dd>
-<p>
-        Print a short usage message and exit.
-</p>
-</dd>
-<dt>
--z &lt;fuzz&gt;
-</dt>
-<dd>
-<p>
-        Pass the timestamp fuzz factor to cvsps, in seconds. If unset,
-        cvsps defaults to 300s.
-</p>
-</dd>
-<dt>
--s &lt;subst&gt;
-</dt>
-<dd>
-<p>
-        Substitute the character "/" in branch names with &lt;subst&gt;
+        Skip paths matching the regex.
 </p>
 </dd>
 <dt>
@@ -438,14 +444,6 @@ the old cvs2git tool.</p>
 <p>
         Import all commits, including recent ones. cvsimport by default
         skips commits that have a timestamp less than 10 minutes ago.
-</p>
-</dd>
-<dt>
--S &lt;regex&gt;
-</dt>
-<dd>
-<p>
-        Skip paths matching the regex.
 </p>
 </dd>
 <dt>
@@ -475,12 +473,20 @@ the old cvs2git tool.</p>
 <p>git-cvsimport will make it appear as those authors had
 their GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL set properly
 all along.</p>
-<p>For convenience, this data is saved to $GIT_DIR/cvs-authors
-each time the -A option is provided and read from that same
+<p>For convenience, this data is saved to <tt>$GIT_DIR/cvs-authors</tt>
+each time the <em>-A</em> option is provided and read from that same
 file each time git-cvsimport is run.</p>
 <p>It is not recommended to use this feature if you intend to
 export changes back to CVS again later with
 <a href="git-cvsexportcommit.html">git-cvsexportcommit(1)</a>.</p>
+</dd>
+<dt>
+-h
+</dt>
+<dd>
+<p>
+        Print a short usage message and exit.
+</p>
 </dd>
 </dl>
 </div>
@@ -505,7 +511,7 @@ various participants of the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Apr-2007 18:33:36 UTC
+Last updated 07-Apr-2007 10:17:28 UTC
 </div>
 </div>
 </body>
