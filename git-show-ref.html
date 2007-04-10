@@ -274,7 +274,8 @@ git-show-ref(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git-show-ref</em> [-q|--quiet] [--verify] [-h|--head] [-d|--dereference]
-             [-s|--hash] [--abbrev] [--tags] [--heads] [--] &lt;pattern&gt;&#8230;</div></div>
+             [-s|--hash] [--abbrev] [--tags] [--heads] [--] &lt;pattern&gt;&#8230;
+<em>git-show-ref</em> --exclude-existing[=pattern]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -282,6 +283,8 @@ git-show-ref(1) Manual Page
 commit IDs. Results can be filtered using a pattern and tags can be
 dereferenced into object IDs. Additionally, it can be used to test whether a
 particular ref exists.</p>
+<p>The --exclude-existing form is a filter that does the inverse, it shows the
+refs from stdin that don't exist in the local repository.</p>
 <p>Use of this utility is encouraged in favor of directly accessing files under
 in the <tt>.git</tt> directory.</p>
 </div>
@@ -350,6 +353,21 @@ in the <tt>.git</tt> directory.</p>
 <p>
         Do not print any results to stdout. When combined with <em>--verify</em> this
         can be used to silently check if a reference exists.
+</p>
+</dd>
+<dt>
+--exclude-existing, --exclude-existing=pattern
+</dt>
+<dd>
+<p>
+        Make git-show-ref act as a filter that reads refs from stdin of the
+        form "<sup>(?:&lt;anything&gt;\s)?&lt;refname&gt;(?:\</sup>{})?$" and performs the
+        following actions on each:
+        (1) strip "^{}" at the end of line if any;
+        (2) ignore if pattern is provided and does not head-match refname;
+        (3) warn if refname is not a well-formed refname and skip;
+        (4) ignore if refname is a ref that exists in the local repository;
+        (5) otherwise output the line.
 </p>
 </dd>
 <dt>
@@ -442,7 +460,7 @@ Man page by Jonas Fonseca &lt;fonseca@diku.dk&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Apr-2007 18:34:22 UTC
+Last updated 10-Apr-2007 21:31:10 UTC
 </div>
 </div>
 </body>
