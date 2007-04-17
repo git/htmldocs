@@ -283,36 +283,133 @@ which introduced the line. Optionally annotate from a given revision.</p>
 <div class="sectionbody">
 <dl>
 <dt>
--l, --long
+-b
 </dt>
 <dd>
 <p>
-        Show long rev (Defaults off).
+        Show blank SHA-1 for boundary commits.  This can also
+        be controlled via the <tt>blame.blankboundary</tt> config option.
 </p>
 </dd>
 <dt>
--t, --time
+--root
 </dt>
 <dd>
 <p>
-        Show raw timestamp (Defaults off).
+        Do not treat root commits as boundaries.  This can also be
+        controlled via the <tt>blame.showroot</tt> config option.
 </p>
 </dd>
 <dt>
--r, --rename
+--show-stats
 </dt>
 <dd>
 <p>
-        Follow renames (Defaults on).
+        Include additional statistics at the end of blame output.
 </p>
 </dd>
 <dt>
--S, --rev-file &lt;revs-file&gt;
+-L n,m
 </dt>
 <dd>
 <p>
-        Use revs from revs-file instead of calling git-rev-list.
+        Annotate only the specified line range (lines count from 1).
 </p>
+</dd>
+<dt>
+-l
+</dt>
+<dd>
+<p>
+        Show long rev (Default: off).
+</p>
+</dd>
+<dt>
+-t
+</dt>
+<dd>
+<p>
+        Show raw timestamp (Default: off).
+</p>
+</dd>
+<dt>
+-S &lt;revs-file&gt;
+</dt>
+<dd>
+<p>
+        Use revs from revs-file instead of calling <a href="git-rev-list.html">git-rev-list(1)</a>.
+</p>
+</dd>
+<dt>
+-p, --porcelain
+</dt>
+<dd>
+<p>
+        Show in a format designed for machine consumption.
+</p>
+</dd>
+<dt>
+--incremental
+</dt>
+<dd>
+<p>
+        Show the result incrementally in a format designed for
+        machine consumption.
+</p>
+</dd>
+<dt>
+--contents &lt;file&gt;
+</dt>
+<dd>
+<p>
+        When &lt;rev&gt; is not specified, the command annotates the
+        changes starting backwards from the working tree copy.
+        This flag makes the command pretend as if the working
+        tree copy has the contents of he named file (specify
+        <tt>-</tt> to make the command read from the standard input).
+</p>
+</dd>
+<dt>
+-M|&lt;num&gt;|
+</dt>
+<dd>
+<p>
+        Detect moving lines in the file as well.  When a commit
+        moves a block of lines in a file (e.g. the original file
+        has A and then B, and the commit changes it to B and
+        then A), traditional <em>blame</em> algorithm typically blames
+        the lines that were moved up (i.e. B) to the parent and
+        assigns blame to the lines that were moved down (i.e. A)
+        to the child commit.  With this option, both groups of lines
+        are blamed on the parent.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;num&gt; is optional but it is the lower bound on the number of
+alphanumeric characters that git must detect as moving
+within a file for it to associate those lines with the parent
+commit.</tt></pre>
+</div></div>
+</dd>
+<dt>
+-C|&lt;num&gt;|
+</dt>
+<dd>
+<p>
+        In addition to <tt>-M</tt>, detect lines copied from other
+        files that were modified in the same commit.  This is
+        useful when you reorganize your program and move code
+        around across files.  When this option is given twice,
+        the command looks for copies from all other files in the
+        parent for the commit that creates the file in addition.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;num&gt; is optional but it is the lower bound on the number of
+alphanumeric characters that git must detect as moving
+between files for it to associate those lines with the parent
+commit.</tt></pre>
+</div></div>
 </dd>
 <dt>
 -h, --help
@@ -338,7 +435,7 @@ which introduced the line. Optionally annotate from a given revision.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Apr-2007 18:33:23 UTC
+Last updated 17-Apr-2007 08:27:39 UTC
 </div>
 </div>
 </body>

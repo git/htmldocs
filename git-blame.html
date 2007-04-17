@@ -273,8 +273,9 @@ git-blame(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-blame</em> [-c] [-l] [-t] [-f] [-n] [-p] [--incremental] [-L n,m] [-S &lt;revs-file&gt;]
-            [-M] [-C] [-C] [--since=&lt;date&gt;] [&lt;rev&gt; | --contents &lt;file&gt;] [--] &lt;file&gt;</div></div>
+<div class="content"><em>git-blame</em> [-c] [-l] [-t] [-f] [-n] [-p] [--incremental] [-L n,m]
+            [-S &lt;revs-file&gt;] [-M] [-C] [-C] [--since=&lt;date&gt;]
+            [&lt;rev&gt; | --contents &lt;file&gt;] [--] &lt;file&gt;</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -300,11 +301,29 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 <div class="sectionbody">
 <dl>
 <dt>
--c, --compatibility
+-b
 </dt>
 <dd>
 <p>
-        Use the same output mode as <a href="git-annotate.html">git-annotate(1)</a> (Default: off).
+        Show blank SHA-1 for boundary commits.  This can also
+        be controlled via the <tt>blame.blankboundary</tt> config option.
+</p>
+</dd>
+<dt>
+--root
+</dt>
+<dd>
+<p>
+        Do not treat root commits as boundaries.  This can also be
+        controlled via the <tt>blame.showroot</tt> config option.
+</p>
+</dd>
+<dt>
+--show-stats
+</dt>
+<dd>
+<p>
+        Include additional statistics at the end of blame output.
 </p>
 </dd>
 <dt>
@@ -316,7 +335,7 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </p>
 </dd>
 <dt>
--l, --long
+-l
 </dt>
 <dd>
 <p>
@@ -324,7 +343,7 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </p>
 </dd>
 <dt>
--t, --time
+-t
 </dt>
 <dd>
 <p>
@@ -332,29 +351,11 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </p>
 </dd>
 <dt>
--S, --rev-file &lt;revs-file&gt;
+-S &lt;revs-file&gt;
 </dt>
 <dd>
 <p>
         Use revs from revs-file instead of calling <a href="git-rev-list.html">git-rev-list(1)</a>.
-</p>
-</dd>
-<dt>
--f, --show-name
-</dt>
-<dd>
-<p>
-        Show filename in the original commit.  By default
-        filename is shown if there is any line that came from a
-        file with different name, due to rename detection.
-</p>
-</dd>
-<dt>
--n, --show-number
-</dt>
-<dd>
-<p>
-        Show line number in the original commit (Default: off).
 </p>
 </dd>
 <dt>
@@ -387,7 +388,7 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </p>
 </dd>
 <dt>
--M
+-M|&lt;num&gt;|
 </dt>
 <dd>
 <p>
@@ -397,12 +398,19 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
         then A), traditional <em>blame</em> algorithm typically blames
         the lines that were moved up (i.e. B) to the parent and
         assigns blame to the lines that were moved down (i.e. A)
-        to the child commit.  With this option, both groups of
-        lines are blamed on the parent.
+        to the child commit.  With this option, both groups of lines
+        are blamed on the parent.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;num&gt; is optional but it is the lower bound on the number of
+alphanumeric characters that git must detect as moving
+within a file for it to associate those lines with the parent
+commit.</tt></pre>
+</div></div>
 </dd>
 <dt>
--C
+-C|&lt;num&gt;|
 </dt>
 <dd>
 <p>
@@ -413,6 +421,13 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
         the command looks for copies from all other files in the
         parent for the commit that creates the file in addition.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;num&gt; is optional but it is the lower bound on the number of
+alphanumeric characters that git must detect as moving
+between files for it to associate those lines with the parent
+commit.</tt></pre>
+</div></div>
 </dd>
 <dt>
 -h, --help
@@ -420,6 +435,46 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 <dd>
 <p>
         Show help message.
+</p>
+</dd>
+<dt>
+-c
+</dt>
+<dd>
+<p>
+        Use the same output mode as <a href="git-annotate.html">git-annotate(1)</a> (Default: off).
+</p>
+</dd>
+<dt>
+--score-debug
+</dt>
+<dd>
+<p>
+        Include debugging information related to the movement of
+        lines between files (see <tt>-C</tt>) and lines moved within a
+        file (see <tt>-M</tt>).  The first number listed is the score.
+        This is the number of alphanumeric characters detected
+        to be moved between or within files.  This must be above
+        a certain threshold for git-blame to consider those lines
+        of code to have been moved.
+</p>
+</dd>
+<dt>
+-f, --show-name
+</dt>
+<dd>
+<p>
+        Show filename in the original commit.  By default
+        filename is shown if there is any line that came from a
+        file with different name, due to rename detection.
+</p>
+</dd>
+<dt>
+-n, --show-number
+</dt>
+<dd>
+<p>
+        Show line number in the original commit (Default: off).
 </p>
 </dd>
 </dl>
@@ -595,7 +650,7 @@ commit commentary), a blame viewer won't ever care.</td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Apr-2007 18:33:26 UTC
+Last updated 17-Apr-2007 08:27:40 UTC
 </div>
 </div>
 </body>
