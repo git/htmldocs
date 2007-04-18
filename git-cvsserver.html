@@ -290,6 +290,9 @@ plugin. Most functionality works fine with both of these clients.</p>
 <p>Currently cvsserver works over SSH connections for read/write clients, and
 over pserver for anonymous CVS access.</p>
 <p>CVS clients cannot tag, branch or perform GIT merges.</p>
+<p>git-cvsserver maps GIT branches to CVS modules. This is very different
+from what most CVS users would expect since in CVS modules usually represent
+one or more directories.</p>
 </div>
 <h2>INSTALLATION</h2>
 <div class="sectionbody">
@@ -329,9 +332,21 @@ For each repo that you want accessible from CVS you need to edit config in
 </tt></pre>
 </div></div>
 <p>Note: you need to ensure each user that is going to invoke git-cvsserver has
-write access to the log file and to the git repository. When offering anon
-access via pserver, this means that the nobody user should have write access
-to at least the sqlite database at the root of the repository.</p>
+write access to the log file and to the database (see
+<a href="#dbbackend">Database Backend</a>. If you want to offer write access over
+SSH, the users of course also need write access to the git repository itself.</p>
+<p><a id="configaccessmethod"></a>All configuration variables can also be overriden for a specific method of
+access. Valid method names are "ext" (for SSH access) and "pserver". The
+following example configuration would disable pserver access while still
+allowing access over SSH.</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>   [gitcvs]
+        enabled=0
+
+   [gitcvs "ext"]
+        enabled=1</tt></pre>
+</div></div>
 </li>
 <li>
 <p>
@@ -364,6 +379,131 @@ Clients should now be able to check out the project. Use the CVS <em>module</em>
 </div></div>
 </li>
 </ol>
+</div>
+<h2><a id="dbbackend"></a>Database Backend</h2>
+<div class="sectionbody">
+<p>git-cvsserver uses one database per git head (i.e. CVS module) to
+store information about the repository for faster access. The
+database doesn't contain any persitent data and can be completly
+regenerated from the git repository at any time. The database
+needs to be updated (i.e. written to) after every commit.</p>
+<p>If the commit is done directly by using git (as opposed to
+using git-cvsserver) the update will need to happen on the
+next repository access by git-cvsserver, independent of
+access method and requested operation.</p>
+<p>That means that even if you offer only read access (e.g. by using
+the pserver method), git-cvsserver should have write access to
+the database to work reliably (otherwise you need to make sure
+that the database if up-to-date all the time git-cvsserver is run).</p>
+<p>By default it uses SQLite databases in the git directory, named
+<tt>gitcvs.&lt;module_name&gt;.sqlite</tt>. Note that the SQLite backend creates
+temporary files in the same directory as the database file on
+write so it might not be enough to grant the users using
+git-cvsserver write access to the database file without granting
+them write access to the directory, too.</p>
+<p>You can configure the database backend with the following
+configuration variables:</p>
+<h3>Configuring database backend</h3>
+<p>git-cvsserver uses the Perl DBI module. Please also read
+its documentation if changing these variables, especially
+about <tt>DBI-&gt;connect()</tt>.</p>
+<dl>
+<dt>
+gitcvs.dbname
+</dt>
+<dd>
+<p>
+        Database name. The exact meaning depends on the
+        used database driver, for SQLite this is a filename.
+        Supports variable substitution (see below). May
+        not contain semicolons (<tt>;</tt>).
+        Default: <em>%Ggitcvs.%m.sqlite</em>
+</p>
+</dd>
+<dt>
+gitcvs.dbdriver
+</dt>
+<dd>
+<p>
+        Used DBI driver. You can specify any available driver
+        for this here, but it might not work. cvsserver is tested
+        with <em>DBD::SQLite</em>, reported to work with
+        <em>DBD::Pg</em>, and reported <strong>not</strong> to work with <em>DBD::mysql</em>.
+        Please regard this as an experimental feature. May not
+        contain double colons (<tt>:</tt>).
+        Default: <em>SQLite</em>
+</p>
+</dd>
+<dt>
+gitcvs.dbuser
+</dt>
+<dd>
+<p>
+        Database user. Only useful if setting <tt>dbdriver</tt>, since
+        SQLite has no concept of database users. Supports variable
+        substitution (see below).
+</p>
+</dd>
+<dt>
+gitcvs.dbpass
+</dt>
+<dd>
+<p>
+        Database password.  Only useful if setting <tt>dbdriver</tt>, since
+        SQLite has no concept of database passwords.
+</p>
+</dd>
+</dl>
+<p>All variables can also be set per access method, see <a href="#configaccessmethod">above</a>.</p>
+<h4>Variable substitution</h4>
+<p>In <tt>dbdriver</tt> and <tt>dbuser</tt> you can use the following variables:</p>
+<dl>
+<dt>
+%G
+</dt>
+<dd>
+<p>
+        git directory name
+</p>
+</dd>
+<dt>
+%g
+</dt>
+<dd>
+<p>
+        git directory name, where all characters except for
+        alpha-numeric ones, <tt>.</tt>, and <tt>-</tt> are replaced with
+        <tt>_</tt> (this should make it easier to use the directory
+        name in a filename if wanted)
+</p>
+</dd>
+<dt>
+%m
+</dt>
+<dd>
+<p>
+        CVS module/git head name
+</p>
+</dd>
+<dt>
+%a
+</dt>
+<dd>
+<p>
+        access method (one of "ext" or "pserver")
+</p>
+</dd>
+<dt>
+%u
+</dt>
+<dd>
+<p>
+        Name of the user running git-cvsserver.
+        If no name can be determined, the
+        numeric uid is used.
+</p>
+</dd>
+</dl>
 </div>
 <h2>Eclipse CVS Client Notes</h2>
 <div class="sectionbody">
@@ -473,7 +613,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Apr-2007 08:30:41 UTC
+Last updated 18-Apr-2007 09:56:50 UTC
 </div>
 </div>
 </body>
