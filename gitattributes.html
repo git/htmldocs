@@ -350,11 +350,13 @@ the name of the attribute prefixed with an exclamation point <tt>!</tt>.</p>
 particular attributes to a path.  Currently, three operations
 are attributes-aware.</p>
 <h3>Checking-out and checking-in</h3>
-<p>The attribute <tt>crlf</tt> affects how the contents stored in the
+<p>These attributes affect how the contents stored in the
 repository are copied to the working tree files when commands
-such as <tt>git checkout</tt> and <tt>git merge</tt> run.  It also affects how
+such as <tt>git checkout</tt> and <tt>git merge</tt> run.  They also affect how
 git stores the contents you prepare in the working tree in the
 repository upon <tt>git add</tt> and <tt>git commit</tt>.</p>
+<h4><tt>crlf</tt></h4>
+<p>This attribute controls the line-ending convention.</p>
 <dl>
 <dt>
 Set
@@ -410,6 +412,46 @@ in to the repository.</p>
 <p>When <tt>core.autocrlf</tt> is set to "input", line endings are
 converted to LF upon checkin, but there is no conversion done
 upon checkout.</p>
+<h4><tt>ident</tt></h4>
+<p>When the attribute <tt>ident</tt> is set to a path, git replaces
+<tt>$ident$</tt> in the blob object with <tt>$ident:</tt>, followed by
+40-character hexadecimal blob object name, followed by a dollar
+sign <tt>$</tt> upon checkout.  Any byte sequence that begins with
+<tt>$ident:</tt> and ends with <tt>$</tt> in the worktree file is replaced
+with <tt>$ident$</tt> upon check-in.</p>
+<h4>Interaction between checkin/checkout attributes</h4>
+<p>In the check-in codepath, the worktree file is first converted
+with <tt>ident</tt> (if specified), and then with <tt>crlf</tt> (again, if
+specified and applicable).</p>
+<p>In the check-out codepath, the blob content is first converted
+with <tt>crlf</tt>, and then <tt>ident</tt>.</p>
+<h4><tt>filter</tt></h4>
+<p>A <tt>filter</tt> attribute can be set to a string value.  This names
+filter driver specified in the configuration.</p>
+<p>A filter driver consists of <tt>clean</tt> command and <tt>smudge</tt>
+command, either of which can be left unspecified.  Upon
+checkout, when <tt>smudge</tt> command is specified, the command is fed
+the blob object from its standard input, and its standard output
+is used to update the worktree file.  Similarly, <tt>clean</tt> command
+is used to convert the contents of worktree file upon checkin.</p>
+<p>Missing filter driver definition in the config is not an error
+but makes the filter a no-op passthru.</p>
+<p>The content filtering is done to massage the content into a
+shape that is more convenient for the platform, filesystem, and
+the user to use.  The keyword here is "more convenient" and not
+"turning something unusable into usable".  In other words, it is
+"hanging yourself because we gave you a long rope" if your
+project uses filtering mechanism in such a way that it makes
+your project unusable unless the checkout is done with a
+specific filter in effect.</p>
+<h4>Interaction between checkin/checkout attributes</h4>
+<p>In the check-in codepath, the worktree file is first converted
+with <tt>filter</tt> driver (if specified and corresponding driver
+defined), then the result is processed with <tt>ident</tt> (if
+specified), and then finally with <tt>crlf</tt> (again, if specified
+and applicable).</p>
+<p>In the check-out codepath, the blob content is first converted
+with <tt>crlf</tt>, and then <tt>ident</tt> and fed to <tt>filter</tt>.</p>
 <h3>Generating diff text</h3>
 <p>The attribute <tt>diff</tt> affects if <tt>git diff</tt> generates textual
 patch for the path or just says <tt>Binary files differ</tt>.</p>
@@ -616,7 +658,7 @@ frotz   unspecified</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 25-Apr-2007 05:59:11 UTC
+Last updated 29-Apr-2007 18:29:52 UTC
 </div>
 </div>
 </body>
