@@ -337,7 +337,31 @@ parameter, and is invoked after a commit is made.</p>
 <p>This hook is meant primarily for notification, and cannot affect
 the outcome of <tt>git-commit</tt>.</p>
 </div>
-<h2>update</h2>
+<h2><a id="pre-receive"></a>pre-receive</h2>
+<div class="sectionbody">
+<p>This hook is invoked by <tt>git-receive-pack</tt> on the remote repository,
+which happens when a <tt>git push</tt> is done on a local repository.
+Just before starting to update refs on the remote repository, the
+pre-receive hook is invoked.  Its exit status determines the success
+or failure of the update.</p>
+<p>This hook executes once for the receive operation. It takes no
+arguments, but for each ref to be updated it receives on standard
+input a line of the format:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;old-value&gt; SP &lt;new-value&gt; SP &lt;ref-name&gt; LF</tt></pre>
+</div></div>
+<p>where <tt>&lt;old-value&gt;</tt> is the old object name stored in the ref,
+<tt>&lt;new-value&gt;</tt> is the new object name to be stored in the ref and
+<tt>&lt;ref-name&gt;</tt> is the full name of the ref.
+When creating a new ref, <tt>&lt;old-value&gt;</tt> is 40 <tt>0</tt>.</p>
+<p>If the hook exits with non-zero status, none of the refs will be
+updated. If the hook exits with zero, updating of individual refs can
+still be prevented by the <a href="#update"><em>update</em></a> hook.</p>
+<p>If you want to report something to the <tt>git-send-pack</tt> on the other end,
+you can simply <tt>echo</tt> your messages.</p>
+</div>
+<h2><a id="update"></a>update</h2>
 <div class="sectionbody">
 <p>This hook is invoked by <tt>git-receive-pack</tt> on the remote repository,
 which happens when a <tt>git push</tt> is done on a local repository.
@@ -365,24 +389,46 @@ and the new objectname to be stored in the ref.
 </ul>
 <p>A zero exit from the update hook allows the ref to be updated.
 Exiting with a non-zero status prevents <tt>git-receive-pack</tt>
-from updating the ref.</p>
+from updating that ref.</p>
 <p>This hook can be used to prevent <em>forced</em> update on certain refs by
 making sure that the object name is a commit object that is a
 descendant of the commit object named by the old object name.
 That is, to enforce a "fast forward only" policy.</p>
 <p>It could also be used to log the old..new status.  However, it
 does not know the entire set of branches, so it would end up
-firing one e-mail per ref when used naively, though.</p>
+firing one e-mail per ref when used naively, though.  The
+<a href="#post-receive"><em>post-receive</em></a> hook is more suited to that.</p>
 <p>Another use suggested on the mailing list is to use this hook to
 implement access control which is finer grained than the one
 based on filesystem group.</p>
 <p>The standard output of this hook is sent to <tt>stderr</tt>, so if you
 want to report something to the <tt>git-send-pack</tt> on the other end,
 you can simply <tt>echo</tt> your messages.</p>
-<p>The default <em>update</em> hook, when enabled, demonstrates how to
-send out a notification e-mail.</p>
+<p>The default <em>update</em> hook, when enabled&#8212;and with
+<tt>hooks.allowunannotated</tt> config option turned on&#8212;prevents
+unannotated tags to be pushed.</p>
 </div>
-<h2>post-update</h2>
+<h2><a id="post-receive"></a>post-receive</h2>
+<div class="sectionbody">
+<p>This hook is invoked by <tt>git-receive-pack</tt> on the remote repository,
+which happens when a <tt>git push</tt> is done on a local repository.
+It executes on the remote repository once after all the refs have
+been updated.</p>
+<p>This hook executes once for the receive operation.  It takes no
+arguments, but gets the same information as the <tt>pre-receive</tt>
+hook does on its standard input.</p>
+<p>This hook does not affect the outcome of <tt>git-receive-pack</tt>, as it
+is called after the real work is done.</p>
+<p>This supersedes the <a id="post-update"></a> hook in that it actually get's
+both old and new values of all the refs.</p>
+<p>If you want to report something to the <tt>git-send-pack</tt> on the
+other end, you can simply <tt>echo</tt> your messages.</p>
+<p>The default <em>post-receive</em> hook is empty, but there is
+a sample script <tt>post-receive-email</tt> provided in the <tt>contrib/hooks</tt>
+directory in git distribution, which implements sending commit
+emails.</p>
+</div>
+<h2><a id="post-update"></a>post-update</h2>
 <div class="sectionbody">
 <p>This hook is invoked by <tt>git-receive-pack</tt> on the remote repository,
 which happens when a <tt>git push</tt> is done on a local repository.
@@ -395,18 +441,21 @@ the outcome of <tt>git-receive-pack</tt>.</p>
 <p>The <em>post-update</em> hook can tell what are the heads that were pushed,
 but it does not know what their original and updated values are,
 so it is a poor place to do log old..new.</p>
+<p>In general, <tt>post-receive</tt> hook is preferred when the hook needs
+to decide its acion on the status of the entire set of refs
+being updated, as this hook is called once per ref, with
+information only on a single ref at a time.</p>
 <p>When enabled, the default <em>post-update</em> hook runs
 <tt>git-update-server-info</tt> to keep the information used by dumb
 transports (e.g., HTTP) up-to-date.  If you are publishing
 a git repository that is accessible via HTTP, you should
 probably enable this hook.</p>
-<p>The standard output of this hook is sent to <tt>/dev/null</tt>; if you
-want to report something to the <tt>git-send-pack</tt> on the other end,
-you can redirect your output to your <tt>stderr</tt>.</p>
+<p>Both standard output and standard error output are forwarded to
+<tt>git-send-pack</tt> on the other end.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Apr-2007 18:34:45 UTC
+Last updated 12-May-2007 20:49:27 UTC
 </div>
 </div>
 </body>
