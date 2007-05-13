@@ -358,8 +358,9 @@ When creating a new ref, <tt>&lt;old-value&gt;</tt> is 40 <tt>0</tt>.</p>
 <p>If the hook exits with non-zero status, none of the refs will be
 updated. If the hook exits with zero, updating of individual refs can
 still be prevented by the <a href="#update"><em>update</em></a> hook.</p>
-<p>If you want to report something to the <tt>git-send-pack</tt> on the other end,
-you can simply <tt>echo</tt> your messages.</p>
+<p>Both standard output and standard error output are forwarded to
+<tt>git-send-pack</tt> on the other end, so you can simply <tt>echo</tt> messages
+for the user.</p>
 </div>
 <h2><a id="update"></a>update</h2>
 <div class="sectionbody">
@@ -401,9 +402,9 @@ firing one e-mail per ref when used naively, though.  The
 <p>Another use suggested on the mailing list is to use this hook to
 implement access control which is finer grained than the one
 based on filesystem group.</p>
-<p>The standard output of this hook is sent to <tt>stderr</tt>, so if you
-want to report something to the <tt>git-send-pack</tt> on the other end,
-you can simply <tt>echo</tt> your messages.</p>
+<p>Both standard output and standard error output are forwarded to
+<tt>git-send-pack</tt> on the other end, so you can simply <tt>echo</tt> messages
+for the user.</p>
 <p>The default <em>update</em> hook, when enabled&#8212;and with
 <tt>hooks.allowunannotated</tt> config option turned on&#8212;prevents
 unannotated tags to be pushed.</p>
@@ -415,14 +416,17 @@ which happens when a <tt>git push</tt> is done on a local repository.
 It executes on the remote repository once after all the refs have
 been updated.</p>
 <p>This hook executes once for the receive operation.  It takes no
-arguments, but gets the same information as the <tt>pre-receive</tt>
+arguments, but gets the same information as the
+<a href="#pre-receive"><em>pre-receive</em></a>
 hook does on its standard input.</p>
 <p>This hook does not affect the outcome of <tt>git-receive-pack</tt>, as it
 is called after the real work is done.</p>
-<p>This supersedes the <a id="post-update"></a> hook in that it actually get's
-both old and new values of all the refs.</p>
-<p>If you want to report something to the <tt>git-send-pack</tt> on the
-other end, you can simply <tt>echo</tt> your messages.</p>
+<p>This supersedes the <a href="#post-update"><em>post-update</em></a> hook in that it get's
+both old and new values of all the refs in addition to their
+names.</p>
+<p>Both standard output and standard error output are forwarded to
+<tt>git-send-pack</tt> on the other end, so you can simply <tt>echo</tt> messages
+for the user.</p>
 <p>The default <em>post-receive</em> hook is empty, but there is
 a sample script <tt>post-receive-email</tt> provided in the <tt>contrib/hooks</tt>
 directory in git distribution, which implements sending commit
@@ -440,22 +444,22 @@ name of ref that was actually updated.</p>
 the outcome of <tt>git-receive-pack</tt>.</p>
 <p>The <em>post-update</em> hook can tell what are the heads that were pushed,
 but it does not know what their original and updated values are,
-so it is a poor place to do log old..new.</p>
-<p>In general, <tt>post-receive</tt> hook is preferred when the hook needs
-to decide its acion on the status of the entire set of refs
-being updated, as this hook is called once per ref, with
-information only on a single ref at a time.</p>
+so it is a poor place to do log old..new. The
+<a href="#post-receive"><em>post-receive</em></a> hook does get both original and
+updated values of the refs. You might consider it instead if you need
+them.</p>
 <p>When enabled, the default <em>post-update</em> hook runs
 <tt>git-update-server-info</tt> to keep the information used by dumb
 transports (e.g., HTTP) up-to-date.  If you are publishing
 a git repository that is accessible via HTTP, you should
 probably enable this hook.</p>
 <p>Both standard output and standard error output are forwarded to
-<tt>git-send-pack</tt> on the other end.</p>
+<tt>git-send-pack</tt> on the other end, so you can simply <tt>echo</tt> messages
+for the user.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 12-May-2007 20:49:27 UTC
+Last updated 13-May-2007 22:18:55 UTC
 </div>
 </div>
 </body>
