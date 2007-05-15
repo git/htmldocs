@@ -291,18 +291,103 @@ each commit introduces are shown.</p>
 </dt>
 <dd>
 <p>
-        Pretty-prints the details of a commit.  <tt>--pretty</tt>
-        without an explicit <tt>=&lt;format&gt;</tt> defaults to <em>medium</em>.
-        If the commit is a merge, and if the pretty-format
-        is not <em>oneline</em>, <em>email</em> or <em>raw</em>, an additional line is
-        inserted before the <em>Author:</em> line.  This line begins with
-        "Merge: " and the sha1s of ancestral commits are printed,
-        separated by spaces.  Note that the listed commits may not
-        necessarily be the list of the <strong>direct</strong> parent commits if you
-        have limited your view of history: for example, if you are
-        only interested in changes related to a certain directory or
-        file.  Here are some additional details for each format:
+        Pretty print the contents of the commit logs in a given format,
+        where <em>&lt;format&gt;</em> can be one of <em>oneline</em>, <em>short</em>, <em>medium</em>,
+        <em>full</em>, <em>fuller</em>, <em>email</em>, <em>raw</em> and <em>format:&lt;string&gt;</em>.
+        When left out the format default to <em>medium</em>.
 </p>
+</dd>
+<dt>
+--encoding[=&lt;encoding&gt;]
+</dt>
+<dd>
+<p>
+        The commit objects record the encoding used for the log message
+        in their encoding header; this option can be used to tell the
+        command to re-code the commit log message in the encoding
+        preferred by the user.  For non plumbing commands this
+        defaults to UTF-8.
+</p>
+</dd>
+<dt>
+-&lt;n&gt;
+</dt>
+<dd>
+<p>
+        Limits the number of commits to show.
+</p>
+</dd>
+<dt>
+&lt;since&gt;..&lt;until&gt;
+</dt>
+<dd>
+<p>
+        Show only commits between the named two commits.  When
+        either &lt;since&gt; or &lt;until&gt; is omitted, it defaults to
+        <tt>HEAD</tt>, i.e. the tip of the current branch.
+        For a more complete list of ways to spell &lt;since&gt;
+        and &lt;until&gt;, see "SPECIFYING REVISIONS" section in
+        <a href="git-rev-parse.html">git-rev-parse(1)</a>.
+</p>
+</dd>
+<dt>
+--first-parent
+</dt>
+<dd>
+<p>
+        Follow only the first parent commit upon seeing a merge
+        commit.  This  option gives a better overview of the
+        evolution of a particular branch.
+</p>
+</dd>
+<dt>
+-p
+</dt>
+<dd>
+<p>
+        Show the change the commit introduces in a patch form.
+</p>
+</dd>
+<dt>
+-g, --walk-reflogs
+</dt>
+<dd>
+<p>
+        Show commits as they were recorded in the reflog. The log contains
+        a record about how the tip of a reference was changed.
+        See also <a href="git-reflog.html">git-reflog(1)</a>.
+</p>
+</dd>
+<dt>
+--decorate
+</dt>
+<dd>
+<p>
+    Print out the ref names of any commits that are shown.
+</p>
+</dd>
+<dt>
+&lt;paths&gt;&#8230;
+</dt>
+<dd>
+<p>
+        Show only commits that affect the specified paths.
+</p>
+</dd>
+</dl>
+</div>
+<h2>PRETTY FORMATS</h2>
+<div class="sectionbody">
+<p>If the commit is a merge, and if the pretty-format
+is not <em>oneline</em>, <em>email</em> or <em>raw</em>, an additional line is
+inserted before the <em>Author:</em> line.  This line begins with
+"Merge: " and the sha1s of ancestral commits are printed,
+separated by spaces.  Note that the listed commits may not
+necessarily be the list of the <strong>direct</strong> parent commits if you
+have limited your view of history: for example, if you are
+only interested in changes related to a certain directory or
+file.</p>
+<p>Here are some additional details for each format:</p>
 <ul>
 <li>
 <p>
@@ -400,7 +485,7 @@ Subject: [PATCH] &lt;title line&gt;</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>full commit message&gt;</tt></pre>
+<pre><tt>&lt;full commit message&gt;</tt></pre>
 </div></div>
 </li>
 <li>
@@ -422,14 +507,14 @@ simplification into account.</p>
 you want to show. It works a little bit like printf format,
 with the notable exception that you get a newline with <em>%n</em>
 instead of <em>\n</em>.</p>
-</li>
-</ul>
-</dd>
-</dl>
-<p>E.g, <em>format:"The author of %h was %an, %ar%nThe title was &gt;&gt;%s&lt;&lt;"</em>
+<p>E.g, <em>format:"The author of %h was %an, %ar%nThe title was &gt;&gt;%s&lt;&lt;%n"</em>
 would show something like this:</p>
-<p>The author of fe6e0ee was Junio C Hamano, 23 hours ago
-The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>The author of fe6e0ee was Junio C Hamano, 23 hours ago
+The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;
+</tt></pre>
+</div></div>
 <p>The placeholders are:</p>
 <ul>
 <li>
@@ -566,85 +651,8 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 <p>
 <em>%n</em>: newline
 </p>
-<dl>
-<dt>
---encoding[=&lt;encoding&gt;]
-</dt>
-<dd>
-<p>
-        The commit objects record the encoding used for the log message
-        in their encoding header; this option can be used to tell the
-        command to re-code the commit log message in the encoding
-        preferred by the user.  For non plumbing commands this
-        defaults to UTF-8.
-</p>
-</dd>
-<dt>
--&lt;n&gt;
-</dt>
-<dd>
-<p>
-        Limits the number of commits to show.
-</p>
-</dd>
-<dt>
-&lt;since&gt;..&lt;until&gt;
-</dt>
-<dd>
-<p>
-        Show only commits between the named two commits.  When
-        either &lt;since&gt; or &lt;until&gt; is omitted, it defaults to
-        <tt>HEAD</tt>, i.e. the tip of the current branch.
-        For a more complete list of ways to spell &lt;since&gt;
-        and &lt;until&gt;, see "SPECIFYING REVISIONS" section in
-        <a href="git-rev-parse.html">git-rev-parse(1)</a>.
-</p>
-</dd>
-<dt>
---first-parent
-</dt>
-<dd>
-<p>
-        Follow only the first parent commit upon seeing a merge
-        commit.  This  option gives a better overview of the
-        evolution of a particular branch.
-</p>
-</dd>
-<dt>
--p
-</dt>
-<dd>
-<p>
-        Show the change the commit introduces in a patch form.
-</p>
-</dd>
-<dt>
--g, --walk-reflogs
-</dt>
-<dd>
-<p>
-        Show commits as they were recorded in the reflog. The log contains
-        a record about how the tip of a reference was changed.
-        See also <a href="git-reflog.html">git-reflog(1)</a>.
-</p>
-</dd>
-<dt>
---decorate
-</dt>
-<dd>
-<p>
-    Print out the ref names of any commits that are shown.
-</p>
-</dd>
-<dt>
-&lt;paths&gt;&#8230;
-</dt>
-<dd>
-<p>
-        Show only commits that affect the specified paths.
-</p>
-</dd>
-</dl>
+</li>
+</ul>
 </li>
 </ul>
 </div>
@@ -779,7 +787,7 @@ reversible operation.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 10-May-2007 23:24:40 UTC
+Last updated 15-May-2007 03:12:36 UTC
 </div>
 </div>
 </body>

@@ -273,8 +273,9 @@ git-am(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-am</em> [--signoff] [--dotest=&lt;dir&gt;] [--utf8 | --no-utf8] [--binary] [--3way]
-         [--interactive] [--whitespace=&lt;option&gt;] [-C&lt;n&gt;] [-p&lt;n&gt;]
+<div class="content"><em>git-am</em> [--signoff] [--dotest=&lt;dir&gt;] [--keep] [--utf8 | --no-utf8]
+         [--3way] [--interactive] [--binary]
+         [--whitespace=&lt;option&gt;] [-C&lt;n&gt;] [-p&lt;n&gt;]
          &lt;mbox&gt;&#8230;
 <em>git-am</em> [--skip | --resolved]</div></div>
 </div>
@@ -329,7 +330,7 @@ current branch.</p>
 <p>
         Pass <tt>-u</tt> flag to <tt>git-mailinfo</tt> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
         The proposed commit log message taken from the e-mail
-        are re-coded into UTF-8 encoding (configuration variable
+        is re-coded into UTF-8 encoding (configuration variable
         <tt>i18n.commitencoding</tt> can be used to specify project's
         preferred encoding if it is not UTF-8).
 </p>
@@ -346,6 +347,17 @@ default.   You could use <tt>--no-utf8</tt> to override this.</p>
 </p>
 </dd>
 <dt>
+-3, --3way
+</dt>
+<dd>
+<p>
+        When the patch does not apply cleanly, fall back on
+        3-way merge, if the patch records the identity of blobs
+        it is supposed to apply to, and we have those blobs
+        available locally.
+</p>
+</dd>
+<dt>
 -b, --binary
 </dt>
 <dd>
@@ -355,14 +367,31 @@ default.   You could use <tt>--no-utf8</tt> to override this.</p>
 </p>
 </dd>
 <dt>
--3, --3way
+--whitespace=&lt;option&gt;
 </dt>
 <dd>
 <p>
-        When the patch does not apply cleanly, fall back on
-        3-way merge, if the patch records the identity of blobs
-        it is supposed to apply to, and we have those blobs
-        locally.
+        This flag is passed to the <tt>git-apply</tt> (see <a href="git-apply.html">git-apply(1)</a>)
+        program that applies
+        the patch.
+</p>
+</dd>
+<dt>
+-C&lt;n&gt;, -p&lt;n&gt;
+</dt>
+<dd>
+<p>
+        These flags are passed to the <tt>git-apply</tt> (see <a href="git-apply.html">git-apply(1)</a>)
+        program that applies
+        the patch.
+</p>
+</dd>
+<dt>
+-i, --interactive
+</dt>
+<dd>
+<p>
+        Run interactively.
 </p>
 </dd>
 <dt>
@@ -372,32 +401,6 @@ default.   You could use <tt>--no-utf8</tt> to override this.</p>
 <p>
         Skip the current patch.  This is only meaningful when
         restarting an aborted patch.
-</p>
-</dd>
-<dt>
---whitespace=&lt;option&gt;
-</dt>
-<dd>
-<p>
-        This flag is passed to the <tt>git-apply</tt> program that applies
-        the patch.
-</p>
-</dd>
-<dt>
--C&lt;n&gt;, -p&lt;n&gt;
-</dt>
-<dd>
-<p>
-        These flags are passed to the <tt>git-apply</tt> program that applies
-        the patch.
-</p>
-</dd>
-<dt>
--i, --interactive
-</dt>
-<dd>
-<p>
-        Run interactively, just like git-applymbox.
 </p>
 </dd>
 <dt>
@@ -471,7 +474,7 @@ recover from this in one of two ways:</p>
 <ol>
 <li>
 <p>
-skip the current one by re-running the command with <em>--skip</em>
+skip the current patch by re-running the command with <em>--skip</em>
   option.
 </p>
 </li>
@@ -506,7 +509,7 @@ names.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 17-Apr-2007 08:27:39 UTC
+Last updated 15-May-2007 03:12:35 UTC
 </div>
 </div>
 </body>
