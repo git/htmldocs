@@ -265,6 +265,9 @@ div.exampleblock-content {
 <div class="sectionbody">
 <p>This tutorial explains how to import a new project into git, make
 changes to it, and share changes with other developers.</p>
+<p>If you are instead primarily interested in using git to fetch a project,
+for example, to test the latest version, you may prefer to start with
+the first two chapters of <a href="user-manual.html">The Git User's Manual</a>.</p>
 <p>First, note that you can get documentation for a command such as "git
 diff" with:</p>
 <div class="listingblock">
@@ -297,43 +300,66 @@ $ git init</tt></pre>
 <pre><tt>Initialized empty Git repository in .git/</tt></pre>
 </div></div>
 <p>You've now initialized the working directory&#8212;you may notice a new
-directory created, named ".git".  Tell git that you want it to track
-every file under the current directory (note the <em>.</em>) with:</p>
+directory created, named ".git".</p>
+<p>Next, tell git to take a snapshot of the contents of all files under the
+current directory (note the <em>.</em>), with <a href="git-add.html">git-add(1)</a>:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git add .</tt></pre>
 </div></div>
-<p>Finally,</p>
+<p>This snapshot is now stored in a temporary staging area which git calls
+the "index".  You can permanently store the contents of the index in the
+repository with <a href="git-commit.html">git-commit(1)</a>:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit</tt></pre>
 </div></div>
-<p>will prompt you for a commit message, then record the current state
-of all the files to the repository.</p>
+<p>This will prompt you for a commit message.  You've now stored the first
+version of your project in git.</p>
 </div>
 <h2>Making changes</h2>
 <div class="sectionbody">
-<p>Try modifying some files, then run</p>
+<p>Modify some files, then add their updated contents to the index:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git diff</tt></pre>
+<pre><tt>$ git add file1 file2 file3</tt></pre>
 </div></div>
-<p>to review your changes.  When you're done, tell git that you
-want the updated contents of these files in the commit and then
-make a commit, like this:</p>
+<p>You are now ready to commit.  You can see what is about to be committed
+using <a href="git-diff.html">git-diff(1)</a> with the &#8212;cached option:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git add file1 file2 file3
-$ git commit</tt></pre>
+<pre><tt>$ git diff --cached</tt></pre>
+</div></div>
+<p>(Without &#8212;cached, <a href="git-diff.html">git-diff(1)</a> will show you any changes that
+you've made but not yet added to the index.)  You can also get a brief
+summary of the situation with <a href="git-status.html">git-status(1)</a>:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git status
+# On branch master
+# Changes to be committed:
+#   (use "git reset HEAD &lt;file&gt;..." to unstage)
+#
+#       modified:   file1
+#       modified:   file2
+#       modified:   file3
+#</tt></pre>
+</div></div>
+<p>If you need to make any further adjustments, do so now, and then add any
+newly modified content to the index.  Finally, commit your changes with:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git commit</tt></pre>
 </div></div>
 <p>This will again prompt your for a message describing the change, and then
-record the new versions of the files you listed.</p>
+record a new version of the project.</p>
 <p>Alternatively, instead of running <tt>git add</tt> beforehand, you can use</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit -a</tt></pre>
 </div></div>
-<p>which will automatically notice modified (but not new) files.</p>
+<p>which will automatically notice any modified (but not new) files, add
+them to the index, and commit, all in one step.</p>
 <p>A note on commit messages: Though not required, it's a good idea to
 begin the commit message with a single short (less than 50 character)
 line summarizing the change, followed by a blank line and then a more
@@ -343,33 +369,12 @@ commit in the body.</p>
 </div>
 <h2>Git tracks content not files</h2>
 <div class="sectionbody">
-<p>With git you have to explicitly "add" all the changed _content_ you
-want to commit together. This can be done in a few different ways:</p>
-<p>1) By using <em>git add &lt;file_spec&gt;&#8230;</em></p>
-<p>This can be performed multiple times before a commit.  Note that this
-is not only for adding new files.  Even modified files must be
-added to the set of changes about to be committed.  The "git status"
-command gives you a summary of what is included so far for the
-next commit.  When done you should use the <em>git commit</em> command to
-make it real.</p>
-<p>Note: don't forget to <em>add</em> a file again if you modified it after the
-first <em>add</em> and before <em>commit</em>. Otherwise only the previous added
-state of that file will be committed. This is because git tracks
-content, so what you're really <em>adding</em> to the commit is the <strong>content</strong>
-of the file in the state it is in when you <em>add</em> it.</p>
-<p>2) By using <em>git commit -a</em> directly</p>
-<p>This is a quick way to automatically <em>add</em> the content from all files
-that were modified since the previous commit, and perform the actual
-commit without having to separately <em>add</em> them beforehand.  This will
-not add content from new files i.e. files that were never added before.
-Those files still have to be added explicitly before performing a
-commit.</p>
-<p>But here's a twist. If you do <em>git commit &lt;file1&gt; &lt;file2&gt; &#8230;</em> then only
-the  changes belonging to those explicitly specified files will be
-committed, entirely bypassing the current "added" changes. Those "added"
-changes will still remain available for a subsequent commit though.</p>
-<p>However, for normal usage you only have to remember <em>git add</em> + <em>git commit</em>
-and/or <em>git commit -a</em>.</p>
+<p>Many revision control systems provide an "add" command that tells the
+system to start tracking changes to a new file.  Git's "add" command
+does something simpler and more powerful: <tt>git add</tt> is used both for new
+and newly modified files, and in both cases it takes a snapshot of the
+given files and stages that content in the index, ready for inclusion in
+the next commit.</p>
 </div>
 <h2>Viewing the changelog</h2>
 <div class="sectionbody">
@@ -746,7 +751,7 @@ The index file is a cache of the state of a directory tree,
 <p><a href="tutorial-2.html">Part two of this tutorial</a> explains the object
 database, the index file, and a few other odds and ends that you'll
 need to make the most of git.</p>
-<p>If you don't want to consider with that right away, a few other
+<p>If you don't want to continue with that right away, a few other
 digressions that may be interesting at this point are:</p>
 <ul>
 <li>
@@ -781,7 +786,7 @@ digressions that may be interesting at this point are:</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 06-May-2007 08:52:37 UTC
+Last updated 20-May-2007 09:08:17 UTC
 </div>
 </div>
 </body>
