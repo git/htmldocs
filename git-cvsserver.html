@@ -307,16 +307,27 @@ If you are going to offer anonymous CVS access via pserver, add a line in
 <pre><tt>   cvspserver stream tcp nowait nobody git-cvsserver pserver
 </tt></pre>
 </div></div>
-<p>Note: In some cases, you need to pass the <em>pserver</em> argument twice for
-git-cvsserver to see it. So the line would look like</p>
+<p>Note: Some inetd servers let you specify the name of the executable
+independently of the value of argv[0] (i.e. the name the program assumes
+it was executed with). In this case the correct line in /etc/inetd.conf
+looks like</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   cvspserver stream tcp nowait nobody git-cvsserver pserver pserver
+<pre><tt>   cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver
 </tt></pre>
 </div></div>
 <p>No special setup is needed for SSH access, other than having GIT tools
 in the PATH. If you have clients that do not accept the CVS_SERVER
-env variable, you can rename git-cvsserver to cvs.</p>
+environment variable, you can rename git-cvsserver to cvs.</p>
+<p>Note: Newer cvs versions (&gt;= 1.12.11) also support specifying
+CVS_SERVER directly in CVSROOT like</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>cvs -d ":ext;CVS_SERVER=git-cvsserver:user@server/path/repo.git" co &lt;HEAD_name&gt;</tt></pre>
+</div></div>
+<p>This has the advantage that it will be saved in your <em>CVS/Root</em> files and
+you don't need to worry about always setting the correct environment
+variable.</p>
 </li>
 <li>
 <p>
@@ -335,7 +346,7 @@ For each repo that you want accessible from CVS you need to edit config in
 write access to the log file and to the database (see
 <a href="#dbbackend">Database Backend</a>. If you want to offer write access over
 SSH, the users of course also need write access to the git repository itself.</p>
-<p><a id="configaccessmethod"></a>All configuration variables can also be overriden for a specific method of
+<p><a id="configaccessmethod"></a>All configuration variables can also be overridden for a specific method of
 access. Valid method names are "ext" (for SSH access) and "pserver". The
 following example configuration would disable pserver access while still
 allowing access over SSH.</p>
@@ -384,7 +395,7 @@ Clients should now be able to check out the project. Use the CVS <em>module</em>
 <div class="sectionbody">
 <p>git-cvsserver uses one database per git head (i.e. CVS module) to
 store information about the repository for faster access. The
-database doesn't contain any persitent data and can be completly
+database doesn't contain any persistent data and can be completely
 regenerated from the git repository at any time. The database
 needs to be updated (i.e. written to) after every commit.</p>
 <p>If the commit is done directly by using git (as opposed to
@@ -613,7 +624,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 18-Apr-2007 09:56:50 UTC
+Last updated 29-May-2007 09:17:38 UTC
 </div>
 </div>
 </body>
