@@ -294,7 +294,7 @@ If you want to update or unset an option which can occur on multiple
 lines, a POSIX regexp <tt>value_regex</tt> needs to be given.  Only the
 existing values that match the regexp are updated or unset.  If
 you want to handle the lines that do <strong>not</strong> match the regex, just
-prepend a single exclamation mark in front (see EXAMPLES).</p>
+prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPLES]</a>).</p>
 <p>The type specifier can be either <em>--int</em> or <em>--bool</em>, which will make
 <em>git-config</em> ensure that the variable(s) are of the given type and
 convert the value to the canonical form (simple decimal number for int,
@@ -335,7 +335,7 @@ you try to unset/set an option for which multiple lines match, or
 </li>
 <li>
 <p>
-you use --global option without $HOME being properly set.
+you use <em>--global</em> option without $HOME being properly set.
 </p>
 </li>
 </ol>
@@ -393,17 +393,24 @@ you use --global option without $HOME being properly set.
 </dt>
 <dd>
 <p>
-        Use global ~/.gitconfig file rather than the repository .git/config.
+        For writing options: write to global ~/.gitconfig file rather than
+        the repository .git/config.
 </p>
+<p>For reading options: read only from global ~/.gitconfig rather than
+from all available files.</p>
+<p>See also <a href="#FILES">[FILES]</a>.</p>
 </dd>
 <dt>
 --system
 </dt>
 <dd>
 <p>
-        Use system-wide $(prefix)/etc/gitconfig rather than the repository
-        .git/config.
+        For writing options: write to system-wide $(prefix)/etc/gitconfig
+        rather than the repository .git/config.
 </p>
+<p>For reading options: read only from system-wide $(prefix)/etc/gitconfig
+rather than from all available files.</p>
+<p>See also <a href="#FILES">[FILES]</a>.</p>
 </dd>
 <dt>
 --remove-section
@@ -466,6 +473,53 @@ you use --global option without $HOME being properly set.
 </dd>
 </dl>
 </div>
+<h2><a id="FILES"></a>FILES</h2>
+<div class="sectionbody">
+<p>There are three files where git-config will search for configuration
+options:</p>
+<div class="literalblock">
+<div class="title">git/config::</div>
+<div class="content">
+<pre><tt>Repository specific configuration file. (The filename is
+of course relative to the repository root, not the working
+directory.)</tt></pre>
+</div></div>
+<dl>
+<dt>
+~/.gitconfig
+</dt>
+<dd>
+<p>
+        User-specific configuration file. Also called "global"
+        configuration file.
+</p>
+</dd>
+<dt>
+$(prefix)/etc/gitconfig
+</dt>
+<dd>
+<p>
+        System-wide configuration file.
+</p>
+</dd>
+</dl>
+<p>If no further options are given, all reading options will read all of these
+files that are available. If the global or the system-wide configuration
+file are not available they will be ignored. If the repository configuration
+file is not available or readable, git-config will exit with a non-zero
+error code. However, in neither case will an error message be issued.</p>
+<p>All writing options will per default write to the repository specific
+configuration file. Note that this also affects options like <em>--replace-all</em>
+and <em>--unset</em>. <strong>git-config will only ever change one file at a time</strong>.</p>
+<p>You can override these rules either by command line options or by environment
+variables. The <em>--global</em> and the <em>--system</em> options will limit the file used
+to the global or system-wide file respectively. The GIT_CONFIG environment
+variable has a similar effect, but you can specify any filename you want.</p>
+<p>The GIT_CONFIG_LOCAL environment variable on the other hand only changes
+the name used instead of the repository configuration file. The global and
+the system-wide configuration files will still be read. (For writing options
+this will obviously result in the same behavior as using GIT_CONFIG.)</p>
+</div>
 <h2>ENVIRONMENT</h2>
 <div class="sectionbody">
 <dl>
@@ -475,7 +529,8 @@ GIT_CONFIG
 <dd>
 <p>
         Take the configuration from the given file instead of .git/config.
-        Using the "--global" option forces this to ~/.gitconfig.
+        Using the "--global" option forces this to ~/.gitconfig. Using the
+        "--system" option forces this to $(prefix)/etc/gitconfig.
 </p>
 </dd>
 <dt>
@@ -483,14 +538,14 @@ GIT_CONFIG_LOCAL
 </dt>
 <dd>
 <p>
-        Currently the same as $GIT_CONFIG; when Git will support global
-        configuration files, this will cause it to take the configuration
-        from the global configuration file in addition to the given file.
+        Take the configuration from the given file instead if .git/config.
+        Still read the global and the system-wide configuration files, though.
 </p>
 </dd>
 </dl>
+<p>See also <a href="#FILES">[FILES]</a>.</p>
 </div>
-<h2>EXAMPLE</h2>
+<h2><a id="EXAMPLES"></a>EXAMPLES</h2>
 <div class="sectionbody">
 <p>Given a .git/config like this:</p>
 <div class="literalblock">
@@ -1702,7 +1757,7 @@ transfer.unpackLimit
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 24-May-2007 06:59:45 UTC
+Last updated 31-May-2007 07:37:48 UTC
 </div>
 </div>
 </body>
