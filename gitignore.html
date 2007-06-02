@@ -256,57 +256,146 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>git-patch-id(1)</title>
+<title>gitignore(5)</title>
 </head>
 <body>
 <div id="header">
 <h1>
-git-patch-id(1) Manual Page
+gitignore(5) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-patch-id -
-   Compute unique ID for a patch
+<p>gitignore -
+   Specifies intentionally untracked files to ignore
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-patch-id</em> &lt; &lt;patch&gt;</p>
+<p>$GIT_DIR/info/exclude, .gitignore</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>A "patch ID" is nothing but a SHA1 of the diff associated with a patch, with
-whitespace and line numbers ignored.  As such, it's "reasonably stable", but at
-the same time also reasonably unique, i.e., two patches that have the same "patch
-ID" are almost guaranteed to be the same thing.</p>
-<p>IOW, you can use this thing to look for likely duplicate commits.</p>
-<p>When dealing with git-diff-tree output, it takes advantage of
-the fact that the patch is prefixed with the object name of the
-commit, and outputs two 40-byte hexadecimal string.  The first
-string is the patch ID, and the second string is the commit ID.
-This can be used to make a mapping from patch ID to commit ID.</p>
-</div>
-<h2>OPTIONS</h2>
-<div class="sectionbody">
-<dl>
-<dt>
-&lt;patch&gt;
-</dt>
-<dd>
+<p>A <tt>gitignore</tt> file specifies intentionally untracked files that
+git should ignore.  Each line in a <tt>gitignore</tt> file specifies a
+pattern.</p>
+<p>When deciding whether to ignore a path, git normally checks
+<tt>gitignore</tt> patterns from multiple sources, with the following
+order of precedence:</p>
+<ul>
+<li>
 <p>
-        The diff to create the ID of.
+Patterns read from the file specified by the configuration
+   variable <em>core.excludesfile</em>.
 </p>
-</dd>
-</dl>
-</div>
-<h2>Author</h2>
-<div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+</li>
+<li>
+<p>
+Patterns read from <tt>$GIT_DIR/info/exclude</tt>.
+</p>
+</li>
+<li>
+<p>
+Patterns read from a <tt>.gitignore</tt> file in the same directory
+   as the path, or in any parent directory, ordered from the
+   deepest such file to a file in the root of the repository.
+   These patterns match relative to the location of the
+   <tt>.gitignore</tt> file.  A project normally includes such
+   <tt>.gitignore</tt> files in its repository, containing patterns for
+   files generated as part of the project build.
+</p>
+</li>
+</ul>
+<p>The underlying git plumbing tools, such as
+<a href="git-ls-files.html">git-ls-files(1)</a> and <a href="git-read-tree.html">git-read-tree(1)</a>, read
+<tt>gitignore</tt> patterns specified by command-line options, or from
+files specified by command-line options.  Higher-level git
+tools, such as <a href="git-status.html">git-status(1)</a> and <a href="git-add.html">git-add(1)</a>,
+use patterns from the sources specified above.</p>
+<p>Patterns have the following format:</p>
+<ul>
+<li>
+<p>
+A blank line matches no files, so it can serve as a separator
+   for readability.
+</p>
+</li>
+<li>
+<p>
+A line starting with # serves as a comment.
+</p>
+</li>
+<li>
+<p>
+An optional prefix <em>!</em> which negates the pattern; any
+   matching file excluded by a previous pattern will become
+   included again.
+</p>
+</li>
+<li>
+<p>
+If the pattern does not contain a slash <em>/</em>, git treats it as
+   a shell glob pattern and checks for a match against the
+   pathname without leading directories.
+</p>
+</li>
+<li>
+<p>
+Otherwise, git treats the pattern as a shell glob suitable
+   for consumption by fnmatch(3) with the FNM_PATHNAME flag:
+   wildcards in the pattern will not match a / in the pathname.
+   For example, "Documentation/*.html" matches
+   "Documentation/git.html" but not
+   "Documentation/ppc/ppc.html".  A leading slash matches the
+   beginning of the pathname; for example, "/*.c" matches
+   "cat-file.c" but not "mozilla-sha1/sha1.c".
+</p>
+</li>
+</ul>
+<p>An example:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git-status
+    [...]
+    # Untracked files:
+    [...]
+    #       Documentation/foo.html
+    #       Documentation/gitignore.html
+    #       file.o
+    #       lib.a
+    #       src/internal.o
+    [...]
+    $ cat .git/info/exclude
+    # ignore objects and archives, anywhere in the tree.
+    *.[oa]
+    $ cat Documentation/.gitignore
+    # ignore generated html files,
+    *.html
+    # except foo.html which is maintained by hand
+    !foo.html
+    $ git-status
+    [...]
+    # Untracked files:
+    [...]
+    #       Documentation/foo.html
+    [...]</tt></pre>
+</div></div>
+<p>Another example:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ cat .gitignore
+    vmlinux*
+    $ ls arch/foo/kernel/vm*
+    arch/foo/kernel/vmlinux.lds.S
+    $ echo '!/vmlinux*' &gt;arch/foo/kernel/.gitignore</tt></pre>
+</div></div>
+<p>The second .gitignore prevents git from ignoring
+<tt>arch/foo/kernel/vmlinux.lds.S</tt>.</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<p>Documentation by David Greaves, Junio C Hamano, Josh Triplett,
+Frank Lichtenheld, and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -314,7 +403,7 @@ This can be used to make a mapping from patch ID to commit ID.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jun-2007 21:09:53 UTC
+Last updated 02-Jun-2007 21:10:18 UTC
 </div>
 </div>
 </body>

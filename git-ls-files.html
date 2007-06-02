@@ -551,128 +551,43 @@ respectively.</p>
 <div class="sectionbody">
 <p><em>git-ls-files</em> can use a list of "exclude patterns" when
 traversing the directory tree and finding files to show when the
-flags --others or --ignored are specified.</p>
-<p>These exclude patterns come from these places:</p>
+flags --others or --ignored are specified.  <a href="gitignore.html">gitignore(5)</a>
+specifies the format of exclude patterns.</p>
+<p>These exclude patterns come from these places, in order:</p>
 <ol>
 <li>
 <p>
-command line flag --exclude=&lt;pattern&gt; specifies a single
-     pattern.
+The command line flag --exclude=&lt;pattern&gt; specifies a
+     single pattern.  Patterns are ordered in the same order
+     they appear in the command line.
 </p>
 </li>
 <li>
 <p>
-command line flag --exclude-from=&lt;file&gt; specifies a list of
-     patterns stored in a file.
+The command line flag --exclude-from=&lt;file&gt; specifies a
+     file containing a list of patterns.  Patterns are ordered
+     in the same order they appear in the file.
 </p>
 </li>
 <li>
 <p>
 command line flag --exclude-per-directory=&lt;name&gt; specifies
      a name of the file in each directory <em>git-ls-files</em>
-     examines, and if exists, its contents are used as an
-     additional list of patterns.
+     examines, normally <tt>.gitignore</tt>.  Files in deeper
+     directories take precedence.  Patterns are ordered in the
+     same order they appear in the files.
 </p>
 </li>
 </ol>
-<p>An exclude pattern file used by (2) and (3) contains one pattern
-per line.  A line that starts with a <em>#</em> can be used as comment
-for readability.</p>
-<p>There are three lists of patterns that are in effect at a given
-time.  They are built and ordered in the following way:</p>
-<ul>
-<li>
-<p>
---exclude=&lt;pattern&gt; from the command line; patterns are
-   ordered in the same order as they appear on the command line.
-</p>
-</li>
-<li>
-<p>
-lines read from --exclude-from=&lt;file&gt;; patterns are ordered
-   in the same order as they appear in the file.
-</p>
-</li>
-<li>
-<p>
-When --exclude-per-directory=&lt;name&gt; is specified, upon
-   entering a directory that has such a file, its contents are
-   appended at the end of the current "list of patterns".  They
-   are popped off when leaving the directory.
-</p>
-</li>
-</ul>
-<p>Each pattern in the pattern list specifies "a match pattern" and
-optionally the fate; either a file that matches the pattern is
-considered excluded or included.  A filename is matched against
-the patterns in the three lists; the --exclude-from list is
-checked first, then the --exclude-per-directory list, and then
-finally the --exclude list. The last match determines its fate.
-If there is no match in the three lists, the fate is "included".</p>
 <p>A pattern specified on the command line with --exclude or read
 from the file specified with --exclude-from is relative to the
 top of the directory tree.  A pattern read from a file specified
 by --exclude-per-directory is relative to the directory that the
 pattern file appears in.</p>
-<p>An exclude pattern is of the following format:</p>
-<ul>
-<li>
-<p>
-an optional prefix <em>!</em> which means that the fate this pattern
-   specifies is "include", not the usual "exclude"; the
-   remainder of the pattern string is interpreted according to
-   the following rules.
-</p>
-</li>
-<li>
-<p>
-if it does not contain a slash <em>/</em>, it is a shell glob
-   pattern and used to match against the filename without
-   leading directories.
-</p>
-</li>
-<li>
-<p>
-otherwise, it is a shell glob pattern, suitable for
-   consumption by fnmatch(3) with FNM_PATHNAME flag.  I.e. a
-   slash in the pattern must match a slash in the pathname.
-   "Documentation/*.html" matches "Documentation/git.html" but
-   not "ppc/ppc.html".  As a natural exception, "/*.c" matches
-   "cat-file.c" but not "mozilla-sha1/sha1.c".
-</p>
-</li>
-</ul>
-<p>An example:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>    $ cat .git/info/exclude
-    # ignore objects and archives, anywhere in the tree.
-    *.[oa]
-    $ cat Documentation/.gitignore
-    # ignore generated html files,
-    *.html
-    # except foo.html which is maintained by hand
-    !foo.html
-    $ git-ls-files --ignored \
-        --exclude='Documentation/*.[0-9]' \
-        --exclude-from=.git/info/exclude \
-        --exclude-per-directory=.gitignore</tt></pre>
-</div></div>
-<p>Another example:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>    $ cat .gitignore
-    vmlinux*
-    $ ls arch/foo/kernel/vm*
-    arch/foo/kernel/vmlinux.lds.S
-    $ echo '!/vmlinux*' &gt;arch/foo/kernel/.gitignore</tt></pre>
-</div></div>
-<p>The second .gitignore keeps <tt>arch/foo/kernel/vmlinux.lds.S</tt> file
-from getting ignored.</p>
 </div>
 <h2>See Also</h2>
 <div class="sectionbody">
-<p><a href="git-read-tree.html">git-read-tree(1)</a></p>
+<p><a href="git-read-tree.html">git-read-tree(1)</a>, <a href="gitignore.html">gitignore(5)</a></p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -680,7 +595,7 @@ from getting ignored.</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<p>Documentation by David Greaves, Junio C Hamano, Josh Triplett, and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -688,7 +603,7 @@ from getting ignored.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-May-2007 04:28:37 UTC
+Last updated 02-Jun-2007 21:09:44 UTC
 </div>
 </div>
 </body>
