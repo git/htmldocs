@@ -256,100 +256,106 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>git-mailinfo(1)</title>
+<title>git-submodule(1)</title>
 </head>
 <body>
 <div id="header">
 <h1>
-git-mailinfo(1) Manual Page
+git-submodule(1) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-mailinfo -
-   Extracts patch and authorship from a single e-mail message
+<p>git-submodule -
+   Initialize, update or inspect submodules
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-mailinfo</em> [-k] [-u | --encoding=&lt;encoding&gt;] &lt;msg&gt; &lt;patch&gt;</p>
+<p><em>git-submodule</em> [--quiet] [--cached] [status|init|update] [--] [&lt;path&gt;&#8230;]</p>
 </div>
-<h2>DESCRIPTION</h2>
+<h2>COMMANDS</h2>
 <div class="sectionbody">
-<p>Reading a single e-mail message from the standard input, and
-writes the commit log message in &lt;msg&gt; file, and the patches in
-&lt;patch&gt; file.  The author name, e-mail and e-mail subject are
-written out to the standard output to be used by git-am
-to create a commit.  It is usually not necessary to use this
-command directly.  See <a href="git-am.html">git-am(1)</a> instead.</p>
+<dl>
+<dt>
+status
+</dt>
+<dd>
+<p>
+        Show the status of the submodules. This will print the SHA-1 of the
+        currently checked out commit for each submodule, along with the
+        submodule path and the output of <a href="git-describe.html">git-describe(1)</a> for the
+        SHA-1. Each SHA-1 will be prefixed with <tt>-</tt> if the submodule is not
+        initialized and <tt>+</tt> if the currently checked out submodule commit
+        does not match the SHA-1 found in the index of the containing
+        repository. This command is the default command for git-submodule.
+</p>
+</dd>
+<dt>
+init
+</dt>
+<dd>
+<p>
+        Initialize the submodules, i.e. clone the git repositories specified
+        in the .gitmodules file and checkout the submodule commits specified
+        in the index of the containing repository. This will make the
+        submodules HEAD be detached.
+</p>
+</dd>
+<dt>
+update
+</dt>
+<dd>
+<p>
+        Update the initialized submodules, i.e. checkout the submodule commits
+        specified in the index of the containing repository. This will make
+        the submodules HEAD be detached.
+</p>
+</dd>
+</dl>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
 <dl>
 <dt>
--k
+-q, --quiet
 </dt>
 <dd>
 <p>
-        Usually the program <em>cleans up</em> the Subject: header line
-        to extract the title line for the commit log message,
-        among which (1) remove <em>Re:</em> or <em>re:</em>, (2) leading
-        whitespaces, (3) <em>[</em> up to <em>]</em>, typically <em>[PATCH]</em>, and
-        then prepends "[PATCH] ".  This flag forbids this
-        munging, and is most useful when used to read back <em>git
-        format-patch -k</em> output.
+        Only print error messages.
 </p>
 </dd>
 <dt>
--u
+--cached
 </dt>
 <dd>
 <p>
-        The commit log message, author name and author email are
-        taken from the e-mail, and after minimally decoding MIME
-        transfer encoding, re-coded in UTF-8 by transliterating
-        them.  This used to be optional but now it is the default.
-</p>
-<p>Note that the patch is always used as-is without charset
-conversion, even with this flag.</p>
-</dd>
-<dt>
---encoding=&lt;encoding&gt;
-</dt>
-<dd>
-<p>
-        Similar to -u but if the local convention is different
-        from what is specified by i18n.commitencoding, this flag
-        can be used to override it.
+        Display the SHA-1 stored in the index, not the SHA-1 of the currently
+        checked out submodule commit. This option is only valid for the
+        status command.
 </p>
 </dd>
 <dt>
-&lt;msg&gt;
+&lt;path&gt;
 </dt>
 <dd>
 <p>
-        The commit log message extracted from e-mail, usually
-        except the title line which comes from e-mail Subject.
-</p>
-</dd>
-<dt>
-&lt;patch&gt;
-</dt>
-<dd>
-<p>
-        The patch extracted from e-mail.
+        Path to submodule(s). When specified this will restrict the command
+        to only operate on the submodules found at the specified paths.
 </p>
 </dd>
 </dl>
 </div>
-<h2>Author</h2>
+<h2>FILES</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and
-Junio C Hamano &lt;junkio@cox.net&gt;</p>
+<p>When cloning submodules, a .gitmodules file in the top-level directory
+of the containing repository is used to find the url of each submodule.
+This file should be formatted in the same way as $GIR_DIR/config. The key
+to each submodule url is "module.$path.url".</p>
 </div>
-<h2>Documentation</h2>
+<h2>AUTHOR</h2>
 <div class="sectionbody">
-<p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<p>Written by Lars Hjemli &lt;hjemli@gmail.com&gt;</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -357,7 +363,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Jun-2007 08:39:36 UTC
+Last updated 03-Jun-2007 08:39:37 UTC
 </div>
 </div>
 </body>
