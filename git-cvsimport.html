@@ -277,7 +277,7 @@ git-cvsimport(1) Manual Page
               [-A &lt;author-conv-file&gt;] [-p &lt;options-for-cvsps&gt;] [-P &lt;file&gt;]
               [-C &lt;git_repository&gt;] [-z &lt;fuzz&gt;] [-i] [-k] [-u] [-s &lt;subst&gt;]
               [-a] [-m] [-M &lt;regex&gt;] [-S &lt;regex&gt;] [-L &lt;commitlimit&gt;]
-              [&lt;CVS_module&gt;]</div></div>
+              [-r &lt;remote&gt;] [&lt;CVS_module&gt;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -286,10 +286,11 @@ repository, or incrementally import into an existing one.</p>
 <p>Splitting the CVS log into patch sets is done by <em>cvsps</em>.
 At least version 2.1 is required.</p>
 <p>You should <strong>never</strong> do any work of your own on the branches that are
-created by git-cvsimport. The initial import will create and populate a
+created by git-cvsimport.  By default initial import will create and populate a
 "master" branch from the CVS repository's main branch which you're free
 to work with; after that, you need to <em>git merge</em> incremental imports, or
-any CVS branches, yourself.</p>
+any CVS branches, yourself.  It is advisable to specify a named remote via
+-r to separate and protect the incoming branches.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -334,13 +335,27 @@ any CVS branches, yourself.</p>
 </p>
 </dd>
 <dt>
+-r &lt;remote&gt;
+</dt>
+<dd>
+<p>
+        The git remote to import this CVS repository into.
+        Moves all CVS branches into remotes/&lt;remote&gt;/&lt;branch&gt;
+        akin to the git-clone --use-separate-remote option.
+</p>
+</dd>
+<dt>
 -o &lt;branch-for-HEAD&gt;
 </dt>
 <dd>
 <p>
-        The <em>HEAD</em> branch from CVS is imported to the <em>origin</em> branch within
-        the git repository, as <em>HEAD</em> already has a special meaning for git.
-        Use this option if you want to import into a different branch.
+        When no remote is specified (via -r) the <em>HEAD</em> branch
+        from CVS is imported to the <em>origin</em> branch within the git
+        repository, as <em>HEAD</em> already has a special meaning for git.
+        When a remote is specified the <em>HEAD</em> branch is named
+        remotes/&lt;remote&gt;/master mirroring git-clone behaviour.
+        Use this option if you want to import into a different
+        branch.
 </p>
 <p>Use <em>-o master</em> for continuing an import that was initially done by
 the old cvs2git tool.</p>
@@ -511,7 +526,7 @@ various participants of the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2007 16:08:06 UTC
+Last updated 13-Jun-2007 08:29:16 UTC
 </div>
 </div>
 </body>
