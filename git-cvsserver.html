@@ -272,9 +272,76 @@ git-cvsserver(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
+<p>SSH:</p>
 <div class="verseblock">
 <div class="content">export CVS_SERVER=git-cvsserver
 <em>cvs</em> -d :ext:user@server/path/repo.git co &lt;HEAD_name&gt;</div></div>
+<p>pserver (/etc/inetd.conf):</p>
+<div class="verseblock">
+<div class="content">cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</div></div>
+<p>Usage:</p>
+<div class="verseblock">
+<div class="content"><em>git-cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</div></div>
+</div>
+<h2>OPTIONS</h2>
+<div class="sectionbody">
+<p>All these options obviously only make sense if enforced by the server side.
+They have been implemented to resemble the <a href="git-daemon.html">git-daemon(1)</a> options as
+closely as possible.</p>
+<dl>
+<dt>
+--base-path &lt;path&gt;
+</dt>
+<dd>
+<p>
+Prepend <em>path</em> to requested CVSROOT
+</p>
+</dd>
+<dt>
+--strict-paths
+</dt>
+<dd>
+<p>
+Don't allow recursing into subdirectories
+</p>
+</dd>
+<dt>
+--export-all
+</dt>
+<dd>
+<p>
+Don't check for <tt>gitcvs.enabled</tt> in config. You also have to specify a list
+of allowed directories (see below) if you want to use this option.
+</p>
+</dd>
+<dt>
+--version, -V
+</dt>
+<dd>
+<p>
+Print version information and exit
+</p>
+</dd>
+<dt>
+--help, -h, -H
+</dt>
+<dd>
+<p>
+Print usage information and exit
+</p>
+</dd>
+<dt>
+&lt;directory&gt;
+</dt>
+<dd>
+<p>
+You can specify a list of allowed directories. If no directories
+are given, all are allowed. This is an additional restriction, gitcvs
+access still needs to be enabled by the <tt>gitcvs.enabled</tt> config option
+unless <em>--export-all</em> was given, too.
+</p>
+</dd>
+</dl>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -624,7 +691,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2007 16:08:07 UTC
+Last updated 16-Jun-2007 09:48:59 UTC
 </div>
 </div>
 </body>
