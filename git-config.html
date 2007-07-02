@@ -273,9 +273,9 @@ git-config(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-config</em> [--system | --global] [-z|--null] name [value [value_regex]]
-<em>git-config</em> [--system | --global] --add name value
-<em>git-config</em> [--system | --global] --replace-all name [value [value_regex]]
+<div class="content"><em>git-config</em> [--system | --global] [type] [-z|--null] name [value [value_regex]]
+<em>git-config</em> [--system | --global] [type] --add name value
+<em>git-config</em> [--system | --global] [type] --replace-all name [value [value_regex]]
 <em>git-config</em> [--system | --global] [type] [-z|--null] --get name [value_regex]
 <em>git-config</em> [--system | --global] [type] [-z|--null] --get-all name [value_regex]
 <em>git-config</em> [--system | --global] [type] [-z|--null] --get-regexp name_regex [value_regex]
@@ -299,8 +299,7 @@ prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPL
 <p>The type specifier can be either <em>--int</em> or <em>--bool</em>, which will make
 <em>git-config</em> ensure that the variable(s) are of the given type and
 convert the value to the canonical form (simple decimal number for int,
-a "true" or "false" string for bool).  Type specifiers currently only
-take effect for reading operations.  If no type specifier is passed,
+a "true" or "false" string for bool).  If no type specifier is passed,
 no checks or transformations are performed on the value.</p>
 <p>This command will fail if:</p>
 <ol>
@@ -769,6 +768,23 @@ core.fileMode
 </p>
 </dd>
 <dt>
+core.quotepath
+</dt>
+<dd>
+<p>
+        The commands that output paths (e.g. <tt>ls-files</tt>,
+        <tt>diff</tt>), when not given the <tt>-z</tt> option, will quote
+        "unusual" characters in the pathname by enclosing the
+        pathname in a double-quote pair and with backslashes the
+        same way strings in C source code are quoted.  If this
+        variable is set to false, the bytes higher than 0x80 are
+        not quoted but output as verbatim.  Note that double
+        quote, backslash and control characters are always
+        quoted without <tt>-z</tt> regardless of the setting of this
+        variable.
+</p>
+</dd>
+<dt>
 core.autocrlf
 </dt>
 <dd>
@@ -850,6 +866,18 @@ core.bare
 repository that ends in "/.git" is assumed to be not bare (bare =
 false), while all other repositories are assumed to be bare (bare
 = true).</p>
+</dd>
+<dt>
+core.worktree
+</dt>
+<dd>
+<p>
+        Set the path to the working tree.  The value will not be
+        used in combination with repositories found automatically in
+        a .git directory (i.e. $GIT_DIR is not set).
+        This can be overriden by the GIT_WORK_TREE environment
+        variable and the <em>--work-tree</em> command line option.
+</p>
 </dd>
 <dt>
 core.logAllRefUpdates
@@ -1792,7 +1820,7 @@ transfer.unpackLimit
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Jun-2007 07:14:34 UTC
+Last updated 02-Jul-2007 00:16:57 UTC
 </div>
 </div>
 </body>
