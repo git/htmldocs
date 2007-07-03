@@ -273,7 +273,8 @@ git-rebase(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-rebase</em> [-v] [--merge] [-C&lt;n&gt;] [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]
+<div class="content"><em>git-rebase</em> [-i | --interactive] [-v | --verbose] [--merge] [-C&lt;n&gt;]
+        [-p | --preserve-merges] [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]
 <em>git-rebase</em> --continue | --skip | --abort</div></div>
 </div>
 <h2>DESCRIPTION</h2>
@@ -508,6 +509,24 @@ desired resolution, you can continue the rebasing process with</p>
         ever ignored.
 </p>
 </dd>
+<dt>
+-i, --interactive
+</dt>
+<dd>
+<p>
+        Make a list of the commits which are about to be rebased.  Let the
+        user edit that list before rebasing.
+</p>
+</dd>
+<dt>
+-p, --preserve-merges
+</dt>
+<dd>
+<p>
+        Instead of ignoring merges, try to recreate them.  This option
+        only works in interactive mode.
+</p>
+</dd>
 </dl>
 </div>
 <h2>MERGE STRATEGIES</h2>
@@ -582,9 +601,138 @@ pre-rebase hook script for an example.</p>
 <p>You must be in the top directory of your project to start (or continue)
 a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
-<h2>Author</h2>
+<h2>INTERACTIVE MODE</h2>
 <div class="sectionbody">
-<p>Written by Junio C Hamano &lt;junkio@cox.net&gt;</p>
+<p>Rebasing interactively means that you have a chance to edit the commits
+which are rebased.  You can reorder the commits, and you can
+remove them (weeding out bad or otherwise unwanted patches).</p>
+<p>The interactive mode is meant for this type of workflow:</p>
+<ol>
+<li>
+<p>
+have a wonderful idea
+</p>
+</li>
+<li>
+<p>
+hack on the code
+</p>
+</li>
+<li>
+<p>
+prepare a series for submission
+</p>
+</li>
+<li>
+<p>
+submit
+</p>
+</li>
+</ol>
+<p>where point 2. consists of several instances of</p>
+<ol class="olist2">
+<li>
+<p>
+regular use
+</p>
+<ol>
+<li>
+<p>
+finish something worthy of a commit
+</p>
+</li>
+<li>
+<p>
+commit
+</p>
+</li>
+</ol>
+</li>
+<li>
+<p>
+independent fixup
+</p>
+<ol>
+<li>
+<p>
+realize that something does not work
+</p>
+</li>
+<li>
+<p>
+fix that
+</p>
+</li>
+<li>
+<p>
+commit it
+</p>
+</li>
+</ol>
+</li>
+</ol>
+<p>Sometimes the thing fixed in b.2. cannot be amended to the not-quite
+perfect commit it fixes, because that commit is buried deeply in a
+patch series.  That is exactly what interactive rebase is for: use it
+after plenty of "a"s and "b"s, by rearranging and editing
+commits, and squashing multiple commits into one.</p>
+<p>Start it with the last commit you want to retain as-is:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git rebase -i &lt;after-this-commit&gt;</tt></pre>
+</div></div>
+<p>An editor will be fired up with all the commits in your current branch
+(ignoring merge commits), which come after the given commit.  You can
+reorder the commits in this list to your heart's content, and you can
+remove them.  The list looks more or less like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>pick deadbee The oneline of this commit
+pick fa1afe1 The oneline of the next commit
+...</tt></pre>
+</div></div>
+<p>The oneline descriptions are purely for your pleasure; <tt>git-rebase</tt> will
+not look at them but at the commit names ("deadbee" and "fa1afe1" in this
+example), so do not delete or edit the names.</p>
+<p>By replacing the command "pick" with the command "edit", you can tell
+<tt>git-rebase</tt> to stop after applying that commit, so that you can edit
+the files and/or the commit message, amend the commit, and continue
+rebasing.</p>
+<p>If you want to fold two or more commits into one, replace the command
+"pick" with "squash" for the second and subsequent commit.  If the
+commits had different authors, it will attribute the squashed commit to
+the author of the last commit.</p>
+<p>In both cases, or when a "pick" does not succeed (because of merge
+errors), the loop will stop to let you fix things, and you can continue
+the loop with <tt>git rebase --continue</tt>.</p>
+<p>For example, if you want to reorder the last 5 commits, such that what
+was HEAD~4 becomes the new HEAD. To achieve that, you would call
+<tt>git-rebase</tt> like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git rebase -i HEAD~5</tt></pre>
+</div></div>
+<p>And move the first patch to the end of the list.</p>
+<p>You might want to preserve merges, if you have a history like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>           X
+            \
+         A---M---B
+        /
+---o---O---P---Q</tt></pre>
+</div></div>
+<p>Suppose you want to rebase the side branch starting at "A" to "Q". Make
+sure that the current HEAD is "B", and call</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git rebase -i -p --onto Q O</tt></pre>
+</div></div>
+</div>
+<h2>Authors</h2>
+<div class="sectionbody">
+<p>Written by Junio C Hamano &lt;junkio@cox.net&gt; and
+Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
@@ -596,7 +744,7 @@ a rebase.  Upon completion, &lt;branch&gt; will be the current branch.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 16-Jun-2007 09:49:16 UTC
+Last updated 03-Jul-2007 07:03:43 UTC
 </div>
 </div>
 </body>
