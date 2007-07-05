@@ -294,7 +294,7 @@ have no effect and result in the new branch pointing to the same
 branch as your current branch.  Nevertheless, this may be useful in
 the future for compensating for some git bugs or such, therefore
 such a usage is permitted.</p>
-<p>WARNING! The rewritten history will have different object names for all
+<p><strong>WARNING</strong>! The rewritten history will have different object names for all
 the objects and will not converge with the original branch.  You will not
 be able to easily push and distribute the rewritten branch on top of the
 original branch.  Please do not use this command if you do not know the
@@ -311,11 +311,12 @@ argument is always evaluated in shell using the <em>eval</em> command.
 Prior to that, the $GIT_COMMIT environment variable will be set to contain
 the id of the commit being rewritten.  Also, GIT_AUTHOR_NAME,
 GIT_AUTHOR_EMAIL, GIT_AUTHOR_DATE, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL,
-and GIT_COMMITTER_DATE is set according to the current commit.</p>
+and GIT_COMMITTER_DATE are set according to the current commit.</p>
 <p>A <em>map</em> function is available that takes an "original sha1 id" argument
 and outputs a "rewritten sha1 id" if the commit has been already
-rewritten, fails otherwise; the <em>map</em> function can return several
-ids on separate lines if your commit filter emitted multiple commits.</p>
+rewritten, and "original sha1 id" otherwise; the <em>map</em> function can
+return several ids on separate lines if your commit filter emitted
+multiple commits.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -342,7 +343,7 @@ ids on separate lines if your commit filter emitted multiple commits.</p>
         directory set to the root of the checked out tree.  The new tree
         is then used as-is (new files are auto-added, disappeared files
         are auto-removed - neither .gitignore files nor any other ignore
-        rules HAVE ANY EFFECT!).
+        rules <strong>HAVE ANY EFFECT</strong>!).
 </p>
 </dd>
 <dt>
@@ -419,8 +420,9 @@ definition impossible to preserve signatures at any rate.)</p>
 </dt>
 <dd>
 <p>
-        Only ever look at the history, which touches the given subdirectory.
-        The result will contain that directory as its project root.
+        Only look at the history which touches the given subdirectory.
+        The result will contain that directory (and only that) as its
+        project root.
 </p>
 </dd>
 <dt>
@@ -464,11 +466,12 @@ or copyright violation) from all commits:</p>
 </div></div>
 <p>Now, you will get the rewritten history saved in the branch <em>newbranch</em>
 (your current branch is left untouched).</p>
-<p>To "etch-graft" a commit to the revision history (set a commit to be
-the parent of the current initial commit and propagate that):</p>
+<p>To set a commit (which typically is at the tip of another
+history) to be the parent of the current initial commit, in
+order to paste the other history behind the current history:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch --parent-filter sed\ 's/^$/-p &lt;graft-id&gt;/' newbranch</tt></pre>
+<pre><tt>git filter-branch --parent-filter 'sed "s/^\$/-p &lt;graft-id&gt;/"' newbranch</tt></pre>
 </div></div>
 <p>(if the parent string is empty - therefore we are dealing with the
 initial commit - add graftcommit as a parent).  Note that this assumes
@@ -478,6 +481,12 @@ happened).  If this is not the case, use:</p>
 <div class="content">
 <pre><tt>git filter-branch --parent-filter \
         'cat; test $GIT_COMMIT = &lt;commit-id&gt; &amp;&amp; echo "-p &lt;graft-id&gt;"' newbranch</tt></pre>
+</div></div>
+<p>or even simpler:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>echo "$commit-id $graft-id" &gt;&gt; .git/info/grafts
+git filter-branch newbranch $graft-id..</tt></pre>
 </div></div>
 <p>To remove commits authored by "Darl McBribe" from the history:</p>
 <div class="listingblock">
@@ -552,7 +561,7 @@ and the git list &lt;git@vger.kernel.org&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Jul-2007 06:40:54 UTC
+Last updated 05-Jul-2007 05:51:15 UTC
 </div>
 </div>
 </body>
