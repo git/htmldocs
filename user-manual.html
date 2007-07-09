@@ -372,7 +372,7 @@ but not from these other heads:</p><div class="literallayout"><p>$ gitk master -
 commits reachable from some head but not from any tag in the repository:</p><div class="literallayout"><p>$ gitk $( git show-ref --heads ) --not  $( git show-ref --tags )</p></div><p>(See <a href="git-rev-parse.html" target="_top">git-rev-parse(1)</a> for explanations of commit-selecting
 syntax such as <code class="literal">&#8212;not</code>.)</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="making-a-release"></a>Creating a changelog and tarball for a software release</h3></div></div></div><p>The <a href="git-archive.html" target="_top">git-archive(1)</a> command can create a tar or zip archive from
 any version of a project; for example:</p><div class="literallayout"><p>$ git archive --format=tar --prefix=project/ HEAD | gzip &gt;latest.tar.gz</p></div><p>will use HEAD to produce a tar archive in which each filename is
-preceded by "prefix/".</p><p>If you're releasing a new version of a software project, you may want
+preceded by "project/".</p><p>If you're releasing a new version of a software project, you may want
 to simultaneously make a changelog to include in the release
 announcement.</p><p>Linus Torvalds, for example, makes new kernel releases by tagging them,
 then running:</p><div class="literallayout"><p>$ release-script 2.6.12 2.6.13-rc6 2.6.13-rc7</p></div><p>where release-script is a shell script that looks like:</p><div class="literallayout"><p>#!/bin/sh<br>
@@ -630,9 +630,9 @@ dangling commit 8e4bec7f2ddaa268bef999853c25755452100f8e<br>
 dangling tree d50bb86186bf27b681d25af89d3b5b68382e4085<br>
 dangling tree b24c2473f1fd3d91352a624795be026d64c8841f<br>
 ...</p></div><p>Dangling objects are not a problem.  At worst they may take up a little
-extra disk space.  They can sometimes provide a last-resort method of
-recovery lost work&#8212;see <a href="#dangling-objects" title="Dangling objects">the section called &#8220;Dangling objects&#8221;</a> for details.  However, if
-you want, you may remove them with <a href="git-prune.html" target="_top">git-prune(1)</a> or the &#8212;prune
+extra disk space.  They can sometimes provide a last-resort method for
+recovering lost work&#8212;see <a href="#dangling-objects" title="Dangling objects">the section called &#8220;Dangling objects&#8221;</a> for details.  However, if
+you wish, you can remove them with <a href="git-prune.html" target="_top">git-prune(1)</a> or the &#8212;prune
 option to <a href="git-gc.html" target="_top">git-gc(1)</a>:</p><div class="literallayout"><p>$ git gc --prune</p></div><p>This may be time-consuming.  Unlike most other git operations (including
 git-gc when run without any options), it is not safe to prune while
 other git operations are in progress in the same repository.</p></div><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="recovering-lost-changes"></a>Recovering lost changes</h3></div></div></div><div class="section" lang="en"><div class="titlepage"><div><div><h4 class="title"><a name="reflogs"></a>Reflogs</h4></div></div></div><p>Say you modify a branch with <a href="git-reset.html" target="_top">git-reset(1)</a> &#8212;hard, and then
@@ -713,9 +713,10 @@ that project to pull the changes from your repository using git-pull[1].
 In the section "<a href="#getting-updates-with-git-pull" title="Getting updates with git pull">Getting updates with git pull</a>" we described this as a way to get updates from the "main"
 repository, but it works just as well in the other direction.</p><p>If you and the maintainer both have accounts on the same machine, then
 you can just pull changes from each other's repositories directly;
-commands that accepts repository URLs as arguments will also accept a
+commands that accept repository URLs as arguments will also accept a
 local directory name:</p><div class="literallayout"><p>$ git clone /path/to/repository<br>
-$ git pull /path/to/other/repository</p></div><p>However, the more common way to do this is to maintain a separate public
+$ git pull /path/to/other/repository</p></div><p>or an ssh url:</p><div class="literallayout"><p>$ git clone ssh://yourhost/~you/repository</p></div><p>For projects with few developers, or for synchronizing a few private
+repositories, this may be all you need.</p><p>However, the more common way to do this is to maintain a separate public
 repository (usually on a different host) for others to pull changes
 from.  This is usually more convenient, and allows you to cleanly
 separate private work in progress from publicly visible work.</p><p>You will continue to do your day-to-day work in your personal
@@ -731,7 +732,7 @@ your personal repo ------------------&gt; your public repo
       |                                     |
       |                                     |
       |               they push             V
-their public repo &lt;------------------- their repo</pre><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="setting-up-a-public-repository"></a>Setting up a public repository</h3></div></div></div><p>Assume your personal repository is in the directory ~/proj.  We
+their public repo &lt;------------------- their repo</pre><p>We explain how to do this in the following sections.</p><div class="section" lang="en"><div class="titlepage"><div><div><h3 class="title"><a name="setting-up-a-public-repository"></a>Setting up a public repository</h3></div></div></div><p>Assume your personal repository is in the directory ~/proj.  We
 first create a new clone of the repository and tell git-daemon that it
 is meant to be public:</p><div class="literallayout"><p>$ git clone --bare ~/proj proj.git<br>
 $ touch proj.git/git-daemon-export-ok</p></div><p>The resulting directory proj.git contains a "bare" git repository&#8212;it is
@@ -769,7 +770,11 @@ branch named "master", run</p><div class="literallayout"><p>$ git push ssh://you
 a <a href="#fast-forwards" title="Fast-forward merges">fast forward</a>.  Normally this is a sign of
 something wrong.  However, if you are sure you know what you're
 doing, you may force git-push to perform the update anyway by
-proceeding the branch name by a plus sign:</p><div class="literallayout"><p>$ git push ssh://yourserver.com/~you/proj.git +master</p></div><p>As with git-fetch, you may also set up configuration options to
+proceeding the branch name by a plus sign:</p><div class="literallayout"><p>$ git push ssh://yourserver.com/~you/proj.git +master</p></div><p>Note that the target of a "push" is normally a
+<a href="#def_bare_repository">bare</a> repository.  You can also push to a
+repository that has a checked-out working tree, but the working tree
+will not be updated by the push.  This may lead to unexpected results if
+the branch you push to is the currently checked-out branch!</p><p>As with git-fetch, you may also set up configuration options to
 save typing; so, for example, after</p><div class="literallayout"><p>$ cat &gt;&gt;.git/config &lt;&lt;EOF<br>
 [remote "public-repo"]<br>
         url = ssh://yourserver.com/~you/proj.git<br>

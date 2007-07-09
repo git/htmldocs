@@ -347,8 +347,8 @@ the name of the attribute prefixed with an exclamation point <tt>!</tt>.</p>
 <h2>EFFECTS</h2>
 <div class="sectionbody">
 <p>Certain operations by git can be influenced by assigning
-particular attributes to a path.  Currently, three operations
-are attributes-aware.</p>
+particular attributes to a path.  Currently, the following
+operations are attributes-aware.</p>
 <h3>Checking-out and checking-in</h3>
 <p>These attributes affect how the contents stored in the
 repository are copied to the working tree files when commands
@@ -454,7 +454,9 @@ and applicable).</p>
 with <tt>crlf</tt>, and then <tt>ident</tt> and fed to <tt>filter</tt>.</p>
 <h3>Generating diff text</h3>
 <p>The attribute <tt>diff</tt> affects if <tt>git diff</tt> generates textual
-patch for the path or just says <tt>Binary files differ</tt>.</p>
+patch for the path or just says <tt>Binary files differ</tt>.  It also
+can affect what line is shown on the hunk header <tt>@@ -k,l +n,m @@</tt>
+line.</p>
 <dl>
 <dt>
 Set
@@ -494,7 +496,8 @@ String
         Diff is shown using the specified custom diff driver.
         The driver program is given its input using the same
         calling convention as used for GIT_EXTERNAL_DIFF
-        program.
+        program.  This name is also used for custom hunk header
+        selection.
 </p>
 </dd>
 </dl>
@@ -514,6 +517,43 @@ attribute set to <tt>jcdiff</tt>, it calls the command you specified
 with the above configuration, i.e. <tt>j-c-diff</tt>, with 7
 parameters, just like <tt>GIT_EXTERNAL_DIFF</tt> program is called.
 See <a href="git.html">git(7)</a> for details.</p>
+<h4>Defining a custom hunk-header</h4>
+<p>Each group of changes (called "hunk") in the textual diff output
+is prefixed with a line of the form:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>@@ -k,l +n,m @@ TEXT</tt></pre>
+</div></div>
+<p>The text is called <em>hunk header</em>, and by default a line that
+begins with an alphabet, an underscore or a dollar sign is used,
+which matches what GNU <tt>diff -p</tt> output uses.  This default
+selection however is not suited for some contents, and you can
+use customized pattern to make a selection.</p>
+<p>First in .gitattributes, you would assign the <tt>diff</tt> attribute
+for paths.</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*.tex   diff=tex</tt></pre>
+</div></div>
+<p>Then, you would define "diff.tex.funcname" configuration to
+specify a regular expression that matches a line that you would
+want to appear as the hunk header, like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[diff "tex"]
+        funcname = "^\\(\\\\\\(sub\\)*section{.*\\)$"</tt></pre>
+</div></div>
+<p>Note.  A single level of backslashes are eaten by the
+configuration file parser, so you would need to double the
+backslashes; the pattern above picks a line that begins with a
+backslash, and zero or more occurences of <tt>sub</tt> followed by
+<tt>section</tt> followed by open brace, to the end of line.</p>
+<p>There are a few built-in patterns to make this easier, and <tt>tex</tt>
+is one of them, so you do not have to write the above in your
+configuration file (you still need to enable this with the
+attribute mechanism, via <tt>.gitattributes</tt>).  Another built-in
+pattern is defined for <tt>java</tt> that defines a pattern suitable
+for program text in Java language.</p>
 <h3>Performing a three-way merge</h3>
 <p>The attribute <tt>merge</tt> affects how three versions of a file is
 merged when a file-level merge is necessary during <tt>git merge</tt>,
@@ -658,7 +698,7 @@ frotz   unspecified</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 16-Jun-2007 09:49:27 UTC
+Last updated 09-Jul-2007 08:47:49 UTC
 </div>
 </div>
 </body>
