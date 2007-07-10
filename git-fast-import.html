@@ -633,7 +633,7 @@ change to the project.</p>
         data
         ('from' SP &lt;committish&gt; LF)?
         ('merge' SP &lt;committish&gt; LF)?
-        (filemodify | filedelete | filedeleteall)*
+        (filemodify | filedelete | filerename | filedeleteall)*
         LF</tt></pre>
 </div></div>
 <p>where <tt>&lt;ref&gt;</tt> is the name of the branch to make the commit on.
@@ -652,11 +652,13 @@ message (see below for <tt>data</tt> command syntax).  To import an empty
 commit message use a 0 length data.  Commit messages are free-form
 and are not interpreted by Git.  Currently they must be encoded in
 UTF-8, as fast-import does not permit other encodings to be specified.</p>
-<p>Zero or more <tt>filemodify</tt>, <tt>filedelete</tt> and <tt>filedeleteall</tt> commands
+<p>Zero or more <tt>filemodify</tt>, <tt>filedelete</tt>, <tt>filename</tt> and
+<tt>filedeleteall</tt> commands
 may be included to update the contents of the branch prior to
 creating the commit.  These commands may be supplied in any order.
 However it is recommended that a <tt>filedeleteall</tt> command preceed
-all <tt>filemodify</tt> commands in the same commit, as <tt>filedeleteall</tt>
+all <tt>filemodify</tt> and <tt>filerename</tt> commands in the same commit, as
+<tt>filedeleteall</tt>
 wipes the branch clean (see below).</p>
 <h4><tt>author</tt></h4>
 <p>An <tt>author</tt> command may optionally appear, if the author information
@@ -836,16 +838,34 @@ contain the special component <tt>.</tt> or <tt>..</tt> (e.g. <tt>foo/./bar</tt>
 </ul>
 <p>It is recommended that <tt>&lt;path&gt;</tt> always be encoded using UTF-8.</p>
 <h4><tt>filedelete</tt></h4>
-<p>Included in a <tt>commit</tt> command to remove a file from the branch.
-If the file removal makes its directory empty, the directory will
+<p>Included in a <tt>commit</tt> command to remove a file or recursively
+delete an entire directory from the branch.  If the file or directory
+removal makes its parent directory empty, the parent directory will
 be automatically removed too.  This cascades up the tree until the
 first non-empty directory or the root is reached.</p>
 <div class="literalblock">
 <div class="content">
 <pre><tt>        'D' SP &lt;path&gt; LF</tt></pre>
 </div></div>
-<p>here <tt>&lt;path&gt;</tt> is the complete path of the file to be removed.
+<p>here <tt>&lt;path&gt;</tt> is the complete path of the file or subdirectory to
+be removed from the branch.
 See <tt>filemodify</tt> above for a detailed description of <tt>&lt;path&gt;</tt>.</p>
+<h4><tt>filerename</tt></h4>
+<p>Renames an existing file or subdirectory to a different location
+within the branch.  The existing file or directory must exist. If
+the destination exists it will be replaced by the source directory.</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'R' SP &lt;path&gt; SP &lt;path&gt; LF</tt></pre>
+</div></div>
+<p>here the first <tt>&lt;path&gt;</tt> is the source location and the second
+<tt>&lt;path&gt;</tt> is the destination.  See <tt>filemodify</tt> above for a detailed
+description of what <tt>&lt;path&gt;</tt> may look like.  To use a source path
+that contains SP the path must be quoted.</p>
+<p>A <tt>filerename</tt> command takes effect immediately.  Once the source
+location has been renamed to the destination any future commands
+applied to the source location will create new files there and not
+impact the destination of the rename.</p>
 <h4><tt>filedeleteall</tt></h4>
 <p>Included in a <tt>commit</tt> command to remove all files (and also all
 directories) from the branch.  This command resets the internal
@@ -1203,7 +1223,7 @@ memory footprint (less than 2.7 MiB per active branch).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 16-Jun-2007 09:49:03 UTC
+Last updated 10-Jul-2007 07:49:19 UTC
 </div>
 </div>
 </body>
