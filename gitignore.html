@@ -281,12 +281,25 @@ git should ignore.  Each line in a <tt>gitignore</tt> file specifies a
 pattern.</p>
 <p>When deciding whether to ignore a path, git normally checks
 <tt>gitignore</tt> patterns from multiple sources, with the following
-order of precedence:</p>
+order of precedence, from highest to lowest (within one level of
+precedence, the last matching pattern decides the outcome):</p>
 <ul>
 <li>
 <p>
-Patterns read from the file specified by the configuration
-   variable <em>core.excludesfile</em>.
+Patterns read from the command line for those commands that support
+   them.
+</p>
+</li>
+<li>
+<p>
+Patterns read from a <tt>.gitignore</tt> file in the same directory
+   as the path, or in any parent directory, with patterns in the
+   higher level files (up to the root) being overriden by those in
+   lower level files down to the directory containing the file.
+   These patterns match relative to the location of the
+   <tt>.gitignore</tt> file.  A project normally includes such
+   <tt>.gitignore</tt> files in its repository, containing patterns for
+   files generated as part of the project build.
 </p>
 </li>
 <li>
@@ -296,13 +309,8 @@ Patterns read from <tt>$GIT_DIR/info/exclude</tt>.
 </li>
 <li>
 <p>
-Patterns read from a <tt>.gitignore</tt> file in the same directory
-   as the path, or in any parent directory, ordered from the
-   deepest such file to a file in the root of the repository.
-   These patterns match relative to the location of the
-   <tt>.gitignore</tt> file.  A project normally includes such
-   <tt>.gitignore</tt> files in its repository, containing patterns for
-   files generated as part of the project build.
+Patterns read from the file specified by the configuration
+   variable <em>core.excludesfile</em>.
 </p>
 </li>
 </ul>
@@ -329,7 +337,8 @@ A line starting with # serves as a comment.
 <p>
 An optional prefix <em>!</em> which negates the pattern; any
    matching file excluded by a previous pattern will become
-   included again.
+   included again.  If a negated pattern matches, this will
+   override lower precedence patterns sources.
 </p>
 </li>
 <li>
@@ -403,7 +412,7 @@ Frank Lichtenheld, and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jul-2007 02:10:00 UTC
+Last updated 22-Jul-2007 09:33:20 UTC
 </div>
 </div>
 </body>
