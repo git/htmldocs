@@ -277,7 +277,7 @@ git-filter-branch(1) Manual Page
         [--index-filter &lt;command&gt;] [--parent-filter &lt;command&gt;]
         [--msg-filter &lt;command&gt;] [--commit-filter &lt;command&gt;]
         [--tag-name-filter &lt;command&gt;] [--subdirectory-filter &lt;directory&gt;]
-        [-d &lt;directory&gt;] &lt;new-branch-name&gt; [&lt;rev-list options&gt;&#8230;]</div></div>
+        [-d &lt;directory&gt;] [-f | --force] [&lt;rev-list options&gt;&#8230;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -290,18 +290,18 @@ information) will be preserved.</p>
 <p>The command takes the new branch name as a mandatory argument and
 the filters as optional arguments.  If you specify no filters, the
 commits will be recommitted without any changes, which would normally
-have no effect and result in the new branch pointing to the same
-branch as your current branch.  Nevertheless, this may be useful in
-the future for compensating for some git bugs or such, therefore
-such a usage is permitted.</p>
+have no effect.  Nevertheless, this may be useful in the future for
+compensating for some git bugs or such, therefore such a usage is
+permitted.</p>
 <p><strong>WARNING</strong>! The rewritten history will have different object names for all
 the objects and will not converge with the original branch.  You will not
 be able to easily push and distribute the rewritten branch on top of the
 original branch.  Please do not use this command if you do not know the
 full implications, and avoid using it anyway, if a simple single commit
 would suffice to fix your problem.</p>
-<p>Always verify that the rewritten version is correct before disposing
-the original branch.</p>
+<p>Always verify that the rewritten version is correct: The original refs,
+if different from the rewritten ones, will be stored in the namespace
+<em>refs/original/</em>.</p>
 <p>Note that since this operation is extensively I/O expensive, it might
 be a good idea to redirect the temporary directory off-disk, e.g. on
 tmpfs.  Reportedly the speedup is very noticeable.</p>
@@ -440,6 +440,16 @@ definition impossible to preserve signatures at any rate.)</p>
 </p>
 </dd>
 <dt>
+-f\|--force
+</dt>
+<dd>
+<p>
+        <tt>git filter-branch</tt> refuses to start with an existing temporary
+        directory or when there are already refs starting with
+        <em>refs/original/</em>, unless forced.
+</p>
+</dd>
+<dt>
 &lt;rev-list-options&gt;
 </dt>
 <dd>
@@ -458,12 +468,12 @@ definition impossible to preserve signatures at any rate.)</p>
 or copyright violation) from all commits:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch --tree-filter 'rm filename' newbranch</tt></pre>
+<pre><tt>git filter-branch --tree-filter 'rm filename' HEAD</tt></pre>
 </div></div>
 <p>A significantly faster version:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch --index-filter 'git update-index --remove filename' newbranch</tt></pre>
+<pre><tt>git filter-branch --index-filter 'git update-index --remove filename' HEAD</tt></pre>
 </div></div>
 <p>Now, you will get the rewritten history saved in the branch <em>newbranch</em>
 (your current branch is left untouched).</p>
@@ -472,7 +482,7 @@ history) to be the parent of the current initial commit, in
 order to paste the other history behind the current history:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch --parent-filter 'sed "s/^\$/-p &lt;graft-id&gt;/"' newbranch</tt></pre>
+<pre><tt>git filter-branch --parent-filter 'sed "s/^\$/-p &lt;graft-id&gt;/"' HEAD</tt></pre>
 </div></div>
 <p>(if the parent string is empty - therefore we are dealing with the
 initial commit - add graftcommit as a parent).  Note that this assumes
@@ -481,13 +491,13 @@ happened).  If this is not the case, use:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch --parent-filter \
-        'cat; test $GIT_COMMIT = &lt;commit-id&gt; &amp;&amp; echo "-p &lt;graft-id&gt;"' newbranch</tt></pre>
+        'cat; test $GIT_COMMIT = &lt;commit-id&gt; &amp;&amp; echo "-p &lt;graft-id&gt;"' HEAD</tt></pre>
 </div></div>
 <p>or even simpler:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>echo "$commit-id $graft-id" &gt;&gt; .git/info/grafts
-git filter-branch newbranch $graft-id..</tt></pre>
+git filter-branch $graft-id..HEAD</tt></pre>
 </div></div>
 <p>To remove commits authored by "Darl McBribe" from the history:</p>
 <div class="listingblock">
@@ -504,7 +514,7 @@ git filter-branch newbranch $graft-id..</tt></pre>
                 done;
         else
                 git commit-tree "$@";
-        fi' newbranch</tt></pre>
+        fi' HEAD</tt></pre>
 </div></div>
 <p>The shift magic first throws away the tree id and then the -p
 parameters.  Note that this handles merges properly! In case Darl
@@ -529,13 +539,13 @@ A--B-----C</tt></pre>
 <p>To rewrite only commits D,E,F,G,H, but leave A, B and C alone, use:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch ... new-H C..H</tt></pre>
+<pre><tt>git filter-branch ... C..H</tt></pre>
 </div></div>
 <p>To rewrite commits E,F,G,H, use one of these:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch ... new-H C..H --not D
-git filter-branch ... new-H D..H --not C</tt></pre>
+<pre><tt>git filter-branch ... C..H --not D
+git filter-branch ... D..H --not C</tt></pre>
 </div></div>
 <p>To move the whole tree into a subdirectory, or remove it from there:</p>
 <div class="listingblock">
@@ -544,7 +554,7 @@ git filter-branch ... new-H D..H --not C</tt></pre>
         'git ls-files -s | sed "s-\t-&amp;newsubdir/-" |
                 GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
                         git update-index --index-info &amp;&amp;
-         mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE' directorymoved</tt></pre>
+         mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE' HEAD</tt></pre>
 </div></div>
 </div>
 <h2>Author</h2>
@@ -562,7 +572,7 @@ and the git list &lt;git@vger.kernel.org&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jul-2007 02:09:40 UTC
+Last updated 24-Jul-2007 08:10:04 UTC
 </div>
 </div>
 </body>
