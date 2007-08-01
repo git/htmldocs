@@ -273,17 +273,17 @@ git-config(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-config</em> [--system | --global] [type] [-z|--null] name [value [value_regex]]
-<em>git-config</em> [--system | --global] [type] --add name value
-<em>git-config</em> [--system | --global] [type] --replace-all name [value [value_regex]]
-<em>git-config</em> [--system | --global] [type] [-z|--null] --get name [value_regex]
-<em>git-config</em> [--system | --global] [type] [-z|--null] --get-all name [value_regex]
-<em>git-config</em> [--system | --global] [type] [-z|--null] --get-regexp name_regex [value_regex]
-<em>git-config</em> [--system | --global] --unset name [value_regex]
-<em>git-config</em> [--system | --global] --unset-all name [value_regex]
-<em>git-config</em> [--system | --global] --rename-section old_name new_name
-<em>git-config</em> [--system | --global] --remove-section name
-<em>git-config</em> [--system | --global] [-z|--null] -l | --list</div></div>
+<div class="content"><em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] name [value [value_regex]]
+<em>git-config</em> [&lt;file-option&gt;] [type] --add name value
+<em>git-config</em> [&lt;file-option&gt;] [type] --replace-all name [value [value_regex]]
+<em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] --get name [value_regex]
+<em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-all name [value_regex]
+<em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-regexp name_regex [value_regex]
+<em>git-config</em> [&lt;file-option&gt;] --unset name [value_regex]
+<em>git-config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
+<em>git-config</em> [&lt;file-option&gt;] --rename-section old_name new_name
+<em>git-config</em> [&lt;file-option&gt;] --remove-section name
+<em>git-config</em> [&lt;file-option&gt;] [-z|--null] -l | --list</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -301,16 +301,21 @@ prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPL
 convert the value to the canonical form (simple decimal number for int,
 a "true" or "false" string for bool).  If no type specifier is passed,
 no checks or transformations are performed on the value.</p>
+<p>The file-option can be one of <em>--system</em>, <em>--global</em> or <em>--file</em>
+which specify where the values will be read from or written to.
+The default is to assume the config file of the current repository,
+.git/config unless defined otherwise with GIT_DIR and GIT_CONFIG
+(see <a href="#FILES">[FILES]</a>).</p>
 <p>This command will fail if:</p>
 <ol>
 <li>
 <p>
-The .git/config file is invalid,
+The config file is invalid,
 </p>
 </li>
 <li>
 <p>
-Can not write to .git/config,
+Can not write to the config file,
 </p>
 </li>
 <li>
@@ -414,6 +419,14 @@ rather than from all available files.</p>
 <p>See also <a href="#FILES">[FILES]</a>.</p>
 </dd>
 <dt>
+-f config-file, --file config-file
+</dt>
+<dd>
+<p>
+        Use the given config file instead of the one specified by GIT_CONFIG.
+</p>
+</dd>
+<dt>
 --remove-section
 </dt>
 <dd>
@@ -489,8 +502,8 @@ rather than from all available files.</p>
 </div>
 <h2><a id="FILES"></a>FILES</h2>
 <div class="sectionbody">
-<p>There are three files where git-config will search for configuration
-options:</p>
+<p>If not set explicitely with <em>--file</em>, there are three files where
+git-config will search for configuration options:</p>
 <div class="literalblock">
 <div class="title">git/config::</div>
 <div class="content">
@@ -1872,7 +1885,7 @@ transfer.unpackLimit
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Jul-2007 07:25:18 UTC
+Last updated 01-Aug-2007 08:42:09 UTC
 </div>
 </div>
 </body>
