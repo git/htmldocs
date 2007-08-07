@@ -931,6 +931,25 @@ section because they affect the <em>git-svn-id:</em> metadata line.</p>
 # You may only dcommit to one branch/tag/trunk at a time.  The usage
 # of dcommit/rebase/show-ignore should be the same as above.</tt></pre>
 </div></div>
+<p>The initial <em>git-svn clone</em> can be quite time-consuming
+(especially for large Subversion repositories). If multiple
+people (or one person with multiple machines) want to use
+git-svn to interact with the same Subversion repository, you can
+do the initial <em>git-svn clone</em> to a repository on a server and
+have each person clone that repository with <em>git clone</em>:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt># Do the initial import on a server
+        ssh server "cd /pub &amp;&amp; git-svn clone http://svn.foo.org/project
+# Clone locally
+        git clone server:/pub/project
+# Tell git-svn which branch contains the Subversion commits
+        git update-ref refs/remotes/git-svn origin/master
+# Initialize git-svn locally (be sure to use the same URL and -T/-b/-t options as were used on server)
+        git-svn init http://svn.foo.org/project
+# Pull the latest changes from Subversion
+        git-svn rebase</tt></pre>
+</div></div>
 </div>
 <h2>REBASE VS. PULL/MERGE</h2>
 <div class="sectionbody">
@@ -1004,7 +1023,7 @@ should be manually entered with a text-editor or using
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jul-2007 02:09:56 UTC
+Last updated 07-Aug-2007 06:05:54 UTC
 </div>
 </div>
 </body>
