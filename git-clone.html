@@ -273,7 +273,8 @@ git-clone(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-clone</em> [--template=&lt;template_directory&gt;] [-l [-s]] [-q] [-n] [--bare]
+<div class="content"><em>git-clone</em> [--template=&lt;template_directory&gt;]
+          [-l] [-s] [--no-hardlinks] [-q] [-n] [--bare]
           [-o &lt;name&gt;] [-u &lt;upload-pack&gt;] [--reference &lt;repository&gt;]
           [--depth &lt;depth&gt;] &lt;repository&gt; [&lt;directory&gt;]</div></div>
 </div>
@@ -307,8 +308,24 @@ configuration variables.</p>
         this flag bypasses normal "git aware" transport
         mechanism and clones the repository by making a copy of
         HEAD and everything under objects and refs directories.
-        The files under .git/objects/ directory are hardlinked
-        to save space when possible.
+        The files under <tt>.git/objects/</tt> directory are hardlinked
+        to save space when possible.  This is now the default when
+        the source repository is specified with <tt>/path/to/repo</tt>
+        syntax, so it essentially is a no-op option.  To force
+        copying instead of hardlinking (which may be desirable
+        if you are trying to make a back-up of your repository),
+        but still avoid the usual "git aware" transport
+        mechanism, <tt>--no-hardlinks</tt> can be used.
+</p>
+</dd>
+<dt>
+--no-hardlinks
+</dt>
+<dd>
+<p>
+        Optimize the cloning process from a repository on a
+        local filesystem by copying files under <tt>.git/objects</tt>
+        directory.
 </p>
 </dd>
 <dt>
@@ -502,11 +519,11 @@ ssh://&#91;user@&#93;host.xz/~/path/to/repo.git
 </li>
 </ul>
 </div></div>
-<p>SSH is the default transport protocol.  You can optionally specify
-which user to log-in as, and an alternate, scp-like syntax is also
-supported.  Both syntaxes support username expansion,
-as does the native git protocol. The following three are
-identical to the last three above, respectively:</p>
+<p>SSH is the default transport protocol over the network.  You can
+optionally specify which user to log-in as, and an alternate,
+scp-like syntax is also supported.  Both syntaxes support
+username expansion, as does the native git protocol. The following
+three are identical to the last three above, respectively:</p>
 <div class="exampleblock">
 <div class="exampleblock-content">
 <ul>
@@ -527,7 +544,7 @@ identical to the last three above, respectively:</p>
 </li>
 </ul>
 </div></div>
-<p>To sync with a local directory, use:</p>
+<p>To sync with a local directory, you can use:</p>
 <div class="exampleblock">
 <div class="exampleblock-content">
 <ul>
@@ -536,8 +553,15 @@ identical to the last three above, respectively:</p>
 /path/to/repo.git/
 </p>
 </li>
+<li>
+<p>
+file:///path/to/repo.git/
+</p>
+</li>
 </ul>
 </div></div>
+<p>They are mostly equivalent, except when cloning.  See
+<a href="git-clone.html">git-clone(1)</a> for details.</p>
 </div>
 <h2>Examples</h2>
 <div class="sectionbody">
@@ -611,7 +635,7 @@ Create a repository on the kernel.org machine that borrows from Linus
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jul-2007 02:09:34 UTC
+Last updated 11-Aug-2007 08:29:13 UTC
 </div>
 </div>
 </body>
