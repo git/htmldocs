@@ -480,6 +480,13 @@ Supplying additional whitespace characters will cause unexpected
 results, such as branch names or file names with leading or trailing
 spaces in their name, or early termination of fast-import when it encounters
 unexpected input.</p>
+<h3>Stream Comments</h3>
+<p>To aid in debugging frontends fast-import ignores any line that
+begins with <tt>#</tt> (ASCII pound/hash) up to and including the line
+ending <tt>LF</tt>.  A comment line may contain any sequence of bytes
+that does not contain an LF and therefore may be used to include
+any detailed debugging information that might be specific to the
+frontend and useful when inspecting a fast-import data stream.</p>
 <h3>Date Formats</h3>
 <p>The following date formats are supported.  A frontend should select
 the format it will use for this import by passing the format name
@@ -620,6 +627,16 @@ and control the current import process.  More detailed discussion
         an import.
 </p>
 </dd>
+<dt>
+<tt>progress</tt>
+</dt>
+<dd>
+<p>
+        Causes fast-import to echo the entire line to its own
+        standard output.  This command is optional and is not needed
+        to perform an import.
+</p>
+</dd>
 </dl>
 <h3><tt>commit</tt></h3>
 <p>Create or update a branch with a new commit, recording one logical
@@ -634,7 +651,7 @@ change to the project.</p>
         ('from' SP &lt;committish&gt; LF)?
         ('merge' SP &lt;committish&gt; LF)?
         (filemodify | filedelete | filecopy | filerename | filedeleteall)*
-        LF</tt></pre>
+        LF?</tt></pre>
 </div></div>
 <p>where <tt>&lt;ref&gt;</tt> is the name of the branch to make the commit on.
 Typically branch names are prefixed with <tt>refs/heads/</tt> in
@@ -660,6 +677,7 @@ However it is recommended that a <tt>filedeleteall</tt> command preceed
 all <tt>filemodify</tt>, <tt>filecopy</tt> and <tt>filerename</tt> commands in the same
 commit, as <tt>filedeleteall</tt>
 wipes the branch clean (see below).</p>
+<p>The <tt>LF</tt> after the command is optional (it used to be required).</p>
 <h4><tt>author</tt></h4>
 <p>An <tt>author</tt> command may optionally appear, if the author information
 might differ from the committer information.  If <tt>author</tt> is omitted
@@ -971,10 +989,11 @@ branch from an existing commit without creating a new commit.</p>
 <div class="content">
 <pre><tt>        'reset' SP &lt;ref&gt; LF
         ('from' SP &lt;committish&gt; LF)?
-        LF</tt></pre>
+        LF?</tt></pre>
 </div></div>
 <p>For a detailed description of <tt>&lt;ref&gt;</tt> and <tt>&lt;committish&gt;</tt> see above
 under <tt>commit</tt> and <tt>from</tt>.</p>
+<p>The <tt>LF</tt> after the command is optional (it used to be required).</p>
 <p>The <tt>reset</tt> command can also be used to create lightweight
 (non-annotated) tags.  For example:</p>
 <div class="exampleblock">
@@ -1009,6 +1028,10 @@ byte count or delimited with a terminating line.  Real frontends
 intended for production-quality conversions should always use the
 exact byte count format, as it is more robust and performs better.
 The delimited format is intended primarily for testing fast-import.</p>
+<p>Comment lines appearing within the <tt>&lt;raw&gt;</tt> part of <tt>data</tt> commands
+are always taken to be part of the body of the data and are therefore
+never ignored by fast-import.  This makes it safe to import any
+file/message content whose lines might start with <tt>#</tt>.</p>
 <dl>
 <dt>
 Exact byte count format
@@ -1020,12 +1043,16 @@ Exact byte count format
 <div class="literalblock">
 <div class="content">
 <pre><tt>        'data' SP &lt;count&gt; LF
-        &lt;raw&gt; LF</tt></pre>
+        &lt;raw&gt; LF?</tt></pre>
 </div></div>
 <p>where <tt>&lt;count&gt;</tt> is the exact number of bytes appearing within
 <tt>&lt;raw&gt;</tt>.  The value of <tt>&lt;count&gt;</tt> is expressed as an ASCII decimal
 integer.  The <tt>LF</tt> on either side of <tt>&lt;raw&gt;</tt> is not
 included in <tt>&lt;count&gt;</tt> and will not be included in the imported data.</p>
+<p>The <tt>LF</tt> after <tt>&lt;raw&gt;</tt> is optional (it used to be required) but
+recommended.  Always including it makes debugging a fast-import
+stream easier as the next command always starts in column 0
+of the next line, even if <tt>&lt;raw&gt;</tt> did not end with an <tt>LF</tt>.</p>
 </dd>
 <dt>
 Delimited format
@@ -1041,7 +1068,8 @@ Delimited format
 <div class="content">
 <pre><tt>        'data' SP '&lt;&lt;' &lt;delim&gt; LF
         &lt;raw&gt; LF
-        &lt;delim&gt; LF</tt></pre>
+        &lt;delim&gt; LF
+        LF?</tt></pre>
 </div></div>
 <p>where <tt>&lt;delim&gt;</tt> is the chosen delimiter string.  The string <tt>&lt;delim&gt;</tt>
 must not appear on a line by itself within <tt>&lt;raw&gt;</tt>, as otherwise
@@ -1049,6 +1077,7 @@ fast-import will think the data ends earlier than it really does.  The <tt>LF</t
 immediately trailing <tt>&lt;raw&gt;</tt> is part of <tt>&lt;raw&gt;</tt>.  This is one of
 the limitations of the delimited format, it is impossible to supply
 a data chunk which does not have an LF as its last byte.</p>
+<p>The <tt>LF</tt> after <tt>&lt;delim&gt; LF</tt> is optional (it used to be required).</p>
 </dd>
 </dl>
 <h3><tt>checkpoint</tt></h3>
@@ -1057,7 +1086,7 @@ save out all current branch refs, tags and marks.</p>
 <div class="literalblock">
 <div class="content">
 <pre><tt>        'checkpoint' LF
-        LF</tt></pre>
+        LF?</tt></pre>
 </div></div>
 <p>Note that fast-import automatically switches packfiles when the current
 packfile reaches --max-pack-size, or 4 GiB, whichever limit is
@@ -1072,6 +1101,31 @@ and long running imports, or when they need to allow another Git
 process access to a branch.  However given that a 30 GiB Subversion
 repository can be loaded into Git through fast-import in about 3 hours,
 explicit checkpointing may not be necessary.</p>
+<p>The <tt>LF</tt> after the command is optional (it used to be required).</p>
+<h3><tt>progress</tt></h3>
+<p>Causes fast-import to print the entire <tt>progress</tt> line unmodified to
+its standard output channel (file descriptor 1) when the command is
+processed from the input stream.  The command otherwise has no impact
+on the current import, or on any of fast-import's internal state.</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'progress' SP &lt;any&gt; LF
+        LF?</tt></pre>
+</div></div>
+<p>The <tt>&lt;any&gt;</tt> part of the command may contain any sequence of bytes
+that does not contain <tt>LF</tt>.  The <tt>LF</tt> after the command is optional.
+Callers may wish to process the output through a tool such as sed to
+remove the leading part of the line, for example:</p>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="literalblock">
+<div class="content">
+<pre><tt>frontend | git-fast-import | sed 's/^progress //'</tt></pre>
+</div></div>
+</div></div>
+<p>Placing a <tt>progress</tt> command immediately after a <tt>checkpoint</tt> will
+inform the reader when the <tt>checkpoint</tt> has been completed and it
+can safely access the refs that fast-import updated.</p>
 </div>
 <h2>Tips and Tricks</h2>
 <div class="sectionbody">
@@ -1144,6 +1198,13 @@ last year), consider expending some extra CPU time and supplying
 This will take longer, but will also produce a smaller packfile.
 You only need to expend the effort once, and everyone using your
 project will benefit from the smaller repository.</p>
+<h3>Include Some Progress Messages</h3>
+<p>Every once in a while have your frontend emit a <tt>progress</tt> message
+to fast-import.  The contents of the messages are entirely free-form,
+so one suggestion would be to output the current month and year
+each time the current commit date moves into the next month.
+Your users will feel better knowing how much of the data stream
+has been processed.</p>
 </div>
 <h2>Packfile Optimization</h2>
 <div class="sectionbody">
@@ -1248,7 +1309,7 @@ memory footprint (less than 2.7 MiB per active branch).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jul-2007 02:09:39 UTC
+Last updated 19-Aug-2007 19:15:24 UTC
 </div>
 </div>
 </body>
