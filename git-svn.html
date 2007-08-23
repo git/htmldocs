@@ -973,6 +973,33 @@ the user on the git side.  git-svn does however follow copy
 history of the directory that it is tracking, however (much like
 how <em>svn log</em> works).</p>
 </div>
+<h2>CAVEATS</h2>
+<div class="sectionbody">
+<p>For the sake of simplicity and interoperating with a less-capable system
+(SVN), it is recommended that all git-svn users clone, fetch and dcommit
+directly from the SVN server, and avoid all git-clone/pull/merge/push
+operations between git repositories and branches.  The recommended
+method of exchanging code between git branches and users is
+git-format-patch and git-am, or just dcommiting to the SVN repository.</p>
+<p>Running <em>git-merge</em> or <em>git-pull</em> is NOT recommended on a branch you
+plan to dcommit from.  Subversion does not represent merges in any
+reasonable or useful fashion; so users using Subversion cannot see any
+merges you've made.  Furthermore, if you merge or pull from a git branch
+that is a mirror of an SVN branch, dcommit may commit to the wrong
+branch.</p>
+<p><em>git-clone</em> does not clone branches under the refs/remotes/ hierarchy or
+any git-svn metadata, or config.  So repositories created and managed with
+using git-svn should use rsync(1) for cloning, if cloning is to be done
+at all.</p>
+<p>Since <em>dcommit</em> uses rebase internally, any git branches you git-push to
+before dcommit on will require forcing an overwrite of the existing ref
+on the remote repository.  This is generally considered bad practice,
+see the git-push(1) documentation for details.</p>
+<p>Do not use the --amend option of git-commit(1) on a change you've
+already dcommitted.  It is considered bad practice to --amend commits
+you've already pushed to a remote repository for other users, and
+dcommit with SVN is analogous to that.</p>
+</div>
 <h2>BUGS</h2>
 <div class="sectionbody">
 <p>We ignore all SVN properties except svn:executable.  Any unhandled
@@ -1023,7 +1050,7 @@ should be manually entered with a text-editor or using
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Aug-2007 06:05:54 UTC
+Last updated 23-Aug-2007 00:24:06 UTC
 </div>
 </div>
 </body>
