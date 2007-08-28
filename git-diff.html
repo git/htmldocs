@@ -290,12 +290,9 @@ tree and the index file, or the index file and the working tree.</p>
         further add to the index but you still haven't.  You can
         stage these changes by using <a href="git-add.html">git-add(1)</a>.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>If exactly two paths are given, and at least one is untracked,
+<p>If exactly two paths are given, and at least one is untracked,
 compare the two files / directories. This behavior can be
-forced by --no-index.</tt></pre>
-</div></div>
+forced by --no-index.</p>
 </dd>
 <dt>
 <em>git-diff</em> [--options] --cached [&lt;commit&gt;] [--] [&lt;path&gt;&#8230;]
@@ -325,8 +322,30 @@ forced by --no-index.</tt></pre>
 </dt>
 <dd>
 <p>
-        This form is to view the changes between two &lt;commit&gt;,
-        for example, tips of two branches.
+        This is to view the changes between two arbitrary
+        &lt;commit&gt;.
+</p>
+</dd>
+<dt>
+<em>git-diff</em> [--options] &lt;commit&gt;..&lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</dt>
+<dd>
+<p>
+        This is synonymous to the previous form.  If &lt;commit&gt; on
+        one side is omitted, it will have the same effect as
+        using HEAD instead.
+</p>
+</dd>
+<dt>
+<em>git-diff</em> [--options] &lt;commit&gt;&#8230;&lt;commit&gt; [--] [&lt;path&gt;&#8230;]
+</dt>
+<dd>
+<p>
+        This form is to view the changes on the branch containing
+        and up to the second &lt;commit&gt;, starting at a common ancestor
+        of both &lt;commit&gt;.  "git-diff A&#8230;B" is equivalent to
+        "git-diff $(git-merge-base A B) B".  You can omit any one
+        of &lt;commit&gt;, which has the same effect as using HEAD instead.
 </p>
 </dd>
 </dl>
@@ -334,7 +353,11 @@ forced by --no-index.</tt></pre>
 noted that all of the &lt;commit&gt; in the above description can be
 any &lt;tree-ish&gt;.</p>
 <p>For a more complete list of ways to spell &lt;commit&gt;, see
-"SPECIFYING REVISIONS" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p>
+"SPECIFYING REVISIONS" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.
+However, "diff" is about comparing two _endpoints_, not ranges,
+and the range notations ("&lt;commit&gt;..&lt;commit&gt;" and
+"&lt;commit&gt;&#8230;&lt;commit&gt;") do not mean a range as defined in the
+"SPECIFYING RANGES" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -827,6 +850,35 @@ Compare the version before the last commit and the last commit.
 </ol>
 </dd>
 <dt>
+Comparing branches
+</dt>
+<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git diff topic master    <b>(1)</b>
+$ git diff topic..master   <b>(2)</b>
+$ git diff topic...master  <b>(3)</b></tt></pre>
+</div></div>
+<ol>
+<li>
+<p>
+Changes between the tips of the topic and the master branches.
+</p>
+</li>
+<li>
+<p>
+Same as above.
+</p>
+</li>
+<li>
+<p>
+Changes that occured on the master branch since when the topic
+branch was started off it.
+</p>
+</li>
+</ol>
+</dd>
+<dt>
 Limiting the diff output
 </dt>
 <dd>
@@ -895,7 +947,7 @@ Output diff in reverse.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Aug-2007 07:23:08 UTC
+Last updated 28-Aug-2007 06:25:09 UTC
 </div>
 </div>
 </body>
