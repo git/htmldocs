@@ -280,18 +280,39 @@ git-format-patch(1) Manual Page
                    [--in-reply-to=Message-Id] [--suffix=.&lt;sfx&gt;]
                    [--ignore-if-in-upstream]
                    [--subject-prefix=Subject-Prefix]
-                   &lt;since&gt;[..&lt;until&gt;]</div></div>
+                   [ &lt;since&gt; | &lt;revision range&gt; ]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Prepare each commit between &lt;since&gt; and &lt;until&gt; with its patch in
+<p>Prepare each commit with its patch in
 one file per commit, formatted to resemble UNIX mailbox format.
-If ..&lt;until&gt; is not specified, the head of the current working
-tree is implied.  For a more complete list of ways to spell
-&lt;since&gt; and &lt;until&gt;, see "SPECIFYING REVISIONS" section in
-<a href="git-rev-parse.html">git-rev-parse(1)</a>.</p>
-<p>The output of this command is convenient for e-mail submission or
+The output of this command is convenient for e-mail submission or
 for use with <a href="git-am.html">git-am(1)</a>.</p>
+<p>There are two ways to specify which commits to operate on.</p>
+<ol>
+<li>
+<p>
+A single commit, &lt;since&gt;, specifies that the commits leading
+   to the tip of the current branch that are not in the history
+   that leads to the &lt;since&gt; to be output.
+</p>
+</li>
+<li>
+<p>
+Generic &lt;revision range&gt; expression (see "SPECIFYING
+   REVISIONS" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>) means the
+   commits in the specified range.
+</p>
+</li>
+</ol>
+<p>A single commit, when interpreted as a &lt;revision range&gt;
+expression, means "everything that leads to that commit", but
+if you write <em>git format-patch &lt;commit&gt;</em>, the previous rule
+applies to that command line and you do not get "everything
+since the beginning of the time".  If you want to format
+everything since project inception to one commit, say "git
+format-patch --root &lt;commit&gt;" to make it clear that it is the
+latter case.</p>
 <p>By default, each output file is numbered sequentially from 1, and uses the
 first line of the commit message (massaged for pathname safety) as
 the filename. With the --numbered-files option, the output file names
@@ -907,6 +928,15 @@ git-format-patch origin
 </p>
 </dd>
 <dt>
+git-format-patch --root origin
+</dt>
+<dd>
+<p>
+        Extract all commits which that leads to <em>origin</em> since the
+        inception of the project.
+</p>
+</dd>
+<dt>
 git-format-patch -M -B origin
 </dt>
 <dd>
@@ -949,7 +979,7 @@ git-format-patch -3
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 25-Aug-2007 03:53:09 UTC
+Last updated 29-Aug-2007 07:30:57 UTC
 </div>
 </div>
 </body>
