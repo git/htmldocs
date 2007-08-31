@@ -465,7 +465,8 @@ git repositories.</p>
 </dt>
 <dd>
 <p>
-        Save the process id in <em>file</em>.
+        Save the process id in <em>file</em>.  Ignored when the daemon
+        is run under <tt>--inetd</tt>.
 </p>
 </dd>
 <dt>
@@ -519,6 +520,12 @@ the facility of inet daemon to achieve the same before spawning
 </div>
 <h2>SERVICES</h2>
 <div class="sectionbody">
+<p>These services can be globally enabled/disabled using the
+command line options of this command.  If a finer-grained
+control is desired (e.g. to allow <tt>git-archive</tt> to be run
+against only in a few selected repositories the daemon serves),
+the per-repository configuration file can be used to enable or
+disable them.</p>
 <dl>
 <dt>
 upload-pack
@@ -536,7 +543,24 @@ upload-archive
 </dt>
 <dd>
 <p>
-        This serves <tt>git-archive --remote</tt>.
+        This serves <tt>git-archive --remote</tt>.  It is disabled by
+        default, but a repository can enable it by setting
+        <tt>daemon.uploadarchive</tt> configuration item to <tt>true</tt>.
+</p>
+</dd>
+<dt>
+receive-pack
+</dt>
+<dd>
+<p>
+        This serves <tt>git-send-pack</tt> clients, allowing anonymous
+        push.  It is disabled by default, as there is _no_
+        authentication in the protocol (in other words, anybody
+        can push anything into the repository, including removal
+        of refs).  This is solely meant for a closed LAN setting
+        where everybody is friendly.  This service can be
+        enabled by <tt>daemon.receivepack</tt> configuration item to
+        <tt>true</tt>.
 </p>
 </dd>
 </dl>
@@ -619,6 +643,17 @@ Repositories can still be accessed by hostname though, assuming
 they correspond to these IP addresses.</p>
 </dd>
 </dl>
+<p>To enable <tt>git-archive --remote</tt> and disable <tt>git-fetch</tt> against
+a repository, have the following in the configuration file in the
+repository (that is the file <em>config</em> next to <em>HEAD</em>, <em>refs</em> and
+<em>objects</em>).</p>
+<p>+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[daemon]
+        uploadpack = false
+        uploadarchive = true</tt></pre>
+</div></div>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -635,7 +670,7 @@ they correspond to these IP addresses.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 01-Aug-2007 08:42:09 UTC
+Last updated 31-Aug-2007 07:55:56 UTC
 </div>
 </div>
 </body>
