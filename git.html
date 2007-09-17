@@ -382,9 +382,9 @@ documentation can be viewed at
 <div class="sectionbody">
 <p>See the references above to get started using git.  The following is
 probably more detail than necessary for a first-time user.</p>
-<p>The <a href="#Discussion">Discussion</a> section below and the
-<a href="core-tutorial.html">Core tutorial</a> both provide introductions to the
-underlying git architecture.</p>
+<p>The <a href="user-manual.html#git-concepts">git concepts chapter of the
+user-manual</a> and the <a href="core-tutorial.html">Core tutorial</a> both provide
+introductions to the underlying git architecture.</p>
 <p>See also the <a href="howto-index.html">howto</a> documents for some useful
 examples.</p>
 </div>
@@ -1886,522 +1886,47 @@ for further details.</p>
 </div>
 <h2>Discussion<a id="Discussion"></a></h2>
 <div class="sectionbody">
-<p>"git" can mean anything, depending on your mood.</p>
-<ul>
-<li>
-<p>
-random three-letter combination that is pronounceable, and not
-   actually used by any common UNIX command.  The fact that it is a
-   mispronunciation of "get" may or may not be relevant.
-</p>
-</li>
-<li>
-<p>
-stupid. contemptible and despicable. simple. Take your pick from the
-   dictionary of slang.
-</p>
-</li>
-<li>
-<p>
-"global information tracker": you're in a good mood, and it actually
-   works for you. Angels sing, and a light suddenly fills the room.
-</p>
-</li>
-<li>
-<p>
-"goddamn idiotic truckload of sh*t": when it breaks
-</p>
-</li>
-</ul>
-<p>This is a (not so) stupid but extremely fast directory content manager.
-It doesn't do a whole lot at its core, but what it <em>does</em> do is track
-directory contents efficiently.</p>
-<p>There are two object abstractions: the "object database", and the
-"current directory cache" aka "index".</p>
-<h3>The Object Database</h3>
-<p>The object database is literally just a content-addressable collection
-of objects.  All objects are named by their content, which is
-approximated by the SHA1 hash of the object itself.  Objects may refer
-to other objects (by referencing their SHA1 hash), and so you can
-build up a hierarchy of objects.</p>
-<p>All objects have a statically determined "type" aka "tag", which is
-determined at object creation time, and which identifies the format of
-the object (i.e. how it is used, and how it can refer to other
-objects).  There are currently four different object types: "blob",
-"tree", "commit" and "tag".</p>
-<p>A "blob" object cannot refer to any other object, and is, like the type
-implies, a pure storage object containing some user data.  It is used to
-actually store the file data, i.e. a blob object is associated with some
-particular version of some file.</p>
-<p>A "tree" object is an object that ties one or more "blob" objects into a
-directory structure. In addition, a tree object can refer to other tree
-objects, thus creating a directory hierarchy.</p>
-<p>A "commit" object ties such directory hierarchies together into
-a DAG of revisions - each "commit" is associated with exactly one tree
-(the directory hierarchy at the time of the commit). In addition, a
-"commit" refers to one or more "parent" commit objects that describe the
-history of how we arrived at that directory hierarchy.</p>
-<p>As a special case, a commit object with no parents is called the "root"
-object, and is the point of an initial project commit.  Each project
-must have at least one root, and while you can tie several different
-root objects together into one project by creating a commit object which
-has two or more separate roots as its ultimate parents, that's probably
-just going to confuse people.  So aim for the notion of "one root object
-per project", even if git itself does not enforce that.</p>
-<p>A "tag" object symbolically identifies and can be used to sign other
-objects. It contains the identifier and type of another object, a
-symbolic name (of course!) and, optionally, a signature.</p>
-<p>Regardless of object type, all objects share the following
-characteristics: they are all deflated with zlib, and have a header
-that not only specifies their type, but also provides size information
-about the data in the object.  It's worth noting that the SHA1 hash
-that is used to name the object is the hash of the original data
-plus this header, so <tt>sha1sum</tt> <em>file</em> does not match the object name
-for <em>file</em>.
-(Historical note: in the dawn of the age of git the hash
-was the sha1 of the <em>compressed</em> object.)</p>
-<p>As a result, the general consistency of an object can always be tested
-independently of the contents or the type of the object: all objects can
-be validated by verifying that (a) their hashes match the content of the
-file and (b) the object successfully inflates to a stream of bytes that
-forms a sequence of &lt;ascii type without space&gt; + &lt;space&gt; + &lt;ascii decimal
-size&gt; + &lt;byte\0&gt; + &lt;binary object data&gt;.</p>
-<p>The structured objects can further have their structure and
-connectivity to other objects verified. This is generally done with
-the <tt>git-fsck</tt> program, which generates a full dependency graph
-of all objects, and verifies their internal consistency (in addition
-to just verifying their superficial consistency through the hash).</p>
-<p>The object types in some more detail:</p>
-<h3>Blob Object</h3>
-<p>A "blob" object is nothing but a binary blob of data, and doesn't
-refer to anything else.  There is no signature or any other
-verification of the data, so while the object is consistent (it <em>is</em>
-indexed by its sha1 hash, so the data itself is certainly correct), it
-has absolutely no other attributes.  No name associations, no
-permissions.  It is purely a blob of data (i.e. normally "file
-contents").</p>
-<p>In particular, since the blob is entirely defined by its data, if two
-files in a directory tree (or in multiple different versions of the
-repository) have the same contents, they will share the same blob
-object. The object is totally independent of its location in the
-directory tree, and renaming a file does not change the object that
-file is associated with in any way.</p>
-<p>A blob is typically created when <a href="git-update-index.html">git-update-index(1)</a>
-(or <a href="git-add.html">git-add(1)</a>) is run, and its data can be accessed by
-<a href="git-cat-file.html">git-cat-file(1)</a>.</p>
-<h3>Tree Object</h3>
-<p>The next hierarchical object type is the "tree" object.  A tree object
-is a list of mode/name/blob data, sorted by name.  Alternatively, the
-mode data may specify a directory mode, in which case instead of
-naming a blob, that name is associated with another TREE object.</p>
-<p>Like the "blob" object, a tree object is uniquely determined by the
-set contents, and so two separate but identical trees will always
-share the exact same object. This is true at all levels, i.e. it's
-true for a "leaf" tree (which does not refer to any other trees, only
-blobs) as well as for a whole subdirectory.</p>
-<p>For that reason a "tree" object is just a pure data abstraction: it
-has no history, no signatures, no verification of validity, except
-that since the contents are again protected by the hash itself, we can
-trust that the tree is immutable and its contents never change.</p>
-<p>So you can trust the contents of a tree to be valid, the same way you
-can trust the contents of a blob, but you don't know where those
-contents <em>came</em> from.</p>
-<p>Side note on trees: since a "tree" object is a sorted list of
-"filename+content", you can create a diff between two trees without
-actually having to unpack two trees.  Just ignore all common parts,
-and your diff will look right.  In other words, you can effectively
-(and efficiently) tell the difference between any two random trees by
-O(n) where "n" is the size of the difference, rather than the size of
-the tree.</p>
-<p>Side note 2 on trees: since the name of a "blob" depends entirely and
-exclusively on its contents (i.e. there are no names or permissions
-involved), you can see trivial renames or permission changes by
-noticing that the blob stayed the same.  However, renames with data
-changes need a smarter "diff" implementation.</p>
-<p>A tree is created with <a href="git-write-tree.html">git-write-tree(1)</a> and
-its data can be accessed by <a href="git-ls-tree.html">git-ls-tree(1)</a>.
-Two trees can be compared with <a href="git-diff-tree.html">git-diff-tree(1)</a>.</p>
-<h3>Commit Object</h3>
-<p>The "commit" object is an object that introduces the notion of
-history into the picture.  In contrast to the other objects, it
-doesn't just describe the physical state of a tree, it describes how
-we got there, and why.</p>
-<p>A "commit" is defined by the tree-object that it results in, the
-parent commits (zero, one or more) that led up to that point, and a
-comment on what happened.  Again, a commit is not trusted per se:
-the contents are well-defined and "safe" due to the cryptographically
-strong signatures at all levels, but there is no reason to believe
-that the tree is "good" or that the merge information makes sense.
-The parents do not have to actually have any relationship with the
-result, for example.</p>
-<p>Note on commits: unlike real SCM's, commits do not contain
-rename information or file mode change information.  All of that is
-implicit in the trees involved (the result tree, and the result trees
-of the parents), and describing that makes no sense in this idiotic
-file manager.</p>
-<p>A commit is created with <a href="git-commit-tree.html">git-commit-tree(1)</a> and
-its data can be accessed by <a href="git-cat-file.html">git-cat-file(1)</a>.</p>
-<h3>Trust</h3>
-<p>An aside on the notion of "trust". Trust is really outside the scope
-of "git", but it's worth noting a few things.  First off, since
-everything is hashed with SHA1, you <em>can</em> trust that an object is
-intact and has not been messed with by external sources.  So the name
-of an object uniquely identifies a known state - just not a state that
-you may want to trust.</p>
-<p>Furthermore, since the SHA1 signature of a commit refers to the
-SHA1 signatures of the tree it is associated with and the signatures
-of the parent, a single named commit specifies uniquely a whole set
-of history, with full contents.  You can't later fake any step of the
-way once you have the name of a commit.</p>
-<p>So to introduce some real trust in the system, the only thing you need
-to do is to digitally sign just <em>one</em> special note, which includes the
-name of a top-level commit.  Your digital signature shows others
-that you trust that commit, and the immutability of the history of
-commits tells others that they can trust the whole history.</p>
-<p>In other words, you can easily validate a whole archive by just
-sending out a single email that tells the people the name (SHA1 hash)
-of the top commit, and digitally sign that email using something
-like GPG/PGP.</p>
-<p>To assist in this, git also provides the tag object&#8230;</p>
-<h3>Tag Object</h3>
-<p>Git provides the "tag" object to simplify creating, managing and
-exchanging symbolic and signed tokens.  The "tag" object at its
-simplest simply symbolically identifies another object by containing
-the sha1, type and symbolic name.</p>
-<p>However it can optionally contain additional signature information
-(which git doesn't care about as long as there's less than 8k of
-it). This can then be verified externally to git.</p>
-<p>Note that despite the tag features, "git" itself only handles content
-integrity; the trust framework (and signature provision and
-verification) has to come from outside.</p>
-<p>A tag is created with <a href="git-mktag.html">git-mktag(1)</a>,
-its data can be accessed by <a href="git-cat-file.html">git-cat-file(1)</a>,
-and the signature can be verified by
-<a href="git-verify-tag.html">git-verify-tag(1)</a>.</p>
-</div>
-<h2>The "index" aka "Current Directory Cache"</h2>
-<div class="sectionbody">
-<p>The index is a simple binary file, which contains an efficient
-representation of a virtual directory content at some random time.  It
-does so by a simple array that associates a set of names, dates,
-permissions and content (aka "blob") objects together.  The cache is
-always kept ordered by name, and names are unique (with a few very
-specific rules) at any point in time, but the cache has no long-term
-meaning, and can be partially updated at any time.</p>
-<p>In particular, the index certainly does not need to be consistent with
-the current directory contents (in fact, most operations will depend on
-different ways to make the index <em>not</em> be consistent with the directory
-hierarchy), but it has three very important attributes:</p>
-<p><em>(a) it can re-generate the full state it caches (not just the
-directory structure: it contains pointers to the "blob" objects so
-that it can regenerate the data too)</em></p>
-<p>As a special case, there is a clear and unambiguous one-way mapping
-from a current directory cache to a "tree object", which can be
-efficiently created from just the current directory cache without
-actually looking at any other data.  So a directory cache at any one
-time uniquely specifies one and only one "tree" object (but has
-additional data to make it easy to match up that tree object with what
-has happened in the directory)</p>
-<p><em>(b) it has efficient methods for finding inconsistencies between that
-cached state ("tree object waiting to be instantiated") and the
-current state.</em></p>
-<p><em>(c) it can additionally efficiently represent information about merge
-conflicts between different tree objects, allowing each pathname to be
-associated with sufficient information about the trees involved that
-you can create a three-way merge between them.</em></p>
-<p>Those are the three ONLY things that the directory cache does.  It's a
-cache, and the normal operation is to re-generate it completely from a
-known tree object, or update/compare it with a live tree that is being
-developed.  If you blow the directory cache away entirely, you generally
-haven't lost any information as long as you have the name of the tree
-that it described.</p>
-<p>At the same time, the index is at the same time also the
-staging area for creating new trees, and creating a new tree always
-involves a controlled modification of the index file.  In particular,
-the index file can have the representation of an intermediate tree that
-has not yet been instantiated.  So the index can be thought of as a
-write-back cache, which can contain dirty information that has not yet
-been written back to the backing store.</p>
-</div>
-<h2>The Workflow</h2>
-<div class="sectionbody">
-<p>Generally, all "git" operations work on the index file. Some operations
-work <strong>purely</strong> on the index file (showing the current state of the
-index), but most operations move data to and from the index file. Either
-from the database or from the working directory. Thus there are four
-main combinations:</p>
-<h3>1) working directory -&gt; index</h3>
-<p>You update the index with information from the working directory with
-the <a href="git-update-index.html">git-update-index(1)</a> command.  You
-generally update the index information by just specifying the filename
-you want to update, like so:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-update-index filename</tt></pre>
-</div></div>
-<p>but to avoid common mistakes with filename globbing etc, the command
-will not normally add totally new entries or remove old entries,
-i.e. it will normally just update existing cache entries.</p>
-<p>To tell git that yes, you really do realize that certain files no
-longer exist, or that new files should be added, you
-should use the <tt>--remove</tt> and <tt>--add</tt> flags respectively.</p>
-<p>NOTE! A <tt>--remove</tt> flag does <em>not</em> mean that subsequent filenames will
-necessarily be removed: if the files still exist in your directory
-structure, the index will be updated with their new status, not
-removed. The only thing <tt>--remove</tt> means is that update-cache will be
-considering a removed file to be a valid thing, and if the file really
-does not exist any more, it will update the index accordingly.</p>
-<p>As a special case, you can also do <tt>git-update-index --refresh</tt>, which
-will refresh the "stat" information of each index to match the current
-stat information. It will <em>not</em> update the object status itself, and
-it will only update the fields that are used to quickly test whether
-an object still matches its old backing store object.</p>
-<h3>2) index -&gt; object database</h3>
-<p>You write your current index file to a "tree" object with the program</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-write-tree</tt></pre>
-</div></div>
-<p>that doesn't come with any options - it will just write out the
-current index into the set of tree objects that describe that state,
-and it will return the name of the resulting top-level tree. You can
-use that tree to re-generate the index at any time by going in the
-other direction:</p>
-<h3>3) object database -&gt; index</h3>
-<p>You read a "tree" file from the object database, and use that to
-populate (and overwrite - don't do this if your index contains any
-unsaved state that you might want to restore later!) your current
-index.  Normal operation is just</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-read-tree &lt;sha1 of tree&gt;</tt></pre>
-</div></div>
-<p>and your index file will now be equivalent to the tree that you saved
-earlier. However, that is only your <em>index</em> file: your working
-directory contents have not been modified.</p>
-<h3>4) index -&gt; working directory</h3>
-<p>You update your working directory from the index by "checking out"
-files. This is not a very common operation, since normally you'd just
-keep your files updated, and rather than write to your working
-directory, you'd tell the index files about the changes in your
-working directory (i.e. <tt>git-update-index</tt>).</p>
-<p>However, if you decide to jump to a new version, or check out somebody
-else's version, or just restore a previous tree, you'd populate your
-index file with read-tree, and then you need to check out the result
-with</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-checkout-index filename</tt></pre>
-</div></div>
-<p>or, if you want to check out all of the index, use <tt>-a</tt>.</p>
-<p>NOTE! git-checkout-index normally refuses to overwrite old files, so
-if you have an old version of the tree already checked out, you will
-need to use the "-f" flag (<em>before</em> the "-a" flag or the filename) to
-<em>force</em> the checkout.</p>
-<p>Finally, there are a few odds and ends which are not purely moving
-from one representation to the other:</p>
-<h3>5) Tying it all together</h3>
-<p>To commit a tree you have instantiated with "git-write-tree", you'd
-create a "commit" object that refers to that tree and the history
-behind it - most notably the "parent" commits that preceded it in
-history.</p>
-<p>Normally a "commit" has one parent: the previous state of the tree
-before a certain change was made. However, sometimes it can have two
-or more parent commits, in which case we call it a "merge", due to the
-fact that such a commit brings together ("merges") two or more
-previous states represented by other commits.</p>
-<p>In other words, while a "tree" represents a particular directory state
-of a working directory, a "commit" represents that state in "time",
-and explains how we got there.</p>
-<p>You create a commit object by giving it the tree that describes the
-state at the time of the commit, and a list of parents:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-commit-tree &lt;tree&gt; -p &lt;parent&gt; [-p &lt;parent2&gt; ..]</tt></pre>
-</div></div>
-<p>and then giving the reason for the commit on stdin (either through
-redirection from a pipe or file, or by just typing it at the tty).</p>
-<p>git-commit-tree will return the name of the object that represents
-that commit, and you should save it away for later use. Normally,
-you'd commit a new <tt>HEAD</tt> state, and while git doesn't care where you
-save the note about that state, in practice we tend to just write the
-result to the file pointed at by <tt>.git/HEAD</tt>, so that we can always see
-what the last committed state was.</p>
-<p>Here is an ASCII art by Jon Loeliger that illustrates how
-various pieces fit together.</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>
-                     commit-tree
-                      commit obj
-                       +----+
-                       |    |
-                       |    |
-                       V    V
-                    +-----------+
-                    | Object DB |
-                    |  Backing  |
-                    |   Store   |
-                    +-----------+
-                       ^
-           write-tree  |     |
-             tree obj  |     |
-                       |     |  read-tree
-                       |     |  tree obj
-                             V
-                    +-----------+
-                    |   Index   |
-                    |  "cache"  |
-                    +-----------+
-         update-index  ^
-             blob obj  |     |
-                       |     |
-    checkout-index -u  |     |  checkout-index
-             stat      |     |  blob obj
-                             V
-                    +-----------+
-                    |  Working  |
-                    | Directory |
-                    +-----------+
-</tt></pre>
-</div></div>
-<h3>6) Examining the data</h3>
-<p>You can examine the data represented in the object database and the
-index with various helper tools. For every object, you can use
-<a href="git-cat-file.html">git-cat-file(1)</a> to examine details about the
-object:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-cat-file -t &lt;objectname&gt;</tt></pre>
-</div></div>
-<p>shows the type of the object, and once you have the type (which is
-usually implicit in where you find the object), you can use</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-cat-file blob|tree|commit|tag &lt;objectname&gt;</tt></pre>
-</div></div>
-<p>to show its contents. NOTE! Trees have binary content, and as a result
-there is a special helper for showing that content, called
-<tt>git-ls-tree</tt>, which turns the binary content into a more easily
-readable form.</p>
-<p>It's especially instructive to look at "commit" objects, since those
-tend to be small and fairly self-explanatory. In particular, if you
-follow the convention of having the top commit name in <tt>.git/HEAD</tt>,
-you can do</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-cat-file commit HEAD</tt></pre>
-</div></div>
-<p>to see what the top commit was.</p>
-<h3>7) Merging multiple trees</h3>
-<p>Git helps you do a three-way merge, which you can expand to n-way by
-repeating the merge procedure arbitrary times until you finally
-"commit" the state.  The normal situation is that you'd only do one
-three-way merge (two parents), and commit it, but if you like to, you
-can do multiple parents in one go.</p>
-<p>To do a three-way merge, you need the two sets of "commit" objects
-that you want to merge, use those to find the closest common parent (a
-third "commit" object), and then use those commit objects to find the
-state of the directory ("tree" object) at these points.</p>
-<p>To get the "base" for the merge, you first look up the common parent
-of two commits with</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-merge-base &lt;commit1&gt; &lt;commit2&gt;</tt></pre>
-</div></div>
-<p>which will return you the commit they are both based on.  You should
-now look up the "tree" objects of those commits, which you can easily
-do with (for example)</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-cat-file commit &lt;commitname&gt; | head -1</tt></pre>
-</div></div>
-<p>since the tree object information is always the first line in a commit
-object.</p>
-<p>Once you know the three trees you are going to merge (the one
-"original" tree, aka the common case, and the two "result" trees, aka
-the branches you want to merge), you do a "merge" read into the
-index. This will complain if it has to throw away your old index contents, so you should
-make sure that you've committed those - in fact you would normally
-always do a merge against your last commit (which should thus match
-what you have in your current index anyway).</p>
-<p>To do the merge, do</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-read-tree -m -u &lt;origtree&gt; &lt;yourtree&gt; &lt;targettree&gt;</tt></pre>
-</div></div>
-<p>which will do all trivial merge operations for you directly in the
-index file, and you can just write the result out with
-<tt>git-write-tree</tt>.</p>
-<p>Historical note.  We did not have <tt>-u</tt> facility when this
-section was first written, so we used to warn that
-the merge is done in the index file, not in your
-working tree, and your working tree will not match your
-index after this step.
-This is no longer true.  The above command, thanks to <tt>-u</tt>
-option, updates your working tree with the merge results for
-paths that have been trivially merged.</p>
-<h3>8) Merging multiple trees, continued</h3>
-<p>Sadly, many merges aren't trivial. If there are files that have
-been added, moved or removed, or if both branches have modified the
-same file, you will be left with an index tree that contains "merge
-entries" in it. Such an index tree can <em>NOT</em> be written out to a tree
-object, and you will have to resolve any such merge clashes using
-other tools before you can write out the result.</p>
-<p>You can examine such index state with <tt>git-ls-files --unmerged</tt>
-command.  An example:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git-read-tree -m $orig HEAD $target
-$ git-ls-files --unmerged
-100644 263414f423d0e4d70dae8fe53fa34614ff3e2860 1       hello.c
-100644 06fa6a24256dc7e560efa5687fa84b51f0263c3a 2       hello.c
-100644 cc44c73eb783565da5831b4d820c962954019b69 3       hello.c</tt></pre>
-</div></div>
-<p>Each line of the <tt>git-ls-files --unmerged</tt> output begins with
-the blob mode bits, blob SHA1, <em>stage number</em>, and the
-filename.  The <em>stage number</em> is git's way to say which tree it
-came from: stage 1 corresponds to <tt>$orig</tt> tree, stage 2 <tt>HEAD</tt>
-tree, and stage3 <tt>$target</tt> tree.</p>
-<p>Earlier we said that trivial merges are done inside
-<tt>git-read-tree -m</tt>.  For example, if the file did not change
-from <tt>$orig</tt> to <tt>HEAD</tt> nor <tt>$target</tt>, or if the file changed
-from <tt>$orig</tt> to <tt>HEAD</tt> and <tt>$orig</tt> to <tt>$target</tt> the same way,
-obviously the final outcome is what is in <tt>HEAD</tt>.  What the
-above example shows is that file <tt>hello.c</tt> was changed from
-<tt>$orig</tt> to <tt>HEAD</tt> and <tt>$orig</tt> to <tt>$target</tt> in a different way.
-You could resolve this by running your favorite 3-way merge
-program, e.g.  <tt>diff3</tt> or <tt>merge</tt>, on the blob objects from
-these three stages yourself, like this:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git-cat-file blob 263414f... &gt;hello.c~1
-$ git-cat-file blob 06fa6a2... &gt;hello.c~2
-$ git-cat-file blob cc44c73... &gt;hello.c~3
-$ merge hello.c~2 hello.c~1 hello.c~3</tt></pre>
-</div></div>
-<p>This would leave the merge result in <tt>hello.c~2</tt> file, along
-with conflict markers if there are conflicts.  After verifying
-the merge result makes sense, you can tell git what the final
-merge result for this file is by:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>mv -f hello.c~2 hello.c
-git-update-index hello.c</tt></pre>
-</div></div>
-<p>When a path is in unmerged state, running <tt>git-update-index</tt> for
-that path tells git to mark the path resolved.</p>
-<p>The above is the description of a git merge at the lowest level,
-to help you understand what conceptually happens under the hood.
-In practice, nobody, not even git itself, uses three <tt>git-cat-file</tt>
-for this.  There is <tt>git-merge-index</tt> program that extracts the
-stages to temporary files and calls a "merge" script on it:</p>
-<div class="literalblock">
-<div class="content">
-<pre><tt>git-merge-index git-merge-one-file hello.c</tt></pre>
-</div></div>
-<p>and that is what higher level <tt>git merge -s resolve</tt> is implemented
-with.</p>
+<p>More detail on the following is available from the
+<a href="user-manual.html#git-concepts">git concepts chapter of the
+user-manual</a> and the <a href="core-tutorial.html">Core tutorial</a>.</p>
+<p>A git project normally consists of a working directory with a ".git"
+subdirectory at the top level.  The .git directory contains, among other
+things, a compressed object database representing the complete history
+of the project, an "index" file which links that history to the current
+contents of the working tree, and named pointers into that history such
+as tags and branch heads.</p>
+<p>The object database contains objects of three main types: blobs, which
+hold file data; trees, which point to blobs and other trees to build up
+directory heirarchies; and commits, which each reference a single tree
+and some number of parent commits.</p>
+<p>The commit, equivalent to what other systems call a "changeset" or
+"version", represents a step in the project's history, and each parent
+represents an immediately preceding step.  Commits with more than one
+parent represent merges of independent lines of development.</p>
+<p>All objects are named by the SHA1 hash of their contents, normally
+written as a string of 40 hex digits.  Such names are globally unique.
+The entire history leading up to a commit can be vouched for by signing
+just that commit.  A fourth object type, the tag, is provided for this
+purpose.</p>
+<p>When first created, objects are stored in individual files, but for
+efficiency may later be compressed together into "pack files".</p>
+<p>Named pointers called refs mark interesting points in history.  A ref
+may contain the SHA1 name of an object or the name of another ref.  Refs
+with names beginning <tt>ref/head/</tt> contain the SHA1 name of the most
+recent commit (or "head") of a branch under developement.  SHA1 names of
+tags of interest are stored under <tt>ref/tags/</tt>.  A special ref named
+<tt>HEAD</tt> contains the name of the currently checked-out branch.</p>
+<p>The index file is initialized with a list of all paths and, for each
+path, a blob object and a set of attributes.  The blob object represents
+the contents of the file as of the head of the current branch.  The
+attributes (last modified time, size, etc.) are taken from the
+corresponding file in the working tree.  Subsequent changes to the
+working tree can be found by comparing these attributes.  The index may
+be updated with new content, and new commits may be created from the
+content stored in the index.</p>
+<p>The index is also capable of storing multiple entries (called "stages")
+for a given pathname.  These stages are used to hold the various
+unmerged version of a file when a merge is in progress.</p>
 </div>
 <h2>Authors</h2>
 <div class="sectionbody">
@@ -2440,7 +1965,7 @@ contributors on the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 04-Sep-2007 01:18:30 UTC
+Last updated 17-Sep-2007 17:32:48 UTC
 </div>
 </div>
 </body>
