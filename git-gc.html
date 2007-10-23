@@ -282,7 +282,8 @@ performance) and removing unreachable objects which may have been
 created from prior invocations of <a href="git-add.html">git-add(1)</a>.</p>
 <p>Users are encouraged to run this task on a regular basis within
 each repository to maintain good disk space utilization and good
-operating performance.</p>
+operating performance. Some git commands may automatically run
+<tt>git-gc</tt>; see the <tt>--auto</tt> flag below for details.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -321,19 +322,22 @@ operating performance.</p>
 </dt>
 <dd>
 <p>
-        With this option, <tt>git gc</tt> checks if there are too many
-        loose objects in the repository and runs
-        <a href="git-repack.html">git-repack(1)</a> with <tt>-d -l</tt> option to pack them.
-        The threshold for loose objects is set with <tt>gc.auto</tt> configuration
-        variable, and can be disabled by setting it to 0.  Some
-        Porcelain commands use this after they perform operation
-        that could create many loose objects automatically.
-        Additionally, when there are too many packs are present,
-        they are consolidated into one larger pack by running
-        the <tt>git-repack</tt> command with <tt>-A</tt> option.  The
-        threshold for number of packs is set with
-        <tt>gc.autopacklimit</tt> configuration variable.
+        With this option, <tt>git gc</tt> checks whether any housekeeping is
+        required; if not, it exits without performing any work.
+        Some git commands run <tt>git gc --auto</tt> after performing
+        operations that could create many loose objects.
 </p>
+<p>Housekeeping is required if there are too many loose objects or
+too many packs in the repository. If the number of loose objects
+exceeds the value of the <tt>gc.auto</tt> configuration variable, then
+all loose objects are combined into a single pack using
+<tt>git-repack -d -l</tt>.  Setting the value of <tt>gc.auto</tt> to 0
+disables automatic packing of loose objects.</p>
+<p>If the number of packs exceeds the value of <tt>gc.autopacklimit</tt>,
+then existing packs (except those marked with a <tt>.keep</tt> file)
+are consolidated into a single pack by using the <tt>-A</tt> option of
+<tt>git-repack</tt>. Setting <tt>gc.autopacklimit</tt> to 0 disables
+automatic consolidation of packs.</p>
 </dd>
 </dl>
 </div>
@@ -386,7 +390,7 @@ more details.  This defaults to 10.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Oct-2007 12:03:49 UTC
+Last updated 23-Oct-2007 01:21:49 UTC
 </div>
 </div>
 </body>

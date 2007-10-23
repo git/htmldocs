@@ -290,7 +290,10 @@ of commits that would be shown by <tt>git log &lt;upstream&gt;..HEAD</tt>.</p>
 --onto option was supplied.  This has the exact same effect as
 <tt>git reset --hard &lt;upstream&gt;</tt> (or &lt;newbase&gt;).</p>
 <p>The commits that were previously saved into the temporary area are
-then reapplied to the current branch, one by one, in order.</p>
+then reapplied to the current branch, one by one, in order. Note that
+any commits in HEAD which introduce the same textual changes as a commit
+in HEAD..&lt;upstream&gt; are omitted (i.e., a patch already accepted upstream
+with a different commit message or timestamp will be skipped).</p>
 <p>It is possible that a merge failure will prevent this process from being
 completely automatic.  You will have to resolve any such merge failure
 and run <tt>git rebase --continue</tt>.  Another option is to bypass the commit
@@ -319,6 +322,24 @@ git-rebase master topic</tt></pre>
 </div></div>
 <p>The latter form is just a short-hand of <tt>git checkout topic</tt>
 followed by <tt>git rebase master</tt>.</p>
+<p>If the upstream branch already contains a change you have made (e.g.,
+because you mailed a patch which was applied upstream), then that commit
+will be skipped. For example, running <tt>git-rebase master</tt> on the
+following history (in which A' and A introduce the same set of changes,
+but have different committer information):</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          A---B---C topic
+         /
+    D---E---A'---F master</tt></pre>
+</div></div>
+<p>will result in:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                   B'---C' topic
+                  /
+    D---E---A'---F master</tt></pre>
+</div></div>
 <p>Here is how you would transplant a topic branch based on one
 branch to another, to pretend that you forked the topic branch
 from the latter branch, using <tt>rebase --onto</tt>.</p>
@@ -810,7 +831,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 30-Sep-2007 08:10:55 UTC
+Last updated 23-Oct-2007 01:21:54 UTC
 </div>
 </div>
 </body>
