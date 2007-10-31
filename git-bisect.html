@@ -281,8 +281,9 @@ on the subcommand:</p>
 <div class="literalblock">
 <div class="content">
 <pre><tt>git bisect start [&lt;bad&gt; [&lt;good&gt;...]] [--] [&lt;paths&gt;...]
-git bisect bad &lt;rev&gt;
-git bisect good &lt;rev&gt;
+git bisect bad [&lt;rev&gt;]
+git bisect good [&lt;rev&gt;...]
+git bisect skip [&lt;rev&gt;...]
 git bisect reset [&lt;branch&gt;]
 git bisect visualize
 git bisect replay &lt;logfile&gt;
@@ -372,6 +373,16 @@ $ git reset --hard HEAD~3               # try 3 revs before what
 </div></div>
 <p>Then compile and test the one you chose to try. After that, tell
 bisect what the result was as usual.</p>
+<h3>Bisect skip</h3>
+<p>Instead of choosing by yourself a nearby commit, you may just want git
+to do it for you using:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bisect skip                 # Current version cannot be tested</tt></pre>
+</div></div>
+<p>But computing the commit to test may be slower afterwards and git may
+eventually not be able to tell the first bad among a bad and one or
+more "skip"ped commits.</p>
 <h3>Cutting down bisection by giving more parameters to bisect start</h3>
 <p>You can further cut down the number of trials if you know what part of
 the tree is involved in the problem you are tracking down, by giving
@@ -398,12 +409,15 @@ or bad, you can automatically bisect using:</p>
 <pre><tt>$ git bisect run my_script</tt></pre>
 </div></div>
 <p>Note that the "run" script (<tt>my_script</tt> in the above example) should
-exit with code 0 in case the current source code is good and with a
-code between 1 and 127 (included) in case the current source code is
-bad.</p>
+exit with code 0 in case the current source code is good.  Exit with a
+code between 1 and 127 (inclusive), except 125, if the current
+source code is bad.</p>
 <p>Any other exit code will abort the automatic bisect process. (A
 program that does "exit(-1)" leaves $? = 255, see exit(3) manual page,
 the value is chopped with "&amp; 0377".)</p>
+<p>The special exit code 125 should be used when the current source code
+cannot be tested. If the "run" script exits with this code, the current
+revision will be skipped, see <tt>git bisect skip</tt> above.</p>
 <p>You may often find that during bisect you want to have near-constant
 tweaks (e.g., s/#define DEBUG 0/#define DEBUG 1/ in a header file, or
 "revision that does not have this commit needs this patch applied to
@@ -431,7 +445,7 @@ know the outcome.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Jul-2007 02:09:31 UTC
+Last updated 31-Oct-2007 05:56:47 UTC
 </div>
 </div>
 </body>
