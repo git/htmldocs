@@ -1143,12 +1143,13 @@ have to do _that_ merge again.</p>
 environment, is <tt>git show-branch</tt>.</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git show-branch --topo-order master mybranch
+<pre><tt>$ git-show-branch --topo-order --more=1 master mybranch
 * [master] Merge work in mybranch
  ! [mybranch] Some work.
 --
 -  [master] Merge work in mybranch
-*+ [mybranch] Some work.</tt></pre>
+*+ [mybranch] Some work.
+*  [master^] Some fun.</tt></pre>
 </div></div>
 <p>The first two lines indicate that it is showing the two branches
 and the first line of the commit log message from their
@@ -1165,9 +1166,31 @@ because <tt>mybranch</tt> has not been merged to incorporate these
 commits from the master branch.  The string inside brackets
 before the commit log message is a short name you can use to
 name the commit.  In the above example, <em>master</em> and <em>mybranch</em>
-are branch heads.  <em>master~1</em> is the first parent of <em>master</em>
+are branch heads.  <em>master^</em> is the first parent of <em>master</em>
 branch head.  Please see <em>git-rev-parse</em> documentation if you
 see more complex cases.</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">Without the <em>&#8212;more=1</em> option, <em>git-show-branch</em> would not output the
+<em>[master^]</em> commit, as <em>[mybranch]</em> commit is a common ancestor of
+both <em>master</em> and <em>mybranch</em> tips.  Please see <em>git-show-branch</em>
+documentation for details.</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">If there were more commits on the <em>master</em> branch after the merge, the
+merge commit itself would not be shown by <em>git-show-branch</em> by
+default.  You would need to provide <em>&#8212;sparse</em> option to make the
+merge commit visible in this case.</td>
+</tr></table>
+</div>
 <p>Now, let's pretend you are the one who did all the work in
 <tt>mybranch</tt>, and the fruit of your hard work has finally been merged
 to the <tt>master</tt> branch. Let's go back to <tt>mybranch</tt>, and run
@@ -1948,7 +1971,7 @@ to follow, not easier.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 03-Nov-2007 02:45:17 UTC
+Last updated 10-Nov-2007 11:26:14 UTC
 </div>
 </div>
 </body>
