@@ -287,6 +287,23 @@ distinguish between them.</p>
 <div class="sectionbody">
 <dl>
 <dt>
+--parseopt
+</dt>
+<dd>
+<p>
+        Use <tt>git-rev-parse</tt> in option parsing mode (see PARSEOPT section below).
+</p>
+</dd>
+<dt>
+--keep-dash-dash
+</dt>
+<dd>
+<p>
+        Only meaningful in <tt>--parseopt</tt> mode. Tells the option parser to echo
+        out the first <tt>--</tt> met instead of skipping it.
+</p>
+</dd>
+<dt>
 --revs-only
 </dt>
 <dd>
@@ -723,10 +740,76 @@ C^@              I J F
 F^! D            G H D F</tt></pre>
 </div></div>
 </div>
+<h2>PARSEOPT</h2>
+<div class="sectionbody">
+<p>In <tt>--parseopt</tt> mode, <tt>git-rev-parse</tt> helps massaging options to bring to shell
+scripts the same facilities C builtins have. It works as an option normalizer
+(e.g. splits single switches aggregate values), a bit like <tt>getopt(1)</tt> does.</p>
+<p>It takes on the standard input the specification of the options to parse and
+understand, and echoes on the standard output a line suitable for <tt>sh(1)</tt> <tt>eval</tt>
+to replace the arguments with normalized ones.  In case of error, it outputs
+usage on the standard error stream, and exits with code 129.</p>
+<h3>Input Format</h3>
+<p><tt>git-rev-parse --parseopt</tt> input format is fully text based. It has two parts,
+separated by a line that contains only <tt>--</tt>. The lines before the separator
+(should be more than one) are used for the usage.
+The lines after the separator describe the options.</p>
+<p>Each line of options has this format:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;opt_spec&gt;&lt;arg_spec&gt;? SP+ help LF</tt></pre>
+</div></div>
+<dl>
+<dt>
+<tt>&lt;opt_spec&gt;</tt>
+</dt>
+<dd>
+<p>
+        its format is the short option character, then the long option name
+        separated by a comma. Both parts are not required, though at least one
+        is necessary. <tt>h,help</tt>, <tt>dry-run</tt> and <tt>f</tt> are all three correct
+        <tt>&lt;opt_spec&gt;</tt>.
+</p>
+</dd>
+<dt>
+<tt>&lt;arg_spec&gt;</tt>
+</dt>
+<dd>
+<p>
+        an <tt>&lt;arg_spec&gt;</tt> tells the option parser if the option has an argument
+        (<tt>=</tt>), an optional one (<tt>?</tt> though its use is discouraged) or none
+        (no <tt>&lt;arg_spec&gt;</tt> in that case).
+</p>
+</dd>
+</dl>
+<p>The remainder of the line, after stripping the spaces, is used
+as the help associated to the option.</p>
+<p>Blank lines are ignored, and lines that don't match this specification are used
+as option group headers (start the line with a space to create such
+lines on purpose).</p>
+<h3>Example</h3>
+<div class="listingblock">
+<div class="content">
+<pre><tt>OPTS_SPEC="\
+some-command [options] &lt;args&gt;...
+
+some-command does foo and bar!
+--
+h,help    show the help
+
+foo       some nifty option --foo
+bar=      some cool option --bar with an argument
+
+  An option group Header
+C?        option C with an optional argument"
+
+eval `echo "$OPTS_SPEC" | git-rev-parse --parseopt -- "$@" || echo exit $?`</tt></pre>
+</div></div>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and
-Junio C Hamano &lt;junkio@cox.net&gt;</p>
+<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; .
+Junio C Hamano &lt;junkio@cox.net&gt; and Pierre Habouzit &lt;madcoder@debian.org&gt;</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
@@ -738,7 +821,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 14-Nov-2007 12:11:46 UTC
+Last updated 19-Nov-2007 05:02:45 UTC
 </div>
 </div>
 </body>
