@@ -283,7 +283,8 @@ git-config(1) Manual Page
 <em>git-config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
 <em>git-config</em> [&lt;file-option&gt;] --rename-section old_name new_name
 <em>git-config</em> [&lt;file-option&gt;] --remove-section name
-<em>git-config</em> [&lt;file-option&gt;] [-z|--null] -l | --list</div></div>
+<em>git-config</em> [&lt;file-option&gt;] [-z|--null] -l | --list
+<em>git-config</em> [&lt;file-option&gt;] --get-color name [default]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -498,6 +499,17 @@ rather than from all available files.</p>
         contain line breaks.
 </p>
 </dd>
+<dt>
+--get-color name default
+</dt>
+<dd>
+<p>
+        Find the color configured for <tt>name</tt> (e.g. <tt>color.diff.new</tt>) and
+        output it as the ANSI color escape sequence to the standard
+        output.  The optional <tt>default</tt> parameter is used instead, if
+        there is no color configured for <tt>name</tt>.
+</p>
+</dd>
 </dl>
 </div>
 <h2><a id="FILES"></a>FILES</h2>
@@ -668,6 +680,15 @@ i.e. the one without a "for &#8230;" postfix, do something like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>% git config core.gitproxy '"proxy-command" for example.com'</tt></pre>
+</div></div>
+<p>An example to use customized color from the configuration in your
+script:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>#!/bin/sh
+WS=$(git config --get-color color.diff.whitespace "blue reverse")
+RESET=$(git config --get-color "" "reset")
+echo "${WS}your whitespace color or blue reverse${RESET}"</tt></pre>
 </div></div>
 </div>
 <h2>CONFIGURATION FILE</h2>
@@ -1127,6 +1148,18 @@ branch.&lt;name&gt;.mergeoptions
         supported options are equal to that of <a href="git-merge.html">git-merge(1)</a>, but
         option values containing whitespace characters are currently not
         supported.
+</p>
+</dd>
+<dt>
+branch.&lt;name&gt;.rebase
+</dt>
+<dd>
+<p>
+        When true, rebase the branch &lt;name&gt; on top of the fetched branch,
+        instead of merging the default branch from the default remote.
+        <strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
+        it unless you understand the implications (see <a href="git-rebase.html">git-rebase(1)</a>
+        for details).
 </p>
 </dd>
 <dt>
@@ -1971,7 +2004,7 @@ transfer.unpackLimit
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 21-Nov-2007 08:54:16 UTC
+Last updated 03-Dec-2007 09:57:28 UTC
 </div>
 </div>
 </body>

@@ -256,91 +256,94 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>git-prune(1)</title>
+<title>git-fast-export(1)</title>
 </head>
 <body>
 <div id="header">
 <h1>
-git-prune(1) Manual Page
+git-fast-export(1) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-prune -
-   Prune all unreachable objects from the object database
+<p>git-fast-export -
+   Git data exporter
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-prune</em> [-n] [--expire &lt;expire&gt;] [--] [&lt;head&gt;&#8230;]</p>
+<p><em>git-fast-export [options]</em> | <em>git-fast-import</em></p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>This runs <tt>git-fsck --unreachable</tt> using all the refs
-available in <tt>$GIT_DIR/refs</tt>, optionally with additional set of
-objects specified on the command line, and prunes all
-objects unreachable from any of these head objects from the object database.
-In addition, it
-prunes the unpacked objects that are also found in packs by
-running <tt>git prune-packed</tt>.</p>
+<p>This program dumps the given revisions in a form suitable to be piped
+into <a href="git-fast-import.html">git-fast-import(1)</a>.</p>
+<p>You can use it as a human readable bundle replacement (see
+<a href="git-bundle.html">git-bundle(1)</a>), or as a kind of an interactive
+<a href="git-filter-branch.html">git-filter-branch(1)</a>.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
 <dl>
 <dt>
--n
+--progress=&lt;n&gt;
 </dt>
 <dd>
 <p>
-        Do not remove anything; just report what it would
-        remove.
+        Insert <em>progress</em> statements every &lt;n&gt; objects, to be shown by
+        <a href="git-fast-import.html">git-fast-import(1)</a> during import.
 </p>
 </dd>
 <dt>
---
+--signed-tags=(ignore|warn|strip|abort)
 </dt>
 <dd>
 <p>
-        Do not interpret any more arguments as options.
+        Specify how to handle signed tags.  Since any transformation
+        after the export can change the tag names (which can also happen
+        when excluding revisions) the signatures will not match.
 </p>
-</dd>
-<dt>
---expire &lt;time&gt;
-</dt>
-<dd>
-<p>
-        Only expire loose objects older than &lt;time&gt;.
-</p>
-</dd>
-<dt>
-&lt;head&gt;&#8230;
-</dt>
-<dd>
-<p>
-        In addition to objects
-        reachable from any of our references, keep objects
-        reachable from listed &lt;head&gt;s.
-</p>
+<p>When asking to <em>abort</em> (which is the default), this program will die
+when encountering a signed tag.  With <em>strip</em>, the tags will be made
+unsigned, with <em>ignore</em>, they will be silently ignored (i.e. not exported)
+and with <em>warn</em>, they will be exported, but you will see a warning.</p>
 </dd>
 </dl>
 </div>
-<h2>EXAMPLE</h2>
+<h2>EXAMPLES</h2>
 <div class="sectionbody">
-<p>To prune objects not used by your repository nor another that
-borrows from your repository via its
-<tt>.git/objects/info/alternates</tt>:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git prune $(cd ../another &amp;&amp; $(git-rev-parse --all))</tt></pre>
+<pre><tt>$ git fast-export --all | (cd /empty/repository &amp;&amp; git fast-import)</tt></pre>
 </div></div>
+<p>This will export the whole repository and import it into the existing
+empty repository.  Except for reencoding commits that are not in
+UTF-8, it would be a one-to-one mirror.</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git fast-export master~5..master |
+        sed "s|refs/heads/master|refs/heads/other|" |
+        git fast-import</tt></pre>
+</div></div>
+<p>This makes a new branch called <em>other</em> from <em>master~5..master</em>
+(i.e. if <em>master</em> has linear history, it will take the last 5 commits).</p>
+<p>Note that this assumes that none of the blobs and commit messages
+referenced by that revision range contains the string
+<em>refs/heads/master</em>.</p>
+</div>
+<h2>Limitations</h2>
+<div class="sectionbody">
+<p>Since <a href="git-fast-import.html">git-fast-import(1)</a> cannot tag trees, you will not be
+able to export the linux-2.6.git repository completely, as it contains
+a tag referencing a tree instead of a commit.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+<p>Written by Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;.</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<p>Documentation by Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
