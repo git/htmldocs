@@ -277,7 +277,7 @@ git-apply(1) Manual Page
           [--apply] [--no-add] [--build-fake-ancestor &lt;file&gt;] [-R | --reverse]
           [--allow-binary-replacement | --binary] [--reject] [-z]
           [-pNUM] [-CNUM] [--inaccurate-eof] [--cached]
-          [--whitespace=&lt;nowarn|warn|error|error-all|strip&gt;]
+          [--whitespace=&lt;nowarn|warn|fix|error|error-all&gt;]
           [--exclude=PATH] [--verbose] [&lt;patch&gt;&#8230;]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
@@ -489,20 +489,23 @@ discouraged.</p>
 </p>
 </dd>
 <dt>
---whitespace=&lt;option&gt;
+--whitespace=&lt;action&gt;
 </dt>
 <dd>
 <p>
-        When applying a patch, detect a new or modified line
-        that ends with trailing whitespaces (this includes a
-        line that solely consists of whitespaces).  By default,
-        the command outputs warning messages and applies the
-        patch.
-        When <a href="git-apply.html">git-apply(1)</a> is used for statistics and not applying a
-        patch, it defaults to <tt>nowarn</tt>.
-        You can use different <tt>&lt;option&gt;</tt> to control this
-        behavior:
+        When applying a patch, detect a new or modified line that has
+        whitespace errors.  What are considered whitespace errors is
+        controlled by <tt>core.whitespace</tt> configuration.  By default,
+        trailing whitespaces (including lines that solely consist of
+        whitespaces) and a space character that is immediately followed
+        by a tab character inside the initial indent of the line are
+        considered whitespace errors.
 </p>
+<p>By default, the command outputs warning messages but applies the patch.
+When <a href="git-apply.html">git-apply(1)</a> is used for statistics and not applying a
+patch, it defaults to <tt>nowarn</tt>.</p>
+<p>You can use different <tt>&lt;action&gt;</tt> to control this
+behavior:</p>
 <ul>
 <li>
 <p>
@@ -512,7 +515,15 @@ discouraged.</p>
 <li>
 <p>
 <tt>warn</tt> outputs warnings for a few such errors, but applies the
-  patch (default).
+  patch as-is (default).
+</p>
+</li>
+<li>
+<p>
+<tt>fix</tt> outputs warnings for a few such errors, and applies the
+  patch after fixing them (<tt>strip</tt> is a synonym --- the tool
+  used to consider only trailing whitespaces as errors, and the
+  fix involved <em>stripping</em> them, but modern gits do more).
 </p>
 </li>
 <li>
@@ -524,12 +535,6 @@ discouraged.</p>
 <li>
 <p>
 <tt>error-all</tt> is similar to <tt>error</tt> but shows all errors.
-</p>
-</li>
-<li>
-<p>
-<tt>strip</tt> outputs warnings for a few such errors, strips out the
-  trailing whitespaces and applies the patch.
 </p>
 </li>
 </ul>
@@ -599,7 +604,7 @@ subdirectory is checked and (if possible) updated.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 14-Nov-2007 12:11:20 UTC
+Last updated 09-Dec-2007 10:19:06 UTC
 </div>
 </div>
 </body>
