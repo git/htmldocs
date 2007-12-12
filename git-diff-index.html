@@ -620,7 +620,7 @@ entries in the index are compared.</p>
 </dt>
 <dd>
 <p>
-        Ignore changes in white spaces at EOL.
+        Ignore changes in whitespace at EOL.
 </p>
 </dd>
 <dt>
@@ -628,9 +628,9 @@ entries in the index are compared.</p>
 </dt>
 <dd>
 <p>
-        Ignore changes in amount of white space.  This ignores white
-        space at line end, and consider all other sequences of one or
-        more white space characters to be equivalent.
+        Ignore changes in amount of whitespace.  This ignores whitespace
+        at line end, and considers all other sequences of one or
+        more whitespace characters to be equivalent.
 </p>
 </dd>
 <dt>
@@ -646,8 +646,8 @@ entries in the index are compared.</p>
 </dt>
 <dd>
 <p>
-        Ignore white space when comparing lines.  This ignores
-        difference even if one line has white space where the other
+        Ignore whitespace when comparing lines.  This ignores
+        differences even if one line has whitespace where the other
         line has none.
 </p>
 </dd>
@@ -1094,6 +1094,121 @@ two unresolved merge parents with the working tree file
 (i.e. file1 is stage 2 aka "our version", file2 is stage 3 aka
 "their version").</p>
 </div>
+<h2>other diff formats</h2>
+<div class="sectionbody">
+<p>The <tt>--summary</tt> option describes newly added, deleted, renamed and
+copied files.  The <tt>--stat</tt> option adds diffstat(1) graph to the
+output.  These options can be combined with other options, such as
+<tt>-p</tt>, and are meant for human consumption.</p>
+<p>When showing a change that involves a rename or a copy, <tt>--stat</tt> output
+formats the pathnames compactly by combining common prefix and suffix of
+the pathnames.  For example, a change that moves <tt>arch/i386/Makefile</tt> to
+<tt>arch/x86/Makefile</tt> while modifying 4 lines will be shown like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>arch/{i386 =&gt; x86}/Makefile    |   4 +--</tt></pre>
+</div></div>
+<p>The <tt>--numstat</tt> option gives the diffstat(1) information but is designed
+for easier machine consumption.  An entry in <tt>--numstat</tt> output looks
+like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>1       2       README
+3       1       arch/{i386 =&gt; x86}/Makefile</tt></pre>
+</div></div>
+<p>That is, from left to right:</p>
+<ol>
+<li>
+<p>
+the number of added lines;
+</p>
+</li>
+<li>
+<p>
+a tab;
+</p>
+</li>
+<li>
+<p>
+the number of deleted lines;
+</p>
+</li>
+<li>
+<p>
+a tab;
+</p>
+</li>
+<li>
+<p>
+pathname (possibly with rename/copy information);
+</p>
+</li>
+<li>
+<p>
+a newline.
+</p>
+</li>
+</ol>
+<p>When <tt>-z</tt> output option is in effect, the output is formatted this way:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>1       2       README NUL
+3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL</tt></pre>
+</div></div>
+<p>That is:</p>
+<ol>
+<li>
+<p>
+the number of added lines;
+</p>
+</li>
+<li>
+<p>
+a tab;
+</p>
+</li>
+<li>
+<p>
+the number of deleted lines;
+</p>
+</li>
+<li>
+<p>
+a tab;
+</p>
+</li>
+<li>
+<p>
+a NUL (only exists if renamed/copied);
+</p>
+</li>
+<li>
+<p>
+pathname in preimage;
+</p>
+</li>
+<li>
+<p>
+a NUL (only exists if renamed/copied);
+</p>
+</li>
+<li>
+<p>
+pathname in postimage (only exists if renamed/copied);
+</p>
+</li>
+<li>
+<p>
+a NUL.
+</p>
+</li>
+</ol>
+<p>The extra <tt>NUL</tt> before the preimage path in renamed case is to allow
+scripts that read the output to tell if the current record being read is
+a single-path record or a rename/copy record without reading ahead.
+After reading added and deleted lines, reading up to <tt>NUL</tt> would yield
+the pathname, but if that is <tt>NUL</tt>, the record will show two paths.</p>
+</div>
 <h2>Operating Modes</h2>
 <div class="sectionbody">
 <p>You can choose whether you want to trust the index file entirely
@@ -1202,7 +1317,7 @@ always have the special all-zero sha1.</td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Dec-2007 09:49:14 UTC
+Last updated 12-Dec-2007 21:33:07 UTC
 </div>
 </div>
 </body>
