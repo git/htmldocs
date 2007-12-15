@@ -226,7 +226,6 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -256,145 +255,111 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>git-help(1)</title>
+<title>builtin API</title>
 </head>
 <body>
 <div id="header">
-<h1>
-git-help(1) Manual Page
-</h1>
-<h2>NAME</h2>
+<h1>builtin API</h1>
+</div>
+<h2>Adding a new built-in</h2>
 <div class="sectionbody">
-<p>git-help -
-   display help information about git
+<p>There are 4 things to do to add a bulit-in command implementation to
+git:</p>
+<ol>
+<li>
+<p>
+Define the implementation of the built-in command <tt>foo</tt> with
+  signature:
 </p>
-</div>
-</div>
-<h2>SYNOPSIS</h2>
-<div class="sectionbody">
-<p><em>git help</em> [-a|--all|-i|--info|-m|--man|-w|--web] [COMMAND]</p>
-</div>
-<h2>DESCRIPTION</h2>
-<div class="sectionbody">
-<p>With no options and no COMMAND given, the synopsis of the <em>git</em>
-command and a list of the most commonly used git commands are printed
-on the standard output.</p>
-<p>If the option <em>--all</em> or <em>-a</em> is given, then all available commands are
-printed on the standard output.</p>
-<p>If a git command is named, a manual page for that command is brought
-up. The <em>man</em> program is used by default for this purpose, but this
-can be overriden by other options or configuration variables.</p>
-<p>Note that <em>git --help &#8230;</em> is identical as <em>git help &#8230;</em> because the
-former is internally converted into the latter.</p>
-</div>
-<h2>OPTIONS</h2>
-<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><tt>int cmd_foo(int argc, const char **argv, const char *prefix);</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Add the external declaration for the function to <tt>builtin.h</tt>.
+</p>
+</li>
+<li>
+<p>
+Add the command to <tt>commands[]</tt> table in <tt>handle_internal_command()</tt>,
+  defined in <tt>git.c</tt>.  The entry should look like:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>{ "foo", cmd_foo, &lt;options&gt; },</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>where options is the bitwise-or of:</tt></pre>
+</div></div>
 <dl>
 <dt>
--a|--all
+<tt>RUN_SETUP</tt>
 </dt>
 <dd>
 <p>
-        Prints all the available commands on the standard output. This
-        option superseeds any other option.
+        Make sure there is a git directory to work on, and if there is a
+        work tree, chdir to the top of it if the command was invoked
+        in a subdirectory.  If there is no work tree, no chdir() is
+        done.
 </p>
 </dd>
 <dt>
--i|--info
+<tt>USE_PAGER</tt>
 </dt>
 <dd>
 <p>
-        Use the <em>info</em> program to display the manual page, instead of
-        the <em>man</em> program that is used by default.
+        If the standard output is connected to a tty, spawn a pager and
+        feed our output to it.
 </p>
-</dd>
-<dt>
--m|--man
-</dt>
-<dd>
-<p>
-        Use the <em>man</em> program to display the manual page. This may be
-        used to override a value set in the <em>help.format</em>
-        configuration variable.
-</p>
-</dd>
-<dt>
--w|--web
-</dt>
-<dd>
-<p>
-        Use a web browser to display the HTML manual page, instead of
-        the <em>man</em> program that is used by default.
-</p>
-<p>The web browser can be specified using the configuration variable
-<em>help.browser</em>, or <em>web.browser</em> if the former is not set. If none of
-these config variables is set, the <em>git-browse--help</em> helper script
-(called by <em>git-help</em>) will pick a suitable default.</p>
-<p>You can explicitly provide a full path to your prefered browser by
-setting the configuration variable <em>browser.&lt;tool&gt;.path</em>. For example,
-you can configure the absolute path to firefox by setting
-<em>browser.firefox.path</em>. Otherwise, <em>git-browse--help</em> assumes the tool
-is available in PATH.</p>
-<p>Note that the script tries, as much as possible, to display the HTML
-page in a new tab on an already opened browser.</p>
 </dd>
 </dl>
-</div>
-<h2>CONFIGURATION VARIABLES</h2>
-<div class="sectionbody">
-<p>If no command line option is passed, the <em>help.format</em> configuration
-variable will be checked. The following values are supported for this
-variable; they make <em>git-help</em> behave as their corresponding command
-line option:</p>
-<ul>
+</li>
 <li>
 <p>
-"man" corresponds to <em>-m|--man</em>,
+Add <tt>builtin-foo.o</tt> to <tt>BUILTIN_OBJS</tt> in <tt>Makefile</tt>.
+</p>
+</li>
+</ol>
+<p>Additionally, if <tt>foo</tt> is a new command, there are 3 more things to do:</p>
+<ol>
+<li>
+<p>
+Add tests to <tt>t/</tt> directory.
 </p>
 </li>
 <li>
 <p>
-"info" corresponds to <em>-i|--info</em>,
+Write documentation in <tt>Documentation/git-foo.txt</tt>.
 </p>
 </li>
 <li>
 <p>
-"web" or "html" correspond to <em>-w|--web</em>,
+Add an entry for <tt>git-foo</tt> to the list at the end of
+  <tt>Documentation/cmd-list.perl</tt>.
 </p>
 </li>
-</ul>
-<p>The <em>help.browser</em>, <em>web.browser</em> and <em>browser.&lt;tool&gt;.path</em> will also
-be checked if the <em>web</em> format is choosen (either by command line
-option or configuration variable). See <em>-w|--web</em> in the OPTIONS
-section above.</p>
-<p>Note that these configuration variables should probably be set using
-the <em>--global</em> flag, for example like this:</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git config --global help.format web
-$ git config --global web.browser firefox</tt></pre>
-</div></div>
-<p>as they are probably more user specific than repository specific.
-See <a href="git-config.html">git-config(1)</a> for more information about this.</p>
+</ol>
 </div>
-<h2>Author</h2>
+<h2>How a built-in is called</h2>
 <div class="sectionbody">
-<p>Written by Junio C Hamano &lt;gitster@pobox.com&gt; and the git-list
-&lt;git@vger.kernel.org&gt;.</p>
-</div>
-<h2>Documentation</h2>
-<div class="sectionbody">
-<p>Initial documentation was part of the <a href="git.html">git(7)</a> man page.
-Christian Couder &lt;chriscool@tuxfamily.org&gt; extracted and rewrote it a
-little. Maintenance is done by the git-list &lt;git@vger.kernel.org&gt;.</p>
-</div>
-<h2>GIT</h2>
-<div class="sectionbody">
-<p>Part of the <a href="git.html">git(7)</a> suite</p>
+<p>The implementation <tt>cmd_foo()</tt> takes three parameters, <tt>argc</tt>, <tt>argv,
+and `prefix</tt>.  The first two are similar to what <tt>main()</tt> of a
+standalone command would be called with.</p>
+<p>When <tt>RUN_SETUP</tt> is specified in the <tt>commands[]</tt> table, and when you
+were started from a subdirectory of the work tree, <tt>cmd_foo()</tt> is called
+after chdir(2) to the top of the work tree, and <tt>prefix</tt> gets the path
+to the subdirectory the command started from.  This allows you to
+convert a user-supplied pathname (typically relative to that directory)
+to a pathname relative to the top of the work tree.</p>
+<p>The return value from <tt>cmd_foo()</tt> becomes the exit status of the
+command.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Dec-2007 08:39:56 UTC
+Last updated 15-Dec-2007 08:39:58 UTC
 </div>
 </div>
 </body>
