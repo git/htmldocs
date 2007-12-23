@@ -256,55 +256,131 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>git-check-attr(1)</title>
+<title>gitcli(5)</title>
 </head>
 <body>
 <div id="header">
 <h1>
-git-check-attr(1) Manual Page
+gitcli(5) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-check-attr -
-   Display gitattributes information.
+<p>gitcli -
+   git command line interface and conventions
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-check-attr</em> attr&#8230; [--] pathname&#8230;</p>
+<p>gitcli</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>For every pathname, this command will list if each attr is <em>unspecified</em>,
-<em>set</em>, or <em>unset</em> as a gitattribute on that pathname.</p>
+<p>This manual describes best practice in how to use git CLI.  Here are
+the rules that you should follow when you are scripting git:</p>
+<ul>
+<li>
+<p>
+it's preferred to use the non dashed form of git commands, which means that
+   you should prefer <tt>"git foo"</tt> to <tt>"git-foo"</tt>.
+</p>
+</li>
+<li>
+<p>
+splitting short options to separate words (prefer <tt>"git foo -a -b"</tt>
+   to <tt>"git foo -ab"</tt>, the latter may not even work).
+</p>
+</li>
+<li>
+<p>
+when a command line option takes an argument, use the <em>sticked</em> form.  In
+   other words, write <tt>"git foo -oArg"</tt> instead of <tt>"git foo -o Arg"</tt> for short
+   options, and <tt>"git foo --long-opt=Arg"</tt> instead of <tt>"git foo --long-opt Arg"</tt>
+   for long options.  An option that takes optional option-argument must be
+   written in the <em>sticked</em> form.
+</p>
+</li>
+<li>
+<p>
+when you give a revision parameter to a command, make sure the parameter is
+   not ambiguous with a name of a file in the work tree.  E.g. do not write
+   <tt>"git log -1 HEAD"</tt> but write <tt>"git log -1 HEAD --"</tt>; the former will not work
+   if you happen to have a file called <tt>HEAD</tt> in the work tree.
+</p>
+</li>
+</ul>
 </div>
-<h2>OPTIONS</h2>
+<h2>ENHANCED CLI</h2>
 <div class="sectionbody">
+<p>From the git 1.5.4 series and further, many git commands (not all of them at the
+time of the writing though) come with an enhanced option parser.</p>
+<p>Here is an exhaustive list of the facilities provided by this option parser.</p>
+<h3>Magic Options</h3>
+<p>Commands which have the enhanced option parser activated all understand a
+couple of magic command line options:</p>
 <dl>
 <dt>
---
+-h
 </dt>
 <dd>
 <p>
-        Interpret all preceding arguments as attributes, and all following
-        arguments as path names. If not supplied, only the first argument will
-        be treated as an attribute.
+        gives a pretty printed usage of the command.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git describe -h
+usage: git-describe [options] &lt;committish&gt;*
+
+    --contains            find the tag that comes after the commit
+    --debug               debug search strategy on stderr
+    --all                 use any ref in .git/refs
+    --tags                use any tag in .git/refs/tags
+    --abbrev [&lt;n&gt;]        use &lt;n&gt; digits to display SHA-1s
+    --candidates &lt;n&gt;      consider &lt;n&gt; most recent tags (default: 10)</tt></pre>
+</div></div>
+</dd>
+<dt>
+--help-all
+</dt>
+<dd>
+<p>
+        Some git commands take options that are only used for plumbing or that
+        are deprecated, and such options are hidden from the default usage. This
+        option gives the full list of options.
 </p>
 </dd>
 </dl>
-</div>
-<h2>SEE ALSO</h2>
-<div class="sectionbody">
-<p><a href="gitattributes.html">gitattributes(5)</a>.</p>
-</div>
-<h2>Author</h2>
-<div class="sectionbody">
-<p>Written by Junio C Hamano &lt;junkio@cox.net&gt;</p>
+<h3>Negating options</h3>
+<p>Options with long option names can be negated by prefixing <tt>"--no-"</tt>. For
+example, <tt>"git branch"</tt> has the option <tt>"--track"</tt> which is <em>on</em> by default. You
+can use <tt>"--no-track"</tt> to override that behaviour. The same goes for <tt>"--color"</tt>
+and <tt>"--no-color"</tt>.</p>
+<h3>Aggregating short options</h3>
+<p>Commands that support the enhanced option parser allow you to aggregate short
+options. This means that you can for example use <tt>"git rm -rf"</tt> or
+<tt>"git clean -fdx"</tt>.</p>
+<h3>Separating argument from the option</h3>
+<p>You can write the mandatory option parameter to an option as a separate
+word on the command line.  That means that all the following uses work:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git foo --long-opt=Arg
+$ git foo --long-opt Arg
+$ git foo -oArg
+$ git foo -o Arg</tt></pre>
+</div></div>
+<p>However, this is <strong>NOT</strong> allowed for switches with an optionnal value, where the
+<em>sticked</em> form must be used:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git describe --abbrev HEAD     # correct
+$ git describe --abbrev=10 HEAD  # correct
+$ git describe --abbrev 10 HEAD  # NOT WHAT YOU MEANT</tt></pre>
+</div></div>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by James Bowes.</p>
+<p>Documentation by Pierre Habouzit.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -312,7 +388,7 @@ git-check-attr(1) Manual Page
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 23-Dec-2007 08:15:26 UTC
+Last updated 23-Dec-2007 08:15:28 UTC
 </div>
 </div>
 </body>
