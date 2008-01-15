@@ -255,116 +255,113 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>GIT Howto Index</title>
+<title>How to use the subtree merge strategy</title>
 </head>
 <body>
 <div id="header">
-<h1>GIT Howto Index</h1>
+<h1>How to use the subtree merge strategy</h1>
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>Here is a collection of mailing list postings made by various
-people describing how they use git in their workflow.</p>
-<ul>
+<p>There are situations where you want to include contents in your project
+from an independently developed project. You can just pull from the
+other project as long as there are no conflicting paths.</p>
+<p>The problematic case is when there are conflicting files. Potential
+candidates are Makefiles and other standard filenames. You could merge
+these files but probably you do not want to.  A better solution for this
+problem can be to merge the project as its own subdirectory. This is not
+supported by the <em>recursive</em> merge strategy, so just pulling won't work.</p>
+<p>What you want is the <em>subtree</em> merge strategy, which helps you in such a
+situation.</p>
+<p>In this example, let's say you have the repository at <tt>/path/to/B</tt> (but
+it can be an URL as well, if you want). You want to merge the <em>master</em>
+branch of that repository to the <tt>dir-B</tt> subdirectory in your current
+branch.</p>
+<p>Here is the command sequence you need:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git remote add -f Bproject /path/to/B <b>(1)</b>
+$ git merge -s ours --no-commit Bproject/master <b>(2)</b>
+$ git read-tree --prefix=dir-B/ -u Bproject/master <b>(3)</b>
+$ git commit -m "Merge B project as our subdirectory" <b>(4)</b>
+
+$ git pull -s subtree Bproject master <b>(5)</b></tt></pre>
+</div></div>
+<ol>
 <li>
 <p>
-<a href="howto/maintain-git.txt">maintain-git</a> by Junio C Hamano &lt;gitster@pobox.com&gt;
-</p>
-</li>
-</ul>
-<p>Imagine that git development is racing along as usual, when our friendly
-neighborhood maintainer is struck down by a wayward bus. Out of the
-hordes of suckers (loyal developers), you have been tricked (chosen) to
-step up as the new maintainer. This howto will show you "how to" do it.</p>
-<ul>
-<li>
-<p>
-<a href="howto/rebase-and-edit.txt">rebase-and-edit</a> by Linus Torvalds &lt;torvalds@osdl.org&gt;
-</p>
-</li>
-</ul>
-<p>In this article, Linus demonstrates how a broken commit
-in a sequence of commits can be removed by rewinding the head and
-reapplying selected changes.</p>
-<ul>
-<li>
-<p>
-<a href="howto/rebase-from-internal-branch.txt">rebase-from-internal-branch</a> by Junio C Hamano &lt;junkio@cox.net&gt;
-</p>
-</li>
-</ul>
-<p>In this article, JC talks about how he rebases the
-public "pu" branch using the core GIT tools when he updates
-the "master" branch, and how "rebase" works.  Also discussed
-is how this applies to individual developers who sends patches
-upstream.</p>
-<ul>
-<li>
-<p>
-<a href="howto/rebuild-from-update-hook.txt">rebuild-from-update-hook</a> by Junio C Hamano &lt;junkio@cox.net&gt;
-</p>
-</li>
-</ul>
-<p>In this how-to article, JC talks about how he
-uses the post-update hook to automate git documentation page
-shown at http://www.kernel.org/pub/software/scm/git/docs/.</p>
-<ul>
-<li>
-<p>
-<a href="howto/recover-corrupted-blob-object.txt">recover-corrupted-blob-object</a> by Linus Torvalds &lt;torvalds@linux-foundation.org&gt;
-</p>
-</li>
-</ul>
-<p>Some tricks to reconstruct blob objects in order to fix
-a corrupted repository.</p>
-<ul>
-<li>
-<p>
-<a href="howto/revert-branch-rebase.html">revert-branch-rebase</a> by Junio C Hamano &lt;junkio@cox.net&gt;
-</p>
-</li>
-</ul>
-<p>In this article, JC gives a small real-life example of using
-<em>git revert</em> command, and using a temporary branch and tag for safety
-and easier sanity checking.</p>
-<ul>
-<li>
-<p>
-<a href="howto/separating-topic-branches.txt">separating-topic-branches</a> by Junio C Hamano &lt;junkio@cox.net&gt;
-</p>
-</li>
-</ul>
-<p>In this article, JC describes how to separate topic branches.</p>
-<ul>
-<li>
-<p>
-<a href="howto/setup-git-server-over-http.txt">setup-git-server-over-http</a> by Rutger Nijlunsing &lt;rutger@nospam.com&gt;
+name the other project "Bproject", and fetch.
 </p>
 </li>
 <li>
 <p>
-<a href="howto/update-hook-example.txt">update-hook-example</a> by Junio C Hamano &lt;junkio@cox.net&gt; and Carl Baldwin &lt;cnb@fc.hp.com&gt;
-</p>
-</li>
-</ul>
-<p>An example hooks/update script is presented to
-implement repository maintenance policies, such as who can push
-into which branch and who can make a tag.</p>
-<ul>
-<li>
-<p>
-<a href="howto/use-git-daemon.txt">use-git-daemon</a>
+prepare for the later step to record the result as a merge.
 </p>
 </li>
 <li>
 <p>
-<a href="howto/using-merge-subtree.html">using-merge-subtree</a> by Sean &lt;seanlkml@sympatico.ca&gt;
+read "master" branch of Bproject to the subdirectory "dir-B".
 </p>
 </li>
-</ul>
-<p>In this article, Sean demonstrates how one can use the subtree merge
-strategy.</p>
+<li>
+<p>
+record the merge result.
+</p>
+</li>
+<li>
+<p>
+maintain the result with subsequent merges using "subtree"
+</p>
+</li>
+</ol>
+<p>The first four commands are used for the initial merge, while the last
+one is to merge updates from <em>B project</em>.</p>
 </div>
+</div>
+<h2>Comparing <em>subtree</em> merge with submodules</h2>
+<div class="sectionbody">
+<ul>
+<li>
+<p>
+The benefit of using subtree merge is that it requires less
+  administrative burden from the users of your repository. It works with
+  older (before Git v1.5.2) clients and you have the code right after
+  clone.
+</p>
+</li>
+<li>
+<p>
+However if you use submodules then you can choose not to transfer the
+  submodule objects. This may be a problem with the subtree merge.
+</p>
+</li>
+<li>
+<p>
+Also, in case you make changes to the other project, it is easier to
+  submit changes if you just use submodules.
+</p>
+</li>
+</ul>
+</div>
+<h2>Additional tips</h2>
+<div class="sectionbody">
+<ul>
+<li>
+<p>
+If you made changes to the other project in your repository, they may
+  want to merge from your project. This is possible using subtree &#8212; it
+  can shift up the paths in your tree and then they can merge only the
+  relevant parts of your tree.
+</p>
+</li>
+<li>
+<p>
+Please note that if the other project merges from you, then it will
+  connects its history to yours, which can be something they don't want
+  to.
+</p>
+</li>
+</ul>
 </div>
 <div id="footer">
 <div id="footer-text">
