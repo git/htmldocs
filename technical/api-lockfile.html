@@ -263,36 +263,105 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>Talk about &lt;lockfile.c&gt;, things like:</p>
+<p>The lockfile API serves two purposes:</p>
 <ul>
 <li>
 <p>
-lockfile lifetime &#8212; atexit(3) looks at them, do not put them on the
-  stack;
+Mutual exclusion.  When we write out a new index file, first
+  we create a new file <tt>$GIT_DIR/index.lock</tt>, write the new
+  contents into it, and rename it to the final destination
+  <tt>$GIT_DIR/index</tt>.  We try to create the <tt>$GIT_DIR/index.lock</tt>
+  file with O_EXCL so that we can notice and fail when somebody
+  else is already trying to update the index file.
 </p>
 </li>
 <li>
 <p>
-hold_lock_file_for_update()
-</p>
-</li>
-<li>
-<p>
-commit_lock_file()
-</p>
-</li>
-<li>
-<p>
-rollback_rock_file()
+Automatic cruft removal.  After we create the "lock" file, we
+  may decide to <tt>die()</tt>, and we would want to make sure that we
+  remove the file that has not been committed to its final
+  destination.  This is done by remembering the lockfiles we
+  created in a linked list and cleaning them up from an
+  <tt>atexit(3)</tt> handler.  Outstanding lockfiles are also removed
+  when the program dies on a signal.
 </p>
 </li>
 </ul>
-<p>(JC, Dscho, Shawn)</p>
 </div>
+</div>
+<h2>The functions</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+hold_lock_file_for_update
+</dt>
+<dd>
+<p>
+        Take a pointer to <tt>struct lock_file</tt>, the filename of
+        the final destination (e.g. <tt>$GIT_DIR/index</tt>) and a flag
+        <tt>die_on_error</tt>.  Attempt to create a lockfile for the
+        destination and return the file descriptor for writing
+        to the file.  If <tt>die_on_error</tt> flag is true, it dies if
+        a lock is already taken for the file; otherwise it
+        returns a negative integer to the caller on failure.
+</p>
+</dd>
+<dt>
+commit_lock_file
+</dt>
+<dd>
+<p>
+        Take a pointer to the <tt>struct lock_file</tt> initialized
+        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
+        close the file descriptor and rename the lockfile to its
+        final destination.  Returns 0 upon success, a negative
+        value on failure to close(2) or rename(2).
+</p>
+</dd>
+<dt>
+rollback_lock_file
+</dt>
+<dd>
+<p>
+        Take a pointer to the <tt>struct lock_file</tt> initialized
+        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
+        close the file descriptor and remove the lockfile.
+</p>
+</dd>
+<dt>
+close_lock_file
+</dt>
+<dd>
+<p>
+        Take a pointer to the <tt>struct lock_file</tt> initialized
+        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
+        and close the file descriptor.  Returns 0 upon success,
+        a negative value on failure to close(2).
+</p>
+</dd>
+</dl>
+<p>Because the structure is used in an <tt>atexit(3)</tt> handler, its
+storage has to stay throughout the life of the program.  It
+cannot be an auto variable allocated on the stack.</p>
+<p>Call <tt>commit_lock_file()</tt> or <tt>rollback_lock_file()</tt> when you are
+done writing to the file descriptor.  If you do not call either
+and simply <tt>exit(3)</tt> from the program, an <tt>atexit(3)</tt> handler
+will close and remove the lockfile.</p>
+<p>If you need to close the file descriptor you obtained from
+<tt>hold_lock_file_for_update</tt> function yourself, do so by calling
+<tt>close_lock_file()</tt>.  You should never call <tt>close(2)</tt> yourself!
+Otherwise the <tt>struct
+lock_file</tt> structure still remembers that the file descriptor
+needs to be closed, and a later call to <tt>commit_lock_file()</tt> or
+<tt>rollback_lock_file()</tt> will result in duplicate calls to
+<tt>close(2)</tt>.  Worse yet, if you <tt>close(2)</tt>, open another file
+descriptor for completely different purpose, and then call
+<tt>commit_lock_file()</tt> or <tt>rollback_lock_file()</tt>, they may close
+that unrelated file descriptor.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:51:27 UTC
+Last updated 17-Jan-2008 02:42:45 UTC
 </div>
 </div>
 </body>
