@@ -281,48 +281,9 @@ git-log(1) Manual Page
 command to control what is shown and how, and options applicable to
 the <a href="git-diff-tree.html">git-diff-tree(1)</a> commands to control how the changes
 each commit introduces are shown.</p>
-<p>This manual page describes only the most frequently used options.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
-<dl>
-<dt>
---pretty[=<em>&lt;format&gt;</em>]
-</dt>
-<dd>
-<p>
-        Pretty-print the contents of the commit logs in a given format,
-        where <em>&lt;format&gt;</em> can be one of <em>oneline</em>, <em>short</em>, <em>medium</em>,
-        <em>full</em>, <em>fuller</em>, <em>email</em>, <em>raw</em> and <em>format:&lt;string&gt;</em>.
-        When omitted, the format defaults to <em>medium</em>.
-</p>
-</dd>
-<dt>
---abbrev-commit
-</dt>
-<dd>
-<p>
-        Instead of showing the full 40-byte hexadecimal commit object
-        name, show only handful hexdigits prefix.  Non default number of
-        digits can be specified with "--abbrev=&lt;n&gt;" (which also modifies
-        diff output, if it is displayed).
-</p>
-<p>This should make "--pretty=oneline" a whole lot more readable for
-people using 80-column terminals.</p>
-</dd>
-<dt>
---encoding[=&lt;encoding&gt;]
-</dt>
-<dd>
-<p>
-        The commit objects record the encoding used for the log message
-        in their encoding header; this option can be used to tell the
-        command to re-code the commit log message in the encoding
-        preferred by the user.  For non plumbing commands this
-        defaults to UTF-8.
-</p>
-</dd>
-</dl>
 <dl>
 <dt>
 -p
@@ -786,31 +747,6 @@ people using 80-column terminals.</p>
 </p>
 </dd>
 <dt>
---first-parent
-</dt>
-<dd>
-<p>
-        Follow only the first parent commit upon seeing a merge
-        commit.  This option can give a better overview when
-        viewing the evolution of a particular topic branch,
-        because merges into a topic branch tend to be only about
-        adjusting to updated upstream from time to time, and
-        this option allows you to ignore the individual commits
-        brought in to your history by such a merge.
-</p>
-</dd>
-<dt>
--g, --walk-reflogs
-</dt>
-<dd>
-<p>
-        Show commits as they were recorded in the reflog. The log contains
-        a record about how the tip of a reference was changed.
-        Cannot be combined with --reverse.
-        See also <a href="git-reflog.html">git-reflog(1)</a>.
-</p>
-</dd>
-<dt>
 --decorate
 </dt>
 <dd>
@@ -856,6 +792,487 @@ people using 80-column terminals.</p>
 <dd>
 <p>
         Show only commits that affect the specified paths.
+</p>
+</dd>
+</dl>
+<h3>Commit Formatting</h3>
+<dl>
+<dt>
+--pretty[=<em>&lt;format&gt;</em>]
+</dt>
+<dd>
+<p>
+        Pretty-print the contents of the commit logs in a given format,
+        where <em>&lt;format&gt;</em> can be one of <em>oneline</em>, <em>short</em>, <em>medium</em>,
+        <em>full</em>, <em>fuller</em>, <em>email</em>, <em>raw</em> and <em>format:&lt;string&gt;</em>.
+        When omitted, the format defaults to <em>medium</em>.
+</p>
+</dd>
+<dt>
+--abbrev-commit
+</dt>
+<dd>
+<p>
+        Instead of showing the full 40-byte hexadecimal commit object
+        name, show only handful hexdigits prefix.  Non default number of
+        digits can be specified with "--abbrev=&lt;n&gt;" (which also modifies
+        diff output, if it is displayed).
+</p>
+<p>This should make "--pretty=oneline" a whole lot more readable for
+people using 80-column terminals.</p>
+</dd>
+<dt>
+--encoding[=&lt;encoding&gt;]
+</dt>
+<dd>
+<p>
+        The commit objects record the encoding used for the log message
+        in their encoding header; this option can be used to tell the
+        command to re-code the commit log message in the encoding
+        preferred by the user.  For non plumbing commands this
+        defaults to UTF-8.
+</p>
+</dd>
+<dt>
+--relative-date
+</dt>
+<dd>
+<p>
+        Synonym for <tt>--date=relative</tt>.
+</p>
+</dd>
+<dt>
+--date={relative,local,default,iso,rfc}
+</dt>
+<dd>
+<p>
+        Only takes effect for dates shown in human-readable format, such
+        as when using "--pretty".
+</p>
+<p><tt>--date=relative</tt> shows dates relative to the current time,
+e.g. "2 hours ago".</p>
+<p><tt>--date=local</tt> shows timestamps in user's local timezone.</p>
+<p><tt>--date=iso</tt> (or <tt>--date=iso8601</tt>) shows timestamps in ISO 8601 format.</p>
+<p><tt>--date=rfc</tt> (or <tt>--date=rfc2822</tt>) shows timestamps in RFC 2822
+format, often found in E-mail messages.</p>
+<p><tt>--date=short</tt> shows only date but not time, in <tt>YYYY-MM-DD</tt> format.</p>
+<p><tt>--date=default</tt> shows timestamps in the original timezone
+(either committer's or author's).</p>
+</dd>
+<dt>
+--header
+</dt>
+<dd>
+<p>
+        Print the contents of the commit in raw-format; each record is
+        separated with a NUL character.
+</p>
+</dd>
+<dt>
+--parents
+</dt>
+<dd>
+<p>
+        Print the parents of the commit.
+</p>
+</dd>
+<dt>
+--timestamp
+</dt>
+<dd>
+<p>
+        Print the raw commit timestamp.
+</p>
+</dd>
+<dt>
+--left-right
+</dt>
+<dd>
+<p>
+        Mark which side of a symmetric diff a commit is reachable from.
+        Commits from the left side are prefixed with <tt>&lt;</tt> and those from
+        the right with <tt>&gt;</tt>.  If combined with <tt>--boundary</tt>, those
+        commits are prefixed with <tt>-</tt>.
+</p>
+<p>For example, if you have this topology:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>             y---b---b  branch B
+            / \ /
+           /   .
+          /   / \
+         o---x---a---a  branch A</tt></pre>
+</div></div>
+<p>you would get an output line this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        $ git rev-list --left-right --boundary --pretty=oneline A...B
+
+        &gt;bbbbbbb... 3rd on b
+        &gt;bbbbbbb... 2nd on b
+        &lt;aaaaaaa... 3rd on a
+        &lt;aaaaaaa... 2nd on a
+        -yyyyyyy... 1st on b
+        -xxxxxxx... 1st on a</tt></pre>
+</div></div>
+</dd>
+</dl>
+<h3>Diff Formatting</h3>
+<p>Below are listed options that control the formatting of diff output.
+Some of them are specific to <a href="git-rev-list.html">git-rev-list(1)</a>, however other diff
+options may be given. See <a href="git-diff-files.html">git-diff-files(1)</a> for more options.</p>
+<dl>
+<dt>
+-c
+</dt>
+<dd>
+<p>
+        This flag changes the way a merge commit is displayed.  It shows
+        the differences from each of the parents to the merge result
+        simultaneously instead of showing pairwise diff between a parent
+        and the result one at a time. Furthermore, it lists only files
+        which were modified from all parents.
+</p>
+</dd>
+<dt>
+--cc
+</dt>
+<dd>
+<p>
+        This flag implies the <em>-c</em> options and further compresses the
+        patch output by omitting hunks that show differences from only
+        one parent, or show the same change from all but one parent for
+        an Octopus merge.
+</p>
+</dd>
+<dt>
+-r
+</dt>
+<dd>
+<p>
+        Show recursive diffs.
+</p>
+</dd>
+<dt>
+-t
+</dt>
+<dd>
+<p>
+        Show the tree objects in the diff output. This implies <em>-r</em>.
+</p>
+</dd>
+</dl>
+<h3>Commit Limiting</h3>
+<p>Besides specifying a range of commits that should be listed using the
+special notations explained in the description, additional commit
+limiting may be applied.</p>
+<dl>
+<dt>
+-n <em>number</em>, --max-count=<em>number</em>
+</dt>
+<dd>
+<p>
+        Limit the number of commits output.
+</p>
+</dd>
+<dt>
+--skip=<em>number</em>
+</dt>
+<dd>
+<p>
+        Skip <em>number</em> commits before starting to show the commit output.
+</p>
+</dd>
+<dt>
+--since=<em>date</em>, --after=<em>date</em>
+</dt>
+<dd>
+<p>
+        Show commits more recent than a specific date.
+</p>
+</dd>
+<dt>
+--until=<em>date</em>, --before=<em>date</em>
+</dt>
+<dd>
+<p>
+        Show commits older than a specific date.
+</p>
+</dd>
+<dt>
+--max-age=<em>timestamp</em>, --min-age=<em>timestamp</em>
+</dt>
+<dd>
+<p>
+        Limit the commits output to specified time range.
+</p>
+</dd>
+<dt>
+--author=<em>pattern</em>, --committer=<em>pattern</em>
+</dt>
+<dd>
+<p>
+        Limit the commits output to ones with author/committer
+        header lines that match the specified pattern (regular expression).
+</p>
+</dd>
+<dt>
+--grep=<em>pattern</em>
+</dt>
+<dd>
+<p>
+        Limit the commits output to ones with log message that
+        matches the specified pattern (regular expression).
+</p>
+</dd>
+<dt>
+-i, --regexp-ignore-case
+</dt>
+<dd>
+<p>
+        Match the regexp limiting patterns without regard to letters case.
+</p>
+</dd>
+<dt>
+-E, --extended-regexp
+</dt>
+<dd>
+<p>
+        Consider the limiting patterns to be extended regular expressions
+        instead of the default basic regular expressions.
+</p>
+</dd>
+<dt>
+--remove-empty
+</dt>
+<dd>
+<p>
+        Stop when a given path disappears from the tree.
+</p>
+</dd>
+<dt>
+--full-history
+</dt>
+<dd>
+<p>
+        Show also parts of history irrelevant to current state of a given
+        path. This turns off history simplification, which removed merges
+        which didn't change anything at all at some child. It will still actually
+        simplify away merges that didn't change anything at all into either
+        child.
+</p>
+</dd>
+<dt>
+--no-merges
+</dt>
+<dd>
+<p>
+        Do not print commits with more than one parent.
+</p>
+</dd>
+<dt>
+--first-parent
+</dt>
+<dd>
+<p>
+        Follow only the first parent commit upon seeing a merge
+        commit.  This option can give a better overview when
+        viewing the evolution of a particular topic branch,
+        because merges into a topic branch tend to be only about
+        adjusting to updated upstream from time to time, and
+        this option allows you to ignore the individual commits
+        brought in to your history by such a merge.
+</p>
+</dd>
+<dt>
+--not
+</dt>
+<dd>
+<p>
+        Reverses the meaning of the <em>&#94;</em> prefix (or lack thereof)
+        for all following revision specifiers, up to the next <em>--not</em>.
+</p>
+</dd>
+<dt>
+--all
+</dt>
+<dd>
+<p>
+        Pretend as if all the refs in <tt>$GIT_DIR/refs/</tt> are listed on the
+        command line as <em>&lt;commit&gt;</em>.
+</p>
+</dd>
+<dt>
+--stdin
+</dt>
+<dd>
+<p>
+        In addition to the <em>&lt;commit&gt;</em> listed on the command
+        line, read them from the standard input.
+</p>
+</dd>
+<dt>
+--quiet
+</dt>
+<dd>
+<p>
+        Don't print anything to standard output.  This form
+        is primarily meant to allow the caller to
+        test the exit status to see if a range of objects is fully
+        connected (or not).  It is faster than redirecting stdout
+        to /dev/null as the output does not have to be formatted.
+</p>
+</dd>
+<dt>
+--cherry-pick
+</dt>
+<dd>
+<p>
+        Omit any commit that introduces the same change as
+        another commit on the "other side" when the set of
+        commits are limited with symmetric difference.<br />
+For example, if you have two branches, <tt>A</tt> and <tt>B</tt>, a usual way
+to list all commits on only one side of them is with
+<tt>--left-right</tt>, like the example above in the description of
+that option.  It however shows the commits that were cherry-picked
+from the other branch (for example, "3rd on b" may be cherry-picked
+from branch A).  With this option, such pairs of commits are
+excluded from the output.
+</p>
+</dd>
+<dt>
+-g, --walk-reflogs
+</dt>
+<dd>
+<p>
+        Instead of walking the commit ancestry chain, walk
+        reflog entries from the most recent one to older ones.
+        When this option is used you cannot specify commits to
+        exclude (that is, <em>&#94;commit</em>, <em>commit1..commit2</em>,
+        nor <em>commit1&#8230;commit2</em> notations cannot be used).<br />
+With <em>--pretty</em> format other than oneline (for obvious reasons),
+this causes the output to have two extra lines of information
+taken from the reflog.  By default, <em>commit@{Nth}</em> notation is
+used in the output.  When the starting commit is specified as
+instead.  Under <em>--pretty=oneline</em>, the commit message is
+prefixed with this information on the same line.
+</p>
+<p>Cannot be combined with <em>--reverse</em>.
+See also <a href="git-reflog.html">git-reflog(1)</a>.</p>
+</dd>
+<dt>
+--merge
+</dt>
+<dd>
+<p>
+        After a failed merge, show refs that touch files having a
+        conflict and don't exist on all heads to merge.
+</p>
+</dd>
+<dt>
+--boundary
+</dt>
+<dd>
+<p>
+        Output uninteresting commits at the boundary, which are usually
+        not shown.
+</p>
+</dd>
+<dt>
+--dense, --sparse
+</dt>
+<dd>
+<p>
+When optional paths are given, the default behaviour (<em>--dense</em>) is to
+only output commits that changes at least one of them, and also ignore
+merges that do not touch the given paths.
+</p>
+<p>Use the <em>--sparse</em> flag to makes the command output all eligible commits
+(still subject to count and age limitation), but apply merge
+simplification nevertheless.</p>
+</dd>
+</dl>
+<h3>Commit Ordering</h3>
+<p>By default, the commits are shown in reverse chronological order.</p>
+<dl>
+<dt>
+--topo-order
+</dt>
+<dd>
+<p>
+        This option makes them appear in topological order (i.e.
+        descendant commits are shown before their parents).
+</p>
+</dd>
+<dt>
+--date-order
+</dt>
+<dd>
+<p>
+        This option is similar to <em>--topo-order</em> in the sense that no
+        parent comes before all of its children, but otherwise things
+        are still ordered in the commit timestamp order.
+</p>
+</dd>
+<dt>
+--reverse
+</dt>
+<dd>
+<p>
+        Output the commits in reverse order.
+        Cannot be combined with <em>--walk-reflogs</em>.
+</p>
+</dd>
+</dl>
+<h3>Object Traversal</h3>
+<p>These options are mostly targeted for packing of git repositories.</p>
+<dl>
+<dt>
+--objects
+</dt>
+<dd>
+<p>
+        Print the object IDs of any object referenced by the listed
+        commits.  <em>--objects foo ^bar</em> thus means "send me
+        all object IDs which I need to download if I have the commit
+        object <em>bar</em>, but not <em>foo</em>".
+</p>
+</dd>
+<dt>
+--objects-edge
+</dt>
+<dd>
+<p>
+        Similar to <em>--objects</em>, but also print the IDs of excluded
+        commits prefixed with a "-" character.  This is used by
+        <a href="git-pack-objects.html">git-pack-objects(1)</a> to build "thin" pack, which records
+        objects in deltified form based on objects contained in these
+        excluded commits to reduce network traffic.
+</p>
+</dd>
+<dt>
+--unpacked
+</dt>
+<dd>
+<p>
+        Only useful with <em>--objects</em>; print the object IDs that are not
+        in packs.
+</p>
+</dd>
+<dt>
+--no-walk
+</dt>
+<dd>
+<p>
+        Only show the given revs, but do not traverse their ancestors.
+</p>
+</dd>
+<dt>
+--do-walk
+</dt>
+<dd>
+<p>
+        Overrides a previous --no-walk.
 </p>
 </dd>
 </dl>
@@ -1477,7 +1894,7 @@ reversible operation.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:27 UTC
+Last updated 19-Jan-2008 08:01:34 UTC
 </div>
 </div>
 </body>
