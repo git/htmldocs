@@ -416,15 +416,58 @@ enabled interface to provide the necessary information.</p>
 </p>
 </dd>
 <dt>
---smtp-user, --smtp-pass
+--smtp-user
 </dt>
 <dd>
 <p>
-        Username and password for SMTP-AUTH. Defaults are the values of
-        the configuration values <em>sendemail.smtpuser</em> and
-        <em>sendemail.smtppass</em>, but see also <em>sendemail.identity</em>.
-        If not set, authentication is not attempted.
+        Username for SMTP-AUTH. In place of this option, the following
+        configuration variables can be specified:
 </p>
+<ul>
+<li>
+<p>
+sendemail.smtpuser
+</p>
+</li>
+<li>
+<p>
+sendemail.&lt;identity&gt;.smtpuser (see sendemail.identity).
+</p>
+</li>
+</ul>
+<p>However, --smtp-user always overrides these variables.</p>
+<p>If a username is not specified (with --smtp-user or a
+configuration variable), then authentication is not attempted.</p>
+</dd>
+<dt>
+--smtp-pass
+</dt>
+<dd>
+<p>
+        Password for SMTP-AUTH. The argument is optional: If no
+        argument is specified, then the empty string is used as
+        the password.
+</p>
+<p>In place of this option, the following configuration variables
+can be specified:</p>
+<ul>
+<li>
+<p>
+sendemail.smtppass
+</p>
+</li>
+<li>
+<p>
+sendemail.&lt;identity&gt;.smtppass (see sendemail.identity).
+</p>
+</li>
+</ul>
+<p>However, --smtp-pass always overrides these variables.</p>
+<p>Furthermore, passwords need not be specified in configuration files
+or on the command line. If a username has been specified (with
+--smtp-user or a configuration variable), but no password has been
+specified (with --smtp-pass or a configuration variable), then the
+user is prompted for a password while the input is masked for privacy.</p>
 </dd>
 <dt>
 --smtp-ssl
@@ -454,6 +497,22 @@ enabled interface to provide the necessary information.</p>
         If this is set, do not add the From: address to the cc: list.
         Default is the value of <em>sendemail.suppressfrom</em> configuration value;
         if that is unspecified, default to --no-suppress-from.
+</p>
+</dd>
+<dt>
+--suppress-cc
+</dt>
+<dd>
+<p>
+        Specify an additional category of recipients to suppress the
+        auto-cc of.  <em>self</em> will avoid including the sender, <em>author</em> will
+        avoid including the patch author, <em>cc</em> will avoid including anyone
+        mentioned in Cc lines in the patch, <em>sob</em> will avoid including
+        anyone mentioned in Signed-off-by lines, and <em>cccmd</em> will avoid
+        running the --cc-cmd.  <em>all</em> will suppress all auto cc values.
+        Default is the value of <em>sendemail.suppresscc</em> configuration value;
+        if that is unspecified, default to <em>self</em> if --suppress-from is
+        specified, as well as <em>sob</em> if --no-signed-off-cc is specified.
 </p>
 </dd>
 <dt>
@@ -618,7 +677,7 @@ send_lots_of_email.pl by Greg Kroah-Hartman.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 27-Jan-2008 08:23:29 UTC
+Last updated 12-Feb-2008 03:18:06 UTC
 </div>
 </div>
 </body>
