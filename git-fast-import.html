@@ -1127,6 +1127,108 @@ remove the leading part of the line, for example:</p>
 inform the reader when the <tt>checkpoint</tt> has been completed and it
 can safely access the refs that fast-import updated.</p>
 </div>
+<h2>Crash Reports</h2>
+<div class="sectionbody">
+<p>If fast-import is supplied invalid input it will terminate with a
+non-zero exit status and create a crash report in the top level of
+the Git repository it was importing into.  Crash reports contain
+a snapshot of the internal fast-import state as well as the most
+recent commands that lead up to the crash.</p>
+<p>All recent commands (including stream comments, file changes and
+progress commands) are shown in the command history within the crash
+report, but raw file data and commit messages are excluded from the
+crash report.  This exclusion saves space within the report file
+and reduces the amount of buffering that fast-import must perform
+during execution.</p>
+<p>After writing a crash report fast-import will close the current
+packfile and export the marks table.  This allows the frontend
+developer to inspect the repository state and resume the import from
+the point where it crashed.  The modified branches and tags are not
+updated during a crash, as the import did not complete successfully.
+Branch and tag information can be found in the crash report and
+must be applied manually if the update is needed.</p>
+<p>An example crash:</p>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="literalblock">
+<div class="content">
+<pre><tt>$ cat &gt;in &lt;&lt;END_OF_INPUT
+# my very first test commit
+commit refs/heads/master
+committer Shawn O. Pearce &lt;spearce&gt; 19283 -0400
+# who is that guy anyway?
+data &lt;&lt;EOF
+this is my commit
+EOF
+M 644 inline .gitignore
+data &lt;&lt;EOF
+.gitignore
+EOF
+M 777 inline bob
+END_OF_INPUT</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>$ git-fast-import &lt;in
+fatal: Corrupt mode: M 777 inline bob
+fast-import: dumping crash report to .git/fast_import_crash_8434</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>$ cat .git/fast_import_crash_8434
+fast-import crash report:
+    fast-import process: 8434
+    parent process     : 1391
+    at Sat Sep 1 00:58:12 2007</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>fatal: Corrupt mode: M 777 inline bob</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Most Recent Commands Before Crash
+---------------------------------
+  # my very first test commit
+  commit refs/heads/master
+  committer Shawn O. Pearce &lt;spearce&gt; 19283 -0400
+  # who is that guy anyway?
+  data &lt;&lt;EOF
+  M 644 inline .gitignore
+  data &lt;&lt;EOF
+* M 777 inline bob</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Active Branch LRU
+-----------------
+    active_branches = 1 cur, 5 max</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>pos  clock name
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ 1)      0 refs/heads/master</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Inactive Branches
+-----------------
+refs/heads/master:
+  status      : active loaded dirty
+  tip commit  : 0000000000000000000000000000000000000000
+  old tree    : 0000000000000000000000000000000000000000
+  cur tree    : 0000000000000000000000000000000000000000
+  commit clock: 0
+  last pack   :</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>-------------------
+END OF CRASH REPORT</tt></pre>
+</div></div>
+</div></div>
+</div>
 <h2>Tips and Tricks</h2>
 <div class="sectionbody">
 <p>The following tips and tricks have been collected from various
@@ -1309,7 +1411,7 @@ memory footprint (less than 2.7 MiB per active branch).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:18 UTC
+Last updated 16-Feb-2008 10:02:22 UTC
 </div>
 </div>
 </body>
