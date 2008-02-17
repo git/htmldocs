@@ -256,138 +256,132 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>git-instaweb(1)</title>
+<title>git-web--browse(1)</title>
 </head>
 <body>
 <div id="header">
 <h1>
-git-instaweb(1) Manual Page
+git-web--browse(1) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-instaweb -
-   Instantly browse your working repository in gitweb
+<p>git-web--browse -
+   git helper script to launch a web browser
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="verseblock">
-<div class="content"><em>git-instaweb</em> [--local] [--httpd=&lt;httpd&gt;] [--port=&lt;port&gt;]
-               [--browser=&lt;browser&gt;]
-<em>git-instaweb</em> [--start] [--stop] [--restart]</div></div>
+<p><em>git-web--browse</em> [OPTIONS] URL/FILE &#8230;</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>A simple script to setup gitweb and a web server for browsing the local
-repository.</p>
+<p>This script tries, as much as possible, to display the URLs and FILEs
+that are passed as arguments, as HTML pages in new tabs on an already
+opened web browser.</p>
+<p>The following browsers (or commands) are currently supported:</p>
+<ul>
+<li>
+<p>
+firefox (this is the default under X Window when not using KDE)
+</p>
+</li>
+<li>
+<p>
+iceweasel
+</p>
+</li>
+<li>
+<p>
+konqueror (this is the default under KDE)
+</p>
+</li>
+<li>
+<p>
+w3m (this is the default outside graphical environments)
+</p>
+</li>
+<li>
+<p>
+links
+</p>
+</li>
+<li>
+<p>
+lynx
+</p>
+</li>
+<li>
+<p>
+dillo
+</p>
+</li>
+<li>
+<p>
+open (this is the default under Mac OS X GUI)
+</p>
+</li>
+</ul>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
 <dl>
 <dt>
--l|--local
+-b BROWSER|--browser=BROWSER
 </dt>
 <dd>
 <p>
-        Only bind the web server to the local IP (127.0.0.1).
+        Use the specified BROWSER. It must be in the list of supported
+        browsers.
 </p>
 </dd>
 <dt>
--d|--httpd
+-t BROWSER|--tool=BROWSER
 </dt>
 <dd>
 <p>
-        The HTTP daemon command-line that will be executed.
-        Command-line options may be specified here, and the
-        configuration file will be added at the end of the command-line.
-        Currently lighttpd, apache2 and webrick are supported.
-        (Default: lighttpd)
+        Same as above.
 </p>
 </dd>
 <dt>
--m|--module-path
+-c CONF.VAR|--config=CONF.VAR
 </dt>
 <dd>
 <p>
-        The module path (only needed if httpd is Apache).
-        (Default: /usr/lib/apache2/modules)
-</p>
-</dd>
-<dt>
--p|--port
-</dt>
-<dd>
-<p>
-        The port number to bind the httpd to.  (Default: 1234)
-</p>
-</dd>
-<dt>
--b|--browser
-</dt>
-<dd>
-<p>
-        The web browser that should be used to view the gitweb
-        page. This will be passed to the <em>git-web--browse</em> helper
-        script along with the URL of the gitweb instance. See
-        <a href="git-web--browse.html">git-web--browse(1)</a> for more information about this. If
-        the script fails, the URL will be printed to stdout.
-</p>
-</dd>
-<dt>
---start
-</dt>
-<dd>
-<p>
-        Start the httpd instance and exit.  This does not generate
-        any of the configuration files for spawning a new instance.
-</p>
-</dd>
-<dt>
---stop
-</dt>
-<dd>
-<p>
-        Stop the httpd instance and exit.  This does not generate
-        any of the configuration files for spawning a new instance,
-        nor does it close the browser.
-</p>
-</dd>
-<dt>
---restart
-</dt>
-<dd>
-<p>
-        Restart the httpd instance and exit.  This does not generate
-        any of the configuration files for spawning a new instance.
+        CONF.VAR is looked up in the git config files. If it's set,
+        then its value specify the browser that should be used.
 </p>
 </dd>
 </dl>
 </div>
-<h2>CONFIGURATION</h2>
+<h2>CONFIGURATION VARIABLES</h2>
 <div class="sectionbody">
-<p>You may specify configuration in your .git/config</p>
+<p>The web browser can be specified using a configuration variable passed
+with the -c (or --config) command line option, or the <em>web.browser</em>
+configuration variable if the former is not used.</p>
+<p>You can explicitly provide a full path to your preferred browser by
+setting the configuration variable <em>browser.&lt;tool&gt;.path</em>. For example,
+you can configure the absolute path to firefox by setting
+<em>browser.firefox.path</em>. Otherwise, <em>git-web--browse</em> assumes the tool
+is available in PATH.</p>
+<p>Note that these configuration variables should probably be set using
+the <em>--global</em> flag, for example like this:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>[instaweb]
-        local = true
-        httpd = apache2 -f
-        port = 4321
-        browser = konqueror
-        modulepath = /usr/lib/apache2/modules
-</tt></pre>
+<pre><tt>$ git config --global web.browser firefox</tt></pre>
 </div></div>
-<p>If the configuration variable <em>instaweb.browser</em> is not set,
-<em>web.browser</em> will be used instead if it is defined. See
-<a href="git-web--browse.html">git-web--browse(1)</a> for more information about this.</p>
+<p>as they are probably more user specific than repository specific.
+See <a href="git-config.html">git-config(1)</a> for more information about this.</p>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
-<p>Written by Eric Wong &lt;normalperson@yhbt.net&gt;</p>
+<p>Written by Christian Couder &lt;chriscool@tuxfamily.org&gt; and the git-list
+&lt;git@vger.kernel.org&gt;, based on git-mergetool by Theodore Y. Ts'o.</p>
 </div>
 <h2>Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Eric Wong &lt;normalperson@yhbt.net&gt;.</p>
+<p>Documentation by Christian Couder &lt;chriscool@tuxfamily.org&gt; and the
+git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <h2>GIT</h2>
 <div class="sectionbody">
@@ -395,7 +389,7 @@ repository.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 17-Feb-2008 03:50:08 UTC
+Last updated 17-Feb-2008 03:50:09 UTC
 </div>
 </div>
 </body>

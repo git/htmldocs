@@ -312,6 +312,29 @@ causes the <tt>git-commit</tt> to abort.</p>
 <p>The default <em>pre-commit</em> hook, when enabled, catches introduction
 of lines with trailing whitespaces and aborts the commit when
 such a line is found.</p>
+<p>All the <tt>git-commit</tt> hooks are invoked with the environment
+variable <tt>GIT_EDITOR=:</tt> if the command will not bring up an editor
+to modify the commit message.</p>
+</div>
+<h2>prepare-commit-msg</h2>
+<div class="sectionbody">
+<p>This hook is invoked by <tt>git-commit</tt> right after preparing the
+default log message, and before the editor is started.</p>
+<p>It takes one to three parameters.  The first is the name of the file
+that the commit log message.  The second is the source of the commit
+message, and can be: <tt>message</tt> (if a <tt>\-m</tt> or <tt>\-F</tt> option was
+given); <tt>template</tt> (if a <tt>\-t</tt> option was given or the
+configuration option <tt>commit.template</tt> is set); <tt>merge</tt> (if the
+commit is a merge or a <tt>.git/MERGE_MSG</tt> file exists); <tt>squash</tt>
+(if a <tt>.git/SQUASH_MSG</tt> file exists); or <tt>commit</tt>, followed by
+a commit SHA1 (if a <tt>\-c</tt>, <tt>\-C</tt> or <tt>--amend</tt> option was given).</p>
+<p>If the exit status is non-zero, <tt>git-commit</tt> will abort.</p>
+<p>The purpose of the hook is to edit the message file in place, and
+it is not suppressed by the <tt>--no-verify</tt> option.  A non-zero exit
+means a failure of the hook and aborts the commit.  It should not
+be used as replacement for pre-commit hook.</p>
+<p>The sample <tt>prepare-commit-msg</tt> hook that comes with git comments
+out the <tt>Conflicts:</tt> part of a merge's commit message.</p>
 </div>
 <h2>commit-msg</h2>
 <div class="sectionbody">
@@ -479,7 +502,7 @@ for the user.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:51:12 UTC
+Last updated 17-Feb-2008 03:50:10 UTC
 </div>
 </div>
 </body>

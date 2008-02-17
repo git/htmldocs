@@ -849,6 +849,52 @@ core.autocrlf
 </p>
 </dd>
 <dt>
+core.safecrlf
+</dt>
+<dd>
+<p>
+        If true, makes git check if converting <tt>CRLF</tt> as controlled by
+        <tt>core.autocrlf</tt> is reversible.  Git will verify if a command
+        modifies a file in the work tree either directly or indirectly.
+        For example, committing a file followed by checking out the
+        same file should yield the original file in the work tree.  If
+        this is not the case for the current setting of
+        <tt>core.autocrlf</tt>, git will reject the file.  The variable can
+        be set to "warn", in which case git will only warn about an
+        irreversible conversion but continue the operation.
+</p>
+<p>CRLF conversion bears a slight chance of corrupting data.
+autocrlf=true will convert CRLF to LF during commit and LF to
+CRLF during checkout.  A file that contains a mixture of LF and
+CRLF before the commit cannot be recreated by git.  For text
+files this is the right thing to do: it corrects line endings
+such that we have only LF line endings in the repository.
+But for binary files that are accidentally classified as text the
+conversion can corrupt data.</p>
+<p>If you recognize such corruption early you can easily fix it by
+setting the conversion type explicitly in .gitattributes.  Right
+after committing you still have the original file in your work
+tree and this file is not yet corrupted.  You can explicitly tell
+git that this file is binary and git will handle the file
+appropriately.</p>
+<p>Unfortunately, the desired effect of cleaning up text files with
+mixed line endings and the undesired effect of corrupting binary
+files cannot be distinguished.  In both cases CRLFs are removed
+in an irreversible way.  For text files this is the right thing
+to do because CRLFs are line endings, while for binary files
+converting CRLFs corrupts data.</p>
+<p>Note, this safety check does not mean that a checkout will generate a
+file identical to the original file for a different setting of
+<tt>core.autocrlf</tt>, but only for the current one.  For example, a text
+file with <tt>LF</tt> would be accepted with <tt>core.autocrlf=input</tt> and could
+later be checked out with <tt>core.autocrlf=true</tt>, in which case the
+resulting file would contain <tt>CRLF</tt>, although the original file
+contained <tt>LF</tt>.  However, in both work trees the line endings would be
+consistent, that is either all <tt>LF</tt> or all <tt>CRLF</tt>, but never mixed.  A
+file with mixed line endings would be reported by the <tt>core.safecrlf</tt>
+mechanism.</p>
+</dd>
+<dt>
 core.symlinks
 </dt>
 <dd>
@@ -2220,7 +2266,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 12-Feb-2008 03:18:05 UTC
+Last updated 17-Feb-2008 03:50:04 UTC
 </div>
 </div>
 </body>
