@@ -316,9 +316,9 @@ the optional plus <tt>+</tt> is used, the remote ref is updated
 even if it does not result in a fast forward update.</p>
 <p>Note: If no explicit refspec is found, (that is neither
 on the command line nor in any Push line of the
-corresponding remotes file---see below), then all the
-heads that exist both on the local side and on the remote
-side are updated.</p>
+corresponding remotes file---see below), then "matching" heads are
+pushed: for every head that exists on the local side, the remote side is
+updated if a head of the same name already exists on the remote side.</p>
 <p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>.</p>
 <p>A parameter &lt;ref&gt; without a colon pushes the &lt;ref&gt; from the source
 repository to the destination repository under the same name.</p>
@@ -572,6 +572,81 @@ corresponding file in the <tt>$GIT_DIR/remotes/</tt> directory.</p>
         Pull: refs/heads/&lt;head&gt;:&lt;remote&gt;</tt></pre>
 </div></div>
 </div>
+<h2>OUTPUT</h2>
+<div class="sectionbody">
+<p>The output of "git push" depends on the transport method used; this
+section describes the output when pushing over the git protocol (either
+locally or via ssh).</p>
+<p>The status of the push is output in tabular form, with each line
+representing the status of a single ref. Each line is of the form:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt> &lt;flag&gt; &lt;summary&gt; &lt;from&gt; -&gt; &lt;to&gt; (&lt;reason&gt;)</tt></pre>
+</div></div>
+<dl>
+<dt>
+flag
+</dt>
+<dd>
+<p>
+        A single character indicating the status of the ref. This is
+        blank for a successfully pushed ref, <tt>!</tt> for a ref that was
+        rejected or failed to push, and <em>=</em> for a ref that was up to
+        date and did not need pushing (note that the status of up to
+        date refs is shown only when <tt>git push</tt> is running verbosely).
+</p>
+</dd>
+<dt>
+summary
+</dt>
+<dd>
+<p>
+        For a successfully pushed ref, the summary shows the old and new
+        values of the ref in a form suitable for using as an argument to
+        <tt>git log</tt> (this is <tt>&lt;old&gt;..&lt;new&gt;</tt> in most cases, and
+        <tt>&lt;old&gt;&#8230;&lt;new&gt;</tt> for forced non-fast forward updates). For a
+        failed update, more details are given for the failure.
+        The string <tt>rejected</tt> indicates that git did not try to send the
+        ref at all (typically because it is not a fast forward). The
+        string <tt>remote rejected</tt> indicates that the remote end refused
+        the update; this rejection is typically caused by a hook on the
+        remote side. The string <tt>remote failure</tt> indicates that the
+        remote end did not report the successful update of the ref
+        (perhaps because of a temporary error on the remote side, a
+        break in the network connection, or other transient error).
+</p>
+</dd>
+<dt>
+from
+</dt>
+<dd>
+<p>
+        The name of the local ref being pushed, minus its
+        <tt>refs/&lt;type&gt;/</tt> prefix. In the case of deletion, the
+        name of the local ref is omitted.
+</p>
+</dd>
+<dt>
+to
+</dt>
+<dd>
+<p>
+        The name of the remote ref being updated, minus its
+        <tt>refs/&lt;type&gt;/</tt> prefix.
+</p>
+</dd>
+<dt>
+reason
+</dt>
+<dd>
+<p>
+        A human-readable explanation. In the case of successfully pushed
+        refs, no explanation is needed. For a failed ref, the reason for
+        failure is described.
+</p>
+</dd>
+</dl>
+</div>
 <h2>Examples</h2>
 <div class="sectionbody">
 <dl>
@@ -634,7 +709,7 @@ by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:37 UTC
+Last updated 20-Feb-2008 10:44:09 UTC
 </div>
 </div>
 </body>

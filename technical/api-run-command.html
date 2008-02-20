@@ -263,30 +263,307 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>Talk about &lt;run-command.h&gt;, and things like:</p>
+<p>The run-command API offers a versatile tool to run sub-processes with
+redirected input and output as well as with a modified environment
+and an alternate current directory.</p>
+<p>A similar API offers the capability to run a function asynchronously,
+which is primarily used to capture the output that the function
+produces in the caller in order to process it.</p>
+</div>
+</div>
+<h2>Functions</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+<tt>start_command</tt>
+</dt>
+<dd>
+<p>
+        Start a sub-process. Takes a pointer to a <tt>struct child_process</tt>
+        that specifies the details and returns pipe FDs (if requested).
+        See below for details.
+</p>
+</dd>
+<dt>
+<tt>finish_command</tt>
+</dt>
+<dd>
+<p>
+        Wait for the completion of a sub-process that was started with
+        start_command().
+</p>
+</dd>
+<dt>
+<tt>run_command</tt>
+</dt>
+<dd>
+<p>
+        A convenience function that encapsulates a sequence of
+        start_command() followed by finish_command(). Takes a pointer
+        to a <tt>struct child_process</tt> that specifies the details.
+</p>
+</dd>
+<dt>
+<tt>run_command_v_opt</tt>, <tt>run_command_v_opt_dir</tt>, <tt>run_command_v_opt_cd_env</tt>
+</dt>
+<dd>
+<p>
+        Convenience functions that encapsulate a sequence of
+        start_command() followed by finish_command(). The argument argv
+        specifies the program and its arguments. The argument opt is zero
+        or more of the flags <tt>RUN_COMMAND_NO_STDIN</tt>, <tt>RUN_GIT_CMD</tt>, or
+        <tt>RUN_COMMAND_STDOUT_TO_STDERR</tt> that correspond to the members
+        .no_stdin, .git_cmd, .stdout_to_stderr of <tt>struct child_process</tt>.
+        The argument dir corresponds the member .dir. The argument env
+        corresponds to the member .env.
+</p>
+</dd>
+<dt>
+<tt>start_async</tt>
+</dt>
+<dd>
+<p>
+        Run a function asynchronously. Takes a pointer to a <tt>struct
+        async</tt> that specifies the details and returns a pipe FD
+        from which the caller reads. See below for details.
+</p>
+</dd>
+<dt>
+<tt>finish_async</tt>
+</dt>
+<dd>
+<p>
+        Wait for the completeion of an asynchronous function that was
+        started with start_async().
+</p>
+</dd>
+</dl>
+</div>
+<h2>Data structures</h2>
+<div class="sectionbody">
 <ul>
 <li>
 <p>
-Environment the command runs with (e.g. GIT_DIR);
-</p>
-</li>
-<li>
-<p>
-File descriptors and pipes;
-</p>
-</li>
-<li>
-<p>
-Exit status;
+<tt>struct child_process</tt>
 </p>
 </li>
 </ul>
-<p>(Hannes, Dscho, Shawn)</p>
-</div>
+<p>This describes the arguments, redirections, and environment of a
+command to run in a sub-process.</p>
+<p>The caller:</p>
+<ol>
+<li>
+<p>
+allocates and clears (memset(&amp;chld, <em>0</em>, sizeof(chld));) a
+   struct child_process variable;
+</p>
+</li>
+<li>
+<p>
+initializes the members;
+</p>
+</li>
+<li>
+<p>
+calls start_command();
+</p>
+</li>
+<li>
+<p>
+processes the data;
+</p>
+</li>
+<li>
+<p>
+closes file descriptors (if necessary; see below);
+</p>
+</li>
+<li>
+<p>
+calls finish_command().
+</p>
+</li>
+</ol>
+<p>The .argv member is set up as an array of string pointers (NULL
+terminated), of which .argv[0] is the program name to run (usually
+without a path). If the command to run is a git command, set argv[0] to
+the command name without the <em>git-</em> prefix and set .git_cmd = 1.</p>
+<p>The members .in, .out, .err are used to redirect stdin, stdout,
+stderr as follows:</p>
+<ol>
+<li>
+<p>
+Specify 0 to request no special redirection. No new file descriptor
+  is allocated. The child process simply inherits the channel from the
+  parent.
+</p>
+</li>
+<li>
+<p>
+Specify -1 to have a pipe allocated; start_command() replaces -1
+  by the pipe FD in the following way:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.in: Returns the writable pipe end into which the caller writes;
+        the readable end of the pipe becomes the child's stdin.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.out, .err: Returns the readable pipe end from which the caller
+        reads; the writable end of the pipe end becomes child's
+        stdout/stderr.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>The caller of start_command() must close the so returned FDs
+after it has completed reading from/writing to it!</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Specify a file descriptor &gt; 0 to be used by the child:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.in: The FD must be readable; it becomes child's stdin.
+.out: The FD must be writable; it becomes child's stdout.
+.err &gt; 0 is not supported.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>The specified FD is closed by start_command(), even if it fails to
+run the sub-process!</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Special forms of redirection are available by setting these members
+  to 1:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.no_stdin, .no_stdout, .no_stderr: The respective channel is
+        redirected to /dev/null.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.stdout_to_stderr: stdout of the child is redirected to the
+        parent's stderr (i.e. *not* to what .err or
+        .no_stderr specify).</tt></pre>
+</div></div>
+</li>
+</ol>
+<p>To modify the environment of the sub-process, specify an array of
+string pointers (NULL terminated) in .env:</p>
+<ol>
+<li>
+<p>
+If the string is of the form "VAR=value", i.e. it contains <em>=</em>
+  the variable is added to the child process's environment.
+</p>
+</li>
+<li>
+<p>
+If the string does not contain <em>=</em>, it names an environement
+  variable that will be removed from the child process's envionment.
+</p>
+</li>
+</ol>
+<p>To specify a new initial working directory for the sub-process,
+specify it in the .dir member.</p>
+<ul>
+<li>
+<p>
+<tt>struct async</tt>
+</p>
+</li>
+</ul>
+<p>This describes a function to run asynchronously, whose purpose is
+to produce output that the caller reads.</p>
+<p>The caller:</p>
+<ol>
+<li>
+<p>
+allocates and clears (memset(&amp;asy, <em>0</em>, sizeof(asy));) a
+   struct async variable;
+</p>
+</li>
+<li>
+<p>
+initializes .proc and .data;
+</p>
+</li>
+<li>
+<p>
+calls start_async();
+</p>
+</li>
+<li>
+<p>
+processes the data by reading from the fd in .out;
+</p>
+</li>
+<li>
+<p>
+closes .out;
+</p>
+</li>
+<li>
+<p>
+calls finish_async().
+</p>
+</li>
+</ol>
+<p>The function pointer in .proc has the following signature:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>int proc(int fd, void *data);</tt></pre>
+</div></div>
+<ol>
+<li>
+<p>
+fd specifies a writable file descriptor to which the function must
+  write the data that it produces. The function <strong>must</strong> close this
+  descriptor before it returns.
+</p>
+</li>
+<li>
+<p>
+data is the value that the caller has specified in the .data member
+  of struct async.
+</p>
+</li>
+<li>
+<p>
+The return value of the function is 0 on success and non-zero
+  on failure. If the function indicates failure, finish_async() will
+  report failure as well.
+</p>
+</li>
+</ol>
+<p>There are serious restrictions on what the asynchronous function can do
+because this facility is implemented by a pipe to a forked process on
+UNIX, but by a thread in the same address space on Windows:</p>
+<ol>
+<li>
+<p>
+It cannot change the program's state (global variables, environment,
+  etc.) in a way that the caller notices; in other words, .out is the
+  only communication channel to the caller.
+</p>
+</li>
+<li>
+<p>
+It must not change the program's state that the caller of the
+  facility also uses.
+</p>
+</li>
+</ol>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:51:29 UTC
+Last updated 20-Feb-2008 10:44:10 UTC
 </div>
 </div>
 </body>

@@ -255,129 +255,188 @@ div.exampleblock-content {
   padding-left: 0.5em;
 }
 </style>
-<title>GIT API Documents</title>
+<title>Remotes configuration API</title>
 </head>
 <body>
 <div id="header">
-<h1>GIT API Documents</h1>
+<h1>Remotes configuration API</h1>
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>GIT has grown a set of internal API over time.  This collection
-documents them.</p>
-<ul>
-<li>
-<p>
-<a href="api-allocation-growing.html">allocation growing API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-builtin.html">builtin API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-decorate.html">decorate API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-diff.html">diff API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-directory-listing.html">directory listing API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-gitattributes.html">gitattributes API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-grep.html">grep API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-hash.html">hash API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-in-core-index.html">in-core index API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-lockfile.html">lockfile API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-object-access.html">object access API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-parse-options.html">parse-options API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-path-list.html">path-list API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-quote.html">quote API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-remote.html">Remotes configuration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-revision-walking.html">revision walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-run-command.html">run-command API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-setup.html">setup API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-strbuf.html">strbuf API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-tree-walking.html">tree walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-xdiff-interface.html">xdiff interface API</a>
-</p>
-</li>
-</ul>
-<p>2007-11-24</p>
+<p>The API in remote.h gives access to the configuration related to
+remotes. It handles all three configuration mechanisms historically
+and currently used by git, and presents the information in a uniform
+fashion. Note that the code also handles plain URLs without any
+configuration, giving them just the default information.</p>
 </div>
+</div>
+<h2>struct remote</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+<tt>name</tt>
+</dt>
+<dd>
+<p>
+        The user's nickname for the remote
+</p>
+</dd>
+<dt>
+<tt>url</tt>
+</dt>
+<dd>
+<p>
+        An array of all of the url_nr URLs configured for the remote
+</p>
+</dd>
+<dt>
+<tt>push</tt>
+</dt>
+<dd>
+<p>
+         An array of refspecs configured for pushing, with
+         push_refspec being the literal strings, and push_refspec_nr
+         being the quantity.
+</p>
+</dd>
+<dt>
+<tt>fetch</tt>
+</dt>
+<dd>
+<p>
+        An array of refspecs configured for fetching, with
+        fetch_refspec being the literal strings, and fetch_refspec_nr
+        being the quantity.
+</p>
+</dd>
+<dt>
+<tt>fetch_tags</tt>
+</dt>
+<dd>
+<p>
+        The setting for whether to fetch tags (as a separate rule from
+        the configured refspecs); -1 means never to fetch tags, 0
+        means to auto-follow tags based on the default heuristic, 1
+        means to always auto-follow tags, and 2 means to fetch all
+        tags.
+</p>
+</dd>
+<dt>
+<tt>receivepack</tt>, <tt>uploadpack</tt>
+</dt>
+<dd>
+<p>
+        The configured helper programs to run on the remote side, for
+        git-native protocols.
+</p>
+</dd>
+<dt>
+<tt>http_proxy</tt>
+</dt>
+<dd>
+<p>
+        The proxy to use for curl (http, https, ftp, etc.) URLs.
+</p>
+</dd>
+</dl>
+<p>struct remotes can be found by name with remote_get(), and iterated
+through with for_each_remote(). remote_get(NULL) will return the
+default remote, given the current branch and configuration.</p>
+</div>
+<h2>struct refspec</h2>
+<div class="sectionbody">
+<p>A struct refspec holds the parsed interpretation of a refspec. If it
+will force updates (starts with a <em>+</em>), force is true. If it is a
+pattern (sides end with <em>*</em>) pattern is true. src and dest are the two
+sides (if a pattern, only the part outside of the wildcards); if there
+is only one side, it is src, and dst is NULL; if sides exist but are
+empty (i.e., the refspec either starts or ends with <em>:</em>), the
+corresponding side is "".</p>
+<p>This parsing can be done to an array of strings to give an array of
+struct refpsecs with parse_ref_spec().</p>
+<p>remote_find_tracking(), given a remote and a struct refspec with
+either src or dst filled out, will fill out the other such that the
+result is in the "fetch" specification for the remote (note that this
+evaluates patterns and returns a single result).</p>
+</div>
+<h2>struct branch</h2>
+<div class="sectionbody">
+<p>Note that this may end up moving to branch.h</p>
+<p>struct branch holds the configuration for a branch. It can be looked
+branch_get(NULL) for HEAD.</p>
+<p>It contains:</p>
+<dl>
+<dt>
+<tt>name</tt>
+</dt>
+<dd>
+<p>
+        The short name of the branch.
+</p>
+</dd>
+<dt>
+<tt>refname</tt>
+</dt>
+<dd>
+<p>
+        The full path for the branch ref.
+</p>
+</dd>
+<dt>
+<tt>remote_name</tt>
+</dt>
+<dd>
+<p>
+        The name of the remote listed in the configuration.
+</p>
+</dd>
+<dt>
+<tt>remote</tt>
+</dt>
+<dd>
+<p>
+        The struct remote for that remote.
+</p>
+</dd>
+<dt>
+<tt>merge_name</tt>
+</dt>
+<dd>
+<p>
+        An array of the "merge" lines in the configuration.
+</p>
+</dd>
+<dt>
+<tt>merge</tt>
+</dt>
+<dd>
+<p>
+        An array of the struct refspecs used for the merge lines. That
+        is, merge[i]-&gt;dst is a local tracking ref which should be
+        merged into this branch by default.
+</p>
+</dd>
+<dt>
+<tt>merge_nr</tt>
+</dt>
+<dd>
+<p>
+        The number of merge configurations
+</p>
+</dd>
+</dl>
+<p>branch_has_merge_config() returns true if the given branch has merge
+configuration given.</p>
+</div>
+<h2>Other stuff</h2>
+<div class="sectionbody">
+<p>There is other stuff in remote.h that is related, in general, to the
+process of interacting with remotes.</p>
+<p>(Daniel Barkalow)</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 20-Feb-2008 10:44:10 UTC
+Last updated 20-Feb-2008 10:44:09 UTC
 </div>
 </div>
 </body>
