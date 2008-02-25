@@ -389,31 +389,82 @@ when unpacking at the destination.</p>
 <p>Assume two repositories exist as R1 on machine A, and R2 on machine B.
 For whatever reason, direct connection between A and B is not allowed,
 but we can move data from A to B via some mechanism (CD, email, etc).
-We want to update R2 with developments made on branch master in R1.
-We set a tag in R1 (lastR2bundle) after the previous such transport,
+We want to update R2 with developments made on branch master in R1.</p>
+<p>To create the bundle you have to specify the basis. You have some options:</p>
+<ul>
+<li>
+<p>
+Without basis.
+</p>
+<p>This is useful when sending the whole history.</p>
+</li>
+</ul>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle master</tt></pre>
+</div></div>
+<ul>
+<li>
+<p>
+Using temporally tags.
+</p>
+<p>We set a tag in R1 (lastR2bundle) after the previous such transport,
 and move it afterwards to help build the bundle.</p>
-<p>in R1 on A:</p>
+</li>
+</ul>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git-bundle create mybundle master ^lastR2bundle
 $ git tag -f lastR2bundle master</tt></pre>
 </div></div>
-<p>(move mybundle from A to B by some mechanism)</p>
-<p>in R2 on B:</p>
+<ul>
+<li>
+<p>
+Using a tag present in both repositories
+</p>
+</li>
+</ul>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle master ^v1.0.0</tt></pre>
+</div></div>
+<ul>
+<li>
+<p>
+A basis based on time.
+</p>
+</li>
+</ul>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle master --since=10.days.ago</tt></pre>
+</div></div>
+<ul>
+<li>
+<p>
+With a limit on the number of commits
+</p>
+</li>
+</ul>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle master -n 10</tt></pre>
+</div></div>
+<p>Then you move mybundle from A to B, and in R2 on B:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git-bundle verify mybundle
-$ git-fetch mybundle  refspec</tt></pre>
+$ git-fetch mybundle master:localRef</tt></pre>
 </div></div>
-<p>where refspec is refInBundle:localRef</p>
-<p>Also, with something like this in your config:</p>
-<div class="literalblock">
+<p>With something like this in the config in R2:</p>
+<div class="listingblock">
 <div class="content">
-<pre><tt>url = /home/me/tmp/file.bdl
-fetch = refs/heads/*:refs/remotes/origin/*</tt></pre>
+<pre><tt>[remote "bundle"]
+    url = /home/me/tmp/file.bdl
+    fetch = refs/heads/*:refs/remotes/origin/*</tt></pre>
 </div></div>
 <p>You can first sneakernet the bundle file to ~/tmp/file.bdl and
-then these commands:</p>
+then these commands on machine B:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-remote bundle
@@ -433,7 +484,7 @@ network.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:03 UTC
+Last updated 25-Feb-2008 08:40:21 UTC
 </div>
 </div>
 </body>
