@@ -322,16 +322,6 @@ these commands.</p>
 </p>
 </dd>
 <dt>
---pretty=&lt;format&gt;
-</dt>
-<dd>
-<p>
-        Controls the output format for the commit logs.
-        &lt;format&gt; can be one of <em>raw</em>, <em>medium</em>, <em>short</em>, <em>full</em>,
-        and <em>oneline</em>.
-</p>
-</dd>
-<dt>
 -m
 </dt>
 <dd>
@@ -343,7 +333,335 @@ these commands.</p>
 <p>However, it is not very useful in general, although it
 <strong>is</strong> useful on a file-by-file basis.</p>
 </dd>
+<dt>
+--pretty[=<em>&lt;format&gt;</em>]
+</dt>
+<dd>
+<p>
+        Pretty-print the contents of the commit logs in a given format,
+        where <em>&lt;format&gt;</em> can be one of <em>oneline</em>, <em>short</em>, <em>medium</em>,
+        <em>full</em>, <em>fuller</em>, <em>email</em>, <em>raw</em> and <em>format:&lt;string&gt;</em>.
+        When omitted, the format defaults to <em>medium</em>.
+</p>
+<p>Note: you can specify the default pretty format in the repository
+configuration (see <a href="git-config.html">git-config(1)</a>).</p>
+</dd>
+<dt>
+--abbrev-commit
+</dt>
+<dd>
+<p>
+        Instead of showing the full 40-byte hexadecimal commit object
+        name, show only handful hexdigits prefix.  Non default number of
+        digits can be specified with "--abbrev=&lt;n&gt;" (which also modifies
+        diff output, if it is displayed).
+</p>
+<p>This should make "--pretty=oneline" a whole lot more readable for
+people using 80-column terminals.</p>
+</dd>
+<dt>
+--encoding[=&lt;encoding&gt;]
+</dt>
+<dd>
+<p>
+        The commit objects record the encoding used for the log message
+        in their encoding header; this option can be used to tell the
+        command to re-code the commit log message in the encoding
+        preferred by the user.  For non plumbing commands this
+        defaults to UTF-8.
+</p>
+</dd>
 </dl>
+</div>
+<h2>PRETTY FORMATS</h2>
+<div class="sectionbody">
+<p>If the commit is a merge, and if the pretty-format
+is not <em>oneline</em>, <em>email</em> or <em>raw</em>, an additional line is
+inserted before the <em>Author:</em> line.  This line begins with
+"Merge: " and the sha1s of ancestral commits are printed,
+separated by spaces.  Note that the listed commits may not
+necessarily be the list of the <strong>direct</strong> parent commits if you
+have limited your view of history: for example, if you are
+only interested in changes related to a certain directory or
+file.</p>
+<p>Here are some additional details for each format:</p>
+<ul>
+<li>
+<p>
+<em>oneline</em>
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;sha1&gt; &lt;title line&gt;</tt></pre>
+</div></div>
+<p>This is designed to be as compact as possible.</p>
+</li>
+<li>
+<p>
+<em>short</em>
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>commit &lt;sha1&gt;
+Author: &lt;author&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;title line&gt;</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<em>medium</em>
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>commit &lt;sha1&gt;
+Author: &lt;author&gt;
+Date: &lt;date&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;title line&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;full commit message&gt;</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<em>full</em>
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>commit &lt;sha1&gt;
+Author: &lt;author&gt;
+Commit: &lt;committer&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;title line&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;full commit message&gt;</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<em>fuller</em>
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>commit &lt;sha1&gt;
+Author: &lt;author&gt;
+AuthorDate: &lt;date &amp; time&gt;
+Commit: &lt;committer&gt;
+CommitDate: &lt;date &amp; time&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;title line&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;full commit message&gt;</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<em>email</em>
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>From &lt;sha1&gt; &lt;date&gt;
+From: &lt;author&gt;
+Date: &lt;date &amp; time&gt;
+Subject: [PATCH] &lt;title line&gt;</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;full commit message&gt;</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+<em>raw</em>
+</p>
+<p>The <em>raw</em> format shows the entire commit exactly as
+stored in the commit object.  Notably, the SHA1s are
+displayed in full, regardless of whether --abbrev or
+--no-abbrev are used, and <em>parents</em> information show the
+true parent commits, without taking grafts nor history
+simplification into account.</p>
+</li>
+<li>
+<p>
+<em>format:</em>
+</p>
+<p>The <em>format:</em> format allows you to specify which information
+you want to show. It works a little bit like printf format,
+with the notable exception that you get a newline with <em>%n</em>
+instead of <em>\n</em>.</p>
+<p>E.g, <em>format:"The author of %h was %an, %ar%nThe title was &gt;&gt;%s&lt;&lt;%n"</em>
+would show something like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>The author of fe6e0ee was Junio C Hamano, 23 hours ago
+The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;
+</tt></pre>
+</div></div>
+<p>The placeholders are:</p>
+<ul>
+<li>
+<p>
+<em>%H</em>: commit hash
+</p>
+</li>
+<li>
+<p>
+<em>%h</em>: abbreviated commit hash
+</p>
+</li>
+<li>
+<p>
+<em>%T</em>: tree hash
+</p>
+</li>
+<li>
+<p>
+<em>%t</em>: abbreviated tree hash
+</p>
+</li>
+<li>
+<p>
+<em>%P</em>: parent hashes
+</p>
+</li>
+<li>
+<p>
+<em>%p</em>: abbreviated parent hashes
+</p>
+</li>
+<li>
+<p>
+<em>%an</em>: author name
+</p>
+</li>
+<li>
+<p>
+<em>%ae</em>: author email
+</p>
+</li>
+<li>
+<p>
+<em>%ad</em>: author date
+</p>
+</li>
+<li>
+<p>
+<em>%aD</em>: author date, RFC2822 style
+</p>
+</li>
+<li>
+<p>
+<em>%ar</em>: author date, relative
+</p>
+</li>
+<li>
+<p>
+<em>%at</em>: author date, UNIX timestamp
+</p>
+</li>
+<li>
+<p>
+<em>%ai</em>: author date, ISO 8601 format
+</p>
+</li>
+<li>
+<p>
+<em>%cn</em>: committer name
+</p>
+</li>
+<li>
+<p>
+<em>%ce</em>: committer email
+</p>
+</li>
+<li>
+<p>
+<em>%cd</em>: committer date
+</p>
+</li>
+<li>
+<p>
+<em>%cD</em>: committer date, RFC2822 style
+</p>
+</li>
+<li>
+<p>
+<em>%cr</em>: committer date, relative
+</p>
+</li>
+<li>
+<p>
+<em>%ct</em>: committer date, UNIX timestamp
+</p>
+</li>
+<li>
+<p>
+<em>%ci</em>: committer date, ISO 8601 format
+</p>
+</li>
+<li>
+<p>
+<em>%e</em>: encoding
+</p>
+</li>
+<li>
+<p>
+<em>%s</em>: subject
+</p>
+</li>
+<li>
+<p>
+<em>%b</em>: body
+</p>
+</li>
+<li>
+<p>
+<em>%Cred</em>: switch color to red
+</p>
+</li>
+<li>
+<p>
+<em>%Cgreen</em>: switch color to green
+</p>
+</li>
+<li>
+<p>
+<em>%Cblue</em>: switch color to blue
+</p>
+</li>
+<li>
+<p>
+<em>%Creset</em>: reset color
+</p>
+</li>
+<li>
+<p>
+<em>%m</em>: left, right or boundary mark
+</p>
+</li>
+<li>
+<p>
+<em>%n</em>: newline
+</p>
+</li>
+</ul>
+</li>
+</ul>
 </div>
 <h2>Examples</h2>
 <div class="sectionbody">
@@ -384,7 +702,7 @@ Junio C Hamano &lt;junkio@cox.net&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:58 UTC
+Last updated 08-Mar-2008 09:30:02 UTC
 </div>
 </div>
 </body>
