@@ -276,11 +276,11 @@ git-mergetool(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Use <em>git mergetool</em> to run one of several merge utilities to resolve
+<p>Use <tt>git mergetool</tt> to run one of several merge utilities to resolve
 merge conflicts.  It is typically run after <a href="git-merge.html">git-merge(1)</a>.</p>
 <p>If one or more &lt;file&gt; parameters are given, the merge tool program will
 be run to resolve differences on each file.  If no &lt;file&gt; names are
-specified, <em>git mergetool</em> will run the merge tool program on every file
+specified, <tt>git mergetool</tt> will run the merge tool program on every file
 with merge conflicts.</p>
 </div>
 <h2>OPTIONS</h2>
@@ -295,15 +295,34 @@ with merge conflicts.</p>
         Valid merge tools are:
         kdiff3, tkdiff, meld, xxdiff, emerge, vimdiff, gvimdiff, ecmerge, and opendiff
 </p>
-<p>If a merge resolution program is not specified, <em>git mergetool</em>
-will use the configuration variable merge.tool.  If the
-configuration variable merge.tool is not set, <em>git mergetool</em>
+<p>If a merge resolution program is not specified, <tt>git mergetool</tt>
+will use the configuration variable <tt>merge.tool</tt>.  If the
+configuration variable <tt>merge.tool</tt> is not set, <tt>git mergetool</tt>
 will pick a suitable default.</p>
 <p>You can explicitly provide a full path to the tool by setting the
-configuration variable mergetool.&lt;tool&gt;.path. For example, you
+configuration variable <tt>mergetool.&lt;tool&gt;.path</tt>. For example, you
 can configure the absolute path to kdiff3 by setting
-mergetool.kdiff3.path. Otherwise, <em>git mergetool</em> assumes the tool
-is available in PATH.</p>
+<tt>mergetool.kdiff3.path</tt>. Otherwise, <tt>git mergetool</tt> assumes the
+tool is available in PATH.</p>
+<p>Instead of running one of the known merge tool programs
+<tt>git mergetool</tt> can be customized to run an alternative program
+by specifying the command line to invoke in a configration
+variable <tt>mergetool.&lt;tool&gt;.cmd</tt>.</p>
+<p>When <tt>git mergetool</tt> is invoked with this tool (either through the
+<tt>-t</tt> or <tt>--tool</tt> option or the <tt>merge.tool</tt> configuration
+variable) the configured command line will be invoked with <tt>$BASE</tt>
+set to the name of a temporary file containing the common base for
+the merge, if available; <tt>$LOCAL</tt> set to the name of a temporary
+file containing the contents of the file on the current branch;
+<tt>$REMOTE</tt> set to the name of a temporary file containing the
+contents of the file to be merged, and <tt>$MERGED</tt> set to the name
+of the file to which the merge tool should write the result of the
+merge resolution.</p>
+<p>If the custom merge tool correctly indicates the success of a
+merge resolution with its exit code then the configuration
+variable <tt>mergetool.&lt;tool&gt;.trustExitCode</tt> can be set to <tt>true</tt>.
+Otherwise, <tt>git mergetool</tt> will prompt the user to indicate the
+success of the resolution after the custom tool has exited.</p>
 </dd>
 </dl>
 </div>
@@ -321,7 +340,7 @@ is available in PATH.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:32 UTC
+Last updated 09-Mar-2008 10:38:33 UTC
 </div>
 </div>
 </body>
