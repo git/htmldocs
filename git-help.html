@@ -304,8 +304,8 @@ former is internally converted into the latter.</p>
 </dt>
 <dd>
 <p>
-        Use the <em>info</em> program to display the manual page, instead of
-        the <em>man</em> program that is used by default.
+        Display manual page for the command in the <em>info</em> format. The
+        <em>info</em> program will be used for that purpose.
 </p>
 </dd>
 <dt>
@@ -313,18 +313,21 @@ former is internally converted into the latter.</p>
 </dt>
 <dd>
 <p>
-        Use the <em>man</em> program to display the manual page. This may be
-        used to override a value set in the <em>help.format</em>
-        configuration variable.
+        Display manual page for the command in the <em>man</em> format. This
+        option may be used to override a value set in the
+        <em>help.format</em> configuration variable.
 </p>
+<p>By default the <em>man</em> program will be used to display the manual page,
+but the <em>man.viewer</em> configuration variable may be used to choose
+other display programs (see below).</p>
 </dd>
 <dt>
 -w|--web
 </dt>
 <dd>
 <p>
-        Use a web browser to display the HTML manual page, instead of
-        the <em>man</em> program that is used by default.
+        Display manual page for the command in the <em>web</em> (HTML)
+        format. A web browser will be used for that purpose.
 </p>
 <p>The web browser can be specified using the configuration variable
 <em>help.browser</em>, or <em>web.browser</em> if the former is not set. If none of
@@ -336,6 +339,7 @@ these config variables is set, the <em>git-web--browse</em> helper script
 </div>
 <h2>CONFIGURATION VARIABLES</h2>
 <div class="sectionbody">
+<h3>help.format</h3>
 <p>If no command line option is passed, the <em>help.format</em> configuration
 variable will be checked. The following values are supported for this
 variable; they make <em>git-help</em> behave as their corresponding command
@@ -353,16 +357,52 @@ line option:</p>
 </li>
 <li>
 <p>
-"web" or "html" correspond to <em>-w|--web</em>,
+"web" or "html" correspond to <em>-w|--web</em>.
 </p>
 </li>
 </ul>
+<h3>help.browser, web.browser and browser.&lt;tool&gt;.path</h3>
 <p>The <em>help.browser</em>, <em>web.browser</em> and <em>browser.&lt;tool&gt;.path</em> will also
 be checked if the <em>web</em> format is chosen (either by command line
 option or configuration variable). See <em>-w|--web</em> in the OPTIONS
 section above and <a href="git-web--browse.html">git-web--browse(1)</a>.</p>
-<p>Note that these configuration variables should probably be set using
-the <em>--global</em> flag, for example like this:</p>
+<h3>man.viewer</h3>
+<p>The <em>man.viewer</em> config variable will be checked if the <em>man</em> format
+is chosen. Only the following values are currently supported:</p>
+<ul>
+<li>
+<p>
+"man": use the <em>man</em> program as usual,
+</p>
+</li>
+<li>
+<p>
+"woman": use <em>emacsclient</em> to launch the "woman" mode in emacs
+(this only works starting with emacsclient versions 22),
+</p>
+</li>
+<li>
+<p>
+"konqueror": use a man KIO slave in konqueror.
+</p>
+</li>
+</ul>
+<p>Multiple values may be given to this configuration variable. Their
+corresponding programs will be tried in the order listed in the
+configuration file.</p>
+<p>For example, this configuration:</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[man]
+        viewer = konqueror
+        viewer = woman</tt></pre>
+</div></div>
+<p>will try to use konqueror first. But this may fail (for example if
+DISPLAY is not set) and in that case emacs' woman mode will be tried.</p>
+<p>If everything fails the <em>man</em> program will be tried anyway.</p>
+<h3>Note about git config --global</h3>
+<p>Note that all these configuration variables should probably be set
+using the <em>--global</em> flag, for example like this:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git config --global help.format web
@@ -388,7 +428,7 @@ little. Maintenance is done by the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 17-Feb-2008 03:50:06 UTC
+Last updated 15-Mar-2008 09:48:17 UTC
 </div>
 </div>
 </body>
