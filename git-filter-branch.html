@@ -289,7 +289,7 @@ a perl rewrite on all files) or information about each commit.
 Otherwise, all information (including original commit times or merge
 information) will be preserved.</p>
 <p>The command will only rewrite the _positive_ refs mentioned in the
-command line (i.e. if you pass <em>a..b</em>, only <em>b</em> will be rewritten).
+command line (e.g. if you pass <em>a..b</em>, only <em>b</em> will be rewritten).
 If you specify no filters, the commits will be recommitted without any
 changes, which would normally have no effect.  Nevertheless, this may be
 useful in the future for compensating for some git bugs or such,
@@ -303,19 +303,20 @@ would suffice to fix your problem.</p>
 <p>Always verify that the rewritten version is correct: The original refs,
 if different from the rewritten ones, will be stored in the namespace
 <em>refs/original/</em>.</p>
-<p>Note that since this operation is extensively I/O expensive, it might
+<p>Note that since this operation is very I/O expensive, it might
 be a good idea to redirect the temporary directory off-disk with the
 <em>-d</em> option, e.g. on tmpfs.  Reportedly the speedup is very noticeable.</p>
 <h3>Filters</h3>
 <p>The filters are applied in the order as listed below.  The &lt;command&gt;
-argument is always evaluated in shell using the <em>eval</em> command (with the
-notable exception of the commit filter, for technical reasons).
+argument is always evaluated in the shell context using the <em>eval</em> command
+(with the notable exception of the commit filter, for technical reasons).
 Prior to that, the $GIT_COMMIT environment variable will be set to contain
 the id of the commit being rewritten.  Also, GIT_AUTHOR_NAME,
 GIT_AUTHOR_EMAIL, GIT_AUTHOR_DATE, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL,
-and GIT_COMMITTER_DATE are set according to the current commit. If any
-evaluation of &lt;command&gt; returns a non-zero exit status, the whole operation
-will be aborted.</p>
+and GIT_COMMITTER_DATE are set according to the current commit.  The values
+of these variables after the filters have run, are used for the new commit.
+If any evaluation of &lt;command&gt; returns a non-zero exit status, the whole
+operation will be aborted.</p>
 <p>A <em>map</em> function is available that takes an "original sha1 id" argument
 and outputs a "rewritten sha1 id" if the commit has been already
 rewritten, and "original sha1 id" otherwise; the <em>map</em> function can
@@ -330,9 +331,9 @@ multiple commits.</p>
 </dt>
 <dd>
 <p>
-        This is the filter for modifying the environment in which
-        the commit will be performed.  Specifically, you might want
-        to rewrite the author/committer name/email/time environment
+        This filter may be used if you only need to modify the environment
+        in which the commit will be performed.  Specifically, you might
+        want to rewrite the author/committer name/email/time environment
         variables (see <a href="git-commit.html">git-commit(1)</a> for details).  Do not forget
         to re-export the variables.
 </p>
@@ -449,7 +450,7 @@ definition impossible to preserve signatures at any rate.)</p>
 <p>
         Use this option to set the path to the temporary directory used for
         rewriting.  When applying a tree filter, the command needs to
-        temporary checkout the tree to some directory, which may consume
+        temporarily check out the tree to some directory, which may consume
         considerable space in case of large projects.  By default it
         does this in the <em>.git-rewrite/</em> directory but you can override
         that choice by this parameter.
@@ -604,7 +605,7 @@ and the git list &lt;git@vger.kernel.org&gt;</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 26-Feb-2008 09:16:45 UTC
+Last updated 23-Mar-2008 09:40:59 UTC
 </div>
 </div>
 </body>

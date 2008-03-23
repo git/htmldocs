@@ -705,6 +705,9 @@ new commit.</p>
 <p>Omitting the <tt>from</tt> command in the first commit of a new branch
 will cause fast-import to create that commit with no ancestor. This
 tends to be desired only for the initial commit of a project.
+If the frontend creates all files from scratch when making a new
+branch, a <tt>merge</tt> command may be used instead of <tt>from</tt> to start
+the commit with an empty tree.
 Omitting the <tt>from</tt> command on existing branches is usually desired,
 as the current commit on that branch is automatically assumed to
 be the first ancestor of the new commit.</p>
@@ -755,13 +758,15 @@ fast-import to resolve the commit through Git's revision parsing library,
 rather than its internal branch table, thereby loading in the
 existing value of the branch.</p>
 <h4><tt>merge</tt></h4>
-<p>Includes one additional ancestor commit, and makes the current
-commit a merge commit.  An unlimited number of <tt>merge</tt> commands per
+<p>Includes one additional ancestor commit.  If the <tt>from</tt> command is
+omitted when creating a new branch, the first <tt>merge</tt> commit will be
+the first ancestor of the current commit, and the branch will start
+out with no files.  An unlimited number of <tt>merge</tt> commands per
 commit are permitted by fast-import, thereby establishing an n-way merge.
 However Git's other tools never create commits with more than 15
 additional ancestors (forming a 16-way merge).  For this reason
 it is suggested that frontends do not use more than 15 <tt>merge</tt>
-commands per commit.</p>
+commands per commit; 16, if starting a new, empty branch.</p>
 <p>Here <tt>&lt;committish&gt;</tt> is any of the commit specification expressions
 also accepted by <tt>from</tt> (see above).</p>
 <h4><tt>filemodify</tt></h4>
@@ -1411,7 +1416,7 @@ memory footprint (less than 2.7 MiB per active branch).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 16-Feb-2008 10:02:22 UTC
+Last updated 23-Mar-2008 09:40:37 UTC
 </div>
 </div>
 </body>
