@@ -394,7 +394,9 @@ CVS_SERVER directly in CVSROOT like</p>
 </div></div>
 <p>This has the advantage that it will be saved in your <em>CVS/Root</em> files and
 you don't need to worry about always setting the correct environment
-variable.</p>
+variable.  SSH users restricted to git-shell don't need to override the default
+with CVS_SERVER (and shouldn't) as git-shell understands <tt>cvs</tt> to mean
+git-cvsserver and pretends that the other end runs the real cvs better.</p>
 </li>
 <li>
 <p>
@@ -428,12 +430,12 @@ allowing access over SSH.</p>
 </li>
 <li>
 <p>
-On the client machine you need to set the following variables.
-   CVSROOT should be set as per normal, but the directory should point at the
-   appropriate git repo. For example:
+If you didn't specify the CVSROOT/CVS_SERVER directly in the checkout command,
+   automatically saving it in your <em>CVS/Root</em> files, then you need to set them
+   explicitly in your environment.  CVSROOT should be set as per normal, but the
+   directory should point at the appropriate git repo.  As above, for SSH clients
+   _not_ restricted to git-shell, CVS_SERVER should be set to git-cvsserver.
 </p>
-<p>For SSH access, CVS_SERVER should be set to git-cvsserver</p>
-<p>Example:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>     export CVSROOT=:ext:user@server:/var/git/project.git
@@ -442,14 +444,20 @@ On the client machine you need to set the following variables.
 </li>
 <li>
 <p>
-For SSH clients that will make commits, make sure their .bashrc file
-   sets the GIT_AUTHOR and GIT_COMMITTER variables.
+For SSH clients that will make commits, make sure their server-side
+   .ssh/environment files (or .bashrc, etc., according to their specific shell)
+   export appropriate values for GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL,
+   GIT_COMMITTER_NAME, and GIT_COMMITTER_EMAIL.  For SSH clients whose login
+   shell is bash, .bashrc may be a reasonable alternative.
 </p>
 </li>
 <li>
 <p>
 Clients should now be able to check out the project. Use the CVS <em>module</em>
-   name to indicate what GIT <em>head</em> you want to check out. Example:
+   name to indicate what GIT <em>head</em> you want to check out.  This also sets the
+   name of your newly checked-out directory, unless you tell it otherwise with
+   <tt>-d &lt;dir_name&gt;</tt>.  For example, this checks out <em>master</em> branch to the
+   <tt>project-master</tt> directory:
 </p>
 <div class="listingblock">
 <div class="content">
@@ -701,7 +709,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Apr-2008 08:38:49 UTC
+Last updated 16-Apr-2008 09:09:50 UTC
 </div>
 </div>
 </body>
