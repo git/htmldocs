@@ -276,11 +276,16 @@ git-rm(1) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Remove files from the working tree and from the index.  The
-files have to be identical to the tip of the branch, and no
-updates to its contents must have been placed in the staging
-area (aka index).  When --cached is given, the staged content has to
-match either the tip of the branch <strong>or</strong> the file on disk.</p>
+<p>Remove files from the index, or from the working tree and the index.
+<tt>git rm</tt> will not remove a file from just your working directory.
+(There is no option to remove a file only from the work tree
+and yet keep it in the index; use <tt>/bin/rm</tt> if you want to do that.)
+The files being removed have to be identical to the tip of the branch,
+and no updates to their contents can be staged in the index,
+though that default behavior can be overridden with the <tt>-f</tt> option.
+When <em>--cached</em> is given, the staged content has to
+match either the tip of the branch or the file on disk,
+allowing the file to be removed from just the index.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -291,10 +296,13 @@ match either the tip of the branch <strong>or</strong> the file on disk.</p>
 <dd>
 <p>
         Files to remove.  Fileglobs (e.g. <tt>*.c</tt>) can be given to
-        remove all matching files.  Also a leading directory name
-        (e.g. <tt>dir</tt> to add <tt>dir/file1</tt> and <tt>dir/file2</tt>) can be
-        given to remove all files in the directory, recursively,
-        but this requires <tt>-r</tt> option to be given for safety.
+        remove all matching files.  If you want git to expand
+        file glob characters, you may need to shell-escape them.
+        A leading directory name
+        (e.g. <tt>dir</tt> to remove <tt>dir/file1</tt> and <tt>dir/file2</tt>) can be
+        given to remove all files in the directory, and recursively
+        all sub-directories,
+        but this requires the <tt>-r</tt> option to be explicitly given.
 </p>
 </dd>
 <dt>
@@ -310,8 +318,9 @@ match either the tip of the branch <strong>or</strong> the file on disk.</p>
 </dt>
 <dd>
 <p>
-        Don't actually remove the file(s), just show if they exist in
-        the index.
+        Don't actually remove any file(s).  Instead, just show
+        if they exist in the index and would otherwise be removed
+        by the command.
 </p>
 </dd>
 <dt>
@@ -338,9 +347,9 @@ match either the tip of the branch <strong>or</strong> the file on disk.</p>
 </dt>
 <dd>
 <p>
-        This option can be used to tell the command to remove
-        the paths only from the index, leaving working tree
-        files.
+        Use this option to unstage and remove paths only from the index.
+        Working tree files, whether modified or not, will be
+        left alone.
 </p>
 </dd>
 <dt>
@@ -364,10 +373,14 @@ match either the tip of the branch <strong>or</strong> the file on disk.</p>
 </div>
 <h2>DISCUSSION</h2>
 <div class="sectionbody">
-<p>The list of &lt;file&gt; given to the command can be exact pathnames,
-file glob patterns, or leading directory name.  The command
-removes only the paths that is known to git.  Giving the name of
+<p>The &lt;file&gt; list given to the command can be exact pathnames,
+file glob patterns, or leading directory names.  The command
+removes only the paths that are known to git.  Giving the name of
 a file that you have not told git about does not remove that file.</p>
+<p>File globbing matches across directory boundaries.  Thus, given
+two directories <tt>d</tt> and <tt>d2</tt>, there is a difference between
+using <tt>git rm 'd*'</tt> and <tt>git rm 'd/*'</tt>, as the former will
+also remove all of directory <tt>d2</tt>.</p>
 </div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
@@ -381,15 +394,14 @@ git-rm Documentation/\*.txt
         <tt>Documentation</tt> directory and any of its subdirectories.
 </p>
 <p>Note that the asterisk <tt>*</tt> is quoted from the shell in this
-example; this lets the command include the files from
-subdirectories of <tt>Documentation/</tt> directory.</p>
+example; this lets git, and not the shell, expand the pathnames
+of files and subdirectories under the <tt>Documentation/</tt> directory.</p>
 </dd>
 <dt>
 git-rm -f git-*.sh
 </dt>
 <dd>
 <p>
-        Remove all git-*.sh scripts that are in the index.
         Because this example lets the shell expand the asterisk
         (i.e. you are listing the files explicitly), it
         does not remove <tt>subdir/git-foo.sh</tt>.
@@ -415,7 +427,7 @@ git-rm -f git-*.sh
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:46 UTC
+Last updated 17-Apr-2008 02:17:31 UTC
 </div>
 </div>
 </body>
