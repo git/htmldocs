@@ -273,7 +273,7 @@ git-branch(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-branch</em> [--color | --no-color] [-r | -a]
+<div class="content"><em>git-branch</em> [--color | --no-color] [-r | -a] [--merged | --no-merged]
            [-v [--abbrev=&lt;length&gt; | --no-abbrev]]
            [--contains &lt;commit&gt;]
 <em>git-branch</em> [--track | --no-track] [-l] [-f] &lt;branchname&gt; [&lt;start-point&gt;]
@@ -288,7 +288,9 @@ Option <tt>-r</tt> causes the remote-tracking branches to be listed,
 and option <tt>-a</tt> shows both.
 With <tt>--contains &lt;commit&gt;</tt>, shows only the branches that
 contains the named commit (in other words, the branches whose
-tip commits are descendant of the named commit).</p>
+tip commits are descendant of the named commit).
+With <tt>--merged</tt>, only branches merged into HEAD will be listed, and
+with <tt>--no-merged</tt> only branches not merged into HEAD will be listed.</p>
 <p>In its second form, a new branch named &lt;branchname&gt; will be created.
 It will start out with a head equal to the one given as &lt;start-point&gt;.
 If no &lt;start-point&gt; is given, the branch will be created with a head
@@ -453,6 +455,30 @@ clean up all obsolete remote-tracking branches.</p>
 </p>
 </dd>
 <dt>
+--contains &lt;commit&gt;
+</dt>
+<dd>
+<p>
+        Only list branches which contain the specified commit.
+</p>
+</dd>
+<dt>
+--merged
+</dt>
+<dd>
+<p>
+        Only list branches which are fully contained by HEAD.
+</p>
+</dd>
+<dt>
+--no-merged
+</dt>
+<dd>
+<p>
+        Do not list branches which are fully contained by HEAD.
+</p>
+</dd>
+<dt>
 &lt;branchname&gt;
 </dt>
 <dd>
@@ -549,6 +575,29 @@ currently checked out) does not have all commits from test branch.
 <p>If you are creating a branch that you want to immediately checkout, it's
 easier to use the git checkout command with its <tt>-b</tt> option to create
 a branch and check it out with a single command.</p>
+<p>The options <tt>--contains</tt>, <tt>--merged</tt> and <tt>--no-merged</tt> serves three related
+but different purposes:</p>
+<ul>
+<li>
+<p>
+<tt>--contains &lt;commit&gt;</tt> is used to find all branches which will need
+  special attention if &lt;commit&gt; were to be rebased or amended, since those
+  branches contain the specified &lt;commit&gt;.
+</p>
+</li>
+<li>
+<p>
+<tt>--merged</tt> is used to find all branches which can be safely deleted,
+  since those branches are fully contained by HEAD.
+</p>
+</li>
+<li>
+<p>
+<tt>--no-merged</tt> is used to find branches which are candidates for merging
+  into HEAD, since those branches are not fully contained by HEAD.
+</p>
+</li>
+</ul>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -564,7 +613,7 @@ a branch and check it out with a single command.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 28-Feb-2008 00:25:37 UTC
+Last updated 06-May-2008 06:34:57 UTC
 </div>
 </div>
 </body>
