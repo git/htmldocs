@@ -289,20 +289,48 @@ when merging local branches into the current branch.</p>
 <div class="sectionbody">
 <dl>
 <dt>
---summary
+--stat
 </dt>
 <dd>
 <p>
         Show a diffstat at the end of the merge. The diffstat is also
-        controlled by the configuration option merge.diffstat.
+        controlled by the configuration option merge.stat.
 </p>
 </dd>
 <dt>
--n, --no-summary
+-n, --no-stat
 </dt>
 <dd>
 <p>
         Do not show diffstat at the end of the merge.
+</p>
+</dd>
+<dt>
+--summary, --no-summary
+</dt>
+<dd>
+<p>
+        Synonyms to --stat and --no-stat; these are deprecated and will be
+        removed in the future.
+</p>
+</dd>
+<dt>
+--log
+</dt>
+<dd>
+<p>
+        In addition to branch names, populate the log message with
+        one-line descriptions from the actual commits that are being
+        merged.
+</p>
+</dd>
+<dt>
+--no-log
+</dt>
+<dd>
+<p>
+        Do not list one-line descriptions from the actual commits being
+        merged.
 </p>
 </dd>
 <dt>
@@ -904,82 +932,86 @@ Otherwise the remote branch of the first refspec is merged.
 </div>
 <h2>EXAMPLES</h2>
 <div class="sectionbody">
-<dl>
-<dt>
-git pull, git pull origin
-</dt>
-<dd>
+<ul>
+<li>
 <p>
-        Update the remote-tracking branches for the repository
-        you cloned from, then merge one of them into your
-        current branch.  Normally the branch merged in is
-        the HEAD of the remote repository, but the choice is
-        determined by the branch.&lt;name&gt;.remote and
-        branch.&lt;name&gt;.merge options; see <a href="git-config.html">git-config(1)</a>
-        for details.
+Update the remote-tracking branches for the repository
+  you cloned from, then merge one of them into your
+  current branch:
 </p>
-</dd>
-<dt>
-git pull origin next
-</dt>
-<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull, git pull origin</tt></pre>
+</div></div>
+<p>Normally the branch merged in is the HEAD of the remote repository,
+but the choice is determined by the branch.&lt;name&gt;.remote and
+branch.&lt;name&gt;.merge options; see <a href="git-config.html">git-config(1)</a> for details.</p>
+</li>
+<li>
 <p>
-        Merge into the current branch the remote branch <tt>next</tt>;
-        leaves a copy of <tt>next</tt> temporarily in FETCH_HEAD, but
-        does not update any remote-tracking branches.
+Merge into the current branch the remote branch <tt>next</tt>:
 </p>
-</dd>
-<dt>
-git pull . fixes enhancements
-</dt>
-<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull origin next</tt></pre>
+</div></div>
+<p>This leaves a copy of <tt>next</tt> temporarily in FETCH_HEAD, but
+does not update any remote-tracking branches.</p>
+</li>
+<li>
 <p>
-        Bundle local branch <tt>fixes</tt> and <tt>enhancements</tt> on top of
-        the current branch, making an Octopus merge.  This <tt>git pull .</tt>
-        syntax is equivalent to <tt>git merge</tt>.
+Bundle local branch <tt>fixes</tt> and <tt>enhancements</tt> on top of
+  the current branch, making an Octopus merge:
 </p>
-</dd>
-<dt>
-git pull -s ours . obsolete
-</dt>
-<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull . fixes enhancements</tt></pre>
+</div></div>
+<p>This <tt>git pull .</tt> syntax is equivalent to <tt>git merge</tt>.</p>
+</li>
+<li>
 <p>
-        Merge local branch <tt>obsolete</tt> into the current branch,
-        using <tt>ours</tt> merge strategy.
+Merge local branch <tt>obsolete</tt> into the current branch, using <tt>ours</tt>
+  merge strategy:
 </p>
-</dd>
-<dt>
-git pull --no-commit . maint
-</dt>
-<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull -s ours . obsolete</tt></pre>
+</div></div>
+</li>
+<li>
 <p>
-        Merge local branch <tt>maint</tt> into the current branch, but
-        do not make a commit automatically.  This can be used
-        when you want to include further changes to the merge,
-        or want to write your own merge commit message.
+Merge local branch <tt>maint</tt> into the current branch, but do not make
+  a commit automatically:
 </p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull --no-commit . maint</tt></pre>
+</div></div>
+<p>This can be used when you want to include further changes to the
+merge, or want to write your own merge commit message.</p>
 <p>You should refrain from abusing this option to sneak substantial
 changes into a merge commit.  Small fixups like bumping
 release/version name would be acceptable.</p>
-</dd>
-<dt>
-Command line pull of multiple branches from one repository
-</dt>
-<dd>
+</li>
+<li>
+<p>
+Command line pull of multiple branches from one repository:
+</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git checkout master
 $ git fetch origin +pu:pu maint:tmp
 $ git pull . tmp</tt></pre>
 </div></div>
-<p>This updates (or creates, as necessary) branches <tt>pu</tt> and <tt>tmp</tt>
-in the local repository by fetching from the branches
-(respectively) <tt>pu</tt> and <tt>maint</tt> from the remote repository.</p>
-<p>The <tt>pu</tt> branch will be updated even if it is does not
-fast-forward; the others will not be.</p>
+<p>This updates (or creates, as necessary) branches <tt>pu</tt> and <tt>tmp</tt> in
+the local repository by fetching from the branches (respectively)
+<tt>pu</tt> and <tt>maint</tt> from the remote repository.</p>
+<p>The <tt>pu</tt> branch will be updated even if it is does not fast-forward;
+the others will not be.</p>
 <p>The final command then merges the newly fetched <tt>tmp</tt> into master.</p>
-</dd>
-</dl>
+</li>
+</ul>
 <p>If you tried a pull which resulted in a complex conflicts and
 would want to start over, you can recover with
 <a href="git-reset.html">git-reset(1)</a>.</p>
@@ -1005,7 +1037,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Mar-2008 09:24:07 UTC
+Last updated 09-May-2008 05:45:38 UTC
 </div>
 </div>
 </body>

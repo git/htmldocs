@@ -368,7 +368,7 @@ option or configuration variable). See <em>-w|--web</em> in the OPTIONS
 section above and <a href="git-web--browse.html">git-web--browse(1)</a>.</p>
 <h3>man.viewer</h3>
 <p>The <em>man.viewer</em> config variable will be checked if the <em>man</em> format
-is chosen. Only the following values are currently supported:</p>
+is chosen. The following values are currently supported:</p>
 <ul>
 <li>
 <p>
@@ -383,23 +383,56 @@ is chosen. Only the following values are currently supported:</p>
 </li>
 <li>
 <p>
-"konqueror": use a man KIO slave in konqueror.
+"konqueror": use <em>kfmclient</em> to open the man page in a new konqueror
+tab (see <em>Note about konqueror</em> below).
 </p>
 </li>
 </ul>
-<p>Multiple values may be given to this configuration variable. Their
-corresponding programs will be tried in the order listed in the
-configuration file.</p>
+<p>Values for other tools can be used if there is a corresponding
+<em>man.&lt;tool&gt;.cmd</em> configuration entry (see below).</p>
+<p>Multiple values may be given to the <em>man.viewer</em> configuration
+variable. Their corresponding programs will be tried in the order
+listed in the configuration file.</p>
 <p>For example, this configuration:</p>
-<div class="literalblock">
+<div class="listingblock">
 <div class="content">
-<pre><tt>[man]
-        viewer = konqueror
-        viewer = woman</tt></pre>
+<pre><tt>        [man]
+                viewer = konqueror
+                viewer = woman</tt></pre>
 </div></div>
 <p>will try to use konqueror first. But this may fail (for example if
 DISPLAY is not set) and in that case emacs' woman mode will be tried.</p>
 <p>If everything fails the <em>man</em> program will be tried anyway.</p>
+<h3>man.&lt;tool&gt;.path</h3>
+<p>You can explicitly provide a full path to your preferred man viewer by
+setting the configuration variable <em>man.&lt;tool&gt;.path</em>. For example, you
+can configure the absolute path to konqueror by setting
+<em>man.konqueror.path</em>. Otherwise, <em>git help</em> assumes the tool is
+available in PATH.</p>
+<h3>man.&lt;tool&gt;.cmd</h3>
+<p>When the man viewer, specified by the <em>man.viewer</em> configuration
+variables, is not among the supported ones, then the corresponding
+<em>man.&lt;tool&gt;.cmd</em> configuration variable will be looked up. If this
+variable exists then the specified tool will be treated as a custom
+command and a shell eval will be used to run the command with the man
+page passed as arguments.</p>
+<h3>Note about konqueror</h3>
+<p>When <em>konqueror</em> is specified in the <em>man.viewer</em> configuration
+variable, we launch <em>kfmclient</em> to try to open the man page on an
+already opened konqueror in a new tab if possible.</p>
+<p>For consistency, we also try such a trick if <em>man.konqueror.path</em> is
+set to something like <em>A_PATH_TO/konqueror</em>. That means we will try to
+launch <em>A_PATH_TO/kfmclient</em> instead.</p>
+<p>If you really want to use <em>konqueror</em>, then you can use something like
+the following:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        [man]
+                viewer = konq
+
+        [man "konq"]
+                cmd = A_PATH_TO/konqueror</tt></pre>
+</div></div>
 <h3>Note about git config --global</h3>
 <p>Note that all these configuration variables should probably be set
 using the <em>--global</em> flag, for example like this:</p>
@@ -428,7 +461,7 @@ little. Maintenance is done by the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 15-Mar-2008 09:48:17 UTC
+Last updated 09-May-2008 05:45:38 UTC
 </div>
 </div>
 </body>

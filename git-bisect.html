@@ -443,6 +443,61 @@ tree to the pristine state.  Finally the "run" script can exit with
 the status of the real test to let "git bisect run" command loop to
 know the outcome.</p>
 </div>
+<h2>EXAMPLES</h2>
+<div class="sectionbody">
+<ul>
+<li>
+<p>
+Automatically bisect a broken build between v1.2 and HEAD:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bisect start HEAD v1.2 --      # HEAD is bad, v1.2 is good
+$ git bisect run make                # "make" builds the app</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Automatically bisect a broken test suite:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cat ~/test.sh
+#!/bin/sh
+make || exit 125                   # this "skip"s broken builds
+make test                          # "make test" runs the test suite
+$ git bisect start v1.3 v1.1 --    # v1.3 is bad, v1.1 is good
+$ git bisect run ~/test.sh</tt></pre>
+</div></div>
+<p>Here we use a "test.sh" custom script. In this script, if "make"
+fails, we "skip" the current commit.</p>
+<p>It's safer to use a custom script outside the repo to prevent
+interactions between the bisect, make and test processes and the
+script.</p>
+<p>And "make test" should "exit 0", if the test suite passes, and
+"exit 1" (for example) otherwise.</p>
+</li>
+<li>
+<p>
+Automatically bisect a broken test case:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cat ~/test.sh
+#!/bin/sh
+make || exit 125                     # this "skip"s broken builds
+~/check_test_case.sh                 # does the test case passes ?
+$ git bisect start HEAD HEAD~10 --   # culprit is among the last 10
+$ git bisect run ~/test.sh</tt></pre>
+</div></div>
+<p>Here "check_test_case.sh" should "exit 0", if the test case passes,
+and "exit 1" (for example) otherwise.</p>
+<p>It's safer if both "test.sh" and "check_test_case.sh" scripts are
+outside the repo to prevent interactions between the bisect, make and
+test processes and the scripts.</p>
+</li>
+</ul>
+</div>
 <h2>Author</h2>
 <div class="sectionbody">
 <p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
@@ -457,7 +512,7 @@ know the outcome.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 12-Apr-2008 08:22:49 UTC
+Last updated 09-May-2008 05:45:35 UTC
 </div>
 </div>
 </body>

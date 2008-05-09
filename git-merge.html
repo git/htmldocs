@@ -273,7 +273,7 @@ git-merge(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-merge</em> [-n] [--summary] [--no-commit] [--squash] [-s &lt;strategy&gt;]&#8230;
+<div class="content"><em>git-merge</em> [-n] [--stat] [--no-commit] [--squash] [-s &lt;strategy&gt;]&#8230;
         [-m &lt;msg&gt;] &lt;remote&gt; &lt;remote&gt;&#8230;
 <em>git-merge</em> &lt;msg&gt; HEAD &lt;remote&gt;&#8230;</div></div>
 </div>
@@ -289,20 +289,48 @@ new scripts.  It is the same as <tt>git merge -m &lt;msg&gt; &lt;remote&gt;</tt>
 <div class="sectionbody">
 <dl>
 <dt>
---summary
+--stat
 </dt>
 <dd>
 <p>
         Show a diffstat at the end of the merge. The diffstat is also
-        controlled by the configuration option merge.diffstat.
+        controlled by the configuration option merge.stat.
 </p>
 </dd>
 <dt>
--n, --no-summary
+-n, --no-stat
 </dt>
 <dd>
 <p>
         Do not show diffstat at the end of the merge.
+</p>
+</dd>
+<dt>
+--summary, --no-summary
+</dt>
+<dd>
+<p>
+        Synonyms to --stat and --no-stat; these are deprecated and will be
+        removed in the future.
+</p>
+</dd>
+<dt>
+--log
+</dt>
+<dd>
+<p>
+        In addition to branch names, populate the log message with
+        one-line descriptions from the actual commits that are being
+        merged.
+</p>
+</dd>
+<dt>
+--no-log
+</dt>
+<dd>
+<p>
+        Do not list one-line descriptions from the actual commits being
+        merged.
 </p>
 </dd>
 <dt>
@@ -477,12 +505,33 @@ would want to start over, you can recover with
 <div class="sectionbody">
 <dl>
 <dt>
-merge.summary
+merge.stat
 </dt>
 <dd>
 <p>
-        Whether to include summaries of merged commits in newly
-        created merge commit. False by default.
+        Whether to print the diffstat berween ORIG_HEAD and merge result
+        at the end of the merge.  True by default.
+</p>
+</dd>
+<dt>
+merge.log
+</dt>
+<dd>
+<p>
+        Whether to include summaries of merged commits in newly created
+        merge commit messages. False by default.
+</p>
+</dd>
+<dt>
+merge.tool
+</dt>
+<dd>
+<p>
+        Controls which merge resolution program is used by
+        <a href="git-mergetool.html">git-mergetool(1)</a>.  Valid built-in values are: "kdiff3",
+        "tkdiff", "meld", "xxdiff", "emerge", "vimdiff", "gvimdiff", and
+        "opendiff".  Any other value is treated is custom merge tool
+        and there must be a corresponing mergetool.&lt;tool&gt;.cmd option.
 </p>
 </dd>
 <dt>
@@ -496,6 +545,34 @@ merge.verbosity
         conflicts, 2 outputs conflicts and file changes.  Level 5 and
         above outputs debugging information.  The default is level 2.
         Can be overridden by <em>GIT_MERGE_VERBOSITY</em> environment variable.
+</p>
+</dd>
+<dt>
+merge.&lt;driver&gt;.name
+</dt>
+<dd>
+<p>
+        Defines a human readable name for a custom low-level
+        merge driver.  See <a href="gitattributes.html">gitattributes(5)</a> for details.
+</p>
+</dd>
+<dt>
+merge.&lt;driver&gt;.driver
+</dt>
+<dd>
+<p>
+        Defines the command that implements a custom low-level
+        merge driver.  See <a href="gitattributes.html">gitattributes(5)</a> for details.
+</p>
+</dd>
+<dt>
+merge.&lt;driver&gt;.recursive
+</dt>
+<dd>
+<p>
+        Names a low-level merge driver to be used when
+        performing an internal merge between common ancestors.
+        See <a href="gitattributes.html">gitattributes(5)</a> for details.
 </p>
 </dd>
 <dt>
@@ -662,7 +739,7 @@ Resolve the conflicts.  <tt>git-diff</tt> would report only the
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 19-Mar-2008 09:24:07 UTC
+Last updated 09-May-2008 05:45:38 UTC
 </div>
 </div>
 </body>
