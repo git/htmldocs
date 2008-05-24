@@ -272,7 +272,7 @@ git-repack(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-repack</em> [-a] [-d] [-f] [-l] [-n] [-q] [--window=N] [--depth=N]</p>
+<p><em>git-repack</em> [-a] [-A] [-d] [-f] [-l] [-n] [-q] [--window=N] [--depth=N]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -301,6 +301,23 @@ engines, disk storage, etc.</p>
         with <em>-d</em>.  This will clean up the objects that <tt>git prune</tt>
         leaves behind, but <tt>git fsck --full</tt> shows as
         dangling.
+</p>
+</dd>
+<dt>
+-A
+</dt>
+<dd>
+<p>
+        Same as <tt>-a</tt>, but any unreachable objects in a previous
+        pack become loose, unpacked objects, instead of being
+        left in the old pack.  Unreachable objects are never
+        intentionally added to a pack, even when repacking.
+        When used with <em>-d</em>, this option
+        prevents unreachable objects from being immediately
+        deleted by way of being left in the old pack and then
+        removed.  Instead, the loose unreachable objects
+        will be pruned according to normal expiry rules
+        with the next <a href="git-gc.html">git-gc(1)</a>.
 </p>
 </dd>
 <dt>
@@ -346,7 +363,10 @@ engines, disk storage, etc.</p>
 <dd>
 <p>
         Do not update the server information with
-        <tt>git update-server-info</tt>.
+        <tt>git update-server-info</tt>.  This option skips
+        updating local catalog files needed to publish
+        this repository (or a direct copy of it)
+        over HTTP or FTP.  See .
 </p>
 </dd>
 <dt>
@@ -423,7 +443,7 @@ that way can try to use older git with it).</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:41 UTC
+Last updated 24-May-2008 01:12:07 UTC
 </div>
 </div>
 </body>
