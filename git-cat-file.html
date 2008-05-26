@@ -272,13 +272,16 @@ git-cat-file(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-cat-file</em> [-t | -s | -e | -p | &lt;type&gt;] &lt;object&gt;</p>
+<p><em>git-cat-file</em> [-t | -s | -e | -p | &lt;type&gt;] &lt;object&gt;
+<em>git-cat-file</em> [--batch | --batch-check] &lt; &lt;list-of-objects&gt;</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Provides content or type of objects in the repository. The type
-is required unless <em>-t</em> or <em>-p</em> is used to find the object type,
-or <em>-s</em> is used to find the object size.</p>
+<p>In the first form, provides content or type of objects in the repository. The
+type is required unless <em>-t</em> or <em>-p</em> is used to find the object type, or <em>-s</em>
+is used to find the object size.</p>
+<p>In the second form, a list of object (separated by LFs) is provided on stdin,
+and the SHA1, type, and size of each object is printed on stdout.</p>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -341,6 +344,24 @@ or <em>-s</em> is used to find the object size.</p>
         points at it.
 </p>
 </dd>
+<dt>
+--batch
+</dt>
+<dd>
+<p>
+        Print the SHA1, type, size, and contents of each object provided on
+        stdin. May not be combined with any other options or arguments.
+</p>
+</dd>
+<dt>
+--batch-check
+</dt>
+<dd>
+<p>
+        Print the SHA1, type, and size of each object provided on stdin. May not be
+        combined with any other options or arguments.
+</p>
+</dd>
 </dl>
 </div>
 <h2>OUTPUT</h2>
@@ -349,8 +370,27 @@ or <em>-s</em> is used to find the object size.</p>
 <p>If <em>-s</em> is specified, the size of the &lt;object&gt; in bytes.</p>
 <p>If <em>-e</em> is specified, no output.</p>
 <p>If <em>-p</em> is specified, the contents of &lt;object&gt; are pretty-printed.</p>
-<p>Otherwise the raw (though uncompressed) contents of the &lt;object&gt; will
-be returned.</p>
+<p>If &lt;type&gt; is specified, the raw (though uncompressed) contents of the &lt;object&gt;
+will be returned.</p>
+<p>If <em>--batch</em> is specified, output of the following form is printed for each
+object specified on stdin:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;sha1&gt; SP &lt;type&gt; SP &lt;size&gt; LF
+&lt;contents&gt; LF</tt></pre>
+</div></div>
+<p>If <em>--batch-check</em> is specified, output of the following form is printed for
+each object specified fon stdin:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;sha1&gt; SP &lt;type&gt; SP &lt;size&gt; LF</tt></pre>
+</div></div>
+<p>For both <em>--batch</em> and <em>--batch-check</em>, output of the following form is printed
+for each object specified on stdin that does not exist in the repository:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;object&gt; SP missing LF</tt></pre>
+</div></div>
 </div>
 <h2>Author</h2>
 <div class="sectionbody">
@@ -366,7 +406,7 @@ be returned.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:50:04 UTC
+Last updated 26-May-2008 01:14:43 UTC
 </div>
 </div>
 </body>

@@ -1689,15 +1689,29 @@ gitcvs.logfile
         various stuff. See <a href="git-cvsserver.html">git-cvsserver(1)</a>.
 </p>
 </dd>
+</dl>
+<p>gitcvs.usecrlfattr
+        If true, the server will look up the <tt>crlf</tt> attribute for
+        files to determine the <em>-k</em> modes to use. If <tt>crlf</tt> is set,
+        the <em>-k</em> mode will be left blank, so cvs clients will
+        treat it as text. If <tt>crlf</tt> is explicitly unset, the file
+        will be set with <em>-kb</em> mode, which supresses any newline munging
+        the client might otherwise do. If <tt>crlf</tt> is not specified,
+        then <em>gitcvs.allbinary</em> is used. See <a href="gitattribute.html">gitattribute(5)</a>.</p>
+<dl>
 <dt>
 gitcvs.allbinary
 </dt>
 <dd>
 <p>
-        If true, all files are sent to the client in mode <em>-kb</em>. This
-        causes the client to treat all files as binary files which suppresses
-        any newline munging it otherwise might do. A work-around for the
-        fact that there is no way yet to set single files to mode <em>-kb</em>.
+        This is used if <em>gitcvs.usecrlfattr</em> does not resolve
+        the correct <em>-kb</em> mode to use. If true, all
+        unresolved files are sent to the client in
+        mode <em>-kb</em>. This causes the client to treat them
+        as binary files, which suppresses any newline munging it
+        otherwise might do. Alternatively, if it is set to "guess",
+        then the contents of the file are examined to decide if
+        it is binary, similar to <em>core.autocrlf</em>.
 </p>
 </dd>
 <dt>
@@ -1750,8 +1764,9 @@ gitcvs.dbTableNamePrefix
 </p>
 </dd>
 </dl>
-<p>All gitcvs variables except for <em>gitcvs.allbinary</em> can also be
-specified as <em>gitcvs.&lt;access_method&gt;.&lt;varname&gt;</em> (where <em>access_method</em>
+<p>All gitcvs variables except for <em>gitcvs.usecrlfattr</em> and
+<em>gitcvs.allbinary</em> can also be specified as
+<em>gitcvs.&lt;access_method&gt;.&lt;varname&gt;</em> (where <em>access_method</em>
 is one of "ext" and "pserver") to make them apply only for the given
 access method.</p>
 <dl>
@@ -2574,7 +2589,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 24-May-2008 01:12:05 UTC
+Last updated 26-May-2008 01:14:43 UTC
 </div>
 </div>
 </body>

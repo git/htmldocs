@@ -671,11 +671,28 @@ TortoiseCVS
 checkout, diff, status, update, log, add, remove, commit.
 Legacy monitoring operations are not supported (edit, watch and related).
 Exports and tagging (tags and branches) are not supported at this stage.</p>
-<p>The server should set the <em>-k</em> mode to binary when relevant, however,
-this is not really implemented yet. For now, you can force the server
-to set <em>-kb</em> for all files by setting the <tt>gitcvs.allbinary</tt> config
-variable. In proper GIT tradition, the contents of the files are
-always respected. No keyword expansion or newline munging is supported.</p>
+<h3>CRLF Line Ending Conversions</h3>
+<p>By default the server leaves the <em>-k</em> mode blank for all files,
+which causes the cvs client to treat them as a text files, subject
+to crlf conversion on some platforms.</p>
+<p>You can make the server use <tt>crlf</tt> attributes to set the <em>-k</em> modes
+for files by setting the <tt>gitcvs.usecrlfattr</tt> config variable.
+In this case, if <tt>crlf</tt> is explicitly unset (<em>-crlf</em>), then the
+server will set <em>-kb</em> mode for binary files. If <tt>crlf</tt> is set,
+then the <em>-k</em> mode will explicitly be left blank.  See
+also <a href="gitattributes.html">gitattributes(5)</a> for more information about the <tt>crlf</tt>
+attribute.</p>
+<p>Alternatively, if <tt>gitcvs.usecrlfattr</tt> config is not enabled
+or if the <tt>crlf</tt> attribute is unspecified for a filename, then
+the server uses the <tt>gitcvs.allbinary</tt> config for the default setting.
+If <tt>gitcvs.allbinary</tt> is set, then file not otherwise
+specified will default to <em>-kb</em> mode. Otherwise the <em>-k</em> mode
+is left blank. But if <tt>gitcvs.allbinary</tt> is set to "guess", then
+the correct <em>-k</em> mode will be guessed based on the contents of
+the file.</p>
+<p>For best consistency with cvs, it is probably best to override the
+defaults by setting <tt>gitcvs.usecrlfattr</tt> to true,
+and <tt>gitcvs.allbinary</tt> to "guess".</p>
 </div>
 <h2>Dependencies</h2>
 <div class="sectionbody">
@@ -709,7 +726,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 16-Apr-2008 09:09:50 UTC
+Last updated 26-May-2008 01:14:44 UTC
 </div>
 </div>
 </body>
