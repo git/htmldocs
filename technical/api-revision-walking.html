@@ -263,6 +263,91 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
+<p>The revision walking API offers functions to build a list of revisions
+and then iterate over that list.</p>
+</div>
+</div>
+<h2>Calling sequence</h2>
+<div class="sectionbody">
+<p>The walking API has a given calling sequence: first you need to
+initialize a rev_info structure, then add revisions to control what kind
+of revision list do you want to get, finally you can iterate over the
+revision list.</p>
+</div>
+<h2>Functions</h2>
+<div class="sectionbody">
+<dl>
+<dt>
+<tt>init_revisions</tt>
+</dt>
+<dd>
+<p>
+        Initialize a rev_info structure with default values. The second
+        parameter may be NULL or can be prefix path, and then the <tt>.prefix</tt>
+        variable will be set to it. This is typically the first function you
+        want to call when you want to deal with a revision list. After calling
+        this function, you are free to customize options, like set
+        <tt>.ignore_merges</tt> to 0 if you don't want to ignore merges, and so on. See
+        <tt>revision.h</tt> for a complete list of available options.
+</p>
+</dd>
+<dt>
+<tt>add_pending_object</tt>
+</dt>
+<dd>
+<p>
+        This function can be used if you want to add commit objects as revision
+        information. You can use the <tt>UNINTERESTING</tt> object flag to indicate if
+        you want to include or exclude the given commit (and commits reachable
+        from the given commit) from the revision list.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">If you have the commits as a string list then you probably want to
+use setup_revisions(), instead of parsing each string and using this
+function.</td>
+</tr></table>
+</div>
+</dd>
+<dt>
+<tt>setup_revisions</tt>
+</dt>
+<dd>
+<p>
+        Parse revision information, filling in the <tt>rev_info</tt> structure, and
+        removing the used arguments from the argument list. Returns the number
+        of arguments left that weren't recognized, which are also moved to the
+        head of the argument list. The last parameter is used in case no
+        parameter given by the first two arguments.
+</p>
+</dd>
+<dt>
+<tt>prepare_revision_walk</tt>
+</dt>
+<dd>
+<p>
+        Prepares the rev_info structure for a walk. You should check if it
+        returns any error (non-zero return code) and if it does not, you can
+        start using get_revision() to do the iteration.
+</p>
+</dd>
+<dt>
+<tt>get_revision</tt>
+</dt>
+<dd>
+<p>
+        Takes a pointer to a <tt>rev_info</tt> structure and iterates over it,
+        returning a <tt>struct commit *</tt> each time you call it. The end of the
+        revision list is indicated by returning a NULL pointer.
+</p>
+</dd>
+</dl>
+</div>
+<h2>Data structures</h2>
+<div class="sectionbody">
 <p>Talk about &lt;revision.h&gt;, things like:</p>
 <ul>
 <li>
@@ -272,16 +357,15 @@ two diff_options, one for path limiting, another for output;
 </li>
 <li>
 <p>
-calling sequence: init_revisions(), setup_revsions(), get_revision();
+remaining functions;
 </p>
 </li>
 </ul>
 <p>(Linus, JC, Dscho)</p>
 </div>
-</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 07-Jan-2008 07:51:29 UTC
+Last updated 01-Jun-2008 08:22:09 UTC
 </div>
 </div>
 </body>

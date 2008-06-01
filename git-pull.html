@@ -543,7 +543,9 @@ unless you have read <a href="git-rebase.html">git-rebase(1)</a> carefully.</p>
 <dd>
 <p>
         The "remote" repository that is the source of a fetch
-        or pull operation.  See the section <a href="#URLS">GIT URLS</a> below.
+        or pull operation.  This parameter can be either a URL
+        (see the section <a href="#URLS">GIT URLS</a> below) or the name
+        of a remote (see the section <a href="#REMOTES">REMOTES</a> below).
 </p>
 </dd>
 <dt>
@@ -754,11 +756,51 @@ configuration section of the form:</p>
 <p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p>
 </div>
-<h2>REMOTES</h2>
+<h2>REMOTES<a id="REMOTES"></a></h2>
 <div class="sectionbody">
-<p>In addition to the above, as a short-hand, the name of a
-file in <tt>$GIT_DIR/remotes</tt> directory can be given; the
-named file should be in the following format:</p>
+<p>The name of one of the following can be used instead
+of a URL as <tt>&lt;repository&gt;</tt> argument:</p>
+<ul>
+<li>
+<p>
+a remote in the git configuration file: <tt>$GIT_DIR/config</tt>,
+</p>
+</li>
+<li>
+<p>
+a file in the <tt>$GIT_DIR/remotes</tt> directory, or
+</p>
+</li>
+<li>
+<p>
+a file in the <tt>$GIT_DIR/branches</tt> directory.
+</p>
+</li>
+</ul>
+<p>All of these also allow you to omit the refspec from the command line
+because they each contain a refspec which git will use by default.</p>
+<h3>Named remote in configuration file</h3>
+<p>You can choose to provide the name of a remote which you had previously
+configured using <a href="git-remote.html">git-remote(1)</a>, <a href="git-config.html">git-config(1)</a>
+or even by a manual edit to the <tt>$GIT_DIR/config</tt> file.  The URL of
+this remote will be used to access the repository.  The refspec
+of this remote will be used by default when you do
+not provide a refspec on the command line.  The entry in the
+config file would appear like this:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        [remote "&lt;name&gt;"]
+                url = &lt;url&gt;
+                push = &lt;refspec&gt;
+                fetch = &lt;refspec&gt;</tt></pre>
+</div></div>
+<h3>Named file in <tt>$GIT_DIR/remotes</tt></h3>
+<p>You can choose to provide the name of a
+file in <tt>$GIT_DIR/remotes</tt>.  The URL
+in this file will be used to access the repository.  The refspec
+in this file will be used as default when you do not
+provide a refspec on the command line.  This file should have the
+following format:</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        URL: one of the above URL format
@@ -766,41 +808,27 @@ named file should be in the following format:</p>
         Pull: &lt;refspec&gt;
 </tt></pre>
 </div></div>
-<p>Then such a short-hand is specified in place of
-&lt;repository&gt; without &lt;refspec&gt; parameters on the command
-line, &lt;refspec&gt; specified on <tt>Push:</tt> lines or <tt>Pull:</tt>
-lines are used for <tt>git-push</tt> and <tt>git-fetch</tt>/<tt>git-pull</tt>,
-respectively.  Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
+<p><tt>Push:</tt> lines are used by <tt>git-push</tt> and
+<tt>Pull:</tt> lines are used by <tt>git-pull</tt> and <tt>git-fetch</tt>.
+Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
 be specified for additional branch mappings.</p>
-<p>Or, equivalently, in the <tt>$GIT_DIR/config</tt> (note the use
-of <tt>fetch</tt> instead of <tt>Pull:</tt>):</p>
+<h3>Named file in <tt>$GIT_DIR/branches</tt></h3>
+<p>You can choose to provide the name of a
+file in <tt>$GIT_DIR/branches</tt>.
+The URL in this file will be used to access the repository.
+This file should have the following format:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [remote "&lt;remote&gt;"]
-                url = &lt;url&gt;
-                push = &lt;refspec&gt;
-                fetch = &lt;refspec&gt;
-</tt></pre>
+<pre><tt>        &lt;url&gt;#&lt;head&gt;</tt></pre>
 </div></div>
-<p>The name of a file in <tt>$GIT_DIR/branches</tt> directory can be
-specified as an older notation short-hand; the named
-file should contain a single line, a URL in one of the
-above formats, optionally followed by a hash <tt>#</tt> and the
-name of remote head (URL fragment notation).
-<tt>$GIT_DIR/branches/&lt;remote&gt;</tt> file that stores a &lt;url&gt;
-without the fragment is equivalent to have this in the
-corresponding file in the <tt>$GIT_DIR/remotes/</tt> directory.</p>
+<p><tt>&lt;url&gt;</tt> is required; <tt>#&lt;head&gt;</tt> is optional.
+When you do not provide a refspec on the command line,
+git will use the following refspec, where <tt>&lt;head&gt;</tt> defaults to <tt>master</tt>,
+and <tt>&lt;repository&gt;</tt> is the name of this file
+you provided in the command line.</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        URL: &lt;url&gt;
-        Pull: refs/heads/master:&lt;remote&gt;
-</tt></pre>
-</div></div>
-<p>while having <tt>&lt;url&gt;#&lt;head&gt;</tt> is equivalent to</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>        URL: &lt;url&gt;
-        Pull: refs/heads/&lt;head&gt;:&lt;remote&gt;</tt></pre>
+<pre><tt>        refs/heads/&lt;head&gt;:&lt;repository&gt;</tt></pre>
 </div></div>
 </div>
 <h2>MERGE STRATEGIES</h2>
@@ -1037,7 +1065,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 09-May-2008 05:45:38 UTC
+Last updated 01-Jun-2008 08:21:42 UTC
 </div>
 </div>
 </body>
