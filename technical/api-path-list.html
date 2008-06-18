@@ -263,25 +263,228 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>Talk about &lt;path-list.h&gt;, things like</p>
+<p>The path_list API offers a data structure and functions to handle sorted
+and unsorted string lists.</p>
+<p>The name is a bit misleading, a path_list may store not only paths but
+strings in general.</p>
+<p>The caller:</p>
+<ol>
+<li>
+<p>
+Allocates and clears a <tt>struct path_list</tt> variable.
+</p>
+</li>
+<li>
+<p>
+Initializes the members. You might want to set the flag <tt>strdup_paths</tt>
+  if the strings should be strdup()ed. For example, this is necessary
+  when you add something like git_path("&#8230;"), since that function returns
+  a static buffer that will change with the next call to git_path().
+</p>
+<p>If you need something advanced, you can manually malloc() the <tt>items</tt>
+member (you need this if you add things later) and you should set the
+<tt>nr</tt> and <tt>alloc</tt> members in that case, too.</p>
+</li>
+<li>
+<p>
+Adds new items to the list, using <tt>path_list_append</tt> or <tt>path_list_insert</tt>.
+</p>
+</li>
+<li>
+<p>
+Can check if a string is in the list using <tt>path_list_has_path</tt> or
+  <tt>unsorted_path_list_has_path</tt> and get it from the list using
+  <tt>path_list_lookup</tt> for sorted lists.
+</p>
+</li>
+<li>
+<p>
+Can sort an unsorted list using <tt>sort_path_list</tt>.
+</p>
+</li>
+<li>
+<p>
+Finally it should free the list using <tt>path_list_clear</tt>.
+</p>
+</li>
+</ol>
+<p>Example:</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>struct path_list list;
+int i;
+
+memset(&amp;list, 0, sizeof(struct path_list));
+path_list_append("foo", &amp;list);
+path_list_append("bar", &amp;list);
+for (i = 0; i &lt; list.nr; i++)
+        printf("%s\n", list.items[i].path)</tt></pre>
+</div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">It is more efficient to build an unsorted list and sort it
+afterwards, instead of building a sorted list (<tt>O(n log n)</tt> instead of
+<tt>O(n^2)</tt>).</td>
+</tr></table>
+</div>
+<p>+
+However, if you use the list to check if a certain string was added
+already, you should not do that (using unsorted_path_list_has_path()),
+because the complexity would be quadratic again (but with a worse factor).</p>
+</div>
+</div>
+<h2>Functions</h2>
+<div class="sectionbody">
 <ul>
 <li>
 <p>
-it is not just paths but strings in general;
+General ones (works with sorted and unsorted lists as well)
+</p>
+<dl>
+<dt>
+<tt>print_path_list</tt>
+</dt>
+<dd>
+<p>
+        Dump a path_list to stdout, useful mainly for debugging purposes. It
+        can take an optional header argument and it writes out the
+        string-pointer pairs of the path_list, each one in its own line.
+</p>
+</dd>
+<dt>
+<tt>path_list_clear</tt>
+</dt>
+<dd>
+<p>
+        Free a path_list. The <tt>path</tt> pointer of the items will be freed in case
+        the <tt>strdup_paths</tt> member of the path_list is set. The second parameter
+        controls if the <tt>util</tt> pointer of the items should be freed or not.
+</p>
+</dd>
+</dl>
+</li>
+<li>
+<p>
+Functions for sorted lists only
+</p>
+<dl>
+<dt>
+<tt>path_list_has_path</tt>
+</dt>
+<dd>
+<p>
+        Determine if the path_list has a given string or not.
+</p>
+</dd>
+<dt>
+<tt>path_list_insert</tt>
+</dt>
+<dd>
+<p>
+        Insert a new element to the path_list. The returned pointer can be handy
+        if you want to write something to the <tt>util</tt> pointer of the
+        path_list_item containing the just added string.
+</p>
+<p>Since this function uses xrealloc() (which die()s if it fails) if the
+list needs to grow, it is safe not to check the pointer. I.e. you may
+write <tt>path_list_insert(&#8230;)-&gt;util = &#8230;;</tt>.</p>
+</dd>
+<dt>
+<tt>path_list_lookup</tt>
+</dt>
+<dd>
+<p>
+        Look up a given string in the path_list, returning the containing
+        path_list_item. If the string is not found, NULL is returned.
+</p>
+</dd>
+</dl>
+</li>
+<li>
+<p>
+Functions for unsorted lists only
+</p>
+<dl>
+<dt>
+<tt>path_list_append</tt>
+</dt>
+<dd>
+<p>
+        Append a new string to the end of the path_list.
+</p>
+</dd>
+<dt>
+<tt>sort_path_list</tt>
+</dt>
+<dd>
+<p>
+        Make an unsorted list sorted.
+</p>
+</dd>
+<dt>
+<tt>unsorted_path_list_has_path</tt>
+</dt>
+<dd>
+<p>
+        It's like <tt>path_list_has_path()</tt> but for unsorted lists.
+</p>
+<p>This function needs to look through all items, as opposed to its
+counterpart for sorted lists, which performs a binary search.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<h2>Data structures</h2>
+<div class="sectionbody">
+<ul>
+<li>
+<p>
+<tt>struct path_list_item</tt>
+</p>
+</li>
+</ul>
+<p>Represents an item of the list. The <tt>path</tt> member is a pointer to the
+string, and you may use the <tt>util</tt> member for any purpose, if you want.</p>
+<ul>
+<li>
+<p>
+<tt>struct path_list</tt>
+</p>
+</li>
+</ul>
+<p>Represents the list itself.</p>
+<ol>
+<li>
+<p>
+The array of items are available via the <tt>items</tt> member.
 </p>
 </li>
 <li>
 <p>
-the calling sequence.
+The <tt>nr</tt> member contains the number of items stored in the list.
 </p>
 </li>
-</ul>
-<p>(Dscho)</p>
-</div>
+<li>
+<p>
+The <tt>alloc</tt> member is used to avoid reallocating at every insertion.
+  You should not tamper with it.
+</p>
+</li>
+<li>
+<p>
+Setting the <tt>strdup_paths</tt> member to 1 will strdup() the strings
+  before adding them, see above.
+</p>
+</li>
+</ol>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2008 01:34:45 UTC
+Last updated 18-Jun-2008 03:17:08 UTC
 </div>
 </div>
 </body>
