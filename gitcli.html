@@ -276,8 +276,45 @@ gitcli(7) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>This manual describes best practice in how to use git CLI.  Here are
-the rules that you should follow when you are scripting git:</p>
+<p>This manual describes the convention used throughout git CLI.</p>
+<p>Many commands take revisions (most often "commits", but sometimes
+"tree-ish", depending on the context and command) and paths as their
+arguments.  Here are the rules:</p>
+<ul>
+<li>
+<p>
+Revisions come first and then paths.
+   E.g. in <tt>git diff v1.0 v2.0 arch/x86 include/asm-x86</tt>,
+   <tt>v1.0</tt> and <tt>v2.0</tt> are revisions and <tt>arch/x86</tt> and <tt>include/asm-x86</tt>
+   are paths.
+</p>
+</li>
+<li>
+<p>
+When an argument can be misunderstood as either a revision or a path,
+   they can be disambiguated by placing <tt>--</tt> between them.
+   E.g. <tt>git diff -- HEAD</tt> is, "I have a file called HEAD in my work
+   tree.  Please show changes between the version I staged in the index
+   and what I have in the work tree for that file". not "show difference
+   between the HEAD commit and the work tree as a whole".  You can say
+   <tt>git diff HEAD --</tt> to ask for the latter.
+</p>
+</li>
+<li>
+<p>
+Without disambiguating <tt>--</tt>, git makes a reasonable guess, but errors
+   out and asking you to disambiguate when ambiguous.  E.g. if you have a
+   file called HEAD in your work tree, <tt>git diff HEAD</tt> is ambiguous, and
+   you have to say either <tt>git diff HEAD --</tt> or <tt>git diff -- HEAD</tt> to
+   disambiguate.
+</p>
+</li>
+</ul>
+<p>When writing a script that is expected to handle random user-input, it is
+a good practice to make it explicit which arguments are which by placing
+disambiguating <tt>--</tt> at appropriate places.</p>
+<p>Here are the rules regarding the "flags" that you should follow when you are
+scripting git:</p>
 <ul>
 <li>
 <p>
@@ -310,7 +347,7 @@ when you give a revision parameter to a command, make sure the parameter is
 </li>
 </ul>
 </div>
-<h2>ENHANCED CLI</h2>
+<h2>ENHANCED OPTION PARSER</h2>
 <div class="sectionbody">
 <p>From the git 1.5.4 series and further, many git commands (not all of them at the
 time of the writing though) come with an enhanced option parser.</p>
@@ -388,7 +425,7 @@ $ git describe --abbrev 10 HEAD  # NOT WHAT YOU MEANT</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2008 01:34:28 UTC
+Last updated 28-Jun-2008 10:07:02 UTC
 </div>
 </div>
 </body>
