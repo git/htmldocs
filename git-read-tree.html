@@ -272,7 +272,7 @@ git-read-tree(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-read-tree</em> (&lt;tree-ish&gt; | [[-m [--trivial] [--aggressive] | --reset | --prefix=&lt;prefix&gt;] [-u | -i]] [--exclude-per-directory=&lt;gitignore&gt;] [--index-output=&lt;file&gt;] &lt;tree-ish1&gt; [&lt;tree-ish2&gt; [&lt;tree-ish3&gt;]])</p>
+<p><em>git read-tree</em> (&lt;tree-ish&gt; | [[-m [--trivial] [--aggressive] | --reset | --prefix=&lt;prefix&gt;] [-u | -i]] [--exclude-per-directory=&lt;gitignore&gt;] [--index-output=&lt;file&gt;] &lt;tree-ish1&gt; [&lt;tree-ish2&gt; [&lt;tree-ish3&gt;]])</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -449,22 +449,22 @@ merge, a single tree merge if only 1 tree is given, a
 fast-forward merge with 2 trees, or a 3-way merge if 3 trees are
 provided.</p>
 <h3>Single Tree Merge</h3>
-<p>If only 1 tree is specified, git-read-tree operates as if the user did not
+<p>If only 1 tree is specified, <tt>git-read-tree</tt> operates as if the user did not
 specify <tt>-m</tt>, except that if the original index has an entry for a
 given pathname, and the contents of the path matches with the tree
 being read, the stat info from the index is used. (In other words, the
 index's stat()s take precedence over the merged tree's).</p>
-<p>That means that if you do a <tt>git-read-tree -m &lt;newtree&gt;</tt> followed by a
-<tt>git-checkout-index -f -u -a</tt>, the <tt>git-checkout-index</tt> only checks out
+<p>That means that if you do a <tt>git read-tree -m &lt;newtree&gt;</tt> followed by a
+<tt>git checkout-index -f -u -a</tt>, the <tt>git-checkout-index</tt> only checks out
 the stuff that really changed.</p>
 <p>This is used to avoid unnecessary false hits when <tt>git-diff-files</tt> is
 run after <tt>git-read-tree</tt>.</p>
 <h3>Two Tree Merge</h3>
-<p>Typically, this is invoked as <tt>git-read-tree -m $H $M</tt>, where $H
+<p>Typically, this is invoked as <tt>git read-tree -m $H $M</tt>, where $H
 is the head commit of the current repository, and $M is the head
 of a foreign tree, which is simply ahead of $H (i.e. we are in a
 fast forward situation).</p>
-<p>When two trees are specified, the user is telling git-read-tree
+<p>When two trees are specified, the user is telling <tt>git-read-tree</tt>
 the following:</p>
 <ol>
 <li>
@@ -479,7 +479,7 @@ The user wants to fast-forward to $M.
 </p>
 </li>
 </ol>
-<p>In this case, the <tt>git-read-tree -m $H $M</tt> command makes sure
+<p>In this case, the <tt>git read-tree -m $H $M</tt> command makes sure
 that no local change is lost as the result of this "merge".
 Here are the "carry forward" rules:</p>
 <div class="literalblock">
@@ -532,17 +532,17 @@ Here are the "carry forward" rules:</p>
 </div></div>
 <p>In all "keep index" cases, the index entry stays as in the
 original index file.  If the entry were not up to date,
-git-read-tree keeps the copy in the work tree intact when
+<tt>git-read-tree</tt> keeps the copy in the work tree intact when
 operating under the -u flag.</p>
-<p>When this form of git-read-tree returns successfully, you can
+<p>When this form of <tt>git-read-tree</tt> returns successfully, you can
 see what "local changes" you made are carried forward by running
-<tt>git-diff-index --cached $M</tt>.  Note that this does not
-necessarily match <tt>git-diff-index --cached $H</tt> would have
+<tt>git diff-index --cached $M</tt>.  Note that this does not
+necessarily match <tt>git diff-index --cached $H</tt> would have
 produced before such a two tree merge.  This is because of cases
 18 and 19 --- if you already had the changes in $M (e.g. maybe
-you picked it up via e-mail in a patch form), <tt>git-diff-index
+you picked it up via e-mail in a patch form), <tt>git diff-index
 --cached $H</tt> would have told you about the change before this
-merge, but it would not show in <tt>git-diff-index --cached $M</tt>
+merge, but it would not show in <tt>git diff-index --cached $M</tt>
 output after two-tree merge.</p>
 <h3>3-Way Merge</h3>
 <p>Each "index" entry has two bits worth of "stage" state. stage 0 is the
@@ -552,7 +552,7 @@ starts out at 1.</p>
 <p>This means that you can do</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git-read-tree -m &lt;tree1&gt; &lt;tree2&gt; &lt;tree3&gt;</tt></pre>
+<pre><tt>$ git read-tree -m &lt;tree1&gt; &lt;tree2&gt; &lt;tree3&gt;</tt></pre>
 </div></div>
 <p>and you will end up with an index with all of the &lt;tree1&gt; entries in
 "stage1", all of the &lt;tree2&gt; entries in "stage2" and all of the
@@ -602,7 +602,7 @@ populated.  Here is an outline of how the algorithm works:</p>
 <li>
 <p>
 if a file exists in identical format in all three trees, it will
-  automatically collapse to "merged" state by git-read-tree.
+  automatically collapse to "merged" state by <tt>git-read-tree</tt>.
 </p>
 </li>
 <li>
@@ -662,15 +662,15 @@ commit.  To illustrate, suppose you start from what has been
 committed last to your repository:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ JC=`git-rev-parse --verify "HEAD^0"`
-$ git-checkout-index -f -u -a $JC</tt></pre>
+<pre><tt>$ JC=`git rev-parse --verify "HEAD^0"`
+$ git checkout-index -f -u -a $JC</tt></pre>
 </div></div>
-<p>You do random edits, without running git-update-index.  And then
+<p>You do random edits, without running <tt>git-update-index</tt>.  And then
 you notice that the tip of your "upstream" tree has advanced
 since you pulled from him:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git-fetch git://.... linus
+<pre><tt>$ git fetch git://.... linus
 $ LT=`cat .git/FETCH_HEAD`</tt></pre>
 </div></div>
 <p>Your work tree is still based on your HEAD ($JC), but you have
@@ -679,16 +679,16 @@ added or modified index entries since $JC, and if you haven't,
 then does the right thing.  So with the following sequence:</p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git-read-tree -m -u `git-merge-base $JC $LT` $JC $LT
-$ git-merge-index git-merge-one-file -a
+<pre><tt>$ git read-tree -m -u `git merge-base $JC $LT` $JC $LT
+$ git merge-index git-merge-one-file -a
 $ echo "Merge with Linus" | \
-  git-commit-tree `git-write-tree` -p $JC -p $LT</tt></pre>
+  git commit-tree `git write-tree` -p $JC -p $LT</tt></pre>
 </div></div>
 <p>what you would commit is a pure merge between $JC and $LT without
 your work-in-progress changes, and your work tree would be
 updated to the result of the merge.</p>
 <p>However, if you have local changes in the working tree that
-would be overwritten by this merge,<tt>git-read-tree</tt> will refuse
+would be overwritten by this merge, <tt>git-read-tree</tt> will refuse
 to run to prevent your changes from being lost.</p>
 <p>In other words, there is no need to worry about what exists only
 in the working tree.  When you have local changes in a part of
@@ -719,7 +719,7 @@ have finished your work-in-progress), attempt the merge again.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 10-Jun-2008 04:10:01 UTC
+Last updated 02-Jul-2008 03:01:57 UTC
 </div>
 </div>
 </body>

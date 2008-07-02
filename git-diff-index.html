@@ -272,7 +272,7 @@ git-diff-index(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git-diff-index</em> [-m] [--cached] [&lt;common diff options&gt;] &lt;tree-ish&gt; [&lt;path&gt;&#8230;]</p>
+<p><em>git diff-index</em> [-m] [--cached] [&lt;common diff options&gt;] &lt;tree-ish&gt; [&lt;path&gt;&#8230;]</p>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -758,7 +758,7 @@ entries in the index are compared.</p>
 </dd>
 </dl>
 <p>For more detailed explanation on these common options, see also
-<a href="gitdiffcore.html">gitdiffcore(7)</a>[diffcore documentation].</p>
+<a href="gitdiffcore.html">gitdiffcore(7)</a>.</p>
 <dl>
 <dt>
 &lt;tree-ish&gt;
@@ -783,7 +783,7 @@ entries in the index are compared.</p>
 <p>
         By default, files recorded in the index but not checked
         out are reported as deleted.  This flag makes
-        "git-diff-index" say that all non-checked-out files are up
+        <tt>git-diff-index</tt> say that all non-checked-out files are up
         to date.
 </p>
 </dd>
@@ -1283,7 +1283,7 @@ of these operations are very useful indeed.</p>
 <div class="literalblock">
 <div class="content">
 <pre><tt>show me the differences between HEAD and the current index
-contents (the ones I'd write with a "git-write-tree")</tt></pre>
+contents (the ones I'd write using `git-write-tree`)</tt></pre>
 </div></div>
 <p>For example, let's say that you have worked on your working directory, updated
 some files in the index and are ready to commit. You want to see exactly
@@ -1291,23 +1291,23 @@ some files in the index and are ready to commit. You want to see exactly
 object and compare it that way, and to do that, you just do</p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git-diff-index --cached HEAD</tt></pre>
+<pre><tt>git diff-index --cached HEAD</tt></pre>
 </div></div>
 <p>Example: let's say I had renamed <tt>commit.c</tt> to <tt>git-commit.c</tt>, and I had
-done an "git-update-index" to make that effective in the index file.
-"git-diff-files" wouldn't show anything at all, since the index file
-matches my working directory. But doing a "git-diff-index" does:</p>
+done an <tt>update-index</tt> to make that effective in the index file.
+<tt>git diff-files</tt> wouldn't show anything at all, since the index file
+matches my working directory. But doing a <tt>git-diff-index</tt> does:</p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>torvalds@ppc970:~/git&gt; git-diff-index --cached HEAD
+<pre><tt>torvalds@ppc970:~/git&gt; git diff-index --cached HEAD
 -100644 blob    4161aecc6700a2eb579e842af0b7f22b98443f74        commit.c
 +100644 blob    4161aecc6700a2eb579e842af0b7f22b98443f74        git-commit.c</tt></pre>
 </div></div>
 <p>You can see easily that the above is a rename.</p>
-<p>In fact, "git-diff-index --cached" <strong>should</strong> always be entirely equivalent to
-actually doing a "git-write-tree" and comparing that. Except this one is much
+<p>In fact, <tt>git diff-index --cached</tt> <strong>should</strong> always be entirely equivalent to
+actually doing a <tt>git-write-tree</tt> and comparing that. Except this one is much
 nicer for the case where you just want to check where you are.</p>
-<p>So doing a "git-diff-index --cached" is basically very useful when you are
+<p>So doing a <tt>git-diff-index --cached</tt> is basically very useful when you are
 asking yourself "what have I already marked for being committed, and
 what's the difference to a previous tree".</p>
 </div>
@@ -1315,7 +1315,7 @@ what's the difference to a previous tree".</p>
 <div class="sectionbody">
 <p>The "non-cached" mode takes a different approach, and is potentially
 the more useful of the two in that what it does can't be emulated with
-a "git-write-tree" + "git-diff-tree". Thus that's the default mode.
+a <tt>git-write-tree</tt> + <tt>git-diff-tree</tt>. Thus that's the default mode.
 The non-cached version asks the question:</p>
 <div class="literalblock">
 <div class="content">
@@ -1323,16 +1323,16 @@ The non-cached version asks the question:</p>
 tree - index contents _and_ files that aren't up-to-date</tt></pre>
 </div></div>
 <p>which is obviously a very useful question too, since that tells you what
-you <strong>could</strong> commit. Again, the output matches the "git-diff-tree -r"
+you <strong>could</strong> commit. Again, the output matches the <tt>git-diff-tree -r</tt>
 output to a tee, but with a twist.</p>
 <p>The twist is that if some file doesn't match the index, we don't have
 a backing store thing for it, and we use the magic "all-zero" sha1 to
 show that. So let's say that you have edited <tt>kernel/sched.c</tt>, but
-have not actually done a "git-update-index" on it yet - there is no
+have not actually done a <tt>git-update-index</tt> on it yet - there is no
 "object" associated with the new state, and you get:</p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>torvalds@ppc970:~/v2.6/linux&gt; git-diff-index HEAD
+<pre><tt>torvalds@ppc970:~/v2.6/linux&gt; git diff-index HEAD
 *100644-&gt;100664 blob    7476bb......-&gt;000000......      kernel/sched.c</tt></pre>
 </div></div>
 <p>i.e., it shows that the tree has changed, and that <tt>kernel/sched.c</tt> has is
@@ -1344,11 +1344,11 @@ directly rather than do an object-to-object diff.</p>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">As with other commands of this type, "git-diff-index" does not
+<td class="content">As with other commands of this type, <tt>git-diff-index</tt> does not
 actually look at the contents of the file at all. So maybe
 <tt>kernel/sched.c</tt> hasn't actually changed, and it's just that you
 touched it. In either case, it's a note that you need to
-"git-update-index" it to make the index be in sync.</td>
+<tt>git-update-index</tt> it to make the index be in sync.</td>
 </tr></table>
 </div>
 <div class="admonitionblock">
@@ -1378,7 +1378,7 @@ always have the special all-zero sha1.</td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2008 01:33:34 UTC
+Last updated 02-Jul-2008 03:01:40 UTC
 </div>
 </div>
 </body>

@@ -273,19 +273,19 @@ git-config(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] name [value [value_regex]]
-<em>git-config</em> [&lt;file-option&gt;] [type] --add name value
-<em>git-config</em> [&lt;file-option&gt;] [type] --replace-all name [value [value_regex]]
-<em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] --get name [value_regex]
-<em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-all name [value_regex]
-<em>git-config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-regexp name_regex [value_regex]
-<em>git-config</em> [&lt;file-option&gt;] --unset name [value_regex]
-<em>git-config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
-<em>git-config</em> [&lt;file-option&gt;] --rename-section old_name new_name
-<em>git-config</em> [&lt;file-option&gt;] --remove-section name
-<em>git-config</em> [&lt;file-option&gt;] [-z|--null] -l | --list
-<em>git-config</em> [&lt;file-option&gt;] --get-color name [default]
-<em>git-config</em> [&lt;file-option&gt;] --get-colorbool name [stdout-is-tty]</div></div>
+<div class="content"><em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] name [value [value_regex]]
+<em>git config</em> [&lt;file-option&gt;] [type] --add name value
+<em>git config</em> [&lt;file-option&gt;] [type] --replace-all name [value [value_regex]]
+<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-all name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-regexp name_regex [value_regex]
+<em>git config</em> [&lt;file-option&gt;] --unset name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] --rename-section old_name new_name
+<em>git config</em> [&lt;file-option&gt;] --remove-section name
+<em>git config</em> [&lt;file-option&gt;] [-z|--null] -l | --list
+<em>git config</em> [&lt;file-option&gt;] --get-color name [default]
+<em>git config</em> [&lt;file-option&gt;] --get-colorbool name [stdout-is-tty]</div></div>
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
@@ -299,7 +299,7 @@ existing values that match the regexp are updated or unset.  If
 you want to handle the lines that do <strong>not</strong> match the regex, just
 prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPLES]</a>).</p>
 <p>The type specifier can be either <em>--int</em> or <em>--bool</em>, which will make
-<em>git-config</em> ensure that the variable(s) are of the given type and
+<tt>git-config</tt> ensure that the variable(s) are of the given type and
 convert the value to the canonical form (simple decimal number for int,
 a "true" or "false" string for bool).  If no type specifier is passed,
 no checks or transformations are performed on the value.</p>
@@ -479,7 +479,7 @@ rather than from all available files.</p>
 </dt>
 <dd>
 <p>
-        git-config will ensure that the output is "true" or "false"
+        <tt>git-config</tt> will ensure that the output is "true" or "false"
 </p>
 </dd>
 <dt>
@@ -487,7 +487,7 @@ rather than from all available files.</p>
 </dt>
 <dd>
 <p>
-        git-config will ensure that the output is a simple
+        <tt>git-config</tt> will ensure that the output is a simple
         decimal number.  An optional value suffix of <em>k</em>, <em>m</em>, or <em>g</em>
         in the config file will cause the value to be multiplied
         by 1024, 1048576, or 1073741824 prior to output.
@@ -540,7 +540,7 @@ rather than from all available files.</p>
 <h2><a id="FILES"></a>FILES</h2>
 <div class="sectionbody">
 <p>If not set explicitly with <em>--file</em>, there are three files where
-git-config will search for configuration options:</p>
+<tt>git-config</tt> will search for configuration options:</p>
 <dl>
 <dt>
 $GIT_DIR/config
@@ -573,11 +573,11 @@ $(prefix)/etc/gitconfig
 <p>If no further options are given, all reading options will read all of these
 files that are available. If the global or the system-wide configuration
 file are not available they will be ignored. If the repository configuration
-file is not available or readable, git-config will exit with a non-zero
+file is not available or readable, <tt>git-config</tt> will exit with a non-zero
 error code. However, in neither case will an error message be issued.</p>
 <p>All writing options will per default write to the repository specific
 configuration file. Note that this also affects options like <em>--replace-all</em>
-and <em>--unset</em>. <strong>git-config will only ever change one file at a time</strong>.</p>
+and <em>--unset</em>. <strong><tt>git-config</tt> will only ever change one file at a time</strong>.</p>
 <p>You can override these rules either by command line options or by environment
 variables. The <em>--global</em> and the <em>--system</em> options will limit the file used
 to the global or system-wide file respectively. The GIT_CONFIG environment
@@ -2300,10 +2300,17 @@ pack.indexVersion
         legacy pack index used by Git versions prior to 1.5.2, and 2 for
         the new pack index with capabilities for packs larger than 4 GB
         as well as proper protection against the repacking of corrupted
-        packs.  Version 2 is selected and this config option ignored
-        whenever the corresponding pack is larger than 2 GB.  Otherwise
-        the default is 1.
+        packs.  Version 2 is the default.  Note that version 2 is enforced
+        and this config option ignored whenever the corresponding pack is
+        larger than 2 GB.
 </p>
+<p>If you have an old git that does not understand the version 2 <tt>&#42;.idx</tt> file,
+cloning or fetching over a non native protocol (e.g. "http" and "rsync")
+that will copy both <tt>&#42;.pack</tt> file and corresponding <tt>&#42;.idx</tt> file from the
+other side may give you a repository that cannot be accessed with your
+older version of git. If the <tt>&#42;.pack</tt> file is smaller than 2 GB, however,
+you can use <a href="git-index-pack.html">git-index-pack(1)</a> on the *.pack file to regenerate
+the <tt>&#42;.idx</tt> file.</p>
 </dd>
 <dt>
 pack.packSizeLimit
@@ -2429,8 +2436,12 @@ repack.usedeltabaseoffset
 </dt>
 <dd>
 <p>
-        Allow <a href="git-repack.html">git-repack(1)</a> to create packs that uses
-        delta-base offset.  Defaults to false.
+        By default, <a href="git-repack.html">git-repack(1)</a> creates packs that use
+        delta-base offset. If you need to share your repository with
+        git older than version 1.4.4, either directly or via a dumb
+        protocol such as http, then you need to set this option to
+        "false" and repack. Access from old git versions over the
+        native protocol are unaffected by this option.
 </p>
 </dd>
 <dt>
@@ -2629,7 +2640,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 29-Jun-2008 08:48:21 UTC
+Last updated 02-Jul-2008 03:01:37 UTC
 </div>
 </div>
 </body>

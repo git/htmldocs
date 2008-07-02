@@ -276,21 +276,21 @@ gitdiffcore(7) Manual Page
 </div>
 <h2>DESCRIPTION</h2>
 <div class="sectionbody">
-<p>The diff commands git-diff-index, git-diff-files, and git-diff-tree
+<p>The diff commands <tt>git-diff-index</tt>, <tt>git-diff-files</tt>, and <tt>git-diff-tree</tt>
 can be told to manipulate differences they find in
-unconventional ways before showing diff(1) output.  The manipulation
+unconventional ways before showing <tt>diff</tt> output.  The manipulation
 is collectively called "diffcore transformation".  This short note
 describes what they are and how to use them to produce diff outputs
 that are easier to understand than the conventional kind.</p>
 </div>
 <h2>The chain of operation</h2>
 <div class="sectionbody">
-<p>The git-diff-* family works by first comparing two sets of
+<p>The <tt>git-diff-&#42;</tt> family works by first comparing two sets of
 files:</p>
 <ul>
 <li>
 <p>
-git-diff-index compares contents of a "tree" object and the
+<tt>git-diff-index</tt> compares contents of a "tree" object and the
    working directory (when <em>--cached</em> flag is not used) or a
    "tree" object and the index file (when <em>--cached</em> flag is
    used);
@@ -298,13 +298,13 @@ git-diff-index compares contents of a "tree" object and the
 </li>
 <li>
 <p>
-git-diff-files compares contents of the index file and the
+<tt>git-diff-files</tt> compares contents of the index file and the
    working directory;
 </p>
 </li>
 <li>
 <p>
-git-diff-tree compares contents of two "tree" objects;
+<tt>git-diff-tree</tt> compares contents of two "tree" objects;
 </p>
 </li>
 </ul>
@@ -356,19 +356,19 @@ diffcore-order
 </p>
 </li>
 </ul>
-<p>These are applied in sequence.  The set of filepairs git-diff-*
+<p>These are applied in sequence.  The set of filepairs <tt>git-diff-&#42;</tt>
 commands find are used as the input to diffcore-pathspec, and
 the output from diffcore-pathspec is used as the input to the
 next transformation.  The final result is then passed to the
 output routine and generates either diff-raw format (see Output
-format sections of the manual for git-diff-* commands) or
+format sections of the manual for <tt>git-diff-&#42;</tt> commands) or
 diff-patch format.</p>
 </div>
 <h2>diffcore-pathspec: For Ignoring Files Outside Our Consideration</h2>
 <div class="sectionbody">
 <p>The first transformation in the chain is diffcore-pathspec, and
 is controlled by giving the pathname parameters to the
-git-diff-* commands on the command line.  The pathspec is used
+<tt>git-diff-&#42;</tt> commands on the command line.  The pathspec is used
 to limit the world diff operates in.  It removes the filepairs
 outside the specified set of pathnames.  E.g. If the input set
 of filepairs included:</p>
@@ -376,10 +376,10 @@ of filepairs included:</p>
 <div class="content">
 <pre><tt>:100644 100644 bcd1234... 0123456... M junkfile</tt></pre>
 </div></div>
-<p>but the command invocation was "git-diff-files myfile", then the
+<p>but the command invocation was <tt>git diff-files myfile</tt>, then the
 junkfile entry would be removed from the list because only "myfile"
 is under consideration.</p>
-<p>Implementation note.  For performance reasons, git-diff-tree
+<p>Implementation note.  For performance reasons, <tt>git-diff-tree</tt>
 uses the pathname parameters on the command line to cull set of
 filepairs it feeds the diffcore mechanism itself, and does not
 use diffcore-pathspec, but the end result is the same.</p>
@@ -387,7 +387,7 @@ use diffcore-pathspec, but the end result is the same.</p>
 <h2>diffcore-break: For Splitting Up "Complete Rewrites"</h2>
 <div class="sectionbody">
 <p>The second transformation in the chain is diffcore-break, and is
-controlled by the -B option to the git-diff-* commands.  This is
+controlled by the -B option to the <tt>git-diff-&#42;</tt> commands.  This is
 used to detect a filepair that represents "complete rewrite" and
 break such filepair into two filepairs that represent delete and
 create.  E.g.  If the input contained this filepair:</p>
@@ -419,7 +419,7 @@ after "-B" option (e.g. "-B75" to tell it to use 75%).</p>
 <div class="sectionbody">
 <p>This transformation is used to detect renames and copies, and is
 controlled by the -M option (to detect renames) and the -C option
-(to detect copies as well) to the git-diff-* commands.  If the
+(to detect copies as well) to the <tt>git-diff-&#42;</tt> commands.  If the
 input contained these filepairs:</p>
 <div class="listingblock">
 <div class="content">
@@ -459,11 +459,11 @@ a similarity score different from the default of 50% by giving a
 number after the "-M" or "-C" option (e.g. "-M8" to tell it to use
 8/10 = 80%).</p>
 <p>Note.  When the "-C" option is used with <tt>--find-copies-harder</tt>
-option, git-diff-* commands feed unmodified filepairs to
+option, <tt>git-diff-&#42;</tt> commands feed unmodified filepairs to
 diffcore mechanism as well as modified ones.  This lets the copy
 detector consider unmodified files as copy source candidates at
 the expense of making it slower.  Without <tt>--find-copies-harder</tt>,
-git-diff-* commands can detect copies only if the file that was
+<tt>git-diff-&#42;</tt> commands can detect copies only if the file that was
 copied happened to have been modified in the same changeset.</p>
 </div>
 <h2>diffcore-merge-broken: For Putting "Complete Rewrites" Back Together</h2>
@@ -515,7 +515,7 @@ version prefixed with <em>+</em>.</p>
 <div class="sectionbody">
 <p>This transformation is used to find filepairs that represent
 changes that touch a specified string, and is controlled by the
--S option and the <tt>--pickaxe-all</tt> option to the git-diff-*
+-S option and the <tt>--pickaxe-all</tt> option to the <tt>git-diff-&#42;</tt>
 commands.</p>
 <p>When diffcore-pickaxe is in use, it checks if there are
 filepairs whose "original" side has the specified string and
@@ -534,7 +534,7 @@ changeset easier.</p>
 <div class="sectionbody">
 <p>This is used to reorder the filepairs according to the user's
 (or project's) taste, and is controlled by the -O option to the
-git-diff-* commands.</p>
+<tt>git-diff-&#42;</tt> commands.</p>
 <p>This takes a text file each of whose lines is a shell glob
 pattern.  Filepairs that match a glob pattern on an earlier line
 in the file are output before ones that match a later line, and
@@ -568,7 +568,7 @@ t</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2008 01:34:34 UTC
+Last updated 02-Jul-2008 03:02:13 UTC
 </div>
 </div>
 </body>

@@ -281,7 +281,7 @@ git-cvsserver(1) Manual Page
 <div class="content">cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</div></div>
 <p>Usage:</p>
 <div class="verseblock">
-<div class="content"><em>git-cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</div></div>
+<div class="content"><em>git cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</div></div>
 </div>
 <h2>OPTIONS</h2>
 <div class="sectionbody">
@@ -366,7 +366,7 @@ plugin. Most functionality works fine with both of these clients.</p>
 <p>Currently cvsserver works over SSH connections for read/write clients, and
 over pserver for anonymous CVS access.</p>
 <p>CVS clients cannot tag, branch or perform GIT merges.</p>
-<p>git-cvsserver maps GIT branches to CVS modules. This is very different
+<p><tt>git-cvsserver</tt> maps GIT branches to CVS modules. This is very different
 from what most CVS users would expect since in CVS modules usually represent
 one or more directories.</p>
 </div>
@@ -394,7 +394,7 @@ looks like</p>
 </div></div>
 <p>No special setup is needed for SSH access, other than having GIT tools
 in the PATH. If you have clients that do not accept the CVS_SERVER
-environment variable, you can rename git-cvsserver to cvs.</p>
+environment variable, you can rename <tt>git-cvsserver</tt> to <tt>cvs</tt>.</p>
 <p>Note: Newer CVS versions (&gt;= 1.12.11) also support specifying
 CVS_SERVER directly in CVSROOT like</p>
 <div class="listingblock">
@@ -403,9 +403,9 @@ CVS_SERVER directly in CVSROOT like</p>
 </div></div>
 <p>This has the advantage that it will be saved in your <em>CVS/Root</em> files and
 you don't need to worry about always setting the correct environment
-variable.  SSH users restricted to git-shell don't need to override the default
-with CVS_SERVER (and shouldn't) as git-shell understands <tt>cvs</tt> to mean
-git-cvsserver and pretends that the other end runs the real cvs better.</p>
+variable.  SSH users restricted to <tt>git-shell</tt> don't need to override the default
+with CVS_SERVER (and shouldn't) as <tt>git-shell</tt> understands <tt>cvs</tt> to mean
+<tt>git-cvsserver</tt> and pretends that the other end runs the real <tt>cvs</tt> better.</p>
 </li>
 <li>
 <p>
@@ -420,7 +420,7 @@ For each repo that you want accessible from CVS you need to edit config in
         logfile=/path/to/logfile
 </tt></pre>
 </div></div>
-<p>Note: you need to ensure each user that is going to invoke git-cvsserver has
+<p>Note: you need to ensure each user that is going to invoke <tt>git-cvsserver</tt> has
 write access to the log file and to the database (see
 <a href="#dbbackend">Database Backend</a>. If you want to offer write access over
 SSH, the users of course also need write access to the git repository itself.</p>
@@ -443,7 +443,7 @@ If you didn't specify the CVSROOT/CVS_SERVER directly in the checkout command,
    automatically saving it in your <em>CVS/Root</em> files, then you need to set them
    explicitly in your environment.  CVSROOT should be set as per normal, but the
    directory should point at the appropriate git repo.  As above, for SSH clients
-   _not_ restricted to git-shell, CVS_SERVER should be set to git-cvsserver.
+   _not_ restricted to <tt>git-shell</tt>, CVS_SERVER should be set to <tt>git-cvsserver</tt>.
 </p>
 <div class="listingblock">
 <div class="content">
@@ -477,29 +477,29 @@ Clients should now be able to check out the project. Use the CVS <em>module</em>
 </div>
 <h2><a id="dbbackend"></a>Database Backend</h2>
 <div class="sectionbody">
-<p>git-cvsserver uses one database per git head (i.e. CVS module) to
+<p><tt>git-cvsserver</tt> uses one database per git head (i.e. CVS module) to
 store information about the repository for faster access. The
 database doesn't contain any persistent data and can be completely
 regenerated from the git repository at any time. The database
 needs to be updated (i.e. written to) after every commit.</p>
-<p>If the commit is done directly by using git (as opposed to
-using git-cvsserver) the update will need to happen on the
-next repository access by git-cvsserver, independent of
+<p>If the commit is done directly by using <tt>git</tt> (as opposed to
+using <tt>git-cvsserver</tt>) the update will need to happen on the
+next repository access by <tt>git-cvsserver</tt>, independent of
 access method and requested operation.</p>
 <p>That means that even if you offer only read access (e.g. by using
-the pserver method), git-cvsserver should have write access to
+the pserver method), <tt>git-cvsserver</tt> should have write access to
 the database to work reliably (otherwise you need to make sure
-that the database is up-to-date any time git-cvsserver is executed).</p>
+that the database is up-to-date any time <tt>git-cvsserver</tt> is executed).</p>
 <p>By default it uses SQLite databases in the git directory, named
 <tt>gitcvs.&lt;module_name&gt;.sqlite</tt>. Note that the SQLite backend creates
 temporary files in the same directory as the database file on
 write so it might not be enough to grant the users using
-git-cvsserver write access to the database file without granting
+<tt>git-cvsserver</tt> write access to the database file without granting
 them write access to the directory, too.</p>
 <p>You can configure the database backend with the following
 configuration variables:</p>
 <h3>Configuring database backend</h3>
-<p>git-cvsserver uses the Perl DBI module. Please also read
+<p><tt>git-cvsserver</tt> uses the Perl DBI module. Please also read
 its documentation if changing these variables, especially
 about <tt>DBI-&gt;connect()</tt>.</p>
 <dl>
@@ -603,7 +603,7 @@ gitcvs.dbTableNamePrefix
 </dt>
 <dd>
 <p>
-        Name of the user running git-cvsserver.
+        Name of the user running <tt>git-cvsserver</tt>.
         If no name can be determined, the
         numeric uid is used.
 </p>
@@ -642,12 +642,12 @@ Pick <em>HEAD</em> when it asks what branch/tag to check out. Untick the
 <p>Protocol notes: If you are using anonymous access via pserver, just select that.
 Those using SSH access should choose the <em>ext</em> protocol, and configure <em>ext</em>
 access on the Preferences-&gt;Team-&gt;CVS-&gt;ExtConnection pane. Set CVS_SERVER to
-<em>git-cvsserver</em>. Note that password support is not good when using <em>ext</em>,
+<tt>git-cvsserver</tt>. Note that password support is not good when using <em>ext</em>,
 you will definitely want to have SSH keys setup.</p>
 <p>Alternatively, you can just use the non-standard extssh protocol that Eclipse
 offer. In that case CVS_SERVER is ignored, and you will have to replace
-the cvs utility on the server with git-cvsserver or manipulate your <tt>.bashrc</tt>
-so that calling <em>cvs</em> effectively calls git-cvsserver.</p>
+the cvs utility on the server with <tt>git-cvsserver</tt> or manipulate your <tt>.bashrc</tt>
+so that calling <em>cvs</em> effectively calls <tt>git-cvsserver</tt>.</p>
 </div>
 <h2>Clients known to work</h2>
 <div class="sectionbody">
@@ -699,13 +699,13 @@ specified will default to <em>-kb</em> mode. Otherwise the <em>-k</em> mode
 is left blank. But if <tt>gitcvs.allbinary</tt> is set to "guess", then
 the correct <em>-k</em> mode will be guessed based on the contents of
 the file.</p>
-<p>For best consistency with cvs, it is probably best to override the
+<p>For best consistency with <tt>cvs</tt>, it is probably best to override the
 defaults by setting <tt>gitcvs.usecrlfattr</tt> to true,
 and <tt>gitcvs.allbinary</tt> to "guess".</p>
 </div>
 <h2>Dependencies</h2>
 <div class="sectionbody">
-<p>git-cvsserver depends on DBD::SQLite.</p>
+<p><tt>git-cvsserver</tt> depends on DBD::SQLite.</p>
 </div>
 <h2>Copyright and Authors</h2>
 <div class="sectionbody">
@@ -735,7 +735,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 08-Jun-2008 22:46:28 UTC
+Last updated 02-Jul-2008 03:01:39 UTC
 </div>
 </div>
 </body>
