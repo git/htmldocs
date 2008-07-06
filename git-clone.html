@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -226,7 +245,33 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+include1::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -255,6 +300,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>git-clone(1)</title>
 </head>
@@ -278,24 +326,24 @@ git-clone(1) Manual Page
           [-o &lt;name&gt;] [-u &lt;upload-pack&gt;] [--reference &lt;repository&gt;]
           [--depth &lt;depth&gt;] [--] &lt;repository&gt; [&lt;directory&gt;]</div></div>
 </div>
-<h2>DESCRIPTION</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Clones a repository into a newly created directory, creates
+<div class="para"><p>Clones a repository into a newly created directory, creates
 remote-tracking branches for each branch in the cloned repository
 (visible using <tt>git branch -r</tt>), and creates and checks out an initial
-branch equal to the cloned repository's currently active branch.</p>
-<p>After the clone, a plain <tt>git fetch</tt> without arguments will update
+branch equal to the cloned repository's currently active branch.</p></div>
+<div class="para"><p>After the clone, a plain <tt>git fetch</tt> without arguments will update
 all the remote-tracking branches, and a <tt>git pull</tt> without
 arguments will in addition merge the remote master branch into the
-current master branch, if any.</p>
-<p>This default configuration is achieved by creating references to
+current master branch, if any.</p></div>
+<div class="para"><p>This default configuration is achieved by creating references to
 the remote branch heads under <tt>$GIT_DIR/refs/remotes/origin</tt> and
 by initializing <tt>remote.origin.url</tt> and <tt>remote.origin.fetch</tt>
-configuration variables.</p>
+configuration variables.</p></div>
 </div>
-<h2>OPTIONS</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 --local
 </dt>
@@ -342,15 +390,15 @@ configuration variables.</p>
         with the source repository.  The resulting repository
         starts out without any object of its own.
 </p>
-<p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
+<div class="para"><p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
 it unless you understand what it does. If you clone your
 repository using this option and then delete branches (or use any
 other git command that makes any existing commit unreferenced) in the
 source repository, some objects may become unreferenced (or dangling).
-These objects may be removed by normal git operations (such as <tt>git-commit</tt>)
+These objects may be removed by normal git operations (such as <em>git-commit</em>)
 which automatically call <tt>git gc --auto</tt>. (See <a href="git-gc.html">git-gc(1)</a>.)
 If these objects are removed and were referenced by the cloned repository,
-then the cloned repository will become corrupt.</p>
+then the cloned repository will become corrupt.</p></div>
 </dd>
 <dt>
 --reference &lt;repository&gt;
@@ -364,7 +412,7 @@ then the cloned repository will become corrupt.</p>
         require fewer objects to be copied from the repository
         being cloned, reducing network and local storage costs.
 </p>
-<p><strong>NOTE</strong>: see NOTE to --shared option.</p>
+<div class="para"><p><strong>NOTE</strong>: see NOTE to --shared option.</p></div>
 </dd>
 <dt>
 --quiet
@@ -375,7 +423,7 @@ then the cloned repository will become corrupt.</p>
 <dd>
 <p>
         Operate quietly.  This flag is passed to "rsync" and
-        <tt>git-fetch-pack</tt> commands when given.
+        <em>git-fetch-pack</em> commands when given.
 </p>
 </dd>
 <dt>
@@ -427,7 +475,7 @@ then the cloned repository will become corrupt.</p>
 <dd>
 <p>
         When given, and the repository to clone from is handled
-        by <tt>git-fetch-pack</tt>, <tt>--exec=&lt;upload-pack&gt;</tt> is passed to
+        by <em>git-fetch-pack</em>, <tt>--exec=&lt;upload-pack&gt;</tt> is passed to
         the command to specify non-default path for the command
         run on the other end.
 </p>
@@ -478,15 +526,15 @@ then the cloned repository will become corrupt.</p>
         is not allowed.
 </p>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>GIT URLS<a id="URLS"></a></h2>
+<h2 id="_git_urls_a_id_urls_a">GIT URLS<a id="URLS"></a></h2>
 <div class="sectionbody">
-<p>One of the following notations can be used
-to name the remote repository:</p>
+<div class="para"><p>One of the following notations can be used
+to name the remote repository:</p></div>
 <div class="exampleblock">
 <div class="exampleblock-content">
-<ul>
+<div class="ilist"><ul>
 <li>
 <p>
 rsync://host.xz/path/to/repo.git/
@@ -532,17 +580,17 @@ ssh://&#91;user@&#93;host.xz/~user/path/to/repo.git/
 ssh://&#91;user@&#93;host.xz/~/path/to/repo.git
 </p>
 </li>
-</ul>
+</ul></div>
 </div></div>
-<p>SSH is the default transport protocol over the network.  You can
+<div class="para"><p>SSH is the default transport protocol over the network.  You can
 optionally specify which user to log-in as, and an alternate,
 scp-like syntax is also supported.  Both syntaxes support
 username expansion, as does the native git protocol, but
 only the former supports port specification. The following
-three are identical to the last three above, respectively:</p>
+three are identical to the last three above, respectively:</p></div>
 <div class="exampleblock">
 <div class="exampleblock-content">
-<ul>
+<div class="ilist"><ul>
 <li>
 <p>
 &#91;user@&#93;host.xz:/path/to/repo.git/
@@ -558,12 +606,12 @@ three are identical to the last three above, respectively:</p>
 &#91;user@&#93;host.xz:path/to/repo.git
 </p>
 </li>
-</ul>
+</ul></div>
 </div></div>
-<p>To sync with a local directory, you can use:</p>
+<div class="para"><p>To sync with a local directory, you can use:</p></div>
 <div class="exampleblock">
 <div class="exampleblock-content">
-<ul>
+<div class="ilist"><ul>
 <li>
 <p>
 /path/to/repo.git/
@@ -574,31 +622,31 @@ three are identical to the last three above, respectively:</p>
 file:///path/to/repo.git/
 </p>
 </li>
-</ul>
+</ul></div>
 </div></div>
-<p>They are equivalent, except the former implies --local option.</p>
-<p>If there are a large number of similarly-named remote repositories and
+<div class="para"><p>They are equivalent, except the former implies --local option.</p></div>
+<div class="para"><p>If there are a large number of similarly-named remote repositories and
 you want to use a different format for them (such that the URLs you
 use will be rewritten into URLs that work), you can create a
-configuration section of the form:</p>
+configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "&lt;actual url base&gt;"]
                 insteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
-<p>For example, with this:</p>
+<div class="para"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
                 insteadOf = work:</tt></pre>
 </div></div>
-<p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
-rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p>
+<div class="para"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
+rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
 </div>
-<h2>Examples</h2>
+<h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 Clone from upstream
 </dt>
@@ -652,23 +700,23 @@ Create a repository on the kernel.org machine that borrows from Linus
     /pub/scm/.../me/subsys-2.6.git</tt></pre>
 </div></div>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Author</h2>
+<h2 id="_author">Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
-<h2>Documentation</h2>
+<h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
-<h2>GIT</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
+<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:01:36 UTC
+Last updated 2008-07-06 05:16:38 UTC
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -226,7 +245,33 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+include1::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -255,6 +300,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>git-bisect(1)</title>
 </head>
@@ -272,12 +320,12 @@ git-bisect(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git bisect</em> &lt;subcommand&gt; &lt;options&gt;</p>
+<div class="para"><p><em>git bisect</em> &lt;subcommand&gt; &lt;options&gt;</p></div>
 </div>
-<h2>DESCRIPTION</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<p>The command takes various subcommands, and different options depending
-on the subcommand:</p>
+<div class="para"><p>The command takes various subcommands, and different options depending
+on the subcommand:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>git bisect help
@@ -291,14 +339,14 @@ git bisect replay &lt;logfile&gt;
 git bisect log
 git bisect run &lt;cmd&gt;...</tt></pre>
 </div></div>
-<p>This command uses <tt>git rev-list --bisect</tt> to help drive the
+<div class="para"><p>This command uses <em>git-rev-list --bisect</em> to help drive the
 binary search process to find which change introduced a bug, given an
-old "good" commit object name and a later "bad" commit object name.</p>
-<h3>Getting help</h3>
-<p>Use "git bisect" to get a short usage description, and "git bisect
-help" or "git bisect -h" to get a long usage description.</p>
-<h3>Basic bisect commands: start, bad, good</h3>
-<p>The way you use it is:</p>
+old "good" commit object name and a later "bad" commit object name.</p></div>
+<h3 id="_getting_help">Getting help</h3><div style="clear:left"></div>
+<div class="para"><p>Use "git bisect" to get a short usage description, and "git bisect
+help" or "git bisect -h" to get a long usage description.</p></div>
+<h3 id="_basic_bisect_commands_start_bad_good">Basic bisect commands: start, bad, good</h3><div style="clear:left"></div>
+<div class="para"><p>The way you use it is:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect start
@@ -306,74 +354,74 @@ $ git bisect bad                 # Current version is bad
 $ git bisect good v2.6.13-rc2    # v2.6.13-rc2 was the last version
                                  # tested that was good</tt></pre>
 </div></div>
-<p>When you give at least one bad and one good versions, it will bisect
-the revision tree and say something like:</p>
+<div class="para"><p>When you give at least one bad and one good versions, it will bisect
+the revision tree and say something like:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>Bisecting: 675 revisions left to test after this</tt></pre>
 </div></div>
-<p>and check out the state in the middle. Now, compile that kernel, and
+<div class="para"><p>and check out the state in the middle. Now, compile that kernel, and
 boot it. Now, let's say that this booted kernel works fine, then just
-do</p>
+do</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect good                       # this one is good</tt></pre>
 </div></div>
-<p>which will now say</p>
+<div class="para"><p>which will now say</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>Bisecting: 337 revisions left to test after this</tt></pre>
 </div></div>
-<p>and you continue along, compiling that one, testing it, and depending
+<div class="para"><p>and you continue along, compiling that one, testing it, and depending
 on whether it is good or bad, you say "git bisect good" or "git bisect
-bad", and ask for the next bisection.</p>
-<p>Until you have no more left, and you'll have been left with the first
-bad kernel rev in "refs/bisect/bad".</p>
-<h3>Bisect reset</h3>
-<p>Oh, and then after you want to reset to the original head, do a</p>
+bad", and ask for the next bisection.</p></div>
+<div class="para"><p>Until you have no more left, and you'll have been left with the first
+bad kernel rev in "refs/bisect/bad".</p></div>
+<h3 id="_bisect_reset">Bisect reset</h3><div style="clear:left"></div>
+<div class="para"><p>Oh, and then after you want to reset to the original head, do a</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect reset</tt></pre>
 </div></div>
-<p>to get back to the original branch, instead of being on the bisection
+<div class="para"><p>to get back to the original branch, instead of being on the bisection
 commit ("git bisect start" will do that for you too, actually: it will
-reset the bisection state).</p>
-<h3>Bisect visualize</h3>
-<p>During the bisection process, you can say</p>
+reset the bisection state).</p></div>
+<h3 id="_bisect_visualize">Bisect visualize</h3><div style="clear:left"></div>
+<div class="para"><p>During the bisection process, you can say</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect visualize</tt></pre>
 </div></div>
-<p>to see the currently remaining suspects in <tt>gitk</tt>.  <tt>visualize</tt> is a bit
-too long to type and <tt>view</tt> is provided as a synonym.</p>
-<p>If <tt>DISPLAY</tt> environment variable is not set, <tt>git log</tt> is used
+<div class="para"><p>to see the currently remaining suspects in <em>gitk</em>.  <tt>visualize</tt> is a bit
+too long to type and <tt>view</tt> is provided as a synonym.</p></div>
+<div class="para"><p>If <em>DISPLAY</em> environment variable is not set, <em>git-log</em> is used
 instead.  You can even give command line options such as <tt>-p</tt> and
-<tt>--stat</tt>.</p>
+<tt>--stat</tt>.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect view --stat</tt></pre>
 </div></div>
-<h3>Bisect log and bisect replay</h3>
-<p>The good/bad input is logged, and</p>
+<h3 id="_bisect_log_and_bisect_replay">Bisect log and bisect replay</h3><div style="clear:left"></div>
+<div class="para"><p>The good/bad input is logged, and</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect log</tt></pre>
 </div></div>
-<p>shows what you have done so far. You can truncate its output somewhere
-and save it in a file, and run</p>
+<div class="para"><p>shows what you have done so far. You can truncate its output somewhere
+and save it in a file, and run</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect replay that-file</tt></pre>
 </div></div>
-<p>if you find later you made a mistake telling good/bad about a
-revision.</p>
-<h3>Avoiding to test a commit</h3>
-<p>If in a middle of bisect session, you know what the bisect suggested
+<div class="para"><p>if you find later you made a mistake telling good/bad about a
+revision.</p></div>
+<h3 id="_avoiding_to_test_a_commit">Avoiding to test a commit</h3><div style="clear:left"></div>
+<div class="para"><p>If in a middle of bisect session, you know what the bisect suggested
 to try next is not a good one to test (e.g. the change the commit
 introduces is known not to work in your environment and you know it
 does not have anything to do with the bug you are chasing), you may
-want to find a near-by commit and try that instead.</p>
-<p>It goes something like this:</p>
+want to find a near-by commit and try that instead.</p></div>
+<div class="para"><p>It goes something like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect good/bad                   # previous round was good/bad.
@@ -382,69 +430,69 @@ $ git bisect visualize                  # oops, that is uninteresting.
 $ git reset --hard HEAD~3               # try 3 revs before what
                                         # was suggested</tt></pre>
 </div></div>
-<p>Then compile and test the one you chose to try. After that, tell
-bisect what the result was as usual.</p>
-<h3>Bisect skip</h3>
-<p>Instead of choosing by yourself a nearby commit, you may just want git
-to do it for you using:</p>
+<div class="para"><p>Then compile and test the one you chose to try. After that, tell
+bisect what the result was as usual.</p></div>
+<h3 id="_bisect_skip">Bisect skip</h3><div style="clear:left"></div>
+<div class="para"><p>Instead of choosing by yourself a nearby commit, you may just want git
+to do it for you using:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect skip                 # Current version cannot be tested</tt></pre>
 </div></div>
-<p>But computing the commit to test may be slower afterwards and git may
+<div class="para"><p>But computing the commit to test may be slower afterwards and git may
 eventually not be able to tell the first bad among a bad and one or
-more "skip"ped commits.</p>
-<h3>Cutting down bisection by giving more parameters to bisect start</h3>
-<p>You can further cut down the number of trials if you know what part of
+more "skip"ped commits.</p></div>
+<h3 id="_cutting_down_bisection_by_giving_more_parameters_to_bisect_start">Cutting down bisection by giving more parameters to bisect start</h3><div style="clear:left"></div>
+<div class="para"><p>You can further cut down the number of trials if you know what part of
 the tree is involved in the problem you are tracking down, by giving
-paths parameters when you say <tt>bisect start</tt>, like this:</p>
+paths parameters when you say <tt>bisect start</tt>, like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect start -- arch/i386 include/asm-i386</tt></pre>
 </div></div>
-<p>If you know beforehand more than one good commits, you can narrow the
+<div class="para"><p>If you know beforehand more than one good commits, you can narrow the
 bisect space down without doing the whole tree checkout every time you
 give good commits. You give the bad revision immediately after <tt>start</tt>
-and then you give all the good revisions you have:</p>
+and then you give all the good revisions you have:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect start v2.6.20-rc6 v2.6.20-rc4 v2.6.20-rc1 --
                    # v2.6.20-rc6 is bad
                    # v2.6.20-rc4 and v2.6.20-rc1 are good</tt></pre>
 </div></div>
-<h3>Bisect run</h3>
-<p>If you have a script that can tell if the current source code is good
-or bad, you can automatically bisect using:</p>
+<h3 id="_bisect_run">Bisect run</h3><div style="clear:left"></div>
+<div class="para"><p>If you have a script that can tell if the current source code is good
+or bad, you can automatically bisect using:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect run my_script</tt></pre>
 </div></div>
-<p>Note that the "run" script (<tt>my_script</tt> in the above example) should
+<div class="para"><p>Note that the "run" script (<tt>my_script</tt> in the above example) should
 exit with code 0 in case the current source code is good.  Exit with a
 code between 1 and 127 (inclusive), except 125, if the current
-source code is bad.</p>
-<p>Any other exit code will abort the automatic bisect process. (A
+source code is bad.</p></div>
+<div class="para"><p>Any other exit code will abort the automatic bisect process. (A
 program that does "exit(-1)" leaves $? = 255, see exit(3) manual page,
-the value is chopped with "&amp; 0377".)</p>
-<p>The special exit code 125 should be used when the current source code
+the value is chopped with "&amp; 0377".)</p></div>
+<div class="para"><p>The special exit code 125 should be used when the current source code
 cannot be tested. If the "run" script exits with this code, the current
-revision will be skipped, see <tt>git bisect skip</tt> above.</p>
-<p>You may often find that during bisect you want to have near-constant
+revision will be skipped, see <tt>git bisect skip</tt> above.</p></div>
+<div class="para"><p>You may often find that during bisect you want to have near-constant
 tweaks (e.g., s/#define DEBUG 0/#define DEBUG 1/ in a header file, or
 "revision that does not have this commit needs this patch applied to
 work around other problem this bisection is not interested in")
-applied to the revision being tested.</p>
-<p>To cope with such a situation, after the inner <tt>git-bisect</tt> finds the
+applied to the revision being tested.</p></div>
+<div class="para"><p>To cope with such a situation, after the inner <em>git-bisect</em> finds the
 next revision to test, with the "run" script, you can apply that tweak
 before compiling, run the real test, and after the test decides if the
 revision (possibly with the needed tweaks) passed the test, rewind the
 tree to the pristine state.  Finally the "run" script can exit with
 the status of the real test to let the "git bisect run" command loop to
-determine the outcome.</p>
+determine the outcome.</p></div>
 </div>
-<h2>EXAMPLES</h2>
+<h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<ul>
+<div class="ilist"><ul>
 <li>
 <p>
 Automatically bisect a broken build between v1.2 and HEAD:
@@ -468,13 +516,13 @@ make test                          # "make test" runs the test suite
 $ git bisect start v1.3 v1.1 --    # v1.3 is bad, v1.1 is good
 $ git bisect run ~/test.sh</tt></pre>
 </div></div>
-<p>Here we use a "test.sh" custom script. In this script, if "make"
-fails, we "skip" the current commit.</p>
-<p>It's safer to use a custom script outside the repo to prevent
+<div class="para"><p>Here we use a "test.sh" custom script. In this script, if "make"
+fails, we "skip" the current commit.</p></div>
+<div class="para"><p>It's safer to use a custom script outside the repo to prevent
 interactions between the bisect, make and test processes and the
-script.</p>
-<p>And "make test" should "exit 0", if the test suite passes, and
-"exit 1" (for example) otherwise.</p>
+script.</p></div>
+<div class="para"><p>And "make test" should "exit 0", if the test suite passes, and
+"exit 1" (for example) otherwise.</p></div>
 </li>
 <li>
 <p>
@@ -489,29 +537,29 @@ make || exit 125                     # this "skip"s broken builds
 $ git bisect start HEAD HEAD~10 --   # culprit is among the last 10
 $ git bisect run ~/test.sh</tt></pre>
 </div></div>
-<p>Here "check_test_case.sh" should "exit 0", if the test case passes,
-and "exit 1" (for example) otherwise.</p>
-<p>It's safer if both "test.sh" and "check_test_case.sh" scripts are
+<div class="para"><p>Here "check_test_case.sh" should "exit 0", if the test case passes,
+and "exit 1" (for example) otherwise.</p></div>
+<div class="para"><p>It's safer if both "test.sh" and "check_test_case.sh" scripts are
 outside the repo to prevent interactions between the bisect, make and
-test processes and the scripts.</p>
+test processes and the scripts.</p></div>
 </li>
-</ul>
+</ul></div>
 </div>
-<h2>Author</h2>
+<h2 id="_author">Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
-<h2>Documentation</h2>
+<h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
-<h2>GIT</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
+<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:01:32 UTC
+Last updated 2008-07-06 05:16:35 UTC
 </div>
 </div>
 </body>

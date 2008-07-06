@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -226,7 +245,33 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+include1::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -255,6 +300,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>git-stash(1)</title>
 </head>
@@ -276,28 +324,28 @@ git-stash(1) Manual Page
 <div class="content"><em>git stash</em> (list | show [&lt;stash&gt;] | apply [&lt;stash&gt;] | clear | drop [&lt;stash&gt;] | pop [&lt;stash&gt;])
 <em>git stash</em> [save [&lt;message&gt;]]</div></div>
 </div>
-<h2>DESCRIPTION</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Use <em>git stash</em> when you want to record the current state of the
+<div class="para"><p>Use <em>git stash</em> when you want to record the current state of the
 working directory and the index, but want to go back to a clean
 working directory.  The command saves your local modifications away
-and reverts the working directory to match the <tt>HEAD</tt> commit.</p>
-<p>The modifications stashed away by this command can be listed with
+and reverts the working directory to match the <tt>HEAD</tt> commit.</p></div>
+<div class="para"><p>The modifications stashed away by this command can be listed with
 <tt>git stash list</tt>, inspected with <tt>git stash show</tt>, and restored
 (potentially on top of a different commit) with <tt>git stash apply</tt>.
 Calling <tt>git stash</tt> without any arguments is equivalent to <tt>git stash save</tt>.
 A stash is by default listed as "WIP on <em>branchname</em> &#8230;", but
 you can give a more descriptive message on the command line when
-you create one.</p>
-<p>The latest stash you created is stored in <tt>$GIT_DIR/refs/stash</tt>; older
+you create one.</p></div>
+<div class="para"><p>The latest stash you created is stored in <tt>$GIT_DIR/refs/stash</tt>; older
 stashes are found in the reflog of this reference and can be named using
 the usual reflog syntax (e.g. <tt>stash@{0}</tt> is the most recently
 created stash, <tt>stash@{1}</tt> is the one before it, <tt>stash@{2.hours.ago}</tt>
-is also possible).</p>
+is also possible).</p></div>
 </div>
-<h2>OPTIONS</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 save [&lt;message&gt;]
 </dt>
@@ -325,8 +373,8 @@ list [&lt;options&gt;]
 <pre><tt>stash@{0}: WIP on submit: 6ebd0e2... Update git-stash documentation
 stash@{1}: On master: 9cc0589... Add git-stash</tt></pre>
 </div></div>
-<p>The command takes options applicable to the <tt>git-log</tt>
-command to control what is shown and how. See <a href="git-log.html">git-log(1)</a>.</p>
+<div class="para"><p>The command takes options applicable to the <em>git-log</em>
+command to control what is shown and how. See <a href="git-log.html">git-log(1)</a>.</p></div>
 </dd>
 <dt>
 show [&lt;stash&gt;]
@@ -336,7 +384,7 @@ show [&lt;stash&gt;]
         Show the changes recorded in the stash as a diff between the
         stashed state and its original parent. When no <tt>&lt;stash&gt;</tt> is given,
         shows the latest one. By default, the command shows the diffstat, but
-        it will accept any format known to <tt>git-diff</tt> (e.g., <tt>git stash show
+        it will accept any format known to <em>git-diff</em> (e.g., <tt>git stash show
         -p stash@{1}</tt> to view the second most recent stash in patch form).
 </p>
 </dd>
@@ -349,12 +397,12 @@ apply [--index] [&lt;stash&gt;]
         working tree state.  When no <tt>&lt;stash&gt;</tt> is given, applies the latest
         one.  The working directory must match the index.
 </p>
-<p>This operation can fail with conflicts; you need to resolve them
-by hand in the working tree.</p>
-<p>If the <tt>--index</tt> option is used, then tries to reinstate not only the working
+<div class="para"><p>This operation can fail with conflicts; you need to resolve them
+by hand in the working tree.</p></div>
+<div class="para"><p>If the <tt>--index</tt> option is used, then tries to reinstate not only the working
 tree's changes, but also the index's ones. However, this can fail, when you
 have conflicts (which are stored in the index, where you therefore can no
-longer apply the changes as they were originally).</p>
+longer apply the changes as they were originally).</p></div>
 </dd>
 <dt>
 clear
@@ -384,28 +432,28 @@ pop [&lt;stash&gt;]
         <tt>stash@{0}</tt> is assumed. See also <tt>apply</tt>.
 </p>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>DISCUSSION</h2>
+<h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<p>A stash is represented as a commit whose tree records the state of the
+<div class="para"><p>A stash is represented as a commit whose tree records the state of the
 working directory, and its first parent is the commit at <tt>HEAD</tt> when
 the stash was created.  The tree of the second parent records the
 state of the index when the stash is made, and it is made a child of
-the <tt>HEAD</tt> commit.  The ancestry graph looks like this:</p>
+the <tt>HEAD</tt> commit.  The ancestry graph looks like this:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>       .----W
       /    /
 -----H----I</tt></pre>
 </div></div>
-<p>where <tt>H</tt> is the <tt>HEAD</tt> commit, <tt>I</tt> is a commit that records the state
+<div class="para"><p>where <tt>H</tt> is the <tt>HEAD</tt> commit, <tt>I</tt> is a commit that records the state
 of the index, and <tt>W</tt> is a commit that records the state of the working
-tree.</p>
+tree.</p></div>
 </div>
-<h2>EXAMPLES</h2>
+<h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 Pulling into a dirty tree
 </dt>
@@ -416,10 +464,10 @@ upstream changes that are possibly relevant to what you are
 doing.  When your local changes do not conflict with the changes in
 the upstream, a simple <tt>git pull</tt> will let you move forward.
 </p>
-<p>However, there are cases in which your local changes do conflict with
+<div class="para"><p>However, there are cases in which your local changes do conflict with
 the upstream changes, and <tt>git pull</tt> refuses to overwrite your
 changes.  In such a case, you can stash your changes away,
-perform a pull, and then unstash, like this:</p>
+perform a pull, and then unstash, like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git pull
@@ -452,7 +500,7 @@ $ git checkout my_wip
 $ git reset --soft HEAD^
 ... continue hacking ...</tt></pre>
 </div></div>
-<p>You can use <tt>git-stash</tt> to simplify the above, like this:</p>
+<div class="para"><p>You can use <em>git-stash</em> to simplify the above, like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>... hack hack hack ...
@@ -463,26 +511,26 @@ $ git stash apply
 ... continue hacking ...</tt></pre>
 </div></div>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>SEE ALSO</h2>
+<h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<p><a href="git-checkout.html">git-checkout(1)</a>,
+<div class="para"><p><a href="git-checkout.html">git-checkout(1)</a>,
 <a href="git-commit.html">git-commit(1)</a>,
 <a href="git-reflog.html">git-reflog(1)</a>,
-<a href="git-reset.html">git-reset(1)</a></p>
+<a href="git-reset.html">git-reset(1)</a></p></div>
 </div>
-<h2>AUTHOR</h2>
+<h2 id="_author">AUTHOR</h2>
 <div class="sectionbody">
-<p>Written by Nanako Shiraishi &lt;nanako3@bluebottle.com&gt;</p>
+<div class="para"><p>Written by Nanako Shiraishi &lt;nanako3@bluebottle.com&gt;</p></div>
 </div>
-<h2>GIT</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
+<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:02:03 UTC
+Last updated 2008-07-06 05:17:03 UTC
 </div>
 </div>
 </body>

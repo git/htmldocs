@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -226,7 +245,33 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+include1::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -255,6 +300,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>git-update-index(1)</title>
 </head>
@@ -286,19 +334,19 @@ git-update-index(1) Manual Page
              [--verbose]
              [--] [&lt;file&gt;]*</div></div>
 </div>
-<h2>DESCRIPTION</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Modifies the index or directory cache. Each file mentioned is updated
+<div class="para"><p>Modifies the index or directory cache. Each file mentioned is updated
 into the index and any <em>unmerged</em> or <em>needs updating</em> state is
-cleared.</p>
-<p>See also <a href="git-add.html">git-add(1)</a> for a more user-friendly way to do some of
-the most common operations on the index.</p>
-<p>The way <tt>git-update-index</tt> handles files it is told about can be modified
-using the various options:</p>
+cleared.</p></div>
+<div class="para"><p>See also <a href="git-add.html">git-add(1)</a> for a more user-friendly way to do some of
+the most common operations on the index.</p></div>
+<div class="para"><p>The way <em>git-update-index</em> handles files it is told about can be modified
+using the various options:</p></div>
 </div>
-<h2>OPTIONS</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 --add
 </dt>
@@ -335,21 +383,21 @@ using the various options:</p>
 <p>
         Quiet.  If --refresh finds that the index needs an update, the
         default behavior is to error out.  This option makes
-        <tt>git-update-index</tt> continue anyway.
+        <em>git-update-index</em> continue anyway.
 </p>
 </dd>
-</dl>
-<p>--ignore-submodules:
+</dl></div>
+<div class="para"><p>--ignore-submodules:
         Do not try to update submodules.  This option is only respected
-        when passed before --refresh.</p>
-<dl>
+        when passed before --refresh.</p></div>
+<div class="vlist"><dl>
 <dt>
 --unmerged
 </dt>
 <dd>
 <p>
         If --refresh finds unmerged changes in the index, the default
-        behavior is to error out.  This option makes <tt>git-update-index</tt>
+        behavior is to error out.  This option makes <em>git-update-index</em>
         continue anyway.
 </p>
 </dd>
@@ -413,7 +461,7 @@ using the various options:</p>
 </dt>
 <dd>
 <p>
-        Runs <tt>git-update-index</tt> itself on the paths whose index
+        Runs <em>git-update-index</em> itself on the paths whose index
         entries are different from those from the <tt>HEAD</tt> commit.
 </p>
 </dd>
@@ -451,7 +499,7 @@ using the various options:</p>
 <dd>
 <p>
         By default, when a file <tt>path</tt> exists in the index,
-        <tt>git-update-index</tt> refuses an attempt to add <tt>path/file</tt>.
+        <em>git-update-index</em> refuses an attempt to add <tt>path/file</tt>.
         Similarly if a file <tt>path/file</tt> exists, a file <tt>path</tt>
         cannot be added.  With --replace flag, existing entries
         that conflicts with the entry being added are
@@ -505,76 +553,76 @@ using the various options:</p>
         The same applies to directories ending <em>/</em> and paths with <em>//</em>
 </p>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Using --refresh</h2>
+<h2 id="_using_refresh">Using --refresh</h2>
 <div class="sectionbody">
-<p><em>--refresh</em> does not calculate a new sha1 file or bring the index
+<div class="para"><p><em>--refresh</em> does not calculate a new sha1 file or bring the index
 up-to-date for mode/content changes. But what it <strong>does</strong> do is to
 "re-match" the stat information of a file with the index, so that you
 can refresh the index for a file that hasn't been changed but where
-the stat entry is out of date.</p>
-<p>For example, you'd want to do this after doing a <tt>git-read-tree</tt>, to link
-up the stat index details with the proper files.</p>
+the stat entry is out of date.</p></div>
+<div class="para"><p>For example, you'd want to do this after doing a <em>git-read-tree</em>, to link
+up the stat index details with the proper files.</p></div>
 </div>
-<h2>Using --cacheinfo or --info-only</h2>
+<h2 id="_using_cacheinfo_or_info_only">Using --cacheinfo or --info-only</h2>
 <div class="sectionbody">
-<p><em>--cacheinfo</em> is used to register a file that is not in the
+<div class="para"><p><em>--cacheinfo</em> is used to register a file that is not in the
 current working directory.  This is useful for minimum-checkout
-merging.</p>
-<p>To pretend you have a file with mode and sha1 at path, say:</p>
+merging.</p></div>
+<div class="para"><p>To pretend you have a file with mode and sha1 at path, say:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git update-index --cacheinfo mode sha1 path</tt></pre>
 </div></div>
-<p><em>--info-only</em> is used to register files without placing them in the object
-database.  This is useful for status-only repositories.</p>
-<p>Both <em>--cacheinfo</em> and <em>--info-only</em> behave similarly: the index is updated
+<div class="para"><p><em>--info-only</em> is used to register files without placing them in the object
+database.  This is useful for status-only repositories.</p></div>
+<div class="para"><p>Both <em>--cacheinfo</em> and <em>--info-only</em> behave similarly: the index is updated
 but the object database isn't.  <em>--cacheinfo</em> is useful when the object is
 in the database but the file isn't available locally.  <em>--info-only</em> is
 useful when the file is available, but you do not wish to update the
-object database.</p>
+object database.</p></div>
 </div>
-<h2>Using --index-info</h2>
+<h2 id="_using_index_info">Using --index-info</h2>
 <div class="sectionbody">
-<p><tt>--index-info</tt> is a more powerful mechanism that lets you feed
+<div class="para"><p><tt>--index-info</tt> is a more powerful mechanism that lets you feed
 multiple entry definitions from the standard input, and designed
-specifically for scripts.  It can take inputs of three formats:</p>
-<ol>
+specifically for scripts.  It can take inputs of three formats:</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 mode         SP sha1          TAB path
 </p>
-<p>The first format is what "git-apply --index-info"
+<div class="para"><p>The first format is what "git-apply --index-info"
 reports, and used to reconstruct a partial tree
 that is used for phony merge base tree when falling
-back on 3-way merge.</p>
+back on 3-way merge.</p></div>
 </li>
 <li>
 <p>
 mode SP type SP sha1          TAB path
 </p>
-<p>The second format is to stuff <tt>git-ls-tree</tt> output
-into the index file.</p>
+<div class="para"><p>The second format is to stuff <em>git-ls-tree</em> output
+into the index file.</p></div>
 </li>
 <li>
 <p>
 mode         SP sha1 SP stage TAB path
 </p>
-<p>This format is to put higher order stages into the
-index file and matches <tt>git-ls-files --stage</tt> output.</p>
+<div class="para"><p>This format is to put higher order stages into the
+index file and matches <em>git-ls-files --stage</em> output.</p></div>
 </li>
-</ol>
-<p>To place a higher stage entry to the index, the path should
+</ol></div>
+<div class="para"><p>To place a higher stage entry to the index, the path should
 first be removed by feeding a mode=0 entry for the path, and
-then feeding necessary input lines in the third format.</p>
-<p>For example, starting with this index:</p>
+then feeding necessary input lines in the third format.</p></div>
+<div class="para"><p>For example, starting with this index:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-files -s
 100644 8a1218a1024a212bb3db30becd860315f9f3ac52 0       frotz</tt></pre>
 </div></div>
-<p>you can feed the following input to <tt>--index-info</tt>:</p>
+<div class="para"><p>you can feed the following input to <tt>--index-info</tt>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git update-index --index-info
@@ -582,10 +630,10 @@ then feeding necessary input lines in the third format.</p>
 100644 8a1218a1024a212bb3db30becd860315f9f3ac52 1       frotz
 100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</tt></pre>
 </div></div>
-<p>The first line of the input feeds 0 as the mode to remove the
+<div class="para"><p>The first line of the input feeds 0 as the mode to remove the
 path; the SHA1 does not matter as long as it is well formatted.
 Then the second and third line feeds stage 1 and stage 2 entries
-for that path.  After the above, we would end up with this:</p>
+for that path.  After the above, we would end up with this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-files -s
@@ -593,9 +641,9 @@ for that path.  After the above, we would end up with this:</p>
 100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</tt></pre>
 </div></div>
 </div>
-<h2>Using &#8220;assume unchanged&#8221; bit</h2>
+<h2 id="_using_8220_assume_unchanged_8221_bit">Using &#8220;assume unchanged&#8221; bit</h2>
 <div class="sectionbody">
-<p>Many operations in git depend on your filesystem to have an
+<div class="para"><p>Many operations in git depend on your filesystem to have an
 efficient <tt>lstat(2)</tt> implementation, so that <tt>st_mtime</tt>
 information for working tree files can be cheaply checked to see
 if the file contents have changed from the version recorded in
@@ -607,27 +655,27 @@ path does not mean git will check the contents of the file to
 see if it has changed &#8212; it makes git to omit any checking and
 assume it has <strong>not</strong> changed.  When you make changes to working
 tree files, you have to explicitly tell git about it by dropping
-"assume unchanged" bit, either before or after you modify them.</p>
-<p>In order to set "assume unchanged" bit, use <tt>--assume-unchanged</tt>
-option.  To unset, use <tt>--no-assume-unchanged</tt>.</p>
-<p>The command looks at <tt>core.ignorestat</tt> configuration variable.  When
+"assume unchanged" bit, either before or after you modify them.</p></div>
+<div class="para"><p>In order to set "assume unchanged" bit, use <tt>--assume-unchanged</tt>
+option.  To unset, use <tt>--no-assume-unchanged</tt>.</p></div>
+<div class="para"><p>The command looks at <tt>core.ignorestat</tt> configuration variable.  When
 this is true, paths updated with <tt>git update-index paths&#8230;</tt> and
 paths updated with other git commands that update both index and
-working tree (e.g. <tt>git-apply --index</tt>, <tt>git-checkout-index -u</tt>,
-and <tt>git-read-tree -u</tt>) are automatically marked as "assume
+working tree (e.g. <em>git-apply --index</em>, <em>git-checkout-index -u</em>,
+and <em>git-read-tree -u</em>) are automatically marked as "assume
 unchanged".  Note that "assume unchanged" bit is <strong>not</strong> set if
 <tt>git update-index --refresh</tt> finds the working tree file matches
 the index (use <tt>git update-index --really-refresh</tt> if you want
-to mark them as "assume unchanged").</p>
+to mark them as "assume unchanged").</p></div>
 </div>
-<h2>Examples</h2>
+<h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<p>To update and refresh only the files already checked out:</p>
+<div class="para"><p>To update and refresh only the files already checked out:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</tt></pre>
 </div></div>
-<dl>
+<div class="vlist"><dl>
 <dt>
 On an inefficient filesystem with <tt>core.ignorestat</tt> set
 </dt>
@@ -648,7 +696,7 @@ $ git update-index --no-assume-unchanged foo.c   <b>(8)</b>
 $ git diff --name-only                           <b>(9)</b>
 M foo.c</tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 forces lstat(2) to set "assume unchanged" bits for paths that match index.
@@ -694,46 +742,46 @@ you can tell about the change after the fact.
 now it checks with lstat(2) and finds it has been changed.
 </p>
 </li>
-</ol>
+</ol></div>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Configuration</h2>
+<h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<p>The command honors <tt>core.filemode</tt> configuration variable.  If
+<div class="para"><p>The command honors <tt>core.filemode</tt> configuration variable.  If
 your repository is on an filesystem whose executable bits are
 unreliable, this should be set to <em>false</em> (see <a href="git-config.html">git-config(1)</a>).
 This causes the command to ignore differences in file modes recorded
 in the index and the file mode on the filesystem if they differ only on
 executable bit.   On such an unfortunate filesystem, you may
-need to use <tt>git-update-index --chmod=</tt>.</p>
-<p>Quite similarly, if <tt>core.symlinks</tt> configuration variable is set
+need to use <em>git-update-index --chmod=</em>.</p></div>
+<div class="para"><p>Quite similarly, if <tt>core.symlinks</tt> configuration variable is set
 to <em>false</em> (see <a href="git-config.html">git-config(1)</a>), symbolic links are checked out
 as plain files, and this command does not modify a recorded file mode
-from symbolic link to regular file.</p>
-<p>The command looks at <tt>core.ignorestat</tt> configuration variable.  See
-<em>Using "assume unchanged" bit</em> section above.</p>
+from symbolic link to regular file.</p></div>
+<div class="para"><p>The command looks at <tt>core.ignorestat</tt> configuration variable.  See
+<em>Using "assume unchanged" bit</em> section above.</p></div>
 </div>
-<h2>SEE ALSO</h2>
+<h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<p><a href="git-config.html">git-config(1)</a>,
-<a href="git-add.html">git-add(1)</a></p>
+<div class="para"><p><a href="git-config.html">git-config(1)</a>,
+<a href="git-add.html">git-add(1)</a></p></div>
 </div>
-<h2>Author</h2>
+<h2 id="_author">Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
-<h2>Documentation</h2>
+<h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<div class="para"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
-<h2>GIT</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
+<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:02:06 UTC
+Last updated 2008-07-06 05:17:06 UTC
 </div>
 </div>
 </body>

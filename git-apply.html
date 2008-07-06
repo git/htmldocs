@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -226,7 +245,33 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+include1::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -255,6 +300,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>git-apply(1)</title>
 </head>
@@ -280,14 +328,14 @@ git-apply(1) Manual Page
           [--whitespace=&lt;nowarn|warn|fix|error|error-all&gt;]
           [--exclude=PATH] [--verbose] [&lt;patch&gt;&#8230;]</div></div>
 </div>
-<h2>DESCRIPTION</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Reads supplied diff output and applies it on a git index file
-and a work tree.</p>
+<div class="para"><p>Reads supplied <em>diff</em> output and applies it on a git index file
+and a work tree.</p></div>
 </div>
-<h2>OPTIONS</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 &lt;patch&gt;&#8230;
 </dt>
@@ -368,14 +416,14 @@ and a work tree.</p>
 </dt>
 <dd>
 <p>
-        Newer <tt>git-diff</tt> output has embedded <em>index information</em>
+        Newer <em>git-diff</em> output has embedded <em>index information</em>
         for each blob to help identify the original version that
         the patch applies to.  When this flag is given, and if
         the original versions of the blobs is available locally,
         builds a temporary index containing those blobs.
 </p>
-<p>When a pure mode change is encountered (which has no index information),
-the information is read from the current index instead.</p>
+<div class="para"><p>When a pure mode change is encountered (which has no index information),
+the information is read from the current index instead.</p></div>
 </dd>
 <dt>
 -R
@@ -393,7 +441,7 @@ the information is read from the current index instead.</p>
 </dt>
 <dd>
 <p>
-        For atomicity, <tt>git-apply</tt> by default fails the whole patch and
+        For atomicity, <em>git-apply</em> by default fails the whole patch and
         does not touch the working tree when some of the hunks
         do not apply.  This option makes it apply
         the parts of the patch that are applicable, and leave the
@@ -437,14 +485,14 @@ the information is read from the current index instead.</p>
 </dt>
 <dd>
 <p>
-        By default, <tt>git-apply</tt> expects that the patch being
+        By default, <em>git-apply</em> expects that the patch being
         applied is a unified diff with at least one line of context.
         This provides good safety measures, but breaks down when
         applying a diff generated with --unified=0. To bypass these
         checks use <em>--unidiff-zero</em>.
 </p>
-<p>Note, for the reasons stated above usage of context-free patches are
-discouraged.</p>
+<div class="para"><p>Note, for the reasons stated above usage of context-free patches are
+discouraged.</p></div>
 </dd>
 <dt>
 --apply
@@ -452,7 +500,7 @@ discouraged.</p>
 <dd>
 <p>
         If you use any of the options marked "Turns off
-        <em>apply</em>" above, <tt>git-apply</tt> reads and outputs the
+        <em>apply</em>" above, <em>git-apply</em> reads and outputs the
         information you asked without actually applying the
         patch.  Give this flag after those flags to also apply
         the patch.
@@ -465,7 +513,7 @@ discouraged.</p>
 <p>
         When applying a patch, ignore additions made by the
         patch.  This can be used to extract the common part between
-        two files by first running <tt>diff</tt> on them and applying
+        two files by first running <em>diff</em> on them and applying
         the result with this option, which would apply the
         deletion part but not addition part.
 </p>
@@ -507,12 +555,12 @@ discouraged.</p>
         by a tab character inside the initial indent of the line are
         considered whitespace errors.
 </p>
-<p>By default, the command outputs warning messages but applies the patch.
+<div class="para"><p>By default, the command outputs warning messages but applies the patch.
 When <tt>git-apply is used for statistics and not applying a
-patch, it defaults to `nowarn</tt>.</p>
-<p>You can use different <tt>&lt;action&gt;</tt> to control this
-behavior:</p>
-<ul>
+patch, it defaults to `nowarn</tt>.</p></div>
+<div class="para"><p>You can use different <tt>&lt;action&gt;</tt> to control this
+behavior:</p></div>
+<div class="ilist"><ul>
 <li>
 <p>
 <tt>nowarn</tt> turns off the trailing whitespace warning.
@@ -543,16 +591,16 @@ behavior:</p>
 <tt>error-all</tt> is similar to <tt>error</tt> but shows all errors.
 </p>
 </li>
-</ul>
+</ul></div>
 </dd>
 <dt>
 --inaccurate-eof
 </dt>
 <dd>
 <p>
-        Under certain circumstances, some versions of diff do not correctly
+        Under certain circumstances, some versions of <em>diff</em> do not correctly
         detect a missing new-line at the end of the file. As a result, patches
-        created by such diff programs do not record incomplete lines
+        created by such <em>diff</em> programs do not record incomplete lines
         correctly. This option adds support for applying such patches by
         working around this bug.
 </p>
@@ -580,11 +628,11 @@ behavior:</p>
         adjusting the hunk headers appropriately).
 </p>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Configuration</h2>
+<h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 apply.whitespace
 </dt>
@@ -594,36 +642,36 @@ apply.whitespace
         line, this configuration item is used as the default.
 </p>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Submodules</h2>
+<h2 id="_submodules">Submodules</h2>
 <div class="sectionbody">
-<p>If the patch contains any changes to submodules then <tt>git-apply</tt>
-treats these changes as follows.</p>
-<p>If --index is specified (explicitly or implicitly), then the submodule
+<div class="para"><p>If the patch contains any changes to submodules then <em>git-apply</em>
+treats these changes as follows.</p></div>
+<div class="para"><p>If --index is specified (explicitly or implicitly), then the submodule
 commits must match the index exactly for the patch to apply.  If any
 of the submodules are checked-out, then these check-outs are completely
 ignored, i.e., they are not required to be up-to-date or clean and they
-are not updated.</p>
-<p>If --index is not specified, then the submodule commits in the patch
+are not updated.</p></div>
+<div class="para"><p>If --index is not specified, then the submodule commits in the patch
 are ignored and only the absence of presence of the corresponding
-subdirectory is checked and (if possible) updated.</p>
+subdirectory is checked and (if possible) updated.</p></div>
 </div>
-<h2>Author</h2>
+<h2 id="_author">Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
-<h2>Documentation</h2>
+<h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Junio C Hamano</p>
+<div class="para"><p>Documentation by Junio C Hamano</p></div>
 </div>
-<h2>GIT</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
+<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:01:32 UTC
+Last updated 2008-07-06 05:16:34 UTC
 </div>
 </div>
 </body>
