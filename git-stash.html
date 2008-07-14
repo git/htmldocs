@@ -321,8 +321,11 @@ git-stash(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git stash</em> (list | show [&lt;stash&gt;] | apply [&lt;stash&gt;] | clear | drop [&lt;stash&gt;] | pop [&lt;stash&gt;])
-<em>git stash</em> [save [&lt;message&gt;]]</div></div>
+<div class="content"><em>git stash</em> list
+<em>git stash</em> (show | apply | drop | pop ) [&lt;stash&gt;]
+<em>git stash</em> branch &lt;branchname&gt; [&lt;stash&gt;]
+<em>git stash</em> [save [&lt;message&gt;]]
+<em>git stash</em> clear</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -347,7 +350,7 @@ is also possible).</p></div>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
-save [&lt;message&gt;]
+save [--keep-index] [&lt;message&gt;]
 </dt>
 <dd>
 <p>
@@ -356,6 +359,8 @@ save [&lt;message&gt;]
         subcommand is given. The &lt;message&gt; part is optional and gives
         the description along with the stashed state.
 </p>
+<div class="para"><p>If the <tt>--keep-index</tt> option is used, all changes already added to the
+index are left intact.</p></div>
 </dd>
 <dt>
 list [&lt;options&gt;]
@@ -403,6 +408,23 @@ by hand in the working tree.</p></div>
 tree's changes, but also the index's ones. However, this can fail, when you
 have conflicts (which are stored in the index, where you therefore can no
 longer apply the changes as they were originally).</p></div>
+</dd>
+<dt>
+branch &lt;branchname&gt; [&lt;stash&gt;]
+</dt>
+<dd>
+<p>
+        Creates and checks out a new branch named <tt>&lt;branchname&gt;</tt> starting from
+        the commit at which the <tt>&lt;stash&gt;</tt> was originally created, applies the
+        changes recorded in <tt>&lt;stash&gt;</tt> to the new working tree and index, then
+        drops the <tt>&lt;stash&gt;</tt> if that completes successfully. When no <tt>&lt;stash&gt;</tt>
+        is given, applies the latest one.
+</p>
+<div class="para"><p>This is useful if the branch on which you ran <tt>git stash save</tt> has
+changed enough that <tt>git stash apply</tt> fails due to conflicts. Since
+the stash is applied on top of the commit that was HEAD at the time
+<tt>git stash</tt> was run, it restores the originally stashed state with
+no conflicts.</p></div>
 </dd>
 <dt>
 clear
@@ -511,6 +533,28 @@ $ git stash apply
 ... continue hacking ...</tt></pre>
 </div></div>
 </dd>
+<dt>
+Testing partial commits
+</dt>
+<dd>
+<p>
+You can use <tt>git stash save --keep-index</tt> when you want to make two or
+more commits out of the changes in the work tree, and you want to test
+each change before committing:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>... hack hack hack ...
+$ git add --patch foo            # add just first part to the index
+$ git stash save --keep-index    # save all other changes to the stash
+$ edit/build/test first part
+$ git commit foo -m 'First part' # commit fully tested change
+$ git stash pop                  # prepare to work on all other changes
+... repeat above five steps until one commit remains ...
+$ edit/build/test remaining parts
+$ git commit foo -m 'Remaining parts'</tt></pre>
+</div></div>
+</dd>
 </dl></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
@@ -530,7 +574,7 @@ $ git stash apply
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-07-06 05:17:03 UTC
+Last updated 2008-07-14 03:12:31 UTC
 </div>
 </div>
 </body>
