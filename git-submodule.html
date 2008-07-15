@@ -321,7 +321,7 @@ git-submodule(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git submodule</em> [--quiet] add [-b branch] [--] &lt;repository&gt; [&lt;path&gt;]
+<div class="content"><em>git submodule</em> [--quiet] add [-b branch] [--] &lt;repository&gt; &lt;path&gt;
 <em>git submodule</em> [--quiet] status [--cached] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] init [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] update [--init] [--] [&lt;path&gt;&#8230;]
@@ -336,15 +336,28 @@ add
 <dd>
 <p>
         Add the given repository as a submodule at the given path
-        to the changeset to be committed next.  If path is a valid
-        repository within the project, it is added as is. Otherwise,
-        repository is cloned at the specified path. path is added to the
-        changeset and registered in .gitmodules.   If no path is
-        specified, the path is deduced from the repository specification.
-        If the repository url begins with ./ or ../, it is stored as
-        given but resolved as a relative path from the main project's
-        url when cloning.
+        to the changeset to be committed next to the current
+        project: the current project is termed termed the "superproject".
 </p>
+<div class="para"><p>This requires two arguments: &lt;repository&gt; and &lt;path&gt;.</p></div>
+<div class="para"><p>&lt;repository&gt; is the URL of the new submodule's origin repository.
+This may be either an absolute URL, or (if it begins with ./
+or ../), the location relative to the superproject's origin
+repository.</p></div>
+<div class="para"><p>&lt;path&gt; is the relative location for the cloned submodule to
+exist in the superproject. If &lt;path&gt; does not exist, then the
+submodule is created by cloning from the named URL. If &lt;path&gt; does
+exist and is already a valid git repository, then this is added
+to the changeset without cloning. This second form is provided
+to ease creating a new submodule from scratch, and presumes
+the user will later push the submodule to the given URL.</p></div>
+<div class="para"><p>In either case, the given URL is recorded into .gitmodules for
+use by subsequent users cloning the superproject. If the URL is
+given relative to the superproject's repository, the presumption
+is the superproject and submodule repositories will be kept
+together in the same relative location, and only the
+superproject's URL need be provided: git-submodule will correctly
+locate the submodule using the relative URL in .gitmodules.</p></div>
 </dd>
 <dt>
 status
@@ -454,6 +467,7 @@ summary
 <p>
         Path to submodule(s). When specified this will restrict the command
         to only operate on the submodules found at the specified paths.
+        (This argument is required with add).
 </p>
 </dd>
 </dl></div>
@@ -476,7 +490,7 @@ for details.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-07-06 05:17:04 UTC
+Last updated 2008-07-15 15:48:35 UTC
 </div>
 </div>
 </body>
