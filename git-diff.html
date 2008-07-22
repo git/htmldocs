@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -226,7 +245,33 @@ td.hlist2 {
 @media print {
   div#footer-badges { display: none; }
 }
-include::./stylesheets/xhtml11-manpage.css[]
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+include1::./stylesheets/xhtml11-manpage.css[]
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -255,6 +300,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>git-diff(1)</title>
 </head>
@@ -272,13 +320,13 @@ git-diff(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<p><em>git diff</em> [&lt;common diff options&gt;] &lt;commit&gt;{0,2} [--] [&lt;path&gt;&#8230;]</p>
+<div class="para"><p><em>git diff</em> [&lt;common diff options&gt;] &lt;commit&gt;{0,2} [--] [&lt;path&gt;&#8230;]</p></div>
 </div>
-<h2>DESCRIPTION</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<p>Show changes between two trees, a tree and the working tree, a
-tree and the index file, or the index file and the working tree.</p>
-<dl>
+<div class="para"><p>Show changes between two trees, a tree and the working tree, a
+tree and the index file, or the index file and the working tree.</p></div>
+<div class="vlist"><dl>
 <dt>
 <em>git diff</em> [--options] [--] [&lt;path&gt;&#8230;]
 </dt>
@@ -286,13 +334,13 @@ tree and the index file, or the index file and the working tree.</p>
 <p>
         This form is to view the changes you made relative to
         the index (staging area for the next commit).  In other
-        words, the differences are what you _could_ tell git to
+        words, the differences are what you <em>could</em> tell git to
         further add to the index but you still haven't.  You can
         stage these changes by using <a href="git-add.html">git-add(1)</a>.
 </p>
-<p>If exactly two paths are given, and at least one is untracked,
+<div class="para"><p>If exactly two paths are given, and at least one is untracked,
 compare the two files / directories. This behavior can be
-forced by --no-index.</p>
+forced by --no-index.</p></div>
 </dd>
 <dt>
 <em>git diff</em> [--options] --cached [&lt;commit&gt;] [--] [&lt;path&gt;&#8230;]
@@ -348,21 +396,21 @@ forced by --no-index.</p>
         of &lt;commit&gt;, which has the same effect as using HEAD instead.
 </p>
 </dd>
-</dl>
-<p>Just in case if you are doing something exotic, it should be
+</dl></div>
+<div class="para"><p>Just in case if you are doing something exotic, it should be
 noted that all of the &lt;commit&gt; in the above description, except
 for the last two forms that use ".." notations, can be any
-&lt;tree-ish&gt;.</p>
-<p>For a more complete list of ways to spell &lt;commit&gt;, see
+&lt;tree-ish&gt;.</p></div>
+<div class="para"><p>For a more complete list of ways to spell &lt;commit&gt;, see
 "SPECIFYING REVISIONS" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.
-However, "diff" is about comparing two _endpoints_, not ranges,
+However, "diff" is about comparing two <em>endpoints</em>, not ranges,
 and the range notations ("&lt;commit&gt;..&lt;commit&gt;" and
 "&lt;commit&gt;...&lt;commit&gt;") do not mean a range as defined in the
-"SPECIFYING RANGES" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p>
+"SPECIFYING RANGES" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p></div>
 </div>
-<h2>OPTIONS</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 -p
 </dt>
@@ -834,10 +882,10 @@ and the range notations ("&lt;commit&gt;..&lt;commit&gt;" and
         Do not show any source or destination prefix.
 </p>
 </dd>
-</dl>
-<p>For more detailed explanation on these common options, see also
-<a href="gitdiffcore.html">gitdiffcore(7)</a>.</p>
-<dl>
+</dl></div>
+<div class="para"><p>For more detailed explanation on these common options, see also
+<a href="gitdiffcore.html">gitdiffcore(7)</a>.</p></div>
+<div class="vlist"><dl>
 <dt>
 &lt;path&gt;&#8230;
 </dt>
@@ -848,15 +896,15 @@ and the range notations ("&lt;commit&gt;..&lt;commit&gt;" and
         names and get diff for all files under them).
 </p>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Output format</h2>
+<h2 id="_output_format">Output format</h2>
 <div class="sectionbody">
-<p>The output format from "git-diff-index", "git-diff-tree",
-"git-diff-files" and "git diff --raw" are very similar.</p>
-<p>These commands all compare two sets of things; what is
-compared differs:</p>
-<dl>
+<div class="para"><p>The output format from "git-diff-index", "git-diff-tree",
+"git-diff-files" and "git diff --raw" are very similar.</p></div>
+<div class="para"><p>These commands all compare two sets of things; what is
+compared differs:</p></div>
+<div class="vlist"><dl>
 <dt>
 git-diff-index &lt;tree-ish&gt;
 </dt>
@@ -889,8 +937,8 @@ git-diff-files [&lt;pattern&gt;&#8230;]
         compares the index and the files on the filesystem.
 </p>
 </dd>
-</dl>
-<p>An output line is formatted this way:</p>
+</dl></div>
+<div class="para"><p>An output line is formatted this way:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>in-place edit  :100644 100644 bcd1234... 0123456... M file0
@@ -900,8 +948,8 @@ create         :000000 100644 0000000... 1234567... A file4
 delete         :100644 000000 1234567... 0000000... D file5
 unmerged       :000000 000000 0000000... 0000000... U file6</tt></pre>
 </div></div>
-<p>That is, from the left to the right:</p>
-<ol>
+<div class="para"><p>That is, from the left to the right:</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 a colon.
@@ -977,25 +1025,25 @@ path for "dst"; only exists for C or R.
 an LF or a NUL when <em>-z</em> option is used, to terminate the record.
 </p>
 </li>
-</ol>
-<p>&lt;sha1&gt; is shown as all 0's if a file is new on the filesystem
-and it is out of sync with the index.</p>
-<p>Example:</p>
+</ol></div>
+<div class="para"><p>&lt;sha1&gt; is shown as all 0's if a file is new on the filesystem
+and it is out of sync with the index.</p></div>
+<div class="para"><p>Example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>:100644 100644 5be4a4...... 000000...... M file.c</tt></pre>
 </div></div>
-<p>When <tt>-z</tt> option is not used, TAB, LF, and backslash characters
+<div class="para"><p>When <tt>-z</tt> option is not used, TAB, LF, and backslash characters
 in pathnames are represented as <tt>\t</tt>, <tt>\n</tt>, and <tt>\\</tt>,
-respectively.</p>
+respectively.</p></div>
 </div>
-<h2>diff format for merges</h2>
+<h2 id="_diff_format_for_merges">diff format for merges</h2>
 <div class="sectionbody">
-<p>"git-diff-tree", "git-diff-files" and "git-diff --raw"
+<div class="para"><p>"git-diff-tree", "git-diff-files" and "git-diff --raw"
 can take <em>-c</em> or <em>--cc</em> option
 to generate diff output also for merge commits.  The output differs
-from the format described above in the following way:</p>
-<ol>
+from the format described above in the following way:</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 there is a colon for each parent
@@ -1021,26 +1069,26 @@ no optional "score" number
 single path, only for "dst"
 </p>
 </li>
-</ol>
-<p>Example:</p>
+</ol></div>
+<div class="para"><p>Example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>::100644 100644 100644 fabadb8... cc95eb0... 4866510... MM      describe.c</tt></pre>
 </div></div>
-<p>Note that <em>combined diff</em> lists only files which were modified from
-all parents.</p>
+<div class="para"><p>Note that <em>combined diff</em> lists only files which were modified from
+all parents.</p></div>
 </div>
-<h2>Generating patches with -p</h2>
+<h2 id="_generating_patches_with_p">Generating patches with -p</h2>
 <div class="sectionbody">
-<p>When "git-diff-index", "git-diff-tree", or "git-diff-files" are run
+<div class="para"><p>When "git-diff-index", "git-diff-tree", or "git-diff-files" are run
 with a <em>-p</em> option, "git diff" without the <em>--raw</em> option, or
 "git log" with the "-p" option, they
 do not produce the output described above; instead they produce a
 patch file.  You can customize the creation of such patches via the
-GIT_EXTERNAL_DIFF and the GIT_DIFF_OPTS environment variables.</p>
-<p>What the -p option produces is slightly different from the traditional
-diff format.</p>
-<ol>
+GIT_EXTERNAL_DIFF and the GIT_DIFF_OPTS environment variables.</p></div>
+<div class="para"><p>What the -p option produces is slightly different from the traditional
+diff format.</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 It is preceded with a "git diff" header, that looks like
@@ -1050,12 +1098,12 @@ It is preceded with a "git diff" header, that looks like
 <div class="content">
 <pre><tt>diff --git a/file1 b/file2</tt></pre>
 </div></div>
-<p>The <tt>a/</tt> and <tt>b/</tt> filenames are the same unless rename/copy is
+<div class="para"><p>The <tt>a/</tt> and <tt>b/</tt> filenames are the same unless rename/copy is
 involved.  Especially, even for a creation or a deletion,
-<tt>/dev/null</tt> is _not_ used in place of <tt>a/</tt> or <tt>b/</tt> filenames.</p>
-<p>When rename/copy is involved, <tt>file1</tt> and <tt>file2</tt> show the
+<tt>/dev/null</tt> is <em>not</em> used in place of <tt>a/</tt> or <tt>b/</tt> filenames.</p></div>
+<div class="para"><p>When rename/copy is involved, <tt>file1</tt> and <tt>file2</tt> show the
 name of the source file of the rename/copy and the name of
-the file that rename/copy produces, respectively.</p>
+the file that rename/copy produces, respectively.</p></div>
 </li>
 <li>
 <p>
@@ -1084,20 +1132,20 @@ TAB, LF, double quote and backslash characters in pathnames
     pathname is put in double quotes.
 </p>
 </li>
-</ol>
-<p>The similarity index is the percentage of unchanged lines, and
+</ol></div>
+<div class="para"><p>The similarity index is the percentage of unchanged lines, and
 the dissimilarity index is the percentage of changed lines.  It
 is a rounded down integer, followed by a percent sign.  The
 similarity index value of 100% is thus reserved for two equal
 files, while 100% dissimilarity means that no line from the old
-file made it into the new one.</p>
+file made it into the new one.</p></div>
 </div>
-<h2>combined diff format</h2>
+<h2 id="_combined_diff_format">combined diff format</h2>
 <div class="sectionbody">
-<p>"git-diff-tree", "git-diff-files" and "git-diff" can take <em>-c</em> or
+<div class="para"><p>"git-diff-tree", "git-diff-files" and "git-diff" can take <em>-c</em> or
 <em>--cc</em> option to produce <em>combined diff</em>.  For showing a merge commit
 with "git log -p", this is the default format.
-A <em>combined diff</em> format looks like this:</p>
+A <em>combined diff</em> format looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>diff --combined describe.c
@@ -1128,7 +1176,7 @@ index fabadb8,cc95eb0..4866510
                 initialized = 1;
                 for_each_ref(get_name);</tt></pre>
 </div></div>
-<ol>
+<div class="olist"><ol>
 <li>
 <p>
 It is preceded with a "git diff" header, that looks like
@@ -1138,10 +1186,10 @@ It is preceded with a "git diff" header, that looks like
 <div class="content">
 <pre><tt>diff --combined file</tt></pre>
 </div></div>
-<p>or like this (when <em>--cc</em> option is used):</p>
+<div class="para"><p>or like this (when <em>--cc</em> option is used):</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>diff --c file</tt></pre>
+<pre><tt>diff --cc file</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1156,11 +1204,11 @@ mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;
 new file mode &lt;mode&gt;
 deleted file mode &lt;mode&gt;,&lt;mode&gt;</tt></pre>
 </div></div>
-<p>The <tt>mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;</tt> line appears only if at least one of
+<div class="para"><p>The <tt>mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;</tt> line appears only if at least one of
 the &lt;mode&gt; is different from the rest. Extended headers with
 information about detected contents movement (renames and
 copying detection) are designed to work with diff of two
-&lt;tree-ish&gt; and are not used by combined diff format.</p>
+&lt;tree-ish&gt; and are not used by combined diff format.</p></div>
 </li>
 <li>
 <p>
@@ -1171,9 +1219,9 @@ It is followed by two-line from-file/to-file header
 <pre><tt>--- a/file
 +++ b/file</tt></pre>
 </div></div>
-<p>Similar to two-line header for traditional <em>unified</em> diff
+<div class="para"><p>Similar to two-line header for traditional <em>unified</em> diff
 format, <tt>/dev/null</tt> is used to signal created or deleted
-files.</p>
+files.</p></div>
 </li>
 <li>
 <p>
@@ -1187,59 +1235,59 @@ Chunk header format is modified to prevent people from
 <div class="content">
 <pre><tt>@@@ &lt;from-file-range&gt; &lt;from-file-range&gt; &lt;to-file-range&gt; @@@</tt></pre>
 </div></div>
-<p>There are (number of parents + 1) <tt>@</tt> characters in the chunk
-header for combined diff format.</p>
+<div class="para"><p>There are (number of parents + 1) <tt>@</tt> characters in the chunk
+header for combined diff format.</p></div>
 </li>
-</ol>
-<p>Unlike the traditional <em>unified</em> diff format, which shows two
+</ol></div>
+<div class="para"><p>Unlike the traditional <em>unified</em> diff format, which shows two
 files A and B with a single column that has <tt>-</tt> (minus &#8212;
 appears in A but removed in B), <tt>+</tt> (plus &#8212; missing in A but
 added to B), or <tt>" "</tt> (space &#8212; unchanged) prefix, this format
 compares two or more files file1, file2,&#8230; with one file X, and
 shows how X differs from each of fileN.  One column for each of
 fileN is prepended to the output line to note how X's line is
-different from it.</p>
-<p>A <tt>-</tt> character in the column N means that the line appears in
+different from it.</p></div>
+<div class="para"><p>A <tt>-</tt> character in the column N means that the line appears in
 fileN but it does not appear in the result.  A <tt>+</tt> character
 in the column N means that the line appears in the last file,
 and fileN does not have that line (in other words, the line was
-added, from the point of view of that parent).</p>
-<p>In the above example output, the function signature was changed
+added, from the point of view of that parent).</p></div>
+<div class="para"><p>In the above example output, the function signature was changed
 from both files (hence two <tt>-</tt> removals from both file1 and
-file2, plus <tt>++</tt> to mean one line that was added does not appear
+file2, plus <tt><tt>+</tt> to mean one line that was added does not appear
 in either file1 nor file2).  Also two other lines are the same
-from file1 but do not appear in file2 (hence prefixed with <tt> +</tt>).</p>
-<p>When shown by <tt>git diff-tree -c</tt>, it compares the parents of a
+from file1 but do not appear in file2 (hence prefixed with <tt> </tt></tt>).</p></div>
+<div class="para"><p>When shown by <tt>git diff-tree -c</tt>, it compares the parents of a
 merge commit with the merge result (i.e. file1..fileN are the
 parents).  When shown by <tt>git diff-files -c</tt>, it compares the
 two unresolved merge parents with the working tree file
 (i.e. file1 is stage 2 aka "our version", file2 is stage 3 aka
-"their version").</p>
+"their version").</p></div>
 </div>
-<h2>other diff formats</h2>
+<h2 id="_other_diff_formats">other diff formats</h2>
 <div class="sectionbody">
-<p>The <tt>--summary</tt> option describes newly added, deleted, renamed and
+<div class="para"><p>The <tt>--summary</tt> option describes newly added, deleted, renamed and
 copied files.  The <tt>--stat</tt> option adds diffstat(1) graph to the
 output.  These options can be combined with other options, such as
-<tt>-p</tt>, and are meant for human consumption.</p>
-<p>When showing a change that involves a rename or a copy, <tt>--stat</tt> output
+<tt>-p</tt>, and are meant for human consumption.</p></div>
+<div class="para"><p>When showing a change that involves a rename or a copy, <tt>--stat</tt> output
 formats the pathnames compactly by combining common prefix and suffix of
 the pathnames.  For example, a change that moves <tt>arch/i386/Makefile</tt> to
-<tt>arch/x86/Makefile</tt> while modifying 4 lines will be shown like this:</p>
+<tt>arch/x86/Makefile</tt> while modifying 4 lines will be shown like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>arch/{i386 =&gt; x86}/Makefile    |   4 +--</tt></pre>
 </div></div>
-<p>The <tt>--numstat</tt> option gives the diffstat(1) information but is designed
+<div class="para"><p>The <tt>--numstat</tt> option gives the diffstat(1) information but is designed
 for easier machine consumption.  An entry in <tt>--numstat</tt> output looks
-like this:</p>
+like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>1       2       README
 3       1       arch/{i386 =&gt; x86}/Makefile</tt></pre>
 </div></div>
-<p>That is, from left to right:</p>
-<ol>
+<div class="para"><p>That is, from left to right:</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 the number of added lines;
@@ -1270,15 +1318,15 @@ pathname (possibly with rename/copy information);
 a newline.
 </p>
 </li>
-</ol>
-<p>When <tt>-z</tt> output option is in effect, the output is formatted this way:</p>
+</ol></div>
+<div class="para"><p>When <tt>-z</tt> output option is in effect, the output is formatted this way:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>1       2       README NUL
 3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL</tt></pre>
 </div></div>
-<p>That is:</p>
-<ol>
+<div class="para"><p>That is:</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 the number of added lines;
@@ -1324,16 +1372,16 @@ pathname in postimage (only exists if renamed/copied);
 a NUL.
 </p>
 </li>
-</ol>
-<p>The extra <tt>NUL</tt> before the preimage path in renamed case is to allow
+</ol></div>
+<div class="para"><p>The extra <tt>NUL</tt> before the preimage path in renamed case is to allow
 scripts that read the output to tell if the current record being read is
 a single-path record or a rename/copy record without reading ahead.
 After reading added and deleted lines, reading up to <tt>NUL</tt> would yield
-the pathname, but if that is <tt>NUL</tt>, the record will show two paths.</p>
+the pathname, but if that is <tt>NUL</tt>, the record will show two paths.</p></div>
 </div>
-<h2>EXAMPLES</h2>
+<h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 Various ways to check your working tree
 </dt>
@@ -1344,7 +1392,7 @@ Various ways to check your working tree
 $ git diff --cached   <b>(2)</b>
 $ git diff HEAD       <b>(3)</b></tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 Changes in the working tree not yet staged for the next commit.
@@ -1362,7 +1410,7 @@ Changes in the working tree since your last commit; what you
 would be committing if you run "git commit -a"
 </p>
 </li>
-</ol>
+</ol></div>
 </dd>
 <dt>
 Comparing with arbitrary commits
@@ -1374,7 +1422,7 @@ Comparing with arbitrary commits
 $ git diff HEAD -- ./test  <b>(2)</b>
 $ git diff HEAD^ HEAD      <b>(3)</b></tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 Instead of using the tip of the current branch, compare with the
@@ -1393,7 +1441,7 @@ file "test".
 Compare the version before the last commit and the last commit.
 </p>
 </li>
-</ol>
+</ol></div>
 </dd>
 <dt>
 Comparing branches
@@ -1405,7 +1453,7 @@ Comparing branches
 $ git diff topic..master   <b>(2)</b>
 $ git diff topic...master  <b>(3)</b></tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 Changes between the tips of the topic and the master branches.
@@ -1422,7 +1470,7 @@ Changes that occurred on the master branch since when the topic
 branch was started off it.
 </p>
 </li>
-</ol>
+</ol></div>
 </dd>
 <dt>
 Limiting the diff output
@@ -1434,7 +1482,7 @@ Limiting the diff output
 $ git diff --name-status                <b>(2)</b>
 $ git diff arch/i386 include/asm-i386   <b>(3)</b></tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 Show only modification, rename and copy, but not addition
@@ -1452,7 +1500,7 @@ diff output.
 Limit diff output to named subtrees.
 </p>
 </li>
-</ol>
+</ol></div>
 </dd>
 <dt>
 Munging the diff output
@@ -1463,7 +1511,7 @@ Munging the diff output
 <pre><tt>$ git diff --find-copies-harder -B -C  <b>(1)</b>
 $ git diff -R                          <b>(2)</b></tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 Spend extra cycles to find renames, copies and complete
@@ -1475,25 +1523,25 @@ rewrites (very expensive).
 Output diff in reverse.
 </p>
 </li>
-</ol>
+</ol></div>
 </dd>
-</dl>
+</dl></div>
 </div>
-<h2>Author</h2>
+<h2 id="_author">Author</h2>
 <div class="sectionbody">
-<p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p>
+<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
-<h2>Documentation</h2>
+<h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p>
+<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
-<h2>GIT</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
+<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:01:41 UTC
+Last updated 2008-07-22 09:19:07 UTC
 </div>
 </div>
 </body>
