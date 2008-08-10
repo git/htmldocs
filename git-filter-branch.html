@@ -326,7 +326,7 @@ git-filter-branch(1) Manual Page
         [--msg-filter &lt;command&gt;] [--commit-filter &lt;command&gt;]
         [--tag-name-filter &lt;command&gt;] [--subdirectory-filter &lt;directory&gt;]
         [--original &lt;namespace&gt;] [-d &lt;directory&gt;] [-f | --force]
-        [&lt;rev-list options&gt;&#8230;]</div></div>
+        [--] [&lt;rev-list options&gt;&#8230;]</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -528,10 +528,10 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
 </dt>
 <dd>
 <p>
-        When options are given after the new branch name, they will
-        be passed to <em>git-rev-list</em>.  Only commits in the resulting
-        output will be filtered, although the filtered commits can still
-        reference parents which are outside of that set.
+        Arguments for <em>git-rev-list</em>.  All positive refs included by
+        these options are rewritten.  You may also specify options
+        such as <em>--all</em>, but you must use <em>--</em> to separate them from
+        the <em>git-filter-branch</em> options.
 </p>
 </dd>
 </dl></div>
@@ -553,6 +553,15 @@ Thus you may instead want to use <tt>rm -f filename</tt> as the script.</p></div
 <pre><tt>git filter-branch --index-filter 'git rm --cached filename' HEAD</tt></pre>
 </div></div>
 <div class="para"><p>Now, you will get the rewritten history saved in HEAD.</p></div>
+<div class="para"><p>To rewrite the repository to look as if <tt>foodir/</tt> had been its project
+root, and discard all other history:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>git filter-branch --subdirectory-filter foodir -- --all</tt></pre>
+</div></div>
+<div class="para"><p>Thus you can, e.g., turn a library subdirectory into a repository of
+its own.  Note the <tt>--</tt> that separates <em>filter-branch</em> options from
+revision options, and the <tt>--all</tt> to rewrite all branches and tags.</p></div>
 <div class="para"><p>To set a commit (which typically is at the tip of another
 history) to be the parent of the current initial commit, in
 order to paste the other history behind the current history:</p></div>
@@ -665,7 +674,7 @@ and the git list &lt;git@vger.kernel.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-07-31 22:10:18 UTC
+Last updated 2008-08-10 03:55:19 UTC
 </div>
 </div>
 </body>
