@@ -314,7 +314,7 @@ git-imap-send(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-imap-send -
-   Dump a mailbox from stdin into an imap folder
+   Send a collection of patches from stdin to an IMAP folder
 </p>
 </div>
 </div>
@@ -324,30 +324,114 @@ git-imap-send(1) Manual Page
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This command uploads a mailbox generated with git-format-patch
-into an imap drafts folder.  This allows patches to be sent as
-other email is sent with mail clients that cannot read mailbox
+<div class="para"><p>This command uploads a mailbox generated with <em>git-format-patch</em>
+into an IMAP drafts folder.  This allows patches to be sent as
+other email is when using mail clients that cannot read mailbox
 files directly.</p></div>
 <div class="para"><p>Typical usage is something like:</p></div>
 <div class="para"><p>git format-patch --signoff --stdout --attach origin | git imap-send</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git-imap-send</em> requires the following values in the repository
-configuration file (shown with examples):</p></div>
+<div class="para"><p>To use the tool, imap.folder and either imap.tunnel or imap.host must be set
+to appropriate values.</p></div>
+<h3 id="_variables">Variables</h3><div style="clear:left"></div>
+<div class="vlist"><dl>
+<dt>
+imap.folder
+</dt>
+<dd>
+<p>
+        The folder to drop the mails into, which is typically the Drafts
+        folder. For example: "INBOX.Drafts", "INBOX/Drafts" or
+        "[Gmail]/Drafts". Required to use imap-send.
+</p>
+</dd>
+<dt>
+imap.tunnel
+</dt>
+<dd>
+<p>
+        Command used to setup a tunnel to the IMAP server through which
+        commands will be piped instead of using a direct network connection
+        to the server. Required when imap.host is not set to use imap-send.
+</p>
+</dd>
+<dt>
+imap.host
+</dt>
+<dd>
+<p>
+        A URL identifying the server. Use a <tt>imap://</tt> prefix for non-secure
+        connections and a <tt>imaps://</tt> prefix for secure connections.
+        Ignored when imap.tunnel is set, but required to use imap-send
+        otherwise.
+</p>
+</dd>
+<dt>
+imap.user
+</dt>
+<dd>
+<p>
+        The username to use when logging in to the server.
+</p>
+</dd>
+<dt>
+imap.password
+</dt>
+<dd>
+<p>
+        The password to use when logging in to the server.
+</p>
+</dd>
+<dt>
+imap.port
+</dt>
+<dd>
+<p>
+        An integer port number to connect to on the server.
+        Defaults to 143 for imap:// hosts and 993 for imaps:// hosts.
+        Ignored when imap.tunnel is set.
+</p>
+</dd>
+<dt>
+imap.sslverify
+</dt>
+<dd>
+<p>
+        A boolean to enable/disable verification of the server certificate
+        used by the SSL/TLS connection. Default is <tt>true</tt>. Ignored when
+        imap.tunnel is set.
+</p>
+</dd>
+</dl></div>
+<h3 id="_examples">Examples</h3><div style="clear:left"></div>
+<div class="para"><p>Using tunnel mode:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>[imap]
-    Folder = "INBOX.Drafts"
-
-[imap]
-    Tunnel = "ssh -q user@server.com /usr/bin/imapd ./Maildir 2&gt; /dev/null"
-
-[imap]
-    Host = imap.server.com
-    User = bob
-    Pass = pwd
-    Port = 143</tt></pre>
+    folder = "INBOX.Drafts"
+    tunnel = "ssh -q -C user@example.com /usr/bin/imapd ./Maildir 2&gt; /dev/null"</tt></pre>
+</div></div>
+<div class="para"><p>Using direct mode:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[imap]
+    folder = "INBOX.Drafts"
+    host = imap://imap.example.com
+    user = bob
+    pass = p4ssw0rd</tt></pre>
+</div></div>
+<div class="para"><p>Using direct mode with SSL:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>[imap]
+    folder = "INBOX.Drafts"
+    host = imaps://imap.example.com
+    user = bob
+    pass = p4ssw0rd
+    port = 123
+    sslverify = false</tt></pre>
 </div></div>
 </div>
 <h2 id="_bugs">BUGS</h2>
@@ -368,7 +452,7 @@ configuration file (shown with examples):</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-07-06 05:16:50 UTC
+Last updated 2008-08-20 09:13:32 UTC
 </div>
 </div>
 </body>
