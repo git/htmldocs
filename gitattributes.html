@@ -428,9 +428,8 @@ Unset
 </dt>
 <dd>
 <p>
-        Unsetting the <tt>crlf</tt> attribute on a path is meant to
-        mark the path as a "binary" file.  The path never goes
-        through line endings conversion upon checkin/checkout.
+        Unsetting the <tt>crlf</tt> attribute on a path tells git not to
+        attempt any end-of-line conversion upon checkin or checkout.
 </p>
 </dd>
 <dt>
@@ -848,6 +847,35 @@ except that they need to be wrapped like this: <tt>$Format:PLACEHOLDERS$</tt>
 in the file.  E.g. the string <tt>$Format:%H$</tt> will be replaced by the
 commit hash.</p></div>
 </div>
+<h2 id="_using_attribute_macros">USING ATTRIBUTE MACROS</h2>
+<div class="sectionbody">
+<div class="para"><p>You do not want any end-of-line conversions applied to, nor textual diffs
+produced for, any binary file you track.  You would need to specify e.g.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*.jpg -crlf -diff</tt></pre>
+</div></div>
+<div class="para"><p>but that may become cumbersome, when you have many attributes.  Using
+attribute macros, you can specify groups of attributes set or unset at
+the same time.  The system knows a built-in attribute macro, <tt>binary</tt>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*.jpg binary</tt></pre>
+</div></div>
+<div class="para"><p>which is equivalent to the above.  Note that the attribute macros can only
+be "Set" (see the above example that sets "binary" macro as if it were an
+ordinary attribute --- setting it in turn unsets "crlf" and "diff").</p></div>
+</div>
+<h2 id="_defining_attribute_macros">DEFINING ATTRIBUTE MACROS</h2>
+<div class="sectionbody">
+<div class="para"><p>Custom attribute macros can be defined only in the <tt>.gitattributes</tt> file
+at the toplevel (i.e. not in any subdirectory).  The built-in attribute
+macro "binary" is equivalent to:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[attr]binary -diff -crlf</tt></pre>
+</div></div>
+</div>
 <h2 id="_example">EXAMPLE</h2>
 <div class="sectionbody">
 <div class="para"><p>If you have these three <tt>gitattributes</tt> file:</p></div>
@@ -910,7 +938,7 @@ frotz   unspecified</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-08-21 10:34:01 UTC
+Last updated 2008-08-31 06:31:48 UTC
 </div>
 </div>
 </body>
