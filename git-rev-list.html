@@ -951,6 +951,66 @@ one of the parents is TREESAME, we follow only that one, so the other
 sides of the merge are never walked.</p></div>
 </dd>
 </dl></div>
+<div class="para"><p>Finally, there is a fourth simplification mode available:</p></div>
+<div class="vlist"><dl>
+<dt>
+--simplify-merges
+</dt>
+<dd>
+<p>
+        First, build a history graph in the same way that
+        <em>--full-history</em> with parent rewriting does (see above).
+</p>
+<div class="para"><p>Then simplify each commit <tt>C</tt> to its replacement <tt>C'</tt> in the final
+history according to the following rules:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Set <tt>C'</tt> to <tt>C</tt>.<br />
+</p>
+</li>
+<li>
+<p>
+Replace each parent <tt>P</tt> of <tt>C'</tt> with its simplification <tt>P'</tt>.  In
+  the process, drop parents that are ancestors of other parents, and
+  remove duplicates.<br />
+</p>
+</li>
+<li>
+<p>
+If after this parent rewriting, <tt>C'</tt> is a root or merge commit (has
+  zero or &gt;1 parents), a boundary commit, or !TREESAME, it remains.
+  Otherwise, it is replaced with its only parent.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>The effect of this is best shown by way of comparing to
+<em>--full-history</em> with parent rewriting.  The example turns into:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          .-A---M---N---O
+         /     /       /
+        I     B       D
+         \   /       /
+          `---------'</tt></pre>
+</div></div>
+<div class="para"><p>Note the major differences in <tt>N</tt> and <tt>P</tt> over <em>--full-history</em>:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<tt>N</tt>'s parent list had <tt>I</tt> removed, because it is an ancestor of the
+  other parent <tt>M</tt>.  Still, <tt>N</tt> remained because it is !TREESAME.<br />
+</p>
+</li>
+<li>
+<p>
+<tt>P</tt>'s parent list similarly had <tt>I</tt> removed.  <tt>P</tt> was then
+  removed completely, because it had one parent and is TREESAME.
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
 <h3 id="_bisection_helpers">Bisection Helpers</h3><div style="clear:left"></div>
 <div class="vlist"><dl>
 <dt>
@@ -1441,7 +1501,7 @@ and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-08-29 08:56:30 UTC
+Last updated 2008-09-03 05:19:58 UTC
 </div>
 </div>
 </body>

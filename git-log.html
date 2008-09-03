@@ -422,12 +422,11 @@ each commit introduces are shown.</p></div>
 </dt>
 <dd>
 <p>
-        Output only the sub-directories that are impacted by a diff,
-        and to what degree they are impacted.  You can override the
-        default cut-off in percent (3) by "--dirstat=limit".  If you
-        want to enable "cumulative" directory statistics, you can use
-        the "--cumulative" flag, which adds up percentages recursively
-        even when they have been already reported for a sub-directory.
+        Output the distribution of relative amount of changes (number of lines added or
+        removed) for each sub-directory. Directories with changes below
+        a cut-off percent (3% by default) are not shown. The cut-off percent
+        can be set with "--dirstat=limit". Changes in a child directory is not
+        counted for the parent directory, unless "--cumulative" is used.
 </p>
 </dd>
 <dt>
@@ -1425,6 +1424,66 @@ one of the parents is TREESAME, we follow only that one, so the other
 sides of the merge are never walked.</p></div>
 </dd>
 </dl></div>
+<div class="para"><p>Finally, there is a fourth simplification mode available:</p></div>
+<div class="vlist"><dl>
+<dt>
+--simplify-merges
+</dt>
+<dd>
+<p>
+        First, build a history graph in the same way that
+        <em>--full-history</em> with parent rewriting does (see above).
+</p>
+<div class="para"><p>Then simplify each commit <tt>C</tt> to its replacement <tt>C'</tt> in the final
+history according to the following rules:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Set <tt>C'</tt> to <tt>C</tt>.<br />
+</p>
+</li>
+<li>
+<p>
+Replace each parent <tt>P</tt> of <tt>C'</tt> with its simplification <tt>P'</tt>.  In
+  the process, drop parents that are ancestors of other parents, and
+  remove duplicates.<br />
+</p>
+</li>
+<li>
+<p>
+If after this parent rewriting, <tt>C'</tt> is a root or merge commit (has
+  zero or &gt;1 parents), a boundary commit, or !TREESAME, it remains.
+  Otherwise, it is replaced with its only parent.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>The effect of this is best shown by way of comparing to
+<em>--full-history</em> with parent rewriting.  The example turns into:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          .-A---M---N---O
+         /     /       /
+        I     B       D
+         \   /       /
+          `---------'</tt></pre>
+</div></div>
+<div class="para"><p>Note the major differences in <tt>N</tt> and <tt>P</tt> over <em>--full-history</em>:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<tt>N</tt>'s parent list had <tt>I</tt> removed, because it is an ancestor of the
+  other parent <tt>M</tt>.  Still, <tt>N</tt> remained because it is !TREESAME.<br />
+</p>
+</li>
+<li>
+<p>
+<tt>P</tt>'s parent list similarly had <tt>I</tt> removed.  <tt>P</tt> was then
+  removed completely, because it had one parent and is TREESAME.
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
 <h3 id="_commit_ordering">Commit Ordering</h3><div style="clear:left"></div>
 <div class="para"><p>By default, the commits are shown in reverse chronological order.</p></div>
 <div class="vlist"><dl>
@@ -2166,7 +2225,7 @@ reversible operation.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-08-29 08:56:28 UTC
+Last updated 2008-09-03 05:19:58 UTC
 </div>
 </div>
 </body>
