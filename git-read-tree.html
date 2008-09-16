@@ -537,7 +537,10 @@ Here are the "carry forward" rules:</p></div>
 0 nothing             nothing  nothing  (does not happen)
 1 nothing             nothing  exists   use M
 2 nothing             exists   nothing  remove path from index
-3 nothing             exists   exists   use M</tt></pre>
+3 nothing             exists   exists,  use M if "initial checkout"
+                               H == M   keep index otherwise
+                               exists   fail
+                               H != M</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -592,6 +595,12 @@ you picked it up via e-mail in a patch form), <tt>git diff-index
 --cached $H</tt> would have told you about the change before this
 merge, but it would not show in <tt>git diff-index --cached $M</tt>
 output after two-tree merge.</p></div>
+<div class="para"><p>Case #3 is slightly tricky and needs explanation.  The result from this
+rule logically should be to remove the path if the user staged the removal
+of the path and then swiching to a new branch.  That however will prevent
+the initial checkout from happening, so the rule is modified to use M (new
+tree) only when the contents of the index is empty.  Otherwise the removal
+of the path is kept as long as $H and $M are the same.</p></div>
 <h3 id="_3_way_merge">3-Way Merge</h3><div style="clear:left"></div>
 <div class="para"><p>Each "index" entry has two bits worth of "stage" state. stage 0 is the
 normal one, and is the only one you'd see in any kind of normal use.</p></div>
@@ -767,7 +776,7 @@ have finished your work-in-progress), attempt the merge again.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-07-06 05:16:57 UTC
+Last updated 2008-09-16 19:17:16 UTC
 </div>
 </div>
 </body>
