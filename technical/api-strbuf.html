@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -225,6 +244,32 @@ td.hlist2 {
 
 @media print {
   div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
 }
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
@@ -254,6 +299,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>strbuf API</title>
 </head>
@@ -263,27 +311,27 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>strbuf's are meant to be used with all the usual C string and memory
+<div class="para"><p>strbuf's are meant to be used with all the usual C string and memory
 APIs. Given that the length of the buffer is known, it's often better to
 use the mem* functions than a str* one (memchr vs. strchr e.g.).
 Though, one has to be careful about the fact that str* functions often
-stop on NULs and that strbufs may have embedded NULs.</p>
-<p>An strbuf is NUL terminated for convenience, but no function in the
-strbuf API actually relies on the string being free of NULs.</p>
-<p>strbufs has some invariants that are very important to keep in mind:</p>
-<ol>
+stop on NULs and that strbufs may have embedded NULs.</p></div>
+<div class="para"><p>An strbuf is NUL terminated for convenience, but no function in the
+strbuf API actually relies on the string being free of NULs.</p></div>
+<div class="para"><p>strbufs has some invariants that are very important to keep in mind:</p></div>
+<div class="olist"><ol>
 <li>
 <p>
 The <tt>buf</tt> member is never NULL, so you it can be used in any usual C
 string operations safely. strbuf's _have_ to be initialized either by
 <tt>strbuf_init()</tt> or by <tt>= STRBUF_INIT</tt> before the invariants, though.
 </p>
-<p>Do <strong>not</strong> assume anything on what <tt>buf</tt> really is (e.g. if it is
+<div class="para"><p>Do <strong>not</strong> assume anything on what <tt>buf</tt> really is (e.g. if it is
 allocated memory or not), use <tt>strbuf_detach()</tt> to unwrap a memory
 buffer from its strbuf shell in a safe way. That is the sole supported
-way. This will give you a malloced buffer that you can later <tt>free()</tt>.</p>
-<p>However, it it totally safe to modify anything in the string pointed by
-the <tt>buf</tt> member, between the indices <tt>0</tt> and <tt>len-1</tt> (inclusive).</p>
+way. This will give you a malloced buffer that you can later <tt>free()</tt>.</p></div>
+<div class="para"><p>However, it it totally safe to modify anything in the string pointed by
+the <tt>buf</tt> member, between the indices <tt>0</tt> and <tt>len-1</tt> (inclusive).</p></div>
 </li>
 <li>
 <p>
@@ -306,7 +354,7 @@ The <tt>buf</tt> member is a byte array that has at least <tt>len + 1</tt> bytes
 <pre><tt>strbuf_grow(sb, SOME_SIZE); <b>(1)</b>
 strbuf_setlen(sb, sb-&gt;len + SOME_OTHER_SIZE);</tt></pre>
 </div></div>
-<ol>
+<div class="colist"><ol>
 <li>
 <p>
 Here, the memory array starting at <tt>sb-&gt;buf</tt>, and of length
@@ -321,8 +369,8 @@ Here, the memory array starting at <tt>sb-&gt;buf</tt>, and of length
 <td class="content"><tt>SOME_OTHER_SIZE</tt> must be smaller or equal to <tt>strbuf_avail(sb)</tt>.</td>
 </tr></table>
 </div>
-<p>Doing so is safe, though if it has to be done in many places, adding the
-missing API to the strbuf module is the way to go.</p>
+<div class="para"><p>Doing so is safe, though if it has to be done in many places, adding the
+missing API to the strbuf module is the way to go.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -335,32 +383,32 @@ instead.</td>
 </tr></table>
 </div>
 </li>
-</ol>
+</ol></div>
 </li>
-</ol>
+</ol></div>
 </div>
 </div>
-<h2>Data structures</h2>
+<h2 id="_data_structures">Data structures</h2>
 <div class="sectionbody">
-<ul>
+<div class="ilist"><ul>
 <li>
 <p>
 <tt>struct strbuf</tt>
 </p>
 </li>
-</ul>
-<p>This is string buffer structure. The <tt>len</tt> member can be used to
+</ul></div>
+<div class="para"><p>This is string buffer structure. The <tt>len</tt> member can be used to
 determine the current length of the string, and <tt>buf</tt> member provides access to
-the string itself.</p>
+the string itself.</p></div>
 </div>
-<h2>Functions</h2>
+<h2 id="_functions">Functions</h2>
 <div class="sectionbody">
-<ul>
+<div class="ilist"><ul>
 <li>
 <p>
 Life cycle
 </p>
-<dl>
+<div class="vlist"><dl>
 <dt>
 <tt>strbuf_init</tt>
 </dt>
@@ -410,13 +458,13 @@ Life cycle
         Swap the contents of two string buffers.
 </p>
 </dd>
-</dl>
+</dl></div>
 </li>
 <li>
 <p>
 Related to the size of the buffer
 </p>
-<dl>
+<div class="vlist"><dl>
 <dt>
 <tt>strbuf_avail</tt>
 </dt>
@@ -457,13 +505,13 @@ Related to the size of the buffer
         Empty the buffer by setting the size of it to zero.
 </p>
 </dd>
-</dl>
+</dl></div>
 </li>
 <li>
 <p>
 Related to the contents of the buffer
 </p>
-<dl>
+<div class="vlist"><dl>
 <dt>
 <tt>strbuf_rtrim</tt>
 </dt>
@@ -482,14 +530,14 @@ Related to the contents of the buffer
         to match, or be greater than the second buffer.
 </p>
 </dd>
-</dl>
+</dl></div>
 </li>
 <li>
 <p>
 Adding data to the buffer
 </p>
 </li>
-</ul>
+</ul></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -499,7 +547,7 @@ Adding data to the buffer
       necessary.</td>
 </tr></table>
 </div>
-<dl>
+<div class="vlist"><dl>
 <dt>
 <tt>strbuf_addch</tt>
 </dt>
@@ -562,7 +610,7 @@ that expands to:</td>
 <div class="content">
 <pre><tt>strbuf_add(..., s, strlen(s));</tt></pre>
 </div></div>
-<p>Meaning that this is efficient to write things like:</p>
+<div class="para"><p>Meaning that this is efficient to write things like:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>strbuf_addstr(sb, "immediate string");</tt></pre>
@@ -594,18 +642,18 @@ that expands to:</td>
         placeholders. To that end, it parses the string and calls the specified
         function for every percent sign found.
 </p>
-<p>The callback function is given a pointer to the character after the <tt>%</tt>
+<div class="para"><p>The callback function is given a pointer to the character after the <tt>%</tt>
 and a pointer to the struct strbuf.  It is expected to add the expanded
 version of the placeholder to the strbuf, e.g. to add a newline
 character if the letter <tt>n</tt> appears after a <tt>%</tt>.  The function returns
 the length of the placeholder recognized and <tt>strbuf_expand()</tt> skips
-over it.</p>
-<p>All other characters (non-percent and not skipped ones) are copied
+over it.</p></div>
+<div class="para"><p>All other characters (non-percent and not skipped ones) are copied
 verbatim to the strbuf.  If the callback returned zero, meaning that the
-placeholder is unknown, then the percent sign is copied, too.</p>
-<p>In order to facilitate caching and to make it possible to give
+placeholder is unknown, then the percent sign is copied, too.</p></div>
+<div class="para"><p>In order to facilitate caching and to make it possible to give
 parameters to the callback, <tt>strbuf_expand()</tt> passes a context pointer,
-which can be used by the programmer of the callback as she sees fit.</p>
+which can be used by the programmer of the callback as she sees fit.</p></div>
 </dd>
 <dt>
 <tt>strbuf_addf</tt>
@@ -674,14 +722,12 @@ same behaviour as well.</td>
 <tt>launch_editor</tt>
 </dt>
 <dd>
-<p>
-</p>
 </dd>
-</dl>
+</dl></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:02:22 UTC
+Last updated 2008-09-19 06:33:33 UTC
 </div>
 </div>
 </body>

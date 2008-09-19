@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 7.0.2" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -16,8 +16,13 @@ body {
   margin: 1em 5% 1em 5%;
 }
 
-a { color: blue; }
-a:visited { color: fuchsia; }
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
 
 em {
   font-style: italic;
@@ -39,12 +44,17 @@ h1, h2, h3, h4, h5, h6 {
   line-height: 1.3;
 }
 
-h1 {
+h1, h2, h3 {
   border-bottom: 2px solid silver;
 }
 h2 {
-  border-bottom: 2px solid silver;
   padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
 }
 
 div.sectionbody {
@@ -70,7 +80,7 @@ span#author {
   color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: 1.1em;
 }
 span#email {
 }
@@ -139,6 +149,9 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
+div.listingblock {
+  margin-right: 0%;
+}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
@@ -148,8 +161,12 @@ div.listingblock > div.content {
 div.quoteblock > div.content {
   padding-left: 2.0em;
 }
-div.quoteblock .attribution {
+
+div.attribution {
   text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
 }
 
 div.admonitionblock .icon {
@@ -194,13 +211,12 @@ dd > *:first-child {
 ul, ol {
     list-style-position: outside;
 }
-ol.olist2 {
+div.olist2 ol {
   list-style-type: lower-alpha;
 }
 
 div.tableblock > table {
-  border-color: #527bbd;
-  border-width: 3px;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -214,6 +230,9 @@ div.hlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
+div.hlist td {
+  padding-bottom: 5px;
+}
 td.hlist1 {
   vertical-align: top;
   font-style: italic;
@@ -225,6 +244,32 @@ td.hlist2 {
 
 @media print {
   div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
 }
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
@@ -254,6 +299,9 @@ div.exampleblock-content {
   border-left: 2px solid silver;
   padding-left: 0.5em;
 }
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
 </style>
 <title>Remotes configuration API</title>
 </head>
@@ -263,16 +311,16 @@ div.exampleblock-content {
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<p>The API in remote.h gives access to the configuration related to
+<div class="para"><p>The API in remote.h gives access to the configuration related to
 remotes. It handles all three configuration mechanisms historically
 and currently used by git, and presents the information in a uniform
 fashion. Note that the code also handles plain URLs without any
-configuration, giving them just the default information.</p>
+configuration, giving them just the default information.</p></div>
 </div>
 </div>
-<h2>struct remote</h2>
+<h2 id="_struct_remote">struct remote</h2>
 <div class="sectionbody">
-<dl>
+<div class="vlist"><dl>
 <dt>
 <tt>name</tt>
 </dt>
@@ -338,34 +386,34 @@ configuration, giving them just the default information.</p>
         The proxy to use for curl (http, https, ftp, etc.) URLs.
 </p>
 </dd>
-</dl>
-<p>struct remotes can be found by name with remote_get(), and iterated
+</dl></div>
+<div class="para"><p>struct remotes can be found by name with remote_get(), and iterated
 through with for_each_remote(). remote_get(NULL) will return the
-default remote, given the current branch and configuration.</p>
+default remote, given the current branch and configuration.</p></div>
 </div>
-<h2>struct refspec</h2>
+<h2 id="_struct_refspec">struct refspec</h2>
 <div class="sectionbody">
-<p>A struct refspec holds the parsed interpretation of a refspec. If it
+<div class="para"><p>A struct refspec holds the parsed interpretation of a refspec. If it
 will force updates (starts with a <em>+</em>), force is true. If it is a
 pattern (sides end with <em>*</em>) pattern is true. src and dest are the two
 sides (if a pattern, only the part outside of the wildcards); if there
 is only one side, it is src, and dst is NULL; if sides exist but are
 empty (i.e., the refspec either starts or ends with <em>:</em>), the
-corresponding side is "".</p>
-<p>This parsing can be done to an array of strings to give an array of
-struct refpsecs with parse_ref_spec().</p>
-<p>remote_find_tracking(), given a remote and a struct refspec with
+corresponding side is "".</p></div>
+<div class="para"><p>This parsing can be done to an array of strings to give an array of
+struct refpsecs with parse_ref_spec().</p></div>
+<div class="para"><p>remote_find_tracking(), given a remote and a struct refspec with
 either src or dst filled out, will fill out the other such that the
 result is in the "fetch" specification for the remote (note that this
-evaluates patterns and returns a single result).</p>
+evaluates patterns and returns a single result).</p></div>
 </div>
-<h2>struct branch</h2>
+<h2 id="_struct_branch">struct branch</h2>
 <div class="sectionbody">
-<p>Note that this may end up moving to branch.h</p>
-<p>struct branch holds the configuration for a branch. It can be looked
-branch_get(NULL) for HEAD.</p>
-<p>It contains:</p>
-<dl>
+<div class="para"><p>Note that this may end up moving to branch.h</p></div>
+<div class="para"><p>struct branch holds the configuration for a branch. It can be looked
+branch_get(NULL) for HEAD.</p></div>
+<div class="para"><p>It contains:</p></div>
+<div class="vlist"><dl>
 <dt>
 <tt>name</tt>
 </dt>
@@ -424,19 +472,19 @@ branch_get(NULL) for HEAD.</p>
         The number of merge configurations
 </p>
 </dd>
-</dl>
-<p>branch_has_merge_config() returns true if the given branch has merge
-configuration given.</p>
+</dl></div>
+<div class="para"><p>branch_has_merge_config() returns true if the given branch has merge
+configuration given.</p></div>
 </div>
-<h2>Other stuff</h2>
+<h2 id="_other_stuff">Other stuff</h2>
 <div class="sectionbody">
-<p>There is other stuff in remote.h that is related, in general, to the
-process of interacting with remotes.</p>
-<p>(Daniel Barkalow)</p>
+<div class="para"><p>There is other stuff in remote.h that is related, in general, to the
+process of interacting with remotes.</p></div>
+<div class="para"><p>(Daniel Barkalow)</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 02-Jul-2008 03:02:21 UTC
+Last updated 2008-09-19 06:33:31 UTC
 </div>
 </div>
 </body>
