@@ -322,7 +322,7 @@ git-checkout(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git checkout</em> [-q] [-f] [--track | --no-track] [-b &lt;new_branch&gt; [-l]] [-m] [&lt;branch&gt;]
-<em>git checkout</em> [&lt;tree-ish&gt;] [--] &lt;paths&gt;&#8230;</div></div>
+<em>git checkout</em> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;paths&gt;&#8230;</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -337,13 +337,19 @@ name is constructed from the specified branch name by stripping
 the first namespace level.</p></div>
 <div class="para"><p>When &lt;paths&gt; are given, this command does <strong>not</strong> switch
 branches.  It updates the named paths in the working tree from
-the index file (i.e. it runs <tt>git checkout-index -f -u</tt>), or
-from a named commit.  In
-this case, the <tt>-f</tt> and <tt>-b</tt> options are meaningless and giving
+the index file, or from a named commit.  In
+this case, the <tt>-b</tt> options is meaningless and giving
 either of them results in an error.  &lt;tree-ish&gt; argument can be
 used to specify a specific tree-ish (i.e. commit, tag or tree)
 to update the index for the given paths before updating the
 working tree.</p></div>
+<div class="para"><p>The index may contain unmerged entries after a failed merge.  By
+default, if you try to check out such an entry from the index, the
+checkout operation will fail and nothing will be checked out.
+Using -f will ignore these unmerged entries.  The contents from a
+specific side of the merge can be checked out of the index by
+using --ours or --theirs.  With -m, changes made to the working tree
+file can be discarded to recreate the original conflicted merge result.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -361,8 +367,23 @@ working tree.</p></div>
 </dt>
 <dd>
 <p>
-        Proceed even if the index or the working tree differs
-        from HEAD.  This is used to throw away local changes.
+        When switching branches, proceed even if the index or the
+        working tree differs from HEAD.  This is used to throw away
+        local changes.
+</p>
+<div class="para"><p>When checking out paths from the index, do not fail upon unmerged
+entries; instead, unmerged entries are ignored.</p></div>
+</dd>
+<dt>
+--ours
+</dt>
+<dt>
+--theirs
+</dt>
+<dd>
+<p>
+        When checking out paths from the index, check out stage #2
+        (<em>ours</em>) or #3 (<em>theirs</em>) for unmerged paths.
 </p>
 </dd>
 <dt>
@@ -427,9 +448,13 @@ exlicitly give a name with <em>-b</em> in such a case.</p></div>
 <dt>
 -m
 </dt>
+<dt>
+--merge
+</dt>
 <dd>
 <p>
-        If you have local modifications to one or more files that
+        When switching branches,
+        if you have local modifications to one or more files that
         are different between the current branch and the branch to
         which you are switching, the command refuses to switch
         branches in order to preserve your modifications in context.
@@ -441,6 +466,20 @@ exlicitly give a name with <em>-b</em> in such a case.</p></div>
 paths are left unmerged, and you need to resolve the conflicts
 and mark the resolved paths with <tt>git add</tt> (or <tt>git rm</tt> if the merge
 should result in deletion of the path).</p></div>
+<div class="para"><p>When checking out paths from the index, this option lets you recreate
+the conflicted merge in the specified paths.</p></div>
+</dd>
+<dt>
+--conflict=&lt;style&gt;
+</dt>
+<dd>
+<p>
+        The same as --merge option above, but changes the way the
+        conflicting hunks are presented, overriding the
+        merge.conflictstyle configuration variable.  Possible values are
+        "merge" (default) and "diff3" (in addition to what is shown by
+        "merge" style, shows the original contents).
+</p>
 </dd>
 <dt>
 &lt;new_branch&gt;
@@ -603,7 +642,7 @@ $ git add frotz</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-09-19 06:32:44 UTC
+Last updated 2008-10-10 15:30:41 UTC
 </div>
 </div>
 </body>

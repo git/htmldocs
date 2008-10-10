@@ -321,8 +321,8 @@ git-push(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git push</em> [--all] [--dry-run] [--tags] [--receive-pack=&lt;git-receive-pack&gt;]
-           [--repo=all] [-f | --force] [-v | --verbose]
+<div class="content"><em>git push</em> [--all | --mirror] [--dry-run] [--tags] [--receive-pack=&lt;git-receive-pack&gt;]
+           [--repo=&lt;repository&gt;] [-f | --force] [-v | --verbose]
            [&lt;repository&gt; &lt;refspec&gt;&#8230;]</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
@@ -453,13 +453,26 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
 </p>
 </dd>
 <dt>
---repo=&lt;repo&gt;
+--repo=&lt;repository&gt;
 </dt>
 <dd>
 <p>
-        When no repository is specified the command defaults to
-        "origin"; this overrides it.
+        This option is only relevant if no &lt;repository&gt; argument is
+        passed in the invocation. In this case, <em>git-push</em> derives the
+        remote name from the current branch: If it tracks a remote
+        branch, then that remote repository is pushed to. Otherwise,
+        the name "origin" is used. For this latter case, this option
+        can be used to override the name "origin". In other words,
+        the difference between these two commands
 </p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>git push public         #1
+git push --repo=public  #2</tt></pre>
+</div></div>
+<div class="para"><p>is that #1 always pushes to "public" whereas #2 pushes to "public"
+only if the current branch does not track a remote branch. This is
+useful if you write an alias or script around <em>git-push</em>.</p></div>
 </dd>
 <dt>
 --thin
@@ -818,7 +831,7 @@ by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-09-19 06:33:06 UTC
+Last updated 2008-10-10 15:30:48 UTC
 </div>
 </div>
 </body>

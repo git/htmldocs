@@ -863,6 +863,20 @@ core.fileMode
 </p>
 </dd>
 <dt>
+core.ignoreCygwinFSTricks
+</dt>
+<dd>
+<p>
+        This option is only used by Cygwin implementation of Git. If false,
+        the Cygwin stat() and lstat() functions are used. This may be useful
+        if your repository consists of a few separate directories joined in
+        one hierarchy using Cygwin mount. If true, Git uses native Win32 API
+        whenever it is possible and falls back to Cygwin functions only to
+        handle symbol links. The native mode is more than twice faster than
+        normal Cygwin l/stat() functions. True by default.
+</p>
+</dd>
+<dt>
 core.trustctime
 </dt>
 <dd>
@@ -1203,8 +1217,17 @@ core.pager
         variable.  Note that git sets the <tt>LESS</tt> environment
         variable to <tt>FRSX</tt> if it is unset when it runs the
         pager.  One can change these settings by setting the
-        <tt>LESS</tt> variable to some other value or by giving the
-        <tt>core.pager</tt> option a value such as "<tt>less -+FRSX</tt>".
+        <tt>LESS</tt> variable to some other value.  Alternately,
+        these settings can be overridden on a project or
+        global basis by setting the <tt>core.pager</tt> option.
+        Setting <tt>core.pager</tt> has no affect on the <tt>LESS</tt>
+        environment variable behaviour above, so if you want
+        to override git's default settings this way, you need
+        to be explicit.  For example, to disable the S option
+        in a backward compatible manner, set <tt>core.pager</tt>
+        to "<tt>less -+$LESS -FRX</tt>".  This will be passed to the
+        shell by git, which will translate the final command to
+        "<tt>LESS=FRSX less -+FRSX -FRX</tt>".
 </p>
 </dd>
 <dt>
@@ -2311,6 +2334,19 @@ man.&lt;tool&gt;.path
 </p>
 </dd>
 <dt>
+merge.conflictstyle
+</dt>
+<dd>
+<p>
+        Specify the style in which conflicted hunks are written out to
+        working tree files upon merge.  The default is "merge", which
+        shows <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt> conflict marker, change made by one side,
+        <tt>=======</tt> marker, change made by the other side, and then
+        <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt> marker.  An alternate style, "diff3", adds <tt>|||||||</tt>
+        marker and the original text before <tt>=======</tt> marker.
+</p>
+</dd>
+<dt>
 mergetool.&lt;tool&gt;.path
 </dt>
 <dd>
@@ -2797,7 +2833,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-09-19 06:32:46 UTC
+Last updated 2008-10-10 15:30:42 UTC
 </div>
 </div>
 </body>

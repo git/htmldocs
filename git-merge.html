@@ -756,6 +756,64 @@ No other changes are done.  In particular, the local
 </p>
 </li>
 </ol></div>
+</div>
+<h2 id="_how_conflicts_are_presented">HOW CONFLICTS ARE PRESENTED</h2>
+<div class="sectionbody">
+<div class="para"><p>During a merge, the working tree files are updated to reflect the result
+of the merge.  Among the changes made to the common ancestor's version,
+non-overlapping ones (that is, you changed an area of the file while the
+other side left that area intact, or vice versa) are incorporated in the
+final result verbatim.  When both sides made changes to the same area,
+however, git cannot randomly pick one side over the other, and asks you to
+resolve it by leaving what both sides did to that area.</p></div>
+<div class="para"><p>By default, git uses the same style as that is used by "merge" program
+from the RCS suite to present such a conflicted hunk, like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Here are lines that are either unchanged from the common
+ancestor, or cleanly resolved because only one side changed.
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
+Conflict resolution is hard;
+let's go shopping.
+=======
+Git makes conflict resolution easy.
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
+And here is another line that is cleanly resolved or unmodified.</tt></pre>
+</div></div>
+<div class="para"><p>The area a pair of conflicting changes happened is marked with markers
+"<tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>", "<tt>=======</tt>", and "<tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>".  The part before the "<tt>=======</tt>"
+is typically your side, and the part after it is typically their side.</p></div>
+<div class="para"><p>The default format does not show what the original said in the conflicted
+area.  You cannot tell how many lines are deleted and replaced with the
+Barbie's remark by your side.  The only thing you can tell is that your
+side wants to say it is hard and you'd prefer to go shopping, while the
+other side wants to claim it is easy.</p></div>
+<div class="para"><p>An alternative style can be used by setting the "merge.conflictstyle"
+configuration variable to "diff3".  In "diff3" style, the above conflict
+may look like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Here are lines that are either unchanged from the common
+ancestor, or cleanly resolved because only one side changed.
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
+Conflict resolution is hard;
+let's go shopping.
+|||||||
+Conflict resolution is hard.
+=======
+Git makes conflict resolution easy.
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
+And here is another line that is cleanly resolved or unmodified.</tt></pre>
+</div></div>
+<div class="para"><p>In addition to the "<tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>", "<tt>=======</tt>", and "<tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>" markers, it uses
+another "<tt>|||||||</tt>" marker that is followed by the original text.  You can
+tell that the original just stated a fact, and your side simply gave in to
+that statement and gave up, while the other side tried to have a more
+positive attitude.  You can sometimes come up with a better resolution by
+viewing the original.</p></div>
+</div>
+<h2 id="_how_to_resolve_conflicts">HOW TO RESOLVE CONFLICTS</h2>
+<div class="sectionbody">
 <div class="para"><p>After seeing a conflict, you can do two things:</p></div>
 <div class="ilist"><ul>
 <li>
@@ -827,7 +885,7 @@ Look at the originals.  <em>git show :1:filename</em> shows the
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-09-19 06:33:03 UTC
+Last updated 2008-10-10 15:30:47 UTC
 </div>
 </div>
 </body>
