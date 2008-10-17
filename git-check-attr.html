@@ -342,6 +342,108 @@ git-check-attr(1) Manual Page
 </dd>
 </dl></div>
 </div>
+<h2 id="_output">OUTPUT</h2>
+<div class="sectionbody">
+<div class="para"><p>The output is of the form:
+&lt;path&gt; COLON SP &lt;attribute&gt; COLON SP &lt;info&gt; LF</p></div>
+<div class="para"><p>Where &lt;path&gt; is the path of a file being queried, &lt;attribute&gt; is an attribute
+being queried and &lt;info&gt; can be either:</p></div>
+<div class="hlist"><table>
+<tr>
+<td class="hlist1">
+<em>unspecified</em>
+</td>
+<td class="hlist2">
+when the attribute is not defined for the path.
+</td>
+</tr>
+<tr>
+<td class="hlist1">
+<em>unset</em>
+</td>
+<td class="hlist2">
+when the attribute is defined to false.
+</td>
+</tr>
+<tr>
+<td class="hlist1">
+<em>set</em>
+</td>
+<td class="hlist2">
+when the attribute is defined to true.
+</td>
+</tr>
+<tr>
+<td class="hlist1">
+&lt;value&gt;
+</td>
+<td class="hlist2">
+when a value has been assigned to the attribute.
+</td>
+</tr>
+</table></div>
+</div>
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="para"><p>In the examples, the following <em>.gitattributes</em> file is used:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*.java diff=java -crlf myAttr
+NoMyAttr.java !myAttr
+README caveat=unspecified</tt></pre>
+</div></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Listing a single attribute:
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git check-attr diff org/example/MyClass.java
+org/example/MyClass.java: diff: java</tt></pre>
+</div></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Listing multiple attributes for a file:
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git check-attr crlf diff myAttr -- org/example/MyClass.java
+org/example/MyClass.java: crlf: unset
+org/example/MyClass.java: diff: java
+org/example/MyClass.java: myAttr: set</tt></pre>
+</div></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Listing attribute for multiple files:
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git check-attr myAttr -- org/example/MyClass.java org/example/NoMyAttr.java
+org/example/MyClass.java: myAttr: set
+org/example/NoMyAttr.java: myAttr: unspecified</tt></pre>
+</div></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Not all values are equally unambiguous:
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git check-attr caveat README
+README: caveat: unspecified</tt></pre>
+</div></div>
+</div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="para"><p><a href="gitattributes.html">gitattributes(5)</a>.</p></div>
@@ -360,7 +462,7 @@ git-check-attr(1) Manual Page
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-09-19 06:32:44 UTC
+Last updated 2008-10-17 10:02:43 UTC
 </div>
 </div>
 </body>
