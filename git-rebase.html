@@ -322,7 +322,7 @@ git-rebase(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git rebase</em> [-i | --interactive] [-v | --verbose] [-m | --merge]
-        [-s &lt;strategy&gt; | --strategy=&lt;strategy&gt;]
+        [-s &lt;strategy&gt; | --strategy=&lt;strategy&gt;] [--no-verify]
         [-C&lt;n&gt;] [ --whitespace=&lt;option&gt;] [-p | --preserve-merges]
         [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]
 <em>git rebase</em> --continue | --skip | --abort</div></div>
@@ -580,6 +580,14 @@ desired resolution, you can continue the rebasing process with</p></div>
 </p>
 </dd>
 <dt>
+--no-verify
+</dt>
+<dd>
+<p>
+        This option bypasses the pre-rebase hook.  See also <a href="githooks.html">githooks(5)</a>.
+</p>
+</dd>
+<dt>
 -C&lt;n&gt;
 </dt>
 <dd>
@@ -620,8 +628,7 @@ desired resolution, you can continue the rebasing process with</p></div>
 </dt>
 <dd>
 <p>
-        Instead of ignoring merges, try to recreate them.  This option
-        only works in interactive mode.
+        Instead of ignoring merges, try to recreate them.
 </p>
 </dd>
 </dl></div>
@@ -698,11 +705,9 @@ subtree
 </div>
 <h2 id="_notes">NOTES</h2>
 <div class="sectionbody">
-<div class="para"><p>When you rebase a branch, you are changing its history in a way that
-will cause problems for anyone who already has a copy of the branch
-in their repository and tries to pull updates from you.  You should
-understand the implications of using <em>git-rebase</em> on a repository that
-you share.</p></div>
+<div class="para"><p>You should understand the implications of using <em>git-rebase</em> on a
+repository that you share.  See also RECOVERING FROM UPSTREAM REBASE
+below.</p></div>
 <div class="para"><p>When the git-rebase command is run, it will first execute a "pre-rebase"
 hook if one exists.  You can use this hook to do sanity checks and
 reject the rebase if it isn't appropriate.  Please see the template
@@ -892,6 +897,135 @@ consistent (they compile, pass the testsuite, etc.) you should use
 <em>git-stash</em> to stash away the not-yet-committed changes
 after each commit, test, and amend the commit if fixes are necessary.</p></div>
 </div>
+<h2 id="_recovering_from_upstream_rebase">RECOVERING FROM UPSTREAM REBASE</h2>
+<div class="sectionbody">
+<div class="para"><p>Rebasing (or any other form of rewriting) a branch that others have
+based work on is a bad idea: anyone downstream of it is forced to
+manually fix their history.  This section explains how to do the fix
+from the downstream's point of view.  The real fix, however, would be
+to avoid rebasing the upstream in the first place.</p></div>
+<div class="para"><p>To illustrate, suppose you are in a situation where someone develops a
+<em>subsystem</em> branch, and you are working on a <em>topic</em> that is dependent
+on this <em>subsystem</em>.  You might end up with a history like the
+following:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    o---o---o---o---o---o---o---o---o  master
+         \
+          o---o---o---o---o  subsystem
+                           \
+                            *---*---*  topic</tt></pre>
+</div></div>
+<div class="para"><p>If <em>subsystem</em> is rebased against <em>master</em>, the following happens:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    o---o---o---o---o---o---o---o  master
+         \                       \
+          o---o---o---o---o       o'--o'--o'--o'--o'  subsystem
+                           \
+                            *---*---*  topic</tt></pre>
+</div></div>
+<div class="para"><p>If you now continue development as usual, and eventually merge <em>topic</em>
+to <em>subsystem</em>, the commits from <em>subsystem</em> will remain duplicated forever:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    o---o---o---o---o---o---o---o  master
+         \                       \
+          o---o---o---o---o       o'--o'--o'--o'--o'--M  subsystem
+                           \                         /
+                            *---*---*-..........-*--*  topic</tt></pre>
+</div></div>
+<div class="para"><p>Such duplicates are generally frowned upon because they clutter up
+history, making it harder to follow.  To clean things up, you need to
+transplant the commits on <em>topic</em> to the new <em>subsystem</em> tip, i.e.,
+rebase <em>topic</em>.  This becomes a ripple effect: anyone downstream from
+<em>topic</em> is forced to rebase too, and so on!</p></div>
+<div class="para"><p>There are two kinds of fixes, discussed in the following subsections:</p></div>
+<div class="vlist"><dl>
+<dt>
+Easy case: The changes are literally the same.
+</dt>
+<dd>
+<p>
+        This happens if the <em>subsystem</em> rebase was a simple rebase and
+        had no conflicts.
+</p>
+</dd>
+<dt>
+Hard case: The changes are not the same.
+</dt>
+<dd>
+<p>
+        This happens if the <em>subsystem</em> rebase had conflicts, or used
+        <tt>--interactive</tt> to omit, edit, or squash commits; or if the
+        upstream used one of <tt>commit --amend</tt>, <tt>reset</tt>, or
+        <tt>filter-branch</tt>.
+</p>
+</dd>
+</dl></div>
+<h3 id="_the_easy_case">The easy case</h3><div style="clear:left"></div>
+<div class="para"><p>Only works if the changes (patch IDs based on the diff contents) on
+<em>subsystem</em> are literally the same before and after the rebase
+<em>subsystem</em> did.</p></div>
+<div class="para"><p>In that case, the fix is easy because <em>git-rebase</em> knows to skip
+changes that are already present in the new upstream.  So if you say
+(assuming you're on <em>topic</em>)</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git rebase subsystem</tt></pre>
+</div></div>
+<div class="para"><p>you will end up with the fixed history</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    o---o---o---o---o---o---o---o  master
+                                 \
+                                  o'--o'--o'--o'--o'  subsystem
+                                                   \
+                                                    *---*---*  topic</tt></pre>
+</div></div>
+<h3 id="_the_hard_case">The hard case</h3><div style="clear:left"></div>
+<div class="para"><p>Things get more complicated if the <em>subsystem</em> changes do not exactly
+correspond to the ones before the rebase.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">While an "easy case recovery" sometimes appears to be successful
+      even in the hard case, it may have unintended consequences.  For
+      example, a commit that was removed via <tt>git rebase
+      --interactive</tt> will be <strong>*resurrected</strong>*!</td>
+</tr></table>
+</div>
+<div class="para"><p>The idea is to manually tell <em>git-rebase</em> "where the old <em>subsystem</em>
+ended and your <em>topic</em> began", that is, what the old merge-base
+between them was.  You will have to find a way to name the last commit
+of the old <em>subsystem</em>, for example:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+With the <em>subsystem</em> reflog: after <em>git-fetch</em>, the old tip of
+  <em>subsystem</em> is at <tt>subsystem@{1}</tt>.  Subsequent fetches will
+  increase the number.  (See <a href="git-reflog.html">git-reflog(1)</a>.)
+</p>
+</li>
+<li>
+<p>
+Relative to the tip of <em>topic</em>: knowing that your <em>topic</em> has three
+  commits, the old tip of <em>subsystem</em> must be <tt>topic~3</tt>.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>You can then transplant the old <tt>subsystem..topic</tt> to the new tip by
+saying (for the reflog case, and assuming you are on <em>topic</em> already):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git rebase --onto subsystem subsystem@{1}</tt></pre>
+</div></div>
+<div class="para"><p>The ripple effect of a "hard case" recovery is especially bad:
+<em>everyone</em> downstream from <em>topic</em> will now have to perform a "hard
+case" recovery too!</p></div>
+</div>
 <h2 id="_authors">Authors</h2>
 <div class="sectionbody">
 <div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt; and
@@ -907,7 +1041,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-10-10 15:30:49 UTC
+Last updated 2008-10-20 05:42:01 UTC
 </div>
 </div>
 </body>
