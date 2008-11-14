@@ -800,8 +800,80 @@ See also <a href="git-reflog.html">git-reflog(1)</a>.
 </dd>
 </dl></div>
 <h3 id="_history_simplification">History Simplification</h3><div style="clear:left"></div>
-<div class="para"><p>When optional paths are given, <em>git rev-list</em> simplifies commits with
-various strategies, according to the options you have selected.</p></div>
+<div class="para"><p>Sometimes you are only interested in parts of the history, for example the
+commits modifying a particular &lt;path&gt;. But there are two parts of
+<em>History Simplification</em>, one part is selecting the commits and the other
+is how to do it, as there are various strategies to simplify the history.</p></div>
+<div class="para"><p>The following options select the commits to be shown:</p></div>
+<div class="vlist"><dl>
+<dt>
+&lt;paths&gt;
+</dt>
+<dd>
+<p>
+        Commits modifying the given &lt;paths&gt; are selected.
+</p>
+</dd>
+<dt>
+--simplify-by-decoration
+</dt>
+<dd>
+<p>
+        Commits that are referred by some branch or tag are selected.
+</p>
+</dd>
+</dl></div>
+<div class="para"><p>Note that extra commits can be shown to give a meaningful history.</p></div>
+<div class="para"><p>The following options affect the way the simplification is performed:</p></div>
+<div class="vlist"><dl>
+<dt>
+Default mode
+</dt>
+<dd>
+<p>
+        Simplifies the history to the simplest history explaining the
+        final state of the tree. Simplest because it prunes some side
+        branches if the end result is the same (i.e. merging branches
+        with the same content)
+</p>
+</dd>
+<dt>
+--full-history
+</dt>
+<dd>
+<p>
+        As the default mode but does not prune some history.
+</p>
+</dd>
+<dt>
+--dense
+</dt>
+<dd>
+<p>
+        Only the selected commits are shown, plus some to have a
+        meaningful history.
+</p>
+</dd>
+<dt>
+--sparse
+</dt>
+<dd>
+<p>
+        All commits in the simplified history are shown.
+</p>
+</dd>
+<dt>
+--simplify-merges
+</dt>
+<dd>
+<p>
+        Additional option to <em>--full-history</em> to remove some needless
+        merges from the resulting history, as there are no selected
+        commits contributing to this merge.
+</p>
+</dd>
+</dl></div>
+<div class="para"><p>A more detailed explanation follows.</p></div>
 <div class="para"><p>Suppose you specified <tt>foo</tt> as the &lt;paths&gt;.  We shall call commits
 that modify <tt>foo</tt> !TREESAME, and the rest TREESAME.  (In a diff
 filtered for <tt>foo</tt>, they look different and equal, respectively.)</p></div>
@@ -1020,6 +1092,13 @@ If after this parent rewriting, <tt>C'</tt> is a root or merge commit (has
 </ul></div>
 </dd>
 </dl></div>
+<div class="para"><p>The <em>--simplify-by-decoration</em> option allows you to view only the
+big picture of the topology of the history, by omitting commits
+that are not referenced by tags.  Commits are marked as !TREESAME
+(in other words, kept after history simplification rules described
+above) if (1) they are referenced by tags, or (2) they change the
+contents of the paths given on the command line.  All other
+commits are marked as TREESAME (subject to be simplified away).</p></div>
 <h3 id="_bisection_helpers">Bisection Helpers</h3><div style="clear:left"></div>
 <div class="vlist"><dl>
 <dt>
@@ -1515,7 +1594,7 @@ and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-11-10 00:08:46 UTC
+Last updated 2008-11-14 08:26:11 UTC
 </div>
 </div>
 </body>
