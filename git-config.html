@@ -1543,14 +1543,6 @@ color.status.&lt;slot&gt;
 </p>
 </dd>
 <dt>
-commit.template
-</dt>
-<dd>
-<p>
-        Specify a file to use as the template for new commit messages.
-</p>
-</dd>
-<dt>
 color.ui
 </dt>
 <dd>
@@ -1560,6 +1552,14 @@ color.ui
         set to <tt>true</tt> or <tt>auto</tt>, use colors only when the output is to the
         terminal. When more specific variables of color.* are set, they always
         take precedence over this setting. Defaults to false.
+</p>
+</dd>
+<dt>
+commit.template
+</dt>
+<dd>
+<p>
+        Specify a file to use as the template for new commit messages.
 </p>
 </dd>
 <dt>
@@ -1824,28 +1824,6 @@ gc.rerereunresolved
         Records of conflicted merge you have not resolved are
         kept for this many days when <em>git-rerere gc</em> is run.
         The default is 15 days.  See <a href="git-rerere.html">git-rerere(1)</a>.
-</p>
-</dd>
-<dt>
-rerere.autoupdate
-</dt>
-<dd>
-<p>
-        When set to true, <tt>git-rerere</tt> updates the index with the
-        resulting contents after it cleanly resolves conflicts using
-        previously recorded resolution.  Defaults to false.
-</p>
-</dd>
-<dt>
-rerere.enabled
-</dt>
-<dd>
-<p>
-        Activate recording of resolved conflicts, so that identical
-        conflict hunks can be resolved automatically, should they
-        be encountered again.  <a href="git-rerere.html">git-rerere(1)</a> command is by
-        default enabled if you create <tt>rr-cache</tt> directory under
-        <tt>$GIT_DIR</tt>, but can be disabled by setting this option to false.
 </p>
 </dd>
 <dt>
@@ -2206,6 +2184,15 @@ i18n.logOutputEncoding
 </p>
 </dd>
 <dt>
+imap
+</dt>
+<dd>
+<p>
+        The configuration variables in the <em>imap</em> section are described
+        in <a href="git-imap-send.html">git-imap-send(1)</a>.
+</p>
+</dd>
+<dt>
 instaweb.browser
 </dt>
 <dd>
@@ -2281,12 +2268,35 @@ man.viewer
 </p>
 </dd>
 <dt>
-merge.stat
+man.&lt;tool&gt;.cmd
 </dt>
 <dd>
 <p>
-        Whether to print the diffstat between ORIG_HEAD and the merge result
-        at the end of the merge.  True by default.
+        Specify the command to invoke the specified man viewer. The
+        specified command is evaluated in shell with the man page
+        passed as argument. (See <a href="git-help.html">git-help(1)</a>.)
+</p>
+</dd>
+<dt>
+man.&lt;tool&gt;.path
+</dt>
+<dd>
+<p>
+        Override the path for the given tool that may be used to
+        display help in the <em>man</em> format. See <a href="git-help.html">git-help(1)</a>.
+</p>
+</dd>
+<dt>
+merge.conflictstyle
+</dt>
+<dd>
+<p>
+        Specify the style in which conflicted hunks are written out to
+        working tree files upon merge.  The default is "merge", which
+        shows <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt> conflict marker, change made by one side,
+        <tt>=======</tt> marker, change made by the other side, and then
+        <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt> marker.  An alternate style, "diff3", adds <tt>|||||||</tt>
+        marker and the original text before <tt>=======</tt> marker.
 </p>
 </dd>
 <dt>
@@ -2306,6 +2316,15 @@ merge.renameLimit
         The number of files to consider when performing rename detection
         during a merge; if not specified, defaults to the value of
         diff.renameLimit.
+</p>
+</dd>
+<dt>
+merge.stat
+</dt>
+<dd>
+<p>
+        Whether to print the diffstat between ORIG_HEAD and the merge result
+        at the end of the merge.  True by default.
 </p>
 </dd>
 <dt>
@@ -2359,38 +2378,6 @@ merge.&lt;driver&gt;.recursive
         Names a low-level merge driver to be used when
         performing an internal merge between common ancestors.
         See <a href="gitattributes.html">gitattributes(5)</a> for details.
-</p>
-</dd>
-<dt>
-man.&lt;tool&gt;.cmd
-</dt>
-<dd>
-<p>
-        Specify the command to invoke the specified man viewer. The
-        specified command is evaluated in shell with the man page
-        passed as argument. (See <a href="git-help.html">git-help(1)</a>.)
-</p>
-</dd>
-<dt>
-man.&lt;tool&gt;.path
-</dt>
-<dd>
-<p>
-        Override the path for the given tool that may be used to
-        display help in the <em>man</em> format. See <a href="git-help.html">git-help(1)</a>.
-</p>
-</dd>
-<dt>
-merge.conflictstyle
-</dt>
-<dd>
-<p>
-        Specify the style in which conflicted hunks are written out to
-        working tree files upon merge.  The default is "merge", which
-        shows <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt> conflict marker, change made by one side,
-        <tt>=======</tt> marker, change made by the other side, and then
-        <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt> marker.  An alternate style, "diff3", adds <tt>|||||||</tt>
-        marker and the original text before <tt>=======</tt> marker.
 </p>
 </dd>
 <dt>
@@ -2581,6 +2568,66 @@ pull.twohead
 </p>
 </dd>
 <dt>
+receive.fsckObjects
+</dt>
+<dd>
+<p>
+        If it is set to true, git-receive-pack will check all received
+        objects. It will abort in the case of a malformed object or a
+        broken link. The result of an abort are only dangling objects.
+        Defaults to false.
+</p>
+</dd>
+<dt>
+receive.unpackLimit
+</dt>
+<dd>
+<p>
+        If the number of objects received in a push is below this
+        limit then the objects will be unpacked into loose object
+        files. However if the number of received objects equals or
+        exceeds this limit then the received pack will be stored as
+        a pack, after adding any missing delta bases.  Storing the
+        pack from a push can make the push operation complete faster,
+        especially on slow filesystems.  If not set, the value of
+        <tt>transfer.unpackLimit</tt> is used instead.
+</p>
+</dd>
+<dt>
+receive.denyDeletes
+</dt>
+<dd>
+<p>
+        If set to true, git-receive-pack will deny a ref update that deletes
+        the ref. Use this to prevent such a ref deletion via a push.
+</p>
+</dd>
+<dt>
+receive.denyCurrentBranch
+</dt>
+<dd>
+<p>
+        If set to true or "refuse", receive-pack will deny a ref update
+        to the currently checked out branch of a non-bare repository.
+        Such a push is potentially dangerous because it brings the HEAD
+        out of sync with the index and working tree. If set to "warn",
+        print a warning of such a push to stderr, but allow the push to
+        proceed. If set to false or "ignore", allow such pushes with no
+        message. Defaults to "warn".
+</p>
+</dd>
+<dt>
+receive.denyNonFastForwards
+</dt>
+<dd>
+<p>
+        If set to true, git-receive-pack will deny a ref update which is
+        not a fast forward. Use this to prevent such an update via a push,
+        even if that push is forced. This configuration variable is
+        set when initializing a shared repository.
+</p>
+</dd>
+<dt>
 remote.&lt;name&gt;.url
 </dt>
 <dd>
@@ -2685,6 +2732,28 @@ repack.usedeltabaseoffset
 </p>
 </dd>
 <dt>
+rerere.autoupdate
+</dt>
+<dd>
+<p>
+        When set to true, <tt>git-rerere</tt> updates the index with the
+        resulting contents after it cleanly resolves conflicts using
+        previously recorded resolution.  Defaults to false.
+</p>
+</dd>
+<dt>
+rerere.enabled
+</dt>
+<dd>
+<p>
+        Activate recording of resolved conflicts, so that identical
+        conflict hunks can be resolved automatically, should they
+        be encountered again.  <a href="git-rerere.html">git-rerere(1)</a> command is by
+        default enabled if you create <tt>rr-cache</tt> directory under
+        <tt>$GIT_DIR</tt>, but can be disabled by setting this option to false.
+</p>
+</dd>
+<dt>
 showbranch.default
 </dt>
 <dd>
@@ -2751,6 +2820,16 @@ tar.umask
 </p>
 </dd>
 <dt>
+transfer.unpackLimit
+</dt>
+<dd>
+<p>
+        When <tt>fetch.unpackLimit</tt> or <tt>receive.unpackLimit</tt> are
+        not set, the value of this variable is used instead.
+        The default value is 100.
+</p>
+</dd>
+<dt>
 url.&lt;base&gt;.insteadOf
 </dt>
 <dd>
@@ -2799,85 +2878,6 @@ user.signingkey
 </p>
 </dd>
 <dt>
-imap
-</dt>
-<dd>
-<p>
-        The configuration variables in the <em>imap</em> section are described
-        in <a href="git-imap-send.html">git-imap-send(1)</a>.
-</p>
-</dd>
-<dt>
-receive.fsckObjects
-</dt>
-<dd>
-<p>
-        If it is set to true, git-receive-pack will check all received
-        objects. It will abort in the case of a malformed object or a
-        broken link. The result of an abort are only dangling objects.
-        Defaults to false.
-</p>
-</dd>
-<dt>
-receive.unpackLimit
-</dt>
-<dd>
-<p>
-        If the number of objects received in a push is below this
-        limit then the objects will be unpacked into loose object
-        files. However if the number of received objects equals or
-        exceeds this limit then the received pack will be stored as
-        a pack, after adding any missing delta bases.  Storing the
-        pack from a push can make the push operation complete faster,
-        especially on slow filesystems.  If not set, the value of
-        <tt>transfer.unpackLimit</tt> is used instead.
-</p>
-</dd>
-<dt>
-receive.denyDeletes
-</dt>
-<dd>
-<p>
-        If set to true, git-receive-pack will deny a ref update that deletes
-        the ref. Use this to prevent such a ref deletion via a push.
-</p>
-</dd>
-<dt>
-receive.denyNonFastForwards
-</dt>
-<dd>
-<p>
-        If set to true, git-receive-pack will deny a ref update which is
-        not a fast forward. Use this to prevent such an update via a push,
-        even if that push is forced. This configuration variable is
-        set when initializing a shared repository.
-</p>
-</dd>
-<dt>
-receive.denyCurrentBranch
-</dt>
-<dd>
-<p>
-        If set to true or "refuse", receive-pack will deny a ref update
-        to the currently checked out branch of a non-bare repository.
-        Such a push is potentially dangerous because it brings the HEAD
-        out of sync with the index and working tree. If set to "warn",
-        print a warning of such a push to stderr, but allow the push to
-        proceed. If set to false or "ignore", allow such pushes with no
-        message. Defaults to "warn".
-</p>
-</dd>
-<dt>
-transfer.unpackLimit
-</dt>
-<dd>
-<p>
-        When <tt>fetch.unpackLimit</tt> or <tt>receive.unpackLimit</tt> are
-        not set, the value of this variable is used instead.
-        The default value is 100.
-</p>
-</dd>
-<dt>
 web.browser
 </dt>
 <dd>
@@ -2903,7 +2903,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-11-15 08:07:37 UTC
+Last updated 2008-11-26 22:50:09 UTC
 </div>
 </div>
 </body>
