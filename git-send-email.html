@@ -320,7 +320,7 @@ git-send-email(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git send-email</em> [options] &lt;file|directory&gt; [&#8230; file|directory]</p></div>
+<div class="para"><p><em>git send-email</em> [options] &lt;file|directory|rev-list options&gt;&#8230;</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -353,6 +353,16 @@ enabled interface to provide the necessary information.</p></div>
 <div class="para"><p>The --cc option must be repeated for each user you want on the cc list.</p></div>
 </dd>
 <dt>
+--annotate
+</dt>
+<dd>
+<p>
+        Review each patch you're about to send in an editor. The setting
+        <em>sendemail.multiedit</em> defines if this will spawn one editor per patch
+        or one for all of them at once.
+</p>
+</dd>
+<dt>
 --compose
 </dt>
 <dd>
@@ -360,6 +370,13 @@ enabled interface to provide the necessary information.</p></div>
         Use $GIT_EDITOR, core.editor, $VISUAL, or $EDITOR to edit an
         introductory message for the patch series.
 </p>
+<div class="para"><p>When compose is in used, git send-email gets less interactive will use the
+values of the headers you set there. If the body of the email (what you type
+after the headers and a blank line) only contains blank (or GIT: prefixed)
+lines, the summary won't be sent, but git-send-email will still use the
+Headers values if you don't removed them.</p></div>
+<div class="para"><p>If it wasn't able to see a header in the summary it will ask you about it
+interactively after quitting your editor.</p></div>
 </dd>
 <dt>
 --from
@@ -603,6 +620,17 @@ user is prompted for a password while the input is masked for privacy.</p></div>
         Perform sanity checks on patches.
         Currently, validation means the following:
 </p>
+</dd>
+<dt>
+--[no-]format-patch
+</dt>
+<dd>
+<p>
+        When an argument may be understood either as a reference or as a file name,
+        choose to understand it as a format-patch argument (<em>--format-patch</em>)
+        or as a file name (<em>--no-format-patch</em>). By default, when such a conflict
+        occurs, git send-email will fail.
+</p>
 <div class="ilist"><ul>
 <li>
 <p>
@@ -637,6 +665,17 @@ sendemail.aliasfiletype
         one of <em>mutt</em>, <em>mailrc</em>, <em>pine</em>, or <em>gnus</em>.
 </p>
 </dd>
+<dt>
+sendemail.multiedit
+</dt>
+<dd>
+<p>
+        If true (default), a single editor instance will be spawned to edit
+        files you have to edit (patches when <em>--annotate</em> is used, and the
+        summary when <em>--compose</em> is used). If false, files will be edited one
+        after the other, spawning a new editor each time.
+</p>
+</dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
@@ -655,7 +694,7 @@ send_lots_of_email.pl by Greg Kroah-Hartman.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-10-31 11:28:50 UTC
+Last updated 2008-11-28 06:26:52 UTC
 </div>
 </div>
 </body>
