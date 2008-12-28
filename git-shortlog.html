@@ -394,15 +394,37 @@ the first line of the commit message will be shown.</p></div>
 </div>
 <h2 id="_files">FILES</h2>
 <div class="sectionbody">
-<div class="para"><p>If the file <tt>.mailmap</tt> exists, it will be used for mapping author
-email addresses to a real author name. One mapping per line, first
-the author name followed by the email address enclosed by
-<em>&lt;</em> and <em>&gt;</em>. Use hash <em>#</em> for comments. Example:</p></div>
+<div class="para"><p>If a file <tt>.mailmap</tt> exists at the toplevel of the repository,
+it is used to map an author email address to a canonical real name. This
+can be used to coalesce together commits by the same person where their
+name was spelled differently (whether with the same email address or
+not).</p></div>
+<div class="para"><p>Each line in the file consists, in this order, of the canonical real name
+of an author, whitespace, and an email address (enclosed by <em>&lt;</em> and <em>&gt;</em>)
+to map to the name. Use hash <em>#</em> for comments, either on their own line,
+or after the email address.</p></div>
+<div class="para"><p>A canonical name may appear in more than one line, associated with
+different email addresses, but it doesn't make sense for a given address
+to appear more than once (if that happens, a later line overrides the
+earlier ones).</p></div>
+<div class="para"><p>So, for example, if your history contains commits by two authors, Jane
+and Joe, whose names appear in the repository under several forms:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt># Keep alphabetized
-Adam Morrow &lt;adam@localhost.localdomain&gt;
-Eve Jones &lt;eve@laptop.(none)&gt;</tt></pre>
+<pre><tt>Joe Developer &lt;joe@example.com&gt;
+Joe R. Developer &lt;joe@example.com&gt;
+Jane Doe &lt;jane@example.com&gt;
+Jane Doe &lt;jane@laptop.(none)&gt;
+Jane D. &lt;jane@desktop.(none)&gt;</tt></pre>
+</div></div>
+<div class="para"><p>Then, supposing Joe wants his middle name initial used, and Jane prefers
+her family name fully spelled out, a proper <tt>.mailmap</tt> file would look like:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt># Note how we don't need an entry for &lt;jane@laptop.(none)&gt;, because the
+# real name of that author is correct already, and coalesced directly.
+Jane Doe &lt;jane@desktop.(none)&gt;
+Joe R. Developer &lt;joe@random.com&gt;</tt></pre>
 </div></div>
 </div>
 <h2 id="_author">Author</h2>
@@ -419,7 +441,7 @@ Eve Jones &lt;eve@laptop.(none)&gt;</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-12-10 08:33:26 UTC
+Last updated 2008-12-28 01:26:12 UTC
 </div>
 </div>
 </body>
