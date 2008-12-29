@@ -321,7 +321,7 @@ git-reset(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git reset</em> [--mixed | --soft | --hard] [-q] [&lt;commit&gt;]
+<div class="content"><em>git reset</em> [--mixed | --soft | --hard | --merge] [-q] [&lt;commit&gt;]
 <em>git reset</em> [-q] [&lt;commit&gt;] [--] &lt;paths&gt;&#8230;</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
@@ -368,6 +368,16 @@ the index from a given commit, without moving HEAD.</p></div>
         Matches the working tree and index to that of the tree being
         switched to. Any changes to tracked files in the working tree
         since &lt;commit&gt; are lost.
+</p>
+</dd>
+<dt>
+--merge
+</dt>
+<dd>
+<p>
+        Resets the index to match the tree recorded by the named commit,
+        and updates the files that are different between the named commit
+        and the current commit in the working tree.
 </p>
 </dd>
 <dt>
@@ -569,6 +579,39 @@ and resets the tip of the branch to that commit.
 </ol></div>
 </dd>
 <dt>
+Undo a merge or pull inside a dirty work tree
+</dt>
+<dd>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git pull                         <b>(1)</b>
+Auto-merging nitfol
+Merge made by recursive.
+ nitfol                |   20 +++++----
+ ...
+$ git reset --merge ORIG_HEAD      <b>(2)</b></tt></pre>
+</div></div>
+<div class="colist"><ol>
+<li>
+<p>
+Even if you may have local modifications in your
+working tree, you can safely say "git pull" when you know
+that the change in the other branch does not overlap with
+them.
+</p>
+</li>
+<li>
+<p>
+After inspecting the result of the merge, you may find
+that the change in the other branch is unsatisfactory.  Running
+"git reset --hard ORIG_HEAD" will let you go back to where you
+were, but it will discard your local changes, which you do not
+want.  "git reset --merge" keeps your local changes.
+</p>
+</li>
+</ol></div>
+</dd>
+<dt>
 Interrupted workflow
 </dt>
 <dd>
@@ -658,7 +701,7 @@ Adds the file to the index again.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-12-19 21:37:56 UTC
+Last updated 2008-12-29 10:33:54 UTC
 </div>
 </div>
 </body>
