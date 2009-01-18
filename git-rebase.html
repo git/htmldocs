@@ -321,11 +321,11 @@ git-rebase(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git rebase</em> [-i | --interactive] [-v | --verbose] [-m | --merge]
-        [-s &lt;strategy&gt; | --strategy=&lt;strategy&gt;] [--no-verify]
-        [-C&lt;n&gt;] [ --whitespace=&lt;option&gt;] [-p | --preserve-merges]
-        [--onto &lt;newbase&gt;] &lt;upstream&gt; [&lt;branch&gt;]
-<em>git rebase</em> --continue | --skip | --abort</div></div>
+<div class="content"><em>git rebase</em> [-i | --interactive] [options] [--onto &lt;newbase&gt;]
+        &lt;upstream&gt; [&lt;branch&gt;]
+<em>git rebase</em> [-i | --interactive] [options] --onto &lt;newbase&gt;
+        --root [&lt;branch&gt;]</div></div>
+<div class="para"><p><em>git rebase</em> --continue | --skip | --abort</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -334,7 +334,8 @@ git-rebase(1) Manual Page
 it remains on the current branch.</p></div>
 <div class="para"><p>All changes made by commits in the current branch but that are not
 in &lt;upstream&gt; are saved to a temporary area.  This is the same set
-of commits that would be shown by <tt>git log &lt;upstream&gt;..HEAD</tt>.</p></div>
+of commits that would be shown by <tt>git log &lt;upstream&gt;..HEAD</tt> (or
+<tt>git log HEAD</tt>, if --root is specified).</p></div>
 <div class="para"><p>The current branch is reset to &lt;upstream&gt;, or &lt;newbase&gt; if the
 --onto option was supplied.  This has the exact same effect as
 <tt>git reset --hard &lt;upstream&gt;</tt> (or &lt;newbase&gt;).  ORIG_HEAD is set
@@ -629,6 +630,20 @@ desired resolution, you can continue the rebasing process with</p></div>
 <dd>
 <p>
         Instead of ignoring merges, try to recreate them.
+</p>
+</dd>
+<dt>
+--root
+</dt>
+<dd>
+<p>
+        Rebase all commits reachable from &lt;branch&gt;, instead of
+        limiting them with an &lt;upstream&gt;.  This allows you to rebase
+        the root commit(s) on a branch.  Must be used with --onto, and
+        will skip changes already contained in &lt;newbase&gt; (instead of
+        &lt;upstream&gt;).  When used together with --preserve-merges, <em>all</em>
+        root commits will be rewritten to have &lt;newbase&gt; as parent
+        instead.
 </p>
 </dd>
 </dl></div>
@@ -1041,7 +1056,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-12-10 08:33:23 UTC
+Last updated 2009-01-18 18:26:22 UTC
 </div>
 </div>
 </body>
