@@ -352,22 +352,24 @@ documentation for <a href="git-receive-pack.html">git-receive-pack(1)</a>.</p></
 </dt>
 <dd>
 <p>
-        The canonical format of a &lt;refspec&gt; parameter is
-        <tt>+?&lt;src&gt;:&lt;dst&gt;</tt>; that is, an optional plus <tt>&#43;</tt>, followed
-        by the source ref, followed by a colon <tt>:</tt>, followed by
-        the destination ref.
+        The format of a &lt;refspec&gt; parameter is an optional plus
+        <tt>&#43;</tt>, followed by the source ref &lt;src&gt;, followed
+        by a colon <tt>:</tt>, followed by the destination ref &lt;dst&gt;.
+        It is used to specify with what &lt;src&gt; object the &lt;dst&gt; ref
+        in the remote repository is to be updated.
 </p>
-<div class="para"><p>The &lt;src&gt; side represents the source branch (or arbitrary
-"SHA1 expression", such as <tt>master~4</tt> (four parents before the
-tip of <tt>master</tt> branch); see <a href="git-rev-parse.html">git-rev-parse(1)</a>) that you
-want to push.  The &lt;dst&gt; side represents the destination location.</p></div>
-<div class="para"><p>The local ref that matches &lt;src&gt; is used
-to fast forward the remote ref that matches &lt;dst&gt;.  If
-the optional leading plus <tt>+</tt> is used, the remote ref is updated
-even if it does not result in a fast forward update.</p></div>
+<div class="para"><p>The &lt;src&gt; is often the name of the branch you would want to push, but
+it can be any arbitrary "SHA-1 expression", such as <tt>master~4</tt> or
+<tt>HEAD</tt> (see <a href="git-rev-parse.html">git-rev-parse(1)</a>).</p></div>
+<div class="para"><p>The &lt;dst&gt; tells which ref on the remote side is updated with this
+push. Arbitrary expressions cannot be used here, an actual ref must
+be named. If <tt>:</tt>&lt;dst&gt; is omitted, the same ref as &lt;src&gt; will be
+updated.</p></div>
+<div class="para"><p>The object referenced by &lt;src&gt; is used to fast forward the ref &lt;dst&gt;
+on the remote side. If the optional leading plus <tt>&#43;</tt> is used, the
+remote ref is updated even if it does not result in a fast forward
+update.</p></div>
 <div class="para"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>.</p></div>
-<div class="para"><p>A lonely &lt;src&gt; parameter (without a colon and a destination) pushes
-the &lt;src&gt; to the same name in the destination repository.</p></div>
 <div class="para"><p>Pushing an empty &lt;src&gt; allows you to delete the &lt;dst&gt; ref from
 the remote repository.</p></div>
 <div class="para"><p>The special refspec <tt>:</tt> (or <tt>+:</tt> to allow non-fast forward updates)
@@ -785,12 +787,12 @@ git push origin master
 </p>
 </dd>
 <dt>
-git push origin :experimental
+git push origin HEAD
 </dt>
 <dd>
 <p>
-        Find a ref that matches <tt>experimental</tt> in the <tt>origin</tt> repository
-        (e.g. <tt>refs/heads/experimental</tt>), and delete it.
+        A handy way to push the current branch to the same name on the
+        remote.
 </p>
 </dd>
 <dt>
@@ -805,6 +807,16 @@ git push origin master:satellite/master dev:satellite/dev
 </p>
 </dd>
 <dt>
+git push origin HEAD:master
+</dt>
+<dd>
+<p>
+        Push the current branch to the remote ref matching <tt>master</tt> in the
+        <tt>origin</tt> repository. This form is convenient to push the current
+        branch without thinking about its local name.
+</p>
+</dd>
+<dt>
 git push origin master:refs/heads/experimental
 </dt>
 <dd>
@@ -814,6 +826,15 @@ git push origin master:refs/heads/experimental
         needed to create a new branch or tag in the remote repository when
         the local name and the remote name are different; otherwise,
         the ref name on its own will work.
+</p>
+</dd>
+<dt>
+git push origin :experimental
+</dt>
+<dd>
+<p>
+        Find a ref that matches <tt>experimental</tt> in the <tt>origin</tt> repository
+        (e.g. <tt>refs/heads/experimental</tt>), and delete it.
 </p>
 </dd>
 </dl></div>
@@ -833,7 +854,7 @@ by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-01-22 03:38:32 UTC
+Last updated 2009-02-01 06:35:53 UTC
 </div>
 </div>
 </body>
