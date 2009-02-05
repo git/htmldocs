@@ -425,7 +425,7 @@ defining the basis.  More than one reference may be packaged, and more
 than one basis can be specified.  The objects packaged are those not
 contained in the union of the given bases.  Each basis can be
 specified explicitly (e.g., ^master~10), or implicitly (e.g.,
-master~10..master, master --since=10.days.ago).</p></div>
+master~10..master, --since=10.days.ago master).</p></div>
 <div class="para"><p>It is very important that the basis used be held by the destination.
 It is okay to err on the side of conservatism, causing the bundle file
 to contain objects already in the destination as these are ignored
@@ -433,93 +433,97 @@ when unpacking at the destination.</p></div>
 </div>
 <h2 id="_example">EXAMPLE</h2>
 <div class="sectionbody">
-<div class="para"><p>Assume two repositories exist as R1 on machine A, and R2 on machine B.
+<div class="para"><p>Assume you want to transfer the history from a repository R1 on machine A
+to another repository R2 on machine B.
 For whatever reason, direct connection between A and B is not allowed,
 but we can move data from A to B via some mechanism (CD, email, etc).
 We want to update R2 with developments made on branch master in R1.</p></div>
-<div class="para"><p>To create the bundle you have to specify the basis. You have some options:</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Without basis.
-</p>
-<div class="para"><p>This is useful when sending the whole history.</p></div>
-</li>
-</ul></div>
+<div class="para"><p>To bootstrap the process, you can first create a bundle that doesn't have
+any basis. You can use a tag to remember up to what commit you sent out
+in order to make it easy to later update the other repository with
+incremental bundle,</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bundle create mybundle master</tt></pre>
+<pre><tt>machineA$ cd R1
+machineA$ git bundle create file.bdl master
+machineA$ git tag -f lastR2bundle master</tt></pre>
 </div></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Using temporally tags.
-</p>
-<div class="para"><p>We set a tag in R1 (lastR2bundle) after the previous such transport,
-and move it afterwards to help build the bundle.</p></div>
-</li>
-</ul></div>
+<div class="para"><p>Then you sneakernet file.bdl to the target machine B. Because you don't
+have to have any object to extract objects from such a bundle, not only
+you can fetch/pull from a bundle, you can clone from it as if it was a
+remote repository.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bundle create mybundle master ^lastR2bundle
-$ git tag -f lastR2bundle master</tt></pre>
+<pre><tt>machineB$ git clone /home/me/tmp/file.bdl R2</tt></pre>
 </div></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Using a tag present in both repositories
-</p>
-</li>
-</ul></div>
+<div class="para"><p>This will define a remote called "origin" in the resulting repository that
+lets you fetch and pull from the bundle. $GIT_DIR/config file in R2 may
+have an entry like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bundle create mybundle master ^v1.0.0</tt></pre>
-</div></div>
-<div class="ilist"><ul>
-<li>
-<p>
-A basis based on time.
-</p>
-</li>
-</ul></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git bundle create mybundle master --since=10.days.ago</tt></pre>
-</div></div>
-<div class="ilist"><ul>
-<li>
-<p>
-With a limit on the number of commits
-</p>
-</li>
-</ul></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git bundle create mybundle master -n 10</tt></pre>
-</div></div>
-<div class="para"><p>Then you move mybundle from A to B, and in R2 on B:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git bundle verify mybundle
-$ git fetch mybundle master:localRef</tt></pre>
-</div></div>
-<div class="para"><p>With something like this in the config in R2:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>[remote "bundle"]
+<pre><tt>[remote "origin"]
     url = /home/me/tmp/file.bdl
     fetch = refs/heads/*:refs/remotes/origin/*</tt></pre>
 </div></div>
-<div class="para"><p>You can first sneakernet the bundle file to ~/tmp/file.bdl and
-then these commands on machine B:</p></div>
+<div class="para"><p>You can fetch/pull to update the resulting mine.git repository after
+replacing the bundle you store at /home/me/tmp/file.bdl with incremental
+updates from here on.</p></div>
+<div class="para"><p>After working more in the original repository, you can create an
+incremental bundle to update the other:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git ls-remote bundle
-$ git fetch bundle
-$ git pull bundle</tt></pre>
+<pre><tt>machineA$ cd R1
+machineA$ git bundle create file.bdl lastR2bundle..master
+machineA$ git tag -f lastR2bundle master</tt></pre>
 </div></div>
-<div class="para"><p>would treat it as if it is talking with a remote side over the
-network.</p></div>
+<div class="para"><p>and sneakernet it to the other machine to replace /home/me/tmp/file.bdl,
+and pull from it.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>machineB$ cd R2
+machineB$ git pull</tt></pre>
+</div></div>
+<div class="para"><p>If you know up to what commit the intended recipient repository should
+have the necessary objects for, you can use that knowledge to specify the
+basis, giving a cut-off point to limit the revisions and objects that go
+in the resulting bundle. The previous example used lastR2bundle tag
+for this purpose, but you can use other options you would give to
+the <a href="git-log.html">git-log(1)</a> command. Here are more examples:</p></div>
+<div class="para"><p>You can use a tag that is present in both.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle v1.0.0..master</tt></pre>
+</div></div>
+<div class="para"><p>You can use a basis based on time.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle --since=10.days master</tt></pre>
+</div></div>
+<div class="para"><p>Or you can use the number of commits.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle create mybundle -10 master</tt></pre>
+</div></div>
+<div class="para"><p>You can run <tt>git-bundle verify</tt> to see if you can extract from a bundle
+that was created with a basis.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bundle verify mybundle</tt></pre>
+</div></div>
+<div class="para"><p>This will list what commits you must have in order to extract from the
+bundle and will error out if you don't have them.</p></div>
+<div class="para"><p>A bundle from a recipient repository's point of view is just like a
+regular repository it fetches/pulls from. You can for example map
+refs, like this example, when fetching:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git fetch mybundle master:localRef</tt></pre>
+</div></div>
+<div class="para"><p>Or see what refs it offers.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git ls-remote mybundle</tt></pre>
+</div></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
@@ -531,7 +535,7 @@ network.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-12-10 08:33:08 UTC
+Last updated 2009-02-05 01:26:14 UTC
 </div>
 </div>
 </body>
