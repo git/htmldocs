@@ -683,6 +683,66 @@ git filter-branch ... D..H --not C</tt></pre>
          mv $GIT_INDEX_FILE.new $GIT_INDEX_FILE' HEAD</tt></pre>
 </div></div>
 </div>
+<h2 id="_checklist_for_shrinking_a_repository">Checklist for Shrinking a Repository</h2>
+<div class="sectionbody">
+<div class="para"><p>git-filter-branch is often used to get rid of a subset of files,
+usually with some combination of <tt>--index-filter</tt> and
+<tt>--subdirectory-filter</tt>.  People expect the resulting repository to
+be smaller than the original, but you need a few more steps to
+actually make it smaller, because git tries hard not to lose your
+objects until you tell it to.  First make sure that:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+You really removed all variants of a filename, if a blob was moved
+  over its lifetime.  <tt>git log --name-only --follow --all --
+  filename</tt> can help you find renames.
+</p>
+</li>
+<li>
+<p>
+You really filtered all refs: use <tt>--tag-name-filter cat --
+  --all</tt> when calling git-filter-branch.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Then there are two ways to get a smaller repository.  A safer way is
+to clone, that keeps your original intact.</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Clone it with <tt>git clone file:///path/to/repo</tt>.  The clone
+  will not have the removed objects.  See <a href="git-clone.html">git-clone(1)</a>.  (Note
+  that cloning with a plain path just hardlinks everything!)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>If you really don't want to clone it, for whatever reasons, check the
+following points instead (in this order).  This is a very destructive
+approach, so <strong>make a backup</strong> or go back to cloning it.  You have been
+warned.</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Remove the original refs backed up by git-filter-branch: say <tt>git
+  for-each-ref --format="%(refname)" refs/original/ | xargs -n 1 git
+  update-ref -d</tt>.
+</p>
+</li>
+<li>
+<p>
+Expire all reflogs with <tt>git reflog expire --expire=now --all</tt>.
+</p>
+</li>
+<li>
+<p>
+Garbage collect all unreferenced objects with <tt>git gc --prune=now</tt>
+  (or if your git-gc is not new enough to support arguments to
+  <tt>--prune</tt>, use <tt>git repack -ad; git prune</tt> instead).
+</p>
+</li>
+</ul></div>
+</div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
 <div class="para"><p>Written by Petr "Pasky" Baudis &lt;pasky@suse.cz&gt;,
@@ -698,7 +758,7 @@ and the git list &lt;git@vger.kernel.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-14 08:18:17 UTC
+Last updated 2009-02-15 10:37:53 UTC
 </div>
 </div>
 </body>
