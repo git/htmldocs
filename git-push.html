@@ -365,14 +365,16 @@ it can be any arbitrary "SHA-1 expression", such as <tt>master~4</tt> or
 push. Arbitrary expressions cannot be used here, an actual ref must
 be named. If <tt>:</tt>&lt;dst&gt; is omitted, the same ref as &lt;src&gt; will be
 updated.</p></div>
-<div class="para"><p>The object referenced by &lt;src&gt; is used to fast forward the ref &lt;dst&gt;
-on the remote side. If the optional leading plus <tt>&#43;</tt> is used, the
-remote ref is updated even if it does not result in a fast forward
-update.</p></div>
+<div class="para"><p>The object referenced by &lt;src&gt; is used to update the &lt;dst&gt; reference
+on the remote side, but by default this is only allowed if the
+update can fast forward &lt;dst&gt;.  By having the optional leading <tt>&#43;</tt>,
+you can tell git to update the &lt;dst&gt; ref even when the update is not a
+fast forward.  This does <strong>not</strong> attempt to merge &lt;src&gt; into &lt;dst&gt;.  See
+EXAMPLES below for details.</p></div>
 <div class="para"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>.</p></div>
 <div class="para"><p>Pushing an empty &lt;src&gt; allows you to delete the &lt;dst&gt; ref from
 the remote repository.</p></div>
-<div class="para"><p>The special refspec <tt>:</tt> (or <tt>+:</tt> to allow non-fast forward updates)
+<div class="para"><p>The special refspec <tt>:</tt> (or <tt>&#43;:</tt> to allow non-fast forward updates)
 directs git to push "matching" branches: for every branch that exists on
 the local side, the remote side is updated if a branch of the same name
 already exists on the remote side.  This is the default operation mode
@@ -837,6 +839,33 @@ git push origin :experimental
         (e.g. <tt>refs/heads/experimental</tt>), and delete it.
 </p>
 </dd>
+<dt>
+git push origin &#43;dev:master
+</dt>
+<dd>
+<p>
+        Update the origin repository's master branch with the dev branch,
+        allowing non-fast forward updates.  <strong>This can leave unreferenced
+        commits dangling in the origin repository.</strong>  Consider the
+        following situation, where a fast forward is not possible:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>            o---o---o---A---B  origin/master
+                     \
+                      X---Y---Z  dev</tt></pre>
+</div></div>
+<div class="para"><p>The above command would change the origin repository to</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                      A---B  (unnamed branch)
+                     /
+            o---o---o---X---Y---Z  master</tt></pre>
+</div></div>
+<div class="para"><p>Commits A and B would no longer belong to a branch with a symbolic name,
+and so would be unreachable.  As such, these commits would be removed by
+a <tt>git gc</tt> command on the origin repository.</p></div>
+</dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
@@ -854,7 +883,7 @@ by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-19 00:54:15 UTC
+Last updated 2009-02-25 09:56:37 UTC
 </div>
 </div>
 </body>
