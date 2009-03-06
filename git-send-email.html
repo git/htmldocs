@@ -580,15 +580,56 @@ user is prompted for a password while the input is masked for privacy.</p></div>
 <dd>
 <p>
         Specify an additional category of recipients to suppress the
-        auto-cc of.  <em>self</em> will avoid including the sender, <em>author</em> will
-        avoid including the patch author, <em>cc</em> will avoid including anyone
-        mentioned in Cc lines in the patch, <em>sob</em> will avoid including
-        anyone mentioned in Signed-off-by lines, and <em>cccmd</em> will avoid
-        running the --cc-cmd.  <em>all</em> will suppress all auto cc values.
-        Default is the value of <em>sendemail.suppresscc</em> configuration value;
-        if that is unspecified, default to <em>self</em> if --suppress-from is
-        specified, as well as <em>sob</em> if --no-signed-off-cc is specified.
+        auto-cc of:
 </p>
+<div class="ilist"><ul>
+<li>
+<p>
+<em>author</em> will avoid including the patch author
+</p>
+</li>
+<li>
+<p>
+<em>self</em> will avoid including the sender
+</p>
+</li>
+<li>
+<p>
+<em>cc</em> will avoid including anyone mentioned in Cc lines in the patch header
+  except for self (use <em>self</em> for that).
+</p>
+</li>
+<li>
+<p>
+<em>ccbody</em> will avoid including anyone mentioned in Cc lines in the
+  patch body (commit message) except for self (use <em>self</em> for that).
+</p>
+</li>
+<li>
+<p>
+<em>sob</em> will avoid including anyone mentioned in Signed-off-by lines except
+   for self (use <em>self</em> for that).
+</p>
+</li>
+<li>
+<p>
+<em>cccmd</em> will avoid running the --cc-cmd.
+</p>
+</li>
+<li>
+<p>
+<em>body</em> is equivalent to <em>sob</em> + <em>ccbody</em>
+</p>
+</li>
+<li>
+<p>
+<em>all</em> will suppress all auto cc values.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Default is the value of <em>sendemail.suppresscc</em> configuration value; if
+that is unspecified, default to <em>self</em> if --suppress-from is
+specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p></div>
 </dd>
 <dt>
 --[no-]suppress-from
@@ -614,6 +655,45 @@ user is prompted for a password while the input is masked for privacy.</p></div>
 </dl></div>
 <h3 id="_administering">Administering</h3><div style="clear:left"></div>
 <div class="vlist"><dl>
+<dt>
+--confirm
+</dt>
+<dd>
+<p>
+        Confirm just before sending:
+</p>
+<div class="ilist"><ul>
+<li>
+<p>
+<em>always</em> will always confirm before sending
+</p>
+</li>
+<li>
+<p>
+<em>never</em> will never confirm before sending
+</p>
+</li>
+<li>
+<p>
+<em>cc</em> will confirm before sending when send-email has automatically
+  added addresses from the patch to the Cc list
+</p>
+</li>
+<li>
+<p>
+<em>compose</em> will confirm before sending the first message when using --compose.
+</p>
+</li>
+<li>
+<p>
+<em>auto</em> is equivalent to <em>cc</em> + <em>compose</em>
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Default is the value of <em>sendemail.confirm</em> configuration value; if that
+is unspecified, default to <em>auto</em> unless any of the suppress options
+have been specified, in which case default to <em>compose</em>.</p></div>
+</dd>
 <dt>
 --dry-run
 </dt>
@@ -695,6 +775,16 @@ sendemail.multiedit
         after the other, spawning a new editor each time.
 </p>
 </dd>
+<dt>
+sendemail.confirm
+</dt>
+<dd>
+<p>
+        Sets the default for whether to confirm before sending. Must be
+        one of <em>always</em>, <em>never</em>, <em>cc</em>, <em>compose</em>, or <em>auto</em>. See <em>--confirm</em>
+        in the previous section for the meaning of these values.
+</p>
+</dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
@@ -713,7 +803,7 @@ send_lots_of_email.pl by Greg Kroah-Hartman.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-20 08:32:54 UTC
+Last updated 2009-03-06 08:20:44 UTC
 </div>
 </div>
 </body>
