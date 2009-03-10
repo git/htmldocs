@@ -415,6 +415,11 @@ in <tt>cmd_foo(int argc, const char **argv, const char *prefix)</tt>
 <div class="para"><p><tt>parse_options()</tt> will filter out the processed options of <tt>argv[]</tt> and leave the
 non-option arguments in <tt>argv[]</tt>.
 <tt>argc</tt> is updated appropriately because of the assignment.</p></div>
+<div class="para"><p>You can also pass NULL instead of a usage array as fourth parameter of
+parse_options(), to avoid displaying a help screen with usage info and
+option list.  This should only be done if necessary, e.g. to implement
+a limited parser for only a subset of the options that needs to be run
+before the full parser, which in turn shows the full help message.</p></div>
 <div class="para"><p>Flags are the bitwise-or of:</p></div>
 <div class="vlist"><dl>
 <dt>
@@ -434,6 +439,43 @@ non-option arguments in <tt>argv[]</tt>.
         Usually the whole argument vector is massaged and reordered.
         Using this flag, processing is stopped at the first non-option
         argument.
+</p>
+</dd>
+<dt>
+<tt>PARSE_OPT_KEEP_ARGV0</tt>
+</dt>
+<dd>
+<p>
+        Keep the first argument, which contains the program name.  It's
+        removed from argv[] by default.
+</p>
+</dd>
+<dt>
+<tt>PARSE_OPT_KEEP_UNKNOWN</tt>
+</dt>
+<dd>
+<p>
+        Keep unknown arguments instead of erroring out.  This doesn't
+        work for all combinations of arguments as users might expect
+        it to do.  E.g. if the first argument in <tt>&#8212;unknown &#8212;known</tt>
+        takes a value (which we can't know), the second one is
+        mistakenly interpreted as a known option.  Similarly, if
+        <tt>PARSE_OPT_STOP_AT_NON_OPTION</tt> is set, the second argument in
+        <tt>&#8212;unknown value</tt> will be mistakenly interpreted as a
+        non-option, not as a value belonging to the unknown option,
+        the parser early.  That's why parse_options() errors out if
+        both options are set.
+</p>
+</dd>
+<dt>
+<tt>PARSE_OPT_NO_INTERNAL_HELP</tt>
+</dt>
+<dd>
+<p>
+        By default, parse_options() handles <tt>-h</tt>, <tt>&#8212;help</tt> and
+        <tt>&#8212;help-all</tt> internally, by showing a help screen.  This option
+        turns it off and allows one to add custom handlers for these
+        options, or to just leave them unknown.
 </p>
 </dd>
 </dl></div>
@@ -666,7 +708,7 @@ for real-world examples.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-14 08:18:55 UTC
+Last updated 2009-03-10 16:39:01 UTC
 </div>
 </div>
 </body>
