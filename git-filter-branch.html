@@ -408,7 +408,9 @@ multiple commits.</p></div>
 <p>
         This is the filter for rewriting the index.  It is similar to the
         tree filter but does not check out the tree, which makes it much
-        faster.  For hairy cases, see <a href="git-update-index.html">git-update-index(1)</a>.
+        faster.  Frequently used with <tt>git rm --cached
+        --ignore-unmatch &#8230;</tt>, see EXAMPLES below.  For hairy
+        cases, see <a href="git-update-index.html">git-update-index(1)</a>.
 </p>
 </dd>
 <dt>
@@ -567,16 +569,16 @@ or copyright violation) from all commits:</p></div>
 <div class="para"><p>However, if the file is absent from the tree of some commit,
 a simple <tt>rm filename</tt> will fail for that tree and commit.
 Thus you may instead want to use <tt>rm -f filename</tt> as the script.</p></div>
-<div class="para"><p>A significantly faster version:</p></div>
+<div class="para"><p>Using <tt>--index-filter</tt> with <em>git-rm</em> yields a significantly faster
+version.  Like with using <tt>rm filename</tt>, <tt>git rm --cached filename</tt>
+will fail if the file is absent from the tree of a commit.  If you
+want to "completely forget" a file, it does not matter when it entered
+history, so we also add <tt>--ignore-unmatch</tt>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git filter-branch --index-filter 'git rm --cached filename' HEAD</tt></pre>
+<pre><tt>git filter-branch --index-filter 'git rm --cached --ignore-unmatch filename' HEAD</tt></pre>
 </div></div>
 <div class="para"><p>Now, you will get the rewritten history saved in HEAD.</p></div>
-<div class="para"><p>As with using <tt>rm filename</tt>, <tt>git rm --cached filename</tt> will fail
-if the file is absent from the tree of a commit.  If it is not important
-whether the file is already absent from the tree, you can use
-<tt>git rm --cached --ignore-unmatch filename</tt> instead.</p></div>
 <div class="para"><p>To rewrite the repository to look as if <tt>foodir/</tt> had been its project
 root, and discard all other history:</p></div>
 <div class="listingblock">
@@ -758,7 +760,7 @@ and the git list &lt;git@vger.kernel.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-15 10:37:53 UTC
+Last updated 2009-03-13 07:52:40 UTC
 </div>
 </div>
 </body>
