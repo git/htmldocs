@@ -325,6 +325,7 @@ git-remote(1) Manual Page
 <em>git remote add</em> [-t &lt;branch&gt;] [-m &lt;master&gt;] [-f] [--mirror] &lt;name&gt; &lt;url&gt;
 <em>git remote rename</em> &lt;old&gt; &lt;new&gt;
 <em>git remote rm</em> &lt;name&gt;
+<em>git remote set-head</em> &lt;name&gt; [-a | -d | &lt;branch&gt;]
 <em>git remote show</em> [-n] &lt;name&gt;
 <em>git remote prune</em> [-n | --dry-run] &lt;name&gt;
 <em>git remote update</em> [group]</div></div>
@@ -371,8 +372,7 @@ refspec for the remote to track all branches under
 is created.  You can give more than one <tt>-t &lt;branch&gt;</tt> to track
 multiple branches without grabbing all branches.</p></div>
 <div class="para"><p>With <tt>-m &lt;master&gt;</tt> option, <tt>$GIT_DIR/remotes/&lt;name&gt;/HEAD</tt> is set
-up to point at remote's <tt>&lt;master&gt;</tt> branch instead of whatever
-branch the <tt>HEAD</tt> at the remote repository actually points at.</p></div>
+up to point at remote's <tt>&lt;master&gt;</tt> branch. See also the set-head command.</p></div>
 <div class="para"><p>In mirror mode, enabled with <tt>--mirror</tt>, the refs will not be stored
 in the <em>refs/remotes/</em> namespace, but in <em>refs/heads/</em>.  This option
 only makes sense in bare repositories.  If a remote uses mirror
@@ -399,6 +399,30 @@ the configuration file format.</p></div>
 Remove the remote named &lt;name&gt;. All remote tracking branches and
 configuration settings for the remote are removed.
 </p>
+</dd>
+<dt>
+<em>set-head</em>
+</dt>
+<dd>
+<p>
+Sets or deletes the default branch (<tt>$GIT_DIR/remotes/&lt;name&gt;/HEAD</tt>) for
+the named remote. Having a default branch for a remote is not required,
+but allows the name of the remote to be specified in lieu of a specific
+branch. For example, if the default branch for <tt>origin</tt> is set to
+<tt>master</tt>, then <tt>origin</tt> may be specified wherever you would normally
+specify <tt>origin/master</tt>.
+</p>
+<div class="para"><p>With <tt>-d</tt>, <tt>$GIT_DIR/remotes/&lt;name&gt;/HEAD</tt> is deleted.</p></div>
+<div class="para"><p>With <tt>-a</tt>, the remote is queried to determine its <tt>HEAD</tt>, then
+<tt>$GIT_DIR/remotes/&lt;name&gt;/HEAD</tt> is set to the same branch. e.g., if the remote
+<tt>HEAD</tt> is pointed at <tt>next</tt>, "<tt>git remote set-head origin -a</tt>" will set
+<tt>$GIT_DIR/refs/remotes/origin/HEAD</tt> to <tt>refs/remotes/origin/next</tt>. This will
+only work if <tt>refs/remotes/origin/next</tt> already exists; if not it must be
+fetched first.</p></div>
+<div class="para"><p>Use <tt>&lt;branch&gt;</tt> to set <tt>$GIT_DIR/remotes/&lt;name&gt;/HEAD</tt> explicitly. e.g., "git
+remote set-head origin master" will set <tt>$GIT_DIR/refs/remotes/origin/HEAD</tt> to
+<tt>refs/remotes/origin/master</tt>. This will only work if
+<tt>refs/remotes/origin/master</tt> already exists; if not it must be fetched first.</p></div>
 </dd>
 <dt>
 <em>show</em>
@@ -506,7 +530,7 @@ $ git merge origin</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-14 08:18:31 UTC
+Last updated 2009-03-18 05:27:01 UTC
 </div>
 </div>
 </body>
