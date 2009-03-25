@@ -333,6 +333,8 @@ git-cvsimport(1) Manual Page
 repository, or incrementally import into an existing one.</p></div>
 <div class="para"><p>Splitting the CVS log into patch sets is done by <em>cvsps</em>.
 At least version 2.1 is required.</p></div>
+<div class="para"><p><strong>WARNING:</strong> for certain situations the import leads to incorrect results.
+Please see the section <a href="#issues">ISSUES</a> for further reference.</p></div>
 <div class="para"><p>You should <strong>never</strong> do any work of your own on the branches that are
 created by <em>git-cvsimport</em>.  By default initial import will create and populate a
 "master" branch from the CVS repository's main branch which you're free
@@ -566,6 +568,74 @@ export changes back to CVS again later with
 <div class="para"><p>Otherwise, success is indicated the Unix way, i.e. by simply exiting with
 a zero exit status.</p></div>
 </div>
+<h2 id="issues">ISSUES</h2>
+<div class="sectionbody">
+<div class="para"><p>Problems related to timestamps:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+If timestamps of commits in the cvs repository are not stable enough
+   to be used for ordering commits
+</p>
+</li>
+<li>
+<p>
+If any files were ever "cvs import"ed more than once (e.g., import of
+   more than one vendor release)
+</p>
+</li>
+<li>
+<p>
+If the timestamp order of different files cross the revision order
+   within the commit matching time window
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Problems related to branches:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Branches on which no commits have been made are not imported
+</p>
+</li>
+<li>
+<p>
+All files from the branching point are added to a branch even if
+   never added in cvs
+</p>
+</li>
+<li>
+<p>
+files added to the source branch <strong>after</strong> a daughter branch was
+   created: If previously no commit was made on the daugther branch they
+   will erroneously be added to the daughter branch in git
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Problems related to tags:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Multiple tags on the same revision are not imported
+</p>
+</li>
+</ul></div>
+<div class="para"><p>If you suspect that any of these issues may apply to the repository you
+want to import consider using these alternative tools which proved to be
+more stable in practise:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+cvs2git (part of cvs2svn), <tt>http://cvs2svn.tigris.org</tt>
+</p>
+</li>
+<li>
+<p>
+parsecvs, <tt>http://cgit.freedesktop.org/~keithp/parsecvs</tt>
+</p>
+</li>
+</ul></div>
+</div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
 <div class="para"><p>Written by Matthias Urlichs &lt;smurf@smurf.noris.de&gt;, with help from
@@ -581,7 +651,7 @@ various participants of the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-14 08:18:10 UTC
+Last updated 2009-03-25 18:49:19 UTC
 </div>
 </div>
 </body>
