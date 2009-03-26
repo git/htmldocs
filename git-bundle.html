@@ -330,13 +330,13 @@ git-bundle(1) Manual Page
 <div class="sectionbody">
 <div class="para"><p>Some workflows require that one or more branches of development on one
 machine be replicated on another machine, but the two machines cannot
-be directly connected so the interactive git protocols (git, ssh,
-rsync, http) cannot be used.  This command provides support for
+be directly connected, and therefore the interactive git protocols (git,
+ssh, rsync, http) cannot be used.  This command provides support for
 <em>git-fetch</em> and <em>git-pull</em> to operate by packaging objects and references
 in an archive at the originating machine, then importing those into
 another repository using <em>git-fetch</em> and <em>git-pull</em>
 after moving the archive by some means (i.e., by sneakernet).  As no
-direct connection between repositories exists, the user must specify a
+direct connection between the repositories exists, the user must specify a
 basis for the bundle that is held by the destination repository: the
 bundle assumes that all objects in the basis are already in the
 destination repository.</p></div>
@@ -363,7 +363,7 @@ verify &lt;file&gt;
        bundle format itself as well as checking that the prerequisite
        commits exist and are fully linked in the current repository.
        <em>git-bundle</em> prints a list of missing commits, if any, and exits
-       with non-zero status.
+       with a non-zero status.
 </p>
 </dd>
 <dt>
@@ -383,8 +383,8 @@ unbundle &lt;file&gt;
 <p>
        Passes the objects in the bundle to <em>git-index-pack</em>
        for storage in the repository, then prints the names of all
-       defined references. If a reflist is given, only references
-       matching those in the given list are printed. This command is
+       defined references. If a list of references is given, only
+       references matching those in the list are printed. This command is
        really plumbing, intended to be called only by <em>git-fetch</em>.
 </p>
 </dd>
@@ -394,8 +394,8 @@ unbundle &lt;file&gt;
 <dd>
 <p>
        A list of arguments, acceptable to <em>git-rev-parse</em> and
-       <em>git-rev-list</em>, that specify the specific objects and references
-       to transport.  For example, "master~10..master" causes the
+       <em>git-rev-list</em>, that specifies the specific objects and references
+       to transport.  For example, <tt>master\~10..master</tt> causes the
        current master reference to be packaged along with all objects
        added since its 10th ancestor commit.  There is no explicit
        limit to the number of references and objects that may be
@@ -410,8 +410,8 @@ unbundle &lt;file&gt;
        A list of references used to limit the references reported as
        available. This is principally of use to <em>git-fetch</em>, which
        expects to receive only those references asked for and not
-       necessarily everything in the pack (in this case, <em>git-bundle</em> is
-       acting like <em>git-fetch-pack</em>).
+       necessarily everything in the pack (in this case, <em>git-bundle</em> acts
+       like <em>git-fetch-pack</em>).
 </p>
 </dd>
 </dl></div>
@@ -420,15 +420,15 @@ unbundle &lt;file&gt;
 <div class="sectionbody">
 <div class="para"><p><em>git-bundle</em> will only package references that are shown by
 <em>git-show-ref</em>: this includes heads, tags, and remote heads.  References
-such as master~1 cannot be packaged, but are perfectly suitable for
+such as <tt>master\~1</tt> cannot be packaged, but are perfectly suitable for
 defining the basis.  More than one reference may be packaged, and more
 than one basis can be specified.  The objects packaged are those not
 contained in the union of the given bases.  Each basis can be
-specified explicitly (e.g., ^master~10), or implicitly (e.g.,
-master~10..master, --since=10.days.ago master).</p></div>
+specified explicitly (e.g. <tt>^master\~10</tt>), or implicitly (e.g.
+<tt>master\~10..master</tt>, <tt>--since=10.days.ago master</tt>).</p></div>
 <div class="para"><p>It is very important that the basis used be held by the destination.
-It is okay to err on the side of conservatism, causing the bundle file
-to contain objects already in the destination as these are ignored
+It is okay to err on the side of caution, causing the bundle file
+to contain objects already in the destination, as these are ignored
 when unpacking at the destination.</p></div>
 </div>
 <h2 id="_example">EXAMPLE</h2>
@@ -436,28 +436,28 @@ when unpacking at the destination.</p></div>
 <div class="para"><p>Assume you want to transfer the history from a repository R1 on machine A
 to another repository R2 on machine B.
 For whatever reason, direct connection between A and B is not allowed,
-but we can move data from A to B via some mechanism (CD, email, etc).
-We want to update R2 with developments made on branch master in R1.</p></div>
-<div class="para"><p>To bootstrap the process, you can first create a bundle that doesn't have
-any basis. You can use a tag to remember up to what commit you sent out
-in order to make it easy to later update the other repository with
-incremental bundle,</p></div>
+but we can move data from A to B via some mechanism (CD, email, etc.).
+We want to update R2 with development made on the branch master in R1.</p></div>
+<div class="para"><p>To bootstrap the process, you can first create a bundle that does not have
+any basis. You can use a tag to remember up to what commit you last
+processed, in order to make it easy to later update the other repository
+with an incremental bundle:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>machineA$ cd R1
 machineA$ git bundle create file.bundle master
 machineA$ git tag -f lastR2bundle master</tt></pre>
 </div></div>
-<div class="para"><p>Then you sneakernet file.bundle to the target machine B. Because you don't
-have to have any object to extract objects from such a bundle, not only
-you can fetch/pull from a bundle, you can clone from it as if it was a
-remote repository.</p></div>
+<div class="para"><p>Then you transfer file.bundle to the target machine B. If you are creating
+the repository on machine B, then you can clone from the bundle as if it
+were a remote repository instead of creating an empty repository and then
+pulling or fetching objects from the bundle:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>machineB$ git clone /home/me/tmp/file.bundle R2</tt></pre>
 </div></div>
 <div class="para"><p>This will define a remote called "origin" in the resulting repository that
-lets you fetch and pull from the bundle. $GIT_DIR/config file in R2 may
+lets you fetch and pull from the bundle. The $GIT_DIR/config file in R2 will
 have an entry like this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -465,61 +465,61 @@ have an entry like this:</p></div>
     url = /home/me/tmp/file.bundle
     fetch = refs/heads/*:refs/remotes/origin/*</tt></pre>
 </div></div>
-<div class="para"><p>You can fetch/pull to update the resulting mine.git repository after
-replacing the bundle you store at /home/me/tmp/file.bundle with incremental
-updates from here on.</p></div>
-<div class="para"><p>After working more in the original repository, you can create an
-incremental bundle to update the other:</p></div>
+<div class="para"><p>To update the resulting mine.git repository, you can fetch or pull after
+replacing the bundle stored at /home/me/tmp/file.bundle with incremental
+updates.</p></div>
+<div class="para"><p>After working some more in the original repository, you can create an
+incremental bundle to update the other repository:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>machineA$ cd R1
 machineA$ git bundle create file.bundle lastR2bundle..master
 machineA$ git tag -f lastR2bundle master</tt></pre>
 </div></div>
-<div class="para"><p>and sneakernet it to the other machine to replace /home/me/tmp/file.bundle,
-and pull from it.</p></div>
+<div class="para"><p>You then transfer the bundle to the other machine to replace
+/home/me/tmp/file.bundle, and pull from it.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>machineB$ cd R2
 machineB$ git pull</tt></pre>
 </div></div>
 <div class="para"><p>If you know up to what commit the intended recipient repository should
-have the necessary objects for, you can use that knowledge to specify the
+have the necessary objects, you can use that knowledge to specify the
 basis, giving a cut-off point to limit the revisions and objects that go
 in the resulting bundle. The previous example used lastR2bundle tag
-for this purpose, but you can use other options you would give to
+for this purpose, but you can use any other options that you would give to
 the <a href="git-log.html">git-log(1)</a> command. Here are more examples:</p></div>
-<div class="para"><p>You can use a tag that is present in both.</p></div>
+<div class="para"><p>You can use a tag that is present in both:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bundle create mybundle v1.0.0..master</tt></pre>
 </div></div>
-<div class="para"><p>You can use a basis based on time.</p></div>
+<div class="para"><p>You can use a basis based on time:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bundle create mybundle --since=10.days master</tt></pre>
 </div></div>
-<div class="para"><p>Or you can use the number of commits.</p></div>
+<div class="para"><p>You can use the number of commits:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bundle create mybundle -10 master</tt></pre>
 </div></div>
 <div class="para"><p>You can run <tt>git-bundle verify</tt> to see if you can extract from a bundle
-that was created with a basis.</p></div>
+that was created with a basis:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bundle verify mybundle</tt></pre>
 </div></div>
 <div class="para"><p>This will list what commits you must have in order to extract from the
-bundle and will error out if you don't have them.</p></div>
+bundle and will error out if you do not have them.</p></div>
 <div class="para"><p>A bundle from a recipient repository's point of view is just like a
-regular repository it fetches/pulls from. You can for example map
-refs, like this example, when fetching:</p></div>
+regular repository which it fetches or pulls from. You can, for example, map
+references when fetching:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git fetch mybundle master:localRef</tt></pre>
 </div></div>
-<div class="para"><p>Or see what refs it offers.</p></div>
+<div class="para"><p>You can also see what references it offers.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-remote mybundle</tt></pre>
@@ -535,7 +535,7 @@ refs, like this example, when fetching:</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-02-14 08:18:04 UTC
+Last updated 2009-03-26 08:39:12 UTC
 </div>
 </div>
 </body>
