@@ -357,15 +357,11 @@ Generic &lt;revision range&gt; expression (see "SPECIFYING
 </p>
 </li>
 </ol></div>
-<div class="para"><p>A single commit, when interpreted as a &lt;revision range&gt;
-expression, means "everything that leads to that commit", but
-if you write <em>git format-patch &lt;commit&gt;</em>, the previous rule
-applies to that command line and you do not get "everything
-since the beginning of the time".  If you want to format
-everything since project inception to one commit, say "git
-format-patch --root &lt;commit&gt;" to make it clear that it is the
-latter case.  If you want to format a single commit, you can do
-this with "git format-patch -1 &lt;commit&gt;".</p></div>
+<div class="para"><p>The first rule takes precedence in the case of a single &lt;commit&gt;.  To
+apply the second rule, i.e., format everything since the beginning of
+history up until &lt;commit&gt;, use the <em>--root</em> option: "git format-patch
+--root &lt;commit&gt;".  If you want to format only &lt;commit&gt; itself, you
+can do this with "git format-patch -1 &lt;commit&gt;".</p></div>
 <div class="para"><p>By default, each output file is numbered sequentially from 1, and uses the
 first line of the commit message (massaged for pathname safety) as
 the filename. With the --numbered-files option, the output file names
@@ -1053,6 +1049,16 @@ if that is not set.</p></div>
 </p>
 </dd>
 <dt>
+--add-header=&lt;header&gt;
+</dt>
+<dd>
+<p>
+        Add an arbitrary header to the email headers.  This is in addition
+        to any configured headers, and may be used multiple times.
+        For example, --add-header="Organization: git-foo"
+</p>
+</dd>
+<dt>
 --cover-letter
 </dt>
 <dd>
@@ -1085,6 +1091,18 @@ not add any suffix.</p></div>
         that they differ.  Note that this disable the patch to be properly
         applied.  By default the contents of changes in those files are
         encoded in the patch.
+</p>
+</dd>
+<dt>
+--root
+</dt>
+<dd>
+<p>
+        Treat the revision argument as a &lt;revision range&gt;, even if it
+        is just a single commit (that would normally be treated as a
+        &lt;since&gt;).  Note that root commits included in the specified
+        range are always formatted as creation patches, independently
+        of this flag.
 </p>
 </dd>
 </dl></div>
@@ -1184,7 +1202,7 @@ as e-mailable patches:
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-03-22 08:21:22 UTC
+Last updated 2009-04-02 06:49:52 UTC
 </div>
 </div>
 </body>
