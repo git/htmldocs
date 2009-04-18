@@ -304,109 +304,83 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-mergetool(1)</title>
+<title>git-mergetool--lib(1)</title>
 </head>
 <body>
 <div id="header">
 <h1>
-git-mergetool(1) Manual Page
+git-mergetool--lib(1) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-mergetool -
-   Run merge conflict resolution tools to resolve merge conflicts
+<p>git-mergetool--lib -
+   Common git merge tool shell scriptlets
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git mergetool</em> [--tool=&lt;tool&gt;] [-y|--no-prompt|--prompt] [&lt;file&gt;]&#8230;</p></div>
+<div class="para"><p><em>TOOL_MODE=(diff|merge) . "$(git --exec-path)/git-mergetool--lib"</em></p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Use <tt>git mergetool</tt> to run one of several merge utilities to resolve
-merge conflicts.  It is typically run after <em>git-merge</em>.</p></div>
-<div class="para"><p>If one or more &lt;file&gt; parameters are given, the merge tool program will
-be run to resolve differences on each file.  If no &lt;file&gt; names are
-specified, <em>git-mergetool</em> will run the merge tool program on every file
-with merge conflicts.</p></div>
+<div class="para"><p>This is not a command the end user would want to run.  Ever.
+This documentation is meant for people who are studying the
+Porcelain-ish scripts and/or are writing new ones.</p></div>
+<div class="para"><p>The <em>git-mergetool--lib</em> scriptlet is designed to be sourced (using
+<tt>.</tt>) by other shell scripts to set up functions for working
+with git merge tools.</p></div>
+<div class="para"><p>Before sourcing <em>git-mergetool--lib</em>, your script must set <tt>TOOL_MODE</tt>
+to define the operation mode for the functions listed below.
+<em>diff</em> and <em>merge</em> are valid values.</p></div>
 </div>
-<h2 id="_options">OPTIONS</h2>
+<h2 id="_functions">FUNCTIONS</h2>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
--t &lt;tool&gt;
-</dt>
-<dt>
---tool=&lt;tool&gt;
+get_merge_tool
 </dt>
 <dd>
 <p>
-        Use the merge resolution program specified by &lt;tool&gt;.
-        Valid merge tools are:
-        kdiff3, tkdiff, meld, xxdiff, emerge, vimdiff, gvimdiff, ecmerge,
-        diffuse, tortoisemerge and opendiff
-</p>
-<div class="para"><p>If a merge resolution program is not specified, <em>git-mergetool</em>
-will use the configuration variable <tt>merge.tool</tt>.  If the
-configuration variable <tt>merge.tool</tt> is not set, <em>git-mergetool</em>
-will pick a suitable default.</p></div>
-<div class="para"><p>You can explicitly provide a full path to the tool by setting the
-configuration variable <tt>mergetool.&lt;tool&gt;.path</tt>. For example, you
-can configure the absolute path to kdiff3 by setting
-<tt>mergetool.kdiff3.path</tt>. Otherwise, <em>git-mergetool</em> assumes the
-tool is available in PATH.</p></div>
-<div class="para"><p>Instead of running one of the known merge tool programs,
-<em>git-mergetool</em> can be customized to run an alternative program
-by specifying the command line to invoke in a configuration
-variable <tt>mergetool.&lt;tool&gt;.cmd</tt>.</p></div>
-<div class="para"><p>When <em>git-mergetool</em> is invoked with this tool (either through the
-<tt>-t</tt> or <tt>--tool</tt> option or the <tt>merge.tool</tt> configuration
-variable) the configured command line will be invoked with <tt>$BASE</tt>
-set to the name of a temporary file containing the common base for
-the merge, if available; <tt>$LOCAL</tt> set to the name of a temporary
-file containing the contents of the file on the current branch;
-<tt>$REMOTE</tt> set to the name of a temporary file containing the
-contents of the file to be merged, and <tt>$MERGED</tt> set to the name
-of the file to which the merge tool should write the result of the
-merge resolution.</p></div>
-<div class="para"><p>If the custom merge tool correctly indicates the success of a
-merge resolution with its exit code, then the configuration
-variable <tt>mergetool.&lt;tool&gt;.trustExitCode</tt> can be set to <tt>true</tt>.
-Otherwise, <em>git-mergetool</em> will prompt the user to indicate the
-success of the resolution after the custom tool has exited.</p></div>
-</dd>
-<dt>
--y
-</dt>
-<dt>
---no-prompt
-</dt>
-<dd>
-<p>
-        Don't prompt before each invocation of the merge resolution
-        program.
+        returns a merge tool.
 </p>
 </dd>
 <dt>
---prompt
+get_merge_tool_cmd
 </dt>
 <dd>
 <p>
-        Prompt before each invocation of the merge resolution program.
-        This is the default behaviour; the option is provided to
-        override any configuration settings.
+        returns the custom command for a merge tool.
+</p>
+</dd>
+<dt>
+get_merge_tool_path
+</dt>
+<dd>
+<p>
+        returns the custom path for a merge tool.
+</p>
+</dd>
+<dt>
+run_merge_tool
+</dt>
+<dd>
+<p>
+        launches a merge tool given the tool name and a true/false
+        flag to indicate whether a merge base is present.
+        <em>$MERGED</em>, <em>$LOCAL</em>, <em>$REMOTE</em>, and <em>$BASE</em> must be defined
+        for use by the merge tool.
 </p>
 </dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Theodore Y Ts'o &lt;tytso@mit.edu&gt;</p></div>
+<div class="para"><p>Written by David Aguilar &lt;davvid@gmail.com&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Theodore Y Ts'o.</p></div>
+<div class="para"><p>Documentation by David Aguilar and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -414,7 +388,7 @@ success of the resolution after the custom tool has exited.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-18 06:17:32 UTC
+Last updated 2009-04-18 06:17:31 UTC
 </div>
 </div>
 </body>

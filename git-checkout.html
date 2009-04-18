@@ -321,20 +321,20 @@ git-checkout(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git checkout</em> [-q] [-f] [-t | --track | --no-track] [-b &lt;new_branch&gt; [-l]] [-m] [&lt;branch&gt;]
+<div class="content"><em>git checkout</em> [-q] [-f] [-m] [&lt;branch&gt;]
+<em>git checkout</em> [-q] [-f] [-m] [-b &lt;new_branch&gt;] [&lt;start_point&gt;]
 <em>git checkout</em> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;paths&gt;&#8230;</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="para"><p>When &lt;paths&gt; are not given, this command switches branches by
-updating the index and working tree to reflect the specified
-branch, &lt;branch&gt;, and updating HEAD to be &lt;branch&gt; or, if
-specified, &lt;new_branch&gt;.  Using -b will cause &lt;new_branch&gt; to
-be created; in this case you can use the --track or --no-track
-options, which will be passed to <tt>git branch</tt>.</p></div>
-<div class="para"><p>As a convenience, --track will default to creating a branch whose
-name is constructed from the specified branch name by stripping
-the first namespace level.</p></div>
+updating the index, working tree, and HEAD to reflect the specified
+branch.</p></div>
+<div class="para"><p>If <tt>-b</tt> is given, a new branch is created and checked out, as if
+<a href="git-branch.html">git-branch(1)</a> were called; in this case you can
+use the --track or --no-track options, which will be passed to <tt>git
+branch</tt>.  As a convenience, --track without <tt>-b</tt> implies branch
+creation; see the description of --track below.</p></div>
 <div class="para"><p>When &lt;paths&gt; are given, this command does <strong>not</strong> switch
 branches.  It updates the named paths in the working tree from
 the index file, or from a named &lt;tree-ish&gt; (most often a commit).  In
@@ -392,9 +392,7 @@ entries; instead, unmerged entries are ignored.</p></div>
 <dd>
 <p>
         Create a new branch named &lt;new_branch&gt; and start it at
-        &lt;branch&gt;.  The new branch name must pass all checks defined
-        by <a href="git-check-ref-format.html">git-check-ref-format(1)</a>.  Some of these checks
-        may restrict the characters allowed in a branch name.
+        &lt;start_point&gt;; see <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
 </dd>
 <dt>
@@ -405,16 +403,8 @@ entries; instead, unmerged entries are ignored.</p></div>
 </dt>
 <dd>
 <p>
-        When creating a new branch, set up configuration so that <em>git-pull</em>
-        will automatically retrieve data from the start point, which must be
-        a branch. Use this if you always pull from the same upstream branch
-        into the new branch, and if you don't want to use "git pull
-        &lt;repository&gt; &lt;refspec&gt;" explicitly. This behavior is the default
-        when the start point is a remote branch. Set the
-        branch.autosetupmerge configuration variable to <tt>false</tt> if you want
-        <em>git checkout</em> and <em>git branch</em> to always behave as if <em>--no-track</em> were
-        given. Set it to <tt>always</tt> if you want this behavior when the
-        start point is either a local or remote branch.
+        When creating a new branch, set up "upstream" configuration. See
+        "--track" in <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
 <div class="para"><p>If no <em>-b</em> option is given, the name of the new branch will be
 derived from the remote branch.  If "remotes/" or "refs/remotes/"
@@ -431,7 +421,8 @@ explicitly give a name with <em>-b</em> in such a case.</p></div>
 </dt>
 <dd>
 <p>
-        Ignore the branch.autosetupmerge configuration variable.
+        Do not set up "upstream" configuration, even if the
+        branch.autosetupmerge configuration variable is true.
 </p>
 </dd>
 <dt>
@@ -439,9 +430,8 @@ explicitly give a name with <em>-b</em> in such a case.</p></div>
 </dt>
 <dd>
 <p>
-        Create the new branch's reflog.  This activates recording of
-        all changes made to the branch ref, enabling use of date
-        based sha1 expressions such as "&lt;branchname&gt;@{yesterday}".
+        Create the new branch's reflog; see <a href="git-branch.html">git-branch(1)</a> for
+        details.
 </p>
 </dd>
 <dt>
@@ -481,11 +471,35 @@ the conflicted merge in the specified paths.</p></div>
 </p>
 </dd>
 <dt>
+&lt;branch&gt;
+</dt>
+<dd>
+<p>
+        Branch to checkout; if it refers to a branch (i.e., a name that,
+        when prepended with "refs/heads/", is a valid ref), then that
+        branch is checked out. Otherwise, if it refers to a valid
+        commit, your HEAD becomes "detached" and you are no longer on
+        any branch (see below for details).
+</p>
+<div class="para"><p>As a special case, the <tt>"@{-N}"</tt> syntax for the N-th last branch
+checks out the branch (instead of detaching).  You may also specify
+<tt>-</tt> which is synonymous with <tt>"@{-1}"</tt>.</p></div>
+</dd>
+<dt>
 &lt;new_branch&gt;
 </dt>
 <dd>
 <p>
         Name for the new branch.
+</p>
+</dd>
+<dt>
+&lt;start_point&gt;
+</dt>
+<dd>
+<p>
+        The name of a commit at which to start the new branch; see
+        <a href="git-branch.html">git-branch(1)</a> for details. Defaults to HEAD.
 </p>
 </dd>
 <dt>
@@ -496,20 +510,6 @@ the conflicted merge in the specified paths.</p></div>
         Tree to checkout from (when paths are given). If not specified,
         the index will be used.
 </p>
-</dd>
-<dt>
-&lt;branch&gt;
-</dt>
-<dd>
-<p>
-        Branch to checkout (when no paths are given); may be any object
-        ID that resolves to a commit.  Defaults to HEAD.
-</p>
-<div class="para"><p>When this parameter names a non-branch (but still a valid commit object),
-your HEAD becomes <em>detached</em>.</p></div>
-<div class="para"><p>As a special case, the <tt>"@{-N}"</tt> syntax for the N-th last branch
-checks out the branch (instead of detaching).  You may also specify
-<tt>-</tt> which is synonymous with <tt>"@{-1}"</tt>.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -652,7 +652,7 @@ $ git add frotz</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-08 07:36:11 UTC
+Last updated 2009-04-18 06:17:30 UTC
 </div>
 </div>
 </body>
