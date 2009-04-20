@@ -384,6 +384,11 @@ is given:</p></div>
 <p>
 <em>group</em> (or <em>true</em>): Make the repository group-writable, (and g+sx, since
    the git group may be not the primary group of all users).
+   This is used to loosen the permissions of an otherwise safe umask(2) value.
+   Note that the umask still applies to the other permission bits (e.g. if
+   umask is <em>0022</em>, using <em>group</em> will not remove read privileges from other
+   (non-group) users). See <em>0xxx</em> for how to exactly specify the repository
+   permissions.
 </p>
 </li>
 <li>
@@ -394,11 +399,12 @@ is given:</p></div>
 </li>
 <li>
 <p>
-<em>0xxx</em>: <em>0xxx</em> is an octal number and each file will have mode <em>0xxx</em>
-   Any option except <em>umask</em> can be set using this option. <em>0xxx</em> will
-   override users umask(2) value, and thus, users with a safe umask (0077)
-   can use this option. <em>0640</em> will create a repository which is group-readable
-   but not writable. <em>0660</em> is equivalent to <em>group</em>.
+<em>0xxx</em>: <em>0xxx</em> is an octal number and each file will have mode <em>0xxx</em>.
+   <em>0xxx</em> will override users' umask(2) value (and not only loosen permissions
+   as <em>group</em> and <em>all</em> does). <em>0640</em> will create a repository which is
+   group-readable, but not group-writable or accessible to others. <em>0660</em> will
+   create a repo that is readable and writable to the current user and group,
+   but inaccessible to others.
 </p>
 <div class="para"><p>By default, the configuration flag receive.denyNonFastForwards is enabled
 in shared repositories, so that you cannot force a non fast-forwarding push
@@ -472,7 +478,7 @@ add all existing file to the index
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-02 06:49:55 UTC
+Last updated 2009-04-20 08:17:44 UTC
 </div>
 </div>
 </body>
