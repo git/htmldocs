@@ -776,14 +776,14 @@ echo "${WS}your whitespace color or blue reverse${RESET}"</tt></pre>
 <h2 id="_configuration_file">CONFIGURATION FILE</h2>
 <div class="sectionbody">
 <div class="para"><p>The git configuration file contains a number of variables that affect
-the git command's behavior. <tt>.git/config</tt> file for each repository
-is used to store the information for that repository, and
-<tt>$HOME/.gitconfig</tt> is used to store per user information to give
-fallback values for <tt>.git/config</tt> file. The file <tt>/etc/gitconfig</tt>
-can be used to store system-wide defaults.</p></div>
-<div class="para"><p>They can be used by both the git plumbing
-and the porcelains. The variables are divided into sections, where
-in the fully qualified variable name the variable itself is the last
+the git command's behavior. The <tt>.git/config</tt> file in each repository
+is used to store the configuration for that repository, and
+<tt>$HOME/.gitconfig</tt> is used to store a per-user configuration as
+fallback values for the <tt>.git/config</tt> file. The file <tt>/etc/gitconfig</tt>
+can be used to store a system-wide default configuration.</p></div>
+<div class="para"><p>The configuration variables are used by both the git plumbing
+and the porcelains. The variables are divided into sections, wherein
+the fully qualified variable name of the variable itself is the last
 dot-separated segment and the section name is everything before the last
 dot. The variable names are case-insensitive and only alphanumeric
 characters are allowed. Some variables may appear multiple times.</p></div>
@@ -795,25 +795,25 @@ blank lines are ignored.</p></div>
 the name of the section in square brackets and continues until the next
 section begins.  Section names are not case sensitive.  Only alphanumeric
 characters, <tt>-</tt> and <tt>.</tt> are allowed in section names.  Each variable
-must belong to some section, which means that there must be section
-header before first setting of a variable.</p></div>
+must belong to some section, which means that there must be a section
+header before the first setting of a variable.</p></div>
 <div class="para"><p>Sections can be further divided into subsections.  To begin a subsection
 put its name in double quotes, separated by space from the section name,
-in the section header, like in example below:</p></div>
+in the section header, like in the example below:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [section "subsection"]
 </tt></pre>
 </div></div>
-<div class="para"><p>Subsection names can contain any characters except newline (doublequote
-<tt>"</tt> and backslash have to be escaped as <tt>\"</tt> and <tt>\\</tt>,
-respectively) and are case sensitive.  Section header cannot span multiple
+<div class="para"><p>Subsection names are case sensitive and can contain any characters except
+newline (doublequote <tt>"</tt> and backslash have to be escaped as <tt>\"</tt> and <tt>\\</tt>,
+respectively).  Section headers cannot span multiple
 lines.  Variables may belong directly to a section or to a given subsection.
 You can have <tt>[section]</tt> if you have <tt>[section "subsection"]</tt>, but you
 don't need to.</p></div>
-<div class="para"><p>There is also (case insensitive) alternative <tt>[section.subsection]</tt> syntax.
-In this syntax subsection names follow the same restrictions as for section
-name.</p></div>
+<div class="para"><p>There is also a case insensitive alternative <tt>[section.subsection]</tt> syntax.
+In this syntax, subsection names follow the same restrictions as for section
+names.</p></div>
 <div class="para"><p>All the other lines are recognized as setting variables, in the form
 <em>name = value</em>.  If there is no equal sign on the line, the entire line
 is taken as <em>name</em> and the variable is recognized as boolean "true".
@@ -828,18 +828,18 @@ a string, an integer, or a boolean.  Boolean values may be given as yes/no,
 converting value to the canonical form using <em>--bool</em> type specifier;
 <em>git-config</em> will ensure that the output is "true" or "false".</p></div>
 <div class="para"><p>String values may be entirely or partially enclosed in double quotes.
-You need to enclose variable value in double quotes if you want to
-preserve leading or trailing whitespace, or if variable value contains
-beginning of comment characters (if it contains <em>#</em> or <em>;</em>).
-Double quote <tt>"</tt> and backslash <tt>\</tt> characters in variable value must
+You need to enclose variable values in double quotes if you want to
+preserve leading or trailing whitespace, or if the variable value contains
+comment characters (i.e. it contains <em>#</em> or <em>;</em>).
+Double quote <tt>"</tt> and backslash <tt>\</tt> characters in variable values must
 be escaped: use <tt>\"</tt> for <tt>"</tt> and <tt>\\</tt> for <tt>\</tt>.</p></div>
 <div class="para"><p>The following escape sequences (beside <tt>\"</tt> and <tt>\\</tt>) are recognized:
 <tt>\n</tt> for newline character (NL), <tt>\t</tt> for horizontal tabulation (HT, TAB)
 and <tt>\b</tt> for backspace (BS).  No other char escape sequence, nor octal
 char sequences are valid.</p></div>
-<div class="para"><p>Variable value ending in a <tt>\</tt> is continued on the next line in the
+<div class="para"><p>Variable values ending in a <tt>\</tt> are continued on the next line in the
 customary UNIX fashion.</p></div>
-<div class="para"><p>Some variables may require special value format.</p></div>
+<div class="para"><p>Some variables may require a special value format.</p></div>
 <h3 id="_example">Example</h3><div style="clear:left"></div>
 <div class="literalblock">
 <div class="content">
@@ -1820,6 +1820,18 @@ fetch.unpackLimit
 </p>
 </dd>
 <dt>
+format.attach
+</dt>
+<dd>
+<p>
+        Enable multipart/mixed attachments as the default for
+        <em>format-patch</em>.  The value can also be a double quoted string
+        which will enable attachments as the default and set the
+        value as the boundary.  See the --attach option in
+        <a href="git-format-patch.html">git-format-patch(1)</a>.
+</p>
+</dd>
+<dt>
 format.numbered
 </dt>
 <dd>
@@ -1838,6 +1850,24 @@ format.headers
 <p>
         Additional email headers to include in a patch to be submitted
         by mail.  See <a href="git-format-patch.html">git-format-patch(1)</a>.
+</p>
+</dd>
+<dt>
+format.cc
+</dt>
+<dd>
+<p>
+        Additional "Cc:" headers to include in a patch to be submitted
+        by mail.  See the --cc option in <a href="git-format-patch.html">git-format-patch(1)</a>.
+</p>
+</dd>
+<dt>
+format.subjectprefix
+</dt>
+<dd>
+<p>
+        The default for format-patch is to output files with the <em>[PATCH]</em>
+        subject prefix. Use this variable to change that prefix.
 </p>
 </dd>
 <dt>
@@ -1866,11 +1896,11 @@ format.thread
 <dd>
 <p>
         The default threading style for <em>git-format-patch</em>.  Can be
-        either a boolean value, <tt>shallow</tt> or <tt>deep</tt>.  <em>Shallow</em>
+        either a boolean value, <tt>shallow</tt> or <tt>deep</tt>.  <tt>shallow</tt>
         threading makes every mail a reply to the head of the series,
         where the head is chosen from the cover letter, the
         <tt>--in-reply-to</tt>, and the first patch mail, in this order.
-        <em>Deep</em> threading makes every mail a reply to the previous one.
+        <tt>deep</tt> threading makes every mail a reply to the previous one.
         A true boolean value is the same as <tt>shallow</tt>, and a false
         value disables threading.
 </p>
@@ -3263,7 +3293,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-20 08:17:44 UTC
+Last updated 2009-04-25 08:29:43 UTC
 </div>
 </div>
 </body>

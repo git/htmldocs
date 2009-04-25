@@ -321,10 +321,10 @@ git-format-patch(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git format-patch</em> [-k] [-o &lt;dir&gt; | --stdout] [--thread]
-                   [--attach[=&lt;boundary&gt;] | --inline[=&lt;boundary&gt;] |
-                     [--no-attach]]
-                   [-s | --signoff] [&lt;common diff options&gt;]
+<div class="content"><em>git format-patch</em> [-k] [(-o|--output-directory) &lt;dir&gt; | --stdout]
+                   [--thread[=&lt;style&gt;]]
+                   [(--attach|--inline)[=&lt;boundary&gt;] | --no-attach]
+                   [-s | --signoff]
                    [-n | --numbered | -N | --no-numbered]
                    [--start-number &lt;n&gt;] [--numbered-files]
                    [--in-reply-to=Message-Id] [--suffix=.&lt;sfx&gt;]
@@ -332,6 +332,7 @@ git-format-patch(1) Manual Page
                    [--subject-prefix=Subject-Prefix]
                    [--cc=&lt;email&gt;]
                    [--cover-letter]
+                   [&lt;common diff options&gt;]
                    [ &lt;since&gt; | &lt;revision range&gt; ]</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
@@ -999,9 +1000,9 @@ override configuration settings.</p></div>
         the Message-Id header to reference.
 </p>
 <div class="para"><p>The optional &lt;style&gt; argument can be either <tt>shallow</tt> or <tt>deep</tt>.
-<em>Shallow</em> threading makes every mail a reply to the head of the
+<em>shallow</em> threading makes every mail a reply to the head of the
 series, where the head is chosen from the cover letter, the
-<tt>--in-reply-to</tt>, and the first patch mail, in this order.  <em>Deep</em>
+<tt>--in-reply-to</tt>, and the first patch mail, in this order.  <em>deep</em>
 threading makes every mail a reply to the previous one.  If not
 specified, defaults to the <em>format.thread</em> configuration, or <tt>shallow</tt>
 if that is not set.</p></div>
@@ -1075,22 +1076,21 @@ if that is not set.</p></div>
 <p>
         Instead of using <tt>.patch</tt> as the suffix for generated
         filenames, use specified suffix.  A common alternative is
-        <tt>--suffix=.txt</tt>.
+        <tt>--suffix=.txt</tt>.  Leaving this empty will remove the <tt>.patch</tt>
+        suffix.
 </p>
-<div class="para"><p>Note that you would need to include the leading dot <tt>.</tt> if you
-want a filename like <tt>0001-description-of-my-change.patch</tt>, and
-the first letter does not have to be a dot.  Leaving it empty would
-not add any suffix.</p></div>
+<div class="para"><p>Note that the leading character does not have to be a dot; for example,
+you can use <tt>--suffix=-patch</tt> to get <tt>0001-description-of-my-change-patch</tt>.</p></div>
 </dd>
 <dt>
 --no-binary
 </dt>
 <dd>
 <p>
-        Don't output contents of changes in binary files, just take note
-        that they differ.  Note that this disable the patch to be properly
-        applied.  By default the contents of changes in those files are
-        encoded in the patch.
+        Do not output contents of changes in binary files, instead
+        display a notice that those files changed.  Patches generated
+        using this option cannot be applied properly, but they are
+        still useful for code review.
 </p>
 </dd>
 <dt>
@@ -1109,10 +1109,10 @@ not add any suffix.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="para"><p>You can specify extra mail header lines to be added to each message
-in the repository configuration, new defaults for the subject prefix
-and file suffix, control attachments, and number patches when outputting
-more than one.</p></div>
+<div class="para"><p>You can specify extra mail header lines to be added to each message,
+defaults for the subject prefix and file suffix, number patches when
+outputting more than one patch, add "Cc:" headers, configure attachments,
+and sign off patches with configuration variables.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>[format]
@@ -1169,8 +1169,8 @@ The same as the previous one:
 </div></div>
 <div class="para"><p>Additionally, it detects and handles renames and complete rewrites
 intelligently to produce a renaming patch.  A renaming patch reduces
-the amount of text output, and generally makes it easier to review it.
-Note that the "patch" program does not understand renaming patches, so
+the amount of text output, and generally makes it easier to review.
+Note that non-git "patch" programs won't understand renaming patches, so
 use it only when you know the recipient uses git to apply your patch.</p></div>
 </li>
 <li>
@@ -1203,7 +1203,7 @@ as e-mailable patches:
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-21 08:10:52 UTC
+Last updated 2009-04-25 08:29:43 UTC
 </div>
 </div>
 </body>
