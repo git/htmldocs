@@ -352,6 +352,16 @@ distinguish between them.</p></div>
 </p>
 </dd>
 <dt>
+--sq-quote
+</dt>
+<dd>
+<p>
+        Use <em>git-rev-parse</em> in shell quoting mode (see SQ-QUOTE
+        section below). In contrast to the <tt>--sq</tt> option below, this
+        mode does only quoting. Nothing else is done to command input.
+</p>
+</dd>
+<dt>
 --revs-only
 </dt>
 <dd>
@@ -426,7 +436,8 @@ distinguish between them.</p></div>
         properly quoted for consumption by shell.  Useful when
         you expect your parameter to contain whitespaces and
         newlines (e.g. when using pickaxe <tt>-S</tt> with
-        <em>git-diff-*</em>).
+        <em>git-diff-*</em>). In contrast to the <tt>--sq-quote</tt> option,
+        the command input is still interpreted as usual.
 </p>
 </dd>
 <dt>
@@ -941,6 +952,29 @@ C?        option C with an optional argument"
 eval `echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?`</tt></pre>
 </div></div>
 </div>
+<h2 id="_sq_quote">SQ-QUOTE</h2>
+<div class="sectionbody">
+<div class="para"><p>In <tt>--sq-quote</tt> mode, <em>git-rev-parse</em> echoes on the standard output a
+single line suitable for <tt>sh(1)</tt> <tt>eval</tt>. This line is made by
+normalizing the arguments following <tt>--sq-quote</tt>. Nothing other than
+quoting the arguments is done.</p></div>
+<div class="para"><p>If you want command input to still be interpreted as usual by
+<em>git-rev-parse</em> before the output is shell quoted, see the <tt>--sq</tt>
+option.</p></div>
+<h3 id="_example_2">Example</h3><div style="clear:left"></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cat &gt;your-git-script.sh &lt;&lt;\EOF
+#!/bin/sh
+args=$(git rev-parse --sq-quote "$@")   # quote user-supplied arguments
+command="git frotz -n24 $args"          # and use it inside a handcrafted
+                                        # command line
+eval "$command"
+EOF
+
+$ sh your-git-script.sh "a b'c"</tt></pre>
+</div></div>
+</div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="ilist"><ul>
@@ -990,7 +1024,7 @@ Junio C Hamano &lt;gitster@pobox.com&gt; and Pierre Habouzit &lt;madcoder@debian
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-30 03:38:32 UTC
+Last updated 2009-05-23 09:53:15 UTC
 </div>
 </div>
 </body>
