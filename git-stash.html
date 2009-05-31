@@ -396,16 +396,27 @@ show [&lt;stash&gt;]
 </p>
 </dd>
 <dt>
+pop [&lt;stash&gt;]
+</dt>
+<dd>
+<p>
+        Remove a single stashed state from the stash list and apply it
+        on top of the current working tree state, i.e., do the inverse
+        operation of <tt>git stash save</tt>. The working directory must
+        match the index.
+</p>
+<div class="para"><p>Applying the state can fail with conflicts; in this case, it is not
+removed from the stash list. You need to resolve the conflicts by hand
+and call <tt>git stash drop</tt> manually afterwards.</p></div>
+<div class="para"><p>When no <tt>&lt;stash&gt;</tt> is given, <tt>stash@{0}</tt> is assumed. See also <tt>apply</tt>.</p></div>
+</dd>
+<dt>
 apply [--index] [&lt;stash&gt;]
 </dt>
 <dd>
 <p>
-        Restore the changes recorded in the stash on top of the current
-        working tree state.  When no <tt>&lt;stash&gt;</tt> is given, applies the latest
-        one.  The working directory must match the index.
+        Like <tt>pop</tt>, but do not remove the state from the stash list.
 </p>
-<div class="para"><p>This operation can fail with conflicts; you need to resolve them
-by hand in the working tree.</p></div>
 <div class="para"><p>If the <tt>--index</tt> option is used, then tries to reinstate not only the working
 tree's changes, but also the index's ones. However, this can fail, when you
 have conflicts (which are stored in the index, where you therefore can no
@@ -444,16 +455,6 @@ drop [&lt;stash&gt;]
 <p>
         Remove a single stashed state from the stash list. When no <tt>&lt;stash&gt;</tt>
         is given, it removes the latest one. i.e. <tt>stash@{0}</tt>
-</p>
-</dd>
-<dt>
-pop [&lt;stash&gt;]
-</dt>
-<dd>
-<p>
-        Remove a single stashed state from the stash list and apply on top
-        of the current working tree state. When no <tt>&lt;stash&gt;</tt> is given,
-        <tt>stash@{0}</tt> is assumed. See also <tt>apply</tt>.
 </p>
 </dd>
 <dt>
@@ -508,7 +509,7 @@ perform a pull, and then unstash, like this:</p></div>
 file foobar not up to date, cannot merge.
 $ git stash
 $ git pull
-$ git stash apply</tt></pre>
+$ git stash pop</tt></pre>
 </div></div>
 </dd>
 <dt>
@@ -540,7 +541,7 @@ $ git reset --soft HEAD^
 $ git stash
 $ edit emergency fix
 $ git commit -a -m "Fix in a hurry"
-$ git stash apply
+$ git stash pop
 # ... continue hacking ...</tt></pre>
 </div></div>
 </dd>
@@ -585,7 +586,7 @@ $ git commit foo -m 'Remaining parts'</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-04-02 06:50:05 UTC
+Last updated 2009-05-31 21:53:08 UTC
 </div>
 </div>
 </body>
