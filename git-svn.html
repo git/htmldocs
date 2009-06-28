@@ -314,7 +314,7 @@ git-svn(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-svn -
-   Bidirectional operation between a single Subversion branch and git
+   Bidirectional operation between a Subversion repository and git
 </p>
 </div>
 </div>
@@ -327,12 +327,11 @@ git-svn(1) Manual Page
 <div class="para"><p><em>git-svn</em> is a simple conduit for changesets between Subversion and git.
 It provides a bidirectional flow of changes between a Subversion and a git
 repository.</p></div>
-<div class="para"><p><em>git-svn</em> can track a single Subversion branch simply by using a
-URL to the branch, follow branches laid out in the Subversion recommended
-method (trunk, branches, tags directories) with the --stdlayout option, or
-follow branches in any layout with the -T/-t/-b options (see options to
-<em>init</em> below, and also the <em>clone</em> command).</p></div>
-<div class="para"><p>Once tracking a Subversion branch (with any of the above methods), the git
+<div class="para"><p><em>git-svn</em> can track a standard Subversion repository,
+following the common "trunk/branches/tags" layout, with the --stdlayout option.
+It can also follow branches and tags in any layout with the -T/-t/-b options
+(see options to <em>init</em> below, and also the <em>clone</em> command).</p></div>
+<div class="para"><p>Once tracking a Subversion repository (with any of the above methods), the git
 repository can be updated from Subversion by the <em>fetch</em> command and
 Subversion updated from git by the <em>dcommit</em> command.</p></div>
 </div>
@@ -381,8 +380,11 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
 <p>
         These are optional command-line options for init.  Each of
         these flags can point to a relative repository path
-        (--tags=project/tags') or a full url
-        (--tags=https://foo.org/project/tags). The option --stdlayout is
+        (--tags=project/tags) or a full url
+        (--tags=https://foo.org/project/tags).
+        You can specify more than one --tags and/or --branches options, in case
+        your Subversion repository places tags or branches under multiple paths.
+        The option --stdlayout is
         a shorthand way of setting trunk,tags,branches as the relative paths,
         which is the Subversion default. If any of the other options are given
         as well, they take precedence.
@@ -605,8 +607,9 @@ and have no uncommitted changes.</p></div>
         It is recommended that you run <em>git-svn</em> fetch and rebase (not
         pull or merge) your commits against the latest changes in the
         SVN repository.
-        An optional command-line argument may be specified as an
-        alternative to HEAD.
+        An optional revision or branch argument may be specified, and
+        causes <em>git-svn</em> to do all work on that revision/branch
+        instead of HEAD.
         This is advantageous over <em>set-tree</em> (below) because it produces
         cleaner, more linear history.<br />
 </p>
@@ -673,6 +676,28 @@ is very strongly discouraged.</tt></pre>
         specified during git svn init.
 </p>
 </dd>
+<dt>
+-d
+</dt>
+<dt>
+--destination
+</dt>
+<dd>
+<p>
+        If more than one --branches (or --tags) option was given to the <em>init</em>
+        or <em>clone</em> command, you must provide the location of the branch (or
+        tag) you wish to create in the SVN repository.  The value of this
+        option must match one of the paths specified by a --branches (or
+        --tags) option.  You can see these paths with the commands
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git config --get-all svn-remote.&lt;name&gt;.branches
+git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
+</div></div>
+<div class="para"><p>where &lt;name&gt; is the name of the SVN repository as specified by the -R option to
+<em>init</em> (or "svn" by default).</p></div>
+</dd>
 </dl></div>
 </dd>
 <dt>
@@ -695,7 +720,7 @@ is very strongly discouraged.</tt></pre>
 <div class="para"><p>The following features from `svn log' are supported:</p></div>
 <div class="vlist"><dl>
 <dt>
---revision=&lt;n&gt;[:&lt;n&gt;]
+-r/--revision=&lt;n&gt;[:&lt;n&gt;]
 </dt>
 <dd>
 <p>
@@ -888,6 +913,81 @@ environment). This command has the same behaviour.</td>
         Shows the Subversion externals.  Use -r/--revision to specify a
         specific revision.
 </p>
+</dd>
+<dt>
+<em>reset</em>
+</dt>
+<dd>
+<p>
+        Undoes the effects of <em>fetch</em> back to the specified revision.
+        This allows you to re-<em>fetch</em> an SVN revision.  Normally the
+        contents of an SVN revision should never change and <em>reset</em>
+        should not be necessary.  However, if SVN permissions change,
+        or if you alter your --ignore-paths option, a <em>fetch</em> may fail
+        with "not found in commit" (file not previously visible) or
+        "checksum mismatch" (missed a modification).  If the problem
+        file cannot be ignored forever (with --ignore-paths) the only
+        way to repair the repo is to use <em>reset</em>.
+</p>
+<div class="para"><p>Only the rev_map and refs/remotes/git-svn are changed.  Follow <em>reset</em>
+with a <em>fetch</em> and then <em>git-reset</em> or <em>git-rebase</em> to move local
+branches onto the new tree.</p></div>
+<div class="vlist"><dl>
+<dt>
+-r/--revision=&lt;n&gt;
+</dt>
+<dd>
+<p>
+        Specify the most recent revision to keep.  All later revisions
+        are discarded.
+</p>
+</dd>
+<dt>
+-p/--parent
+</dt>
+<dd>
+<p>
+        Discard the specified revision as well, keeping the nearest
+        parent instead.
+</p>
+</dd>
+<dt>
+Example:
+</dt>
+<dd>
+<p>
+Assume you have local changes in "master", but you need to refetch "r2".
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    r1---r2---r3 remotes/git-svn
+                \
+                 A---B master</tt></pre>
+</div></div>
+<div class="para"><p>Fix the ignore-paths or SVN permissions problem that caused "r2" to
+be incomplete in the first place.  Then:</p></div>
+<div class="verseblock">
+<div class="content">git svn reset -r2 -p
+git svn fetch</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    r1---r2'--r3' remotes/git-svn
+      \
+       r2---r3---A---B master</tt></pre>
+</div></div>
+<div class="para"><p>Then fixup "master" with <em>git-rebase</em>.
+Do NOT use <em>git-merge</em> or your history will not be compatible with a
+future <em>dcommit</em>!</p></div>
+<div class="verseblock">
+<div class="content">git rebase --onto remotes/git-svn A^ master</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    r1---r2'--r3' remotes/git-svn
+                \
+                 A'--B' master</tt></pre>
+</div></div>
+</dd>
+</dl></div>
 </dd>
 </dl></div>
 </div>
@@ -1328,6 +1428,17 @@ see the <a href="git-push.html">git-push(1)</a> documentation for details.</p></
 already dcommitted.  It is considered bad practice to --amend commits
 you've already pushed to a remote repository for other users, and
 dcommit with SVN is analogous to that.</p></div>
+<div class="para"><p>When using multiple --branches or --tags, <em>git-svn</em> does not automatically
+handle name collisions (for example, if two branches from different paths have
+the same name, or if a branch and a tag have the same name).  In these cases,
+use <em>init</em> to set up your git repository then, before your first <em>fetch</em>, edit
+the .git/config file so that the branches and tags are associated with
+different name spaces.  For example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>branches = stable/*:refs/remotes/svn/stable/*
+branches = debug/*:refs/remotes/svn/debug/*</tt></pre>
+</div></div>
 </div>
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
@@ -1378,7 +1489,7 @@ should be manually entered with a text-editor or using <em>git-config</em>.</p><
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-06-21 08:03:02 UTC
+Last updated 2009-06-28 05:19:35 UTC
 </div>
 </div>
 </body>
