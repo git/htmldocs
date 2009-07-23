@@ -322,7 +322,7 @@ git-format-patch(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git format-patch</em> [-k] [(-o|--output-directory) &lt;dir&gt; | --stdout]
-                   [--thread[=&lt;style&gt;]]
+                   [--no-thread | --thread[=&lt;style&gt;]]
                    [(--attach|--inline)[=&lt;boundary&gt;] | --no-attach]
                    [-s | --signoff]
                    [-n | --numbered | -N | --no-numbered]
@@ -993,19 +993,27 @@ override configuration settings.</p></div>
 <dt>
 --thread[=&lt;style&gt;]
 </dt>
+<dt>
+--no-thread
+</dt>
 <dd>
 <p>
-        Add In-Reply-To and References headers to make the second and
-        subsequent mails appear as replies to the first.  Also generates
-        the Message-Id header to reference.
+        Controls addition of In-Reply-To and References headers to
+        make the second and subsequent mails appear as replies to the
+        first.  Also controls generation of the Message-Id header to
+        reference.
 </p>
 <div class="para"><p>The optional &lt;style&gt; argument can be either <tt>shallow</tt> or <tt>deep</tt>.
 <em>shallow</em> threading makes every mail a reply to the head of the
 series, where the head is chosen from the cover letter, the
 <tt>--in-reply-to</tt>, and the first patch mail, in this order.  <em>deep</em>
-threading makes every mail a reply to the previous one.  If not
-specified, defaults to the <em>format.thread</em> configuration, or <tt>shallow</tt>
-if that is not set.</p></div>
+threading makes every mail a reply to the previous one.</p></div>
+<div class="para"><p>The default is --no-thread, unless the <em>format.thread</em> configuration
+is set.  If --thread is specified without a style, it defaults to the
+style specified by <em>format.thread</em> if any, or else <tt>shallow</tt>.</p></div>
+<div class="para"><p>Beware that the default for <em>git send-email</em> is to thread emails
+itself.  If you want <em>git format-patch</em> to take care of hreading, you
+will want to ensure that threading is disabled for <em>git send-email</em>.</p></div>
 </dd>
 <dt>
 --in-reply-to=Message-Id
@@ -1203,7 +1211,7 @@ as e-mailable patches:
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-07-01 02:30:51 UTC
+Last updated 2009-07-23 06:20:11 UTC
 </div>
 </div>
 </body>
