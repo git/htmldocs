@@ -311,40 +311,267 @@ div#toc a:visited { color: blue; }
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="para"><p>Talk about &lt;tree-walk.h&gt;, things like</p></div>
+<div class="para"><p>The tree walking API is used to traverse and inspect trees.</p></div>
+</div>
+</div>
+<h2 id="_data_structures">Data Structures</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+<tt>struct name_entry</tt>
+</dt>
+<dd>
+<p>
+        An entry in a tree. Each entry has a sha1 identifier, pathname, and
+        mode.
+</p>
+</dd>
+<dt>
+<tt>struct tree_desc</tt>
+</dt>
+<dd>
+<p>
+        A semi-opaque data structure used to maintain the current state of the
+        walk.
+</p>
 <div class="ilist"><ul>
 <li>
 <p>
-struct tree_desc
+<tt>buffer</tt> is a pointer into the memory representation of the tree. It always
+points at the current entry being visited.
 </p>
 </li>
 <li>
 <p>
-init_tree_desc
+<tt>size</tt> counts the number of bytes left in the <tt>buffer</tt>.
 </p>
 </li>
 <li>
 <p>
-tree_entry_extract
-</p>
-</li>
-<li>
-<p>
-update_tree_entry
-</p>
-</li>
-<li>
-<p>
-get_tree_entry
+<tt>entry</tt> points to the current entry being visited.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>(JC, Linus)</p></div>
+</dd>
+<dt>
+<tt>struct traverse_info</tt>
+</dt>
+<dd>
+<p>
+        A structure used to maintain the state of a traversal.
+</p>
+<div class="ilist"><ul>
+<li>
+<p>
+<tt>prev</tt> points to the traverse_info which was used to descend into the
+current tree. If this is the top-level tree <tt>prev</tt> will point to
+a dummy traverse_info.
+</p>
+</li>
+<li>
+<p>
+<tt>name</tt> is the entry for the current tree (if the tree is a subtree).
+</p>
+</li>
+<li>
+<p>
+<tt>pathlen</tt> is the length of the full path for the current tree.
+</p>
+</li>
+<li>
+<p>
+<tt>conflicts</tt> can be used by callbacks to maintain directory-file conflicts.
+</p>
+</li>
+<li>
+<p>
+<tt>fn</tt> is a callback called for each entry in the tree. See Traversing for more
+information.
+</p>
+</li>
+<li>
+<p>
+<tt>data</tt> can be anything the <tt>fn</tt> callback would want to use.
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
 </div>
+<h2 id="_initializing">Initializing</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+<tt>init_tree_desc</tt>
+</dt>
+<dd>
+<p>
+        Initialize a <tt>tree_desc</tt> and decode its first entry. The buffer and
+        size parameters are assumed to be the same as the buffer and size
+        members of <tt>struct tree</tt>.
+</p>
+</dd>
+<dt>
+<tt>fill_tree_descriptor</tt>
+</dt>
+<dd>
+<p>
+        Initialize a <tt>tree_desc</tt> and decode its first entry given the sha1 of
+        a tree. Returns the <tt>buffer</tt> member if the sha1 is a valid tree
+        identifier and NULL otherwise.
+</p>
+</dd>
+<dt>
+<tt>setup_traverse_info</tt>
+</dt>
+<dd>
+<p>
+        Initialize a <tt>traverse_info</tt> given the pathname of the tree to start
+        traversing from. The <tt>base</tt> argument is assumed to be the <tt>path</tt>
+        member of the <tt>name_entry</tt> being recursed into unless the tree is a
+        top-level tree in which case the empty string ("") is used.
+</p>
+</dd>
+</dl></div>
+</div>
+<h2 id="_walking">Walking</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+<tt>tree_entry</tt>
+</dt>
+<dd>
+<p>
+        Visit the next entry in a tree. Returns 1 when there are more entries
+        left to visit and 0 when all entries have been visited. This is
+        commonly used in the test of a while loop.
+</p>
+</dd>
+<dt>
+<tt>tree_entry_len</tt>
+</dt>
+<dd>
+<p>
+        Calculate the length of a tree entry's pathname. This utilizes the
+        memory structure of a tree entry to avoid the overhead of using a
+        generic strlen().
+</p>
+</dd>
+<dt>
+<tt>update_tree_entry</tt>
+</dt>
+<dd>
+<p>
+        Walk to the next entry in a tree. This is commonly used in conjunction
+        with <tt>tree_entry_extract</tt> to inspect the current entry.
+</p>
+</dd>
+<dt>
+<tt>tree_entry_extract</tt>
+</dt>
+<dd>
+<p>
+        Decode the entry currently being visited (the one pointed to by
+        <tt>tree_desc's</tt> <tt>entry</tt> member) and return the sha1 of the entry. The
+        <tt>pathp</tt> and <tt>modep</tt> arguments are set to the entry's pathname and mode
+        respectively.
+</p>
+</dd>
+<dt>
+<tt>get_tree_entry</tt>
+</dt>
+<dd>
+<p>
+        Find an entry in a tree given a pathname and the sha1 of a tree to
+        search. Returns 0 if the entry is found and -1 otherwise. The third
+        and fourth parameters are set to the entry's sha1 and mode
+        respectively.
+</p>
+</dd>
+</dl></div>
+</div>
+<h2 id="_traversing">Traversing</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+<tt>traverse_trees</tt>
+</dt>
+<dd>
+<p>
+        Traverse <tt>n</tt> number of trees in parallel. The <tt>fn</tt> callback member of
+        <tt>traverse_info</tt> is called once for each tree entry.
+</p>
+</dd>
+<dt>
+<tt>traverse_callback_t</tt>
+</dt>
+<dd>
+<p>
+        The arguments passed to the traverse callback are as follows:
+</p>
+<div class="ilist"><ul>
+<li>
+<p>
+<tt>n</tt> counts the number of trees being traversed.
+</p>
+</li>
+<li>
+<p>
+<tt>mask</tt> has its nth bit set if something exists in the nth entry.
+</p>
+</li>
+<li>
+<p>
+<tt>dirmask</tt> has its nth bit set if the nth tree's entry is a directory.
+</p>
+</li>
+<li>
+<p>
+<tt>entry</tt> is an array of size <tt>n</tt> where the nth entry is from the nth tree.
+</p>
+</li>
+<li>
+<p>
+<tt>info</tt> maintains the state of the traversal.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Returning a negative value will terminate the traversal. Otherwise the
+return value is treated as an update mask. If the nth bit is set the nth tree
+will be updated and if the bit is not set the nth tree entry will be the
+same in the next callback invocation.</p></div>
+</dd>
+<dt>
+<tt>make_traverse_path</tt>
+</dt>
+<dd>
+<p>
+        Generate the full pathname of a tree entry based from the root of the
+        traversal. For example, if the traversal has recursed into another
+        tree named "bar" the pathname of an entry "baz" in the "bar"
+        tree would be "bar/baz".
+</p>
+</dd>
+<dt>
+<tt>traverse_path_len</tt>
+</dt>
+<dd>
+<p>
+        Calculate the length of a pathname returned by <tt>make_traverse_path</tt>.
+        This utilizes the memory structure of a tree entry to avoid the
+        overhead of using a generic strlen().
+</p>
+</dd>
+</dl></div>
+</div>
+<h2 id="_authors">Authors</h2>
+<div class="sectionbody">
+<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt; and Linus Torvalds
+&lt;torvalds@linux-foundation.org&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-07-01 02:31:16 UTC
+Last updated 2009-08-05 21:21:16 UTC
 </div>
 </div>
 </body>
