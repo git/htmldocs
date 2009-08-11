@@ -359,13 +359,45 @@ produces in the caller in order to process it.</p></div>
         Convenience functions that encapsulate a sequence of
         start_command() followed by finish_command(). The argument argv
         specifies the program and its arguments. The argument opt is zero
-        or more of the flags <tt>RUN_COMMAND_NO_STDIN</tt>, <tt>RUN_GIT_CMD</tt>, or
-        <tt>RUN_COMMAND_STDOUT_TO_STDERR</tt> that correspond to the members
-        .no_stdin, .git_cmd, .stdout_to_stderr of <tt>struct child_process</tt>.
+        or more of the flags <tt>RUN_COMMAND_NO_STDIN</tt>, <tt>RUN_GIT_CMD</tt>,
+        <tt>RUN_COMMAND_STDOUT_TO_STDERR</tt>, or <tt>RUN_SILENT_EXEC_FAILURE</tt>
+        that correspond to the members .no_stdin, .git_cmd,
+        .stdout_to_stderr, .silent_exec_failure of <tt>struct child_process</tt>.
         The argument dir corresponds the member .dir. The argument env
         corresponds to the member .env.
 </p>
 </dd>
+</dl></div>
+<div class="para"><p>The functions above do the following:</p></div>
+<div class="olist"><ol>
+<li>
+<p>
+If a system call failed, errno is set and -1 is returned. A diagnostic
+  is printed.
+</p>
+</li>
+<li>
+<p>
+If the program was not found, then -1 is returned and errno is set to
+  ENOENT; a diagnostic is printed only if .silent_exec_failure is 0.
+</p>
+</li>
+<li>
+<p>
+Otherwise, the program is run. If it terminates regularly, its exit
+  code is returned. No diagnistic is printed, even if the exit code is
+  non-zero.
+</p>
+</li>
+<li>
+<p>
+If the program terminated due to a signal, then the return value is the
+  signal number - 128, ie. it is negative and so indicates an unusual
+  condition; a diagnostic is printed. This return value can be passed to
+  exit(2), which will report the same code to the parent process that a
+  POSIX shell's $? would report for a program that died from the signal.
+</p>
+<div class="vlist"><dl>
 <dt>
 <tt>start_async</tt>
 </dt>
@@ -405,6 +437,8 @@ produces in the caller in order to process it.</p></div>
 </p>
 </dd>
 </dl></div>
+</li>
+</ol></div>
 </div>
 <h2 id="_data_structures">Data structures</h2>
 <div class="sectionbody">
@@ -540,6 +574,10 @@ If the string does not contain <em>=</em>, it names an environment
 </ol></div>
 <div class="para"><p>To specify a new initial working directory for the sub-process,
 specify it in the .dir member.</p></div>
+<div class="para"><p>If the program cannot be found, the functions return -1 and set
+errno to ENOENT. Normally, an error message is printed, but if
+.silent_exec_failure is set to 1, no message is printed for this
+special error condition.</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
@@ -631,7 +669,7 @@ It must not change the program's state that the caller of the
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-07-01 02:31:15 UTC
+Last updated 2009-08-11 06:23:35 UTC
 </div>
 </div>
 </body>
