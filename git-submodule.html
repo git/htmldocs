@@ -323,12 +323,12 @@ git-submodule(1) Manual Page
 <div class="verseblock">
 <div class="content"><em>git submodule</em> [--quiet] add [-b branch]
               [--reference &lt;repository&gt;] [--] &lt;repository&gt; &lt;path&gt;
-<em>git submodule</em> [--quiet] status [--cached] [--] [&lt;path&gt;&#8230;]
+<em>git submodule</em> [--quiet] status [--cached] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] init [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] update [--init] [-N|--no-fetch] [--rebase]
-              [--reference &lt;repository&gt;] [--merge] [--] [&lt;path&gt;&#8230;]
+              [--reference &lt;repository&gt;] [--merge] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] summary [--cached|--files] [--summary-limit &lt;n&gt;] [commit] [--] [&lt;path&gt;&#8230;]
-<em>git submodule</em> [--quiet] foreach &lt;command&gt;
+<em>git submodule</em> [--quiet] foreach [--recursive] &lt;command&gt;
 <em>git submodule</em> [--quiet] sync [--] [&lt;path&gt;&#8230;]</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
@@ -414,6 +414,8 @@ status
         does not match the SHA-1 found in the index of the containing
         repository. This command is the default command for <em>git-submodule</em>.
 </p>
+<div class="para"><p>If <em>--recursive</em> is specified, this command will recurse into nested
+submodules, and show their status as well.</p></div>
 </dd>
 <dt>
 init
@@ -445,6 +447,8 @@ update
 <div class="para"><p>If the submodule is not yet initialized, and you just want to use the
 setting as stored in .gitmodules, you can automatically initialize the
 submodule with the --init option.</p></div>
+<div class="para"><p>If <em>--recursive</em> is specified, this command will recurse into the
+registered submodules, and update any nested submodules within.</p></div>
 </dd>
 <dt>
 summary
@@ -467,12 +471,15 @@ foreach
 <dd>
 <p>
         Evaluates an arbitrary shell command in each checked out submodule.
-        The command has access to the variables $path and $sha1:
+        The command has access to the variables $name, $path and $sha1:
+        $name is the name of the relevant submodule section in .gitmodules,
         $path is the name of the submodule directory relative to the
         superproject, and $sha1 is the commit as recorded in the superproject.
         Any submodules defined in the superproject but not checked out are
         ignored by this command. Unless given --quiet, foreach prints the name
         of each submodule before evaluating the command.
+        If --recursive is given, submodules are traversed recursively (i.e.
+        the given shell command is evaluated in nested submodules as well).
         A non-zero return from the command in any submodule causes
         the processing to terminate. This can be overridden by adding <em>|| :</em>
         to the end of the command.
@@ -610,6 +617,17 @@ sync
 for <a href="git-clone.html">git-clone(1)</a>'s --reference and --shared options carefully.</p></div>
 </dd>
 <dt>
+--recursive
+</dt>
+<dd>
+<p>
+        This option is only valid for foreach, update and status commands.
+        Traverse submodules recursively. The operation is performed not
+        only in the submodules of the current repo, but also
+        in any nested submodules inside those submodules (and so on).
+</p>
+</dd>
+<dt>
 &lt;path&gt;&#8230;
 </dt>
 <dd>
@@ -639,7 +657,7 @@ for details.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-08-26 01:35:05 UTC
+Last updated 2009-08-28 01:08:24 UTC
 </div>
 </div>
 </body>
