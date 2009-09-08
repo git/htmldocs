@@ -326,7 +326,7 @@ git-stash(1) Manual Page
 <em>git stash</em> drop [-q|--quiet] [&lt;stash&gt;]
 <em>git stash</em> ( pop | apply ) [--index] [-q|--quiet] [&lt;stash&gt;]
 <em>git stash</em> branch &lt;branchname&gt; [&lt;stash&gt;]
-<em>git stash</em> [save [--keep-index] [-q|--quiet] [&lt;message&gt;]]
+<em>git stash</em> [save [--patch] [-k|--[no-]keep-index] [-q|--quiet] [&lt;message&gt;]]
 <em>git stash</em> clear
 <em>git stash</em> create</div></div>
 </div>
@@ -353,17 +353,27 @@ is also possible).</p></div>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
-save [--keep-index] [-q|--quiet] [&lt;message&gt;]
+save [--patch] [--[no-]keep-index] [-q|--quiet] [&lt;message&gt;]
 </dt>
 <dd>
 <p>
         Save your local modifications to a new <em>stash</em>, and run <tt>git reset
-        --hard</tt> to revert them.  This is the default action when no
-        subcommand is given. The &lt;message&gt; part is optional and gives
-        the description along with the stashed state.
+        --hard</tt> to revert them.  The &lt;message&gt; part is optional and gives
+        the description along with the stashed state.  For quickly making
+        a snapshot, you can omit _both_ "save" and &lt;message&gt;, but giving
+        only &lt;message&gt; does not trigger this action to prevent a misspelled
+        subcommand from making an unwanted stash.
 </p>
 <div class="para"><p>If the <tt>--keep-index</tt> option is used, all changes already added to the
 index are left intact.</p></div>
+<div class="para"><p>With <tt>--patch</tt>, you can interactively select hunks from in the diff
+between HEAD and the working tree to be stashed.  The stash entry is
+constructed such that its index state is the same as the index state
+of your repository, and its worktree contains only the changes you
+selected interactively.  The selected changes are then rolled back
+from your worktree.</p></div>
+<div class="para"><p>The <tt>--patch</tt> option implies <tt>--keep-index</tt>.  You can use
+<tt>--no-keep-index</tt> to override this.</p></div>
 </dd>
 <dt>
 list [&lt;options&gt;]
@@ -605,7 +615,7 @@ xargs git log --merges --no-walk --grep=WIP</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-08-11 06:23:34 UTC
+Last updated 2009-09-08 00:55:01 UTC
 </div>
 </div>
 </body>
