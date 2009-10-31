@@ -380,7 +380,9 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 <dd>
 <p>
         Instead of using the default 7 hexadecimal digits as the
-        abbreviated object name, use &lt;n&gt; digits.
+        abbreviated object name, use &lt;n&gt; digits, or as many digits
+        as needed to form a unique object name.  An &lt;n&gt; of 0
+        will suppress long format, only showing the closest tag.
 </p>
 </dd>
 <dt>
@@ -424,8 +426,8 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
         This is useful when you want to see parts of the commit object name
         in "describe" output, even when the commit in question happens to be
         a tagged version.  Instead of just emitting the tag name, it will
-        describe such a commit as v1.2-0-deadbeef (0th commit since tag v1.2
-        that points at object deadbeef&#8230;.).
+        describe such a commit as v1.2-0-gdeadbee (0th commit since tag v1.2
+        that points at object deadbee&#8230;.).
 </p>
 </dd>
 <dt>
@@ -479,7 +481,7 @@ tags/v1.0.0-21-g975b</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[torvalds@g5 git]$ git describe --all HEAD^
+<pre><tt>[torvalds@g5 git]$ git describe --all --abbrev=4 HEAD^
 heads/lt/describe-7-g975b</tt></pre>
 </div></div>
 <div class="para"><p>With --abbrev set to 0, the command can be used to find the
@@ -489,6 +491,11 @@ closest tagname without any suffix:</p></div>
 <pre><tt>[torvalds@g5 git]$ git describe --abbrev=0 v1.0.5^2
 tags/v1.0.0</tt></pre>
 </div></div>
+<div class="para"><p>Note that the suffix you get if you type these commands today may be
+longer than what Linus saw above when he ran this command, as your
+git repository may have new commits whose object names begin with
+975b that did not exist back then, and "-g975b" suffix alone may not
+be sufficient to disambiguate these commits.</p></div>
 </div>
 <h2 id="_search_strategy">SEARCH STRATEGY</h2>
 <div class="sectionbody">
@@ -523,7 +530,7 @@ updated by Shawn Pearce &lt;spearce@spearce.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-07-01 02:30:47 UTC
+Last updated 2009-10-31 04:03:03 UTC
 </div>
 </div>
 </body>

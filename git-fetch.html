@@ -341,29 +341,6 @@ branches you are not interested in, you will not get them.</p></div>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
--q
-</dt>
-<dt>
---quiet
-</dt>
-<dd>
-<p>
-        Pass --quiet to git-fetch-pack and silence any other internally
-        used git commands.
-</p>
-</dd>
-<dt>
--v
-</dt>
-<dt>
---verbose
-</dt>
-<dd>
-<p>
-        Be verbose.
-</p>
-</dd>
-<dt>
 -a
 </dt>
 <dt>
@@ -377,14 +354,13 @@ branches you are not interested in, you will not get them.</p></div>
 </p>
 </dd>
 <dt>
---upload-pack &lt;upload-pack&gt;
+--depth=&lt;depth&gt;
 </dt>
 <dd>
 <p>
-        When given, and the repository to fetch from is handled
-        by <em>git-fetch-pack</em>, <em>--exec=&lt;upload-pack&gt;</em> is passed to
-        the command to specify non-default path for the command
-        run on the other end.
+        Deepen the history of a <em>shallow</em> repository created by
+        <tt>git clone</tt> with <tt>--depth=&lt;depth&gt;</tt> option (see <a href="git-clone.html">git-clone(1)</a>)
+        by the specified number of commits.
 </p>
 </dd>
 <dt>
@@ -400,6 +376,17 @@ branches you are not interested in, you will not get them.</p></div>
         <tt>&lt;lbranch&gt;</tt> unless the remote branch <tt>&lt;rbranch&gt;</tt> it
         fetches is a descendant of <tt>&lt;lbranch&gt;</tt>.  This option
         overrides that check.
+</p>
+</dd>
+<dt>
+-k
+</dt>
+<dt>
+--keep
+</dt>
+<dd>
+<p>
+        Keep downloaded pack.
 </p>
 </dd>
 <dt>
@@ -432,17 +419,6 @@ branches you are not interested in, you will not get them.</p></div>
 </p>
 </dd>
 <dt>
--k
-</dt>
-<dt>
---keep
-</dt>
-<dd>
-<p>
-        Keep downloaded pack.
-</p>
-</dd>
-<dt>
 -u
 </dt>
 <dt>
@@ -459,13 +435,37 @@ branches you are not interested in, you will not get them.</p></div>
 </p>
 </dd>
 <dt>
---depth=&lt;depth&gt;
+--upload-pack &lt;upload-pack&gt;
 </dt>
 <dd>
 <p>
-        Deepen the history of a <em>shallow</em> repository created by
-        <tt>git clone</tt> with <tt>--depth=&lt;depth&gt;</tt> option (see <a href="git-clone.html">git-clone(1)</a>)
-        by the specified number of commits.
+        When given, and the repository to fetch from is handled
+        by <em>git-fetch-pack</em>, <em>--exec=&lt;upload-pack&gt;</em> is passed to
+        the command to specify non-default path for the command
+        run on the other end.
+</p>
+</dd>
+<dt>
+-q
+</dt>
+<dt>
+--quiet
+</dt>
+<dd>
+<p>
+        Pass --quiet to git-fetch-pack and silence any other internally
+        used git commands.
+</p>
+</dd>
+<dt>
+-v
+</dt>
+<dt>
+--verbose
+</dt>
+<dd>
+<p>
+        Be verbose.
 </p>
 </dd>
 <dt>
@@ -786,6 +786,38 @@ refspecs, if you don't provide one on the command line.
 <pre><tt>        HEAD:refs/heads/&lt;head&gt;</tt></pre>
 </div></div>
 </div>
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="ilist"><ul>
+<li>
+<p>
+Update the remote-tracking branches:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git fetch origin</tt></pre>
+</div></div>
+<div class="para"><p>The above command copies all branches from the remote refs/heads/
+namespace and stores them to the local refs/remotes/origin/ namespace,
+unless the branch.&lt;name&gt;.fetch option is used to specify a non-default
+refspec.</p></div>
+</li>
+<li>
+<p>
+Using refspecs explicitly:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git fetch origin +pu:pu maint:tmp</tt></pre>
+</div></div>
+<div class="para"><p>This updates (or creates, as necessary) branches <tt>pu</tt> and <tt>tmp</tt> in
+the local repository by fetching from the branches (respectively)
+<tt>pu</tt> and <tt>maint</tt> from the remote repository.</p></div>
+<div class="para"><p>The <tt>pu</tt> branch will be updated even if it is does not fast-forward,
+because it is prefixed with a plus sign; <tt>tmp</tt> will not be.</p></div>
+</li>
+</ul></div>
+</div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="para"><p><a href="git-pull.html">git-pull(1)</a></p></div>
@@ -805,7 +837,7 @@ Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-09-13 09:50:53 UTC
+Last updated 2009-10-31 04:03:06 UTC
 </div>
 </div>
 </body>

@@ -322,6 +322,7 @@ git-check-ref-format(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git check-ref-format</em> &lt;refname&gt;
+<em>git check-ref-format</em> --print &lt;refname&gt;
 <em>git check-ref-format</em> --branch &lt;branchname-shorthand&gt;</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
@@ -415,24 +416,38 @@ at-open-brace <tt>@{</tt> is used as a notation to access a reflog entry.
 </p>
 </li>
 </ol></div>
+<div class="para"><p>With the <tt>--print</tt> option, if <em>refname</em> is acceptable, it prints the
+canonicalized name of a hypothetical reference with that name.  That is,
+it prints <em>refname</em> with any extra <tt>/</tt> characters removed.</p></div>
 <div class="para"><p>With the <tt>--branch</tt> option, it expands the &#8220;previous branch syntax&#8221;
 <tt>@{-n}</tt>.  For example, <tt>@{-1}</tt> is a way to refer the last branch you
 were on.  This option should be used by porcelains to accept this
 syntax anywhere a branch name is expected, so they can act as if you
 typed the branch name.</p></div>
 </div>
-<h2 id="_example">EXAMPLE</h2>
+<h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
-git check-ref-format --branch @{-1}
-</dt>
-<dd>
+<div class="ilist"><ul>
+<li>
 <p>
-Print the name of the previous branch.
+Print the name of the previous branch:
 </p>
-</dd>
-</dl></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git check-ref-format --branch @{-1}</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Determine the reference name to use for a new branch:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ ref=$(git check-ref-format --print "refs/heads/$newbranch") ||
+die "we do not like '$newbranch' as a branch name."</tt></pre>
+</div></div>
+</li>
+</ul></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -440,7 +455,7 @@ Print the name of the previous branch.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-10-19 08:04:09 UTC
+Last updated 2009-10-31 04:03:02 UTC
 </div>
 </div>
 </body>

@@ -333,7 +333,7 @@ git bisect start [&lt;bad&gt; [&lt;good&gt;...]] [--] [&lt;paths&gt;...]
 git bisect bad [&lt;rev&gt;]
 git bisect good [&lt;rev&gt;...]
 git bisect skip [(&lt;rev&gt;|&lt;range&gt;)...]
-git bisect reset [&lt;branch&gt;]
+git bisect reset [&lt;commit&gt;]
 git bisect visualize
 git bisect replay &lt;logfile&gt;
 git bisect log
@@ -380,15 +380,24 @@ or "git bisect bad" to ask for the next bisection.</p></div>
 <div class="para"><p>Eventually there will be no more revisions left to bisect, and you
 will have been left with the first bad kernel revision in "refs/bisect/bad".</p></div>
 <h3 id="_bisect_reset">Bisect reset</h3><div style="clear:left"></div>
-<div class="para"><p>To return to the original head after a bisect session, issue the
-following command:</p></div>
+<div class="para"><p>After a bisect session, to clean up the bisection state and return to
+the original HEAD, issue the following command:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect reset</tt></pre>
 </div></div>
-<div class="para"><p>This resets the tree to the original branch instead of being on the
-bisection commit ("git bisect start" will also do that, as it resets
-the bisection state).</p></div>
+<div class="para"><p>By default, this will return your tree to the commit that was checked
+out before <tt>git bisect start</tt>.  (A new <tt>git bisect start</tt> will also do
+that, as it cleans up the old bisection state.)</p></div>
+<div class="para"><p>With an optional argument, you can return to a different commit
+instead:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bisect reset &lt;commit&gt;</tt></pre>
+</div></div>
+<div class="para"><p>For example, <tt>git bisect reset HEAD</tt> will leave you on the current
+bisection commit and avoid switching commits at all, while <tt>git bisect
+reset bisect/bad</tt> will check out the first bad revision.</p></div>
 <h3 id="_bisect_visualize">Bisect visualize</h3><div style="clear:left"></div>
 <div class="para"><p>To see the currently remaining suspects in <em>gitk</em>, issue the following
 command during the bisection process:</p></div>
@@ -599,7 +608,7 @@ $ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-07-02 03:16:40 UTC
+Last updated 2009-10-31 04:03:02 UTC
 </div>
 </div>
 </body>
