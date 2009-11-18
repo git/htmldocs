@@ -891,6 +891,18 @@ environment). This command has the same behaviour.</td>
 </p>
 </dd>
 <dt>
+<em>mkdirs</em>
+</dt>
+<dd>
+<p>
+        Attempts to recreate empty directories that core git cannot track
+        based on information in $GIT_DIR/svn/&lt;refname&gt;/unhandled.log files.
+        Empty directories are automatically recreated when using
+        "git svn clone" and "git svn rebase", so "mkdirs" is intended
+        for use after commands like "git checkout" or "git reset".
+</p>
+</dd>
+<dt>
 <em>commit-diff</em>
 </dt>
 <dd>
@@ -1466,6 +1478,16 @@ reasonable or useful fashion; so users using Subversion cannot see any
 merges you've made.  Furthermore, if you merge or pull from a git branch
 that is a mirror of an SVN branch, <em>dcommit</em> may commit to the wrong
 branch.</p></div>
+<div class="para"><p>If you do merge, note the following rule: <em>git svn dcommit</em> will
+attempt to commit on top of the SVN commit named in</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>git log --grep=^git-svn-id: --first-parent -1</tt></pre>
+</div></div>
+<div class="para"><p>You <em>must</em> therefore ensure that the most recent commit of the branch
+you want to dcommit to is the <em>first</em> parent of the merge.  Chaos will
+ensue otherwise, especially if the first parent is an older commit on
+the same SVN branch.</p></div>
 <div class="para"><p><em>git clone</em> does not clone branches under the refs/remotes/ hierarchy or
 any <em>git svn</em> metadata, or config.  So repositories created and managed with
 using <em>git svn</em> should use <em>rsync</em> for cloning, if cloning is to be done
@@ -1539,7 +1561,7 @@ should be manually entered with a text-editor or using <em>git config</em>.</p><
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-11-15 09:57:21 UTC
+Last updated 2009-11-18 07:39:10 UTC
 </div>
 </div>
 </body>
