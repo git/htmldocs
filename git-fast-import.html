@@ -698,7 +698,7 @@ change to the project.</p></div>
         data
         ('from' SP &lt;committish&gt; LF)?
         ('merge' SP &lt;committish&gt; LF)?
-        (filemodify | filedelete | filecopy | filerename | filedeleteall)*
+        (filemodify | filedelete | filecopy | filerename | filedeleteall | notemodify)*
         LF?</tt></pre>
 </div></div>
 <div class="para"><p>where <tt>&lt;ref&gt;</tt> is the name of the branch to make the commit on.
@@ -717,14 +717,13 @@ message (see below for <tt>data</tt> command syntax).  To import an empty
 commit message use a 0 length data.  Commit messages are free-form
 and are not interpreted by Git.  Currently they must be encoded in
 UTF-8, as fast-import does not permit other encodings to be specified.</p></div>
-<div class="para"><p>Zero or more <tt>filemodify</tt>, <tt>filedelete</tt>, <tt>filecopy</tt>, <tt>filerename</tt>
-and <tt>filedeleteall</tt> commands
+<div class="para"><p>Zero or more <tt>filemodify</tt>, <tt>filedelete</tt>, <tt>filecopy</tt>, <tt>filerename</tt>,
+<tt>filedeleteall</tt> and <tt>notemodify</tt> commands
 may be included to update the contents of the branch prior to
 creating the commit.  These commands may be supplied in any order.
 However it is recommended that a <tt>filedeleteall</tt> command precede
-all <tt>filemodify</tt>, <tt>filecopy</tt> and <tt>filerename</tt> commands in the same
-commit, as <tt>filedeleteall</tt>
-wipes the branch clean (see below).</p></div>
+all <tt>filemodify</tt>, <tt>filecopy</tt>, <tt>filerename</tt> and <tt>notemodify</tt> commands in
+the same commit, as <tt>filedeleteall</tt> wipes the branch clean (see below).</p></div>
 <div class="para"><p>The <tt>LF</tt> after the command is optional (it used to be required).</p></div>
 <h4 id="_tt_author_tt"><tt>author</tt></h4>
 <div class="para"><p>An <tt>author</tt> command may optionally appear, if the author information
@@ -989,6 +988,47 @@ The <tt>filedeleteall</tt> approach may however require fast-import to use sligh
 more memory per active branch (less than 1 MiB for even most large
 projects); so frontends that can easily obtain only the affected
 paths for a commit are encouraged to do so.</p></div>
+<h4 id="_tt_notemodify_tt"><tt>notemodify</tt></h4>
+<div class="para"><p>Included in a <tt>commit</tt> command to add a new note (annotating a given
+commit) or change the content of an existing note.  This command has
+two different means of specifying the content of the note.</p></div>
+<div class="vlist"><dl>
+<dt>
+External data format
+</dt>
+<dd>
+<p>
+        The data content for the note was already supplied by a prior
+        <tt>blob</tt> command.  The frontend just needs to connect it to the
+        commit that is to be annotated.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'N' SP &lt;dataref&gt; SP &lt;committish&gt; LF</tt></pre>
+</div></div>
+<div class="para"><p>Here <tt>&lt;dataref&gt;</tt> can be either a mark reference (<tt>:&lt;idnum&gt;</tt>)
+set by a prior <tt>blob</tt> command, or a full 40-byte SHA-1 of an
+existing Git blob object.</p></div>
+</dd>
+<dt>
+Inline data format
+</dt>
+<dd>
+<p>
+        The data content for the note has not been supplied yet.
+        The frontend wants to supply it as part of this modify
+        command.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'N' SP 'inline' SP &lt;committish&gt; LF
+        data</tt></pre>
+</div></div>
+<div class="para"><p>See below for a detailed description of the <tt>data</tt> command.</p></div>
+</dd>
+</dl></div>
+<div class="para"><p>In both formats <tt>&lt;committish&gt;</tt> is any of the commit specification
+expressions also accepted by <tt>from</tt> (see above).</p></div>
 <h3 id="_tt_mark_tt"><tt>mark</tt></h3><div style="clear:left"></div>
 <div class="para"><p>Arranges for fast-import to save a reference to the current object, allowing
 the frontend to recall this object at a future point in time, without
@@ -1471,7 +1511,7 @@ memory footprint (less than 2.7 MiB per active branch).</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-11-15 09:57:06 UTC
+Last updated 2009-11-21 17:36:55 UTC
 </div>
 </div>
 </body>
