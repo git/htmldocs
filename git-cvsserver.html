@@ -528,10 +528,9 @@ Clients should now be able to check out the project. Use the CVS <em>module</em>
 <h2 id="dbbackend">Database Backend</h2>
 <div class="sectionbody">
 <div class="para"><p><em>git-cvsserver</em> uses one database per git head (i.e. CVS module) to
-store information about the repository for faster access. The
-database doesn't contain any persistent data and can be completely
-regenerated from the git repository at any time. The database
-needs to be updated (i.e. written to) after every commit.</p></div>
+store information about the repository to maintain consistent
+CVS revision numbers. The database needs to be
+updated (i.e. written to) after every commit.</p></div>
 <div class="para"><p>If the commit is done directly by using <tt>git</tt> (as opposed to
 using <em>git-cvsserver</em>) the update will need to happen on the
 next repository access by <em>git-cvsserver</em>, independent of
@@ -546,6 +545,17 @@ temporary files in the same directory as the database file on
 write so it might not be enough to grant the users using
 <em>git-cvsserver</em> write access to the database file without granting
 them write access to the directory, too.</p></div>
+<div class="para"><p>The database can not be reliably regenerated in a
+consistent form after the branch it is tracking has changed.
+Example: For merged branches, <em>git-cvsserver</em> only tracks
+one branch of development, and after a <em>git-merge</em> an
+incrementally updated database may track a different branch
+than a database regenerated from scratch, causing inconsistent
+CVS revision numbers. <tt>git-cvsserver</tt> has no way of knowing which
+branch it would have picked if it had been run incrementally
+pre-merge. So if you have to fully or partially (from old
+backup) regenerate the database, you should be suspicious
+of pre-existing CVS sandboxes.</p></div>
 <div class="para"><p>You can configure the database backend with the following
 configuration variables:</p></div>
 <h3 id="_configuring_database_backend">Configuring database backend</h3><div style="clear:left"></div>
@@ -785,7 +795,7 @@ Martin Langhoff &lt;martin@catalyst.net.nz&gt;
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-11-15 09:57:03 UTC
+Last updated 2009-11-23 11:08:56 UTC
 </div>
 </div>
 </body>
