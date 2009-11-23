@@ -567,6 +567,11 @@ rebase.stat
         strategy is used, this allows rebase to be aware of renames on the
         upstream side.
 </p>
+<div class="para"><p>Note that a rebase merge works by replaying each commit from the working
+branch on top of the &lt;upstream&gt; branch.  Because of this, when a merge
+conflict happens, the side reported as <em>ours</em> is the so-far rebased
+series, starting with &lt;upstream&gt;, and <em>theirs</em> is the working branch.  In
+other words, the sides are swapped.</p></div>
 </dd>
 <dt>
 -s &lt;strategy&gt;
@@ -577,10 +582,13 @@ rebase.stat
 <dd>
 <p>
         Use the given merge strategy.
-        If there is no <tt>-s</tt> option, a built-in list of strategies
-        is used instead (<em>git-merge-recursive</em> when merging a single
-        head, <em>git-merge-octopus</em> otherwise).  This implies --merge.
+        If there is no <tt>-s</tt> option <em>git-merge-recursive</em> is used
+        instead.  This implies --merge.
 </p>
+<div class="para"><p>Because <em>git-rebase</em> replays each commit from the working branch
+on top of the &lt;upstream&gt; branch using the given strategy, using
+the <em>ours</em> strategy simply discards all patches from the &lt;branch&gt;,
+which makes little sense.</p></div>
 </dd>
 <dt>
 -q
@@ -772,8 +780,9 @@ ours
 </dt>
 <dd>
 <p>
-        This resolves any number of heads, but the result of the
-        merge is always the current branch head.  It is meant to
+        This resolves any number of heads, but the resulting tree of the
+        merge is always that of the current branch head, effectively
+        ignoring all changes from all other branches.  It is meant to
         be used to supersede old development history of side
         branches.
 </p>
@@ -1132,7 +1141,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-11-15 09:57:15 UTC
+Last updated 2009-11-23 06:10:46 UTC
 </div>
 </div>
 </body>
