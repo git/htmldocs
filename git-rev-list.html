@@ -778,7 +778,9 @@ limiting may be applied.</p></div>
 <dd>
 <p>
         In addition to the <em>&lt;commit&gt;</em> listed on the command
-        line, read them from the standard input.
+        line, read them from the standard input. If a <em>--</em> separator is
+        seen, stop reading commits and start reading paths to limit the
+        result.
 </p>
 </dd>
 <dt>
@@ -1161,7 +1163,11 @@ commits are marked as TREESAME (subject to be simplified away).</p></div>
 <dd>
 <p>
 Limit output to the one commit object which is roughly halfway between
-the included and excluded commits. Thus, if
+included and excluded commits. Note that the bad bisection ref
+<tt>$GIT_DIR/refs/bisect/bad</tt> is added to the included commits (if it
+exists) and the good bisection refs <tt>$GIT_DIR/refs/bisect/good-*</tt> are
+added to the excluded commits (if they exist). Thus, supposing there
+are no refs in <tt>$GIT_DIR/refs/bisect/</tt>, if
 </p>
 </dd>
 </dl></div>
@@ -1185,15 +1191,16 @@ one.</p></div>
 </dt>
 <dd>
 <p>
-This calculates the same as <tt>--bisect</tt>, but outputs text ready
-to be eval'ed by the shell. These lines will assign the name of
-the midpoint revision to the variable <tt>bisect_rev</tt>, and the
-expected number of commits to be tested after <tt>bisect_rev</tt> is
-tested to <tt>bisect_nr</tt>, the expected number of commits to be
-tested if <tt>bisect_rev</tt> turns out to be good to <tt>bisect_good</tt>,
-the expected number of commits to be tested if <tt>bisect_rev</tt>
-turns out to be bad to <tt>bisect_bad</tt>, and the number of commits
-we are bisecting right now to <tt>bisect_all</tt>.
+This calculates the same as <tt>--bisect</tt>, except that refs in
+<tt>$GIT_DIR/refs/bisect/</tt> are not used, and except that this outputs
+text ready to be eval'ed by the shell. These lines will assign the
+name of the midpoint revision to the variable <tt>bisect_rev</tt>, and the
+expected number of commits to be tested after <tt>bisect_rev</tt> is tested
+to <tt>bisect_nr</tt>, the expected number of commits to be tested if
+<tt>bisect_rev</tt> turns out to be good to <tt>bisect_good</tt>, the expected
+number of commits to be tested if <tt>bisect_rev</tt> turns out to be bad to
+<tt>bisect_bad</tt>, and the number of commits we are bisecting right now to
+<tt>bisect_all</tt>.
 </p>
 </dd>
 <dt>
@@ -1203,8 +1210,9 @@ we are bisecting right now to <tt>bisect_all</tt>.
 <p>
 This outputs all the commit objects between the included and excluded
 commits, ordered by their distance to the included and excluded
-commits. The farthest from them is displayed first. (This is the only
-one displayed by <tt>--bisect</tt>.)
+commits. Refs in <tt>$GIT_DIR/refs/bisect/</tt> are not used. The farthest
+from them is displayed first. (This is the only one displayed by
+<tt>--bisect</tt>.)
 </p>
 <div class="para"><p>This is useful because it makes it easy to choose a good commit to
 test when you want to avoid to test some of them for some reason (they
@@ -1648,9 +1656,7 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 <li>
 <p>
 <em>%w([&lt;w&gt;[,&lt;i1&gt;[,&lt;i2&gt;]]])</em>: switch line wrapping, like the -w option of
-  <a href="git-shortlog.html">git-shortlog(1)</a>.  NOTE: Color placeholders (<tt>%C*</tt>) are not
-  recognized as having no width, so they should not be put into wrapped
-  sections.
+  <a href="git-shortlog.html">git-shortlog(1)</a>.
 </p>
 </li>
 </ul></div>
@@ -1718,7 +1724,7 @@ and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-11-23 06:10:47 UTC
+Last updated 2009-11-24 10:53:39 UTC
 </div>
 </div>
 </body>
