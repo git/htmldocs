@@ -408,6 +408,21 @@ a blank line.  The option field &lt;why&gt; may be quoted in a C
 style string if it contains an LF.</p></div>
 <div class="para"><p>Supported if the helper has the "push" capability.</p></div>
 </dd>
+<dt>
+<em>import</em> &lt;name&gt;
+</dt>
+<dd>
+<p>
+        Produces a fast-import stream which imports the current value
+        of the named ref. It may additionally import other refs as
+        needed to construct the history efficiently. The script writes
+        to a helper-specific private namespace. The value of the named
+        ref should be written to a location in this namespace derived
+        by applying the refspecs from the "refspec" capability to the
+        name of the ref.
+</p>
+<div class="para"><p>Supported if the helper has the "import" capability.</p></div>
+</dd>
 </dl></div>
 <div class="para"><p>If a fatal error occurs, the program writes the error message to
 stderr and exits. The caller should expect that a suitable error
@@ -443,6 +458,29 @@ capabilities reported by the helper.</p></div>
         This helper supports the <em>push</em> command.
 </p>
 </dd>
+<dt>
+<em>import</em>
+</dt>
+<dd>
+<p>
+        This helper supports the <em>import</em> command.
+</p>
+</dd>
+<dt>
+<em>refspec</em> <em>spec</em>
+</dt>
+<dd>
+<p>
+        When using the import command, expect the source ref to have
+        been written to the destination ref. The earliest applicable
+        refspec takes precedence. For example
+        "refs/heads/<strong>:refs/svn/origin/branches/</strong>" means that, after an
+        "import refs/heads/name", the script has written to
+        refs/svn/origin/branches/name. If this capability is used at
+        all, it must cover all refs reported by the list command; if
+        it is not used, it is effectively "<strong>:</strong>"
+</p>
+</dd>
 </dl></div>
 </div>
 <h2 id="_ref_list_attributes">REF LIST ATTRIBUTES</h2>
@@ -456,6 +494,15 @@ capabilities reported by the helper.</p></div>
         The caller wants to use the ref list to prepare push
         commands.  A helper might chose to acquire the ref list by
         opening a different type of connection to the destination.
+</p>
+</dd>
+<dt>
+<em>unchanged</em>
+</dt>
+<dd>
+<p>
+        This ref is unchanged since the last import or fetch, although
+        the helper cannot necessarily determine what value that produced.
 </p>
 </dd>
 </dl></div>
@@ -522,7 +569,7 @@ capabilities reported by the helper.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:45 UTC
+Last updated 2009-12-26 23:13:52 UTC
 </div>
 </div>
 </body>
