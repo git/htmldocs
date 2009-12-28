@@ -320,7 +320,7 @@ git-status(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git status</em> &lt;options&gt;&#8230;</p></div>
+<div class="para"><p><em>git status</em> [&lt;options&gt;&#8230;] [--] [&lt;pathspec&gt;&#8230;]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
@@ -331,21 +331,123 @@ tracked by git (and are not ignored by <a href="gitignore.html">gitignore(5)</a>
 are what you _would_ commit by running <tt>git commit</tt>; the second and
 third are what you _could_ commit by running <em>git-add</em> before running
 <tt>git commit</tt>.</p></div>
-<div class="para"><p>The command takes the same set of options as <em>git-commit</em>; it
-shows what would be committed if the same options are given to
-<em>git-commit</em>.</p></div>
-<div class="para"><p>If there is no path that is different between the index file and
-the current HEAD commit (i.e., there is nothing to commit by running
-<tt>git commit</tt>), the command exits with non-zero status.</p></div>
+</div>
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+-s
+</dt>
+<dt>
+--short
+</dt>
+<dd>
+<p>
+        Give the output in the short-format.
+</p>
+</dd>
+<dt>
+--porcelain
+</dt>
+<dd>
+<p>
+        Give the output in a stable, easy-to-parse format for scripts.
+        Currently this is identical to --short output, but is guaranteed
+        not to change in the future, making it safe for scripts.
+</p>
+</dd>
+<dt>
+-u[&lt;mode&gt;]
+</dt>
+<dt>
+--untracked-files[=&lt;mode&gt;]
+</dt>
+<dd>
+<p>
+        Show untracked files (Default: <em>all</em>).
+</p>
+<div class="para"><p>The mode parameter is optional, and is used to specify
+the handling of untracked files. The possible options are:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<em>no</em>     - Show no untracked files
+</p>
+</li>
+<li>
+<p>
+<em>normal</em> - Shows untracked files and directories
+</p>
+</li>
+<li>
+<p>
+<em>all</em>    - Also shows individual files in untracked directories.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>See <a href="git-config.html">git-config(1)</a> for configuration variable
+used to change the default for when the option is not
+specified.</p></div>
+</dd>
+<dt>
+-z
+</dt>
+<dd>
+<p>
+        Terminate entries with NUL, instead of LF.  This implies
+        the <tt>--porcelain</tt> output format if no other format is given.
+</p>
+</dd>
+</dl></div>
 </div>
 <h2 id="_output">OUTPUT</h2>
 <div class="sectionbody">
 <div class="para"><p>The output from this command is designed to be used as a commit
-template comment, and all the output lines are prefixed with <em>#</em>.</p></div>
+template comment, and all the output lines are prefixed with <em>#</em>.
+The default, long format, is designed to be human readable,
+verbose and descriptive.  They are subject to change in any time.</p></div>
 <div class="para"><p>The paths mentioned in the output, unlike many other git commands, are
 made relative to the current directory if you are working in a
 subdirectory (this is on purpose, to help cutting and pasting). See
 the status.relativePaths config option below.</p></div>
+<div class="para"><p>In short-format, the status of each path is shown as</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>XY PATH1 -&gt; PATH2</tt></pre>
+</div></div>
+<div class="para"><p>where <tt>PATH1</tt> is the path in the <tt>HEAD</tt>, and <tt> -&gt; PATH2</tt> part is
+shown only when <tt>PATH1</tt> corresponds to a different path in the
+index/worktree (i.e. renamed).</p></div>
+<div class="para"><p>For unmerged entries, <tt>X</tt> shows the status of stage #2 (i.e. ours) and <tt>Y</tt>
+shows the status of stage #3 (i.e. theirs).</p></div>
+<div class="para"><p>For entries that do not have conflicts, <tt>X</tt> shows the status of the index,
+and <tt>Y</tt> shows the status of the work tree.  For untracked paths, <tt>XY</tt> are
+<tt>??</tt>.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>X          Y     Meaning
+-------------------------------------------------
+          [MD]   not updated
+M        [ MD]   updated in index
+A        [ MD]   added to index
+D        [ MD]   deleted from index
+R        [ MD]   renamed in index
+C        [ MD]   copied in index
+[MARC]           index and work tree matches
+[ MARC]     M    work tree changed since index
+[ MARC]     D    deleted in work tree
+-------------------------------------------------
+D           D    unmerged, both deleted
+A           U    unmerged, added by us
+U           D    unmerged, deleted by them
+U           A    unmerged, added by them
+D           U    unmerged, deleted by us
+A           A    unmerged, both added
+U           U    unmerged, both modified
+-------------------------------------------------
+?           ?    untracked
+-------------------------------------------------</tt></pre>
+</div></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
@@ -357,9 +459,9 @@ to colorize its output.</p></div>
 paths shown are relative to the repository root, not to the current
 directory.</p></div>
 <div class="para"><p>If <tt>status.submodulesummary</tt> is set to a non zero number or true (identical
-to -1 or an unlimited number), the submodule summary will be enabled and a
-summary of commits for modified submodules will be shown (see --summary-limit
-option of <a href="git-submodule.html">git-submodule(1)</a>).</p></div>
+to -1 or an unlimited number), the submodule summary will be enabled for
+the long format and a summary of commits for modified submodules will be
+shown (see --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>).</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
@@ -367,8 +469,7 @@ option of <a href="git-submodule.html">git-submodule(1)</a>).</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and
-Junio C Hamano &lt;gitster@pobox.com&gt;.</p></div>
+<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt;.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
@@ -380,7 +481,7 @@ Junio C Hamano &lt;gitster@pobox.com&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:49 UTC
+Last updated 2009-12-28 09:33:36 UTC
 </div>
 </div>
 </body>
