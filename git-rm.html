@@ -325,13 +325,13 @@ git-rm(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="para"><p>Remove files from the index, or from the working tree and the index.
-<em>git-rm</em> will not remove a file from just your working directory.
-(There is no option to remove a file only from the work tree
+<tt>git rm</tt> will not remove a file from just your working directory.
+(There is no option to remove a file only from the working tree
 and yet keep it in the index; use <tt>/bin/rm</tt> if you want to do that.)
 The files being removed have to be identical to the tip of the branch,
 and no updates to their contents can be staged in the index,
 though that default behavior can be overridden with the <tt>-f</tt> option.
-When <em>--cached</em> is given, the staged content has to
+When <tt>--cached</tt> is given, the staged content has to
 match either the tip of the branch or the file on disk,
 allowing the file to be removed from just the index.</p></div>
 </div>
@@ -422,7 +422,7 @@ allowing the file to be removed from just the index.</p></div>
 </dt>
 <dd>
 <p>
-        <em>git-rm</em> normally outputs one line (in the form of an "rm" command)
+        <tt>git rm</tt> normally outputs one line (in the form of an <tt>rm</tt> command)
         for each file removed. This option suppresses that output.
 </p>
 </dd>
@@ -438,6 +438,48 @@ a file that you have not told git about does not remove that file.</p></div>
 two directories <tt>d</tt> and <tt>d2</tt>, there is a difference between
 using <tt>git rm 'd*'</tt> and <tt>git rm 'd/*'</tt>, as the former will
 also remove all of directory <tt>d2</tt>.</p></div>
+</div>
+<h2 id="_removing_files_that_have_disappeared_from_the_filesystem">REMOVING FILES THAT HAVE DISAPPEARED FROM THE FILESYSTEM</h2>
+<div class="sectionbody">
+<div class="para"><p>There is no option for <tt>git rm</tt> to remove from the index only
+the paths that have disappeared from the filesystem. However,
+depending on the use case, there are several ways that can be
+done.</p></div>
+<h3 id="_using_git_commit_a">Using "git commit -a"</h3><div style="clear:left"></div>
+<div class="para"><p>If you intend that your next commit should record all modifications
+of tracked files in the working tree and record all removals of
+files that have been removed from the working tree with <tt>rm</tt>
+(as opposed to <tt>git rm</tt>), use <tt>git commit -a</tt>, as it will
+automatically notice and record all removals.  You can also have a
+similar effect without committing by using <tt>git add -u</tt>.</p></div>
+<h3 id="_using_git_add_a">Using "git add -A"</h3><div style="clear:left"></div>
+<div class="para"><p>When accepting a new code drop for a vendor branch, you probably
+want to record both the removal of paths and additions of new paths
+as well as modifications of existing paths.</p></div>
+<div class="para"><p>Typically you would first remove all tracked files from the working
+tree using this command:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>git ls-files -z | xargs -0 rm -f</tt></pre>
+</div></div>
+<div class="para"><p>and then "untar" the new code in the working tree. Alternately
+you could "rsync" the changes into the working tree.</p></div>
+<div class="para"><p>After that, the easiest way to record all removals, additions, and
+modifications in the working tree is:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>git add -A</tt></pre>
+</div></div>
+<div class="para"><p>See <a href="git-add.html">git-add(1)</a>.</p></div>
+<h3 id="_other_ways">Other ways</h3><div style="clear:left"></div>
+<div class="para"><p>If all you really want to do is to remove from the index the files
+that are no longer present in the working tree (perhaps because
+your working tree is dirty so that you cannot use <tt>git commit -a</tt>),
+use the following command:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>git diff --name-only --diff-filter=D -z | xargs -0 git rm --cached</tt></pre>
+</div></div>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
@@ -484,7 +526,7 @@ git rm -f git-*.sh
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:47 UTC
+Last updated 2010-01-08 07:39:28 UTC
 </div>
 </div>
 </body>

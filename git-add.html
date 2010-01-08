@@ -327,24 +327,28 @@ git-add(1) Manual Page
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This command adds the current content of new or modified files to the
-index, thus staging that content for inclusion in the next commit.</p></div>
+<div class="para"><p>This command updates the index using the current content found in
+the working tree, to prepare the content staged for the next commit.
+It typically adds the current content of existing paths as a whole,
+but with some options it can also be used to add content with
+only part of the changes made to the working tree files applied, or
+remove paths that do not exist in the working tree anymore.</p></div>
 <div class="para"><p>The "index" holds a snapshot of the content of the working tree, and it
 is this snapshot that is taken as the contents of the next commit.  Thus
 after making any changes to the working directory, and before running
-the commit command, you must use the <em>add</em> command to add any new or
+the commit command, you must use the <tt>add</tt> command to add any new or
 modified files to the index.</p></div>
 <div class="para"><p>This command can be performed multiple times before a commit.  It only
 adds the content of the specified file(s) at the time the add command is
 run; if you want subsequent changes included in the next commit, then
-you must run <em>git add</em> again to add the new content to the index.</p></div>
-<div class="para"><p>The <em>git status</em> command can be used to obtain a summary of which
+you must run <tt>git add</tt> again to add the new content to the index.</p></div>
+<div class="para"><p>The <tt>git status</tt> command can be used to obtain a summary of which
 files have changes that are staged for the next commit.</p></div>
-<div class="para"><p>The <em>git add</em> command will not add ignored files by default.  If any
-ignored files were explicitly specified on the command line, <em>git add</em>
+<div class="para"><p>The <tt>git add</tt> command will not add ignored files by default.  If any
+ignored files were explicitly specified on the command line, <tt>git add</tt>
 will fail with a list of ignored files.  Ignored files reached by
 directory recursion or filename globbing performed by Git (quote your
-globs before the shell) will be silently ignored.  The <em>add</em> command can
+globs before the shell) will be silently ignored.  The <tt>add</tt> command can
 be used to add ignored files with the <tt>-f</tt> (force) option.</p></div>
 <div class="para"><p>Please see <a href="git-commit.html">git-commit(1)</a> for alternative ways to add content to a
 commit.</p></div>
@@ -449,14 +453,16 @@ apply.</p></div>
 </dt>
 <dd>
 <p>
-        Update only files that git already knows about, staging modified
-        content for commit and marking deleted files for removal. This
-        is similar
-        to what "git commit -a" does in preparation for making a commit,
-        except that the update is limited to paths specified on the
-        command line. If no paths are specified, all tracked files in the
-        current directory and its subdirectories are updated.
+        Only match &lt;filepattern&gt; against already tracked files in
+        the index rather than the working tree. That means that it
+        will never stage new files, but that it will stage modified
+        new contents of tracked files and that it will remove files
+        from the index if the corresponding files in the working tree
+        have been removed.
 </p>
+<div class="para"><p>If no &lt;filepattern&gt; is given, default to "."; in other words,
+update all tracked files in the current directory and its
+subdirectories.</p></div>
 </dd>
 <dt>
 -A
@@ -466,9 +472,10 @@ apply.</p></div>
 </dt>
 <dd>
 <p>
-        Update files that git already knows about (same as <em>--update</em>)
-        and add all untracked files that are not ignored by <em>.gitignore</em>
-        mechanism.
+        Like <tt>-u</tt>, but match &lt;filepattern&gt; against files in the
+        working tree in addition to the index. That means that it
+        will find new files as well as staging modified content and
+        removing files that are no longer in the working tree.
 </p>
 </dd>
 <dt>
@@ -482,8 +489,8 @@ apply.</p></div>
         Record only the fact that the path will be added later. An entry
         for the path is placed in the index with no content. This is
         useful for, among other things, showing the unstaged content of
-        such files with <em>git diff</em> and committing them with <em>git commit
-        -a</em>.
+        such files with <tt>git diff</tt> and committing them with <tt>git commit
+        -a</tt>.
 </p>
 </dd>
 <dt>
@@ -519,7 +526,7 @@ apply.</p></div>
 </div>
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<div class="para"><p>The optional configuration variable <em>core.excludesfile</em> indicates a path to a
+<div class="para"><p>The optional configuration variable <tt>core.excludesfile</tt> indicates a path to a
 file containing patterns of file names to exclude from git-add, similar to
 $GIT_DIR/info/exclude.  Patterns in the exclude file are used in addition to
 those in info/exclude.  See <a href="gitrepository-layout.html">gitrepository-layout(5)</a>.</p></div>
@@ -570,7 +577,7 @@ and type return, like this:</p></div>
       5: patch        6: diff         7: quit         8: help
     What now&gt; 1</tt></pre>
 </div></div>
-<div class="para"><p>You also could say "s" or "sta" or "status" above as long as the
+<div class="para"><p>You also could say <tt>s</tt> or <tt>sta</tt> or <tt>status</tt> above as long as the
 choice is unique.</p></div>
 <div class="para"><p>The main command loop has 6 subcommands (plus help and quit).</p></div>
 <div class="vlist"><dl>
@@ -580,9 +587,9 @@ status
 <dd>
 <p>
    This shows the change between HEAD and index (i.e. what will be
-   committed if you say "git commit"), and between index and
+   committed if you say <tt>git commit</tt>), and between index and
    working tree files (i.e. what you could stage further before
-   "git commit" using "git-add") for each path.  A sample output
+   <tt>git commit</tt> using <tt>git add</tt>) for each path.  A sample output
    looks like this:
 </p>
 <div class="listingblock">
@@ -714,7 +721,7 @@ diff
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:25 UTC
+Last updated 2010-01-08 07:39:28 UTC
 </div>
 </div>
 </body>
