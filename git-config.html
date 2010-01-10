@@ -347,11 +347,12 @@ lines, a POSIX regexp <tt>value_regex</tt> needs to be given.  Only the
 existing values that match the regexp are updated or unset.  If
 you want to handle the lines that do <strong>not</strong> match the regex, just
 prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPLES]</a>).</p></div>
-<div class="para"><p>The type specifier can be either <em>--int</em> or <em>--bool</em>, which will make
+<div class="para"><p>The type specifier can be either <em>--int</em> or <em>--bool</em>, to make
 <em>git-config</em> ensure that the variable(s) are of the given type and
 convert the value to the canonical form (simple decimal number for int,
-a "true" or "false" string for bool).  If no type specifier is passed,
-no checks or transformations are performed on the value.</p></div>
+a "true" or "false" string for bool), or <em>--path</em>, which does some
+path expansion (see <em>--path</em> below).  If no type specifier is passed, no
+checks or transformations are performed on the value.</p></div>
 <div class="para"><p>The file-option can be one of <em>--system</em>, <em>--global</em> or <em>--file</em>
 which specify where the values will be read from or written to.
 The default is to assume the config file of the current repository,
@@ -550,6 +551,18 @@ rather than from all available files.</p></div>
 <p>
         <em>git-config</em> will ensure that the output matches the format of
         either --bool or --int, as described above.
+</p>
+</dd>
+<dt>
+--path
+</dt>
+<dd>
+<p>
+        <em>git-config</em> will expand leading <em>&#126;</em> to the value of
+        <em>$HOME</em>, and <em>&#126;user</em> to the home directory for the
+        specified user.  This option has no effect when setting the
+        value (but you can use <em>git config bla &#126;/</em> from the
+        command line to let your shell do the expansion).
 </p>
 </dd>
 <dt>
@@ -1496,7 +1509,7 @@ branch.autosetupmerge
 </dt>
 <dd>
 <p>
-        Tells <em>git-branch</em> and <em>git-checkout</em> to setup new branches
+        Tells <em>git-branch</em> and <em>git-checkout</em> to set up new branches
         so that <a href="git-pull.html">git-pull(1)</a> will appropriately merge from the
         starting point branch. Note that even if this option is not set,
         this behavior can be chosen per-branch using the <tt>--track</tt>
@@ -1803,7 +1816,7 @@ diff.autorefreshindex
         contents in the work tree match the contents in the
         index.  This option defaults to true.  Note that this
         affects only <em>git-diff</em> Porcelain, and not lower level
-        <em>diff</em> commands, such as <em>git-diff-files</em>.
+        <em>diff</em> commands such as <em>git-diff-files</em>.
 </p>
 </dd>
 <dt>
@@ -2046,8 +2059,8 @@ format.thread
 <dd>
 <p>
         The default threading style for <em>git-format-patch</em>.  Can be
-        either a boolean value, <tt>shallow</tt> or <tt>deep</tt>.  <tt>shallow</tt>
-        threading makes every mail a reply to the head of the series,
+        a boolean value, or <tt>shallow</tt> or <tt>deep</tt>.  <tt>shallow</tt> threading
+        makes every mail a reply to the head of the series,
         where the head is chosen from the cover letter, the
         <tt>--in-reply-to</tt>, and the first patch mail, in this order.
         <tt>deep</tt> threading makes every mail a reply to the previous one.
@@ -2105,15 +2118,12 @@ gc.packrefs
 </dt>
 <dd>
 <p>
-        <em>git-gc</em> does not run <tt>git pack-refs</tt> in a bare repository by
-        default so that older dumb-transport clients can still fetch
-        from the repository.  Setting this to <tt>true</tt> lets <em>git-gc</em>
-        to run <tt>git pack-refs</tt>.  Setting this to <tt>false</tt> tells
-        <em>git-gc</em> never to run <tt>git pack-refs</tt>. The default setting is
-        <tt>notbare</tt>. Enable it only when you know you do not have to
-        support such clients.  The default setting will change to <tt>true</tt>
-        at some stage, and setting this to <tt>false</tt> will continue to
-        prevent <tt>git pack-refs</tt> from being run from <em>git-gc</em>.
+        Running <tt>git pack-refs</tt> in a repository renders it
+        unclonable by Git versions prior to 1.5.1.2 over dumb
+        transports such as HTTP.  This variable determines whether
+        <em>git gc</em> runs <tt>git pack-refs</tt>. This can be set to "nobare"
+        to enable it within all non-bare repos or it can be set to a
+        boolean value.  The default is <tt>true</tt>.
 </p>
 </dd>
 <dt>
@@ -2599,6 +2609,17 @@ http.maxRequests
 <p>
         How many HTTP requests to launch in parallel. Can be overridden
         by the <em>GIT_HTTP_MAX_REQUESTS</em> environment variable. Default is 5.
+</p>
+</dd>
+<dt>
+http.minSessions
+</dt>
+<dd>
+<p>
+        The number of curl sessions (counted across slots) to be kept across
+        requests. They will not be ended with curl_easy_cleanup() until
+        http_cleanup() is invoked. If USE_CURL_MULTI is not defined, this
+        value will be capped at 1. Defaults to 1.
 </p>
 </dd>
 <dt>
@@ -3652,7 +3673,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-30 09:45:19 UTC
+Last updated 2010-01-10 19:52:58 UTC
 </div>
 </div>
 </body>
