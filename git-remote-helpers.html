@@ -340,7 +340,10 @@ helper programs will behave as documented here.</p></div>
 <dd>
 <p>
         Lists the capabilities of the helper, one per line, ending
-        with a blank line.
+        with a blank line. Each capability may be preceeded with <em>*</em>.
+        This marks them mandatory for git version using the remote
+        helper to understand (unknown mandatory capability is fatal
+        error).
 </p>
 </dd>
 <dt>
@@ -423,6 +426,24 @@ style string if it contains an LF.</p></div>
 </p>
 <div class="para"><p>Supported if the helper has the "import" capability.</p></div>
 </dd>
+<dt>
+<em>connect</em> &lt;service&gt;
+</dt>
+<dd>
+<p>
+        Connects to given service. Standard input and standard output
+        of helper are connected to specified service (git prefix is
+        included in service name so e.g. fetching uses <em>git-upload-pack</em>
+        as service) on remote side. Valid replies to this command are
+        empty line (connection established), <em>fallback</em> (no smart
+        transport support, fall back to dumb transports) and just
+        exiting with error message printed (can't connect, don't
+        bother trying to fall back). After line feed terminating the
+        positive (empty) response, the output of service starts. After
+        the connection ends, the remote helper exits.
+</p>
+<div class="para"><p>Supported if the helper has the "connect" capability.</p></div>
+</dd>
 </dl></div>
 <div class="para"><p>If a fatal error occurs, the program writes the error message to
 stderr and exits. The caller should expect that a suitable error
@@ -479,6 +500,14 @@ capabilities reported by the helper.</p></div>
         refs/svn/origin/branches/name. If this capability is used at
         all, it must cover all refs reported by the list command; if
         it is not used, it is effectively "<strong>:</strong>"
+</p>
+</dd>
+<dt>
+<em>connect</em>
+</dt>
+<dd>
+<p>
+        This helper supports the <em>connect</em> command.
 </p>
 </dd>
 </dl></div>
@@ -558,10 +587,23 @@ capabilities reported by the helper.</p></div>
         If true, pretend the operation completed successfully,
         but don't actually change any repository data.  For most
         helpers this only applies to the <em>push</em>, if supported.</p></div>
+<div class="vlist"><dl>
+<dt>
+<em>option servpath &lt;c-style-quoted-path&gt;</em>
+</dt>
+<dd>
+<p>
+        Set service path (--upload-pack, --receive-pack etc.) for
+        next connect. Remote helper MAY support this option. Remote
+        helper MUST NOT rely on this option being set before
+        connect request occurs.
+</p>
+</dd>
+</dl></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Daniel Barkalow.</p></div>
+<div class="para"><p>Documentation by Daniel Barkalow and Ilari Liusvaara</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -569,7 +611,7 @@ capabilities reported by the helper.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-26 23:13:52 UTC
+Last updated 2010-01-13 23:08:41 UTC
 </div>
 </div>
 </body>

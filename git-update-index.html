@@ -327,6 +327,7 @@ git-update-index(1) Manual Page
              [--cacheinfo &lt;mode&gt; &lt;object&gt; &lt;file&gt;]*
              [--chmod=(+|-)x]
              [--assume-unchanged | --no-assume-unchanged]
+             [--skip-worktree | --no-skip-worktree]
              [--ignore-submodules]
              [--really-refresh] [--unresolve] [--again | -g]
              [--info-only] [--index-info]
@@ -473,6 +474,20 @@ you will need to handle the situation manually.</p></div>
 <p>
         Like <em>--refresh</em>, but checks stat information unconditionally,
         without regard to the "assume unchanged" setting.
+</p>
+</dd>
+<dt>
+--skip-worktree
+</dt>
+<dt>
+--no-skip-worktree
+</dt>
+<dd>
+<p>
+        When one of these flags is specified, the object name recorded
+        for the paths are not updated. Instead, these options
+        set and unset the "skip-worktree" bit for the paths. See
+        section "Skip-worktree bit" below for more information.
 </p>
 </dd>
 <dt>
@@ -768,6 +783,23 @@ now it checks with lstat(2) and finds it has been changed.
 </dd>
 </dl></div>
 </div>
+<h2 id="_skip_worktree_bit">Skip-worktree bit</h2>
+<div class="sectionbody">
+<div class="para"><p>Skip-worktree bit can be defined in one (long) sentence: When reading
+an entry, if it is marked as skip-worktree, then Git pretends its
+working directory version is up to date and read the index version
+instead.</p></div>
+<div class="para"><p>To elaborate, "reading" means checking for file existence, reading
+file attributes or file content. The working directory version may be
+present or absent. If present, its content may match against the index
+version or not. Writing is not affected by this bit, content safety
+is still first priority. Note that Git _can_ update working directory
+file, that is marked skip-worktree, if it is safe to do so (i.e.
+working directory version matches index version)</p></div>
+<div class="para"><p>Although this bit looks similar to assume-unchanged bit, its goal is
+different from assume-unchanged bit's. Skip-worktree also takes
+precedence over assume-unchanged bit when both are set.</p></div>
+</div>
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
 <div class="para"><p>The command honors <tt>core.filemode</tt> configuration variable.  If
@@ -807,7 +839,7 @@ ctime for marking files processed) (see <a href="git-config.html">git-config(1)<
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:51 UTC
+Last updated 2010-01-13 23:08:42 UTC
 </div>
 </div>
 </body>

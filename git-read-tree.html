@@ -322,7 +322,7 @@ git-read-tree(1) Manual Page
 <div class="sectionbody">
 <div class="para"><p><em>git read-tree</em> [[-m [--trivial] [--aggressive] | --reset | --prefix=&lt;prefix&gt;]
                 [-u [--exclude-per-directory=&lt;gitignore&gt;] | -i]]
-                [--index-output=&lt;file&gt;]
+                [--index-output=&lt;file&gt;] [--no-sparse-checkout]
                 &lt;tree-ish1&gt; [&lt;tree-ish2&gt; [&lt;tree-ish3&gt;]]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
@@ -481,6 +481,15 @@ when both sides adds a path identically.  The resolution
         file itself, and you need write permission to the
         directories the index file and index output file are
         located in.
+</p>
+</dd>
+<dt>
+--no-sparse-checkout
+</dt>
+<dd>
+<p>
+        Disable sparse checkout support even if <tt>core.sparseCheckout</tt>
+        is true.
 </p>
 </dd>
 <dt>
@@ -760,6 +769,45 @@ a case, you can simply continue doing what you were in the
 middle of doing, and when your working tree is ready (i.e. you
 have finished your work-in-progress), attempt the merge again.</p></div>
 </div>
+<h2 id="_sparse_checkout">Sparse checkout</h2>
+<div class="sectionbody">
+<div class="para"><p>"Sparse checkout" allows to sparsely populate working directory.
+It uses skip-worktree bit (see <a href="git-update-index.html">git-update-index(1)</a>) to tell
+Git whether a file on working directory is worth looking at.</p></div>
+<div class="para"><p>"git read-tree" and other merge-based commands ("git merge", "git
+checkout"&#8230;) can help maintaining skip-worktree bitmap and working
+directory update. <tt>$GIT_DIR/info/sparse-checkout</tt> is used to
+define the skip-worktree reference bitmap. When "git read-tree" needs
+to update working directory, it will reset skip-worktree bit in index
+based on this file, which uses the same syntax as .gitignore files.
+If an entry matches a pattern in this file, skip-worktree will be
+set on that entry. Otherwise, skip-worktree will be unset.</p></div>
+<div class="para"><p>Then it compares the new skip-worktree value with the previous one. If
+skip-worktree turns from unset to set, it will add the corresponding
+file back. If it turns from set to unset, that file will be removed.</p></div>
+<div class="para"><p>While <tt>$GIT_DIR/info/sparse-checkout</tt> is usually used to specify what
+files are in. You can also specify what files are _not_ in, using
+negate patterns. For example, to remove file "unwanted":</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*
+!unwanted</tt></pre>
+</div></div>
+<div class="para"><p>Another tricky thing is fully repopulating working directory when you
+no longer want sparse checkout. You cannot just disable "sparse
+checkout" because skip-worktree are still in the index and you working
+directory is still sparsely populated. You should re-populate working
+directory with the <tt>$GIT_DIR/info/sparse-checkout</tt> file content as
+follows:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*</tt></pre>
+</div></div>
+<div class="para"><p>Then you can disable sparse checkout. Sparse checkout support in "git
+read-tree" and similar commands is disabled by default. You need to
+turn <tt>core.sparseCheckout</tt> on in order to have sparse checkout
+support.</p></div>
+</div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="para"><p><a href="git-write-tree.html">git-write-tree(1)</a>; <a href="git-ls-files.html">git-ls-files(1)</a>;
@@ -779,7 +827,7 @@ have finished your work-in-progress), attempt the merge again.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:44 UTC
+Last updated 2010-01-13 23:08:41 UTC
 </div>
 </div>
 </body>
