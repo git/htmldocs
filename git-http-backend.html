@@ -330,6 +330,10 @@ clients accessing the repository over http:// and https:// protocols.
 The program supports clients fetching using both the smart HTTP protcol
 and the backwards-compatible dumb HTTP protocol, as well as clients
 pushing using the smart HTTP protocol.</p></div>
+<div class="para"><p>It verifies that the directory has the magic file
+"git-daemon-export-ok", and it will refuse to export any git directory
+that hasn't explicitly been marked for export this way (unless the
+GIT_HTTP_EXPORT_ALL environmental variable is set).</p></div>
 <div class="para"><p>By default, only the <tt>upload-pack</tt> service is enabled, which serves
 <em>git-fetch-pack</em> and <em>git-ls-remote</em> clients, which are invoked from
 <em>git-fetch</em>, <em>git-pull</em>, and <em>git-clone</em>.  If the client is authenticated,
@@ -404,6 +408,7 @@ Apache 2.x
 <div class="listingblock">
 <div class="content">
 <pre><tt>SetEnv GIT_PROJECT_ROOT /var/www/git
+SetEnv GIT_HTTP_EXPORT_ALL
 ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/</tt></pre>
 </div></div>
 <div class="para"><p>To enable anonymous read access but authenticated write access,
@@ -517,6 +522,9 @@ REQUEST_METHOD
 </p>
 </li>
 </ul></div>
+<div class="para"><p>The GIT_HTTP_EXPORT_ALL environmental variable may be passed to
+<em>git-http-backend</em> to bypass the check for the "git-daemon-export-ok"
+file in each repository before allowing export of that repository.</p></div>
 <div class="para"><p>The backend process sets GIT_COMMITTER_NAME to <em>$REMOTE_USER</em> and
 GIT_COMMITTER_EMAIL to <em>${REMOTE_USER}@http.${REMOTE_ADDR}</em>,
 ensuring that any reflogs created by <em>git-receive-pack</em> contain some
@@ -538,7 +546,7 @@ invoked by the <em>git-receive-pack</em>.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:37 UTC
+Last updated 2010-01-18 01:25:22 UTC
 </div>
 </div>
 </body>
