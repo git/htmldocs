@@ -650,6 +650,9 @@ version of the placeholder to the strbuf, e.g. to add a newline
 character if the letter <tt>n</tt> appears after a <tt>%</tt>.  The function returns
 the length of the placeholder recognized and <tt>strbuf_expand()</tt> skips
 over it.</p></div>
+<div class="para"><p>The format <tt>%%</tt> is automatically expanded to a single <tt>%</tt> as a quoting
+mechanism; callers do not need to handle the <tt>%</tt> placeholder themselves,
+and the callback function will not be invoked for this placeholder.</p></div>
 <div class="para"><p>All other characters (non-percent and not skipped ones) are copied
 verbatim to the strbuf.  If the callback returned zero, meaning that the
 placeholder is unknown, then the percent sign is copied, too.</p></div>
@@ -666,6 +669,17 @@ which can be used by the programmer of the callback as she sees fit.</p></div>
         struct strbuf_expand_dict_entry as context, i.e. pairs of
         placeholder and replacement string.  The array needs to be
         terminated by an entry with placeholder set to NULL.
+</p>
+</dd>
+<dt>
+<tt>strbuf_addbuf_percentquote</tt>
+</dt>
+<dd>
+<p>
+        Append the contents of one strbuf to another, quoting any
+        percent signs ("%") into double-percents ("%%") in the
+        destination. This is useful for literal data to be fed to either
+        strbuf_expand or to the *printf family of functions.
 </p>
 </dd>
 <dt>
@@ -756,7 +770,7 @@ same behaviour as well.</td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-20 23:01:20 UTC
+Last updated 2010-01-21 00:41:42 UTC
 </div>
 </div>
 </body>
