@@ -324,14 +324,17 @@ git-pull(1) Manual Page
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Runs <em>git-fetch</em> with the given parameters, and calls <em>git-merge</em>
+<div class="para"><p>Runs <em>git fetch</em> with the given parameters, and calls <em>git merge</em>
 to merge the retrieved head(s) into the current branch.
-With <tt>--rebase</tt>, calls <em>git-rebase</em> instead of <em>git-merge</em>.</p></div>
+With <tt>--rebase</tt>, calls <em>git rebase</em> instead of <em>git merge</em>.</p></div>
 <div class="para"><p>Note that you can use <tt>.</tt> (current directory) as the
 &lt;repository&gt; to pull from the local repository &#8212; this is useful
 when merging local branches into the current branch.</p></div>
-<div class="para"><p>Also note that options meant for <em>git-pull</em> itself and underlying
-<em>git-merge</em> must be given before the options meant for <em>git-fetch</em>.</p></div>
+<div class="para"><p>Also note that options meant for <em>git pull</em> itself and underlying
+<em>git merge</em> must be given before the options meant for <em>git fetch</em>.</p></div>
+<div class="para"><p><strong>Warning</strong>: Running <em>git pull</em> (actually, the underlying <em>git merge</em>)
+with uncommitted changes is discouraged: while possible, it leaves you
+in a state that is hard to back out of in the case of a conflict.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -440,8 +443,8 @@ option can be used to override --squash.</p></div>
         Use the given merge strategy; can be supplied more than
         once to specify them in the order they should be tried.
         If there is no <tt>-s</tt> option, a built-in list of strategies
-        is used instead (<em>git-merge-recursive</em> when merging a single
-        head, <em>git-merge-octopus</em> otherwise).
+        is used instead (<em>git merge-recursive</em> when merging a single
+        head, <em>git merge-octopus</em> otherwise).
 </p>
 </dd>
 <dt>
@@ -476,6 +479,18 @@ option can be used to override --squash.</p></div>
 <dd>
 <p>
         Be verbose.
+</p>
+</dd>
+<dt>
+-X &lt;option&gt;
+</dt>
+<dt>
+--strategy-option=&lt;option&gt;
+</dt>
+<dd>
+<p>
+        Pass merge strategy specific option through to the merge
+        strategy.
 </p>
 </dd>
 </dl></div>
@@ -554,7 +569,7 @@ unless you have read <a href="git-rebase.html">git-rebase(1)</a> carefully.</td>
 </dt>
 <dd>
 <p>
-        When <em>git-fetch</em> is used with <tt>&lt;rbranch&gt;:&lt;lbranch&gt;</tt>
+        When <em>git fetch</em> is used with <tt>&lt;rbranch&gt;:&lt;lbranch&gt;</tt>
         refspec, it refuses to update the local branch
         <tt>&lt;lbranch&gt;</tt> unless the remote branch <tt>&lt;rbranch&gt;</tt> it
         fetches is a descendant of <tt>&lt;lbranch&gt;</tt>.  This option
@@ -606,10 +621,10 @@ unless you have read <a href="git-rebase.html">git-rebase(1)</a> carefully.</td>
 </dt>
 <dd>
 <p>
-        By default <em>git-fetch</em> refuses to update the head which
+        By default <em>git fetch</em> refuses to update the head which
         corresponds to the current branch.  This flag disables the
-        check.  This is purely for the internal use for <em>git-pull</em>
-        to communicate with <em>git-fetch</em>, and unless you are
+        check.  This is purely for the internal use for <em>git pull</em>
+        to communicate with <em>git fetch</em>, and unless you are
         implementing your own Porcelain you are not supposed to
         use it.
 </p>
@@ -620,7 +635,7 @@ unless you have read <a href="git-rebase.html">git-rebase(1)</a> carefully.</td>
 <dd>
 <p>
         When given, and the repository to fetch from is handled
-        by <em>git-fetch-pack</em>, <em>--exec=&lt;upload-pack&gt;</em> is passed to
+        by <em>git fetch-pack</em>, <em>--exec=&lt;upload-pack&gt;</em> is passed to
         the command to specify non-default path for the command
         run on the other end.
 </p>
@@ -675,7 +690,7 @@ must know this is the expected usage pattern for a branch.</td>
 </td>
 <td class="content">You never do your own development on branches that appear
 on the right hand side of a &lt;refspec&gt; colon on <tt>Pull:</tt> lines;
-they are to be updated by <em>git-fetch</em>.  If you intend to do
+they are to be updated by <em>git fetch</em>.  If you intend to do
 development derived from a remote branch <tt>B</tt>, have a <tt>Pull:</tt>
 line to track it (i.e. <tt>Pull: B:remote-B</tt>), and have a separate
 branch <tt>my-B</tt> to do your development on top of it.  The latter
@@ -692,13 +707,13 @@ on the remote branch, merge it into your development branch with
 <div class="title">Note</div>
 </td>
 <td class="content">There is a difference between listing multiple &lt;refspec&gt;
-directly on <em>git-pull</em> command line and having multiple
+directly on <em>git pull</em> command line and having multiple
 <tt>Pull:</tt> &lt;refspec&gt; lines for a &lt;repository&gt; and running
-<em>git-pull</em> command without any explicit &lt;refspec&gt; parameters.
+<em>git pull</em> command without any explicit &lt;refspec&gt; parameters.
 &lt;refspec&gt; listed explicitly on the command line are always
 merged into the current branch after fetching.  In other words,
 if you list more than one remote refs, you would be making
-an Octopus.  While <em>git-pull</em> run without any explicit &lt;refspec&gt;
+an Octopus.  While <em>git pull</em> run without any explicit &lt;refspec&gt;
 parameter takes default &lt;refspec&gt;s from <tt>Pull:</tt> lines, it
 merges only the first &lt;refspec&gt; found into the current branch,
 after fetching all the remote refs.  This is because making an
@@ -914,8 +929,8 @@ following format:</p></div>
         Pull: &lt;refspec&gt;
 </tt></pre>
 </div></div>
-<div class="para"><p><tt>Push:</tt> lines are used by <em>git-push</em> and
-<tt>Pull:</tt> lines are used by <em>git-pull</em> and <em>git-fetch</em>.
+<div class="para"><p><tt>Push:</tt> lines are used by <em>git push</em> and
+<tt>Pull:</tt> lines are used by <em>git pull</em> and <em>git fetch</em>.
 Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
 be specified for additional branch mappings.</p></div>
 <h3 id="_named_file_in_tt_git_dir_branches_tt">Named file in <tt>$GIT_DIR/branches</tt></h3><div style="clear:left"></div>
@@ -945,6 +960,10 @@ refspecs, if you don't provide one on the command line.
 </div>
 <h2 id="_merge_strategies">MERGE STRATEGIES</h2>
 <div class="sectionbody">
+<div class="para"><p>The merge mechanism (<em>git-merge</em> and <em>git-pull</em> commands) allows the
+backend <em>merge strategies</em> to be chosen with <tt>-s</tt> option.  Some strategies
+can also take their own options, which can be passed by giving <tt>-X&lt;option&gt;</tt>
+arguments to <em>git-merge</em> and/or <em>git-pull</em>.</p></div>
 <div class="vlist"><dl>
 <dt>
 resolve
@@ -975,6 +994,42 @@ recursive
         renames.  This is the default merge strategy when
         pulling or merging one branch.
 </p>
+<div class="para"><p>The <em>recursive</em> strategy can take the following options:</p></div>
+<div class="vlist"><dl>
+<dt>
+ours
+</dt>
+<dd>
+<p>
+        This option forces conflicting hunks to be auto-resolved cleanly by
+        favoring <em>our</em> version.  Changes from the other tree that do not
+        conflict with our side are reflected to the merge result.
+</p>
+<div class="para"><p>This should not be confused with the <em>ours</em> merge strategy, which does not
+even look at what the other tree contains at all.  It discards everything
+the other tree did, declaring <em>our</em> history contains all that happened in it.</p></div>
+</dd>
+<dt>
+theirs
+</dt>
+<dd>
+<p>
+        This is opposite of <em>ours</em>.
+</p>
+</dd>
+<dt>
+subtree[=path]
+</dt>
+<dd>
+<p>
+        This option is a more advanced form of <em>subtree</em> strategy, where
+        the strategy makes a guess on how two trees must be shifted to
+        match with each other when merging.  Instead, the specified path
+        is prefixed (or stripped from the beginning) to make the shape of
+        two trees to match.
+</p>
+</dd>
+</dl></div>
 </dd>
 <dt>
 octopus
@@ -997,7 +1052,8 @@ ours
         merge is always that of the current branch head, effectively
         ignoring all changes from all other branches.  It is meant to
         be used to supersede old development history of side
-        branches.
+        branches.  Note that this is different from the -Xours option to
+        the <em>recursive</em> merge strategy.
 </p>
 </dd>
 <dt>
@@ -1107,7 +1163,7 @@ $ git merge origin/next</tt></pre>
 </li>
 </ul></div>
 <div class="para"><p>If you tried a pull which resulted in a complex conflicts and
-would want to start over, you can recover with <em>git-reset</em>.</p></div>
+would want to start over, you can recover with <em>git reset</em>.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
@@ -1130,7 +1186,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:43 UTC
+Last updated 2010-01-21 17:44:34 UTC
 </div>
 </div>
 </body>

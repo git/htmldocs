@@ -329,7 +329,7 @@ git-rebase(1) Manual Page
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>If &lt;branch&gt; is specified, <em>git-rebase</em> will perform an automatic
+<div class="para"><p>If &lt;branch&gt; is specified, <em>git rebase</em> will perform an automatic
 <tt>git checkout &lt;branch&gt;</tt> before doing anything else.  Otherwise
 it remains on the current branch.</p></div>
 <div class="para"><p>All changes made by commits in the current branch but that are not
@@ -465,8 +465,8 @@ the following situation:</p></div>
 <div class="para"><p>This is useful if F and G were flawed in some way, or should not be
 part of topicA.  Note that the argument to --onto and the &lt;upstream&gt;
 parameter can be any valid commit-ish.</p></div>
-<div class="para"><p>In case of conflict, <em>git-rebase</em> will stop at the first problematic commit
-and leave conflict markers in the tree.  You can use <em>git-diff</em> to locate
+<div class="para"><p>In case of conflict, <em>git rebase</em> will stop at the first problematic commit
+and leave conflict markers in the tree.  You can use <em>git diff</em> to locate
 the markers (&lt;&lt;&lt;&lt;&lt;&lt;) and make edits to resolve the conflict.  For each
 file you edit, you need to tell git that the conflict has been resolved,
 typically this would be done with</p></div>
@@ -480,7 +480,7 @@ desired resolution, you can continue the rebasing process with</p></div>
 <div class="content">
 <pre><tt>git rebase --continue</tt></pre>
 </div></div>
-<div class="para"><p>Alternatively, you can undo the <em>git-rebase</em> with</p></div>
+<div class="para"><p>Alternatively, you can undo the <em>git rebase</em> with</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>git rebase --abort</tt></pre>
@@ -582,10 +582,10 @@ other words, the sides are swapped.</p></div>
 <dd>
 <p>
         Use the given merge strategy.
-        If there is no <tt>-s</tt> option <em>git-merge-recursive</em> is used
+        If there is no <tt>-s</tt> option <em>git merge-recursive</em> is used
         instead.  This implies --merge.
 </p>
-<div class="para"><p>Because <em>git-rebase</em> replays each commit from the working branch
+<div class="para"><p>Because <em>git rebase</em> replays each commit from the working branch
 on top of the &lt;upstream&gt; branch using the given strategy, using
 the <em>ours</em> strategy simply discards all patches from the &lt;branch&gt;,
 which makes little sense.</p></div>
@@ -673,7 +673,7 @@ which makes little sense.</p></div>
 </dt>
 <dd>
 <p>
-        These flag are passed to the <em>git-apply</em> program
+        These flag are passed to the <em>git apply</em> program
         (see <a href="git-apply.html">git-apply(1)</a>) that applies the patch.
         Incompatible with the --interactive option.
 </p>
@@ -686,7 +686,7 @@ which makes little sense.</p></div>
 </dt>
 <dd>
 <p>
-        These flags are passed to <em>git-am</em> to easily change the dates
+        These flags are passed to <em>git am</em> to easily change the dates
         of the rebased commits (see <a href="git-am.html">git-am(1)</a>).
 </p>
 </dd>
@@ -746,6 +746,10 @@ which makes little sense.</p></div>
 </div>
 <h2 id="_merge_strategies">MERGE STRATEGIES</h2>
 <div class="sectionbody">
+<div class="para"><p>The merge mechanism (<em>git-merge</em> and <em>git-pull</em> commands) allows the
+backend <em>merge strategies</em> to be chosen with <tt>-s</tt> option.  Some strategies
+can also take their own options, which can be passed by giving <tt>-X&lt;option&gt;</tt>
+arguments to <em>git-merge</em> and/or <em>git-pull</em>.</p></div>
 <div class="vlist"><dl>
 <dt>
 resolve
@@ -776,6 +780,42 @@ recursive
         renames.  This is the default merge strategy when
         pulling or merging one branch.
 </p>
+<div class="para"><p>The <em>recursive</em> strategy can take the following options:</p></div>
+<div class="vlist"><dl>
+<dt>
+ours
+</dt>
+<dd>
+<p>
+        This option forces conflicting hunks to be auto-resolved cleanly by
+        favoring <em>our</em> version.  Changes from the other tree that do not
+        conflict with our side are reflected to the merge result.
+</p>
+<div class="para"><p>This should not be confused with the <em>ours</em> merge strategy, which does not
+even look at what the other tree contains at all.  It discards everything
+the other tree did, declaring <em>our</em> history contains all that happened in it.</p></div>
+</dd>
+<dt>
+theirs
+</dt>
+<dd>
+<p>
+        This is opposite of <em>ours</em>.
+</p>
+</dd>
+<dt>
+subtree[=path]
+</dt>
+<dd>
+<p>
+        This option is a more advanced form of <em>subtree</em> strategy, where
+        the strategy makes a guess on how two trees must be shifted to
+        match with each other when merging.  Instead, the specified path
+        is prefixed (or stripped from the beginning) to make the shape of
+        two trees to match.
+</p>
+</dd>
+</dl></div>
 </dd>
 <dt>
 octopus
@@ -798,7 +838,8 @@ ours
         merge is always that of the current branch head, effectively
         ignoring all changes from all other branches.  It is meant to
         be used to supersede old development history of side
-        branches.
+        branches.  Note that this is different from the -Xours option to
+        the <em>recursive</em> merge strategy.
 </p>
 </dd>
 <dt>
@@ -817,7 +858,7 @@ subtree
 </div>
 <h2 id="_notes">NOTES</h2>
 <div class="sectionbody">
-<div class="para"><p>You should understand the implications of using <em>git-rebase</em> on a
+<div class="para"><p>You should understand the implications of using <em>git rebase</em> on a
 repository that you share.  See also RECOVERING FROM UPSTREAM REBASE
 below.</p></div>
 <div class="para"><p>When the git-rebase command is run, it will first execute a "pre-rebase"
@@ -916,11 +957,11 @@ remove them.  The list looks more or less like this:</p></div>
 pick fa1afe1 The oneline of the next commit
 ...</tt></pre>
 </div></div>
-<div class="para"><p>The oneline descriptions are purely for your pleasure; <em>git-rebase</em> will
+<div class="para"><p>The oneline descriptions are purely for your pleasure; <em>git rebase</em> will
 not look at them but at the commit names ("deadbee" and "fa1afe1" in this
 example), so do not delete or edit the names.</p></div>
 <div class="para"><p>By replacing the command "pick" with the command "edit", you can tell
-<em>git-rebase</em> to stop after applying that commit, so that you can edit
+<em>git rebase</em> to stop after applying that commit, so that you can edit
 the files and/or the commit message, amend the commit, and continue
 rebasing.</p></div>
 <div class="para"><p>If you just want to edit the commit message for a commit, replace the
@@ -932,12 +973,12 @@ attributed to the author of the first commit.  The suggested commit
 message for the folded commit is the concatenation of the commit
 messages of the first commit and of those with the "squash" command,
 but omits the commit messages of commits with the "fixup" command.</p></div>
-<div class="para"><p><em>git-rebase</em> will stop when "pick" has been replaced with "edit" or
+<div class="para"><p><em>git rebase</em> will stop when "pick" has been replaced with "edit" or
 when a command fails due to merge errors. When you are done editing
 and/or resolving conflicts you can continue with <tt>git rebase --continue</tt>.</p></div>
 <div class="para"><p>For example, if you want to reorder the last 5 commits, such that what
 was HEAD~4 becomes the new HEAD. To achieve that, you would call
-<em>git-rebase</em> like this:</p></div>
+<em>git rebase</em> like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git rebase -i HEAD~5</tt></pre>
@@ -962,7 +1003,7 @@ sure that the current HEAD is "B", and call</p></div>
 <h2 id="_splitting_commits">SPLITTING COMMITS</h2>
 <div class="sectionbody">
 <div class="para"><p>In interactive mode, you can mark commits with the action "edit".  However,
-this does not necessarily mean that <em>git-rebase</em> expects the result of this
+this does not necessarily mean that <em>git rebase</em> expects the result of this
 edit to be exactly one commit.  Indeed, you can undo the commit, or you can
 add other commits.  This can be used to split a commit into two:</p></div>
 <div class="ilist"><ul>
@@ -989,7 +1030,7 @@ When it comes to editing that commit, execute <tt>git reset HEAD^</tt>.  The
 <p>
 Now add the changes to the index that you want to have in the first
   commit.  You can use <tt>git add</tt> (possibly interactively) or
-  <em>git-gui</em> (or both) to do that.
+  <em>git gui</em> (or both) to do that.
 </p>
 </li>
 <li>
@@ -1011,7 +1052,7 @@ Continue the rebase with <tt>git rebase --continue</tt>.
 </ul></div>
 <div class="para"><p>If you are not absolutely sure that the intermediate revisions are
 consistent (they compile, pass the testsuite, etc.) you should use
-<em>git-stash</em> to stash away the not-yet-committed changes
+<em>git stash</em> to stash away the not-yet-committed changes
 after each commit, test, and amend the commit if fixes are necessary.</p></div>
 </div>
 <h2 id="_recovering_from_upstream_rebase">RECOVERING FROM UPSTREAM REBASE</h2>
@@ -1084,7 +1125,7 @@ Hard case: The changes are not the same.
 <div class="para"><p>Only works if the changes (patch IDs based on the diff contents) on
 <em>subsystem</em> are literally the same before and after the rebase
 <em>subsystem</em> did.</p></div>
-<div class="para"><p>In that case, the fix is easy because <em>git-rebase</em> knows to skip
+<div class="para"><p>In that case, the fix is easy because <em>git rebase</em> knows to skip
 changes that are already present in the new upstream.  So if you say
 (assuming you're on <em>topic</em>)</p></div>
 <div class="listingblock">
@@ -1114,14 +1155,14 @@ correspond to the ones before the rebase.</p></div>
       --interactive</tt> will be <strong>*resurrected</strong>*!</td>
 </tr></table>
 </div>
-<div class="para"><p>The idea is to manually tell <em>git-rebase</em> "where the old <em>subsystem</em>
+<div class="para"><p>The idea is to manually tell <em>git rebase</em> "where the old <em>subsystem</em>
 ended and your <em>topic</em> began", that is, what the old merge-base
 between them was.  You will have to find a way to name the last commit
 of the old <em>subsystem</em>, for example:</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
-With the <em>subsystem</em> reflog: after <em>git-fetch</em>, the old tip of
+With the <em>subsystem</em> reflog: after <em>git fetch</em>, the old tip of
   <em>subsystem</em> is at <tt>subsystem@{1}</tt>.  Subsequent fetches will
   increase the number.  (See <a href="git-reflog.html">git-reflog(1)</a>.)
 </p>
@@ -1158,7 +1199,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-01-21 00:41:39 UTC
+Last updated 2010-01-21 17:44:35 UTC
 </div>
 </div>
 </body>

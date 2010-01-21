@@ -322,18 +322,19 @@ git-merge-file(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git merge-file</em> [-L &lt;current-name&gt; [-L &lt;base-name&gt; [-L &lt;other-name&gt;]]]
-        [-p|--stdout] [-q|--quiet] &lt;current-file&gt; &lt;base-file&gt; &lt;other-file&gt;</div></div>
+        [--ours|--theirs] [-p|--stdout] [-q|--quiet]
+        &lt;current-file&gt; &lt;base-file&gt; &lt;other-file&gt;</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git-merge-file</em> incorporates all changes that lead from the <tt>&lt;base-file&gt;</tt>
+<div class="para"><p><em>git merge-file</em> incorporates all changes that lead from the <tt>&lt;base-file&gt;</tt>
 to <tt>&lt;other-file&gt;</tt> into <tt>&lt;current-file&gt;</tt>. The result ordinarily goes into
-<tt>&lt;current-file&gt;</tt>. <em>git-merge-file</em> is useful for combining separate changes
+<tt>&lt;current-file&gt;</tt>. <em>git merge-file</em> is useful for combining separate changes
 to an original. Suppose <tt>&lt;base-file&gt;</tt> is the original, and both
 <tt>&lt;current-file&gt;</tt> and <tt>&lt;other-file&gt;</tt> are modifications of <tt>&lt;base-file&gt;</tt>,
-then <em>git-merge-file</em> combines both changes.</p></div>
+then <em>git merge-file</em> combines both changes.</p></div>
 <div class="para"><p>A conflict occurs if both <tt>&lt;current-file&gt;</tt> and <tt>&lt;other-file&gt;</tt> have changes
-in a common segment of lines. If a conflict is found, <em>git-merge-file</em>
+in a common segment of lines. If a conflict is found, <em>git merge-file</em>
 normally outputs a warning and brackets the conflict with lines containing
 &lt;&lt;&lt;&lt;&lt;&lt;&lt; and &gt;&gt;&gt;&gt;&gt;&gt;&gt; markers. A typical conflict will look like this:</p></div>
 <div class="literalblock">
@@ -345,10 +346,12 @@ lines in file B
 &gt;&gt;&gt;&gt;&gt;&gt;&gt; B</tt></pre>
 </div></div>
 <div class="para"><p>If there are conflicts, the user should edit the result and delete one of
-the alternatives.</p></div>
+the alternatives.  When <tt>--ours</tt> or <tt>--theirs</tt> option is in effect, however,
+these conflicts are resolved favouring lines from <tt>&lt;current-file&gt;</tt> or
+lines from <tt>&lt;other-file&gt;</tt> respectively.</p></div>
 <div class="para"><p>The exit value of this program is negative on error, and the number of
 conflicts otherwise. If the merge was clean, the exit value is 0.</p></div>
-<div class="para"><p><em>git-merge-file</em> is designed to be a minimal clone of RCS <em>merge</em>; that is, it
+<div class="para"><p><em>git merge-file</em> is designed to be a minimal clone of RCS <em>merge</em>; that is, it
 implements all of RCS <em>merge</em>'s functionality which is needed by
 <a href="git.html">git(1)</a>.</p></div>
 </div>
@@ -383,6 +386,18 @@ implements all of RCS <em>merge</em>'s functionality which is needed by
 <dd>
 <p>
         Quiet; do not warn about conflicts.
+</p>
+</dd>
+<dt>
+--ours
+</dt>
+<dt>
+--theirs
+</dt>
+<dd>
+<p>
+        Instead of leaving conflicts in the file, resolve conflicts
+        favouring our (or their) side of the lines.
 </p>
 </dd>
 </dl></div>
@@ -425,7 +440,7 @@ with parts copied from the original documentation of RCS <em>merge</em>.</p></di
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:40 UTC
+Last updated 2010-01-21 17:44:32 UTC
 </div>
 </div>
 </body>

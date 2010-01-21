@@ -322,16 +322,19 @@ git-merge(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="content"><em>git merge</em> [-n] [--stat] [--no-commit] [--squash] [-s &lt;strategy&gt;]&#8230;
-         [--[no-]rerere-autoupdate] [-m &lt;msg&gt;] &lt;remote&gt;&#8230;
-<em>git merge</em> &lt;msg&gt; HEAD &lt;remote&gt;&#8230;</div></div>
+        [--[no-]rerere-autoupdate] [-m &lt;msg&gt;] &lt;commit&gt;&#8230;
+<em>git merge</em> &lt;msg&gt; HEAD &lt;commit&gt;&#8230;</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This is the top-level interface to the merge machinery
-which drives multiple merge strategy scripts.</p></div>
-<div class="para"><p>The second syntax (&lt;msg&gt; <tt>HEAD</tt> &lt;remote&gt;) is supported for
+<div class="para"><p>Merges the history specified by &lt;commit&gt; into HEAD, optionally using a
+specific merge strategy.</p></div>
+<div class="para"><p>The second syntax (&lt;msg&gt; <tt>HEAD</tt> &lt;commit&gt;&#8230;) is supported for
 historical reasons.  Do not use it from the command line or in
-new scripts.  It is the same as <tt>git merge -m &lt;msg&gt; &lt;remote&gt;</tt>.</p></div>
+new scripts.  It is the same as <tt>git merge -m &lt;msg&gt; &lt;commit&gt;&#8230;</tt>.</p></div>
+<div class="para"><p><strong>Warning</strong>: Running <em>git merge</em> with uncommitted changes is
+discouraged: while possible, it leaves you in a state that is hard to
+back out of in the case of a conflict.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -439,8 +442,8 @@ option can be used to override --squash.</p></div>
         Use the given merge strategy; can be supplied more than
         once to specify them in the order they should be tried.
         If there is no <tt>-s</tt> option, a built-in list of strategies
-        is used instead (<em>git-merge-recursive</em> when merging a single
-        head, <em>git-merge-octopus</em> otherwise).
+        is used instead (<em>git merge-recursive</em> when merging a single
+        head, <em>git merge-octopus</em> otherwise).
 </p>
 </dd>
 <dt>
@@ -478,6 +481,18 @@ option can be used to override --squash.</p></div>
 </p>
 </dd>
 <dt>
+-X &lt;option&gt;
+</dt>
+<dt>
+--strategy-option=&lt;option&gt;
+</dt>
+<dd>
+<p>
+        Pass merge strategy specific option through to the merge
+        strategy.
+</p>
+</dd>
+<dt>
 -m &lt;msg&gt;
 </dt>
 <dd>
@@ -501,19 +516,23 @@ option can be used to override --squash.</p></div>
 </p>
 </dd>
 <dt>
-&lt;remote&gt;&#8230;
+&lt;commit&gt;&#8230;
 </dt>
 <dd>
 <p>
-        Other branch heads to merge into our branch.  You need at
-        least one &lt;remote&gt;.  Specifying more than one &lt;remote&gt;
-        obviously means you are trying an Octopus.
+        Commits, usually other branch heads, to merge into our branch.
+        You need at least one &lt;commit&gt;.  Specifying more than one
+        &lt;commit&gt; obviously means you are trying an Octopus.
 </p>
 </dd>
 </dl></div>
 </div>
 <h2 id="_merge_strategies">MERGE STRATEGIES</h2>
 <div class="sectionbody">
+<div class="para"><p>The merge mechanism (<em>git-merge</em> and <em>git-pull</em> commands) allows the
+backend <em>merge strategies</em> to be chosen with <tt>-s</tt> option.  Some strategies
+can also take their own options, which can be passed by giving <tt>-X&lt;option&gt;</tt>
+arguments to <em>git-merge</em> and/or <em>git-pull</em>.</p></div>
 <div class="vlist"><dl>
 <dt>
 resolve
@@ -544,6 +563,42 @@ recursive
         renames.  This is the default merge strategy when
         pulling or merging one branch.
 </p>
+<div class="para"><p>The <em>recursive</em> strategy can take the following options:</p></div>
+<div class="vlist"><dl>
+<dt>
+ours
+</dt>
+<dd>
+<p>
+        This option forces conflicting hunks to be auto-resolved cleanly by
+        favoring <em>our</em> version.  Changes from the other tree that do not
+        conflict with our side are reflected to the merge result.
+</p>
+<div class="para"><p>This should not be confused with the <em>ours</em> merge strategy, which does not
+even look at what the other tree contains at all.  It discards everything
+the other tree did, declaring <em>our</em> history contains all that happened in it.</p></div>
+</dd>
+<dt>
+theirs
+</dt>
+<dd>
+<p>
+        This is opposite of <em>ours</em>.
+</p>
+</dd>
+<dt>
+subtree[=path]
+</dt>
+<dd>
+<p>
+        This option is a more advanced form of <em>subtree</em> strategy, where
+        the strategy makes a guess on how two trees must be shifted to
+        match with each other when merging.  Instead, the specified path
+        is prefixed (or stripped from the beginning) to make the shape of
+        two trees to match.
+</p>
+</dd>
+</dl></div>
 </dd>
 <dt>
 octopus
@@ -566,7 +621,8 @@ ours
         merge is always that of the current branch head, effectively
         ignoring all changes from all other branches.  It is meant to
         be used to supersede old development history of side
-        branches.
+        branches.  Note that this is different from the -Xours option to
+        the <em>recursive</em> merge strategy.
 </p>
 </dd>
 <dt>
@@ -583,7 +639,7 @@ subtree
 </dd>
 </dl></div>
 <div class="para"><p>If you tried a merge which resulted in complex conflicts and
-want to start over, you can recover with <em>git-reset</em>.</p></div>
+want to start over, you can recover with <em>git reset</em>.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
@@ -762,8 +818,8 @@ file matches exactly the current <tt>HEAD</tt> commit; otherwise we
 will write out your local changes already registered in your
 index file along with the merge result, which is not good.
 Because 1. involves only those paths differing between your
-branch and the remote branch you are pulling from during the
-merge (which is typically a fraction of the whole tree), you can
+branch and the branch you are merging
+(which is typically a fraction of the whole tree), you can
 have local modifications in your working tree as long as they do
 not overlap with what the merge updates.</p></div>
 <div class="para"><p>When there are conflicts, the following happens:</p></div>
@@ -783,7 +839,7 @@ Cleanly merged paths are updated both in the index file and
 <p>
 For conflicting paths, the index file records up to three
    versions; stage1 stores the version from the common ancestor,
-   stage2 from <tt>HEAD</tt>, and stage3 from the remote branch (you
+   stage2 from <tt>HEAD</tt>, and stage3 from the other branch (you
    can inspect the stages with <tt>git ls-files -u</tt>).  The working
    tree files contain the result of the "merge" program; i.e. 3-way
    merge results with familiar conflict markers <tt>&lt;&lt;&lt; === &gt;&gt;&gt;</tt>.
@@ -862,7 +918,7 @@ viewing the original.</p></div>
 <p>
 Decide not to merge.  The only clean-ups you need are to reset
    the index file to the <tt>HEAD</tt> commit to reverse 2. and to clean
-   up working tree changes made by 2. and 3.; <em>git-reset --hard</em> can
+   up working tree changes made by 2. and 3.; <tt>git-reset --hard</tt> can
    be used for this.
 </p>
 </li>
@@ -870,7 +926,7 @@ Decide not to merge.  The only clean-ups you need are to reset
 <p>
 Resolve the conflicts.  Git will mark the conflicts in
    the working tree.  Edit the files into shape and
-   <em>git-add</em> them to the index.  Use <em>git-commit</em> to seal the deal.
+   <em>git add</em> them to the index.  Use <em>git commit</em> to seal the deal.
 </p>
 </li>
 </ul></div>
@@ -878,28 +934,28 @@ Resolve the conflicts.  Git will mark the conflicts in
 <div class="ilist"><ul>
 <li>
 <p>
-Use a mergetool.  <em>git mergetool</em> to launch a graphical
+Use a mergetool.  <tt>git mergetool</tt> to launch a graphical
    mergetool which will work you through the merge.
 </p>
 </li>
 <li>
 <p>
-Look at the diffs.  <em>git diff</em> will show a three-way diff,
-   highlighting changes from both the HEAD and remote versions.
+Look at the diffs.  <tt>git diff</tt> will show a three-way diff,
+   highlighting changes from both the HEAD and their versions.
 </p>
 </li>
 <li>
 <p>
-Look at the diffs on their own. <em>git log --merge -p &lt;path&gt;</em>
-   will show diffs first for the HEAD version and then the
-   remote version.
+Look at the diffs on their own. <tt>git log --merge -p &lt;path&gt;</tt>
+   will show diffs first for the HEAD version and then
+   their version.
 </p>
 </li>
 <li>
 <p>
-Look at the originals.  <em>git show :1:filename</em> shows the
-   common ancestor, <em>git show :2:filename</em> shows the HEAD
-   version and <em>git show :3:filename</em> shows the remote version.
+Look at the originals.  <tt>git show :1:filename</tt> shows the
+   common ancestor, <tt>git show :2:filename</tt> shows the HEAD
+   version and <tt>git show :3:filename</tt> shows their version.
 </p>
 </li>
 </ul></div>
@@ -967,7 +1023,7 @@ release/version name would be acceptable.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-01-19 06:20:44 UTC
+Last updated 2010-01-21 17:44:33 UTC
 </div>
 </div>
 </body>

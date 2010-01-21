@@ -334,8 +334,8 @@ but does not actually <strong>update</strong> any of the files it "caches". (see
 fast-forward (i.e. 2-way) merge, or a 3-way merge, with the <tt>-m</tt>
 flag.  When used with <tt>-m</tt>, the <tt>-u</tt> flag causes it to also update
 the files in the work tree with the result of the merge.</p></div>
-<div class="para"><p>Trivial merges are done by <em>git-read-tree</em> itself.  Only conflicting paths
-will be in unmerged state when <em>git-read-tree</em> returns.</p></div>
+<div class="para"><p>Trivial merges are done by <em>git read-tree</em> itself.  Only conflicting paths
+will be in unmerged state when <em>git read-tree</em> returns.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -396,7 +396,7 @@ will be in unmerged state when <em>git-read-tree</em> returns.</p></div>
 </dt>
 <dd>
 <p>
-        Restrict three-way merge by <em>git-read-tree</em> to happen
+        Restrict three-way merge by <em>git read-tree</em> to happen
         only if there is no file-level merging required, instead
         of resolving merge for trivial cases and leaving
         conflicting files unresolved in the index.
@@ -407,7 +407,7 @@ will be in unmerged state when <em>git-read-tree</em> returns.</p></div>
 </dt>
 <dd>
 <p>
-        Usually a three-way merge by <em>git-read-tree</em> resolves
+        Usually a three-way merge by <em>git read-tree</em> resolves
         the merge for really trivial cases and leaves other
         cases unresolved in the index, so that Porcelains can
         implement different merge policies.  This flag makes the
@@ -504,27 +504,27 @@ when both sides adds a path identically.  The resolution
 </div>
 <h2 id="_merging">Merging</h2>
 <div class="sectionbody">
-<div class="para"><p>If <tt>-m</tt> is specified, <em>git-read-tree</em> can perform 3 kinds of
+<div class="para"><p>If <tt>-m</tt> is specified, <em>git read-tree</em> can perform 3 kinds of
 merge, a single tree merge if only 1 tree is given, a
 fast-forward merge with 2 trees, or a 3-way merge if 3 trees are
 provided.</p></div>
 <h3 id="_single_tree_merge">Single Tree Merge</h3><div style="clear:left"></div>
-<div class="para"><p>If only 1 tree is specified, <em>git-read-tree</em> operates as if the user did not
+<div class="para"><p>If only 1 tree is specified, <em>git read-tree</em> operates as if the user did not
 specify <tt>-m</tt>, except that if the original index has an entry for a
 given pathname, and the contents of the path matches with the tree
 being read, the stat info from the index is used. (In other words, the
 index's stat()s take precedence over the merged tree's).</p></div>
 <div class="para"><p>That means that if you do a <tt>git read-tree -m &lt;newtree&gt;</tt> followed by a
-<tt>git checkout-index -f -u -a</tt>, the <em>git-checkout-index</em> only checks out
+<tt>git checkout-index -f -u -a</tt>, the <em>git checkout-index</em> only checks out
 the stuff that really changed.</p></div>
-<div class="para"><p>This is used to avoid unnecessary false hits when <em>git-diff-files</em> is
-run after <em>git-read-tree</em>.</p></div>
+<div class="para"><p>This is used to avoid unnecessary false hits when <em>git diff-files</em> is
+run after <em>git read-tree</em>.</p></div>
 <h3 id="_two_tree_merge">Two Tree Merge</h3><div style="clear:left"></div>
 <div class="para"><p>Typically, this is invoked as <tt>git read-tree -m $H $M</tt>, where $H
 is the head commit of the current repository, and $M is the head
 of a foreign tree, which is simply ahead of $H (i.e. we are in a
 fast-forward situation).</p></div>
-<div class="para"><p>When two trees are specified, the user is telling <em>git-read-tree</em>
+<div class="para"><p>When two trees are specified, the user is telling <em>git read-tree</em>
 the following:</p></div>
 <div class="olist"><ol>
 <li>
@@ -595,9 +595,9 @@ Here are the "carry forward" rules:</p></div>
 </div></div>
 <div class="para"><p>In all "keep index" cases, the index entry stays as in the
 original index file.  If the entry were not up to date,
-<em>git-read-tree</em> keeps the copy in the work tree intact when
+<em>git read-tree</em> keeps the copy in the work tree intact when
 operating under the -u flag.</p></div>
-<div class="para"><p>When this form of <em>git-read-tree</em> returns successfully, you can
+<div class="para"><p>When this form of <em>git read-tree</em> returns successfully, you can
 see what "local changes" you made are carried forward by running
 <tt>git diff-index --cached $M</tt>.  Note that this does not
 necessarily match <tt>git diff-index --cached $H</tt> would have
@@ -616,7 +616,7 @@ of the path is kept as long as $H and $M are the same.</p></div>
 <h3 id="_3_way_merge">3-Way Merge</h3><div style="clear:left"></div>
 <div class="para"><p>Each "index" entry has two bits worth of "stage" state. stage 0 is the
 normal one, and is the only one you'd see in any kind of normal use.</p></div>
-<div class="para"><p>However, when you do <em>git-read-tree</em> with three trees, the "stage"
+<div class="para"><p>However, when you do <em>git read-tree</em> with three trees, the "stage"
 starts out at 1.</p></div>
 <div class="para"><p>This means that you can do</p></div>
 <div class="listingblock">
@@ -629,7 +629,7 @@ starts out at 1.</p></div>
 branch into the current branch, we use the common ancestor tree
 as &lt;tree1&gt;, the current branch head as &lt;tree2&gt;, and the other
 branch head as &lt;tree3&gt;.</p></div>
-<div class="para"><p>Furthermore, <em>git-read-tree</em> has special-case logic that says: if you see
+<div class="para"><p>Furthermore, <em>git read-tree</em> has special-case logic that says: if you see
 a file that matches in all respects in the following states, it
 "collapses" back to "stage0":</p></div>
 <div class="ilist"><ul>
@@ -655,7 +655,7 @@ stage 1 and stage 3 are the same and stage 2 is different take
 </p>
 </li>
 </ul></div>
-<div class="para"><p>The <em>git-write-tree</em> command refuses to write a nonsensical tree, and it
+<div class="para"><p>The <em>git write-tree</em> command refuses to write a nonsensical tree, and it
 will complain about unmerged entries if it sees a single entry that is not
 stage 0.</p></div>
 <div class="para"><p>OK, this all sounds like a collection of totally nonsensical rules,
@@ -671,7 +671,7 @@ populated.  Here is an outline of how the algorithm works:</p></div>
 <li>
 <p>
 if a file exists in identical format in all three trees, it will
-  automatically collapse to "merged" state by <em>git-read-tree</em>.
+  automatically collapse to "merged" state by <em>git read-tree</em>.
 </p>
 </li>
 <li>
@@ -714,8 +714,8 @@ if you find a matching "stage2" and "stage3" tree, you remove one
 </ul></div>
 </li>
 </ul></div>
-<div class="para"><p>You would normally use <em>git-merge-index</em> with supplied
-<em>git-merge-one-file</em> to do this last step.  The script updates
+<div class="para"><p>You would normally use <em>git merge-index</em> with supplied
+<em>git merge-one-file</em> to do this last step.  The script updates
 the files in the working tree as it merges each path and at the
 end of a successful merge.</p></div>
 <div class="para"><p>When you start a 3-way merge with an index file that is already
@@ -734,7 +734,7 @@ committed last to your repository:</p></div>
 <pre><tt>$ JC=`git rev-parse --verify "HEAD^0"`
 $ git checkout-index -f -u -a $JC</tt></pre>
 </div></div>
-<div class="para"><p>You do random edits, without running <em>git-update-index</em>.  And then
+<div class="para"><p>You do random edits, without running <em>git update-index</em>.  And then
 you notice that the tip of your "upstream" tree has advanced
 since you pulled from him:</p></div>
 <div class="listingblock">
@@ -757,13 +757,13 @@ $ echo "Merge with Linus" | \
 your work-in-progress changes, and your work tree would be
 updated to the result of the merge.</p></div>
 <div class="para"><p>However, if you have local changes in the working tree that
-would be overwritten by this merge, <em>git-read-tree</em> will refuse
+would be overwritten by this merge, <em>git read-tree</em> will refuse
 to run to prevent your changes from being lost.</p></div>
 <div class="para"><p>In other words, there is no need to worry about what exists only
 in the working tree.  When you have local changes in a part of
 the project that is not involved in the merge, your changes do
 not interfere with the merge, and are kept intact.  When they
-<strong>do</strong> interfere, the merge does not even start (<em>git-read-tree</em>
+<strong>do</strong> interfere, the merge does not even start (<em>git read-tree</em>
 complains loudly and fails without modifying anything).  In such
 a case, you can simply continue doing what you were in the
 middle of doing, and when your working tree is ready (i.e. you
@@ -827,7 +827,7 @@ support.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-01-13 23:08:41 UTC
+Last updated 2010-01-21 17:44:35 UTC
 </div>
 </div>
 </body>

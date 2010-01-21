@@ -362,7 +362,7 @@ to import into git.</p></div>
 <div class="para"><p>For our first example, we're going to start a totally new repository from
 scratch, with no pre-existing files, and we'll call it <em>git-tutorial</em>.
 To start up, create a subdirectory for it, change into that
-subdirectory, and initialize the git infrastructure with <em>git-init</em>:</p></div>
+subdirectory, and initialize the git infrastructure with <em>git init</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ mkdir git-tutorial
@@ -474,7 +474,7 @@ commit that index file as an object.
 </li>
 </ul></div>
 <div class="para"><p>The first step is trivial: when you want to tell git about any changes
-to your working tree, you use the <em>git-update-index</em> program. That
+to your working tree, you use the <em>git update-index</em> program. That
 program normally just takes a list of filenames you want to update, but
 to avoid trivial mistakes, it refuses to add new entries to the index
 (or remove existing ones) unless you explicitly tell it that you're
@@ -501,13 +501,13 @@ database. If you did exactly the steps above, you should now be able to do</p></
 </div></div>
 <div class="para"><p>which correspond with the objects with names of <tt>557db&#8230;</tt> and
 <tt>f24c7&#8230;</tt> respectively.</p></div>
-<div class="para"><p>If you want to, you can use <em>git-cat-file</em> to look at those objects, but
+<div class="para"><p>If you want to, you can use <em>git cat-file</em> to look at those objects, but
 you'll have to use the object name, not the filename of the object:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git cat-file -t 557db03de997c86a4a028e1ebd3a1ceb225be238</tt></pre>
 </div></div>
-<div class="para"><p>where the <tt>-t</tt> tells <em>git-cat-file</em> to tell you what the "type" of the
+<div class="para"><p>where the <tt>-t</tt> tells <em>git cat-file</em> to tell you what the "type" of the
 object is. git will tell you that you have a "blob" object (i.e., just a
 regular file), and you can see the contents with</p></div>
 <div class="listingblock">
@@ -540,7 +540,7 @@ hexadecimal digits in most places.</td>
 <div class="para"><p>Anyway, as we mentioned previously, you normally never actually take a
 look at the objects themselves, and typing long 40-character hex
 names is not something you'd normally want to do. The above digression
-was just to show that <em>git-update-index</em> did something magical, and
+was just to show that <em>git update-index</em> did something magical, and
 actually saved away the contents of your files into the git object
 database.</p></div>
 <div class="para"><p>Updating the index did something else too: it created a <tt>.git/index</tt>
@@ -559,7 +559,7 @@ start off by adding another line to <tt>hello</tt> first:</p></div>
 </div></div>
 <div class="para"><p>and you can now, since you told git about the previous state of <tt>hello</tt>, ask
 git what has changed in the tree compared to your old index, using the
-<em>git-diff-files</em> command:</p></div>
+<em>git diff-files</em> command:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git diff-files</tt></pre>
@@ -568,7 +568,7 @@ git what has changed in the tree compared to your old index, using the
 version of a <em>diff</em>, but that internal version really just tells you
 that it has noticed that "hello" has been modified, and that the old object
 contents it had have been replaced with something else.</p></div>
-<div class="para"><p>To make it readable, we can tell <em>git-diff-files</em> to output the
+<div class="para"><p>To make it readable, we can tell <em>git diff-files</em> to output the
 differences as a patch, using the <tt>-p</tt> flag:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -582,7 +582,7 @@ index 557db03..263414f 100644
 +It's a new day for git</tt></pre>
 </div></div>
 <div class="para"><p>i.e. the diff of the change we caused by adding another line to <tt>hello</tt>.</p></div>
-<div class="para"><p>In other words, <em>git-diff-files</em> always shows us the difference between
+<div class="para"><p>In other words, <em>git diff-files</em> always shows us the difference between
 what is recorded in the index, and what is currently in the working
 tree. That's very useful.</p></div>
 <div class="para"><p>A common shorthand for <tt>git diff-files -p</tt> is to just write <tt>git
@@ -606,7 +606,7 @@ that git knows about in the index, and commit them as a real tree. We do
 that in two phases: creating a <em>tree</em> object, and committing that <em>tree</em>
 object as a <em>commit</em> object together with an explanation of what the
 tree was all about, along with information of how we came to that state.</p></div>
-<div class="para"><p>Creating a tree object is trivial, and is done with <em>git-write-tree</em>.
+<div class="para"><p>Creating a tree object is trivial, and is done with <em>git write-tree</em>.
 There are no options or other input: <tt>git write-tree</tt> will take the
 current index state, and write an object that describes that whole
 index. In other words, we're now tying together all the different
@@ -627,21 +627,21 @@ you can use <tt>git cat-file -t 8988d...</tt> to see that this time the object
 is not a "blob" object, but a "tree" object (you can also use
 <tt>git cat-file</tt> to actually output the raw object contents, but you'll see
 mainly a binary mess, so that's less interesting).</p></div>
-<div class="para"><p>However &#8212; normally you'd never use <em>git-write-tree</em> on its own, because
+<div class="para"><p>However &#8212; normally you'd never use <em>git write-tree</em> on its own, because
 normally you always commit a tree into a commit object using the
-<em>git-commit-tree</em> command. In fact, it's easier to not actually use
-<em>git-write-tree</em> on its own at all, but to just pass its result in as an
-argument to <em>git-commit-tree</em>.</p></div>
-<div class="para"><p><em>git-commit-tree</em> normally takes several arguments &#8212; it wants to know
+<em>git commit-tree</em> command. In fact, it's easier to not actually use
+<em>git write-tree</em> on its own at all, but to just pass its result in as an
+argument to <em>git commit-tree</em>.</p></div>
+<div class="para"><p><em>git commit-tree</em> normally takes several arguments &#8212; it wants to know
 what the <em>parent</em> of a commit was, but since this is the first commit
 ever in this new repository, and it has no parents, we only need to pass in
-the object name of the tree. However, <em>git-commit-tree</em> also wants to get a
+the object name of the tree. However, <em>git commit-tree</em> also wants to get a
 commit message on its standard input, and it will write out the resulting
 object name for the commit to its standard output.</p></div>
 <div class="para"><p>And this is where we create the <tt>.git/refs/heads/master</tt> file
 which is pointed at by <tt>HEAD</tt>. This file is supposed to contain
 the reference to the top-of-tree of the master branch, and since
-that's exactly what <em>git-commit-tree</em> spits out, we can do this
+that's exactly what <em>git commit-tree</em> spits out, we can do this
 all with a sequence of simple shell commands:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -659,10 +659,10 @@ instead, and it would have done the above magic scripting for you.</p></div>
 </div>
 <h2 id="_making_a_change">Making a change</h2>
 <div class="sectionbody">
-<div class="para"><p>Remember how we did the <em>git-update-index</em> on file <tt>hello</tt> and then we
+<div class="para"><p>Remember how we did the <em>git update-index</em> on file <tt>hello</tt> and then we
 changed <tt>hello</tt> afterward, and could compare the new state of <tt>hello</tt> with the
 state we saved in the index file?</p></div>
-<div class="para"><p>Further, remember how I said that <em>git-write-tree</em> writes the contents
+<div class="para"><p>Further, remember how I said that <em>git write-tree</em> writes the contents
 of the <strong>index</strong> file to the tree, and thus what we just committed was in
 fact the <strong>original</strong> contents of the file <tt>hello</tt>, not the new ones. We did
 that on purpose, to show the difference between the index state, and the
@@ -672,11 +672,11 @@ when we commit things.</p></div>
 we'll still see the same difference we saw last time: the index file
 hasn't changed by the act of committing anything. However, now that we
 have committed something, we can also learn to use a new command:
-<em>git-diff-index</em>.</p></div>
-<div class="para"><p>Unlike <em>git-diff-files</em>, which showed the difference between the index
-file and the working tree, <em>git-diff-index</em> shows the differences
+<em>git diff-index</em>.</p></div>
+<div class="para"><p>Unlike <em>git diff-files</em>, which showed the difference between the index
+file and the working tree, <em>git diff-index</em> shows the differences
 between a committed <strong>tree</strong> and either the index file or the working
-tree. In other words, <em>git-diff-index</em> wants a tree to be diffed
+tree. In other words, <em>git diff-index</em> wants a tree to be diffed
 against, and before we did the commit, we couldn't do that, because we
 didn't have anything to diff against.</p></div>
 <div class="para"><p>But now we can do</p></div>
@@ -684,7 +684,7 @@ didn't have anything to diff against.</p></div>
 <div class="content">
 <pre><tt>$ git diff-index -p HEAD</tt></pre>
 </div></div>
-<div class="para"><p>(where <tt>-p</tt> has the same meaning as it did in <em>git-diff-files</em>), and it
+<div class="para"><p>(where <tt>-p</tt> has the same meaning as it did in <em>git diff-files</em>), and it
 will show us the same difference, but for a totally different reason.
 Now we're comparing the working tree not against the index file,
 but against the tree we just wrote. It just so happens that those two
@@ -696,7 +696,7 @@ it with</p></div>
 <pre><tt>$ git diff HEAD</tt></pre>
 </div></div>
 <div class="para"><p>which ends up doing the above for you.</p></div>
-<div class="para"><p>In other words, <em>git-diff-index</em> normally compares a tree against the
+<div class="para"><p>In other words, <em>git diff-index</em> normally compares a tree against the
 working tree, but when given the <tt>--cached</tt> flag, it is told to
 instead compare against just the index cache contents, and ignore the
 current working tree state entirely. Since we just wrote the index
@@ -708,7 +708,7 @@ an empty set of differences, and that's exactly what it does.</p></div>
 <div class="title">Note</div>
 </td>
 <td class="content">
-<div class="para"><p><em>git-diff-index</em> really always uses the index for its
+<div class="para"><p><em>git diff-index</em> really always uses the index for its
 comparisons, and saying that it compares a tree against the working
 tree is thus not strictly accurate. In particular, the list of
 files to compare (the "meta-data") <strong>always</strong> comes from the index file,
@@ -735,11 +735,11 @@ update the index cache:</p></div>
 </div></div>
 <div class="para"><p>(note how we didn't need the <tt>--add</tt> flag this time, since git knew
 about the file already).</p></div>
-<div class="para"><p>Note what happens to the different <em>git-diff-*</em> versions here. After
+<div class="para"><p>Note what happens to the different <em>git diff-*</em> versions here. After
 we've updated <tt>hello</tt> in the index, <tt>git diff-files -p</tt> now shows no
 differences, but <tt>git diff-index -p HEAD</tt> still *does* show that the
 current state is different from the state we committed. In fact, now
-<em>git-diff-index</em> shows the same difference whether we use the <tt>--cached</tt>
+<em>git diff-index</em> shows the same difference whether we use the <tt>--cached</tt>
 flag or not, since now the index is coherent with the working tree.</p></div>
 <div class="para"><p>Now, since we've updated <tt>hello</tt> in the index, we can commit the new
 version. We could do it by writing the tree by hand again, and
@@ -763,14 +763,14 @@ the change for you.</p></div>
 looking at what <tt>git commit</tt> really does, feel free to investigate:
 it's a few very simple shell scripts to generate the helpful (?) commit
 message headers, and a few one-liners that actually do the
-commit itself (<em>git-commit</em>).</p></div>
+commit itself (<em>git commit</em>).</p></div>
 </div>
 <h2 id="_inspecting_changes">Inspecting Changes</h2>
 <div class="sectionbody">
 <div class="para"><p>While creating changes is useful, it's even more useful if you can tell
 later what changed. The most useful command for this is another of the
-<em>diff</em> family, namely <em>git-diff-tree</em>.</p></div>
-<div class="para"><p><em>git-diff-tree</em> can be given two arbitrary trees, and it will tell you the
+<em>diff</em> family, namely <em>git diff-tree</em>.</p></div>
+<div class="para"><p><em>git diff-tree</em> can be given two arbitrary trees, and it will tell you the
 differences between them. Perhaps even more commonly, though, you can
 give it just a single commit object, and it will figure out the parent
 of that commit itself, and show the difference directly. Thus, to get
@@ -823,14 +823,14 @@ diff-index  |    V
 </td>
 </tr></table>
 </div>
-<div class="para"><p>More interestingly, you can also give <em>git-diff-tree</em> the <tt>--pretty</tt> flag,
+<div class="para"><p>More interestingly, you can also give <em>git diff-tree</em> the <tt>--pretty</tt> flag,
 which tells it to also show the commit message and author and date of the
 commit, and you can tell it to show a whole series of diffs.
 Alternatively, you can tell it to be "silent", and not show the diffs at
 all, but just show the actual commit message.</p></div>
-<div class="para"><p>In fact, together with the <em>git-rev-list</em> program (which generates a
-list of revisions), <em>git-diff-tree</em> ends up being a veritable fount of
-changes. A trivial (but very useful) script called <em>git-whatchanged</em> is
+<div class="para"><p>In fact, together with the <em>git rev-list</em> program (which generates a
+list of revisions), <em>git diff-tree</em> ends up being a veritable fount of
+changes. A trivial (but very useful) script called <em>git whatchanged</em> is
 included with git which does exactly this, and shows a log of recent
 activities.</p></div>
 <div class="para"><p>To see the whole history of our pitiful little git-tutorial project, you
@@ -857,7 +857,7 @@ short history.</p></div>
 If this is a problem because it is huge, you can hide it by setting
 the log.showroot configuration variable to false. Having this, you
 can still show it for each command just adding the <tt>--root</tt> option,
-which is a flag for <em>git-diff-tree</em> accepted by both commands.</td>
+which is a flag for <em>git diff-tree</em> accepted by both commands.</td>
 </tr></table>
 </div>
 <div class="para"><p>With that, you should now be having some inkling of what git does, and
@@ -868,7 +868,7 @@ can explore on your own.</p></div>
 <div class="title">Note</div>
 </td>
 <td class="content">Most likely, you are not directly using the core
-git Plumbing commands, but using Porcelain such as <em>git-add</em>, `git-rm'
+git Plumbing commands, but using Porcelain such as <em>git add</em>, `git-rm'
 and `git-commit'.</td>
 </tr></table>
 </div>
@@ -899,7 +899,7 @@ pointer to the state you want to tag, but also a small tag name and
 message, along with optionally a PGP signature that says that yes,
 you really did
 that tag. You create these annotated tags with either the <tt>-a</tt> or
-<tt>-s</tt> flag to <em>git-tag</em>:</p></div>
+<tt>-s</tt> flag to <em>git tag</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git tag -s &lt;tagname&gt;</tt></pre>
@@ -950,7 +950,7 @@ history outside the project you created.</p></div>
 <li>
 <p>
 if you want to move or duplicate a git repository, you can do so. There
-   is <em>git-clone</em> command, but if all you want to do is just to
+   is <em>git clone</em> command, but if all you want to do is just to
    create a copy of your repository (with all the full history that
    went along with it), you can do so with a regular
    <tt>cp -a git-tutorial new-git-tutorial</tt>.
@@ -973,14 +973,14 @@ duplicate a remote git repository with <strong>any</strong> regular copy mechani
 index cache when you do this, and especially with other peoples'
 repositories you often want to make sure that the index cache is in some
 known state (you don't know <strong>what</strong> they've done and not yet checked in),
-so usually you'll precede the <em>git-update-index</em> with a</p></div>
+so usually you'll precede the <em>git update-index</em> with a</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git read-tree --reset HEAD
 $ git update-index --refresh</tt></pre>
 </div></div>
 <div class="para"><p>which will force a total index re-build from the tree pointed to by <tt>HEAD</tt>.
-It resets the index contents to <tt>HEAD</tt>, and then the <em>git-update-index</em>
+It resets the index contents to <tt>HEAD</tt>, and then the <em>git update-index</em>
 makes sure to match up all index entries with the checked-out files.
 If the original repository had uncommitted changes in its
 working tree, <tt>git update-index --refresh</tt> notices them and
@@ -993,8 +993,8 @@ tells you they need to be updated.</p></div>
 <div class="para"><p>and in fact a lot of the common git command combinations can be scripted
 with the <tt>git xyz</tt> interfaces.  You can learn things by just looking
 at what the various git scripts do.  For example, <tt>git reset</tt> used to be
-the above two lines implemented in <em>git-reset</em>, but some things like
-<em>git-status</em> and <em>git-commit</em> are slightly more complex scripts around
+the above two lines implemented in <em>git reset</em>, but some things like
+<em>git status</em> and <em>git commit</em> are slightly more complex scripts around
 the basic git commands.</p></div>
 <div class="para"><p>Many (most?) public remote repositories will not contain any of
 the checked out files or even an index file, and will <strong>only</strong> contain the
@@ -1028,7 +1028,7 @@ those, you'd check them out with</p></div>
 up-to-date (so that you don't have to refresh it afterward), and the
 <tt>-a</tt> flag means "check out all files" (if you have a stale copy or an
 older version of a checked out tree you may also need to add the <tt>-f</tt>
-flag first, to tell <em>git-checkout-index</em> to <strong>force</strong> overwriting of any old
+flag first, to tell <em>git checkout-index</em> to <strong>force</strong> overwriting of any old
 files).</p></div>
 <div class="para"><p>Again, this can all be simplified with</p></div>
 <div class="listingblock">
@@ -1070,7 +1070,7 @@ to it.</p></div>
 <td class="content">
 <div class="para"><p>If you make the decision to start your new branch at some
 other point in the history than the current <tt>HEAD</tt>, you can do so by
-just telling <em>git-checkout</em> what the base of the checkout would be.
+just telling <em>git checkout</em> what the base of the checkout would be.
 In other words, if you have an earlier tag or branch, you'd just do</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1108,7 +1108,7 @@ checking it out and switching to it. If so, just use the command</p></div>
 </div></div>
 <div class="para"><p>which will simply _create_ the branch, but will not do anything further.
 You can then later &#8212; once you decide that you want to actually develop
-on that branch &#8212; switch to that branch with a regular <em>git-checkout</em>
+on that branch &#8212; switch to that branch with a regular <em>git checkout</em>
 with the branchname as the argument.</p></div>
 </div>
 <h2 id="_merging_two_branches">Merging two branches</h2>
@@ -1161,7 +1161,7 @@ source.</p></div>
 <div class="para"><p>Anyway, let's exit <em>gitk</em> (<tt>^Q</tt> or the File menu), and decide that we want
 to merge the work we did on the <tt>mybranch</tt> branch into the <tt>master</tt>
 branch (which is currently our <tt>HEAD</tt> too). To do that, there's a nice
-script called <em>git-merge</em>, which wants to know which branches you want
+script called <em>git merge</em>, which wants to know which branches you want
 to resolve and what the merge is all about:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1199,7 +1199,7 @@ Work, work, work</tt></pre>
 </div></div>
 <div class="para"><p>which will very loudly warn you that you're now committing a merge
 (which is correct, so never mind), and you can write a small merge
-message about your adventures in <em>git-merge</em>-land.</p></div>
+message about your adventures in <em>git merge</em>-land.</p></div>
 <div class="para"><p>After you're done, start up <tt>gitk --all</tt> to see graphically what the
 history looks like. Notice that <tt>mybranch</tt> still exists, and you can
 switch to it, and continue to work with it if you want to. The
@@ -1241,7 +1241,7 @@ see more complex cases.</p></div>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">Without the <em>--more=1</em> option, <em>git-show-branch</em> would not output the
+<td class="content">Without the <em>--more=1</em> option, <em>git show-branch</em> would not output the
 <em>[master^]</em> commit, as <em>[mybranch]</em> commit is a common ancestor of
 both <em>master</em> and <em>mybranch</em> tips.  Please see <a href="git-show-branch.html">git-show-branch(1)</a>
 for details.</td>
@@ -1253,7 +1253,7 @@ for details.</td>
 <div class="title">Note</div>
 </td>
 <td class="content">If there were more commits on the <em>master</em> branch after the merge, the
-merge commit itself would not be shown by <em>git-show-branch</em> by
+merge commit itself would not be shown by <em>git show-branch</em> by
 default.  You would need to provide <em>--sparse</em> option to make the
 merge commit visible in this case.</td>
 </tr></table>
@@ -1261,7 +1261,7 @@ merge commit visible in this case.</td>
 <div class="para"><p>Now, let's pretend you are the one who did all the work in
 <tt>mybranch</tt>, and the fruit of your hard work has finally been merged
 to the <tt>master</tt> branch. Let's go back to <tt>mybranch</tt>, and run
-<em>git-merge</em> to get the "upstream changes" back to your branch.</p></div>
+<em>git merge</em> to get the "upstream changes" back to your branch.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git checkout mybranch
@@ -1298,11 +1298,11 @@ looks like, or run <em>show-branch</em>, which tells you this.</p></div>
 <div class="para"><p>It's usually much more common that you merge with somebody else than
 merging with your own branches, so it's worth pointing out that git
 makes that very easy too, and in fact, it's not that different from
-doing a <em>git-merge</em>. In fact, a remote merge ends up being nothing
+doing a <em>git merge</em>. In fact, a remote merge ends up being nothing
 more than "fetch the work from a remote repository into a temporary tag"
-followed by a <em>git-merge</em>.</p></div>
+followed by a <em>git merge</em>.</p></div>
 <div class="para"><p>Fetching from a remote repository is done by, unsurprisingly,
-<em>git-fetch</em>:</p></div>
+<em>git fetch</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git fetch &lt;remote-repository&gt;</tt></pre>
@@ -1386,7 +1386,7 @@ sometimes also called <em>commit walkers</em>.</p></div>
 transports</em>, because they do not require any git aware smart
 server like git Native transport does.  Any stock HTTP server
 that does not even support directory index would suffice.  But
-you must prepare your repository with <em>git-update-server-info</em>
+you must prepare your repository with <em>git update-server-info</em>
 to help dumb transport downloaders.</p></div>
 </dd>
 </dl></div>
@@ -1408,7 +1408,7 @@ argument.</p></div>
 </td>
 <td class="content">You could do without using any branches at all, by
 keeping as many local repositories as you would like to have
-branches, and merging between them with <em>git-pull</em>, just like
+branches, and merging between them with <em>git pull</em>, just like
 you merge between branches. The advantage of this approach is
 that it lets you keep a set of files for each <tt>branch</tt> checked
 out and you may find it easier to switch back and forth if you
@@ -1425,7 +1425,7 @@ like this:</p></div>
 <div class="content">
 <pre><tt>$ git config remote.linus.url http://www.kernel.org/pub/scm/git/git.git/</tt></pre>
 </div></div>
-<div class="para"><p>and use the "linus" keyword with <em>git-pull</em> instead of the full URL.</p></div>
+<div class="para"><p>and use the "linus" keyword with <em>git pull</em> instead of the full URL.</p></div>
 <div class="para"><p>Examples.</p></div>
 <div class="olist"><ol>
 <li>
@@ -1473,7 +1473,7 @@ and bring ourselves back to the pre-merge state:</p></div>
 +* [master^2] Some work.
 +* [master^] Some fun.</tt></pre>
 </div></div>
-<div class="para"><p>Remember, before running <em>git-merge</em>, our <tt>master</tt> head was at
+<div class="para"><p>Remember, before running <em>git merge</em>, our <tt>master</tt> head was at
 "Some fun." commit, while our <tt>mybranch</tt> head was at "Some
 work." commit.</p></div>
 <div class="listingblock">
@@ -1497,7 +1497,7 @@ $ git reset --hard master^</tt></pre>
 <div class="para"><p>Now we are ready to experiment with the merge by hand.</p></div>
 <div class="para"><p><tt>git merge</tt> command, when merging two branches, uses 3-way merge
 algorithm.  First, it finds the common ancestor between them.
-The command it uses is <em>git-merge-base</em>:</p></div>
+The command it uses is <em>git merge-base</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ mb=$(git merge-base HEAD mybranch)</tt></pre>
@@ -1518,7 +1518,7 @@ this:</p></div>
 <div class="content">
 <pre><tt>$ git read-tree -m -u $mb HEAD mybranch</tt></pre>
 </div></div>
-<div class="para"><p>This is the same <em>git-read-tree</em> command we have already seen,
+<div class="para"><p>This is the same <em>git read-tree</em> command we have already seen,
 but it takes three trees, unlike previous examples.  This reads
 the contents of each tree into different <em>stage</em> in the index
 file (the first tree goes to stage 1, the second to stage 2,
@@ -1555,8 +1555,8 @@ stages.</p></div>
 </div></div>
 <div class="para"><p>The next step of merging is to merge these three versions of the
 file, using 3-way merge.  This is done by giving
-<em>git-merge-one-file</em> command as one of the arguments to
-<em>git-merge-index</em> command:</p></div>
+<em>git merge-one-file</em> command as one of the arguments to
+<em>git merge-index</em> command:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git merge-index git-merge-one-file hello
@@ -1564,7 +1564,7 @@ Auto-merging hello
 ERROR: Merge conflict in hello
 fatal: merge program failed</tt></pre>
 </div></div>
-<div class="para"><p><em>git-merge-one-file</em> script is called with parameters to
+<div class="para"><p><em>git merge-one-file</em> script is called with parameters to
 describe those three versions, and is responsible to leave the
 merge results in the working tree.
 It is a fairly straightforward shell script, and
@@ -1582,9 +1582,9 @@ the working tree..  This can be seen if you run <tt>ls-files
 100644 cc44c73eb783565da5831b4d820c962954019b69 3       hello</tt></pre>
 </div></div>
 <div class="para"><p>This is the state of the index file and the working file after
-<em>git-merge</em> returns control back to you, leaving the conflicting
+<em>git merge</em> returns control back to you, leaving the conflicting
 merge for you to resolve.  Notice that the path <tt>hello</tt> is still
-unmerged, and what you see with <em>git-diff</em> at this point is
+unmerged, and what you see with <em>git diff</em> at this point is
 differences since stage 2 (i.e. your version).</p></div>
 </div>
 <h2 id="_publishing_your_work">Publishing your work</h2>
@@ -1624,8 +1624,8 @@ done only once.</p></div>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content"><em>git-push</em> uses a pair of commands,
-<em>git-send-pack</em> on your local machine, and <em>git-receive-pack</em>
+<td class="content"><em>git push</em> uses a pair of commands,
+<em>git send-pack</em> on your local machine, and <em>git-receive-pack</em>
 on the remote machine. The communication between the two over
 the network internally uses an SSH connection.</td>
 </tr></table>
@@ -1640,7 +1640,7 @@ an empty directory:</p></div>
 <pre><tt>$ mkdir my-git.git</tt></pre>
 </div></div>
 <div class="para"><p>Then, make that directory into a git repository by running
-<em>git-init</em>, but this time, since its name is not the usual
+<em>git init</em>, but this time, since its name is not the usual
 <tt>.git</tt>, we do things slightly differently:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1706,7 +1706,7 @@ storage by "packing them together". The command</p></div>
 </div></div>
 <div class="para"><p>will do it for you. If you followed the tutorial examples, you
 would have accumulated about 17 objects in <tt>.git/objects/??/</tt>
-directories by now. <em>git-repack</em> tells you how many objects it
+directories by now. <em>git repack</em> tells you how many objects it
 packed, and stores the packed file in <tt>.git/objects/pack</tt>
 directory.</p></div>
 <div class="admonitionblock">
@@ -1723,7 +1723,7 @@ in the pack, and the latter holds the index for random
 access.</td>
 </tr></table>
 </div>
-<div class="para"><p>If you are paranoid, running <em>git-verify-pack</em> command would
+<div class="para"><p>If you are paranoid, running <em>git verify-pack</em> command would
 detect if you have a corrupt pack, but do not worry too much.
 Our programs are always perfect ;-).</p></div>
 <div class="para"><p>Once you have packed objects, you do not need to leave the
@@ -1791,10 +1791,10 @@ Prepare a public repository accessible to others.
 transport protocols (HTTP), you need to keep this repository
 <em>dumb transport friendly</em>.  After <tt>git init</tt>,
 <tt>$GIT_DIR/hooks/post-update.sample</tt> copied from the standard templates
-would contain a call to <em>git-update-server-info</em>
+would contain a call to <em>git update-server-info</em>
 but you need to manually enable the hook with
 <tt>mv post-update.sample post-update</tt>.  This makes sure
-<em>git-update-server-info</em> keeps the necessary files up-to-date.</p></div>
+<em>git update-server-info</em> keeps the necessary files up-to-date.</p></div>
 </li>
 <li>
 <p>
@@ -1804,9 +1804,9 @@ Push into the public repository from your primary
 </li>
 <li>
 <p>
-<em>git-repack</em> the public repository. This establishes a big
+<em>git repack</em> the public repository. This establishes a big
    pack that contains the initial set of objects as the
-   baseline, and possibly <em>git-prune</em> if the transport
+   baseline, and possibly <em>git prune</em> if the transport
    used for pulling from your repository supports packed
    repositories.
 </p>
@@ -1828,7 +1828,7 @@ Push your changes to the public repository, and announce it
 </li>
 <li>
 <p>
-Every once in a while, <em>git-repack</em> the public repository.
+Every once in a while, <em>git repack</em> the public repository.
    Go back to step 5. and continue working.
 </p>
 </li>
@@ -1838,7 +1838,7 @@ on that project and has an own "public repository" goes like this:</p></div>
 <div class="olist"><ol>
 <li>
 <p>
-Prepare your work repository, by <em>git-clone</em> the public
+Prepare your work repository, by <em>git clone</em> the public
    repository of the "project lead". The URL used for the
    initial cloning is stored in the remote.origin.url
    configuration variable.
@@ -1862,7 +1862,7 @@ Copy over the packed files from "project lead" public
 <li>
 <p>
 Push into the public repository from your primary
-   repository. Run <em>git-repack</em>, and possibly <em>git-prune</em> if the
+   repository. Run <em>git repack</em>, and possibly <em>git prune</em> if the
    transport used for pulling from your repository supports
    packed repositories.
 </p>
@@ -1887,7 +1887,7 @@ Push your changes to your public repository, and ask your
 </li>
 <li>
 <p>
-Every once in a while, <em>git-repack</em> the public repository.
+Every once in a while, <em>git repack</em> the public repository.
    Go back to step 5. and continue working.
 </p>
 </li>
@@ -1898,7 +1898,7 @@ like this:</p></div>
 <div class="olist"><ol>
 <li>
 <p>
-Prepare your work repository, by <em>git-clone</em> the public
+Prepare your work repository, by <em>git clone</em> the public
    repository of the "project lead" (or a "subsystem
    maintainer", if you work on a subsystem). The URL used for
    the initial cloning is stored in the remote.origin.url
@@ -2002,8 +2002,8 @@ branch before these two merges by resetting it to <em>master~2</em>:</p></div>
 <pre><tt>$ git reset --hard master~2</tt></pre>
 </div></div>
 <div class="para"><p>You can make sure <tt>git show-branch</tt> matches the state before
-those two <em>git-merge</em> you just did.  Then, instead of running
-two <em>git-merge</em> commands in a row, you would merge these two
+those two <em>git merge</em> you just did.  Then, instead of running
+two <em>git merge</em> commands in a row, you would merge these two
 branch heads (this is known as <em>making an Octopus</em>):</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2047,7 +2047,7 @@ to follow, not easier.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-01-21 00:41:41 UTC
+Last updated 2010-01-21 17:44:43 UTC
 </div>
 </div>
 </body>
