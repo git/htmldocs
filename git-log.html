@@ -978,6 +978,21 @@ people using 80-column terminals.</p></div>
 </p>
 </dd>
 <dt>
+--no-notes
+</dt>
+<dt>
+--show-notes
+</dt>
+<dd>
+<p>
+        Show the notes (see <a href="git-notes.html">git-notes(1)</a>) that annotate the
+        commit, when showing the commit log message.  This is the default
+        for <tt>git log</tt>, <tt>git show</tt> and <tt>git whatchanged</tt> commands when
+        there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option is
+        given on the command line.
+</p>
+</dd>
+<dt>
 --relative-date
 </dt>
 <dd>
@@ -1282,30 +1297,47 @@ limiting may be applied.</p></div>
 </p>
 </dd>
 <dt>
---branches
+--branches[=pattern]
 </dt>
 <dd>
 <p>
         Pretend as if all the refs in <tt>$GIT_DIR/refs/heads</tt> are listed
-        on the command line as <em>&lt;commit&gt;</em>.
+        on the command line as <em>&lt;commit&gt;</em>. If <tt>pattern</tt> is given, limit
+        branches to ones matching given shell glob. If pattern lacks <em>?</em>,
+        <em><strong></em>, or <em>[</em>, <em>/</strong></em> at the end is impiled.
 </p>
 </dd>
 <dt>
---tags
+--tags[=pattern]
 </dt>
 <dd>
 <p>
         Pretend as if all the refs in <tt>$GIT_DIR/refs/tags</tt> are listed
-        on the command line as <em>&lt;commit&gt;</em>.
+        on the command line as <em>&lt;commit&gt;</em>. If <tt>pattern</tt> is given, limit
+        tags to ones matching given shell glob. If pattern lacks <em>?</em>, <em><strong></em>,
+        or <em>[</em>, <em>/</strong></em> at the end is impiled.
 </p>
 </dd>
 <dt>
---remotes
+--remotes[=pattern]
 </dt>
 <dd>
 <p>
         Pretend as if all the refs in <tt>$GIT_DIR/refs/remotes</tt> are listed
-        on the command line as <em>&lt;commit&gt;</em>.
+        on the command line as <em>&lt;commit&gt;</em>. If `pattern`is given, limit
+        remote tracking branches to ones matching given shell glob.
+        If pattern lacks <em>?</em>, <em><strong></em>, or <em>[</em>, <em>/</strong></em> at the end is impiled.
+</p>
+</dd>
+<dt>
+--glob=glob-pattern
+</dt>
+<dd>
+<p>
+        Pretend as if all the refs matching shell glob <tt>glob-pattern</tt>
+        are listed on the command line as <em>&lt;commit&gt;</em>. Leading <em>refs/</em>,
+        is automatically prepended if missing. If pattern lacks <em>?</em>, <em><strong></em>,
+        or <em>[</em>, <em>/</strong></em> at the end is impiled.
 </p>
 </dd>
 <dt>
@@ -2424,6 +2456,25 @@ git log --follow builtin-rev-list.c
         present name.
 </p>
 </dd>
+<dt>
+git log --branches --not --remotes=origin
+</dt>
+<dd>
+<p>
+        Shows all commits that are in any of local branches but not in
+        any of remote tracking branches for <em>origin</em> (what you have that
+        origin doesn't).
+</p>
+</dd>
+<dt>
+git log master --not --remotes=*/master
+</dt>
+<dd>
+<p>
+        Shows all commits that are in local master but not in any remote
+        repository master branches.
+</p>
+</dd>
 </dl></div>
 </div>
 <h2 id="_discussion">Discussion</h2>
@@ -2515,7 +2566,7 @@ reversible operation.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-01-21 17:44:31 UTC
+Last updated 2010-01-23 03:02:28 UTC
 </div>
 </div>
 </body>
