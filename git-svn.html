@@ -423,6 +423,14 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
 </p>
 </dd>
 <dt>
+--rewrite-uuid=&lt;UUID&gt;
+</dt>
+<dd>
+<p>
+        Set the <em>rewriteUUID</em> option in the [svn-remote] config.
+</p>
+</dd>
+<dt>
 --username=&lt;USER&gt;
 </dt>
 <dd>
@@ -723,6 +731,30 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </div></div>
 <div class="para"><p>where &lt;name&gt; is the name of the SVN repository as specified by the -R option to
 <em>init</em> (or "svn" by default).</p></div>
+</dd>
+<dt>
+--username
+</dt>
+<dd>
+<p>
+        Specify the SVN username to perform the commit as.  This option overrides
+        configuration property <em>username</em>.
+</p>
+</dd>
+<dt>
+--commit-url
+</dt>
+<dd>
+<p>
+        Use the specified URL to connect to the destination Subversion
+        repository.  This is useful in cases where the source SVN
+        repository is read-only.  This option overrides configuration
+        property <em>commiturl</em>.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git config --get-all svn-remote.&lt;name&gt;.commiturl</tt></pre>
+</div></div>
 </dd>
 </dl></div>
 </dd>
@@ -1357,6 +1389,17 @@ svn-remote.&lt;name&gt;.rewriteRoot
 </p>
 </dd>
 <dt>
+svn-remote.&lt;name&gt;.rewriteUUID
+</dt>
+<dd>
+<p>
+        Similar to the useSvmProps option; this is for users who need
+        to remap the UUID manually. This may be useful in situations
+        where the original UUID is not available via either useSvmProps
+        or useSvnsyncProps.
+</p>
+</dd>
+<dt>
 svn.brokenSymlinkWorkaround
 </dt>
 <dd>
@@ -1371,12 +1414,13 @@ svn.brokenSymlinkWorkaround
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>Since the noMetadata, rewriteRoot, useSvnsyncProps and useSvmProps
+<div class="para"><p>Since the noMetadata, rewriteRoot, rewriteUUID, useSvnsyncProps and useSvmProps
 options all affect the metadata generated and used by <em>git svn</em>; they
 <strong>must</strong> be set in the configuration file before any history is imported
 and these settings should never be changed once they are set.</p></div>
-<div class="para"><p>Additionally, only one of these four options can be used per-svn-remote
-section because they affect the <em>git-svn-id:</em> metadata line.</p></div>
+<div class="para"><p>Additionally, only one of these options can be used per svn-remote
+section because they affect the <em>git-svn-id:</em> metadata line, except
+for rewriteRoot and rewriteUUID which can be used together.</p></div>
 </div>
 <h2 id="_basic_examples">BASIC EXAMPLES</h2>
 <div class="sectionbody">
@@ -1546,6 +1590,20 @@ however the remote wildcard may be anywhere as long as it's an
 independent path component (surrounded by <em>/</em> or EOL).   This
 type of configuration is not automatically created by <em>init</em> and
 should be manually entered with a text-editor or using <em>git config</em>.</p></div>
+<div class="para"><p>It is also possible to fetch a subset of branches or tags by using a
+comma-separated list of names within braces. For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[svn-remote "huge-project"]
+        url = http://server.org/svn
+        fetch = trunk/src:refs/remotes/trunk
+        branches = branches/{red,green}/src:refs/remotes/branches/*
+        tags = tags/{1.0,2.0}/src:refs/remotes/tags/*</tt></pre>
+</div></div>
+<div class="para"><p>Note that git-svn keeps track of the highest revision in which a branch
+or tag has appeared. If the subset of branches or tags is changed after
+fetching, then .git/svn/.metadata must be manually edited to remove (or
+reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
@@ -1561,7 +1619,7 @@ should be manually entered with a text-editor or using <em>git config</em>.</p><
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2009-12-03 09:12:50 UTC
+Last updated 2010-01-24 20:06:04 UTC
 </div>
 </div>
 </body>

@@ -327,8 +327,30 @@ git-merge(1) Manual Page
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Merges the history specified by &lt;commit&gt; into HEAD, optionally using a
-specific merge strategy.</p></div>
+<div class="para"><p>Incorporates changes from the named commits (since the time their
+histories diverged from the current branch) into the current
+branch.  This command is used by <em>git pull</em> to incorporate changes
+from another repository and can be used by hand to merge changes
+from one branch into another.</p></div>
+<div class="para"><p>Assume the following history exists and the current branch is
+"<tt>master</tt>":</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          A---B---C topic
+         /
+    D---E---F---G master</tt></pre>
+</div></div>
+<div class="para"><p>Then "<tt>git merge topic</tt>" will replay the changes made on the
+<tt>topic</tt> branch since it diverged from <tt>master</tt> (i.e., <tt>E</tt>) until
+its current commit (<tt>C</tt>) on top of <tt>master</tt>, and record the result
+in a new commit along with the names of the two parent commits and
+a log message from the user describing the changes.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          A---B---C topic
+         /         \
+    D---E---F---G---H master</tt></pre>
+</div></div>
 <div class="para"><p>The second syntax (&lt;msg&gt; <tt>HEAD</tt> &lt;commit&gt;&#8230;) is supported for
 historical reasons.  Do not use it from the command line or in
 new scripts.  It is the same as <tt>git merge -m &lt;msg&gt; &lt;commit&gt;&#8230;</tt>.</p></div>
@@ -527,6 +549,231 @@ option can be used to override --squash.</p></div>
 </dd>
 </dl></div>
 </div>
+<h2 id="_pre_merge_checks">PRE-MERGE CHECKS</h2>
+<div class="sectionbody">
+<div class="para"><p>Before applying outside changes, you should get your own work in
+good shape and committed locally, so it will not be clobbered if
+there are conflicts.  See also <a href="git-stash.html">git-stash(1)</a>.
+<em>git pull</em> and <em>git merge</em> will stop without doing anything when
+local uncommitted changes overlap with files that <em>git pull</em>/<em>git
+merge</em> may need to update.</p></div>
+<div class="para"><p>To avoid recording unrelated changes in the merge commit,
+<em>git pull</em> and <em>git merge</em> will also abort if there are any changes
+registered in the index relative to the <tt>HEAD</tt> commit.  (One
+exception is when the changed index entries are in the state that
+would result from the merge already.)</p></div>
+<div class="para"><p>If all named commits are already ancestors of <tt>HEAD</tt>, <em>git merge</em>
+will exit early with the message "Already up-to-date."</p></div>
+</div>
+<h2 id="_fast_forward_merge">FAST-FORWARD MERGE</h2>
+<div class="sectionbody">
+<div class="para"><p>Often the current branch head is an ancestor of the named commit.
+This is the most common case especially when invoked from <em>git
+pull</em>: you are tracking an upstream repository, you have committed
+no local changes, and now you want to update to a newer upstream
+revision.  In this case, a new commit is not needed to store the
+combined history; instead, the <tt>HEAD</tt> (along with the index) is
+updated to point at the named commit, without creating an extra
+merge commit.</p></div>
+<div class="para"><p>This behavior can be suppressed with the <tt>--no-ff</tt> option.</p></div>
+</div>
+<h2 id="_true_merge">TRUE MERGE</h2>
+<div class="sectionbody">
+<div class="para"><p>Except in a fast-forward merge (see above), the branches to be
+merged must be tied together by a merge commit that has both of them
+as its parents.</p></div>
+<div class="para"><p>A merged version reconciling the changes from all branches to be
+merged is committed, and your <tt>HEAD</tt>, index, and working tree are
+updated to it.  It is possible to have modifications in the working
+tree as long as they do not overlap; the update will preserve them.</p></div>
+<div class="para"><p>When it is not obvious how to reconcile the changes, the following
+happens:</p></div>
+<div class="olist"><ol>
+<li>
+<p>
+The <tt>HEAD</tt> pointer stays the same.
+</p>
+</li>
+<li>
+<p>
+The <tt>MERGE_HEAD</tt> ref is set to point to the other branch head.
+</p>
+</li>
+<li>
+<p>
+Paths that merged cleanly are updated both in the index file and
+   in your working tree.
+</p>
+</li>
+<li>
+<p>
+For conflicting paths, the index file records up to three
+   versions: stage 1 stores the version from the common ancestor,
+   stage 2 from <tt>HEAD</tt>, and stage 3 from <tt>MERGE_HEAD</tt> (you
+   can inspect the stages with <tt>git ls-files -u</tt>).  The working
+   tree files contain the result of the "merge" program; i.e. 3-way
+   merge results with familiar conflict markers <tt>&lt;&lt;&lt;</tt> <tt>===</tt> <tt>&gt;&gt;&gt;</tt>.
+</p>
+</li>
+<li>
+<p>
+No other changes are made.  In particular, the local
+   modifications you had before you started merge will stay the
+   same and the index entries for them stay as they were,
+   i.e. matching <tt>HEAD</tt>.
+</p>
+</li>
+</ol></div>
+<div class="para"><p>If you tried a merge which resulted in complex conflicts and
+want to start over, you can recover with <tt>git reset --merge</tt>.</p></div>
+</div>
+<h2 id="_how_conflicts_are_presented">HOW CONFLICTS ARE PRESENTED</h2>
+<div class="sectionbody">
+<div class="para"><p>During a merge, the working tree files are updated to reflect the result
+of the merge.  Among the changes made to the common ancestor's version,
+non-overlapping ones (that is, you changed an area of the file while the
+other side left that area intact, or vice versa) are incorporated in the
+final result verbatim.  When both sides made changes to the same area,
+however, git cannot randomly pick one side over the other, and asks you to
+resolve it by leaving what both sides did to that area.</p></div>
+<div class="para"><p>By default, git uses the same style as that is used by "merge" program
+from the RCS suite to present such a conflicted hunk, like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Here are lines that are either unchanged from the common
+ancestor, or cleanly resolved because only one side changed.
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
+Conflict resolution is hard;
+let's go shopping.
+=======
+Git makes conflict resolution easy.
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
+And here is another line that is cleanly resolved or unmodified.</tt></pre>
+</div></div>
+<div class="para"><p>The area where a pair of conflicting changes happened is marked with markers
+<tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>, <tt>=======</tt>, and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>.  The part before the <tt>=======</tt>
+is typically your side, and the part afterwards is typically their side.</p></div>
+<div class="para"><p>The default format does not show what the original said in the conflicting
+area.  You cannot tell how many lines are deleted and replaced with
+Barbie's remark on your side.  The only thing you can tell is that your
+side wants to say it is hard and you'd prefer to go shopping, while the
+other side wants to claim it is easy.</p></div>
+<div class="para"><p>An alternative style can be used by setting the "merge.conflictstyle"
+configuration variable to "diff3".  In "diff3" style, the above conflict
+may look like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>Here are lines that are either unchanged from the common
+ancestor, or cleanly resolved because only one side changed.
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
+Conflict resolution is hard;
+let's go shopping.
+|||||||
+Conflict resolution is hard.
+=======
+Git makes conflict resolution easy.
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
+And here is another line that is cleanly resolved or unmodified.</tt></pre>
+</div></div>
+<div class="para"><p>In addition to the <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>, <tt>=======</tt>, and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt> markers, it uses
+another <tt>|||||||</tt> marker that is followed by the original text.  You can
+tell that the original just stated a fact, and your side simply gave in to
+that statement and gave up, while the other side tried to have a more
+positive attitude.  You can sometimes come up with a better resolution by
+viewing the original.</p></div>
+</div>
+<h2 id="_how_to_resolve_conflicts">HOW TO RESOLVE CONFLICTS</h2>
+<div class="sectionbody">
+<div class="para"><p>After seeing a conflict, you can do two things:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Decide not to merge.  The only clean-ups you need are to reset
+   the index file to the <tt>HEAD</tt> commit to reverse 2. and to clean
+   up working tree changes made by 2. and 3.; <tt>git-reset --hard</tt> can
+   be used for this.
+</p>
+</li>
+<li>
+<p>
+Resolve the conflicts.  Git will mark the conflicts in
+   the working tree.  Edit the files into shape and
+   <em>git add</em> them to the index.  Use <em>git commit</em> to seal the deal.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>You can work through the conflict with a number of tools:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Use a mergetool.  <tt>git mergetool</tt> to launch a graphical
+   mergetool which will work you through the merge.
+</p>
+</li>
+<li>
+<p>
+Look at the diffs.  <tt>git diff</tt> will show a three-way diff,
+   highlighting changes from both the <tt>HEAD</tt> and <tt>MERGE_HEAD</tt>
+   versions.
+</p>
+</li>
+<li>
+<p>
+Look at the diffs from each branch. <tt>git log --merge -p &lt;path&gt;</tt>
+   will show diffs first for the <tt>HEAD</tt> version and then the
+   <tt>MERGE_HEAD</tt> version.
+</p>
+</li>
+<li>
+<p>
+Look at the originals.  <tt>git show :1:filename</tt> shows the
+   common ancestor, <tt>git show :2:filename</tt> shows the <tt>HEAD</tt>
+   version, and <tt>git show :3:filename</tt> shows the <tt>MERGE_HEAD</tt>
+   version.
+</p>
+</li>
+</ul></div>
+</div>
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="ilist"><ul>
+<li>
+<p>
+Merge branches <tt>fixes</tt> and <tt>enhancements</tt> on top of
+  the current branch, making an octopus merge:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git merge fixes enhancements</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Merge branch <tt>obsolete</tt> into the current branch, using <tt>ours</tt>
+  merge strategy:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git merge -s ours obsolete</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Merge branch <tt>maint</tt> into the current branch, but do not make
+  a new commit automatically:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git merge --no-commit maint</tt></pre>
+</div></div>
+<div class="para"><p>This can be used when you want to include further changes to the
+merge, or want to write your own merge commit message.</p></div>
+<div class="para"><p>You should refrain from abusing this option to sneak substantial
+changes into a merge commit.  Small fixups like bumping
+release/version name would be acceptable.</p></div>
+</li>
+</ul></div>
+</div>
 <h2 id="_merge_strategies">MERGE STRATEGIES</h2>
 <div class="sectionbody">
 <div class="para"><p>The merge mechanism (<em>git-merge</em> and <em>git-pull</em> commands) allows the
@@ -638,8 +885,6 @@ subtree
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>If you tried a merge which resulted in complex conflicts and
-want to start over, you can recover with <em>git reset</em>.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
@@ -751,255 +996,6 @@ branch.&lt;name&gt;.mergeoptions
 </dd>
 </dl></div>
 </div>
-<h2 id="_how_merge_works">HOW MERGE WORKS</h2>
-<div class="sectionbody">
-<div class="para"><p>A merge is always between the current <tt>HEAD</tt> and one or more
-commits (usually, branch head or tag), and the index file must
-match the tree of <tt>HEAD</tt> commit (i.e. the contents of the last commit)
-when it starts out.  In other words, <tt>git diff --cached HEAD</tt> must
-report no changes.  (One exception is when the changed index
-entries are already in the same state that would result from
-the merge anyway.)</p></div>
-<div class="para"><p>Three kinds of merge can happen:</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-The merged commit is already contained in <tt>HEAD</tt>. This is the
-  simplest case, called "Already up-to-date."
-</p>
-</li>
-<li>
-<p>
-<tt>HEAD</tt> is already contained in the merged commit. This is the
-  most common case especially when invoked from <em>git pull</em>:
-  you are tracking an upstream repository, have committed no local
-  changes and now you want to update to a newer upstream revision.
-  Your <tt>HEAD</tt> (and the index) is updated to point at the merged
-  commit, without creating an extra merge commit.  This is
-  called "Fast-forward".
-</p>
-</li>
-<li>
-<p>
-Both the merged commit and <tt>HEAD</tt> are independent and must be
-  tied together by a merge commit that has both of them as its parents.
-  The rest of this section describes this "True merge" case.
-</p>
-</li>
-</ul></div>
-<div class="para"><p>The chosen merge strategy merges the two commits into a single
-new source tree.
-When things merge cleanly, this is what happens:</p></div>
-<div class="olist"><ol>
-<li>
-<p>
-The results are updated both in the index file and in your
-   working tree;
-</p>
-</li>
-<li>
-<p>
-Index file is written out as a tree;
-</p>
-</li>
-<li>
-<p>
-The tree gets committed; and
-</p>
-</li>
-<li>
-<p>
-The <tt>HEAD</tt> pointer gets advanced.
-</p>
-</li>
-</ol></div>
-<div class="para"><p>Because of 2., we require that the original state of the index
-file matches exactly the current <tt>HEAD</tt> commit; otherwise we
-will write out your local changes already registered in your
-index file along with the merge result, which is not good.
-Because 1. involves only those paths differing between your
-branch and the branch you are merging
-(which is typically a fraction of the whole tree), you can
-have local modifications in your working tree as long as they do
-not overlap with what the merge updates.</p></div>
-<div class="para"><p>When there are conflicts, the following happens:</p></div>
-<div class="olist"><ol>
-<li>
-<p>
-<tt>HEAD</tt> stays the same.
-</p>
-</li>
-<li>
-<p>
-Cleanly merged paths are updated both in the index file and
-   in your working tree.
-</p>
-</li>
-<li>
-<p>
-For conflicting paths, the index file records up to three
-   versions; stage1 stores the version from the common ancestor,
-   stage2 from <tt>HEAD</tt>, and stage3 from the other branch (you
-   can inspect the stages with <tt>git ls-files -u</tt>).  The working
-   tree files contain the result of the "merge" program; i.e. 3-way
-   merge results with familiar conflict markers <tt>&lt;&lt;&lt; === &gt;&gt;&gt;</tt>.
-</p>
-</li>
-<li>
-<p>
-No other changes are done.  In particular, the local
-   modifications you had before you started merge will stay the
-   same and the index entries for them stay as they were,
-   i.e. matching <tt>HEAD</tt>.
-</p>
-</li>
-</ol></div>
-</div>
-<h2 id="_how_conflicts_are_presented">HOW CONFLICTS ARE PRESENTED</h2>
-<div class="sectionbody">
-<div class="para"><p>During a merge, the working tree files are updated to reflect the result
-of the merge.  Among the changes made to the common ancestor's version,
-non-overlapping ones (that is, you changed an area of the file while the
-other side left that area intact, or vice versa) are incorporated in the
-final result verbatim.  When both sides made changes to the same area,
-however, git cannot randomly pick one side over the other, and asks you to
-resolve it by leaving what both sides did to that area.</p></div>
-<div class="para"><p>By default, git uses the same style as that is used by "merge" program
-from the RCS suite to present such a conflicted hunk, like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>Here are lines that are either unchanged from the common
-ancestor, or cleanly resolved because only one side changed.
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
-Conflict resolution is hard;
-let's go shopping.
-=======
-Git makes conflict resolution easy.
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
-And here is another line that is cleanly resolved or unmodified.</tt></pre>
-</div></div>
-<div class="para"><p>The area where a pair of conflicting changes happened is marked with markers
-<tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>, <tt>=======</tt>, and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>.  The part before the <tt>=======</tt>
-is typically your side, and the part afterwards is typically their side.</p></div>
-<div class="para"><p>The default format does not show what the original said in the conflicting
-area.  You cannot tell how many lines are deleted and replaced with
-Barbie's remark on your side.  The only thing you can tell is that your
-side wants to say it is hard and you'd prefer to go shopping, while the
-other side wants to claim it is easy.</p></div>
-<div class="para"><p>An alternative style can be used by setting the "merge.conflictstyle"
-configuration variable to "diff3".  In "diff3" style, the above conflict
-may look like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>Here are lines that are either unchanged from the common
-ancestor, or cleanly resolved because only one side changed.
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
-Conflict resolution is hard;
-let's go shopping.
-|||||||
-Conflict resolution is hard.
-=======
-Git makes conflict resolution easy.
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
-And here is another line that is cleanly resolved or unmodified.</tt></pre>
-</div></div>
-<div class="para"><p>In addition to the <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>, <tt>=======</tt>, and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt> markers, it uses
-another <tt>|||||||</tt> marker that is followed by the original text.  You can
-tell that the original just stated a fact, and your side simply gave in to
-that statement and gave up, while the other side tried to have a more
-positive attitude.  You can sometimes come up with a better resolution by
-viewing the original.</p></div>
-</div>
-<h2 id="_how_to_resolve_conflicts">HOW TO RESOLVE CONFLICTS</h2>
-<div class="sectionbody">
-<div class="para"><p>After seeing a conflict, you can do two things:</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Decide not to merge.  The only clean-ups you need are to reset
-   the index file to the <tt>HEAD</tt> commit to reverse 2. and to clean
-   up working tree changes made by 2. and 3.; <tt>git-reset --hard</tt> can
-   be used for this.
-</p>
-</li>
-<li>
-<p>
-Resolve the conflicts.  Git will mark the conflicts in
-   the working tree.  Edit the files into shape and
-   <em>git add</em> them to the index.  Use <em>git commit</em> to seal the deal.
-</p>
-</li>
-</ul></div>
-<div class="para"><p>You can work through the conflict with a number of tools:</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Use a mergetool.  <tt>git mergetool</tt> to launch a graphical
-   mergetool which will work you through the merge.
-</p>
-</li>
-<li>
-<p>
-Look at the diffs.  <tt>git diff</tt> will show a three-way diff,
-   highlighting changes from both the HEAD and their versions.
-</p>
-</li>
-<li>
-<p>
-Look at the diffs on their own. <tt>git log --merge -p &lt;path&gt;</tt>
-   will show diffs first for the HEAD version and then
-   their version.
-</p>
-</li>
-<li>
-<p>
-Look at the originals.  <tt>git show :1:filename</tt> shows the
-   common ancestor, <tt>git show :2:filename</tt> shows the HEAD
-   version and <tt>git show :3:filename</tt> shows their version.
-</p>
-</li>
-</ul></div>
-</div>
-<h2 id="_examples">EXAMPLES</h2>
-<div class="sectionbody">
-<div class="ilist"><ul>
-<li>
-<p>
-Merge branches <tt>fixes</tt> and <tt>enhancements</tt> on top of
-  the current branch, making an octopus merge:
-</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git merge fixes enhancements</tt></pre>
-</div></div>
-</li>
-<li>
-<p>
-Merge branch <tt>obsolete</tt> into the current branch, using <tt>ours</tt>
-  merge strategy:
-</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git merge -s ours obsolete</tt></pre>
-</div></div>
-</li>
-<li>
-<p>
-Merge branch <tt>maint</tt> into the current branch, but do not make
-  a new commit automatically:
-</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ git merge --no-commit maint</tt></pre>
-</div></div>
-<div class="para"><p>This can be used when you want to include further changes to the
-merge, or want to write your own merge commit message.</p></div>
-<div class="para"><p>You should refrain from abusing this option to sneak substantial
-changes into a merge commit.  Small fixups like bumping
-release/version name would be acceptable.</p></div>
-</li>
-</ul></div>
-</div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="para"><p><a href="git-fmt-merge-msg.html">git-fmt-merge-msg(1)</a>, <a href="git-pull.html">git-pull(1)</a>,
@@ -1023,7 +1019,7 @@ release/version name would be acceptable.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-01-21 17:44:33 UTC
+Last updated 2010-01-24 20:06:01 UTC
 </div>
 </div>
 </body>
