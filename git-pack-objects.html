@@ -331,23 +331,24 @@ git-pack-objects(1) Manual Page
 <div class="sectionbody">
 <div class="para"><p>Reads list of objects from the standard input, and writes a packed
 archive with specified base-name, or to the standard output.</p></div>
-<div class="para"><p>A packed archive is an efficient way to transfer set of objects
-between two repositories, and also is an archival format which
-is efficient to access.  The packed archive format (.pack) is
-designed to be self contained so that it can be unpacked without
-any further information, but for fast, random access to the objects
-in the pack, a pack index file (.idx) will be generated.</p></div>
-<div class="para"><p>Placing both in the pack/ subdirectory of $GIT_OBJECT_DIRECTORY (or
+<div class="para"><p>A packed archive is an efficient way to transfer a set of objects
+between two repositories as well as an access efficient archival
+format.  In a packed archive, an object is either stored as a
+compressed whole or as a difference from some other object.
+The latter is often called a delta.</p></div>
+<div class="para"><p>The packed archive format (.pack) is designed to be self-contained
+so that it can be unpacked without any further information. Therefore,
+each object that a delta depends upon must be present within the pack.</p></div>
+<div class="para"><p>A pack index file (.idx) is generated for fast, random access to the
+objects in the pack. Placing both the index file (.idx) and the packed
+archive (.pack) in the pack/ subdirectory of $GIT_OBJECT_DIRECTORY (or
 any of the directories on $GIT_ALTERNATE_OBJECT_DIRECTORIES)
-enables git to read from such an archive.</p></div>
+enables git to read from the pack archive.</p></div>
 <div class="para"><p>The <em>git unpack-objects</em> command can read the packed archive and
 expand the objects contained in the pack into "one-file
 one-object" format; this is typically done by the smart-pull
 commands when a pack is created on-the-fly for efficient network
 transport by their peers.</p></div>
-<div class="para"><p>In a packed archive, an object is either stored as a compressed
-whole, or as a difference from some other object.  The latter is
-often called a delta.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -404,7 +405,7 @@ base-name
 <p>
         This implies <tt>--revs</tt>.  In addition to the list of
         revision arguments read from the standard input, pretend
-        as if all refs under <tt>$GIT_DIR/refs</tt> are specified to be
+        as if all refs under <tt>refs/</tt> are specified to be
         included.
 </p>
 </dd>
@@ -589,6 +590,20 @@ base-name
 </p>
 </dd>
 <dt>
+--thin
+</dt>
+<dd>
+<p>
+        Create a "thin" pack by omitting the common objects between a
+        sender and a receiver in order to reduce network transfer. This
+        option only makes sense in conjunction with --stdout.
+</p>
+<div class="para"><p>Note: A thin pack violates the packed archive format by omitting
+required objects and is thus unusable by git without making it
+self-contained. Use <tt>git index-pack --fix-thin</tt>
+(see <a href="git-index-pack.html">git-index-pack(1)</a>) to restore the self-contained property.</p></div>
+</dd>
+<dt>
 --delta-base-offset
 </dt>
 <dd>
@@ -660,7 +675,7 @@ base-name
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-13 00:59:50 UTC
+Last updated 2010-02-19 09:57:45 UTC
 </div>
 </div>
 </body>
