@@ -404,8 +404,8 @@ If the program terminated due to a signal, then the return value is the
 <dd>
 <p>
         Run a function asynchronously. Takes a pointer to a <tt>struct
-        async</tt> that specifies the details and returns a pipe FD
-        from which the caller reads. See below for details.
+        async</tt> that specifies the details and returns a set of pipe FDs
+        for communication with the function. See below for details.
 </p>
 </dd>
 <dt>
@@ -529,7 +529,7 @@ Specify a file descriptor &gt; 0 to be used by the child:
 <div class="content">
 <pre><tt>.in: The FD must be readable; it becomes child's stdin.
 .out: The FD must be writable; it becomes child's stdout.
-.err &gt; 0 is not supported.</tt></pre>
+.err: The FD must be writable; it becomes child's stderr.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -607,12 +607,12 @@ calls start_async();
 </li>
 <li>
 <p>
-processes the data by reading from the fd in .out;
+processes communicates with proc through .in and .out;
 </p>
 </li>
 <li>
 <p>
-closes .out;
+closes .in and .out;
 </p>
 </li>
 <li>
@@ -621,17 +621,67 @@ calls finish_async().
 </p>
 </li>
 </ol></div>
+<div class="para"><p>The members .in, .out are used to provide a set of fd's for
+communication between the caller and the callee as follows:</p></div>
+<div class="olist"><ol>
+<li>
+<p>
+Specify 0 to have no file descriptor passed.  The callee will
+  receive -1 in the corresponding argument.
+</p>
+</li>
+<li>
+<p>
+Specify &lt; 0 to have a pipe allocated; start_async() replaces
+  with the pipe FD in the following way:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.in: Returns the writable pipe end into which the caller
+writes; the readable end of the pipe becomes the function's
+in argument.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.out: Returns the readable pipe end from which the caller
+reads; the writable end of the pipe becomes the function's
+out argument.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>The caller of start_async() must close the returned FDs after it
+has completed reading from/writing from them.</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+Specify a file descriptor &gt; 0 to be used by the function:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>.in: The FD must be readable; it becomes the function's in.
+.out: The FD must be writable; it becomes the function's out.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>The specified FD is closed by start_async(), even if it fails to
+run the function.</tt></pre>
+</div></div>
+</li>
+</ol></div>
 <div class="para"><p>The function pointer in .proc has the following signature:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>int proc(int fd, void *data);</tt></pre>
+<pre><tt>int proc(int in, int out, void *data);</tt></pre>
 </div></div>
 <div class="olist"><ol>
 <li>
 <p>
-fd specifies a writable file descriptor to which the function must
-  write the data that it produces. The function <strong>must</strong> close this
-  descriptor before it returns.
+in, out specifies a set of file descriptors to which the function
+  must read/write the data that it needs/produces.  The function
+  <strong>must</strong> close these descriptors before it returns.  A descriptor
+  may be -1 if the caller did not configure a descriptor for that
+  direction.
 </p>
 </li>
 <li>
@@ -655,8 +705,8 @@ UNIX, but by a thread in the same address space on Windows:</p></div>
 <li>
 <p>
 It cannot change the program's state (global variables, environment,
-  etc.) in a way that the caller notices; in other words, .out is the
-  only communication channel to the caller.
+  etc.) in a way that the caller notices; in other words, .in and .out
+  are the only communication channels to the caller.
 </p>
 </li>
 <li>
@@ -669,7 +719,7 @@ It must not change the program's state that the caller of the
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-13 01:00:11 UTC
+Last updated 2010-02-22 00:13:13 UTC
 </div>
 </div>
 </body>
