@@ -314,35 +314,87 @@ git-notes(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-notes -
-   Add/inspect commit notes
+   Add/inspect object notes
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git notes</em> (edit [-F &lt;file&gt; | -m &lt;msg&gt;] | show) [commit]</div></div>
+<div class="content"><em>git notes</em> [list [&lt;object&gt;]]
+<em>git notes</em> add [-f] [-F &lt;file&gt; | -m &lt;msg&gt; | (-c | -C) &lt;object&gt;] [&lt;object&gt;]
+<em>git notes</em> copy [-f] &lt;from-object&gt; &lt;to-object&gt;
+<em>git notes</em> append [-F &lt;file&gt; | -m &lt;msg&gt; | (-c | -C) &lt;object&gt;] [&lt;object&gt;]
+<em>git notes</em> edit [&lt;object&gt;]
+<em>git notes</em> show [&lt;object&gt;]
+<em>git notes</em> remove [&lt;object&gt;]
+<em>git notes</em> prune</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This command allows you to add notes to commit messages, without
-changing the commit.  To discern these notes from the message stored
-in the commit object, the notes are indented like the message, after
-an unindented line saying "Notes:".</p></div>
-<div class="para"><p>To disable commit notes, you have to set the config variable
-core.notesRef to the empty string.  Alternatively, you can set it
-to a different ref, something like "refs/notes/bugzilla".  This setting
-can be overridden by the environment variable "GIT_NOTES_REF".</p></div>
+<div class="para"><p>This command allows you to add/remove notes to/from objects, without
+changing the objects themselves.</p></div>
+<div class="para"><p>A typical use of notes is to extend a commit message without having
+to change the commit itself. Such commit notes can be shown by <tt>git log</tt>
+along with the original commit message. To discern these notes from the
+message stored in the commit object, the notes are indented like the
+message, after an unindented line saying "Notes:".</p></div>
+<div class="para"><p>To disable notes, you have to set the config variable core.notesRef to
+the empty string.  Alternatively, you can set it to a different ref,
+something like "refs/notes/bugzilla".  This setting can be overridden
+by the environment variable "GIT_NOTES_REF".</p></div>
 </div>
 <h2 id="_subcommands">SUBCOMMANDS</h2>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
+list
+</dt>
+<dd>
+<p>
+        List the notes object for a given object. If no object is
+        given, show a list of all note objects and the objects they
+        annotate (in the format "&lt;note object&gt; &lt;annotated object&gt;").
+        This is the default subcommand if no subcommand is given.
+</p>
+</dd>
+<dt>
+add
+</dt>
+<dd>
+<p>
+        Add notes for a given object (defaults to HEAD). Abort if the
+        object already has notes (use <tt>-f</tt> to overwrite an
+        existing note).
+</p>
+</dd>
+<dt>
+copy
+</dt>
+<dd>
+<p>
+        Copy the notes for the first object onto the second object.
+        Abort if the second object already has notes, or if the first
+        object has none (use -f to overwrite existing notes to the
+        second object). This subcommand is equivalent to:
+        <tt>git notes add [-f] -C $(git notes list &lt;from-object&gt;) &lt;to-object&gt;</tt>
+</p>
+</dd>
+<dt>
+append
+</dt>
+<dd>
+<p>
+        Append to the notes of an existing object (defaults to HEAD).
+        Creates a new notes object if needed.
+</p>
+</dd>
+<dt>
 edit
 </dt>
 <dd>
 <p>
-        Edit the notes for a given commit (defaults to HEAD).
+        Edit the notes for a given object (defaults to HEAD).
 </p>
 </dd>
 <dt>
@@ -350,7 +402,25 @@ show
 </dt>
 <dd>
 <p>
-        Show the notes for a given commit (defaults to HEAD).
+        Show the notes for a given object (defaults to HEAD).
+</p>
+</dd>
+<dt>
+remove
+</dt>
+<dd>
+<p>
+        Remove the notes for a given object (defaults to HEAD).
+        This is equivalent to specifying an empty note message to
+        the <tt>edit</tt> subcommand.
+</p>
+</dd>
+<dt>
+prune
+</dt>
+<dd>
+<p>
+        Remove all notes for non-existing/unreachable objects.
 </p>
 </dd>
 </dl></div>
@@ -359,35 +429,75 @@ show
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
+-f
+</dt>
+<dt>
+--force
+</dt>
+<dd>
+<p>
+        When adding notes to an object that already has notes,
+        overwrite the existing notes (instead of aborting).
+</p>
+</dd>
+<dt>
 -m &lt;msg&gt;
+</dt>
+<dt>
+--message=&lt;msg&gt;
 </dt>
 <dd>
 <p>
         Use the given note message (instead of prompting).
-        If multiple <tt>-m</tt> (or <tt>-F</tt>) options are given, their
-        values are concatenated as separate paragraphs.
+        If multiple <tt>-m</tt> options are given, their values
+        are concatenated as separate paragraphs.
 </p>
 </dd>
 <dt>
 -F &lt;file&gt;
 </dt>
+<dt>
+--file=&lt;file&gt;
+</dt>
 <dd>
 <p>
         Take the note message from the given file.  Use <em>-</em> to
         read the note message from the standard input.
-        If multiple <tt>-F</tt> (or <tt>-m</tt>) options are given, their
-        values are concatenated as separate paragraphs.
+</p>
+</dd>
+<dt>
+-C &lt;object&gt;
+</dt>
+<dt>
+--reuse-message=&lt;object&gt;
+</dt>
+<dd>
+<p>
+        Reuse the note message from the given note object.
+</p>
+</dd>
+<dt>
+-c &lt;object&gt;
+</dt>
+<dt>
+--reedit-message=&lt;object&gt;
+</dt>
+<dd>
+<p>
+        Like <em>-C</em>, but with <em>-c</em> the editor is invoked, so that
+        the user can further edit the note message.
 </p>
 </dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Johannes Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
+<div class="para"><p>Written by Johannes Schindelin &lt;johannes.schindelin@gmx.de&gt; and
+Johan Herland &lt;johan@herland.net&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Johannes Schindelin</p></div>
+<div class="para"><p>Documentation by Johannes Schindelin and Johan Herland</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -395,7 +505,7 @@ show
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-13 00:59:50 UTC
+Last updated 2010-03-15 20:32:31 UTC
 </div>
 </div>
 </body>
