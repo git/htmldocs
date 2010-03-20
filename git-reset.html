@@ -321,7 +321,7 @@ git-reset(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git reset</em> [--mixed | --soft | --hard | --merge] [-q] [&lt;commit&gt;]
+<div class="content"><em>git reset</em> [--mixed | --soft | --hard | --merge | --keep] [-q] [&lt;commit&gt;]
 <em>git reset</em> [-q] [&lt;commit&gt;] [--] &lt;paths&gt;&#8230;
 <em>git reset</em> --patch [&lt;commit&gt;] [--] [&lt;paths&gt;&#8230;]</div></div>
 </div>
@@ -383,6 +383,19 @@ HEAD.</p></div>
 </p>
 </dd>
 <dt>
+--keep
+</dt>
+<dd>
+<p>
+        Reset the index to the given commit, keeping local changes in
+        the working tree since the current commit, while updating
+        working tree files without local changes to what appears in
+        the given commit.  If a file that is different between the
+        current commit and the given commit has local changes, reset
+        is aborted.
+</p>
+</dd>
+<dt>
 -p
 </dt>
 <dt>
@@ -440,7 +453,8 @@ in the index and in state D in HEAD.</p></div>
  A       B     C    D     --soft   A       B     D
                           --mixed  A       D     D
                           --hard   D       D     D
-                          --merge (disallowed)</tt></pre>
+                          --merge (disallowed)
+                          --keep  (disallowed)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -449,7 +463,8 @@ in the index and in state D in HEAD.</p></div>
  A       B     C    C     --soft   A       B     C
                           --mixed  A       C     C
                           --hard   C       C     C
-                          --merge (disallowed)</tt></pre>
+                          --merge (disallowed)
+                          --keep   A       C     C</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -458,7 +473,8 @@ in the index and in state D in HEAD.</p></div>
  B       B     C    D     --soft   B       B     D
                           --mixed  B       D     D
                           --hard   D       D     D
-                          --merge  D       D     D</tt></pre>
+                          --merge  D       D     D
+                          --keep  (disallowed)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -467,7 +483,8 @@ in the index and in state D in HEAD.</p></div>
  B       B     C    C     --soft   B       B     C
                           --mixed  B       C     C
                           --hard   C       C     C
-                          --merge  C       C     C</tt></pre>
+                          --merge  C       C     C
+                          --keep   B       C     C</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -476,7 +493,8 @@ in the index and in state D in HEAD.</p></div>
  B       C     C    D     --soft   B       C     D
                           --mixed  B       D     D
                           --hard   D       D     D
-                          --merge (disallowed)</tt></pre>
+                          --merge (disallowed)
+                          --keep  (disallowed)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -485,7 +503,8 @@ in the index and in state D in HEAD.</p></div>
  B       C     C    C     --soft   B       C     C
                           --mixed  B       C     C
                           --hard   C       C     C
-                          --merge  B       C     C</tt></pre>
+                          --merge  B       C     C
+                          --keep   B       C     C</tt></pre>
 </div></div>
 <div class="para"><p>"reset --merge" is meant to be used when resetting out of a conflicted
 merge. Any mergy operation guarantees that the work tree file that is
@@ -495,6 +514,14 @@ we see some difference between the index and the target and also
 between the index and the work tree, then it means that we are not
 resetting out from a state that a mergy operation left after failing
 with a conflict. That is why we disallow --merge option in this case.</p></div>
+<div class="para"><p>"reset --keep" is meant to be used when removing some of the last
+commits in the current branch while keeping changes in the working
+tree. If there could be conflicts between the changes in the commit we
+want to remove and the changes in the working tree we want to keep,
+the reset is disallowed. That's why it is disallowed if there are both
+changes between the working tree and HEAD, and between HEAD and the
+target. To be safe, it is also disallowed when there are unmerged
+entries.</p></div>
 <div class="para"><p>The following tables show what happens when there are unmerged
 entries:</p></div>
 <div class="literalblock">
@@ -504,7 +531,8 @@ entries:</p></div>
  X       U     A    B     --soft  (disallowed)
                           --mixed  X       B     B
                           --hard   B       B     B
-                          --merge  B       B     B</tt></pre>
+                          --merge  B       B     B
+                          --keep  (disallowed)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -513,7 +541,8 @@ entries:</p></div>
  X       U     A    A     --soft  (disallowed)
                           --mixed  X       A     A
                           --hard   A       A     A
-                          --merge  A       A     A</tt></pre>
+                          --merge  A       A     A
+                          --keep  (disallowed)</tt></pre>
 </div></div>
 <div class="para"><p>X means any state and U means an unmerged index.</p></div>
 </div>
@@ -804,6 +833,47 @@ Adds the file to the index again.
 </li>
 </ol></div>
 </dd>
+<dt>
+Keep changes in working tree while discarding some previous commits
+</dt>
+<dd>
+<div class="para"><p>Suppose you are working on something and you commit it, and then you
+continue working a bit more, but now you think that what you have in
+your working tree should be in another branch that has nothing to do
+with what you commited previously. You can start a new branch and
+reset it while keeping the changes in your work tree.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git tag start
+$ git checkout -b branch1
+$ edit
+$ git commit ...                            <b>(1)</b>
+$ edit
+$ git checkout -b branch2                   <b>(2)</b>
+$ git reset --keep start                    <b>(3)</b></tt></pre>
+</div></div>
+<div class="colist"><ol>
+<li>
+<p>
+This commits your first edits in branch1.
+</p>
+</li>
+<li>
+<p>
+In the ideal world, you could have realized that the earlier
+    commit did not belong to the new topic when you created and switched
+    to branch2 (i.e. "git checkout -b branch2 start"), but nobody is
+    perfect.
+</p>
+</li>
+<li>
+<p>
+But you can use "reset --keep" to remove the unwanted commit after
+    you switched to "branch2".
+</p>
+</li>
+</ol></div>
+</dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
@@ -820,7 +890,7 @@ Adds the file to the index again.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-13 00:59:54 UTC
+Last updated 2010-03-20 20:59:13 UTC
 </div>
 </div>
 </body>
