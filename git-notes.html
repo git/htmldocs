@@ -323,7 +323,7 @@ git-notes(1) Manual Page
 <div class="verseblock">
 <div class="content"><em>git notes</em> [list [&lt;object&gt;]]
 <em>git notes</em> add [-f] [-F &lt;file&gt; | -m &lt;msg&gt; | (-c | -C) &lt;object&gt;] [&lt;object&gt;]
-<em>git notes</em> copy [-f] &lt;from-object&gt; &lt;to-object&gt;
+<em>git notes</em> copy [-f] ( --stdin | &lt;from-object&gt; &lt;to-object&gt; )
 <em>git notes</em> append [-F &lt;file&gt; | -m &lt;msg&gt; | (-c | -C) &lt;object&gt;] [&lt;object&gt;]
 <em>git notes</em> edit [&lt;object&gt;]
 <em>git notes</em> show [&lt;object&gt;]
@@ -338,11 +338,15 @@ changing the objects themselves.</p></div>
 to change the commit itself. Such commit notes can be shown by <tt>git log</tt>
 along with the original commit message. To discern these notes from the
 message stored in the commit object, the notes are indented like the
-message, after an unindented line saying "Notes:".</p></div>
-<div class="para"><p>To disable notes, you have to set the config variable core.notesRef to
-the empty string.  Alternatively, you can set it to a different ref,
-something like "refs/notes/bugzilla".  This setting can be overridden
-by the environment variable "GIT_NOTES_REF".</p></div>
+message, after an unindented line saying "Notes (&lt;refname&gt;):" (or
+"Notes:" for the default setting).</p></div>
+<div class="para"><p>This command always manipulates the notes specified in "core.notesRef"
+(see <a href="git-config.html">git-config(1)</a>), which can be overridden by GIT_NOTES_REF.
+To change which notes are shown by <em>git-log</em>, see the
+"notes.displayRef" configuration.</p></div>
+<div class="para"><p>See the description of "notes.rewrite.&lt;command&gt;" in
+<a href="git-config.html">git-config(1)</a> for a way of carrying your notes across commands
+that rewrite commits.</p></div>
 </div>
 <h2 id="_subcommands">SUBCOMMANDS</h2>
 <div class="sectionbody">
@@ -379,6 +383,14 @@ copy
         second object). This subcommand is equivalent to:
         <tt>git notes add [-f] -C $(git notes list &lt;from-object&gt;) &lt;to-object&gt;</tt>
 </p>
+<div class="para"><p>In <tt>--stdin</tt> mode, take lines in the format</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>&lt;from-object&gt; SP &lt;to-object&gt; [ SP &lt;rest&gt; ] LF</tt></pre>
+</div></div>
+<div class="para"><p>on standard input, and copy the notes from each &lt;from-object&gt; to its
+corresponding &lt;to-object&gt;.  (The optional <tt>&lt;rest&gt;</tt> is ignored so that
+the command can read the input given to the <tt>post-rewrite</tt> hook.)</p></div>
 </dd>
 <dt>
 append
@@ -488,7 +500,27 @@ prune
         the user can further edit the note message.
 </p>
 </dd>
+<dt>
+--ref &lt;ref&gt;
+</dt>
+<dd>
+<p>
+        Manipulate the notes tree in &lt;ref&gt;.  This overrides both
+        GIT_NOTES_REF and the "core.notesRef" configuration.  The ref
+        is taken to be in <tt>refs/notes/</tt> if it is not qualified.
+</p>
+</dd>
 </dl></div>
+</div>
+<h2 id="_notes">NOTES</h2>
+<div class="sectionbody">
+<div class="para"><p>Every notes change creates a new commit at the specified notes ref.
+You can therefore inspect the history of the notes by invoking, e.g.,
+<tt>git log -p notes/commits</tt>.</p></div>
+<div class="para"><p>Currently the commit message only records which operation triggered
+the update, and the commit authorship is determined according to the
+usual rules (see <a href="git-commit.html">git-commit(1)</a>).  These details may change in
+the future.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
@@ -505,7 +537,7 @@ Johan Herland &lt;johan@herland.net&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-03-15 20:32:31 UTC
+Last updated 2010-03-25 00:38:23 UTC
 </div>
 </div>
 </body>

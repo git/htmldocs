@@ -1488,10 +1488,12 @@ core.notesRef
 <p>
         When showing commit messages, also show notes which are stored in
         the given ref.  This ref is expected to contain files named
-        after the full SHA-1 of the commit they annotate.
+        after the full SHA-1 of the commit they annotate.  The ref
+        must be fully qualified.
 </p>
 <div class="para"><p>If such a file exists in the given ref, the referenced blob is read, and
-appended to the commit message, separated by a "Notes:" line.  If the
+appended to the commit message, separated by a "Notes (&lt;refname&gt;):"
+line (shortened to "Notes:" in the case of "refs/notes/commits").  If the
 given ref itself does not exist, it is not an error, but means that no
 notes should be printed.</p></div>
 <div class="para"><p>This setting defaults to "refs/notes/commits", and can be overridden by
@@ -3102,6 +3104,68 @@ mergetool.prompt
 </p>
 </dd>
 <dt>
+notes.displayRef
+</dt>
+<dd>
+<p>
+        The (fully qualified) refname from which to show notes when
+        showing commit messages.  The value of this variable can be set
+        to a glob, in which case notes from all matching refs will be
+        shown.  You may also specify this configuration variable
+        several times.  A warning will be issued for refs that do not
+        exist, but a glob that does not match any refs is silently
+        ignored.
+</p>
+<div class="para"><p>This setting can be overridden with the <tt>GIT_NOTES_DISPLAY_REF</tt>
+environment variable, which must be a colon separated list of refs or
+globs.</p></div>
+<div class="para"><p>The effective value of "core.notesRef" (possibly overridden by
+GIT_NOTES_REF) is also implicitly added to the list of refs to be
+displayed.</p></div>
+</dd>
+<dt>
+notes.rewrite.&lt;command&gt;
+</dt>
+<dd>
+<p>
+        When rewriting commits with &lt;command&gt; (currently <tt>amend</tt> or
+        <tt>rebase</tt>) and this variable is set to <tt>true</tt>, git
+        automatically copies your notes from the original to the
+        rewritten commit.  Defaults to <tt>true</tt>, but see
+        "notes.rewriteRef" below.
+</p>
+<div class="para"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_REF</tt>
+environment variable, which must be a colon separated list of refs or
+globs.</p></div>
+</dd>
+<dt>
+notes.rewriteMode
+</dt>
+<dd>
+<p>
+        When copying notes during a rewrite (see the
+        "notes.rewrite.&lt;command&gt;" option), determines what to do if
+        the target commit already has a note.  Must be one of
+        <tt>overwrite</tt>, <tt>concatenate</tt>, or <tt>ignore</tt>.  Defaults to
+        <tt>concatenate</tt>.
+</p>
+<div class="para"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_MODE</tt>
+environment variable.</p></div>
+</dd>
+<dt>
+notes.rewriteRef
+</dt>
+<dd>
+<p>
+        When copying notes during a rewrite, specifies the (fully
+        qualified) ref whose notes should be copied.  The ref may be a
+        glob, in which case notes in all matching refs will be copied.
+        You may also specify this configuration several times.
+</p>
+<div class="para"><p>Does not have a default value; you must configure this variable to
+enable note rewriting.</p></div>
+</dd>
+<dt>
 pack.window
 </dt>
 <dd>
@@ -3807,7 +3871,7 @@ web.browser
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-03-20 20:59:12 UTC
+Last updated 2010-03-25 00:38:20 UTC
 </div>
 </div>
 </body>

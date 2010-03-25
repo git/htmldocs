@@ -983,7 +983,7 @@ people using 80-column terminals.</p></div>
 --no-notes
 </dt>
 <dt>
---show-notes
+--show-notes[=&lt;ref&gt;]
 </dt>
 <dd>
 <p>
@@ -992,6 +992,19 @@ people using 80-column terminals.</p></div>
         for <tt>git log</tt>, <tt>git show</tt> and <tt>git whatchanged</tt> commands when
         there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option is
         given on the command line.
+</p>
+<div class="para"><p>With an optional argument, add this ref to the list of notes.  The ref
+is taken to be in <tt>refs/notes/</tt> if it is not qualified.</p></div>
+</dd>
+<dt>
+--[no-]standard-notes
+</dt>
+<dd>
+<p>
+        Enable or disable populating the notes ref list from the
+        <em>core.notesRef</em> and <em>notes.displayRef</em> variables (or
+        corresponding environment overrides).  Enabled by default.
+        See <a href="git-config.html">git-config(1)</a>.
 </p>
 </dd>
 <dt>
@@ -1096,8 +1109,8 @@ options may be given. See <a href="git-diff-files.html">git-diff-files(1)</a> fo
 </dt>
 <dd>
 <p>
-        This flag changes the way a merge commit is displayed.  It shows
-        the differences from each of the parents to the merge result
+        With this option, diff output for a merge commit
+        shows the differences from each of the parents to the merge result
         simultaneously instead of showing pairwise diff between a parent
         and the result one at a time. Furthermore, it lists only files
         which were modified from all parents.
@@ -1112,6 +1125,19 @@ options may be given. See <a href="git-diff-files.html">git-diff-files(1)</a> fo
         patch output by omitting uninteresting hunks whose contents in
         the parents have only two variants and the merge result picks
         one of them without modification.
+</p>
+</dd>
+<dt>
+-m
+</dt>
+<dd>
+<p>
+        This flag makes the merge commits show the full diff like
+        regular commits; for each merge parent, a separate log entry
+        and diff is generated. An exception is that only diff against
+        the first parent is shown when <em>--first-parent</em> option is given;
+        in that case, the output represents the changes the merge
+        brought _into_ the then-current branch.
 </p>
 </dd>
 <dt>
@@ -2288,7 +2314,8 @@ file made it into the new one.</p></div>
 <div class="sectionbody">
 <div class="para"><p>"git-diff-tree", "git-diff-files" and "git-diff" can take <em>-c</em> or
 <em>--cc</em> option to produce <em>combined diff</em>.  For showing a merge commit
-with "git log -p", this is the default format.
+with "git log -p", this is the default format; you can force showing
+full diff with the <em>-m</em> option.
 A <em>combined diff</em> format looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2477,6 +2504,18 @@ git log master --not --remotes=*/master
         repository master branches.
 </p>
 </dd>
+<dt>
+git log -p -m --first-parent
+</dt>
+<dd>
+<p>
+        Shows the history including change diffs, but only from the
+        "main branch" perspective, skipping commits that come from merged
+        branches, and showing full diffs of changes introduced by the merges.
+        This makes sense only when following a strict policy of merging all
+        topic branches when staying on a single integration branch.
+</p>
+</dd>
 </dl></div>
 </div>
 <h2 id="_discussion">Discussion</h2>
@@ -2568,7 +2607,7 @@ reversible operation.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-03-03 05:12:42 UTC
+Last updated 2010-03-25 00:38:23 UTC
 </div>
 </div>
 </body>

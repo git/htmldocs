@@ -558,6 +558,43 @@ for the user.</p></div>
 <div class="para"><p>This hook is invoked by <em>git gc --auto</em>. It takes no parameter, and
 exiting with non-zero status from this script causes the <em>git gc --auto</em>
 to abort.</p></div>
+<h3 id="_post_rewrite">post-rewrite</h3><div style="clear:left"></div>
+<div class="para"><p>This hook is invoked by commands that rewrite commits (<tt>git commit
+--amend</tt>, <em>git-rebase</em>; currently <em>git-filter-branch</em> does <em>not</em> call
+it!).  Its first argument denotes the command it was invoked by:
+currently one of <tt>amend</tt> or <tt>rebase</tt>.  Further command-dependent
+arguments may be passed in the future.</p></div>
+<div class="para"><p>The hook receives a list of the rewritten commits on stdin, in the
+format</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;old-sha1&gt; SP &lt;new-sha1&gt; [ SP &lt;extra-info&gt; ] LF</tt></pre>
+</div></div>
+<div class="para"><p>The <em>extra-info</em> is again command-dependent.  If it is empty, the
+preceding SP is also omitted.  Currently, no commands pass any
+<em>extra-info</em>.</p></div>
+<div class="para"><p>The hook always runs after the automatic note copying (see
+"notes.rewrite.&lt;command&gt;" in linkgit:git-config.txt) has happened, and
+thus has access to these notes.</p></div>
+<div class="para"><p>The following command-specific comments apply:</p></div>
+<div class="vlist"><dl>
+<dt>
+rebase
+</dt>
+<dd>
+<p>
+        For the <em>squash</em> and <em>fixup</em> operation, all commits that were
+        squashed are listed as being rewritten to the squashed commit.
+        This means that there will be several lines sharing the same
+        <em>new-sha1</em>.
+</p>
+<div class="para"><p>The commits are guaranteed to be listed in the order that they were
+processed by rebase.</p></div>
+</dd>
+</dl></div>
+<div class="para"><p>There is no default <em>post-rewrite</em> hook, but see the
+<tt>post-receive-copy-notes</tt> script in <tt>contrib/hooks</tt> for an example
+that copies your git-notes to the rewritten commits.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -565,7 +602,7 @@ to abort.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-13 01:00:02 UTC
+Last updated 2010-03-25 00:38:25 UTC
 </div>
 </div>
 </body>
