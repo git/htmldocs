@@ -417,12 +417,56 @@ the status.relativePaths config option below.</p></div>
 </div></div>
 <div class="para"><p>where <tt>PATH1</tt> is the path in the <tt>HEAD</tt>, and <tt> -&gt; PATH2</tt> part is
 shown only when <tt>PATH1</tt> corresponds to a different path in the
-index/worktree (i.e. renamed).</p></div>
-<div class="para"><p>For unmerged entries, <tt>X</tt> shows the status of stage #2 (i.e. ours) and <tt>Y</tt>
-shows the status of stage #3 (i.e. theirs).</p></div>
-<div class="para"><p>For entries that do not have conflicts, <tt>X</tt> shows the status of the index,
-and <tt>Y</tt> shows the status of the work tree.  For untracked paths, <tt>XY</tt> are
-<tt>??</tt>.</p></div>
+index/worktree (i.e. the file is renamed). The <em>XY</em> is a two-letter
+status code.</p></div>
+<div class="para"><p>The fields (including the <tt>-&gt;</tt>) are separated from each other by a
+single space. If a filename contains whitespace or other nonprintable
+characters, that field will be quoted in the manner of a C string
+literal: surrounded by ASCII double quote (34) characters, and with
+interior special characters backslash-escaped.</p></div>
+<div class="para"><p>For paths with merge conflicts, <tt>X</tt> and <em>Y</em> show the modification
+states of each side of the merge. For paths that do not have merge
+conflicts, <tt>X</tt> shows the status of the index, and <tt>Y</tt> shows the status
+of the work tree.  For untracked paths, <tt>XY</tt> are <tt>??</tt>.  Other status
+codes can be interpreted as follows:</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<em> </em> = unmodified
+</p>
+</li>
+<li>
+<p>
+<em>M</em> = modified
+</p>
+</li>
+<li>
+<p>
+<em>A</em> = added
+</p>
+</li>
+<li>
+<p>
+<em>D</em> = deleted
+</p>
+</li>
+<li>
+<p>
+<em>R</em> = renamed
+</p>
+</li>
+<li>
+<p>
+<em>C</em> = copied
+</p>
+</li>
+<li>
+<p>
+<em>U</em> = updated but unmerged
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Ignored files are not listed.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>X          Y     Meaning
@@ -430,7 +474,7 @@ and <tt>Y</tt> shows the status of the work tree.  For untracked paths, <tt>XY</
           [MD]   not updated
 M        [ MD]   updated in index
 A        [ MD]   added to index
-D        [ MD]   deleted from index
+D         [ M]   deleted from index
 R        [ MD]   renamed in index
 C        [ MD]   copied in index
 [MARC]           index and work tree matches
@@ -448,6 +492,15 @@ U           U    unmerged, both modified
 ?           ?    untracked
 -------------------------------------------------</tt></pre>
 </div></div>
+<div class="para"><p>There is an alternate -z format recommended for machine parsing.  In
+that format, the status field is the same, but some other things
+change.  First, the <em>-&gt;</em> is omitted from rename entries and the field
+order is reversed (e.g <em>from -&gt; to</em> becomes <em>to from</em>). Second, a NUL
+(ASCII 0) follows each filename, replacing space as a field separator
+and the terminating newline (but a space still separates the status
+field from the first filename).  Third, filenames containing special
+characters are not specially formatted; no quoting or
+backslash-escaping is performed.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
@@ -481,7 +534,7 @@ shown (see --summary-limit option of <a href="git-submodule.html">git-submodule(
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-02-13 00:59:57 UTC
+Last updated 2010-04-24 02:56:09 UTC
 </div>
 </div>
 </body>
