@@ -314,7 +314,7 @@ git-notes(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-notes -
-   Add/inspect object notes
+   Add or inspect object notes
 </p>
 </div>
 </div>
@@ -328,25 +328,26 @@ git-notes(1) Manual Page
 <em>git notes</em> edit [&lt;object&gt;]
 <em>git notes</em> show [&lt;object&gt;]
 <em>git notes</em> remove [&lt;object&gt;]
-<em>git notes</em> prune</div></div>
+<em>git notes</em> prune [-n | -v]</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This command allows you to add/remove notes to/from objects, without
-changing the objects themselves.</p></div>
-<div class="para"><p>A typical use of notes is to extend a commit message without having
-to change the commit itself. Such commit notes can be shown by <tt>git log</tt>
-along with the original commit message. To discern these notes from the
+<div class="para"><p>Adds, removes, or reads notes attached to objects, without touching
+the objects themselves.</p></div>
+<div class="para"><p>By default, notes are saved to and read from <tt>refs/notes/commits</tt>, but
+this default can be overridden.  See the OPTIONS, CONFIGURATION, and
+ENVIRONMENT sections below.  If this ref does not exist, it will be
+quietly created when it is first needed to store a note.</p></div>
+<div class="para"><p>A typical use of notes is to supplement a commit message without
+changing the commit itself. Notes can be shown by <em>git log</em> along with
+the original commit message. To distinguish these notes from the
 message stored in the commit object, the notes are indented like the
 message, after an unindented line saying "Notes (&lt;refname&gt;):" (or
-"Notes:" for the default setting).</p></div>
-<div class="para"><p>This command always manipulates the notes specified in "core.notesRef"
-(see <a href="git-config.html">git-config(1)</a>), which can be overridden by GIT_NOTES_REF.
-To change which notes are shown by <em>git-log</em>, see the
-"notes.displayRef" configuration.</p></div>
-<div class="para"><p>See the description of "notes.rewrite.&lt;command&gt;" in
-<a href="git-config.html">git-config(1)</a> for a way of carrying your notes across commands
-that rewrite commits.</p></div>
+"Notes:" for <tt>refs/notes/commits</tt>).</p></div>
+<div class="para"><p>To change which notes are shown by <em>git log</em>, see the
+"notes.displayRef" configuration in <a href="git-log.html">git-log(1)</a>.</p></div>
+<div class="para"><p>See the "notes.rewrite.&lt;command&gt;" configuration for a way to carry
+notes across commands that rewrite commits.</p></div>
 </div>
 <h2 id="_subcommands">SUBCOMMANDS</h2>
 <div class="sectionbody">
@@ -463,6 +464,8 @@ prune
         Use the given note message (instead of prompting).
         If multiple <tt>-m</tt> options are given, their values
         are concatenated as separate paragraphs.
+        Lines starting with <tt>#</tt> and empty lines other than a
+        single line between paragraphs will be stripped out.
 </p>
 </dd>
 <dt>
@@ -475,6 +478,8 @@ prune
 <p>
         Take the note message from the given file.  Use <em>-</em> to
         read the note message from the standard input.
+        Lines starting with <tt>#</tt> and empty lines other than a
+        single line between paragraphs will be stripped out.
 </p>
 </dd>
 <dt>
@@ -485,7 +490,8 @@ prune
 </dt>
 <dd>
 <p>
-        Reuse the note message from the given note object.
+        Take the note message from the given blob object (for
+        example, another note).
 </p>
 </dd>
 <dt>
@@ -505,22 +511,197 @@ prune
 </dt>
 <dd>
 <p>
-        Manipulate the notes tree in &lt;ref&gt;.  This overrides both
-        GIT_NOTES_REF and the "core.notesRef" configuration.  The ref
+        Manipulate the notes tree in &lt;ref&gt;.  This overrides
+        <em>GIT_NOTES_REF</em> and the "core.notesRef" configuration.  The ref
         is taken to be in <tt>refs/notes/</tt> if it is not qualified.
+</p>
+</dd>
+<dt>
+-n
+</dt>
+<dd>
+<p>
+        Do not remove anything; just report the object names whose notes
+        would be removed.
+</p>
+</dd>
+<dt>
+-v
+</dt>
+<dd>
+<p>
+        Report all object names whose notes are removed.
 </p>
 </dd>
 </dl></div>
 </div>
-<h2 id="_notes">NOTES</h2>
+<h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
+<div class="para"><p>Commit notes are blobs containing extra information about an object
+(usually information to supplement a commit's message).  These blobs
+are taken from notes refs.  A notes ref is usually a branch which
+contains "files" whose paths are the object names for the objects
+they describe, with some directory separators included for performance
+reasons <br />[Permitted pathnames have the form
+<em>ab</em><tt>/</tt><em>cd</em><tt>/</tt><em>ef</em><tt>/</tt><em>&#8230;</em><tt>/</tt><em>abcdef&#8230;</em>: a sequence of directory
+names of two hexadecimal digits each followed by a filename with the
+rest of the object ID.]<br />.</p></div>
 <div class="para"><p>Every notes change creates a new commit at the specified notes ref.
 You can therefore inspect the history of the notes by invoking, e.g.,
-<tt>git log -p notes/commits</tt>.</p></div>
-<div class="para"><p>Currently the commit message only records which operation triggered
-the update, and the commit authorship is determined according to the
-usual rules (see <a href="git-commit.html">git-commit(1)</a>).  These details may change in
-the future.</p></div>
+<tt>git log -p notes/commits</tt>.  Currently the commit message only records
+which operation triggered the update, and the commit authorship is
+determined according to the usual rules (see <a href="git-commit.html">git-commit(1)</a>).
+These details may change in the future.</p></div>
+<div class="para"><p>It is also permitted for a notes ref to point directly to a tree
+object, in which case the history of the notes can be read with
+<tt>git log -p -g &lt;refname&gt;</tt>.</p></div>
+</div>
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="para"><p>You can use notes to add annotations with information that was not
+available at the time a commit was written.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git notes add -m 'Tested-by: Johannes Sixt &lt;j6t@kdbg.org&gt;' 72a144e2
+$ git show -s 72a144e
+[...]
+    Signed-off-by: Junio C Hamano &lt;gitster@pobox.com&gt;
+
+Notes:
+    Tested-by: Johannes Sixt &lt;j6t@kdbg.org&gt;</tt></pre>
+</div></div>
+<div class="para"><p>In principle, a note is a regular Git blob, and any kind of
+(non-)format is accepted.  You can binary-safely create notes from
+arbitrary files using <em>git hash-object</em>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cc *.c
+$ blob=$(git hash-object -w a.out)
+$ git notes --ref=built add -C "$blob" HEAD</tt></pre>
+</div></div>
+<div class="para"><p>Of course, it doesn't make much sense to display non-text-format notes
+with <em>git log</em>, so if you use such notes, you'll probably need to write
+some special-purpose tools to do something useful with them.</p></div>
+</div>
+<h2 id="_configuration">CONFIGURATION</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+core.notesRef
+</dt>
+<dd>
+<p>
+        Notes ref to read and manipulate instead of
+        <tt>refs/notes/commits</tt>.  Must be an unabbreviated ref name.
+        This setting can be overridden through the environment and
+        command line.
+</p>
+</dd>
+<dt>
+notes.displayRef
+</dt>
+<dd>
+<p>
+        Which ref (or refs, if a glob or specified more than once), in
+        addition to the default set by <tt>core.notesRef</tt> or
+        <em>GIT_NOTES_REF</em>, to read notes from when showing commit
+        messages with the <em>git log</em> family of commands.
+        This setting can be overridden on the command line or by the
+        <em>GIT_NOTES_DISPLAY_REF</em> environment variable.
+        See <a href="git-log.html">git-log(1)</a>.
+</p>
+</dd>
+<dt>
+notes.rewrite.&lt;command&gt;
+</dt>
+<dd>
+<p>
+        When rewriting commits with &lt;command&gt; (currently <tt>amend</tt> or
+        <tt>rebase</tt>), if this variable is <tt>false</tt>, git will not copy
+        notes from the original to the rewritten commit.  Defaults to
+        <tt>true</tt>.  See also "<tt>notes.rewriteRef</tt>" below.
+</p>
+<div class="para"><p>This setting can be overridden by the <em>GIT_NOTES_REWRITE_REF</em>
+environment variable.</p></div>
+</dd>
+<dt>
+notes.rewriteMode
+</dt>
+<dd>
+<p>
+        When copying notes during a rewrite, what to do if the target
+        commit already has a note.  Must be one of <tt>overwrite</tt>,
+        <tt>concatenate</tt>, and <tt>ignore</tt>.  Defaults to <tt>concatenate</tt>.
+</p>
+<div class="para"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_MODE</tt>
+environment variable.</p></div>
+</dd>
+<dt>
+notes.rewriteRef
+</dt>
+<dd>
+<p>
+        When copying notes during a rewrite, specifies the (fully
+        qualified) ref whose notes should be copied.  May be a glob,
+        in which case notes in all matching refs will be copied.  You
+        may also specify this configuration several times.
+</p>
+<div class="para"><p>Does not have a default value; you must configure this variable to
+enable note rewriting.</p></div>
+<div class="para"><p>Can be overridden with the <em>GIT_NOTES_REWRITE_REF</em> environment variable.</p></div>
+</dd>
+</dl></div>
+</div>
+<h2 id="_environment">ENVIRONMENT</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+<em>GIT_NOTES_REF</em>
+</dt>
+<dd>
+<p>
+        Which ref to manipulate notes from, instead of <tt>refs/notes/commits</tt>.
+        This overrides the <tt>core.notesRef</tt> setting.
+</p>
+</dd>
+<dt>
+<em>GIT_NOTES_DISPLAY_REF</em>
+</dt>
+<dd>
+<p>
+        Colon-delimited list of refs or globs indicating which refs,
+        in addition to the default from <tt>core.notesRef</tt> or
+        <em>GIT_NOTES_REF</em>, to read notes from when showing commit
+        messages.
+        This overrides the <tt>notes.displayRef</tt> setting.
+</p>
+<div class="para"><p>A warning will be issued for refs that do not exist, but a glob that
+does not match any refs is silently ignored.</p></div>
+</dd>
+<dt>
+<em>GIT_NOTES_REWRITE_MODE</em>
+</dt>
+<dd>
+<p>
+        When copying notes during a rewrite, what to do if the target
+        commit already has a note.
+        Must be one of <tt>overwrite</tt>, <tt>concatenate</tt>, and <tt>ignore</tt>.
+        This overrides the <tt>core.rewriteMode</tt> setting.
+</p>
+</dd>
+<dt>
+<em>GIT_NOTES_REWRITE_REF</em>
+</dt>
+<dd>
+<p>
+        When rewriting commits, which notes to copy from the original
+        to the rewritten commit.  Must be a colon-delimited list of
+        refs or globs.
+</p>
+<div class="para"><p>If not set in the environment, the list of notes to copy depends
+on the <tt>notes.rewrite.&lt;command&gt;</tt> and <tt>notes.rewriteRef</tt> settings.</p></div>
+</dd>
+</dl></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
@@ -537,7 +718,7 @@ Johan Herland &lt;johan@herland.net&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-04-24 02:56:02 UTC
+Last updated 2010-06-13 19:56:35 UTC
 </div>
 </div>
 </body>
