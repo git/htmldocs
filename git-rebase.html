@@ -723,6 +723,9 @@ the reversion" (see the
 <p>
         Instead of ignoring merges, try to recreate them.
 </p>
+<div class="para"><p>This uses the <tt>--interactive</tt> machinery internally, but combining it
+with the <tt>--interactive</tt> option explicitly is generally not a good
+idea unless you know what you are doing (see BUGS below).</p></div>
 </dd>
 <dt>
 --root
@@ -1209,6 +1212,30 @@ saying (for the reflog case, and assuming you are on <em>topic</em> already):</p
 <em>everyone</em> downstream from <em>topic</em> will now have to perform a "hard
 case" recovery too!</p></div>
 </div>
+<h2 id="_bugs">BUGS</h2>
+<div class="sectionbody">
+<div class="para"><p>The todo list presented by <tt>--preserve-merges --interactive</tt> does not
+represent the topology of the revision graph.  Editing commits and
+rewording their commit messages should work fine, but attempts to
+reorder commits tend to produce counterintuitive results.</p></div>
+<div class="para"><p>For example, an attempt to rearrange</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>1 --- 2 --- 3 --- 4 --- 5</tt></pre>
+</div></div>
+<div class="para"><p>to</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>1 --- 2 --- 4 --- 3 --- 5</tt></pre>
+</div></div>
+<div class="para"><p>by moving the "pick 4" line will result in the following history:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        3
+       /
+1 --- 2 --- 4 --- 5</tt></pre>
+</div></div>
+</div>
 <h2 id="_authors">Authors</h2>
 <div class="sectionbody">
 <div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt; and
@@ -1224,7 +1251,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-06-02 23:32:08 UTC
+Last updated 2010-06-21 15:23:41 UTC
 </div>
 </div>
 </body>
