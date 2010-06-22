@@ -975,6 +975,18 @@ Default mode
         commits contributing to this merge.
 </p>
 </dd>
+<dt>
+--ancestry-path
+</dt>
+<dd>
+<p>
+        When given a range of commits to display (e.g. <em>commit1..commit2</em>
+        or <em>commit2 &#94;commit1</em>), only display commits that exist
+        directly on the ancestry chain between the <em>commit1</em> and
+        <em>commit2</em>, i.e. commits that are both descendants of <em>commit1</em>,
+        and ancestors of <em>commit2</em>.
+</p>
+</dd>
 </dl></div>
 <div class="para"><p>A more detailed explanation follows.</p></div>
 <div class="para"><p>Suppose you specified <tt>foo</tt> as the &lt;paths&gt;.  We shall call commits
@@ -1053,7 +1065,7 @@ Default mode
 <div class="listingblock">
 <div class="content">
 <pre><tt>          .-A---N---O
-         /         /
+         /     /   /
         I---------D</tt></pre>
 </div></div>
 <div class="para"><p>Note how the rule to only follow the TREESAME parent, if one is
@@ -1134,9 +1146,6 @@ affects inclusion:</p></div>
 one of the parents is TREESAME, we follow only that one, so the other
 sides of the merge are never walked.</p></div>
 </dd>
-</dl></div>
-<div class="para"><p>Finally, there is a fourth simplification mode available:</p></div>
-<div class="vlist"><dl>
 <dt>
 --simplify-merges
 </dt>
@@ -1193,6 +1202,48 @@ If after this parent rewriting, <tt>C'</tt> is a root or merge commit (has
 </p>
 </li>
 </ul></div>
+</dd>
+</dl></div>
+<div class="para"><p>Finally, there is a fifth simplification mode available:</p></div>
+<div class="vlist"><dl>
+<dt>
+--ancestry-path
+</dt>
+<dd>
+<p>
+        Limit the displayed commits to those directly on the ancestry
+        chain between the "from" and "to" commits in the given commit
+        range. I.e. only display commits that are ancestor of the "to"
+        commit, and descendants of the "from" commit.
+</p>
+<div class="para"><p>As an example use case, consider the following commit history:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>            D---E-------F
+           /     \       \
+          B---C---G---H---I---J
+         /                     \
+        A-------K---------------L--M</tt></pre>
+</div></div>
+<div class="para"><p>A regular <em>D..M</em> computes the set of commits that are ancestors of <tt>M</tt>,
+but excludes the ones that are ancestors of <tt>D</tt>. This is useful to see
+what happened to the history leading to <tt>M</tt> since <tt>D</tt>, in the sense
+that "what does <tt>M</tt> have that did not exist in <tt>D</tt>". The result in this
+example would be all the commits, except <tt>A</tt> and <tt>B</tt> (and <tt>D</tt> itself,
+of course).</p></div>
+<div class="para"><p>When we want to find out what commits in <tt>M</tt> are contaminated with the
+bug introduced by <tt>D</tt> and need fixing, however, we might want to view
+only the subset of <em>D..M</em> that are actually descendants of <tt>D</tt>, i.e.
+excluding <tt>C</tt> and <tt>K</tt>. This is exactly what the <em>--ancestry-path</em>
+option does. Applied to the <em>D..M</em> range, it results in:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                E-------F
+                 \       \
+                  G---H---I---J
+                               \
+                                L--M</tt></pre>
+</div></div>
 </dd>
 </dl></div>
 <div class="para"><p>The <em>--simplify-by-decoration</em> option allows you to view only the
@@ -1742,6 +1793,9 @@ placeholder expands to a non-empty string.</p></div>
 <div class="para"><p>If you add a <tt>-</tt> (minus sign) after <em>%</em> of a placeholder, line-feeds that
 immediately precede the expansion are deleted if and only if the
 placeholder expands to an empty string.</p></div>
+<div class="para"><p>If you add a <tt> </tt> (space) after <em>%</em> of a placeholder, a space
+is inserted immediately before the expansion if and only if the
+placeholder expands to a non-empty string.</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
@@ -1792,7 +1846,7 @@ and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-06-13 19:56:35 UTC
+Last updated 2010-06-22 23:22:26 UTC
 </div>
 </div>
 </body>

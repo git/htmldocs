@@ -314,31 +314,34 @@ git-cherry-pick(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-cherry-pick -
-   Apply the change introduced by an existing commit
+   Apply the changes introduced by some existing commits
 </p>
 </div>
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git cherry-pick</em> [--edit] [-n] [-m parent-number] [-s] [-x] [--ff] &lt;commit&gt;</p></div>
+<div class="para"><p><em>git cherry-pick</em> [--edit] [-n] [-m parent-number] [-s] [-x] [--ff] &lt;commit&gt;&#8230;</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Given one existing commit, apply the change the patch introduces, and record a
-new commit that records it.  This requires your working tree to be clean (no
-modifications from the HEAD commit).</p></div>
+<div class="para"><p>Given one or more existing commits, apply the change each one
+introduces, recording a new commit for each.  This requires your
+working tree to be clean (no modifications from the HEAD commit).</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
-&lt;commit&gt;
+&lt;commit&gt;&#8230;
 </dt>
 <dd>
 <p>
-        Commit to cherry-pick.
+        Commits to cherry-pick.
         For a more complete list of ways to spell commits, see the
         "SPECIFYING REVISIONS" section in <a href="git-rev-parse.html">git-rev-parse(1)</a>.
+        Sets of commits can be passed but no traversal is done by
+        default, as if the <em>--no-walk</em> option was specified, see
+        <a href="git-rev-list.html">git-rev-list(1)</a>.
 </p>
 </dd>
 <dt>
@@ -404,10 +407,10 @@ modifications from the HEAD commit).</p></div>
 </dt>
 <dd>
 <p>
-        Usually the command automatically creates a commit.
-        This flag applies the change necessary to cherry-pick
-        the named commit to your working tree and the index,
-        but does not make the commit.  In addition, when this
+        Usually the command automatically creates a sequence of commits.
+        This flag applies the changes necessary to cherry-pick
+        each named commit to your working tree and the index,
+        without making any commit.  In addition, when this
         option is used, your index does not have to match the
         HEAD commit.  The cherry-pick is done against the
         beginning state of your index.
@@ -438,6 +441,65 @@ effect to your index in a row.</p></div>
 </dd>
 </dl></div>
 </div>
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+git cherry-pick master
+</dt>
+<dd>
+<p>
+        Apply the change introduced by the commit at the tip of the
+        master branch and create a new commit with this change.
+</p>
+</dd>
+<dt>
+git cherry-pick ..master
+</dt>
+<dt>
+git cherry-pick ^HEAD master
+</dt>
+<dd>
+<p>
+        Apply the changes introduced by all commits that are ancestors
+        of master but not of HEAD to produce new commits.
+</p>
+</dd>
+<dt>
+git cherry-pick master\<sub>4 master</sub>2
+</dt>
+<dd>
+<p>
+        Apply the changes introduced by the fifth and third last
+        commits pointed to by master and create 2 new commits with
+        these changes.
+</p>
+</dd>
+<dt>
+git cherry-pick -n master~1 next
+</dt>
+<dd>
+<p>
+        Apply to the working tree and the index the changes introduced
+        by the second last commit pointed to by master and by the last
+        commit pointed to by next, but do not create any commit with
+        these changes.
+</p>
+</dd>
+<dt>
+git cherry-pick --ff ..next
+</dt>
+<dd>
+<p>
+        If history is linear and HEAD is an ancestor of next, update
+        the working tree and advance the HEAD pointer to match next.
+        Otherwise, apply the changes introduced by those commits that
+        are in next but not HEAD to the current branch, creating a new
+        commit for each new change.
+</p>
+</dd>
+</dl></div>
+</div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
 <div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
@@ -446,13 +508,17 @@ effect to your index in a row.</p></div>
 <div class="sectionbody">
 <div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
+<h2 id="_see_also">SEE ALSO</h2>
+<div class="sectionbody">
+<div class="para"><p><a href="git-revert.html">git-revert(1)</a></p></div>
+</div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-04-24 02:55:48 UTC
+Last updated 2010-06-22 23:22:24 UTC
 </div>
 </div>
 </body>
