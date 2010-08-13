@@ -320,24 +320,60 @@ git-pull(1) Manual Page
 </div>
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git pull</em> &lt;options&gt; &lt;repository&gt; &lt;refspec&gt;&#8230;</p></div>
+<div class="para"><p><em>git pull</em> [options] [&lt;repository&gt; [&lt;refspec&gt;&#8230;]]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Runs <em>git fetch</em> with the given parameters, and calls <em>git merge</em>
-to merge the retrieved head(s) into the current branch.
-With <tt>--rebase</tt>, calls <em>git rebase</em> instead of <em>git merge</em>.</p></div>
-<div class="para"><p>Note that you can use <tt>.</tt> (current directory) as the
-&lt;repository&gt; to pull from the local repository &#8212; this is useful
-when merging local branches into the current branch.</p></div>
-<div class="para"><p>Also note that options meant for <em>git pull</em> itself and underlying
-<em>git merge</em> must be given before the options meant for <em>git fetch</em>.</p></div>
-<div class="para"><p><strong>Warning</strong>: Running <em>git pull</em> (actually, the underlying <em>git merge</em>)
+<div class="para"><p>Incorporates changes from a remote repository into the current
+branch.  In its default mode, <tt>git pull</tt> is shorthand for
+<tt>git fetch</tt> followed by <tt>git merge FETCH_HEAD</tt>.</p></div>
+<div class="para"><p>More precisely, <em>git pull</em> runs <em>git fetch</em> with the given
+parameters and calls <em>git merge</em> to merge the retrieved branch
+heads into the current branch.
+With <tt>--rebase</tt>, it runs <em>git rebase</em> instead of <em>git merge</em>.</p></div>
+<div class="para"><p>&lt;repository&gt; should be the name of a remote repository as
+passed to <a href="git-fetch.html">git-fetch(1)</a>.  &lt;refspec&gt; can name an
+arbitrary remote ref (for example, the name of a tag) or even
+a collection of refs with corresponding remote tracking branches
+(e.g., refs/heads/<strong>:refs/remotes/origin/</strong>), but usually it is
+the name of a branch in the remote repository.</p></div>
+<div class="para"><p>Default values for &lt;repository&gt; and &lt;branch&gt; are read from the
+"remote" and "merge" configuration for the current branch
+as set by <a href="git-branch.html">git-branch(1)</a> <tt>--track</tt>.</p></div>
+<div class="para"><p>Assume the following history exists and the current branch is
+"<tt>master</tt>":</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          A---B---C master on origin
+         /
+    D---E---F---G master</tt></pre>
+</div></div>
+<div class="para"><p>Then "<tt>git pull</tt>" will fetch and replay the changes from the remote
+<tt>master</tt> branch since it diverged from the local <tt>master</tt> (i.e., <tt>E</tt>)
+until its current commit (<tt>C</tt>) on top of <tt>master</tt> and record the
+result in a new commit along with the names of the two parent commits
+and a log message from the user describing the changes.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>          A---B---C remotes/origin/master
+         /         \
+    D---E---F---G---H master</tt></pre>
+</div></div>
+<div class="para"><p>See <a href="git-merge.html">git-merge(1)</a> for details, including how conflicts
+are presented and handled.</p></div>
+<div class="para"><p>In git 1.7.0 or later, to cancel a conflicting merge, use
+<tt>git reset --merge</tt>.  <strong>Warning</strong>: In older versions of git, running <em>git pull</em>
 with uncommitted changes is discouraged: while possible, it leaves you
-in a state that is hard to back out of in the case of a conflict.</p></div>
+in a state that may be hard to back out of in the case of a conflict.</p></div>
+<div class="para"><p>If any of the remote changes overlap with local uncommitted changes,
+the merge will be automatically cancelled and the work tree untouched.
+It is generally best to get any local changes in working order before
+pulling or stash them away with <a href="git-stash.html">git-stash(1)</a>.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
+<div class="para"><p>Options meant for <em>git pull</em> itself and the underlying <em>git merge</em>
+must be given before the options meant for <em>git fetch</em>.</p></div>
 <div class="vlist"><dl>
 <dt>
 -q
@@ -1217,7 +1253,7 @@ Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-07-21 21:55:31 UTC
+Last updated 2010-08-13 02:46:20 UTC
 </div>
 </div>
 </body>
