@@ -1041,6 +1041,28 @@ sure that the current HEAD is "B", and call</p></div>
 <div class="content">
 <pre><tt>$ git rebase -i -p --onto Q O</tt></pre>
 </div></div>
+<div class="para"><p>Reordering and editing commits usually creates untested intermediate
+steps.  You may want to check that your history editing did not break
+anything by running a test, or at least recompiling at intermediate
+points in history by using the "exec" command (shortcut "x").  You may
+do so by creating a todo list like this one:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>pick deadbee Implement feature XXX
+fixup f1a5c00 Fix to feature XXX
+exec make
+pick c0ffeee The oneline of the next commit
+edit deadbab The oneline of the commit after
+exec cd subdir; make test
+...</tt></pre>
+</div></div>
+<div class="para"><p>The interactive rebase will stop when a command fails (i.e. exits with
+non-0 status) to give you an opportunity to fix the problem. You can
+continue with <tt>git rebase --continue</tt>.</p></div>
+<div class="para"><p>The "exec" command launches the command in a shell (the one specified
+in <tt>$SHELL</tt>, or the default shell if <tt>$SHELL</tt> is not set), so you can
+use shell features (like "cd", "&gt;", ";" &#8230;). The command is run from
+the root of the working tree.</p></div>
 </div>
 <h2 id="_splitting_commits">SPLITTING COMMITS</h2>
 <div class="sectionbody">
@@ -1265,7 +1287,7 @@ Johannes E. Schindelin &lt;johannes.schindelin@gmx.de&gt;</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-08-18 22:14:54 UTC
+Last updated 2010-08-22 07:24:54 UTC
 </div>
 </div>
 </body>
