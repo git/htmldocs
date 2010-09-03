@@ -321,7 +321,7 @@ git-bundle(1) Manual Page
 <h2>SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git bundle</em> create &lt;file&gt; &lt;git-rev-list args&gt;
+<div class="content"><em>git bundle</em> create &lt;file&gt; &lt;git-rev-list-args&gt;
 <em>git bundle</em> verify &lt;file&gt;
 <em>git bundle</em> list-heads &lt;file&gt; [refname&#8230;]
 <em>git bundle</em> unbundle &lt;file&gt; [refname&#8230;]</div></div>
@@ -349,8 +349,8 @@ create &lt;file&gt;
 </dt>
 <dd>
 <p>
-       Used to create a bundle named <em>file</em>.  This requires the
-       <em>git rev-list</em> arguments to define the bundle contents.
+        Used to create a bundle named <em>file</em>.  This requires the
+        <em>git-rev-list-args</em> arguments to define the bundle contents.
 </p>
 </dd>
 <dt>
@@ -358,12 +358,12 @@ verify &lt;file&gt;
 </dt>
 <dd>
 <p>
-       Used to check that a bundle file is valid and will apply
-       cleanly to the current repository.  This includes checks on the
-       bundle format itself as well as checking that the prerequisite
-       commits exist and are fully linked in the current repository.
-       <em>git bundle</em> prints a list of missing commits, if any, and exits
-       with a non-zero status.
+        Used to check that a bundle file is valid and will apply
+        cleanly to the current repository.  This includes checks on the
+        bundle format itself as well as checking that the prerequisite
+        commits exist and are fully linked in the current repository.
+        <em>git bundle</em> prints a list of missing commits, if any, and exits
+        with a non-zero status.
 </p>
 </dd>
 <dt>
@@ -371,9 +371,9 @@ list-heads &lt;file&gt;
 </dt>
 <dd>
 <p>
-       Lists the references defined in the bundle.  If followed by a
-       list of references, only references matching those given are
-       printed out.
+        Lists the references defined in the bundle.  If followed by a
+        list of references, only references matching those given are
+        printed out.
 </p>
 </dd>
 <dt>
@@ -381,25 +381,26 @@ unbundle &lt;file&gt;
 </dt>
 <dd>
 <p>
-       Passes the objects in the bundle to <em>git index-pack</em>
-       for storage in the repository, then prints the names of all
-       defined references. If a list of references is given, only
-       references matching those in the list are printed. This command is
-       really plumbing, intended to be called only by <em>git fetch</em>.
+        Passes the objects in the bundle to <em>git index-pack</em>
+        for storage in the repository, then prints the names of all
+        defined references. If a list of references is given, only
+        references matching those in the list are printed. This command is
+        really plumbing, intended to be called only by <em>git fetch</em>.
 </p>
 </dd>
 <dt>
-[git-rev-list-args&#8230;]
+&lt;git-rev-list-args&gt;
 </dt>
 <dd>
 <p>
-       A list of arguments, acceptable to <em>git rev-parse</em> and
-       <em>git rev-list</em>, that specifies the specific objects and references
-       to transport.  For example, <tt>master\~10..master</tt> causes the
-       current master reference to be packaged along with all objects
-       added since its 10th ancestor commit.  There is no explicit
-       limit to the number of references and objects that may be
-       packaged.
+        A list of arguments, acceptable to <em>git rev-parse</em> and
+        <em>git rev-list</em> (and containg a named ref, see SPECIFYING REFERENCES
+        below), that specifies the specific objects and references
+        to transport.  For example, <tt>master&#126;10..master</tt> causes the
+        current master reference to be packaged along with all objects
+        added since its 10th ancestor commit.  There is no explicit
+        limit to the number of references and objects that may be
+        packaged.
 </p>
 </dd>
 <dt>
@@ -407,11 +408,11 @@ unbundle &lt;file&gt;
 </dt>
 <dd>
 <p>
-       A list of references used to limit the references reported as
-       available. This is principally of use to <em>git fetch</em>, which
-       expects to receive only those references asked for and not
-       necessarily everything in the pack (in this case, <em>git bundle</em> acts
-       like <em>git fetch-pack</em>).
+        A list of references used to limit the references reported as
+        available. This is principally of use to <em>git fetch</em>, which
+        expects to receive only those references asked for and not
+        necessarily everything in the pack (in this case, <em>git bundle</em> acts
+        like <em>git fetch-pack</em>).
 </p>
 </dd>
 </dl></div>
@@ -420,12 +421,12 @@ unbundle &lt;file&gt;
 <div class="sectionbody">
 <div class="para"><p><em>git bundle</em> will only package references that are shown by
 <em>git show-ref</em>: this includes heads, tags, and remote heads.  References
-such as <tt>master\~1</tt> cannot be packaged, but are perfectly suitable for
+such as <tt>master&#126;1</tt> cannot be packaged, but are perfectly suitable for
 defining the basis.  More than one reference may be packaged, and more
 than one basis can be specified.  The objects packaged are those not
 contained in the union of the given bases.  Each basis can be
-specified explicitly (e.g. <tt>^master\~10</tt>), or implicitly (e.g.
-<tt>master\~10..master</tt>, <tt>--since=10.days.ago master</tt>).</p></div>
+specified explicitly (e.g. <tt>^master&#126;10</tt>), or implicitly (e.g.
+<tt>master&#126;10..master</tt>, <tt>--since=10.days.ago master</tt>).</p></div>
 <div class="para"><p>It is very important that the basis used be held by the destination.
 It is okay to err on the side of caution, causing the bundle file
 to contain objects already in the destination, as these are ignored
@@ -486,7 +487,7 @@ machineB$ git pull</tt></pre>
 <div class="para"><p>If you know up to what commit the intended recipient repository should
 have the necessary objects, you can use that knowledge to specify the
 basis, giving a cut-off point to limit the revisions and objects that go
-in the resulting bundle. The previous example used lastR2bundle tag
+in the resulting bundle. The previous example used the lastR2bundle tag
 for this purpose, but you can use any other options that you would give to
 the <a href="git-log.html">git-log(1)</a> command. Here are more examples:</p></div>
 <div class="para"><p>You can use a tag that is present in both:</p></div>
@@ -519,7 +520,7 @@ references when fetching:</p></div>
 <div class="content">
 <pre><tt>$ git fetch mybundle master:localRef</tt></pre>
 </div></div>
-<div class="para"><p>You can also see what references it offers.</p></div>
+<div class="para"><p>You can also see what references it offers:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-remote mybundle</tt></pre>
@@ -535,7 +536,7 @@ references when fetching:</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-07-21 21:55:15 UTC
+Last updated 2010-09-03 21:30:03 UTC
 </div>
 </div>
 </body>

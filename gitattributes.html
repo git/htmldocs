@@ -645,6 +645,15 @@ command is "cat").</p></div>
         clean = indent
         smudge = cat</tt></pre>
 </div></div>
+<div class="para"><p>For best results, <tt>clean</tt> should not alter its output further if it is
+run twice ("clean-&gt;clean" should be equivalent to "clean"), and
+multiple <tt>smudge</tt> commands should not alter <tt>clean</tt>'s output
+("smudge-&gt;smudge-&gt;clean" should be equivalent to "clean").  See the
+section on merging below.</p></div>
+<div class="para"><p>The "indent" filter is well-behaved in this regard: it will not modify
+input that is already correctly indented.  In this case, the lack of a
+smudge filter means that the clean filter _must_ accept its own output
+without modifying it.</p></div>
 <h4 id="_interaction_between_checkin_checkout_attributes">Interaction between checkin/checkout attributes</h4>
 <div class="para"><p>In the check-in codepath, the worktree file is first converted
 with <tt>filter</tt> driver (if specified and corresponding driver
@@ -653,6 +662,23 @@ specified), and then finally with <tt>text</tt> (again, if specified
 and applicable).</p></div>
 <div class="para"><p>In the check-out codepath, the blob content is first converted
 with <tt>text</tt>, and then <tt>ident</tt> and fed to <tt>filter</tt>.</p></div>
+<h4 id="_merging_branches_with_differing_checkin_checkout_attributes">Merging branches with differing checkin/checkout attributes</h4>
+<div class="para"><p>If you have added attributes to a file that cause the canonical
+repository format for that file to change, such as adding a
+clean/smudge filter or text/eol/ident attributes, merging anything
+where the attribute is not in place would normally cause merge
+conflicts.</p></div>
+<div class="para"><p>To prevent these unnecessary merge conflicts, git can be told to run a
+virtual check-out and check-in of all three stages of a file when
+resolving a three-way merge by setting the <tt>merge.renormalize</tt>
+configuration variable.  This prevents changes caused by check-in
+conversion from causing spurious merge conflicts when a converted file
+is merged with an unconverted file.</p></div>
+<div class="para"><p>As long as a "smudge-&gt;clean" results in the same output as a "clean"
+even on files that are already smudged, this strategy will
+automatically resolve all filter-related conflicts.  Filters that do
+not act in this way may cause additional merge conflicts that must be
+resolved manually.</p></div>
 <h3 id="_generating_diff_text">Generating diff text</h3><div style="clear:left"></div>
 <h4 id="_tt_diff_tt"><tt>diff</tt></h4>
 <div class="para"><p>The attribute <tt>diff</tt> affects how <em>git</em> generates diffs for particular
@@ -1187,7 +1213,7 @@ frotz   unspecified</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-08-22 07:24:55 UTC
+Last updated 2010-09-03 21:30:36 UTC
 </div>
 </div>
 </body>
