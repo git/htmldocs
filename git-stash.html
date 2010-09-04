@@ -423,14 +423,17 @@ and call <tt>git stash drop</tt> manually afterwards.</p></div>
 tree's changes, but also the index's ones. However, this can fail, when you
 have conflicts (which are stored in the index, where you therefore can no
 longer apply the changes as they were originally).</p></div>
-<div class="para"><p>When no <tt>&lt;stash&gt;</tt> is given, <tt>stash@{0}</tt> is assumed.</p></div>
+<div class="para"><p>When no <tt>&lt;stash&gt;</tt> is given, <tt>stash@{0}</tt> is assumed, otherwise <tt>&lt;stash&gt;</tt> must
+be a reference of the form <tt>stash@{&lt;revision&gt;}</tt>.</p></div>
 </dd>
 <dt>
 apply [--index] [-q|--quiet] [&lt;stash&gt;]
 </dt>
 <dd>
 <p>
-        Like <tt>pop</tt>, but do not remove the state from the stash list.
+        Like <tt>pop</tt>, but do not remove the state from the stash list. Unlike <tt>pop</tt>,
+        <tt>&lt;stash&gt;</tt> may be any commit that looks like a commit created by
+        <tt>stash save</tt> or <tt>stash create</tt>.
 </p>
 </dd>
 <dt>
@@ -440,8 +443,9 @@ branch &lt;branchname&gt; [&lt;stash&gt;]
 <p>
         Creates and checks out a new branch named <tt>&lt;branchname&gt;</tt> starting from
         the commit at which the <tt>&lt;stash&gt;</tt> was originally created, applies the
-        changes recorded in <tt>&lt;stash&gt;</tt> to the new working tree and index, then
-        drops the <tt>&lt;stash&gt;</tt> if that completes successfully. When no <tt>&lt;stash&gt;</tt>
+        changes recorded in <tt>&lt;stash&gt;</tt> to the new working tree and index.
+        If that succeeds, and <tt>&lt;stash&gt;</tt> is a reference of the form
+        <tt>stash@{&lt;revision&gt;}</tt>, it then drops the <tt>&lt;stash&gt;</tt>. When no <tt>&lt;stash&gt;</tt>
         is given, applies the latest one.
 </p>
 <div class="para"><p>This is useful if the branch on which you ran <tt>git stash save</tt> has
@@ -466,7 +470,9 @@ drop [-q|--quiet] [&lt;stash&gt;]
 <dd>
 <p>
         Remove a single stashed state from the stash list. When no <tt>&lt;stash&gt;</tt>
-        is given, it removes the latest one. i.e. <tt>stash@{0}</tt>
+        is given, it removes the latest one. i.e. <tt>stash@{0}</tt>, otherwise
+        <tt>&lt;stash&gt;</tt> must a valid stash log reference of the form
+        <tt>stash@{&lt;revision&gt;}</tt>.
 </p>
 </dd>
 <dt>
@@ -615,7 +621,7 @@ xargs git log --merges --no-walk --grep=WIP</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-03 21:30:32 UTC
+Last updated 2010-09-04 16:22:46 UTC
 </div>
 </div>
 </body>
