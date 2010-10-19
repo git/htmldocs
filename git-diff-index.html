@@ -1217,12 +1217,11 @@ do not produce the output described above; instead they produce a
 patch file.  You can customize the creation of such patches via the
 GIT_EXTERNAL_DIFF and the GIT_DIFF_OPTS environment variables.</p></div>
 <div class="para"><p>What the -p option produces is slightly different from the traditional
-diff format.</p></div>
+diff format:</p></div>
 <div class="olist"><ol>
 <li>
 <p>
-It is preceded with a "git diff" header, that looks like
-     this:
+It is preceded with a "git diff" header that looks like this:
 </p>
 <div class="literalblock">
 <div class="content">
@@ -1230,7 +1229,7 @@ It is preceded with a "git diff" header, that looks like
 </div></div>
 <div class="para"><p>The <tt>a/</tt> and <tt>b/</tt> filenames are the same unless rename/copy is
 involved.  Especially, even for a creation or a deletion,
-<tt>/dev/null</tt> is _not_ used in place of <tt>a/</tt> or <tt>b/</tt> filenames.</p></div>
+<tt>/dev/null</tt> is _not_ used in place of the <tt>a/</tt> or <tt>b/</tt> filenames.</p></div>
 <div class="para"><p>When rename/copy is involved, <tt>file1</tt> and <tt>file2</tt> show the
 name of the source file of the rename/copy and the name of
 the file that rename/copy produces, respectively.</p></div>
@@ -1253,6 +1252,18 @@ similarity index &lt;number&gt;
 dissimilarity index &lt;number&gt;
 index &lt;hash&gt;..&lt;hash&gt; &lt;mode&gt;</tt></pre>
 </div></div>
+<div class="para"><p>File modes are printed as 6-digit octal numbers including the file type
+and file permission bits.</p></div>
+<div class="para"><p>Path names in extended headers do not include the <tt>a/</tt> and <tt>b/</tt> prefixes.</p></div>
+<div class="para"><p>The similarity index is the percentage of unchanged lines, and
+the dissimilarity index is the percentage of changed lines.  It
+is a rounded down integer, followed by a percent sign.  The
+similarity index value of 100% is thus reserved for two equal
+files, while 100% dissimilarity means that no line from the old
+file made it into the new one.</p></div>
+<div class="para"><p>The index line includes the SHA-1 checksum before and after the change.
+The &lt;mode&gt; is included if the file mode does not change; otherwise,
+separate lines indicate the old and the new mode.</p></div>
 </li>
 <li>
 <p>
@@ -1262,13 +1273,24 @@ TAB, LF, double quote and backslash characters in pathnames
     pathname is put in double quotes.
 </p>
 </li>
+<li>
+<p>
+All the <tt>file1</tt> files in the output refer to files before the
+    commit, and all the <tt>file2</tt> files refer to files after the commit.
+    It is incorrect to apply each change to each file sequentially.  For
+    example, this patch will swap a and b:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>diff --git a/a b/b
+rename from a
+rename to b
+diff --git a/b b/a
+rename from b
+rename to a</tt></pre>
+</div></div>
+</li>
 </ol></div>
-<div class="para"><p>The similarity index is the percentage of unchanged lines, and
-the dissimilarity index is the percentage of changed lines.  It
-is a rounded down integer, followed by a percent sign.  The
-similarity index value of 100% is thus reserved for two equal
-files, while 100% dissimilarity means that no line from the old
-file made it into the new one.</p></div>
 </div>
 <h2 id="_combined_diff_format">combined diff format</h2>
 <div class="sectionbody">
@@ -1618,7 +1640,7 @@ always have the special all-zero sha1.</td>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-30 00:02:54 UTC
+Last updated 2010-10-19 23:50:42 UTC
 </div>
 </div>
 </body>
