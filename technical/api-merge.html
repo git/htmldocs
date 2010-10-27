@@ -339,6 +339,65 @@ performing a three-way merge of corresponding files, taking
 </ul></div>
 </div>
 </div>
+<h2 id="_data_structures">Data structures</h2>
+<div class="sectionbody">
+<div class="ilist"><ul>
+<li>
+<p>
+<tt>mmbuffer_t</tt>, <tt>mmfile_t</tt>
+</p>
+</li>
+</ul></div>
+<div class="para"><p>These store data usable for use by the xdiff backend, for writing and
+for reading, respectively.  See <tt>xdiff/xdiff.h</tt> for the definitions
+and <tt>diff.c</tt> for examples.</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<tt>struct ll_merge_options</tt>
+</p>
+</li>
+</ul></div>
+<div class="para"><p>This describes the set of options the calling program wants to affect
+the operation of a low-level (single file) merge.  Some options:</p></div>
+<div class="vlist"><dl>
+<dt>
+<tt>virtual_ancestor</tt>
+</dt>
+<dd>
+<p>
+        Behave as though this were part of a merge between common
+        ancestors in a recursive merge.
+        If a helper program is specified by the
+        <tt>[merge "&lt;driver&gt;"] recursive</tt> configuration, it will
+        be used (see <a href="gitattributes.html">gitattributes(5)</a>).
+</p>
+</dd>
+<dt>
+<tt>variant</tt>
+</dt>
+<dd>
+<p>
+        Resolve local conflicts automatically in favor
+        of one side or the other (as in <em>git merge-file</em>
+        <tt>&#8212;ours</tt>/<tt>&#8212;theirs</tt>/<tt>&#8212;union</tt>).  Can be <tt>0</tt>,
+        <tt>XDL_MERGE_FAVOR_OURS</tt>, <tt>XDL_MERGE_FAVOR_THEIRS</tt>, or
+        <tt>XDL_MERGE_FAVOR_UNION</tt>.
+</p>
+</dd>
+<dt>
+<tt>renormalize</tt>
+</dt>
+<dd>
+<p>
+        Resmudge and clean the "base", "theirs" and "ours" files
+        before merging.  Use this when the merge is likely to have
+        overlapped with a change in smudge/clean or end-of-line
+        normalization rules.
+</p>
+</dd>
+</dl></div>
+</div>
 <h2 id="_low_level_single_file_merge">Low-level (single file) merge</h2>
 <div class="sectionbody">
 <div class="vlist"><dl>
@@ -355,36 +414,44 @@ performing a three-way merge of corresponding files, taking
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>The caller:</p></div>
-<div class="olist"><ol>
+<div class="para"><p>Calling sequence:</p></div>
+<div class="ilist"><ul>
 <li>
 <p>
-allocates an mmbuffer_t variable for the result;
+Prepare a <tt>struct ll_merge_options</tt> to record options.
+  If you have no special requests, skip this and pass <tt>NULL</tt>
+  as the <tt>opts</tt> parameter to use the default options.
 </p>
 </li>
 <li>
 <p>
-allocates and fills variables with the file's original content
-   and two modified versions (using <tt>read_mmfile</tt>, for example);
+Allocate an mmbuffer_t variable for the result.
 </p>
 </li>
 <li>
 <p>
-calls ll_merge();
+Allocate and fill variables with the file's original content
+  and two modified versions (using <tt>read_mmfile</tt>, for example).
 </p>
 </li>
 <li>
 <p>
-reads the output from result_buf.ptr and result_buf.size;
+Call <tt>ll_merge()</tt>.
 </p>
 </li>
 <li>
 <p>
-releases buffers when finished (free(ancestor.ptr); free(ours.ptr);
-   free(theirs.ptr); free(result_buf.ptr);).
+Read the merged content from <tt>result_buf.ptr</tt> and <tt>result_buf.size</tt>.
 </p>
 </li>
-</ol></div>
+<li>
+<p>
+Release buffers when finished.  A simple
+  <tt>free(ancestor.ptr); free(ours.ptr); free(theirs.ptr);
+  free(result_buf.ptr);</tt> will do.
+</p>
+</li>
+</ul></div>
 <div class="para"><p>If the modifications do not merge cleanly, <tt>ll_merge</tt> will return a
 nonzero value and <tt>result_buf</tt> will generally include a description of
 the conflict bracketed by markers such as the traditional <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>
@@ -392,25 +459,6 @@ and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>.</p></div>
 <div class="para"><p>The <tt>ancestor_label</tt>, <tt>our_label</tt>, and <tt>their_label</tt> parameters are
 used to label the different sides of a conflict if the merge driver
 supports this.</p></div>
-<div class="para"><p>The <tt>flag</tt> parameter is a bitfield:</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-The <tt>LL_OPT_VIRTUAL_ANCESTOR</tt> bit indicates whether this is an
-   internal merge to consolidate ancestors for a recursive merge.
-</p>
-</li>
-<li>
-<p>
-The <tt>LL_OPT_FAVOR_MASK</tt> bits allow local conflicts to be automatically
-   resolved in favor of one side or the other (as in <em>git merge-file</em>
-   <tt>&#8212;ours</tt>/<tt>&#8212;theirs</tt>/<tt>&#8212;union</tt>).
-   They can be populated by <tt>create_ll_flag</tt>, whose argument can be
-   <tt>XDL_MERGE_FAVOR_OURS</tt>, <tt>XDL_MERGE_FAVOR_THEIRS</tt>, or
-   <tt>XDL_MERGE_FAVOR_UNION</tt>.
-</p>
-</li>
-</ul></div>
 </div>
 <h2 id="_everything_else">Everything else</h2>
 <div class="sectionbody">
@@ -446,7 +494,7 @@ merge options
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:12 UTC
+Last updated 2010-10-27 06:08:22 UTC
 </div>
 </div>
 </body>
