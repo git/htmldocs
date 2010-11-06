@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-checkout-index(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-checkout-index(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,27 +412,29 @@ git-checkout-index(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git checkout-index</em> [-u] [-q] [-a] [-f] [-n] [--prefix=&lt;string&gt;]
+<div class="verseblock-content"><em>git checkout-index</em> [-u] [-q] [-a] [-f] [-n] [--prefix=&lt;string&gt;]
                    [--stage=&lt;number&gt;|all]
                    [--temp]
                    [-z] [--stdin]
-                   [--] [&lt;file&gt;&#8230;]</div></div>
+                   [--] [&lt;file&gt;&#8230;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Will copy all files listed from the index to the working directory
+<div class="paragraph"><p>Will copy all files listed from the index to the working directory
 (not overwriting existing files).</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -u
 </dt>
-<dt>
+<dt class="hdlist1">
 --index
 </dt>
 <dd>
@@ -347,10 +443,10 @@ git-checkout-index(1) Manual Page
         the index file.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -358,10 +454,10 @@ git-checkout-index(1) Manual Page
         be quiet if files exist or are not in the index
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -369,10 +465,10 @@ git-checkout-index(1) Manual Page
         forces overwrite of existing files
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -a
 </dt>
-<dt>
+<dt class="hdlist1">
 --all
 </dt>
 <dd>
@@ -381,19 +477,19 @@ git-checkout-index(1) Manual Page
         together with explicit filenames.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -n
 </dt>
-<dt>
+<dt class="hdlist1">
 --no-create
 </dt>
 <dd>
 <p>
-        Don't checkout new files, only refresh files already checked
+        Don&#8217;t checkout new files, only refresh files already checked
         out.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --prefix=&lt;string&gt;
 </dt>
 <dd>
@@ -402,7 +498,7 @@ git-checkout-index(1) Manual Page
         including a trailing /)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --stage=&lt;number&gt;|all
 </dt>
 <dd>
@@ -412,7 +508,7 @@ git-checkout-index(1) Manual Page
         Note: --stage=all automatically implies --temp.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --temp
 </dt>
 <dd>
@@ -422,7 +518,7 @@ git-checkout-index(1) Manual Page
         associations will be written to stdout.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --stdin
 </dt>
 <dd>
@@ -432,7 +528,7 @@ git-checkout-index(1) Manual Page
         separated by LF (i.e. one path per line) by default.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -z
 </dt>
 <dd>
@@ -441,7 +537,7 @@ git-checkout-index(1) Manual Page
         NUL character instead of LF.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --
 </dt>
 <dd>
@@ -450,18 +546,18 @@ git-checkout-index(1) Manual Page
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>The order of the flags used to matter, but not anymore.</p></div>
-<div class="para"><p>Just doing <tt>git checkout-index</tt> does nothing. You probably meant
+<div class="paragraph"><p>The order of the flags used to matter, but not anymore.</p></div>
+<div class="paragraph"><p>Just doing <tt>git checkout-index</tt> does nothing. You probably meant
 <tt>git checkout-index -a</tt>. And if you want to force it, you want
 <tt>git checkout-index -f -a</tt>.</p></div>
-<div class="para"><p>Intuitiveness is not the goal here. Repeatability is. The reason for
+<div class="paragraph"><p>Intuitiveness is not the goal here. Repeatability is. The reason for
 the "no arguments means no work" behavior is that from scripts you are
 supposed to be able to do:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ find . -name '*.h' -print0 | xargs -0 git checkout-index -f --</tt></pre>
 </div></div>
-<div class="para"><p>which will force all existing <tt>*.h</tt> files to be replaced with their
+<div class="paragraph"><p>which will force all existing <tt>*.h</tt> files to be replaced with their
 cached copies. If an empty command line implied "all", then this would
 force-refresh everything in the index, which was not the point.  But
 since <em>git checkout-index</em> accepts --stdin it would be faster to use:</p></div>
@@ -469,27 +565,27 @@ since <em>git checkout-index</em> accepts --stdin it would be faster to use:</p>
 <div class="content">
 <pre><tt>$ find . -name '*.h' -print0 | git checkout-index -f -z --stdin</tt></pre>
 </div></div>
-<div class="para"><p>The <tt>--</tt> is just a good idea when you know the rest will be filenames;
+<div class="paragraph"><p>The <tt>--</tt> is just a good idea when you know the rest will be filenames;
 it will prevent problems with a filename of, for example,  <tt>-a</tt>.
 Using <tt>--</tt> is probably a good policy in scripts.</p></div>
 </div>
 <h2 id="_using_temp_or_stage_all">Using --temp or --stage=all</h2>
 <div class="sectionbody">
-<div class="para"><p>When <tt>--temp</tt> is used (or implied by <tt>--stage=all</tt>)
+<div class="paragraph"><p>When <tt>--temp</tt> is used (or implied by <tt>--stage=all</tt>)
 <em>git checkout-index</em> will create a temporary file for each index
 entry being checked out.  The index will not be updated with stat
 information.  These options can be useful if the caller needs all
 stages of all unmerged entries so that the unmerged files can be
 processed by an external merge tool.</p></div>
-<div class="para"><p>A listing will be written to stdout providing the association of
+<div class="paragraph"><p>A listing will be written to stdout providing the association of
 temporary file names to tracked path names.  The listing format
 has two variations:</p></div>
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 tempname TAB path RS
 </p>
-<div class="para"><p>The first format is what gets used when <tt>--stage</tt> is omitted or
+<div class="paragraph"><p>The first format is what gets used when <tt>--stage</tt> is omitted or
 is not <tt>--stage=all</tt>. The field tempname is the temporary file
 name holding the file content and path is the tracked path name in
 the index.  Only the requested entries are output.</p></div>
@@ -498,27 +594,27 @@ the index.  Only the requested entries are output.</p></div>
 <p>
 stage1temp SP stage2temp SP stage3tmp TAB path RS
 </p>
-<div class="para"><p>The second format is what gets used when <tt>--stage=all</tt>.  The three
+<div class="paragraph"><p>The second format is what gets used when <tt>--stage=all</tt>.  The three
 stage temporary fields (stage1temp, stage2temp, stage3temp) list the
 name of the temporary file if there is a stage entry in the index
 or <tt>.</tt> if there is no stage entry.  Paths which only have a stage 0
 entry will always be omitted from the output.</p></div>
 </li>
 </ol></div>
-<div class="para"><p>In both formats RS (the record separator) is newline by default
+<div class="paragraph"><p>In both formats RS (the record separator) is newline by default
 but will be the null byte if -z was passed on the command line.
 The temporary file names are always safe strings; they will never
 contain directory separators or whitespace characters.  The path
 field is always relative to the current directory and the temporary
 file names are always relative to the top level directory.</p></div>
-<div class="para"><p>If the object being copied out to a temporary file is a symbolic
+<div class="paragraph"><p>If the object being copied out to a temporary file is a symbolic
 link the content of the link will be written to a normal file.  It is
 up to the end-user or the Porcelain to make use of this information.</p></div>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 To update and refresh only the files already checked out
 </dt>
 <dd>
@@ -527,7 +623,7 @@ To update and refresh only the files already checked out
 <pre><tt>$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</tt></pre>
 </div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Using <em>git checkout-index</em> to "export an entire tree"
 </dt>
 <dd>
@@ -540,13 +636,13 @@ Using <em>git checkout-index</em> to "export an entire tree"
 <div class="content">
 <pre><tt>$ git checkout-index --prefix=git-export-dir/ -a</tt></pre>
 </div></div>
-<div class="para"><p><tt>git checkout-index</tt> will "export" the index into the specified
+<div class="paragraph"><p><tt>git checkout-index</tt> will "export" the index into the specified
 directory.</p></div>
-<div class="para"><p>The final "/" is important. The exported name is literally just
+<div class="paragraph"><p>The final "/" is important. The exported name is literally just
 prefixed with the specified string.  Contrast this with the
 following example.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Export files with a prefix
 </dt>
 <dd>
@@ -554,27 +650,27 @@ Export files with a prefix
 <div class="content">
 <pre><tt>$ git checkout-index --prefix=.merged- Makefile</tt></pre>
 </div></div>
-<div class="para"><p>This will check out the currently cached copy of <tt>Makefile</tt>
+<div class="paragraph"><p>This will check out the currently cached copy of <tt>Makefile</tt>
 into the file <tt>.merged-Makefile</tt>.</p></div>
 </dd>
 </dl></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by David Greaves,
-Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by David Greaves,
+Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-22 04:11:03 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

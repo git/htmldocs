@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>merge API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -279,6 +347,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -291,8 +360,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -303,7 +381,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>merge API</title>
 </head>
 <body>
 <div id="header">
@@ -311,12 +388,12 @@ div#toc a:visited { color: blue; }
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="para"><p>The merge API helps a program to reconcile two competing sets of
+<div class="paragraph"><p>The merge API helps a program to reconcile two competing sets of
 improvements to some files (e.g., unregistered changes from the work
 tree versus changes involved in switching to a new branch), reporting
 conflicts if found.  The library called through this API is
 responsible for a few things.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 determining which trees to merge (recursive ancestor consolidation);
@@ -341,27 +418,27 @@ performing a three-way merge of corresponding files, taking
 </div>
 <h2 id="_data_structures">Data structures</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>mmbuffer_t</tt>, <tt>mmfile_t</tt>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>These store data usable for use by the xdiff backend, for writing and
+<div class="paragraph"><p>These store data usable for use by the xdiff backend, for writing and
 for reading, respectively.  See <tt>xdiff/xdiff.h</tt> for the definitions
 and <tt>diff.c</tt> for examples.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>struct ll_merge_options</tt>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>This describes the set of options the calling program wants to affect
+<div class="paragraph"><p>This describes the set of options the calling program wants to affect
 the operation of a low-level (single file) merge.  Some options:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>virtual_ancestor</tt>
 </dt>
 <dd>
@@ -373,19 +450,19 @@ the operation of a low-level (single file) merge.  Some options:</p></div>
         be used (see <a href="gitattributes.html">gitattributes(5)</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>variant</tt>
 </dt>
 <dd>
 <p>
         Resolve local conflicts automatically in favor
         of one side or the other (as in <em>git merge-file</em>
-        <tt>&#8212;ours</tt>/<tt>&#8212;theirs</tt>/<tt>&#8212;union</tt>).  Can be <tt>0</tt>,
+        <tt>--ours</tt>/<tt>--theirs</tt>/<tt>--union</tt>).  Can be <tt>0</tt>,
         <tt>XDL_MERGE_FAVOR_OURS</tt>, <tt>XDL_MERGE_FAVOR_THEIRS</tt>, or
         <tt>XDL_MERGE_FAVOR_UNION</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>renormalize</tt>
 </dt>
 <dd>
@@ -400,8 +477,8 @@ the operation of a low-level (single file) merge.  Some options:</p></div>
 </div>
 <h2 id="_low_level_single_file_merge">Low-level (single file) merge</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>ll_merge</tt>
 </dt>
 <dd>
@@ -414,8 +491,8 @@ the operation of a low-level (single file) merge.  Some options:</p></div>
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>Calling sequence:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>Calling sequence:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 Prepare a <tt>struct ll_merge_options</tt> to record options.
@@ -430,7 +507,7 @@ Allocate an mmbuffer_t variable for the result.
 </li>
 <li>
 <p>
-Allocate and fill variables with the file's original content
+Allocate and fill variables with the file&#8217;s original content
   and two modified versions (using <tt>read_mmfile</tt>, for example).
 </p>
 </li>
@@ -452,18 +529,18 @@ Release buffers when finished.  A simple
 </p>
 </li>
 </ul></div>
-<div class="para"><p>If the modifications do not merge cleanly, <tt>ll_merge</tt> will return a
+<div class="paragraph"><p>If the modifications do not merge cleanly, <tt>ll_merge</tt> will return a
 nonzero value and <tt>result_buf</tt> will generally include a description of
 the conflict bracketed by markers such as the traditional <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>
 and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>.</p></div>
-<div class="para"><p>The <tt>ancestor_label</tt>, <tt>our_label</tt>, and <tt>their_label</tt> parameters are
+<div class="paragraph"><p>The <tt>ancestor_label</tt>, <tt>our_label</tt>, and <tt>their_label</tt> parameters are
 used to label the different sides of a conflict if the merge driver
 supports this.</p></div>
 </div>
 <h2 id="_everything_else">Everything else</h2>
 <div class="sectionbody">
-<div class="para"><p>Talk about &lt;merge-recursive.h&gt; and merge_file():</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>Talk about &lt;merge-recursive.h&gt; and merge_file():</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 merge_trees() to merge with rename detection
@@ -490,11 +567,11 @@ merge options
 </p>
 </li>
 </ul></div>
-<div class="para"><p>(Daniel, Miklos, Stephan, JC)</p></div>
+<div class="paragraph"><p>(Daniel, Miklos, Stephan, JC)</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-27 06:08:22 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

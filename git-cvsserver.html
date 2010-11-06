@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-cvsserver(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-cvsserver(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,26 +412,32 @@ git-cvsserver(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p>SSH:</p></div>
+<div class="paragraph"><p>SSH:</p></div>
 <div class="verseblock">
-<div class="content">export CVS_SERVER="git cvsserver"
-<em>cvs</em> -d :ext:user@server/path/repo.git co &lt;HEAD_name&gt;</div></div>
-<div class="para"><p>pserver (/etc/inetd.conf):</p></div>
+<div class="verseblock-content">export CVS_SERVER="git cvsserver"
+<em>cvs</em> -d :ext:user@server/path/repo.git co &lt;HEAD_name&gt;</div>
+<div class="verseblock-attribution">
+</div></div>
+<div class="paragraph"><p>pserver (/etc/inetd.conf):</p></div>
 <div class="verseblock">
-<div class="content">cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</div></div>
-<div class="para"><p>Usage:</p></div>
+<div class="verseblock-content">cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</div>
+<div class="verseblock-attribution">
+</div></div>
+<div class="paragraph"><p>Usage:</p></div>
 <div class="verseblock">
-<div class="content"><em>git-cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</div></div>
+<div class="verseblock-content"><em>git-cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="para"><p>All these options obviously only make sense if enforced by the server side.
+<div class="paragraph"><p>All these options obviously only make sense if enforced by the server side.
 They have been implemented to resemble the <a href="git-daemon.html">git-daemon(1)</a> options as
 closely as possible.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --base-path &lt;path&gt;
 </dt>
 <dd>
@@ -345,27 +445,27 @@ closely as possible.</p></div>
 Prepend <em>path</em> to requested CVSROOT
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --strict-paths
 </dt>
 <dd>
 <p>
-Don't allow recursing into subdirectories
+Don&#8217;t allow recursing into subdirectories
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --export-all
 </dt>
 <dd>
 <p>
-Don't check for <tt>gitcvs.enabled</tt> in config. You also have to specify a list
+Don&#8217;t check for <tt>gitcvs.enabled</tt> in config. You also have to specify a list
 of allowed directories (see below) if you want to use this option.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -V
 </dt>
-<dt>
+<dt class="hdlist1">
 --version
 </dt>
 <dd>
@@ -373,13 +473,13 @@ of allowed directories (see below) if you want to use this option.
 Print version information and exit
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -h
 </dt>
-<dt>
+<dt class="hdlist1">
 -H
 </dt>
-<dt>
+<dt class="hdlist1">
 --help
 </dt>
 <dd>
@@ -387,7 +487,7 @@ Print version information and exit
 Print usage information and exit
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;directory&gt;
 </dt>
 <dd>
@@ -402,23 +502,23 @@ unless <em>--export-all</em> was given, too.
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This application is a CVS emulation layer for git.</p></div>
-<div class="para"><p>It is highly functional. However, not all methods are implemented,
+<div class="paragraph"><p>This application is a CVS emulation layer for git.</p></div>
+<div class="paragraph"><p>It is highly functional. However, not all methods are implemented,
 and for those methods that are implemented,
 not all switches are implemented.</p></div>
-<div class="para"><p>Testing has been done using both the CLI CVS client, and the Eclipse CVS
+<div class="paragraph"><p>Testing has been done using both the CLI CVS client, and the Eclipse CVS
 plugin. Most functionality works fine with both of these clients.</p></div>
 </div>
 <h2 id="_limitations">LIMITATIONS</h2>
 <div class="sectionbody">
-<div class="para"><p>CVS clients cannot tag, branch or perform GIT merges.</p></div>
-<div class="para"><p><em>git-cvsserver</em> maps GIT branches to CVS modules. This is very different
+<div class="paragraph"><p>CVS clients cannot tag, branch or perform GIT merges.</p></div>
+<div class="paragraph"><p><em>git-cvsserver</em> maps GIT branches to CVS modules. This is very different
 from what most CVS users would expect since in CVS modules usually represent
 one or more directories.</p></div>
 </div>
 <h2 id="_installation">INSTALLATION</h2>
 <div class="sectionbody">
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 If you are going to offer CVS access via pserver, add a line in
@@ -426,62 +526,58 @@ If you are going to offer CVS access via pserver, add a line in
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   cvspserver stream tcp nowait nobody git-cvsserver pserver
-</tt></pre>
+<pre><tt>   cvspserver stream tcp nowait nobody git-cvsserver pserver</tt></pre>
 </div></div>
-<div class="para"><p>Note: Some inetd servers let you specify the name of the executable
+<div class="paragraph"><p>Note: Some inetd servers let you specify the name of the executable
 independently of the value of argv[0] (i.e. the name the program assumes
 it was executed with). In this case the correct line in /etc/inetd.conf
 looks like</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver
-</tt></pre>
+<pre><tt>   cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</tt></pre>
 </div></div>
-<div class="para"><p>Only anonymous access is provided by pserve by default. To commit you
+<div class="paragraph"><p>Only anonymous access is provided by pserve by default. To commit you
 will have to create pserver accounts, simply add a gitcvs.authdb
 setting in the config file of the repositories you want the cvsserver
 to allow writes to, for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>
-   [gitcvs]
-        authdb = /etc/cvsserver/passwd
-</tt></pre>
+<pre><tt>   [gitcvs]
+        authdb = /etc/cvsserver/passwd</tt></pre>
 </div></div>
-<div class="para"><p>The format of these files is username followed by the crypted password,
+<div class="paragraph"><p>The format of these files is username followed by the crypted password,
 for example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>   myuser:$1Oyx5r9mdGZ2
    myuser:$1$BA)@$vbnMJMDym7tA32AamXrm./</tt></pre>
 </div></div>
-<div class="para"><p>You can use the <em>htpasswd</em> facility that comes with Apache to make these
-files, but Apache's MD5 crypt method differs from the one used by most C
-library's crypt() function, so don't use the -m option.</p></div>
-<div class="para"><p>Alternatively you can produce the password with perl's crypt() operator:</p></div>
+<div class="paragraph"><p>You can use the <em>htpasswd</em> facility that comes with Apache to make these
+files, but Apache&#8217;s MD5 crypt method differs from the one used by most C
+library&#8217;s crypt() function, so don&#8217;t use the -m option.</p></div>
+<div class="paragraph"><p>Alternatively you can produce the password with perl&#8217;s crypt() operator:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>   perl -e 'my ($user, $pass) = @ARGV; printf "%s:%s\n", $user, crypt($user, $pass)' $USER password</tt></pre>
 </div></div>
-<div class="para"><p>Then provide your password via the pserver method, for example:</p></div>
+<div class="paragraph"><p>Then provide your password via the pserver method, for example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>   cvs -d:pserver:someuser:somepassword &lt;at&gt; server/path/repo.git co &lt;HEAD_name&gt;</tt></pre>
 </div></div>
-<div class="para"><p>No special setup is needed for SSH access, other than having GIT tools
+<div class="paragraph"><p>No special setup is needed for SSH access, other than having GIT tools
 in the PATH. If you have clients that do not accept the CVS_SERVER
 environment variable, you can rename <em>git-cvsserver</em> to <tt>cvs</tt>.</p></div>
-<div class="para"><p>Note: Newer CVS versions (&gt;= 1.12.11) also support specifying
+<div class="paragraph"><p>Note: Newer CVS versions (&gt;= 1.12.11) also support specifying
 CVS_SERVER directly in CVSROOT like</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>cvs -d ":ext;CVS_SERVER=git cvsserver:user@server/path/repo.git" co &lt;HEAD_name&gt;</tt></pre>
 </div></div>
-<div class="para"><p>This has the advantage that it will be saved in your <em>CVS/Root</em> files and
-you don't need to worry about always setting the correct environment
-variable.  SSH users restricted to <em>git-shell</em> don't need to override the default
-with CVS_SERVER (and shouldn't) as <em>git-shell</em> understands <tt>cvs</tt> to mean
+<div class="paragraph"><p>This has the advantage that it will be saved in your <em>CVS/Root</em> files and
+you don&#8217;t need to worry about always setting the correct environment
+variable.  SSH users restricted to <em>git-shell</em> don&#8217;t need to override the default
+with CVS_SERVER (and shouldn&#8217;t) as <em>git-shell</em> understands <tt>cvs</tt> to mean
 <em>git-cvsserver</em> and pretends that the other end runs the real <em>cvs</em> better.</p></div>
 </li>
 <li>
@@ -494,16 +590,15 @@ For each repo that you want accessible from CVS you need to edit config in
 <pre><tt>   [gitcvs]
         enabled=1
         # optional for debugging
-        logfile=/path/to/logfile
-</tt></pre>
+        logfile=/path/to/logfile</tt></pre>
 </div></div>
-<div class="para"><p>Note: you need to ensure each user that is going to invoke <em>git-cvsserver</em> has
+<div class="paragraph"><p>Note: you need to ensure each user that is going to invoke <em>git-cvsserver</em> has
 write access to the log file and to the database (see
 <a href="#dbbackend">Database Backend</a>. If you want to offer write access over
 SSH, the users of course also need write access to the git repository itself.</p></div>
-<div class="para"><p>You also need to ensure that each repository is "bare" (without a git index
+<div class="paragraph"><p>You also need to ensure that each repository is "bare" (without a git index
 file) for <tt>cvs commit</tt> to work. See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
-<div class="para" id="configaccessmethod"><p>All configuration variables can also be overridden for a specific method of
+<div class="paragraph" id="configaccessmethod"><p>All configuration variables can also be overridden for a specific method of
 access. Valid method names are "ext" (for SSH access) and "pserver". The
 following example configuration would disable pserver access while still
 allowing access over SSH.</p></div>
@@ -518,11 +613,11 @@ allowing access over SSH.</p></div>
 </li>
 <li>
 <p>
-If you didn't specify the CVSROOT/CVS_SERVER directly in the checkout command,
+If you didn&#8217;t specify the CVSROOT/CVS_SERVER directly in the checkout command,
    automatically saving it in your <em>CVS/Root</em> files, then you need to set them
    explicitly in your environment.  CVSROOT should be set as per normal, but the
    directory should point at the appropriate git repo.  As above, for SSH clients
-   _not_ restricted to <em>git-shell</em>, CVS_SERVER should be set to <em>git-cvsserver</em>.
+   <em>not</em> restricted to <em>git-shell</em>, CVS_SERVER should be set to <em>git-cvsserver</em>.
 </p>
 <div class="listingblock">
 <div class="content">
@@ -556,25 +651,25 @@ Clients should now be able to check out the project. Use the CVS <em>module</em>
 </div>
 <h2 id="dbbackend">Database Backend</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git-cvsserver</em> uses one database per git head (i.e. CVS module) to
+<div class="paragraph"><p><em>git-cvsserver</em> uses one database per git head (i.e. CVS module) to
 store information about the repository to maintain consistent
 CVS revision numbers. The database needs to be
 updated (i.e. written to) after every commit.</p></div>
-<div class="para"><p>If the commit is done directly by using <tt>git</tt> (as opposed to
+<div class="paragraph"><p>If the commit is done directly by using <tt>git</tt> (as opposed to
 using <em>git-cvsserver</em>) the update will need to happen on the
 next repository access by <em>git-cvsserver</em>, independent of
 access method and requested operation.</p></div>
-<div class="para"><p>That means that even if you offer only read access (e.g. by using
+<div class="paragraph"><p>That means that even if you offer only read access (e.g. by using
 the pserver method), <em>git-cvsserver</em> should have write access to
 the database to work reliably (otherwise you need to make sure
 that the database is up-to-date any time <em>git-cvsserver</em> is executed).</p></div>
-<div class="para"><p>By default it uses SQLite databases in the git directory, named
+<div class="paragraph"><p>By default it uses SQLite databases in the git directory, named
 <tt>gitcvs.&lt;module_name&gt;.sqlite</tt>. Note that the SQLite backend creates
 temporary files in the same directory as the database file on
 write so it might not be enough to grant the users using
 <em>git-cvsserver</em> write access to the database file without granting
 them write access to the directory, too.</p></div>
-<div class="para"><p>The database can not be reliably regenerated in a
+<div class="paragraph"><p>The database can not be reliably regenerated in a
 consistent form after the branch it is tracking has changed.
 Example: For merged branches, <em>git-cvsserver</em> only tracks
 one branch of development, and after a <em>git merge</em> an
@@ -585,14 +680,14 @@ branch it would have picked if it had been run incrementally
 pre-merge. So if you have to fully or partially (from old
 backup) regenerate the database, you should be suspicious
 of pre-existing CVS sandboxes.</p></div>
-<div class="para"><p>You can configure the database backend with the following
+<div class="paragraph"><p>You can configure the database backend with the following
 configuration variables:</p></div>
 <h3 id="_configuring_database_backend">Configuring database backend</h3><div style="clear:left"></div>
-<div class="para"><p><em>git-cvsserver</em> uses the Perl DBI module. Please also read
+<div class="paragraph"><p><em>git-cvsserver</em> uses the Perl DBI module. Please also read
 its documentation if changing these variables, especially
-about <tt>DBI-&gt;connect()</tt>.</p></div>
-<div class="vlist"><dl>
-<dt>
+about <tt>DBI&#8594;connect()</tt>.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 gitcvs.dbname
 </dt>
 <dd>
@@ -604,7 +699,7 @@ gitcvs.dbname
         Default: <em>%Ggitcvs.%m.sqlite</em>
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 gitcvs.dbdriver
 </dt>
 <dd>
@@ -618,7 +713,7 @@ gitcvs.dbdriver
         Default: <em>SQLite</em>
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 gitcvs.dbuser
 </dt>
 <dd>
@@ -628,7 +723,7 @@ gitcvs.dbuser
         substitution (see below).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 gitcvs.dbpass
 </dt>
 <dd>
@@ -637,7 +732,7 @@ gitcvs.dbpass
         SQLite has no concept of database passwords.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 gitcvs.dbTableNamePrefix
 </dt>
 <dd>
@@ -648,11 +743,11 @@ gitcvs.dbTableNamePrefix
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>All variables can also be set per access method, see <a href="#configaccessmethod">above</a>.</p></div>
+<div class="paragraph"><p>All variables can also be set per access method, see <a href="#configaccessmethod">above</a>.</p></div>
 <h4 id="_variable_substitution">Variable substitution</h4>
-<div class="para"><p>In <tt>dbdriver</tt> and <tt>dbuser</tt> you can use the following variables:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>In <tt>dbdriver</tt> and <tt>dbuser</tt> you can use the following variables:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 %G
 </dt>
 <dd>
@@ -660,7 +755,7 @@ gitcvs.dbTableNamePrefix
         git directory name
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 %g
 </dt>
 <dd>
@@ -671,7 +766,7 @@ gitcvs.dbTableNamePrefix
         name in a filename if wanted)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 %m
 </dt>
 <dd>
@@ -679,7 +774,7 @@ gitcvs.dbTableNamePrefix
         CVS module/git head name
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 %a
 </dt>
 <dd>
@@ -687,7 +782,7 @@ gitcvs.dbTableNamePrefix
         access method (one of "ext" or "pserver")
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 %u
 </dt>
 <dd>
@@ -701,22 +796,22 @@ gitcvs.dbTableNamePrefix
 </div>
 <h2 id="_environment">ENVIRONMENT</h2>
 <div class="sectionbody">
-<div class="para"><p>These variables obviate the need for command-line options in some
+<div class="paragraph"><p>These variables obviate the need for command-line options in some
 circumstances, allowing easier restricted usage through git-shell.</p></div>
-<div class="para"><p>GIT_CVSSERVER_BASE_PATH takes the place of the argument to --base-path.</p></div>
-<div class="para"><p>GIT_CVSSERVER_ROOT specifies a single-directory whitelist. The
+<div class="paragraph"><p>GIT_CVSSERVER_BASE_PATH takes the place of the argument to --base-path.</p></div>
+<div class="paragraph"><p>GIT_CVSSERVER_ROOT specifies a single-directory whitelist. The
 repository must still be configured to allow access through
 git-cvsserver, as described above.</p></div>
-<div class="para"><p>When these environment variables are set, the corresponding
+<div class="paragraph"><p>When these environment variables are set, the corresponding
 command-line arguments may not be used.</p></div>
 </div>
 <h2 id="_eclipse_cvs_client_notes">Eclipse CVS Client Notes</h2>
 <div class="sectionbody">
-<div class="para"><p>To get a checkout with the Eclipse CVS client:</p></div>
-<div class="olist"><ol>
+<div class="paragraph"><p>To get a checkout with the Eclipse CVS client:</p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Select "Create a new project -&gt; From CVS checkout"
+Select "Create a new project &#8594; From CVS checkout"
 </p>
 </li>
 <li>
@@ -739,19 +834,19 @@ Pick <em>HEAD</em> when it asks what branch/tag to check out. Untick the
 </p>
 </li>
 </ol></div>
-<div class="para"><p>Protocol notes: If you are using anonymous access via pserver, just select that.
+<div class="paragraph"><p>Protocol notes: If you are using anonymous access via pserver, just select that.
 Those using SSH access should choose the <em>ext</em> protocol, and configure <em>ext</em>
-access on the Preferences-&gt;Team-&gt;CVS-&gt;ExtConnection pane. Set CVS_SERVER to
+access on the Preferences&#8594;Team&#8594;CVS&#8594;ExtConnection pane. Set CVS_SERVER to
 "<tt>git cvsserver</tt>". Note that password support is not good when using <em>ext</em>,
 you will definitely want to have SSH keys setup.</p></div>
-<div class="para"><p>Alternatively, you can just use the non-standard extssh protocol that Eclipse
+<div class="paragraph"><p>Alternatively, you can just use the non-standard extssh protocol that Eclipse
 offer. In that case CVS_SERVER is ignored, and you will have to replace
 the cvs utility on the server with <em>git-cvsserver</em> or manipulate your <tt>.bashrc</tt>
 so that calling <em>cvs</em> effectively calls <em>git-cvsserver</em>.</p></div>
 </div>
 <h2 id="_clients_known_to_work">Clients known to work</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 CVS 1.12.9 on Debian
@@ -776,19 +871,19 @@ TortoiseCVS
 </div>
 <h2 id="_operations_supported">Operations supported</h2>
 <div class="sectionbody">
-<div class="para"><p>All the operations required for normal use are supported, including
+<div class="paragraph"><p>All the operations required for normal use are supported, including
 checkout, diff, status, update, log, add, remove, commit.
 Legacy monitoring operations are not supported (edit, watch and related).
 Exports and tagging (tags and branches) are not supported at this stage.</p></div>
 <h3 id="_crlf_line_ending_conversions">CRLF Line Ending Conversions</h3><div style="clear:left"></div>
-<div class="para"><p>By default the server leaves the <em>-k</em> mode blank for all files,
+<div class="paragraph"><p>By default the server leaves the <em>-k</em> mode blank for all files,
 which causes the CVS client to treat them as a text files, subject
 to end-of-line conversion on some platforms.</p></div>
-<div class="para"><p>You can make the server use the end-of-line conversion attributes to
+<div class="paragraph"><p>You can make the server use the end-of-line conversion attributes to
 set the <em>-k</em> modes for files by setting the <tt>gitcvs.usecrlfattr</tt>
 config variable.  See <a href="gitattributes.html">gitattributes(5)</a> for more information
 about end-of-line conversion.</p></div>
-<div class="para"><p>Alternatively, if <tt>gitcvs.usecrlfattr</tt> config is not enabled
+<div class="paragraph"><p>Alternatively, if <tt>gitcvs.usecrlfattr</tt> config is not enabled
 or the attributes do not allow automatic detection for a filename, then
 the server uses the <tt>gitcvs.allbinary</tt> config for the default setting.
 If <tt>gitcvs.allbinary</tt> is set, then file not otherwise
@@ -796,43 +891,43 @@ specified will default to <em>-kb</em> mode. Otherwise the <em>-k</em> mode
 is left blank. But if <tt>gitcvs.allbinary</tt> is set to "guess", then
 the correct <em>-k</em> mode will be guessed based on the contents of
 the file.</p></div>
-<div class="para"><p>For best consistency with <em>cvs</em>, it is probably best to override the
+<div class="paragraph"><p>For best consistency with <em>cvs</em>, it is probably best to override the
 defaults by setting <tt>gitcvs.usecrlfattr</tt> to true,
 and <tt>gitcvs.allbinary</tt> to "guess".</p></div>
 </div>
 <h2 id="_dependencies">Dependencies</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git-cvsserver</em> depends on DBD::SQLite.</p></div>
+<div class="paragraph"><p><em>git-cvsserver</em> depends on DBD::SQLite.</p></div>
 </div>
 <h2 id="_copyright_and_authors">Copyright and Authors</h2>
 <div class="sectionbody">
-<div class="para"><p>This program is copyright The Open University UK - 2006.</p></div>
-<div class="para"><p>Authors:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>This program is copyright The Open University UK - 2006.</p></div>
+<div class="paragraph"><p>Authors:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
-Martyn Smith    &lt;martyn@catalyst.net.nz&gt;
+Martyn Smith    &lt;<a href="mailto:martyn@catalyst.net.nz">martyn@catalyst.net.nz</a>&gt;
 </p>
 </li>
 <li>
 <p>
-Martin Langhoff &lt;martin@laptop.org&gt;
+Martin Langhoff &lt;<a href="mailto:martin@laptop.org">martin@laptop.org</a>&gt;
 </p>
 </li>
 </ul></div>
-<div class="para"><p>with ideas and patches from participants of the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>with ideas and patches from participants of the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Martyn Smith &lt;martyn@catalyst.net.nz&gt;, Martin Langhoff &lt;martin@laptop.org&gt;, and Matthias Urlichs &lt;smurf@smurf.noris.de&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Martyn Smith &lt;<a href="mailto:martyn@catalyst.net.nz">martyn@catalyst.net.nz</a>&gt;, Martin Langhoff &lt;<a href="mailto:martin@laptop.org">martin@laptop.org</a>&gt;, and Matthias Urlichs &lt;<a href="mailto:smurf@smurf.noris.de">smurf@smurf.noris.de</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-07 00:00:52 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

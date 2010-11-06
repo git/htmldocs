@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-rev-parse(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-rev-parse(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,13 +412,13 @@ git-rev-parse(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git rev-parse</em> [ --option ] &lt;args&gt;&#8230;</p></div>
+<div class="paragraph"><p><em>git rev-parse</em> [ --option ] &lt;args&gt;&#8230;</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Many git porcelainish commands take mixture of flags
+<div class="paragraph"><p>Many git porcelainish commands take mixture of flags
 (i.e. parameters that begin with a dash <em>-</em>) and parameters
 meant for the underlying <em>git rev-list</em> command they use internally
 and flags and parameters for the other commands they use
@@ -333,8 +427,8 @@ distinguish between them.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --parseopt
 </dt>
 <dd>
@@ -342,7 +436,7 @@ distinguish between them.</p></div>
         Use <em>git rev-parse</em> in option parsing mode (see PARSEOPT section below).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --keep-dashdash
 </dt>
 <dd>
@@ -351,7 +445,7 @@ distinguish between them.</p></div>
         out the first <tt>--</tt> met instead of skipping it.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --stop-at-non-option
 </dt>
 <dd>
@@ -361,7 +455,7 @@ distinguish between them.</p></div>
         that take options themselves.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --sq-quote
 </dt>
 <dd>
@@ -371,7 +465,7 @@ distinguish between them.</p></div>
         mode does only quoting. Nothing else is done to command input.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --revs-only
 </dt>
 <dd>
@@ -380,7 +474,7 @@ distinguish between them.</p></div>
         <em>git rev-list</em> command.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-revs
 </dt>
 <dd>
@@ -389,7 +483,7 @@ distinguish between them.</p></div>
         <em>git rev-list</em> command.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --flags
 </dt>
 <dd>
@@ -397,7 +491,7 @@ distinguish between them.</p></div>
         Do not output non-flag parameters.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-flags
 </dt>
 <dd>
@@ -405,7 +499,7 @@ distinguish between them.</p></div>
         Do not output flag parameters.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --default &lt;arg&gt;
 </dt>
 <dd>
@@ -414,7 +508,7 @@ distinguish between them.</p></div>
         instead.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --verify
 </dt>
 <dd>
@@ -423,10 +517,10 @@ distinguish between them.</p></div>
         object name.  Otherwise barf and abort.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -436,7 +530,7 @@ distinguish between them.</p></div>
         instead exit with non-zero status silently.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --sq
 </dt>
 <dd>
@@ -450,7 +544,7 @@ distinguish between them.</p></div>
         the command input is still interpreted as usual.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --not
 </dt>
 <dd>
@@ -460,7 +554,7 @@ distinguish between them.</p></div>
         one.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --symbolic
 </dt>
 <dd>
@@ -470,7 +564,7 @@ distinguish between them.</p></div>
         form as close to the original input as possible.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --symbolic-full-name
 </dt>
 <dd>
@@ -483,7 +577,7 @@ distinguish between them.</p></div>
         refnames (e.g. "refs/heads/master").
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --abbrev-ref[=(strict|loose)]
 </dt>
 <dd>
@@ -493,7 +587,7 @@ distinguish between them.</p></div>
         abbreviation mode.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --all
 </dt>
 <dd>
@@ -501,13 +595,13 @@ distinguish between them.</p></div>
         Show all refs found in <tt>refs/</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --branches[=pattern]
 </dt>
-<dt>
+<dt class="hdlist1">
 --tags[=pattern]
 </dt>
-<dt>
+<dt class="hdlist1">
 --remotes[=pattern]
 </dt>
 <dd>
@@ -516,12 +610,12 @@ distinguish between them.</p></div>
         respectively (i.e., refs found in <tt>refs/heads</tt>,
         <tt>refs/tags</tt>, or <tt>refs/remotes</tt>, respectively).
 </p>
-<div class="para"><p>If a <tt>pattern</tt> is given, only refs matching the given shell glob are
+<div class="paragraph"><p>If a <tt>pattern</tt> is given, only refs matching the given shell glob are
 shown.  If the pattern does not contain a globbing character (<tt>?</tt>,
 <tt>&#42;</tt>, or <tt>[</tt>), it is turned into a prefix match by
 appending <tt>/&#42;</tt>.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --glob=pattern
 </dt>
 <dd>
@@ -533,7 +627,7 @@ appending <tt>/&#42;</tt>.</p></div>
         match by appending <tt>/&#42;</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --show-toplevel
 </dt>
 <dd>
@@ -541,7 +635,7 @@ appending <tt>/&#42;</tt>.</p></div>
         Show the absolute path of the top-level directory.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --show-prefix
 </dt>
 <dd>
@@ -551,7 +645,7 @@ appending <tt>/&#42;</tt>.</p></div>
         directory.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --show-cdup
 </dt>
 <dd>
@@ -561,7 +655,7 @@ appending <tt>/&#42;</tt>.</p></div>
         directory (typically a sequence of "../", or an empty string).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --git-dir
 </dt>
 <dd>
@@ -569,7 +663,7 @@ appending <tt>/&#42;</tt>.</p></div>
         Show <tt>$GIT_DIR</tt> if defined else show the path to the .git directory.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --is-inside-git-dir
 </dt>
 <dd>
@@ -578,7 +672,7 @@ appending <tt>/&#42;</tt>.</p></div>
         directory print "true", otherwise "false".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --is-inside-work-tree
 </dt>
 <dd>
@@ -587,7 +681,7 @@ appending <tt>/&#42;</tt>.</p></div>
         repository print "true", otherwise "false".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --is-bare-repository
 </dt>
 <dd>
@@ -595,7 +689,7 @@ appending <tt>/&#42;</tt>.</p></div>
         When the repository is bare print "true", otherwise "false".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --local-env-vars
 </dt>
 <dd>
@@ -606,10 +700,10 @@ appending <tt>/&#42;</tt>.</p></div>
         even if they are set.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --short
 </dt>
-<dt>
+<dt class="hdlist1">
 --short=number
 </dt>
 <dd>
@@ -619,10 +713,10 @@ appending <tt>/&#42;</tt>.</p></div>
         7 is used. The minimum length is 4.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --since=datestring
 </dt>
-<dt>
+<dt class="hdlist1">
 --after=datestring
 </dt>
 <dd>
@@ -631,10 +725,10 @@ appending <tt>/&#42;</tt>.</p></div>
         --max-age= parameter for <em>git rev-list</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --until=datestring
 </dt>
-<dt>
+<dt class="hdlist1">
 --before=datestring
 </dt>
 <dd>
@@ -643,7 +737,7 @@ appending <tt>/&#42;</tt>.</p></div>
         --min-age= parameter for <em>git rev-list</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;args&gt;&#8230;
 </dt>
 <dd>
@@ -655,12 +749,12 @@ appending <tt>/&#42;</tt>.</p></div>
 </div>
 <h2 id="_specifying_revisions">SPECIFYING REVISIONS</h2>
 <div class="sectionbody">
-<div class="para"><p>A revision parameter typically, but not necessarily, names a
+<div class="paragraph"><p>A revision parameter typically, but not necessarily, names a
 commit object.  They use what is called an <em>extended SHA1</em>
 syntax.  Here are various ways to spell object names.  The
 ones listed near the end of this list are to name trees and
 blobs contained in a commit.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 The full SHA1 object name (40-byte hexadecimal string), or
@@ -686,7 +780,7 @@ A symbolic ref name.  E.g. <em>master</em> typically means the commit
   When ambiguous, a <tt>&lt;name&gt;</tt> is disambiguated by taking the
   first match in the following rules:
 </p>
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 if <tt>$GIT_DIR/&lt;name&gt;</tt> exists, that is what you mean (this is usually
@@ -717,7 +811,7 @@ otherwise, <tt>refs/remotes/&lt;name&gt;</tt> if exists;
 <p>
 otherwise, <tt>refs/remotes/&lt;name&gt;/HEAD</tt> if exists.
 </p>
-<div class="para"><p>HEAD names the commit your changes in the working tree is based on.
+<div class="paragraph"><p>HEAD names the commit your changes in the working tree is based on.
 FETCH_HEAD records the branch you fetched from a remote repository
 with your last <em>git fetch</em> invocation.
 ORIG_HEAD is created by commands that moves your HEAD in a drastic
@@ -726,7 +820,7 @@ you can change the tip of the branch back to the state before you ran
 them easily.
 MERGE_HEAD records the commit(s) you are merging into your branch
 when you run <em>git merge</em>.</p></div>
-<div class="para"><p>Note that any of the <tt>refs/*</tt> cases above may come either from
+<div class="paragraph"><p>Note that any of the <tt>refs/*</tt> cases above may come either from
 the <tt>$GIT_DIR/refs</tt> directory or from the <tt>$GIT_DIR/packed-refs</tt> file.</p></div>
 </li>
 </ol></div>
@@ -842,13 +936,13 @@ A colon, optionally followed by a stage number (0 to 3) and a
   colon, followed by a path (e.g. <tt>:0:README</tt>); this names a blob object in the
   index at the given path. Missing stage number (and the colon
   that follows it, e.g. <tt>:README</tt>) names a stage 0 entry. During a merge, stage
-  1 is the common ancestor, stage 2 is the target branch's version
+  1 is the common ancestor, stage 2 is the target branch&#8217;s version
   (typically the current branch), and stage 3 is the version from
   the branch being merged.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Here is an illustration, by Jon Loeliger.  Both commit nodes B
+<div class="paragraph"><p>Here is an illustration, by Jon Loeliger.  Both commit nodes B
 and C are parents of commit node A.  Parent commits are ordered
 left-to-right.</p></div>
 <div class="literalblock">
@@ -880,29 +974,29 @@ J = F^2  = B^3^2   = A^^3^2</tt></pre>
 </div>
 <h2 id="_specifying_ranges">SPECIFYING RANGES</h2>
 <div class="sectionbody">
-<div class="para"><p>History traversing commands such as <em>git log</em> operate on a set
+<div class="paragraph"><p>History traversing commands such as <em>git log</em> operate on a set
 of commits, not just a single commit.  To these commands,
 specifying a single revision with the notation described in the
 previous section means the set of commits reachable from that
 commit, following the commit ancestry chain.</p></div>
-<div class="para"><p>To exclude commits reachable from a commit, a prefix <tt>&#94;</tt>
+<div class="paragraph"><p>To exclude commits reachable from a commit, a prefix <tt>&#94;</tt>
 notation is used.  E.g. <tt>&#94;r1 r2</tt> means commits reachable
 from <tt>r2</tt> but exclude the ones reachable from <tt>r1</tt>.</p></div>
-<div class="para"><p>This set operation appears so often that there is a shorthand
+<div class="paragraph"><p>This set operation appears so often that there is a shorthand
 for it.  When you have two commits <tt>r1</tt> and <tt>r2</tt> (named according
 to the syntax explained in SPECIFYING REVISIONS above), you can ask
 for commits that are reachable from r2 excluding those that are reachable
 from r1 by <tt>&#94;r1 r2</tt> and it can be written as <tt>r1..r2</tt>.</p></div>
-<div class="para"><p>A similar notation <tt>r1...r2</tt> is called symmetric difference
+<div class="paragraph"><p>A similar notation <tt>r1...r2</tt> is called symmetric difference
 of <tt>r1</tt> and <tt>r2</tt> and is defined as
 <tt>r1 r2 --not $(git merge-base --all r1 r2)</tt>.
 It is the set of commits that are reachable from either one of
 <tt>r1</tt> or <tt>r2</tt> but not from both.</p></div>
-<div class="para"><p>Two other shorthands for naming a set that is formed by a commit
+<div class="paragraph"><p>Two other shorthands for naming a set that is formed by a commit
 and its parent commits exist.  The <tt>r1&#94;@</tt> notation means all
 parents of <tt>r1</tt>.  <tt>r1&#94;!</tt> includes commit <tt>r1</tt> but excludes
 all of its parents.</p></div>
-<div class="para"><p>Here are a handful of examples:</p></div>
+<div class="paragraph"><p>Here are a handful of examples:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>D                G H D
@@ -917,27 +1011,27 @@ F^! D            G H D F</tt></pre>
 </div>
 <h2 id="_parseopt">PARSEOPT</h2>
 <div class="sectionbody">
-<div class="para"><p>In <tt>--parseopt</tt> mode, <em>git rev-parse</em> helps massaging options to bring to shell
+<div class="paragraph"><p>In <tt>--parseopt</tt> mode, <em>git rev-parse</em> helps massaging options to bring to shell
 scripts the same facilities C builtins have. It works as an option normalizer
 (e.g. splits single switches aggregate values), a bit like <tt>getopt(1)</tt> does.</p></div>
-<div class="para"><p>It takes on the standard input the specification of the options to parse and
+<div class="paragraph"><p>It takes on the standard input the specification of the options to parse and
 understand, and echoes on the standard output a string suitable for <tt>sh(1)</tt> <tt>eval</tt>
 to replace the arguments with normalized ones.  In case of error, it outputs
 usage on the standard error stream, and exits with code 129.</p></div>
-<div class="para"><p>Note: Make sure you quote the result when passing it to <tt>eval</tt>.  See
+<div class="paragraph"><p>Note: Make sure you quote the result when passing it to <tt>eval</tt>.  See
 below for an example.</p></div>
 <h3 id="_input_format">Input Format</h3><div style="clear:left"></div>
-<div class="para"><p><em>git rev-parse --parseopt</em> input format is fully text based. It has two parts,
+<div class="paragraph"><p><em>git rev-parse --parseopt</em> input format is fully text based. It has two parts,
 separated by a line that contains only <tt>--</tt>. The lines before the separator
 (should be more than one) are used for the usage.
 The lines after the separator describe the options.</p></div>
-<div class="para"><p>Each line of options has this format:</p></div>
+<div class="paragraph"><p>Each line of options has this format:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>&lt;opt_spec&gt;&lt;flags&gt;* SP+ help LF</tt></pre>
 </div></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>&lt;opt_spec&gt;</tt>
 </dt>
 <dd>
@@ -948,14 +1042,14 @@ The lines after the separator describe the options.</p></div>
         <tt>&lt;opt_spec&gt;</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>&lt;flags&gt;</tt>
 </dt>
 <dd>
 <p>
         <tt>&lt;flags&gt;</tt> are of <tt>*</tt>, <tt>=</tt>, <tt>?</tt> or <tt>!</tt>.
 </p>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Use <tt>=</tt> if the option takes an argument.
@@ -969,7 +1063,7 @@ Use <tt>?</tt> to mean that the option is optional (though its use is discourage
 <li>
 <p>
 Use <tt>*</tt> to mean that this option should not be listed in the usage
-          generated for the <tt>-h</tt> argument. It's shown for <tt>--help-all</tt> as
+          generated for the <tt>-h</tt> argument. It&#8217;s shown for <tt>--help-all</tt> as
           documented in <a href="gitcli.html">gitcli(7)</a>.
 </p>
 </li>
@@ -981,9 +1075,9 @@ Use <tt>!</tt> to not make the corresponding negated long option available.
 </ul></div>
 </dd>
 </dl></div>
-<div class="para"><p>The remainder of the line, after stripping the spaces, is used
+<div class="paragraph"><p>The remainder of the line, after stripping the spaces, is used
 as the help associated to the option.</p></div>
-<div class="para"><p>Blank lines are ignored, and lines that don't match this specification are used
+<div class="paragraph"><p>Blank lines are ignored, and lines that don&#8217;t match this specification are used
 as option group headers (start the line with a space to create such
 lines on purpose).</p></div>
 <h3 id="_example">Example</h3><div style="clear:left"></div>
@@ -1007,11 +1101,11 @@ eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?)"</
 </div>
 <h2 id="_sq_quote">SQ-QUOTE</h2>
 <div class="sectionbody">
-<div class="para"><p>In <tt>--sq-quote</tt> mode, <em>git rev-parse</em> echoes on the standard output a
+<div class="paragraph"><p>In <tt>--sq-quote</tt> mode, <em>git rev-parse</em> echoes on the standard output a
 single line suitable for <tt>sh(1)</tt> <tt>eval</tt>. This line is made by
 normalizing the arguments following <tt>--sq-quote</tt>. Nothing other than
 quoting the arguments is done.</p></div>
-<div class="para"><p>If you want command input to still be interpreted as usual by
+<div class="paragraph"><p>If you want command input to still be interpreted as usual by
 <em>git rev-parse</em> before the output is shell quoted, see the <tt>--sq</tt>
 option.</p></div>
 <h3 id="_example_2">Example</h3><div style="clear:left"></div>
@@ -1030,7 +1124,7 @@ $ sh your-git-script.sh "a b'c"</tt></pre>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Print the object name of the current commit:
@@ -1048,7 +1142,7 @@ Print the commit object name from the revision in the $REV shell variable:
 <div class="content">
 <pre><tt>$ git rev-parse --verify $REV</tt></pre>
 </div></div>
-<div class="para"><p>This will error out if $REV is empty or not a valid revision.</p></div>
+<div class="paragraph"><p>This will error out if $REV is empty or not a valid revision.</p></div>
 </li>
 <li>
 <p>
@@ -1058,26 +1152,26 @@ Same as above:
 <div class="content">
 <pre><tt>$ git rev-parse --default master --verify $REV</tt></pre>
 </div></div>
-<div class="para"><p>but if $REV is empty, the commit object name from master will be printed.</p></div>
+<div class="paragraph"><p>but if $REV is empty, the commit object name from master will be printed.</p></div>
 </li>
 </ul></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; .
-Junio C Hamano &lt;gitster@pobox.com&gt; and Pierre Habouzit &lt;madcoder@debian.org&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt; .
+Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt; and Pierre Habouzit &lt;<a href="mailto:madcoder@debian.org">madcoder@debian.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-22 04:11:10 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

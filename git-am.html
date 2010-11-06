@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-am(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-am(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,27 +412,29 @@ git-am(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git am</em> [--signoff] [--keep] [--keep-cr | --no-keep-cr] [--utf8 | --no-utf8]
+<div class="verseblock-content"><em>git am</em> [--signoff] [--keep] [--keep-cr | --no-keep-cr] [--utf8 | --no-utf8]
          [--3way] [--interactive] [--committer-date-is-author-date]
          [--ignore-date] [--ignore-space-change | --ignore-whitespace]
          [--whitespace=&lt;option&gt;] [-C&lt;n&gt;] [-p&lt;n&gt;] [--directory=&lt;dir&gt;]
          [--reject] [-q | --quiet] [--scissors | --no-scissors]
          [(&lt;mbox&gt; | &lt;Maildir&gt;)&#8230;]
-<em>git am</em> (--continue | --skip | --abort)</div></div>
+<em>git am</em> (--continue | --skip | --abort)</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Splits mail messages in a mailbox into commit log message,
+<div class="paragraph"><p>Splits mail messages in a mailbox into commit log message,
 authorship information and patches, and applies them to the
 current branch.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 (&lt;mbox&gt;|&lt;Maildir&gt;)&#8230;
 </dt>
 <dd>
@@ -348,10 +444,10 @@ current branch.</p></div>
         If you supply directories, they will be treated as Maildirs.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -s
 </dt>
-<dt>
+<dt class="hdlist1">
 --signoff
 </dt>
 <dd>
@@ -360,10 +456,10 @@ current branch.</p></div>
         the committer identity of yourself.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -k
 </dt>
-<dt>
+<dt class="hdlist1">
 --keep
 </dt>
 <dd>
@@ -371,10 +467,10 @@ current branch.</p></div>
         Pass <tt>-k</tt> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --keep-cr
 </dt>
-<dt>
+<dt class="hdlist1">
 --no-keep-cr
 </dt>
 <dd>
@@ -385,10 +481,10 @@ current branch.</p></div>
         default behaviour.  <tt>--no-keep-cr</tt> is useful to override <tt>am.keepcr</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -c
 </dt>
-<dt>
+<dt class="hdlist1">
 --scissors
 </dt>
 <dd>
@@ -397,7 +493,7 @@ current branch.</p></div>
         <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-scissors
 </dt>
 <dd>
@@ -405,10 +501,10 @@ current branch.</p></div>
         Ignore scissors lines (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -416,10 +512,10 @@ current branch.</p></div>
         Be quiet. Only print error messages.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -u
 </dt>
-<dt>
+<dt class="hdlist1">
 --utf8
 </dt>
 <dd>
@@ -427,13 +523,13 @@ current branch.</p></div>
         Pass <tt>-u</tt> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
         The proposed commit log message taken from the e-mail
         is re-coded into UTF-8 encoding (configuration variable
-        <tt>i18n.commitencoding</tt> can be used to specify project's
+        <tt>i18n.commitencoding</tt> can be used to specify project&#8217;s
         preferred encoding if it is not UTF-8).
 </p>
-<div class="para"><p>This was optional in prior versions of git, but now it is the
+<div class="paragraph"><p>This was optional in prior versions of git, but now it is the
 default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-utf8
 </dt>
 <dd>
@@ -442,10 +538,10 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -3
 </dt>
-<dt>
+<dt class="hdlist1">
 --3way
 </dt>
 <dd>
@@ -456,28 +552,28 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         available locally.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --ignore-date
 </dt>
-<dt>
+<dt class="hdlist1">
 --ignore-space-change
 </dt>
-<dt>
+<dt class="hdlist1">
 --ignore-whitespace
 </dt>
-<dt>
+<dt class="hdlist1">
 --whitespace=&lt;option&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -C&lt;n&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -p&lt;n&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --directory=&lt;dir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --reject
 </dt>
 <dd>
@@ -487,10 +583,10 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         the patch.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -i
 </dt>
-<dt>
+<dt class="hdlist1">
 --interactive
 </dt>
 <dd>
@@ -498,7 +594,7 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         Run interactively.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --committer-date-is-author-date
 </dt>
 <dd>
@@ -510,7 +606,7 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         value as the author date.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --ignore-date
 </dt>
 <dd>
@@ -522,7 +618,7 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         value as the committer date.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --skip
 </dt>
 <dd>
@@ -531,13 +627,13 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         restarting an aborted patch.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --continue
 </dt>
-<dt>
+<dt class="hdlist1">
 -r
 </dt>
-<dt>
+<dt class="hdlist1">
 --resolved
 </dt>
 <dd>
@@ -550,7 +646,7 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         file, and continue.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --resolvemsg=&lt;msg&gt;
 </dt>
 <dd>
@@ -562,7 +658,7 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
         for internal use between <em>git rebase</em> and <em>git am</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --abort
 </dt>
 <dd>
@@ -574,21 +670,21 @@ default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
 </div>
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<div class="para"><p>The commit author name is taken from the "From: " line of the
+<div class="paragraph"><p>The commit author name is taken from the "From: " line of the
 message, and commit author date is taken from the "Date: " line
 of the message.  The "Subject: " line is used as the title of
 the commit, after stripping common prefix "[PATCH &lt;anything&gt;]".
 The "Subject: " line is supposed to concisely describe what the
 commit is about in one line of text.</p></div>
-<div class="para"><p>"From: " and "Subject: " lines starting the body override the respective
+<div class="paragraph"><p>"From: " and "Subject: " lines starting the body override the respective
 commit author name and title values taken from the headers.</p></div>
-<div class="para"><p>The commit message is formed by the title taken from the
+<div class="paragraph"><p>The commit message is formed by the title taken from the
 "Subject: ", a blank line and the body of the message up to
 where the patch begins.  Excess whitespace at the end of each
 line is automatically stripped.</p></div>
-<div class="para"><p>The patch is expected to be inline, directly following the
+<div class="paragraph"><p>The patch is expected to be inline, directly following the
 message.  Any line that is of the form:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 three-dashes and end-of-line, or
@@ -605,12 +701,12 @@ a line that begins with "Index: "
 </p>
 </li>
 </ul></div>
-<div class="para"><p>is taken as the beginning of a patch, and the commit log message
+<div class="paragraph"><p>is taken as the beginning of a patch, and the commit log message
 is terminated before the first occurrence of such a line.</p></div>
-<div class="para"><p>When initially invoking <tt>git am</tt>, you give it the names of the mailboxes
+<div class="paragraph"><p>When initially invoking <tt>git am</tt>, you give it the names of the mailboxes
 to process.  Upon seeing the first patch that does not apply, it
 aborts in the middle.  You can recover from this in one of two ways:</p></div>
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 skip the current patch by re-running the command with the <em>--skip</em>
@@ -625,11 +721,11 @@ hand resolve the conflict in the working directory, and update
 </p>
 </li>
 </ol></div>
-<div class="para"><p>The command refuses to process new mailboxes while the <tt>.git/rebase-apply</tt>
+<div class="paragraph"><p>The command refuses to process new mailboxes while the <tt>.git/rebase-apply</tt>
 directory exists, so if you decide to start over from scratch,
 run <tt>rm -f -r .git/rebase-apply</tt> before running the command with mailbox
 names.</p></div>
-<div class="para"><p>Before any patches are applied, ORIG_HEAD is set to the tip of the
+<div class="paragraph"><p>Before any patches are applied, ORIG_HEAD is set to the tip of the
 current branch.  This is useful if you have problems with multiple
 commits, like running <em>git am</em> on the wrong branch or an error in the
 commits that is more easily fixed by changing the mailbox (e.g.
@@ -637,23 +733,23 @@ errors in the "From:" lines).</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-apply.html">git-apply(1)</a>.</p></div>
+<div class="paragraph"><p><a href="git-apply.html">git-apply(1)</a>.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
+<div class="paragraph"><p>Written by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Petr Baudis, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Petr Baudis, Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-22 04:11:02 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

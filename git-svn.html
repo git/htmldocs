@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-svn(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-svn(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,27 +412,27 @@ git-svn(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git svn</em> &lt;command&gt; [options] [arguments]</p></div>
+<div class="paragraph"><p><em>git svn</em> &lt;command&gt; [options] [arguments]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git svn</em> is a simple conduit for changesets between Subversion and git.
+<div class="paragraph"><p><em>git svn</em> is a simple conduit for changesets between Subversion and git.
 It provides a bidirectional flow of changes between a Subversion and a git
 repository.</p></div>
-<div class="para"><p><em>git svn</em> can track a standard Subversion repository,
+<div class="paragraph"><p><em>git svn</em> can track a standard Subversion repository,
 following the common "trunk/branches/tags" layout, with the --stdlayout option.
 It can also follow branches and tags in any layout with the -T/-t/-b options
 (see options to <em>init</em> below, and also the <em>clone</em> command).</p></div>
-<div class="para"><p>Once tracking a Subversion repository (with any of the above methods), the git
+<div class="paragraph"><p>Once tracking a Subversion repository (with any of the above methods), the git
 repository can be updated from Subversion by the <em>fetch</em> command and
 Subversion updated from git by the <em>dcommit</em> command.</p></div>
 </div>
 <h2 id="_commands">COMMANDS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>init</em>
 </dt>
 <dd>
@@ -351,29 +445,29 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         argument.  Normally this command initializes the current
         directory.
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -T&lt;trunk_subdir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --trunk=&lt;trunk_subdir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -t&lt;tags_subdir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --tags=&lt;tags_subdir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -b&lt;branches_subdir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --branches=&lt;branches_subdir&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -s
 </dt>
-<dt>
+<dt class="hdlist1">
 --stdlayout
 </dt>
 <dd>
@@ -390,7 +484,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         as well, they take precedence.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-metadata
 </dt>
 <dd>
@@ -400,7 +494,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         section of this manpage before using this option.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --use-svm-props
 </dt>
 <dd>
@@ -408,7 +502,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         Set the <em>useSvmProps</em> option in the [svn-remote] config.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --use-svnsync-props
 </dt>
 <dd>
@@ -416,7 +510,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         Set the <em>useSvnsyncProps</em> option in the [svn-remote] config.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --rewrite-root=&lt;URL&gt;
 </dt>
 <dd>
@@ -424,7 +518,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         Set the <em>rewriteRoot</em> option in the [svn-remote] config.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --rewrite-uuid=&lt;UUID&gt;
 </dt>
 <dd>
@@ -432,7 +526,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         Set the <em>rewriteUUID</em> option in the [svn-remote] config.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --username=&lt;USER&gt;
 </dt>
 <dd>
@@ -443,7 +537,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         the URL, eg svn+ssh://foo@svn.bar.com/project
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --prefix=&lt;prefix&gt;
 </dt>
 <dd>
@@ -458,7 +552,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         projects that share a common repository.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --ignore-paths=&lt;regex&gt;
 </dt>
 <dd>
@@ -468,7 +562,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         of <em>--ignore-paths</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-minimize-url
 </dt>
 <dd>
@@ -487,7 +581,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>fetch</em>
 </dt>
 <dd>
@@ -497,8 +591,8 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         .git/config file may be specified as an optional command-line
         argument.
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --localtime
 </dt>
 <dd>
@@ -507,13 +601,13 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
         makes <em>git log</em> (even without --date=local) show the same times
         that <tt>svn log</tt> would in the local timezone.
 </p>
-<div class="para"><p>This doesn't interfere with interoperating with the Subversion
+<div class="paragraph"><p>This doesn&#8217;t interfere with interoperating with the Subversion
 repository you cloned from, but if you wish for your local Git
-repository to be able to interoperate with someone else's local Git
-repository, either don't use this option or you should both use it in
+repository to be able to interoperate with someone else&#8217;s local Git
+repository, either don&#8217;t use this option or you should both use it in
 the same local timezone.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --parent
 </dt>
 <dd>
@@ -521,7 +615,7 @@ the same local timezone.</p></div>
         Fetch only from the SVN parent of the current HEAD.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --ignore-paths=&lt;regex&gt;
 </dt>
 <dd>
@@ -533,30 +627,26 @@ the same local timezone.</p></div>
         <em>rebase</em>, etc) on a given repository.
 </p>
 <div class="verseblock">
-<div class="content">config key: svn-remote.&lt;name&gt;.ignore-paths</div></div>
-<div class="para"><p>If the ignore-paths config key is set and the command line option is
+<div class="verseblock-content">config key: svn-remote.&lt;name&gt;.ignore-paths</div>
+<div class="verseblock-attribution">
+</div></div>
+<div class="paragraph"><p>If the ignore-paths config key is set and the command line option is
 also given, both regular expressions will be used.</p></div>
-<div class="para"><p>Examples:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>Examples:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 Skip "doc*" directory for every fetch
 </dt>
 <dd>
-<p>
-+
-</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>--ignore-paths="^doc"</tt></pre>
 </div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Skip "branches" and "tags" of first level directories
 </dt>
 <dd>
-<p>
-+
-</p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>--ignore-paths="^[^/]+/(?:branches|tags)"</tt></pre>
@@ -564,7 +654,7 @@ Skip "branches" and "tags" of first level directories
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --use-log-author
 </dt>
 <dd>
@@ -574,21 +664,21 @@ Skip "branches" and "tags" of first level directories
         in the log message and use that as the author string.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --add-author-from
 </dt>
 <dd>
 <p>
         When committing to svn from git (as part of commit or dcommit
-        operations), if the existing log message doesn't already have a
+        operations), if the existing log message doesn&#8217;t already have a
         From: or Signed-off-by: line, append a From: line based on the
-        git commit's author string.  If you use this, then --use-log-author
+        git commit&#8217;s author string.  If you use this, then --use-log-author
         will retrieve a valid author string for all commits.
 </p>
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>clone</em>
 </dt>
 <dd>
@@ -604,7 +694,7 @@ Skip "branches" and "tags" of first level directories
         able to update the working tree with the latest changes.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>rebase</em>
 </dt>
 <dd>
@@ -612,19 +702,19 @@ Skip "branches" and "tags" of first level directories
         This fetches revisions from the SVN parent of the current HEAD
         and rebases the current (uncommitted to SVN) work against it.
 </p>
-<div class="para"><p>This works similarly to <tt>svn update</tt> or <em>git pull</em> except that
+<div class="paragraph"><p>This works similarly to <tt>svn update</tt> or <em>git pull</em> except that
 it preserves linear history with <em>git rebase</em> instead of
 <em>git merge</em> for ease of dcommitting with <em>git svn</em>.</p></div>
-<div class="para"><p>This accepts all options that <em>git svn fetch</em> and <em>git rebase</em>
+<div class="paragraph"><p>This accepts all options that <em>git svn fetch</em> and <em>git rebase</em>
 accept.  However, <em>--fetch-all</em> only fetches from the current
 [svn-remote], and not all [svn-remote] definitions.</p></div>
-<div class="para"><p>Like <em>git rebase</em>; this requires that the working tree be clean
+<div class="paragraph"><p>Like <em>git rebase</em>; this requires that the working tree be clean
 and have no uncommitted changes.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -l
 </dt>
-<dt>
+<dt class="hdlist1">
 --local
 </dt>
 <dd>
@@ -635,7 +725,7 @@ and have no uncommitted changes.</p></div>
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>dcommit</em>
 </dt>
 <dd>
@@ -653,8 +743,8 @@ and have no uncommitted changes.</p></div>
         This is advantageous over <em>set-tree</em> (below) because it produces
         cleaner, more linear history.
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --no-rebase
 </dt>
 <dd>
@@ -662,7 +752,7 @@ and have no uncommitted changes.</p></div>
         After committing, do not rebase or reset.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --commit-url &lt;URL&gt;
 </dt>
 <dd>
@@ -674,25 +764,27 @@ and have no uncommitted changes.</p></div>
         method (e.g. <tt>svn+ssh://</tt> or <tt>https://</tt>) for commit.
 </p>
 <div class="verseblock">
-<div class="content">config key: svn-remote.&lt;name&gt;.commiturl
-config key: svn.commiturl (overwrites all svn-remote.&lt;name&gt;.commiturl options)</div></div>
-<div class="para"><p>Using this option for any other purpose (don't ask) is very strongly
+<div class="verseblock-content">config key: svn-remote.&lt;name&gt;.commiturl
+config key: svn.commiturl (overwrites all svn-remote.&lt;name&gt;.commiturl options)</div>
+<div class="verseblock-attribution">
+</div></div>
+<div class="paragraph"><p>Using this option for any other purpose (don&#8217;t ask) is very strongly
 discouraged.</p></div>
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>branch</em>
 </dt>
 <dd>
 <p>
         Create a branch in the SVN repository.
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -m
 </dt>
-<dt>
+<dt class="hdlist1">
 --message
 </dt>
 <dd>
@@ -700,10 +792,10 @@ discouraged.</p></div>
         Allows to specify the commit message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -t
 </dt>
-<dt>
+<dt class="hdlist1">
 --tag
 </dt>
 <dd>
@@ -712,10 +804,10 @@ discouraged.</p></div>
         specified during git svn init.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -d
 </dt>
-<dt>
+<dt class="hdlist1">
 --destination
 </dt>
 <dd>
@@ -731,10 +823,10 @@ discouraged.</p></div>
 <pre><tt>git config --get-all svn-remote.&lt;name&gt;.branches
 git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </div></div>
-<div class="para"><p>where &lt;name&gt; is the name of the SVN repository as specified by the -R option to
+<div class="paragraph"><p>where &lt;name&gt; is the name of the SVN repository as specified by the -R option to
 <em>init</em> (or "svn" by default).</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --username
 </dt>
 <dd>
@@ -743,7 +835,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
         the <em>username</em> configuration property.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --commit-url
 </dt>
 <dd>
@@ -760,7 +852,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>tag</em>
 </dt>
 <dd>
@@ -769,7 +861,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
         <em>branch -t</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>log</em>
 </dt>
 <dd>
@@ -777,12 +869,12 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
         This should make it easy to look up svn log messages when svn
         users refer to -r/--revision numbers.
 </p>
-<div class="para"><p>The following features from `svn log' are supported:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>The following features from &#8216;svn log&#8217; are supported:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -r &lt;n&gt;[:&lt;n&gt;]
 </dt>
-<dt>
+<dt class="hdlist1">
 --revision=&lt;n&gt;[:&lt;n&gt;]
 </dt>
 <dd>
@@ -791,28 +883,28 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
         HEAD, NEXT, BASE, PREV, etc &#8230;
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -v
 </dt>
-<dt>
+<dt class="hdlist1">
 --verbose
 </dt>
 <dd>
 <p>
-        it's not completely compatible with the --verbose
+        it&#8217;s not completely compatible with the --verbose
         output in svn log, but reasonably close.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --limit=&lt;n&gt;
 </dt>
 <dd>
 <p>
-        is NOT the same as --max-count, doesn't count
+        is NOT the same as --max-count, doesn&#8217;t count
         merged/excluded commits
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --incremental
 </dt>
 <dd>
@@ -821,9 +913,9 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>New features:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>New features:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --show-commit
 </dt>
 <dd>
@@ -831,7 +923,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
         shows the git commit sha1, as well
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --oneline
 </dt>
 <dd>
@@ -850,35 +942,35 @@ client converts the UTC time to the local time (or based on the TZ=
 environment). This command has the same behaviour.</td>
 </tr></table>
 </div>
-<div class="para"><p>Any other arguments are passed directly to <em>git log</em></p></div>
+<div class="paragraph"><p>Any other arguments are passed directly to <em>git log</em></p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>blame</em>
 </dt>
 <dd>
 <p>
        Show what revision and author last modified each line of a file. The
        output of this mode is format-compatible with the output of
-       `svn blame' by default. Like the SVN blame command,
+       &#8216;svn blame&#8217; by default. Like the SVN blame command,
        local uncommitted changes in the working copy are ignored;
        the version of the file in the HEAD revision is annotated. Unknown
        arguments are passed directly to <em>git blame</em>.
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --git-format
 </dt>
 <dd>
 <p>
         Produce output in the same format as <em>git blame</em>, but with
         SVN revision numbers instead of git commit hashes. In this mode,
-        changes that haven't been committed to SVN (including local
+        changes that haven&#8217;t been committed to SVN (including local
         working-copy edits) are shown as revision 0.
 </p>
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>find-rev</em>
 </dt>
 <dd>
@@ -889,7 +981,7 @@ environment). This command has the same behaviour.</td>
         tree-ish, returns the corresponding SVN revision number.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>set-tree</em>
 </dt>
 <dd>
@@ -903,7 +995,7 @@ environment). This command has the same behaviour.</td>
         independently of <em>git svn</em> functions.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>create-ignore</em>
 </dt>
 <dd>
@@ -914,7 +1006,7 @@ environment). This command has the same behaviour.</td>
         specific revision.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>show-ignore</em>
 </dt>
 <dd>
@@ -924,7 +1016,7 @@ environment). This command has the same behaviour.</td>
         the $GIT_DIR/info/exclude file.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>mkdirs</em>
 </dt>
 <dd>
@@ -936,7 +1028,7 @@ environment). This command has the same behaviour.</td>
         for use after commands like "git checkout" or "git reset".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>commit-diff</em>
 </dt>
 <dd>
@@ -951,18 +1043,18 @@ environment). This command has the same behaviour.</td>
         The -r&lt;revision&gt; option is required for this.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>info</em>
 </dt>
 <dd>
 <p>
         Shows information about a file or directory similar to what
-        `svn info' provides.  Does not currently support a -r/--revision
+        &#8216;svn info&#8217; provides.  Does not currently support a -r/--revision
         argument.  Use the --url option to output only the value of the
         <em>URL:</em> field.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>proplist</em>
 </dt>
 <dd>
@@ -972,7 +1064,7 @@ environment). This command has the same behaviour.</td>
         Subversion revision.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>propget</em>
 </dt>
 <dd>
@@ -981,7 +1073,7 @@ environment). This command has the same behaviour.</td>
         file.  A specific revision can be specified with -r/--revision.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>show-externals</em>
 </dt>
 <dd>
@@ -990,7 +1082,7 @@ environment). This command has the same behaviour.</td>
         specific revision.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>gc</em>
 </dt>
 <dd>
@@ -999,7 +1091,7 @@ environment). This command has the same behaviour.</td>
         and remove $GIT_DIR/svn/&lt;refname&gt;index files in .git/svn.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>reset</em>
 </dt>
 <dd>
@@ -1014,14 +1106,14 @@ environment). This command has the same behaviour.</td>
         file cannot be ignored forever (with --ignore-paths) the only
         way to repair the repo is to use <em>reset</em>.
 </p>
-<div class="para"><p>Only the rev_map and refs/remotes/git-svn are changed.  Follow <em>reset</em>
+<div class="paragraph"><p>Only the rev_map and refs/remotes/git-svn are changed.  Follow <em>reset</em>
 with a <em>fetch</em> and then <em>git reset</em> or <em>git rebase</em> to move local
 branches onto the new tree.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -r &lt;n&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --revision=&lt;n&gt;
 </dt>
 <dd>
@@ -1030,10 +1122,10 @@ branches onto the new tree.</p></div>
         are discarded.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -p
 </dt>
-<dt>
+<dt class="hdlist1">
 --parent
 </dt>
 <dd>
@@ -1042,7 +1134,7 @@ branches onto the new tree.</p></div>
         parent instead.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 Example:
 </dt>
 <dd>
@@ -1055,22 +1147,26 @@ Assume you have local changes in "master", but you need to refetch "r2".
                 \
                  A---B master</tt></pre>
 </div></div>
-<div class="para"><p>Fix the ignore-paths or SVN permissions problem that caused "r2" to
+<div class="paragraph"><p>Fix the ignore-paths or SVN permissions problem that caused "r2" to
 be incomplete in the first place.  Then:</p></div>
 <div class="verseblock">
-<div class="content">git svn reset -r2 -p
-git svn fetch</div></div>
+<div class="verseblock-content">git svn reset -r2 -p
+git svn fetch</div>
+<div class="verseblock-attribution">
+</div></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>    r1---r2'--r3' remotes/git-svn
       \
        r2---r3---A---B master</tt></pre>
 </div></div>
-<div class="para"><p>Then fixup "master" with <em>git rebase</em>.
+<div class="paragraph"><p>Then fixup "master" with <em>git rebase</em>.
 Do NOT use <em>git merge</em> or your history will not be compatible with a
 future <em>dcommit</em>!</p></div>
 <div class="verseblock">
-<div class="content">git rebase --onto remotes/git-svn A^ master</div></div>
+<div class="verseblock-content">git rebase --onto remotes/git-svn A^ master</div>
+<div class="verseblock-attribution">
+</div></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>    r1---r2'--r3' remotes/git-svn
@@ -1084,11 +1180,11 @@ future <em>dcommit</em>!</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --shared[=(false|true|umask|group|all|world|everybody)]
 </dt>
-<dt>
+<dt class="hdlist1">
 --template=&lt;template_directory&gt;
 </dt>
 <dd>
@@ -1097,88 +1193,94 @@ future <em>dcommit</em>!</p></div>
         These are passed directly to <em>git init</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -r &lt;ARG&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --revision &lt;ARG&gt;
 </dt>
 <dd>
 <p>
            Used with the <em>fetch</em> command.
 </p>
-<div class="para"><p>This allows revision ranges for partial/cauterized history
+<div class="paragraph"><p>This allows revision ranges for partial/cauterized history
 to be supported.  $NUMBER, $NUMBER1:$NUMBER2 (numeric ranges),
 $NUMBER:HEAD, and BASE:$NUMBER are all supported.</p></div>
-<div class="para"><p>This can allow you to make partial mirrors when running fetch;
+<div class="paragraph"><p>This can allow you to make partial mirrors when running fetch;
 but is generally not recommended because history will be skipped
 and lost.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -
 </dt>
-<dt>
+<dt class="hdlist1">
 --stdin
 </dt>
 <dd>
 <p>
         Only used with the <em>set-tree</em> command.
 </p>
-<div class="para"><p>Read a list of commits from stdin and commit them in reverse
+<div class="paragraph"><p>Read a list of commits from stdin and commit them in reverse
 order.  Only the leading sha1 is read from each line, so
 <em>git rev-list --pretty=oneline</em> output can be used.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --rmdir
 </dt>
 <dd>
 <p>
         Only used with the <em>dcommit</em>, <em>set-tree</em> and <em>commit-diff</em> commands.
 </p>
-<div class="para"><p>Remove directories from the SVN tree if there are no files left
+<div class="paragraph"><p>Remove directories from the SVN tree if there are no files left
 behind.  SVN can version empty directories, and they are not
 removed by default if there are no files left in them.  git
 cannot version empty directories.  Enabling this flag will make
 the commit to SVN act like git.</p></div>
 <div class="verseblock">
-<div class="content">config key: svn.rmdir</div></div>
+<div class="verseblock-content">config key: svn.rmdir</div>
+<div class="verseblock-attribution">
+</div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -e
 </dt>
-<dt>
+<dt class="hdlist1">
 --edit
 </dt>
 <dd>
 <p>
         Only used with the <em>dcommit</em>, <em>set-tree</em> and <em>commit-diff</em> commands.
 </p>
-<div class="para"><p>Edit the commit message before committing to SVN.  This is off by
+<div class="paragraph"><p>Edit the commit message before committing to SVN.  This is off by
 default for objects that are commits, and forced on when committing
 tree objects.</p></div>
 <div class="verseblock">
-<div class="content">config key: svn.edit</div></div>
+<div class="verseblock-content">config key: svn.edit</div>
+<div class="verseblock-attribution">
+</div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -l&lt;num&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --find-copies-harder
 </dt>
 <dd>
 <p>
         Only used with the <em>dcommit</em>, <em>set-tree</em> and <em>commit-diff</em> commands.
 </p>
-<div class="para"><p>They are both passed directly to <em>git diff-tree</em>; see
+<div class="paragraph"><p>They are both passed directly to <em>git diff-tree</em>; see
 <a href="git-diff-tree.html">git-diff-tree(1)</a> for more information.</p></div>
 <div class="verseblock">
-<div class="content">config key: svn.l
-config key: svn.findcopiesharder</div></div>
+<div class="verseblock-content">config key: svn.l
+config key: svn.findcopiesharder</div>
+<div class="verseblock-attribution">
+</div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -A&lt;filename&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --authors-file=&lt;filename&gt;
 </dt>
 <dd>
@@ -1189,15 +1291,17 @@ config key: svn.findcopiesharder</div></div>
 <div class="content">
 <pre><tt>        loginname = Joe User &lt;user@example.com&gt;</tt></pre>
 </div></div>
-<div class="para"><p>If this option is specified and <em>git svn</em> encounters an SVN
+<div class="paragraph"><p>If this option is specified and <em>git svn</em> encounters an SVN
 committer name that does not exist in the authors-file, <em>git svn</em>
 will abort operation. The user will then have to add the
 appropriate entry.  Re-running the previous <em>git svn</em> command
 after the authors-file is modified should continue operation.</p></div>
 <div class="verseblock">
-<div class="content">config key: svn.authorsfile</div></div>
+<div class="verseblock-content">config key: svn.authorsfile</div>
+<div class="verseblock-attribution">
+</div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --authors-prog=&lt;filename&gt;
 </dt>
 <dd>
@@ -1209,10 +1313,10 @@ after the authors-file is modified should continue operation.</p></div>
         which will be treated as if included in the authors file.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -1221,10 +1325,10 @@ after the authors-file is modified should continue operation.</p></div>
         even less verbose.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --repack[=&lt;n&gt;]
 </dt>
-<dt>
+<dt class="hdlist1">
 --repack-flags=&lt;flags&gt;
 </dt>
 <dd>
@@ -1232,37 +1336,39 @@ after the authors-file is modified should continue operation.</p></div>
         These should help keep disk usage sane for large fetches with
         many revisions.
 </p>
-<div class="para"><p>--repack takes an optional argument for the number of revisions
+<div class="paragraph"><p>--repack takes an optional argument for the number of revisions
 to fetch before repacking.  This defaults to repacking every
 1000 commits fetched if no argument is specified.</p></div>
-<div class="para"><p>--repack-flags are passed directly to <em>git repack</em>.</p></div>
+<div class="paragraph"><p>--repack-flags are passed directly to <em>git repack</em>.</p></div>
 <div class="verseblock">
-<div class="content">config key: svn.repack
-config key: svn.repackflags</div></div>
+<div class="verseblock-content">config key: svn.repack
+config key: svn.repackflags</div>
+<div class="verseblock-attribution">
+</div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m
 </dt>
-<dt>
+<dt class="hdlist1">
 --merge
 </dt>
-<dt>
+<dt class="hdlist1">
 -s&lt;strategy&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --strategy=&lt;strategy&gt;
 </dt>
 <dd>
 <p>
         These are only used with the <em>dcommit</em> and <em>rebase</em> commands.
 </p>
-<div class="para"><p>Passed directly to <em>git rebase</em> when using <em>dcommit</em> if a
+<div class="paragraph"><p>Passed directly to <em>git rebase</em> when using <em>dcommit</em> if a
 <em>git reset</em> cannot be used (see <em>dcommit</em>).</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -n
 </dt>
-<dt>
+<dt class="hdlist1">
 --dry-run
 </dt>
 <dd>
@@ -1270,23 +1376,23 @@ config key: svn.repackflags</div></div>
         This can be used with the <em>dcommit</em>, <em>rebase</em>, <em>branch</em> and
         <em>tag</em> commands.
 </p>
-<div class="para"><p>For <em>dcommit</em>, print out the series of git arguments that would show
+<div class="paragraph"><p>For <em>dcommit</em>, print out the series of git arguments that would show
 which diffs would be committed to SVN.</p></div>
-<div class="para"><p>For <em>rebase</em>, display the local branch associated with the upstream svn
+<div class="paragraph"><p>For <em>rebase</em>, display the local branch associated with the upstream svn
 repository associated with the current branch and the URL of svn
 repository that will be fetched from.</p></div>
-<div class="para"><p>For <em>branch</em> and <em>tag</em>, display the urls that will be used for copying when
+<div class="paragraph"><p>For <em>branch</em> and <em>tag</em>, display the urls that will be used for copying when
 creating the branch or tag.</p></div>
 </dd>
 </dl></div>
 </div>
 <h2 id="_advanced_options">ADVANCED OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -i&lt;GIT_SVN_ID&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --id &lt;GIT_SVN_ID&gt;
 </dt>
 <dd>
@@ -1297,10 +1403,10 @@ creating the branch or tag.</p></div>
         no longer require this switch as an argument.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -R&lt;remote name&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --svn-remote &lt;remote name&gt;
 </dt>
 <dd>
@@ -1310,43 +1416,45 @@ creating the branch or tag.</p></div>
         Default: "svn"
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --follow-parent
 </dt>
 <dd>
 <p>
-        This is especially helpful when we're tracking a directory
+        This is especially helpful when we&#8217;re tracking a directory
         that has been moved around within the repository, or if we
         started tracking a branch and never tracked the trunk it was
         descended from. This feature is enabled by default, use
         --no-follow-parent to disable it.
 </p>
 <div class="verseblock">
-<div class="content">config key: svn.followparent</div></div>
+<div class="verseblock-content">config key: svn.followparent</div>
+<div class="verseblock-attribution">
+</div></div>
 </dd>
 </dl></div>
 </div>
 <h2 id="_config_file_only_options">CONFIG FILE-ONLY OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 svn.noMetadata
 </dt>
-<dt>
+<dt class="hdlist1">
 svn-remote.&lt;name&gt;.noMetadata
 </dt>
 <dd>
 <p>
         This gets rid of the <em>git-svn-id:</em> lines at the end of every commit.
 </p>
-<div class="para"><p>This option can only be used for one-shot imports as <em>git svn</em>
+<div class="paragraph"><p>This option can only be used for one-shot imports as <em>git svn</em>
 will not be able to fetch again without metadata. Additionally,
 if you lose your .git/svn/<strong>*/.rev_map.</strong> files, <em>git svn</em> will not
 be able to rebuild them.</p></div>
-<div class="para"><p>The <em>git svn log</em> command will not work on repositories using
+<div class="paragraph"><p>The <em>git svn log</em> command will not work on repositories using
 this, either.  Using this conflicts with the <em>useSvmProps</em>
 option for (hopefully) obvious reasons.</p></div>
-<div class="para"><p>This option is NOT recommended as it makes it difficult to track down
+<div class="paragraph"><p>This option is NOT recommended as it makes it difficult to track down
 old references to SVN revision numbers in existing documentation, bug
 reports and archives.  If you plan to eventually migrate from SVN to git
 and are certain about dropping SVN history, consider
@@ -1354,10 +1462,10 @@ and are certain about dropping SVN history, consider
 reformating of metadata for ease-of-reading and rewriting authorship
 info for non-"svn.authorsFile" users.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 svn.useSvmProps
 </dt>
-<dt>
+<dt class="hdlist1">
 svn-remote.&lt;name&gt;.useSvmProps
 </dt>
 <dd>
@@ -1365,7 +1473,7 @@ svn-remote.&lt;name&gt;.useSvmProps
         This allows <em>git svn</em> to re-map repository URLs and UUIDs from
         mirrors created using SVN::Mirror (or svk) for metadata.
 </p>
-<div class="para"><p>If an SVN revision has a property, "svm:headrev", it is likely
+<div class="paragraph"><p>If an SVN revision has a property, "svm:headrev", it is likely
 that the revision was created by SVN::Mirror (also used by SVK).
 The property contains a repository UUID and a revision.  We want
 to make it look like we are mirroring the original URL, so
@@ -1373,10 +1481,10 @@ introduce a helper function that returns the original identity
 URL and UUID, and use it when generating metadata in commit
 messages.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 svn.useSvnsyncProps
 </dt>
-<dt>
+<dt class="hdlist1">
 svn-remote.&lt;name&gt;.useSvnsyncprops
 </dt>
 <dd>
@@ -1386,7 +1494,7 @@ svn-remote.&lt;name&gt;.useSvnsyncprops
         later.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 svn-remote.&lt;name&gt;.rewriteRoot
 </dt>
 <dd>
@@ -1398,7 +1506,7 @@ svn-remote.&lt;name&gt;.rewriteRoot
         metadata so users of it will see the public URL.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 svn-remote.&lt;name&gt;.rewriteUUID
 </dt>
 <dd>
@@ -1409,7 +1517,7 @@ svn-remote.&lt;name&gt;.rewriteUUID
         or useSvnsyncProps.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 svn.brokenSymlinkWorkaround
 </dt>
 <dd>
@@ -1423,7 +1531,7 @@ svn.brokenSymlinkWorkaround
         be "true".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 svn.pathnameencoding
 </dt>
 <dd>
@@ -1431,21 +1539,21 @@ svn.pathnameencoding
         This instructs git svn to recode pathnames to a given encoding.
         It can be used by windows users and by those who work in non-utf8
         locales to avoid corrupted file names with non-ASCII characters.
-        Valid encodings are the ones supported by Perl's Encode module.
+        Valid encodings are the ones supported by Perl&#8217;s Encode module.
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>Since the noMetadata, rewriteRoot, rewriteUUID, useSvnsyncProps and useSvmProps
+<div class="paragraph"><p>Since the noMetadata, rewriteRoot, rewriteUUID, useSvnsyncProps and useSvmProps
 options all affect the metadata generated and used by <em>git svn</em>; they
 <strong>must</strong> be set in the configuration file before any history is imported
 and these settings should never be changed once they are set.</p></div>
-<div class="para"><p>Additionally, only one of these options can be used per svn-remote
+<div class="paragraph"><p>Additionally, only one of these options can be used per svn-remote
 section because they affect the <em>git-svn-id:</em> metadata line, except
 for rewriteRoot and rewriteUUID which can be used together.</p></div>
 </div>
 <h2 id="_basic_examples">BASIC EXAMPLES</h2>
 <div class="sectionbody">
-<div class="para"><p>Tracking and contributing to the trunk of a Subversion-managed project:</p></div>
+<div class="paragraph"><p>Tracking and contributing to the trunk of a Subversion-managed project:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt># Clone a repo (like git clone):
@@ -1465,7 +1573,7 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 # Append svn:ignore settings to the default git exclude file:
         git svn show-ignore &gt;&gt; .git/info/exclude</tt></pre>
 </div></div>
-<div class="para"><p>Tracking and contributing to an entire Subversion-managed project
+<div class="paragraph"><p>Tracking and contributing to an entire Subversion-managed project
 (complete with a trunk, tags and branches):</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1481,7 +1589,7 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 # You may only dcommit to one branch/tag/trunk at a time.  The usage
 # of dcommit/rebase/show-ignore should be the same as above.</tt></pre>
 </div></div>
-<div class="para"><p>The initial <em>git svn clone</em> can be quite time-consuming
+<div class="paragraph"><p>The initial <em>git svn clone</em> can be quite time-consuming
 (especially for large Subversion repositories). If multiple
 people (or one person with multiple machines) want to use
 <em>git svn</em> to interact with the same Subversion repository, you can
@@ -1508,11 +1616,11 @@ have each person clone that repository with <em>git clone</em>:</p></div>
 </div>
 <h2 id="_rebase_vs_pull_merge">REBASE VS. PULL/MERGE</h2>
 <div class="sectionbody">
-<div class="para"><p>Originally, <em>git svn</em> recommended that the <em>remotes/git-svn</em> branch be
+<div class="paragraph"><p>Originally, <em>git svn</em> recommended that the <em>remotes/git-svn</em> branch be
 pulled or merged from.  This is because the author favored
 <tt>git svn set-tree B</tt> to commit a single head rather than the
 <tt>git svn set-tree A..B</tt> notation to commit multiple commits.</p></div>
-<div class="para"><p>If you use <tt>git svn set-tree A..B</tt> to commit several diffs and you do
+<div class="paragraph"><p>If you use <tt>git svn set-tree A..B</tt> to commit several diffs and you do
 not have the latest remotes/git-svn merged into my-branch, you should
 use <tt>git svn rebase</tt> to update your work branch instead of <tt>git pull</tt> or
 <tt>git merge</tt>.  <tt>pull</tt>/<tt>merge</tt> can cause non-linear history to be flattened
@@ -1521,7 +1629,7 @@ previous commits in SVN.</p></div>
 </div>
 <h2 id="_design_philosophy">DESIGN PHILOSOPHY</h2>
 <div class="sectionbody">
-<div class="para"><p>Merge tracking in Subversion is lacking and doing branched development
+<div class="paragraph"><p>Merge tracking in Subversion is lacking and doing branched development
 with Subversion can be cumbersome as a result.  While <em>git svn</em> can track
 copy history (including branches and tags) for repositories adopting a
 standard layout, it cannot yet represent merge history that happened
@@ -1531,41 +1639,41 @@ compatibility with SVN (see the CAVEATS section below).</p></div>
 </div>
 <h2 id="_caveats">CAVEATS</h2>
 <div class="sectionbody">
-<div class="para"><p>For the sake of simplicity and interoperating with a less-capable system
+<div class="paragraph"><p>For the sake of simplicity and interoperating with a less-capable system
 (SVN), it is recommended that all <em>git svn</em> users clone, fetch and dcommit
 directly from the SVN server, and avoid all <em>git clone</em>/<em>pull</em>/<em>merge</em>/<em>push</em>
 operations between git repositories and branches.  The recommended
 method of exchanging code between git branches and users is
-<em>git format-patch</em> and <em>git am</em>, or just 'dcommit'ing to the SVN repository.</p></div>
-<div class="para"><p>Running <em>git merge</em> or <em>git pull</em> is NOT recommended on a branch you
+<em>git format-patch</em> and <em>git am</em>, or just 'dcommit&#8217;ing to the SVN repository.</p></div>
+<div class="paragraph"><p>Running <em>git merge</em> or <em>git pull</em> is NOT recommended on a branch you
 plan to <em>dcommit</em> from.  Subversion does not represent merges in any
 reasonable or useful fashion; so users using Subversion cannot see any
-merges you've made.  Furthermore, if you merge or pull from a git branch
+merges you&#8217;ve made.  Furthermore, if you merge or pull from a git branch
 that is a mirror of an SVN branch, <em>dcommit</em> may commit to the wrong
 branch.</p></div>
-<div class="para"><p>If you do merge, note the following rule: <em>git svn dcommit</em> will
+<div class="paragraph"><p>If you do merge, note the following rule: <em>git svn dcommit</em> will
 attempt to commit on top of the SVN commit named in</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git log --grep=^git-svn-id: --first-parent -1</tt></pre>
 </div></div>
-<div class="para"><p>You <em>must</em> therefore ensure that the most recent commit of the branch
+<div class="paragraph"><p>You <em>must</em> therefore ensure that the most recent commit of the branch
 you want to dcommit to is the <em>first</em> parent of the merge.  Chaos will
 ensue otherwise, especially if the first parent is an older commit on
 the same SVN branch.</p></div>
-<div class="para"><p><em>git clone</em> does not clone branches under the refs/remotes/ hierarchy or
+<div class="paragraph"><p><em>git clone</em> does not clone branches under the refs/remotes/ hierarchy or
 any <em>git svn</em> metadata, or config.  So repositories created and managed with
 using <em>git svn</em> should use <em>rsync</em> for cloning, if cloning is to be done
 at all.</p></div>
-<div class="para"><p>Since <em>dcommit</em> uses rebase internally, any git branches you <em>git push</em> to
+<div class="paragraph"><p>Since <em>dcommit</em> uses rebase internally, any git branches you <em>git push</em> to
 before <em>dcommit</em> on will require forcing an overwrite of the existing ref
 on the remote repository.  This is generally considered bad practice,
 see the <a href="git-push.html">git-push(1)</a> documentation for details.</p></div>
-<div class="para"><p>Do not use the --amend option of <a href="git-commit.html">git-commit(1)</a> on a change you've
+<div class="paragraph"><p>Do not use the --amend option of <a href="git-commit.html">git-commit(1)</a> on a change you&#8217;ve
 already dcommitted.  It is considered bad practice to --amend commits
-you've already pushed to a remote repository for other users, and
+you&#8217;ve already pushed to a remote repository for other users, and
 dcommit with SVN is analogous to that.</p></div>
-<div class="para"><p>When using multiple --branches or --tags, <em>git svn</em> does not automatically
+<div class="paragraph"><p>When using multiple --branches or --tags, <em>git svn</em> does not automatically
 handle name collisions (for example, if two branches from different paths have
 the same name, or if a branch and a tag have the same name).  In these cases,
 use <em>init</em> to set up your git repository then, before your first <em>fetch</em>, edit
@@ -1579,18 +1687,18 @@ branches = debug/*:refs/remotes/svn/debug/*</tt></pre>
 </div>
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
-<div class="para"><p>We ignore all SVN properties except svn:executable.  Any unhandled
+<div class="paragraph"><p>We ignore all SVN properties except svn:executable.  Any unhandled
 properties are logged to $GIT_DIR/svn/&lt;refname&gt;/unhandled.log</p></div>
-<div class="para"><p>Renamed and copied directories are not detected by git and hence not
+<div class="paragraph"><p>Renamed and copied directories are not detected by git and hence not
 tracked when committing to SVN.  I do not plan on adding support for
-this as it's quite difficult and time-consuming to get working for all
-the possible corner cases (git doesn't do it, either).  Committing
-renamed and copied files are fully supported if they're similar enough
+this as it&#8217;s quite difficult and time-consuming to get working for all
+the possible corner cases (git doesn&#8217;t do it, either).  Committing
+renamed and copied files are fully supported if they&#8217;re similar enough
 for git to detect them.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git svn</em> stores [svn-remote] configuration information in the
+<div class="paragraph"><p><em>git svn</em> stores [svn-remote] configuration information in the
 repository .git/config file.  It is similar the core git
 [remote] sections except <em>fetch</em> keys do not accept glob
 arguments; but they are instead handled by the <em>branches</em>
@@ -1605,13 +1713,13 @@ listed below are allowed:</p></div>
         branches = branches/*/project-a:refs/remotes/project-a/branches/*
         tags = tags/*/project-a:refs/remotes/project-a/tags/*</tt></pre>
 </div></div>
-<div class="para"><p>Keep in mind that the <em>*</em> (asterisk) wildcard of the local ref
-(right of the <em>:</em>) *must* be the farthest right path component;
-however the remote wildcard may be anywhere as long as it's an
+<div class="paragraph"><p>Keep in mind that the <em>*</em> (asterisk) wildcard of the local ref
+(right of the <em>:</em>) <strong>must</strong> be the farthest right path component;
+however the remote wildcard may be anywhere as long as it&#8217;s an
 independent path component (surrounded by <em>/</em> or EOL).   This
 type of configuration is not automatically created by <em>init</em> and
 should be manually entered with a text-editor or using <em>git config</em>.</p></div>
-<div class="para"><p>It is also possible to fetch a subset of branches or tags by using a
+<div class="paragraph"><p>It is also possible to fetch a subset of branches or tags by using a
 comma-separated list of names within braces. For example:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1621,26 +1729,26 @@ comma-separated list of names within braces. For example:</p></div>
         branches = branches/{red,green}/src:refs/remotes/branches/*
         tags = tags/{1.0,2.0}/src:refs/remotes/tags/*</tt></pre>
 </div></div>
-<div class="para"><p>Note that git-svn keeps track of the highest revision in which a branch
+<div class="paragraph"><p>Note that git-svn keeps track of the highest revision in which a branch
 or tag has appeared. If the subset of branches or tags is changed after
 fetching, then .git/svn/.metadata must be manually edited to remove (or
 reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-rebase.html">git-rebase(1)</a></p></div>
+<div class="paragraph"><p><a href="git-rebase.html">git-rebase(1)</a></p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Eric Wong &lt;normalperson@yhbt.net&gt;.</p></div>
+<div class="paragraph"><p>Written by Eric Wong &lt;<a href="mailto:normalperson@yhbt.net">normalperson@yhbt.net</a>&gt;.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Eric Wong &lt;normalperson@yhbt.net&gt;.</p></div>
+<div class="paragraph"><p>Written by Eric Wong &lt;<a href="mailto:normalperson@yhbt.net">normalperson@yhbt.net</a>&gt;.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-22 04:11:12 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

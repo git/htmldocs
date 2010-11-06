@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-filter-branch(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-filter-branch(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,34 +412,36 @@ git-filter-branch(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git filter-branch</em> [--env-filter &lt;command&gt;] [--tree-filter &lt;command&gt;]
+<div class="verseblock-content"><em>git filter-branch</em> [--env-filter &lt;command&gt;] [--tree-filter &lt;command&gt;]
         [--index-filter &lt;command&gt;] [--parent-filter &lt;command&gt;]
         [--msg-filter &lt;command&gt;] [--commit-filter &lt;command&gt;]
         [--tag-name-filter &lt;command&gt;] [--subdirectory-filter &lt;directory&gt;]
         [--prune-empty]
         [--original &lt;namespace&gt;] [-d &lt;directory&gt;] [-f | --force]
-        [--] [&lt;rev-list options&gt;&#8230;]</div></div>
+        [--] [&lt;rev-list options&gt;&#8230;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Lets you rewrite git revision history by rewriting the branches mentioned
+<div class="paragraph"><p>Lets you rewrite git revision history by rewriting the branches mentioned
 in the &lt;rev-list options&gt;, applying custom filters on each revision.
 Those filters can modify each tree (e.g. removing a file or running
 a perl rewrite on all files) or information about each commit.
 Otherwise, all information (including original commit times or merge
 information) will be preserved.</p></div>
-<div class="para"><p>The command will only rewrite the _positive_ refs mentioned in the
+<div class="paragraph"><p>The command will only rewrite the <em>positive</em> refs mentioned in the
 command line (e.g. if you pass <em>a..b</em>, only <em>b</em> will be rewritten).
 If you specify no filters, the commits will be recommitted without any
 changes, which would normally have no effect.  Nevertheless, this may be
 useful in the future for compensating for some git bugs or such,
 therefore such a usage is permitted.</p></div>
-<div class="para"><p><strong>NOTE</strong>: This command honors <tt>.git/info/grafts</tt>. If you have any grafts
+<div class="paragraph"><p><strong>NOTE</strong>: This command honors <tt>.git/info/grafts</tt>. If you have any grafts
 defined, running this command will make them permanent.</p></div>
-<div class="para"><p><strong>WARNING</strong>! The rewritten history will have different object names for all
+<div class="paragraph"><p><strong>WARNING</strong>! The rewritten history will have different object names for all
 the objects and will not converge with the original branch.  You will not
 be able to easily push and distribute the rewritten branch on top of the
 original branch.  Please do not use this command if you do not know the
@@ -353,14 +449,14 @@ full implications, and avoid using it anyway, if a simple single commit
 would suffice to fix your problem.  (See the "RECOVERING FROM UPSTREAM
 REBASE" section in <a href="git-rebase.html">git-rebase(1)</a> for further information about
 rewriting published history.)</p></div>
-<div class="para"><p>Always verify that the rewritten version is correct: The original refs,
+<div class="paragraph"><p>Always verify that the rewritten version is correct: The original refs,
 if different from the rewritten ones, will be stored in the namespace
 <em>refs/original/</em>.</p></div>
-<div class="para"><p>Note that since this operation is very I/O expensive, it might
+<div class="paragraph"><p>Note that since this operation is very I/O expensive, it might
 be a good idea to redirect the temporary directory off-disk with the
 <em>-d</em> option, e.g. on tmpfs.  Reportedly the speedup is very noticeable.</p></div>
 <h3 id="_filters">Filters</h3><div style="clear:left"></div>
-<div class="para"><p>The filters are applied in the order as listed below.  The &lt;command&gt;
+<div class="paragraph"><p>The filters are applied in the order as listed below.  The &lt;command&gt;
 argument is always evaluated in the shell context using the <em>eval</em> command
 (with the notable exception of the commit filter, for technical reasons).
 Prior to that, the $GIT_COMMIT environment variable will be set to contain
@@ -370,7 +466,7 @@ and GIT_COMMITTER_DATE are set according to the current commit.  The values
 of these variables after the filters have run, are used for the new commit.
 If any evaluation of &lt;command&gt; returns a non-zero exit status, the whole
 operation will be aborted.</p></div>
-<div class="para"><p>A <em>map</em> function is available that takes an "original sha1 id" argument
+<div class="paragraph"><p>A <em>map</em> function is available that takes an "original sha1 id" argument
 and outputs a "rewritten sha1 id" if the commit has been already
 rewritten, and "original sha1 id" otherwise; the <em>map</em> function can
 return several ids on separate lines if your commit filter emitted
@@ -378,8 +474,8 @@ multiple commits.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --env-filter &lt;command&gt;
 </dt>
 <dd>
@@ -391,7 +487,7 @@ multiple commits.</p></div>
         to re-export the variables.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --tree-filter &lt;command&gt;
 </dt>
 <dd>
@@ -404,7 +500,7 @@ multiple commits.</p></div>
         rules <strong>HAVE ANY EFFECT</strong>!).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --index-filter &lt;command&gt;
 </dt>
 <dd>
@@ -416,12 +512,12 @@ multiple commits.</p></div>
         cases, see <a href="git-update-index.html">git-update-index(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --parent-filter &lt;command&gt;
 </dt>
 <dd>
 <p>
-        This is the filter for rewriting the commit's parent list.
+        This is the filter for rewriting the commit&#8217;s parent list.
         It will receive the parent string on stdin and shall output
         the new parent string on stdout.  The parent string is in
         the format described in <a href="git-commit-tree.html">git-commit-tree(1)</a>: empty for
@@ -429,7 +525,7 @@ multiple commits.</p></div>
         "-p parent1 -p parent2 -p parent3 &#8230;" for a merge commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --msg-filter &lt;command&gt;
 </dt>
 <dd>
@@ -440,7 +536,7 @@ multiple commits.</p></div>
         used as the new commit message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --commit-filter &lt;command&gt;
 </dt>
 <dd>
@@ -451,18 +547,18 @@ multiple commits.</p></div>
         "&lt;TREE_ID&gt; [(-p &lt;PARENT_COMMIT_ID&gt;)&#8230;]" and the log message on
         stdin.  The commit id is expected on stdout.
 </p>
-<div class="para"><p>As a special extension, the commit filter may emit multiple
+<div class="paragraph"><p>As a special extension, the commit filter may emit multiple
 commit ids; in that case, the rewritten children of the original commit will
 have all of them as parents.</p></div>
-<div class="para"><p>You can use the <em>map</em> convenience function in this filter, and other
+<div class="paragraph"><p>You can use the <em>map</em> convenience function in this filter, and other
 convenience functions, too.  For example, calling <em>skip_commit "$@"</em>
 will leave out the current commit (but not its changes! If you want
 that, use <em>git rebase</em> instead).</p></div>
-<div class="para"><p>You can also use the <tt>git_commit_non_empty_tree "$@"</tt> instead of
-<tt>git commit-tree "$@"</tt> if you don't wish to keep commits with a single parent
+<div class="paragraph"><p>You can also use the <tt>git_commit_non_empty_tree "$@"</tt> instead of
+<tt>git commit-tree "$@"</tt> if you don&#8217;t wish to keep commits with a single parent
 and that makes no change to the tree.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --tag-name-filter &lt;command&gt;
 </dt>
 <dd>
@@ -473,11 +569,11 @@ and that makes no change to the tree.</p></div>
         The original tag name is passed via standard input, and the new
         tag name is expected on standard output.
 </p>
-<div class="para"><p>The original tags are not deleted, but can be overwritten;
+<div class="paragraph"><p>The original tags are not deleted, but can be overwritten;
 use "--tag-name-filter cat" to simply update the tags.  In this
 case, be very careful and make sure you have the old tags
 backed up in case the conversion has run afoul.</p></div>
-<div class="para"><p>Nearly proper rewriting of tag objects is supported. If the tag has
+<div class="paragraph"><p>Nearly proper rewriting of tag objects is supported. If the tag has
 a message attached, a new tag object will be created with the same message,
 author, and timestamp. If the tag has a signature attached, the
 signature will be stripped. It is by definition impossible to preserve
@@ -488,7 +584,7 @@ be removed, buyer beware. There is also no support for changing the
 author or timestamp (or the tag message for that matter). Tags which point
 to other tags will be rewritten to point to the underlying commit.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --subdirectory-filter &lt;directory&gt;
 </dt>
 <dd>
@@ -498,7 +594,7 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
         project root. Implies <a href="#Remap_to_ancestor">[Remap_to_ancestor]</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --prune-empty
 </dt>
 <dd>
@@ -513,7 +609,7 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
         happen.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --original &lt;namespace&gt;
 </dt>
 <dd>
@@ -522,7 +618,7 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
         will be stored. The default value is <em>refs/original</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -d &lt;directory&gt;
 </dt>
 <dd>
@@ -535,10 +631,10 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
         that choice by this parameter.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -548,7 +644,7 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
         <em>refs/original/</em>, unless forced.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;rev-list options&gt;&#8230;
 </dt>
 <dd>
@@ -561,24 +657,24 @@ to other tags will be rewritten to point to the underlying commit.</p></div>
 </dd>
 </dl></div>
 <h3 id="Remap_to_ancestor">Remap to ancestor</h3><div style="clear:left"></div>
-<div class="para"><p>By using <a href="rev-list.html">rev-list(1)</a> arguments, e.g., path limiters, you can limit the
+<div class="paragraph"><p>By using <a href="rev-list.html">rev-list(1)</a> arguments, e.g., path limiters, you can limit the
 set of revisions which get rewritten. However, positive refs on the command
-line are distinguished: we don't let them be excluded by such limiters. For
+line are distinguished: we don&#8217;t let them be excluded by such limiters. For
 this purpose, they are instead rewritten to point at the nearest ancestor that
 was not excluded.</p></div>
 </div>
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<div class="para"><p>Suppose you want to remove a file (containing confidential information
+<div class="paragraph"><p>Suppose you want to remove a file (containing confidential information
 or copyright violation) from all commits:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch --tree-filter 'rm filename' HEAD</tt></pre>
 </div></div>
-<div class="para"><p>However, if the file is absent from the tree of some commit,
+<div class="paragraph"><p>However, if the file is absent from the tree of some commit,
 a simple <tt>rm filename</tt> will fail for that tree and commit.
 Thus you may instead want to use <tt>rm -f filename</tt> as the script.</p></div>
-<div class="para"><p>Using <tt>--index-filter</tt> with <em>git rm</em> yields a significantly faster
+<div class="paragraph"><p>Using <tt>--index-filter</tt> with <em>git rm</em> yields a significantly faster
 version.  Like with using <tt>rm filename</tt>, <tt>git rm --cached filename</tt>
 will fail if the file is absent from the tree of a commit.  If you
 want to "completely forget" a file, it does not matter when it entered
@@ -587,24 +683,24 @@ history, so we also add <tt>--ignore-unmatch</tt>:</p></div>
 <div class="content">
 <pre><tt>git filter-branch --index-filter 'git rm --cached --ignore-unmatch filename' HEAD</tt></pre>
 </div></div>
-<div class="para"><p>Now, you will get the rewritten history saved in HEAD.</p></div>
-<div class="para"><p>To rewrite the repository to look as if <tt>foodir/</tt> had been its project
+<div class="paragraph"><p>Now, you will get the rewritten history saved in HEAD.</p></div>
+<div class="paragraph"><p>To rewrite the repository to look as if <tt>foodir/</tt> had been its project
 root, and discard all other history:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch --subdirectory-filter foodir -- --all</tt></pre>
 </div></div>
-<div class="para"><p>Thus you can, e.g., turn a library subdirectory into a repository of
+<div class="paragraph"><p>Thus you can, e.g., turn a library subdirectory into a repository of
 its own.  Note the <tt>--</tt> that separates <em>filter-branch</em> options from
 revision options, and the <tt>--all</tt> to rewrite all branches and tags.</p></div>
-<div class="para"><p>To set a commit (which typically is at the tip of another
+<div class="paragraph"><p>To set a commit (which typically is at the tip of another
 history) to be the parent of the current initial commit, in
 order to paste the other history behind the current history:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch --parent-filter 'sed "s/^\$/-p &lt;graft-id&gt;/"' HEAD</tt></pre>
 </div></div>
-<div class="para"><p>(if the parent string is empty - which happens when we are dealing with
+<div class="paragraph"><p>(if the parent string is empty - which happens when we are dealing with
 the initial commit - add graftcommit as a parent).  Note that this assumes
 history with a single root (that is, no merge without common ancestors
 happened).  If this is not the case, use:</p></div>
@@ -613,13 +709,13 @@ happened).  If this is not the case, use:</p></div>
 <pre><tt>git filter-branch --parent-filter \
         'test $GIT_COMMIT = &lt;commit-id&gt; &amp;&amp; echo "-p &lt;graft-id&gt;" || cat' HEAD</tt></pre>
 </div></div>
-<div class="para"><p>or even simpler:</p></div>
+<div class="paragraph"><p>or even simpler:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>echo "$commit-id $graft-id" &gt;&gt; .git/info/grafts
 git filter-branch $graft-id..HEAD</tt></pre>
 </div></div>
-<div class="para"><p>To remove commits authored by "Darl McBribe" from the history:</p></div>
+<div class="paragraph"><p>To remove commits authored by "Darl McBribe" from the history:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch --commit-filter '
@@ -630,7 +726,7 @@ git filter-branch $graft-id..HEAD</tt></pre>
                 git commit-tree "$@";
         fi' HEAD</tt></pre>
 </div></div>
-<div class="para"><p>The function <em>skip_commit</em> is defined as follows:</p></div>
+<div class="paragraph"><p>The function <em>skip_commit</em> is defined as follows:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>skip_commit()
@@ -644,12 +740,12 @@ git filter-branch $graft-id..HEAD</tt></pre>
         done;
 }</tt></pre>
 </div></div>
-<div class="para"><p>The shift magic first throws away the tree id and then the -p
+<div class="paragraph"><p>The shift magic first throws away the tree id and then the -p
 parameters.  Note that this handles merges properly! In case Darl
 committed a merge between P1 and P2, it will be propagated properly
 and all children of the merge will become merge commits with P1,P2
 as their parents instead of the merge commit.</p></div>
-<div class="para"><p>You can rewrite the commit log messages using <tt>--msg-filter</tt>.  For
+<div class="paragraph"><p>You can rewrite the commit log messages using <tt>--msg-filter</tt>.  For
 example, <em>git svn-id</em> strings in a repository created by <em>git svn</em> can
 be removed this way:</p></div>
 <div class="listingblock">
@@ -658,11 +754,11 @@ be removed this way:</p></div>
         sed -e "/^git-svn-id:/d"
 '</tt></pre>
 </div></div>
-<div class="para"><p>To restrict rewriting to only part of the history, specify a revision
+<div class="paragraph"><p>To restrict rewriting to only part of the history, specify a revision
 range in addition to the new branch name.  The new branch name will
 point to the top-most revision that a <em>git rev-list</em> of this range
 will print.</p></div>
-<div class="para"><p>If you need to add <em>Acked-by</em> lines to, say, the last 10 commits (none
+<div class="paragraph"><p>If you need to add <em>Acked-by</em> lines to, say, the last 10 commits (none
 of which is a merge), use this command:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -671,29 +767,29 @@ of which is a merge), use this command:</p></div>
         echo "Acked-by: Bugs Bunny &lt;bunny@bugzilla.org&gt;"
 ' HEAD~10..HEAD</tt></pre>
 </div></div>
-<div class="para"><p><strong>NOTE</strong> the changes introduced by the commits, and which are not reverted
+<div class="paragraph"><p><strong>NOTE</strong> the changes introduced by the commits, and which are not reverted
 by subsequent commits, will still be in the rewritten branch. If you want
-to throw out _changes_ together with the commits, you should use the
+to throw out <em>changes</em> together with the commits, you should use the
 interactive mode of <em>git rebase</em>.</p></div>
-<div class="para"><p>Consider this history:</p></div>
+<div class="paragraph"><p>Consider this history:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>     D--E--F--G--H
     /     /
 A--B-----C</tt></pre>
 </div></div>
-<div class="para"><p>To rewrite only commits D,E,F,G,H, but leave A, B and C alone, use:</p></div>
+<div class="paragraph"><p>To rewrite only commits D,E,F,G,H, but leave A, B and C alone, use:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch ... C..H</tt></pre>
 </div></div>
-<div class="para"><p>To rewrite commits E,F,G,H, use one of these:</p></div>
+<div class="paragraph"><p>To rewrite commits E,F,G,H, use one of these:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch ... C..H --not D
 git filter-branch ... D..H --not C</tt></pre>
 </div></div>
-<div class="para"><p>To move the whole tree into a subdirectory, or remove it from there:</p></div>
+<div class="paragraph"><p>To move the whole tree into a subdirectory, or remove it from there:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git filter-branch --index-filter \
@@ -705,13 +801,13 @@ git filter-branch ... D..H --not C</tt></pre>
 </div>
 <h2 id="_checklist_for_shrinking_a_repository">Checklist for Shrinking a Repository</h2>
 <div class="sectionbody">
-<div class="para"><p>git-filter-branch is often used to get rid of a subset of files,
+<div class="paragraph"><p>git-filter-branch is often used to get rid of a subset of files,
 usually with some combination of <tt>--index-filter</tt> and
 <tt>--subdirectory-filter</tt>.  People expect the resulting repository to
 be smaller than the original, but you need a few more steps to
 actually make it smaller, because git tries hard not to lose your
 objects until you tell it to.  First make sure that:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 You really removed all variants of a filename, if a blob was moved
@@ -726,9 +822,9 @@ You really filtered all refs: use <tt>--tag-name-filter cat --
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Then there are two ways to get a smaller repository.  A safer way is
+<div class="paragraph"><p>Then there are two ways to get a smaller repository.  A safer way is
 to clone, that keeps your original intact.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Clone it with <tt>git clone file:///path/to/repo</tt>.  The clone
@@ -737,11 +833,11 @@ Clone it with <tt>git clone file:///path/to/repo</tt>.  The clone
 </p>
 </li>
 </ul></div>
-<div class="para"><p>If you really don't want to clone it, for whatever reasons, check the
+<div class="paragraph"><p>If you really don&#8217;t want to clone it, for whatever reasons, check the
 following points instead (in this order).  This is a very destructive
 approach, so <strong>make a backup</strong> or go back to cloning it.  You have been
 warned.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Remove the original refs backed up by git-filter-branch: say <tt>git
@@ -765,20 +861,20 @@ Garbage collect all unreferenced objects with <tt>git gc --prune=now</tt>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Petr "Pasky" Baudis &lt;pasky@suse.cz&gt;,
-and the git list &lt;git@vger.kernel.org&gt;</p></div>
+<div class="paragraph"><p>Written by Petr "Pasky" Baudis &lt;<a href="mailto:pasky@suse.cz">pasky@suse.cz</a>&gt;,
+and the git list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Petr Baudis and the git list.</p></div>
+<div class="paragraph"><p>Documentation by Petr Baudis and the git list.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-22 04:11:06 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

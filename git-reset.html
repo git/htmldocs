@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-reset(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-reset(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,21 +412,23 @@ git-reset(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git reset</em> [-q] [&lt;commit&gt;] [--] &lt;paths&gt;&#8230;
+<div class="verseblock-content"><em>git reset</em> [-q] [&lt;commit&gt;] [--] &lt;paths&gt;&#8230;
 <em>git reset</em> --patch [&lt;commit&gt;] [--] [&lt;paths&gt;&#8230;]
-<em>git reset</em> [--soft | --mixed | --hard | --merge | --keep] [-q] [&lt;commit&gt;]</div></div>
+<em>git reset</em> [--soft | --mixed | --hard | --merge | --keep] [-q] [&lt;commit&gt;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>In the first and second form, copy entries from &lt;commit&gt; to the index.
+<div class="paragraph"><p>In the first and second form, copy entries from &lt;commit&gt; to the index.
 In the third form, set the current branch head (HEAD) to &lt;commit&gt;, optionally
 modifying index and working tree to match.  The &lt;commit&gt; defaults to HEAD
 in all forms.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>git reset</em> [-q] [&lt;commit&gt;] [--] &lt;paths&gt;&#8230;
 </dt>
 <dd>
@@ -341,16 +437,16 @@ in all forms.</p></div>
         state at &lt;commit&gt;.  (It does not affect the working tree, nor
         the current branch.)
 </p>
-<div class="para"><p>This means that <tt>git reset &lt;paths&gt;</tt> is the opposite of <tt>git add
+<div class="paragraph"><p>This means that <tt>git reset &lt;paths&gt;</tt> is the opposite of <tt>git add
 &lt;paths&gt;</tt>.</p></div>
-<div class="para"><p>After running <tt>git reset &lt;paths&gt;</tt> to update the index entry, you can
+<div class="paragraph"><p>After running <tt>git reset &lt;paths&gt;</tt> to update the index entry, you can
 use <a href="git-checkout.html">git-checkout(1)</a> to check the contents out of the index to
 the working tree.
 Alternatively, using <a href="git-checkout.html">git-checkout(1)</a> and specifying a commit, you
 can copy the contents of a path out of a commit to the index and to the
 working tree in one go.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>git reset</em> --patch|-p [&lt;commit&gt;] [--] [&lt;paths&gt;&#8230;]
 </dt>
 <dd>
@@ -359,10 +455,10 @@ working tree in one go.</p></div>
         and &lt;commit&gt; (defaults to HEAD).  The chosen hunks are applied
         in reverse to the index.
 </p>
-<div class="para"><p>This means that <tt>git reset -p</tt> is the opposite of <tt>git add -p</tt> (see
+<div class="paragraph"><p>This means that <tt>git reset -p</tt> is the opposite of <tt>git add -p</tt> (see
 <a href="git-add.html">git-add(1)</a>).</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>git reset</em> [--&lt;mode&gt;] [&lt;commit&gt;]
 </dt>
 <dd>
@@ -372,8 +468,8 @@ working tree in one go.</p></div>
         the working tree depending on &lt;mode&gt;, which
         must be one of the following:
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --soft
 </dt>
 <dd>
@@ -384,7 +480,7 @@ working tree in one go.</p></div>
         would put it.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --mixed
 </dt>
 <dd>
@@ -394,7 +490,7 @@ working tree in one go.</p></div>
         been updated. This is the default action.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --hard
 </dt>
 <dd>
@@ -403,7 +499,7 @@ working tree in one go.</p></div>
         working tree since &lt;commit&gt; are discarded.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --merge
 </dt>
 <dd>
@@ -413,12 +509,12 @@ working tree in one go.</p></div>
         different between the index and working tree (i.e. which have changes
         which have not been added).
         If a file that is different between &lt;commit&gt; and the index has unstaged
-        changes, reset is aborted.<br />
-In other words, --merge does something like a <em>git read-tree -u -m &lt;commit&gt;</em>,
-but carries forward unmerged index entries.
+        changes, reset is aborted.
 </p>
+<div class="paragraph"><p>In other words, --merge does something like a <em>git read-tree -u -m &lt;commit&gt;</em>,
+but carries forward unmerged index entries.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --keep
 </dt>
 <dd>
@@ -428,24 +524,24 @@ but carries forward unmerged index entries.
         which are different between HEAD and the working tree (i.e.
         which have local changes).
         If a file that is different between &lt;commit&gt; and HEAD has local changes,
-        reset is aborted.<br />
-In other words, --keep does a 2-way merge between &lt;commit&gt; and HEAD followed by
-<em>git reset --mixed &lt;commit&gt;</em>.
+        reset is aborted.
 </p>
+<div class="paragraph"><p>In other words, --keep does a 2-way merge between &lt;commit&gt; and HEAD followed by
+<em>git reset --mixed &lt;commit&gt;</em>.</p></div>
 </dd>
 </dl></div>
 </dd>
 </dl></div>
-<div class="para"><p>If you want to undo a commit other than the latest on a branch,
+<div class="paragraph"><p>If you want to undo a commit other than the latest on a branch,
 <a href="git-revert.html">git-revert(1)</a> is your friend.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -457,20 +553,20 @@ In other words, --keep does a 2-way merge between &lt;commit&gt; and HEAD follow
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 Undo add
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ edit                                     <b>(1)</b>
+<pre><tt>$ edit                                     <b>&lt;1&gt;</b>
 $ git add frotz.c filfre.c
-$ mailx                                    <b>(2)</b>
-$ git reset                                <b>(3)</b>
-$ git pull git://info.example.com/ nitfol  <b>(4)</b></tt></pre>
+$ mailx                                    <b>&lt;2&gt;</b>
+$ git reset                                <b>&lt;3&gt;</b>
+$ git pull git://info.example.com/ nitfol  <b>&lt;4&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 You are happily working on something, and find the changes
@@ -501,18 +597,18 @@ changes still in the working tree.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Undo a commit and redo
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit ...
-$ git reset --soft HEAD^      <b>(1)</b>
-$ edit                        <b>(2)</b>
-$ git commit -a -c ORIG_HEAD  <b>(3)</b></tt></pre>
+$ git reset --soft HEAD^      <b>&lt;1&gt;</b>
+$ edit                        <b>&lt;2&gt;</b>
+$ git commit -a -c ORIG_HEAD  <b>&lt;3&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 This is most often done when you remembered what you
@@ -531,21 +627,21 @@ Make corrections to working tree files.
 commit by starting with its log message.  If you do not need to
 edit the message further, you can give -C option instead.
 </p>
-<div class="para"><p>See also the --amend option to <a href="git-commit.html">git-commit(1)</a>.</p></div>
+<div class="paragraph"><p>See also the --amend option to <a href="git-commit.html">git-commit(1)</a>.</p></div>
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Undo a commit, making it a topic branch
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git branch topic/wip     <b>(1)</b>
-$ git reset --hard HEAD~3  <b>(2)</b>
-$ git checkout topic/wip   <b>(3)</b></tt></pre>
+<pre><tt>$ git branch topic/wip     <b>&lt;1&gt;</b>
+$ git reset --hard HEAD~3  <b>&lt;2&gt;</b>
+$ git checkout topic/wip   <b>&lt;3&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 You have made some commits, but realize they were premature
@@ -566,16 +662,16 @@ Switch to "topic/wip" branch and keep working.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Undo commits permanently
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit ...
-$ git reset --hard HEAD~3   <b>(1)</b></tt></pre>
+$ git reset --hard HEAD~3   <b>&lt;1&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 The last three commits (HEAD, HEAD^, and HEAD~2) were bad
@@ -587,23 +683,23 @@ the implications of doing so.)
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Undo a merge or pull
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull                         <b>(1)</b>
+<pre><tt>$ git pull                         <b>&lt;1&gt;</b>
 Auto-merging nitfol
 CONFLICT (content): Merge conflict in nitfol
 Automatic merge failed; fix conflicts and then commit the result.
-$ git reset --hard                 <b>(2)</b>
-$ git pull . topic/branch          <b>(3)</b>
+$ git reset --hard                 <b>&lt;2&gt;</b>
+$ git pull . topic/branch          <b>&lt;3&gt;</b>
 Updating from 41223... to 13134...
 Fast-forward
-$ git reset --hard ORIG_HEAD       <b>(4)</b></tt></pre>
+$ git reset --hard ORIG_HEAD       <b>&lt;4&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 Try to update from the upstream resulted in a lot of
@@ -635,20 +731,20 @@ and resets the tip of the branch to that commit.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Undo a merge or pull inside a dirty working tree
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull                         <b>(1)</b>
+<pre><tt>$ git pull                         <b>&lt;1&gt;</b>
 Auto-merging nitfol
 Merge made by recursive.
  nitfol                |   20 +++++----
  ...
-$ git reset --merge ORIG_HEAD      <b>(2)</b></tt></pre>
+$ git reset --merge ORIG_HEAD      <b>&lt;2&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 Even if you may have local modifications in your
@@ -668,11 +764,11 @@ want.  "git reset --merge" keeps your local changes.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Interrupted workflow
 </dt>
 <dd>
-<div class="para"><p>Suppose you are interrupted by an urgent fix request while you
+<div class="paragraph"><p>Suppose you are interrupted by an urgent fix request while you
 are in the middle of a large change.  The files in your
 working tree are not in any shape to be committed yet, but you
 need to get to the other branch for a quick bugfix.</p></div>
@@ -680,15 +776,15 @@ need to get to the other branch for a quick bugfix.</p></div>
 <div class="content">
 <pre><tt>$ git checkout feature ;# you were working in "feature" branch and
 $ work work work       ;# got interrupted
-$ git commit -a -m "snapshot WIP"                 <b>(1)</b>
+$ git commit -a -m "snapshot WIP"                 <b>&lt;1&gt;</b>
 $ git checkout master
 $ fix fix fix
 $ git commit ;# commit with real log
 $ git checkout feature
-$ git reset --soft HEAD^ ;# go back to WIP state  <b>(2)</b>
-$ git reset                                       <b>(3)</b></tt></pre>
+$ git reset --soft HEAD^ ;# go back to WIP state  <b>&lt;2&gt;</b>
+$ git reset                                       <b>&lt;3&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 This commit will get blown away so a throw-away log message is OK.
@@ -706,24 +802,24 @@ At this point the index file still has all the WIP changes you
     committed as <em>snapshot WIP</em>.  This updates the index to show your
     WIP files as uncommitted.
 </p>
-<div class="para"><p>See also <a href="git-stash.html">git-stash(1)</a>.</p></div>
+<div class="paragraph"><p>See also <a href="git-stash.html">git-stash(1)</a>.</p></div>
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Reset a single file in the index
 </dt>
 <dd>
-<div class="para"><p>Suppose you have added a file to your index, but later decide you do not
+<div class="paragraph"><p>Suppose you have added a file to your index, but later decide you do not
 want to add it to your commit. You can remove the file from the index
 while keeping your changes with git reset.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git reset -- frotz.c                      <b>(1)</b>
-$ git commit -m "Commit files in index"     <b>(2)</b>
-$ git add frotz.c                           <b>(3)</b></tt></pre>
+<pre><tt>$ git reset -- frotz.c                      <b>&lt;1&gt;</b>
+$ git commit -m "Commit files in index"     <b>&lt;2&gt;</b>
+$ git add frotz.c                           <b>&lt;3&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 This removes the file from the index while keeping it in the working
@@ -742,11 +838,11 @@ Adds the file to the index again.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Keep changes in working tree while discarding some previous commits
 </dt>
 <dd>
-<div class="para"><p>Suppose you are working on something and you commit it, and then you
+<div class="paragraph"><p>Suppose you are working on something and you commit it, and then you
 continue working a bit more, but now you think that what you have in
 your working tree should be in another branch that has nothing to do
 with what you committed previously. You can start a new branch and
@@ -756,12 +852,12 @@ reset it while keeping the changes in your working tree.</p></div>
 <pre><tt>$ git tag start
 $ git checkout -b branch1
 $ edit
-$ git commit ...                            <b>(1)</b>
+$ git commit ...                            <b>&lt;1&gt;</b>
 $ edit
-$ git checkout -b branch2                   <b>(2)</b>
-$ git reset --keep start                    <b>(3)</b></tt></pre>
+$ git checkout -b branch2                   <b>&lt;2&gt;</b>
+$ git reset --keep start                    <b>&lt;3&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 This commits your first edits in branch1.
@@ -787,14 +883,14 @@ But you can use "reset --keep" to remove the unwanted commit after
 </div>
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<div class="para"><p>The tables below show what happens when running:</p></div>
+<div class="paragraph"><p>The tables below show what happens when running:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>git reset --option target</tt></pre>
 </div></div>
-<div class="para"><p>to reset the HEAD to another commit (<tt>target</tt>) with the different
+<div class="paragraph"><p>to reset the HEAD to another commit (<tt>target</tt>) with the different
 reset options depending on the state of the files.</p></div>
-<div class="para"><p>In these tables, A, B, C and D are some different states of a
+<div class="paragraph"><p>In these tables, A, B, C and D are some different states of a
 file. For example, the first line of the first table means that if a
 file is in state A in the working tree, in state B in the index, in
 state C in HEAD and in state D in the target, then "git reset --soft
@@ -862,7 +958,7 @@ in state D).</p></div>
                           --merge  B       C     C
                           --keep   B       C     C</tt></pre>
 </div></div>
-<div class="para"><p>"reset --merge" is meant to be used when resetting out of a conflicted
+<div class="paragraph"><p>"reset --merge" is meant to be used when resetting out of a conflicted
 merge. Any mergy operation guarantees that the working tree file that is
 involved in the merge does not have local change wrt the index before
 it starts, and that it writes the result out to the working tree. So if
@@ -870,15 +966,15 @@ we see some difference between the index and the target and also
 between the index and the working tree, then it means that we are not
 resetting out from a state that a mergy operation left after failing
 with a conflict. That is why we disallow --merge option in this case.</p></div>
-<div class="para"><p>"reset --keep" is meant to be used when removing some of the last
+<div class="paragraph"><p>"reset --keep" is meant to be used when removing some of the last
 commits in the current branch while keeping changes in the working
 tree. If there could be conflicts between the changes in the commit we
 want to remove and the changes in the working tree we want to keep,
-the reset is disallowed. That's why it is disallowed if there are both
+the reset is disallowed. That&#8217;s why it is disallowed if there are both
 changes between the working tree and HEAD, and between HEAD and the
 target. To be safe, it is also disallowed when there are unmerged
 entries.</p></div>
-<div class="para"><p>The following tables show what happens when there are unmerged
+<div class="paragraph"><p>The following tables show what happens when there are unmerged
 entries:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -900,23 +996,23 @@ entries:</p></div>
                           --merge  A       A     A
                           --keep  (disallowed)</tt></pre>
 </div></div>
-<div class="para"><p>X means any state and U means an unmerged index.</p></div>
+<div class="paragraph"><p>X means any state and U means an unmerged index.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt; and Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
+<div class="paragraph"><p>Written by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt; and Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-07 00:00:53 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

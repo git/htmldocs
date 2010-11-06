@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-push(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-push(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,25 +412,27 @@ git-push(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git push</em> [--all | --mirror | --tags] [-n | --dry-run] [--receive-pack=&lt;git-receive-pack&gt;]
+<div class="verseblock-content"><em>git push</em> [--all | --mirror | --tags] [-n | --dry-run] [--receive-pack=&lt;git-receive-pack&gt;]
            [--repo=&lt;repository&gt;] [-f | --force] [-v | --verbose] [-u | --set-upstream]
-           [&lt;repository&gt; [&lt;refspec&gt;&#8230;]]</div></div>
+           [&lt;repository&gt; [&lt;refspec&gt;&#8230;]]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Updates remote refs using local refs, while sending objects
+<div class="paragraph"><p>Updates remote refs using local refs, while sending objects
 necessary to complete the given refs.</p></div>
-<div class="para"><p>You can make interesting things happen to a repository
+<div class="paragraph"><p>You can make interesting things happen to a repository
 every time you push into it, by setting up <em>hooks</em> there.  See
 documentation for <a href="git-receive-pack.html">git-receive-pack(1)</a>.</p></div>
 </div>
 <h2 id="_options_a_id_options_a">OPTIONS<a id="OPTIONS"></a></h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 &lt;repository&gt;
 </dt>
 <dd>
@@ -347,7 +443,7 @@ documentation for <a href="git-receive-pack.html">git-receive-pack(1)</a>.</p></
         of a remote (see the section <a href="#REMOTES">REMOTES</a> below).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;refspec&gt;&#8230;
 </dt>
 <dd>
@@ -358,30 +454,30 @@ documentation for <a href="git-receive-pack.html">git-receive-pack(1)</a>.</p></
         It is used to specify with what &lt;src&gt; object the &lt;dst&gt; ref
         in the remote repository is to be updated.
 </p>
-<div class="para"><p>The &lt;src&gt; is often the name of the branch you would want to push, but
+<div class="paragraph"><p>The &lt;src&gt; is often the name of the branch you would want to push, but
 it can be any arbitrary "SHA-1 expression", such as <tt>master~4</tt> or
 <tt>HEAD</tt> (see <a href="gitrevisions.html">gitrevisions(7)</a>).</p></div>
-<div class="para"><p>The &lt;dst&gt; tells which ref on the remote side is updated with this
+<div class="paragraph"><p>The &lt;dst&gt; tells which ref on the remote side is updated with this
 push. Arbitrary expressions cannot be used here, an actual ref must
 be named. If <tt>:</tt>&lt;dst&gt; is omitted, the same ref as &lt;src&gt; will be
 updated.</p></div>
-<div class="para"><p>The object referenced by &lt;src&gt; is used to update the &lt;dst&gt; reference
+<div class="paragraph"><p>The object referenced by &lt;src&gt; is used to update the &lt;dst&gt; reference
 on the remote side, but by default this is only allowed if the
 update can fast-forward &lt;dst&gt;.  By having the optional leading <tt>&#43;</tt>,
 you can tell git to update the &lt;dst&gt; ref even when the update is not a
 fast-forward.  This does <strong>not</strong> attempt to merge &lt;src&gt; into &lt;dst&gt;.  See
 EXAMPLES below for details.</p></div>
-<div class="para"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>.</p></div>
-<div class="para"><p>Pushing an empty &lt;src&gt; allows you to delete the &lt;dst&gt; ref from
+<div class="paragraph"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>.</p></div>
+<div class="paragraph"><p>Pushing an empty &lt;src&gt; allows you to delete the &lt;dst&gt; ref from
 the remote repository.</p></div>
-<div class="para"><p>The special refspec <tt>:</tt> (or <tt>&#43;:</tt> to allow non-fast-forward updates)
+<div class="paragraph"><p>The special refspec <tt>:</tt> (or <tt>&#43;:</tt> to allow non-fast-forward updates)
 directs git to push "matching" branches: for every branch that exists on
 the local side, the remote side is updated if a branch of the same name
 already exists on the remote side.  This is the default operation mode
 if no explicit refspec is found (that is neither on the command line
 nor in any Push line of the corresponding remotes file---see below).</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --all
 </dt>
 <dd>
@@ -390,7 +486,7 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         refs under <tt>refs/heads/</tt> be pushed.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --mirror
 </dt>
 <dd>
@@ -406,10 +502,10 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         set.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -n
 </dt>
-<dt>
+<dt class="hdlist1">
 --dry-run
 </dt>
 <dd>
@@ -417,7 +513,7 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         Do everything except actually send the updates.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --porcelain
 </dt>
 <dd>
@@ -427,7 +523,7 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         symbolic names of the refs will be given.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --delete
 </dt>
 <dd>
@@ -436,7 +532,7 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         the same as prefixing all refs with a colon.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --tags
 </dt>
 <dd>
@@ -446,10 +542,10 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         line.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --receive-pack=&lt;git-receive-pack&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --exec=&lt;git-receive-pack&gt;
 </dt>
 <dd>
@@ -460,10 +556,10 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         a directory on the default $PATH.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -474,7 +570,7 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
         remote repository to lose commits; use it with care.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --repo=&lt;repository&gt;
 </dt>
 <dd>
@@ -492,14 +588,14 @@ nor in any Push line of the corresponding remotes file---see below).</p></div>
 <pre><tt>git push public         #1
 git push --repo=public  #2</tt></pre>
 </div></div>
-<div class="para"><p>is that #1 always pushes to "public" whereas #2 pushes to "public"
+<div class="paragraph"><p>is that #1 always pushes to "public" whereas #2 pushes to "public"
 only if the current branch does not track a remote branch. This is
 useful if you write an alias or script around <em>git push</em>.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -u
 </dt>
-<dt>
+<dt class="hdlist1">
 --set-upstream
 </dt>
 <dd>
@@ -510,10 +606,10 @@ useful if you write an alias or script around <em>git push</em>.</p></div>
         see <em>branch.&lt;name&gt;.merge</em> in <a href="git-config.html">git-config(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --thin
 </dt>
-<dt>
+<dt class="hdlist1">
 --no-thin
 </dt>
 <dd>
@@ -524,10 +620,10 @@ useful if you write an alias or script around <em>git push</em>.</p></div>
         --thin.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -537,10 +633,10 @@ useful if you write an alias or script around <em>git push</em>.</p></div>
         error stream.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -v
 </dt>
-<dt>
+<dt class="hdlist1">
 --verbose
 </dt>
 <dd>
@@ -548,7 +644,7 @@ useful if you write an alias or script around <em>git push</em>.</p></div>
         Run verbosely.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --progress
 </dt>
 <dd>
@@ -563,13 +659,13 @@ useful if you write an alias or script around <em>git push</em>.</p></div>
 </div>
 <h2 id="_git_urls_a_id_urls_a">GIT URLS<a id="URLS"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>In general, URLs contain information about the transport protocol, the
+<div class="paragraph"><p>In general, URLs contain information about the transport protocol, the
 address of the remote server, and the path to the repository.
 Depending on the transport protocol, some of this information may be
 absent.</p></div>
-<div class="para"><p>Git natively supports ssh, git, http, https, ftp, ftps, and rsync
+<div class="paragraph"><p>Git natively supports ssh, git, http, https, ftp, ftps, and rsync
 protocols. The following syntaxes may be used with them:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 ssh://&#91;user@&#93;host.xz&#91;:port&#93;/path/to/repo.git/
@@ -596,16 +692,16 @@ rsync://host.xz/path/to/repo.git/
 </p>
 </li>
 </ul></div>
-<div class="para"><p>An alternative scp-like syntax may also be used with the ssh protocol:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>An alternative scp-like syntax may also be used with the ssh protocol:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 &#91;user@&#93;host.xz:path/to/repo.git/
 </p>
 </li>
 </ul></div>
-<div class="para"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 ssh://&#91;user@&#93;host.xz&#91;:port&#93;/~&#91;user&#93;/path/to/repo.git/
@@ -622,9 +718,9 @@ git://host.xz&#91;:port&#93;/~&#91;user&#93;/path/to/repo.git/
 </p>
 </li>
 </ul></div>
-<div class="para"><p>For local repositories, also supported by git natively, the following
+<div class="paragraph"><p>For local repositories, also supported by git natively, the following
 syntaxes may be used:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 /path/to/repo.git/
@@ -632,28 +728,28 @@ syntaxes may be used:</p></div>
 </li>
 <li>
 <p>
-file:///path/to/repo.git/
+<a href="file:///path/to/repo.git/">file:///path/to/repo.git/</a>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>These two syntaxes are mostly equivalent, except when cloning, when
+<div class="paragraph"><p>These two syntaxes are mostly equivalent, except when cloning, when
 the former implies --local option. See <a href="git-clone.html">git-clone(1)</a> for
 details.</p></div>
-<div class="para"><p>When git doesn't know how to handle a certain transport protocol, it
+<div class="paragraph"><p>When git doesn&#8217;t know how to handle a certain transport protocol, it
 attempts to use the <em>remote-&lt;transport&gt;</em> remote helper, if one
 exists. To explicitly request a remote helper, the following syntax
 may be used:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 &lt;transport&gt;::&lt;address&gt;
 </p>
 </li>
 </ul></div>
-<div class="para"><p>where &lt;address&gt; may be a path, a server and path, or an arbitrary
+<div class="paragraph"><p>where &lt;address&gt; may be a path, a server and path, or an arbitrary
 URL-like string recognized by the specific remote helper being
 invoked. See <a href="git-remote-helpers.html">git-remote-helpers(1)</a> for details.</p></div>
-<div class="para"><p>If there are a large number of similarly-named remote repositories and
+<div class="paragraph"><p>If there are a large number of similarly-named remote repositories and
 you want to use a different format for them (such that the URLs you
 use will be rewritten into URLs that work), you can create a
 configuration section of the form:</p></div>
@@ -662,37 +758,37 @@ configuration section of the form:</p></div>
 <pre><tt>        [url "&lt;actual url base&gt;"]
                 insteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
-<div class="para"><p>For example, with this:</p></div>
+<div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
                 insteadOf = work:</tt></pre>
 </div></div>
-<div class="para"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
+<div class="paragraph"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
-<div class="para"><p>If you want to rewrite URLs for push only, you can create a
+<div class="paragraph"><p>If you want to rewrite URLs for push only, you can create a
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "&lt;actual url base&gt;"]
                 pushInsteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
-<div class="para"><p>For example, with this:</p></div>
+<div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "ssh://example.org/"]
                 pushInsteadOf = git://example.org/</tt></pre>
 </div></div>
-<div class="para"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
+<div class="paragraph"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
 "ssh://example.org/path/to/repo.git" for pushes, but pulls will still
 use the original URL.</p></div>
 </div>
 <h2 id="_remotes_a_id_remotes_a">REMOTES<a id="REMOTES"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>The name of one of the following can be used instead
+<div class="paragraph"><p>The name of one of the following can be used instead
 of a URL as <tt>&lt;repository&gt;</tt> argument:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 a remote in the git configuration file: <tt>$GIT_DIR/config</tt>,
@@ -709,10 +805,10 @@ a file in the <tt>$GIT_DIR/branches</tt> directory.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>All of these also allow you to omit the refspec from the command line
+<div class="paragraph"><p>All of these also allow you to omit the refspec from the command line
 because they each contain a refspec which git will use by default.</p></div>
 <h3 id="_named_remote_in_configuration_file">Named remote in configuration file</h3><div style="clear:left"></div>
-<div class="para"><p>You can choose to provide the name of a remote which you had previously
+<div class="paragraph"><p>You can choose to provide the name of a remote which you had previously
 configured using <a href="git-remote.html">git-remote(1)</a>, <a href="git-config.html">git-config(1)</a>
 or even by a manual edit to the <tt>$GIT_DIR/config</tt> file.  The URL of
 this remote will be used to access the repository.  The refspec
@@ -727,10 +823,10 @@ config file would appear like this:</p></div>
                 push = &lt;refspec&gt;
                 fetch = &lt;refspec&gt;</tt></pre>
 </div></div>
-<div class="para"><p>The <tt>&lt;pushurl&gt;</tt> is used for pushes only. It is optional and defaults
+<div class="paragraph"><p>The <tt>&lt;pushurl&gt;</tt> is used for pushes only. It is optional and defaults
 to <tt>&lt;url&gt;</tt>.</p></div>
 <h3 id="_named_file_in_tt_git_dir_remotes_tt">Named file in <tt>$GIT_DIR/remotes</tt></h3><div style="clear:left"></div>
-<div class="para"><p>You can choose to provide the name of a
+<div class="paragraph"><p>You can choose to provide the name of a
 file in <tt>$GIT_DIR/remotes</tt>.  The URL
 in this file will be used to access the repository.  The refspec
 in this file will be used as default when you do not
@@ -740,15 +836,14 @@ following format:</p></div>
 <div class="content">
 <pre><tt>        URL: one of the above URL format
         Push: &lt;refspec&gt;
-        Pull: &lt;refspec&gt;
-</tt></pre>
+        Pull: &lt;refspec&gt;</tt></pre>
 </div></div>
-<div class="para"><p><tt>Push:</tt> lines are used by <em>git push</em> and
+<div class="paragraph"><p><tt>Push:</tt> lines are used by <em>git push</em> and
 <tt>Pull:</tt> lines are used by <em>git pull</em> and <em>git fetch</em>.
 Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
 be specified for additional branch mappings.</p></div>
 <h3 id="_named_file_in_tt_git_dir_branches_tt">Named file in <tt>$GIT_DIR/branches</tt></h3><div style="clear:left"></div>
-<div class="para"><p>You can choose to provide the name of a
+<div class="paragraph"><p>You can choose to provide the name of a
 file in <tt>$GIT_DIR/branches</tt>.
 The URL in this file will be used to access the repository.
 This file should have the following format:</p></div>
@@ -756,17 +851,17 @@ This file should have the following format:</p></div>
 <div class="content">
 <pre><tt>        &lt;url&gt;#&lt;head&gt;</tt></pre>
 </div></div>
-<div class="para"><p><tt>&lt;url&gt;</tt> is required; <tt>#&lt;head&gt;</tt> is optional.</p></div>
-<div class="para"><p>Depending on the operation, git will use one of the following
-refspecs, if you don't provide one on the command line.
+<div class="paragraph"><p><tt>&lt;url&gt;</tt> is required; <tt>#&lt;head&gt;</tt> is optional.</p></div>
+<div class="paragraph"><p>Depending on the operation, git will use one of the following
+refspecs, if you don&#8217;t provide one on the command line.
 <tt>&lt;branch&gt;</tt> is the name of this file in <tt>$GIT_DIR/branches</tt> and
 <tt>&lt;head&gt;</tt> defaults to <tt>master</tt>.</p></div>
-<div class="para"><p>git fetch uses:</p></div>
+<div class="paragraph"><p>git fetch uses:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</tt></pre>
 </div></div>
-<div class="para"><p>git push uses:</p></div>
+<div class="paragraph"><p>git push uses:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        HEAD:refs/heads/&lt;head&gt;</tt></pre>
@@ -774,82 +869,82 @@ refspecs, if you don't provide one on the command line.
 </div>
 <h2 id="_output">OUTPUT</h2>
 <div class="sectionbody">
-<div class="para"><p>The output of "git push" depends on the transport method used; this
+<div class="paragraph"><p>The output of "git push" depends on the transport method used; this
 section describes the output when pushing over the git protocol (either
 locally or via ssh).</p></div>
-<div class="para"><p>The status of the push is output in tabular form, with each line
+<div class="paragraph"><p>The status of the push is output in tabular form, with each line
 representing the status of a single ref. Each line is of the form:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt> &lt;flag&gt; &lt;summary&gt; &lt;from&gt; -&gt; &lt;to&gt; (&lt;reason&gt;)</tt></pre>
 </div></div>
-<div class="para"><p>If --porcelain is used, then each line of the output is of the form:</p></div>
+<div class="paragraph"><p>If --porcelain is used, then each line of the output is of the form:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt> &lt;flag&gt; \t &lt;from&gt;:&lt;to&gt; \t &lt;summary&gt; (&lt;reason&gt;)</tt></pre>
 </div></div>
-<div class="para"><p>The status of up-to-date refs is shown only if --porcelain or --verbose
+<div class="paragraph"><p>The status of up-to-date refs is shown only if --porcelain or --verbose
 option is used.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 flag
 </dt>
 <dd>
 <p>
         A single character indicating the status of the ref:
 </p>
-<div class="hlist"><table>
-<tr>
-<td class="hlist1">
+<div class="dlist"><dl>
+<dt class="hdlist1">
 (space)
-</td>
-<td class="hlist2">
+</dt>
+<dd>
+<p>
 for a successfully pushed fast-forward;
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-<tt>&#43;</tt>
-</td>
-<td class="hlist2">
-for a successful forced update;
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-<tt>-</tt>
-</td>
-<td class="hlist2">
-for a successfully deleted ref;
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-<tt>*</tt>
-</td>
-<td class="hlist2">
-for a successfully pushed new ref;
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-<tt>!</tt>
-</td>
-<td class="hlist2">
-for a ref that was rejected or failed to push; and
-</td>
-</tr>
-<tr>
-<td class="hlist1">
-<tt>=</tt>
-</td>
-<td class="hlist2">
-for a ref that was up to date and did not need pushing.
-</td>
-</tr>
-</table></div>
+</p>
 </dd>
-<dt>
+<dt class="hdlist1">
+<tt>&#43;</tt>
+</dt>
+<dd>
+<p>
+for a successful forced update;
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>-</tt>
+</dt>
+<dd>
+<p>
+for a successfully deleted ref;
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>*</tt>
+</dt>
+<dd>
+<p>
+for a successfully pushed new ref;
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>!</tt>
+</dt>
+<dd>
+<p>
+for a ref that was rejected or failed to push; and
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>=</tt>
+</dt>
+<dd>
+<p>
+for a ref that was up to date and did not need pushing.
+</p>
+</dd>
+</dl></div>
+</dd>
+<dt class="hdlist1">
 summary
 </dt>
 <dd>
@@ -859,9 +954,9 @@ summary
         <tt>git log</tt> (this is <tt>&lt;old&gt;..&lt;new&gt;</tt> in most cases, and
         <tt>&lt;old&gt;...&lt;new&gt;</tt> for forced non-fast-forward updates).
 </p>
-<div class="para"><p>For a failed update, more details are given:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>For a failed update, more details are given:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 rejected
 </dt>
 <dd>
@@ -870,7 +965,7 @@ rejected
         is not a fast-forward and you did not force the update.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 remote rejected
 </dt>
 <dd>
@@ -884,7 +979,7 @@ remote rejected
         <tt>receive.denyDeleteCurrent</tt>.  See <a href="git-config.html">git-config(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 remote failure
 </dt>
 <dd>
@@ -896,7 +991,7 @@ remote failure
 </dd>
 </dl></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 from
 </dt>
 <dd>
@@ -906,7 +1001,7 @@ from
         name of the local ref is omitted.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 to
 </dt>
 <dd>
@@ -915,7 +1010,7 @@ to
         <tt>refs/&lt;type&gt;/</tt> prefix.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 reason
 </dt>
 <dd>
@@ -929,66 +1024,60 @@ reason
 </div>
 <h2 id="_note_about_fast_forwards">Note about fast-forwards</h2>
 <div class="sectionbody">
-<div class="para"><p>When an update changes a branch (or more in general, a ref) that used to
+<div class="paragraph"><p>When an update changes a branch (or more in general, a ref) that used to
 point at commit A to point at another commit B, it is called a
 fast-forward update if and only if B is a descendant of A.</p></div>
-<div class="para"><p>In a fast-forward update from A to B, the set of commits that the original
+<div class="paragraph"><p>In a fast-forward update from A to B, the set of commits that the original
 commit A built on top of is a subset of the commits the new commit B
 builds on top of.  Hence, it does not lose any history.</p></div>
-<div class="para"><p>In contrast, a non-fast-forward update will lose history.  For example,
+<div class="paragraph"><p>In contrast, a non-fast-forward update will lose history.  For example,
 suppose you and somebody else started at the same commit X, and you built
 a history leading to commit B while the other person built a history
 leading to commit A.  The history looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>
-      B
+<pre><tt>      B
      /
- ---X---A
-</tt></pre>
+ ---X---A</tt></pre>
 </div></div>
-<div class="para"><p>Further suppose that the other person already pushed changes leading to A
+<div class="paragraph"><p>Further suppose that the other person already pushed changes leading to A
 back to the original repository you two obtained the original commit X.</p></div>
-<div class="para"><p>The push done by the other person updated the branch that used to point at
+<div class="paragraph"><p>The push done by the other person updated the branch that used to point at
 commit X to point at commit A.  It is a fast-forward.</p></div>
-<div class="para"><p>But if you try to push, you will attempt to update the branch (that
-now points at A) with commit B.  This does _not_ fast-forward.  If you did
+<div class="paragraph"><p>But if you try to push, you will attempt to update the branch (that
+now points at A) with commit B.  This does <em>not</em> fast-forward.  If you did
 so, the changes introduced by commit A will be lost, because everybody
 will now start building on top of B.</p></div>
-<div class="para"><p>The command by default does not allow an update that is not a fast-forward
+<div class="paragraph"><p>The command by default does not allow an update that is not a fast-forward
 to prevent such loss of history.</p></div>
-<div class="para"><p>If you do not want to lose your work (history from X to B) nor the work by
+<div class="paragraph"><p>If you do not want to lose your work (history from X to B) nor the work by
 the other person (history from X to A), you would need to first fetch the
 history from the repository, create a history that contains changes done
 by both parties, and push the result back.</p></div>
-<div class="para"><p>You can perform "git pull", resolve potential conflicts, and "git push"
+<div class="paragraph"><p>You can perform "git pull", resolve potential conflicts, and "git push"
 the result.  A "git pull" will create a merge commit C between commits A
 and B.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>
-      B---C
+<pre><tt>      B---C
      /   /
- ---X---A
-</tt></pre>
+ ---X---A</tt></pre>
 </div></div>
-<div class="para"><p>Updating A with the resulting merge commit will fast-forward and your
+<div class="paragraph"><p>Updating A with the resulting merge commit will fast-forward and your
 push will be accepted.</p></div>
-<div class="para"><p>Alternatively, you can rebase your change between X and B on top of A,
+<div class="paragraph"><p>Alternatively, you can rebase your change between X and B on top of A,
 with "git pull --rebase", and push the result back.  The rebase will
 create a new commit D that builds the change between X and B on top of
 A.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>
-      B   D
+<pre><tt>      B   D
      /   /
- ---X---A
-</tt></pre>
+ ---X---A</tt></pre>
 </div></div>
-<div class="para"><p>Again, updating A with this commit will fast-forward and your push will be
+<div class="paragraph"><p>Again, updating A with this commit will fast-forward and your push will be
 accepted.</p></div>
-<div class="para"><p>There is another common situation where you may encounter non-fast-forward
+<div class="paragraph"><p>There is another common situation where you may encounter non-fast-forward
 rejection when you try to push, and it is possible even when you are
 pushing into a repository nobody else pushes into. After you push commit
 A yourself (in the first picture in this section), replace it with "git
@@ -1001,18 +1090,18 @@ a case where you do mean to lose history.</p></div>
 </div>
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 git push
 </dt>
 <dd>
 <p>
         Works like <tt>git push &lt;remote&gt;</tt>, where &lt;remote&gt; is the
-        current branch's remote (or <tt>origin</tt>, if no remote is
+        current branch&#8217;s remote (or <tt>origin</tt>, if no remote is
         configured for the current branch).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin
 </dt>
 <dd>
@@ -1020,15 +1109,15 @@ git push origin
         Without additional configuration, works like
         <tt>git push origin :</tt>.
 </p>
-<div class="para"><p>The default behavior of this command when no &lt;refspec&gt; is given can be
+<div class="paragraph"><p>The default behavior of this command when no &lt;refspec&gt; is given can be
 configured by setting the <tt>push</tt> option of the remote.</p></div>
-<div class="para"><p>For example, to default to pushing only the current branch to <tt>origin</tt>
+<div class="paragraph"><p>For example, to default to pushing only the current branch to <tt>origin</tt>
 use <tt>git config remote.origin.push HEAD</tt>.  Any valid &lt;refspec&gt; (like
 the ones in the examples below) can be configured as the default for
 <tt>git push origin</tt>.</p></div>
-</dd>
-<dt>
-git push origin :
+<div class="dlist"><dl>
+<dt class="hdlist1">
+git push origin 
 </dt>
 <dd>
 <p>
@@ -1037,7 +1126,9 @@ git push origin :
         description of "matching" branches.
 </p>
 </dd>
-<dt>
+</dl></div>
+</dd>
+<dt class="hdlist1">
 git push origin master
 </dt>
 <dd>
@@ -1049,7 +1140,7 @@ git push origin master
         created.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin HEAD
 </dt>
 <dd>
@@ -1058,7 +1149,7 @@ git push origin HEAD
         remote.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin master:satellite/master dev:satellite/dev
 </dt>
 <dd>
@@ -1069,7 +1160,7 @@ git push origin master:satellite/master dev:satellite/dev
         do the same for <tt>dev</tt> and <tt>satellite/dev</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin HEAD:master
 </dt>
 <dd>
@@ -1079,7 +1170,7 @@ git push origin HEAD:master
         branch without thinking about its local name.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin master:refs/heads/experimental
 </dt>
 <dd>
@@ -1091,7 +1182,7 @@ git push origin master:refs/heads/experimental
         the ref name on its own will work.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin :experimental
 </dt>
 <dd>
@@ -1100,12 +1191,12 @@ git push origin :experimental
         (e.g. <tt>refs/heads/experimental</tt>), and delete it.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git push origin &#43;dev:master
 </dt>
 <dd>
 <p>
-        Update the origin repository's master branch with the dev branch,
+        Update the origin repository&#8217;s master branch with the dev branch,
         allowing non-fast-forward updates.  <strong>This can leave unreferenced
         commits dangling in the origin repository.</strong>  Consider the
         following situation, where a fast-forward is not possible:
@@ -1116,14 +1207,14 @@ git push origin &#43;dev:master
                      \
                       X---Y---Z  dev</tt></pre>
 </div></div>
-<div class="para"><p>The above command would change the origin repository to</p></div>
+<div class="paragraph"><p>The above command would change the origin repository to</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>                      A---B  (unnamed branch)
                      /
             o---o---o---X---Y---Z  master</tt></pre>
 </div></div>
-<div class="para"><p>Commits A and B would no longer belong to a branch with a symbolic name,
+<div class="paragraph"><p>Commits A and B would no longer belong to a branch with a symbolic name,
 and so would be unreachable.  As such, these commits would be removed by
 a <tt>git gc</tt> command on the origin repository.</p></div>
 </dd>
@@ -1131,20 +1222,20 @@ a <tt>git gc</tt> command on the origin repository.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt;, later rewritten in C
-by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
+<div class="paragraph"><p>Written by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;, later rewritten in C
+by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-14 04:35:17 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

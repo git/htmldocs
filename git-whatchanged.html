@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-whatchanged(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-whatchanged(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,22 +412,22 @@ git-whatchanged(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git whatchanged</em> &lt;option&gt;&#8230;</p></div>
+<div class="paragraph"><p><em>git whatchanged</em> &lt;option&gt;&#8230;</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Shows commit logs and diff output each commit introduces.  The
+<div class="paragraph"><p>Shows commit logs and diff output each commit introduces.  The
 command internally invokes <em>git rev-list</em> piped to
 <em>git diff-tree</em>, and takes command line options for both of
 these commands.</p></div>
-<div class="para"><p>This manual page describes only the most frequently used options.</p></div>
+<div class="paragraph"><p>This manual page describes only the most frequently used options.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -p
 </dt>
 <dd>
@@ -343,7 +437,7 @@ these commands.</p></div>
         paths and their nature of changes.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -&lt;n&gt;
 </dt>
 <dd>
@@ -351,7 +445,7 @@ these commands.</p></div>
         Limit output to &lt;n&gt; commits.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;since&gt;..&lt;until&gt;
 </dt>
 <dd>
@@ -360,7 +454,7 @@ these commands.</p></div>
         exclusive, top inclusive).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -r
 </dt>
 <dd>
@@ -369,7 +463,7 @@ these commands.</p></div>
         not just the top level.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m
 </dt>
 <dd>
@@ -378,13 +472,13 @@ these commands.</p></div>
         With this flag, show differences to that commit from all
         of its parents.
 </p>
-<div class="para"><p>However, it is not very useful in general, although it
+<div class="paragraph"><p>However, it is not very useful in general, although it
 <strong>is</strong> useful on a file-by-file basis.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --pretty[=&lt;format&gt;]
 </dt>
-<dt>
+<dt class="hdlist1">
 --format=&lt;format&gt;
 </dt>
 <dd>
@@ -395,10 +489,10 @@ these commands.</p></div>
         the "PRETTY FORMATS" section for some additional details for each
         format.  When omitted, the format defaults to <em>medium</em>.
 </p>
-<div class="para"><p>Note: you can specify the default pretty format in the repository
+<div class="paragraph"><p>Note: you can specify the default pretty format in the repository
 configuration (see <a href="git-config.html">git-config(1)</a>).</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --abbrev-commit
 </dt>
 <dd>
@@ -408,10 +502,10 @@ configuration (see <a href="git-config.html">git-config(1)</a>).</p></div>
         digits can be specified with "--abbrev=&lt;n&gt;" (which also modifies
         diff output, if it is displayed).
 </p>
-<div class="para"><p>This should make "--pretty=oneline" a whole lot more readable for
+<div class="paragraph"><p>This should make "--pretty=oneline" a whole lot more readable for
 people using 80-column terminals.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --oneline
 </dt>
 <dd>
@@ -420,7 +514,7 @@ people using 80-column terminals.</p></div>
         used together.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --encoding[=&lt;encoding&gt;]
 </dt>
 <dd>
@@ -432,10 +526,10 @@ people using 80-column terminals.</p></div>
         defaults to UTF-8.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-notes
 </dt>
-<dt>
+<dt class="hdlist1">
 --show-notes[=&lt;ref&gt;]
 </dt>
 <dd>
@@ -446,10 +540,10 @@ people using 80-column terminals.</p></div>
         there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option is
         given on the command line.
 </p>
-<div class="para"><p>With an optional argument, add this ref to the list of notes.  The ref
+<div class="paragraph"><p>With an optional argument, add this ref to the list of notes.  The ref
 is taken to be in <tt>refs/notes/</tt> if it is not qualified.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]standard-notes
 </dt>
 <dd>
@@ -464,7 +558,7 @@ is taken to be in <tt>refs/notes/</tt> if it is not qualified.</p></div>
 </div>
 <h2 id="_pretty_formats">PRETTY FORMATS</h2>
 <div class="sectionbody">
-<div class="para"><p>If the commit is a merge, and if the pretty-format
+<div class="paragraph"><p>If the commit is a merge, and if the pretty-format
 is not <em>oneline</em>, <em>email</em> or <em>raw</em>, an additional line is
 inserted before the <em>Author:</em> line.  This line begins with
 "Merge: " and the sha1s of ancestral commits are printed,
@@ -473,13 +567,13 @@ necessarily be the list of the <strong>direct</strong> parent commits if you
 have limited your view of history: for example, if you are
 only interested in changes related to a certain directory or
 file.</p></div>
-<div class="para"><p>There are several built-in formats, and you can define
+<div class="paragraph"><p>There are several built-in formats, and you can define
 additional formats by setting a pretty.&lt;name&gt;
 config option to either another format name, or a
 <em>format:</em> string, as described below (see
 <a href="git-config.html">git-config(1)</a>). Here are the details of the
 built-in formats:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>oneline</em>
@@ -488,7 +582,7 @@ built-in formats:</p></div>
 <div class="content">
 <pre><tt>&lt;sha1&gt; &lt;title line&gt;</tt></pre>
 </div></div>
-<div class="para"><p>This is designed to be as compact as possible.</p></div>
+<div class="paragraph"><p>This is designed to be as compact as possible.</p></div>
 </li>
 <li>
 <p>
@@ -583,7 +677,7 @@ Subject: [PATCH] &lt;title line&gt;</tt></pre>
 <p>
 <em>raw</em>
 </p>
-<div class="para"><p>The <em>raw</em> format shows the entire commit exactly as
+<div class="paragraph"><p>The <em>raw</em> format shows the entire commit exactly as
 stored in the commit object.  Notably, the SHA1s are
 displayed in full, regardless of whether --abbrev or
 --no-abbrev are used, and <em>parents</em> information show the
@@ -594,20 +688,19 @@ simplification into account.</p></div>
 <p>
 <em>format:&lt;string&gt;</em>
 </p>
-<div class="para"><p>The <em>format:&lt;string&gt;</em> format allows you to specify which information
+<div class="paragraph"><p>The <em>format:&lt;string&gt;</em> format allows you to specify which information
 you want to show. It works a little bit like printf format,
 with the notable exception that you get a newline with <em>%n</em>
 instead of <em>\n</em>.</p></div>
-<div class="para"><p>E.g, <em>format:"The author of %h was %an, %ar%nThe title was &gt;&gt;%s&lt;&lt;%n"</em>
+<div class="paragraph"><p>E.g, <em>format:"The author of %h was %an, %ar%nThe title was &gt;&gt;%s&lt;&lt;%n"</em>
 would show something like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>The author of fe6e0ee was Junio C Hamano, 23 hours ago
-The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;
-</tt></pre>
+The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;</tt></pre>
 </div></div>
-<div class="para"><p>The placeholders are:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The placeholders are:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>%H</em>: commit hash
@@ -844,21 +937,21 @@ insert an empty string unless we are traversing reflog entries (e.g., by
 format if <tt>--decorate</tt> was not already provided on the command line.</td>
 </tr></table>
 </div>
-<div class="para"><p>If you add a <tt>&#43;</tt> (plus sign) after <em>%</em> of a placeholder, a line-feed
+<div class="paragraph"><p>If you add a <tt>&#43;</tt> (plus sign) after <em>%</em> of a placeholder, a line-feed
 is inserted immediately before the expansion if and only if the
 placeholder expands to a non-empty string.</p></div>
-<div class="para"><p>If you add a <tt>-</tt> (minus sign) after <em>%</em> of a placeholder, line-feeds that
+<div class="paragraph"><p>If you add a <tt>-</tt> (minus sign) after <em>%</em> of a placeholder, line-feeds that
 immediately precede the expansion are deleted if and only if the
 placeholder expands to an empty string.</p></div>
-<div class="para"><p>If you add a <tt> </tt> (space) after <em>%</em> of a placeholder, a space
+<div class="paragraph"><p>If you add a ` ` (space) after <em>%</em> of a placeholder, a space
 is inserted immediately before the expansion if and only if the
 placeholder expands to a non-empty string.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>tformat:</em>
 </p>
-<div class="para"><p>The <em>tformat:</em> format works exactly like <em>format:</em>, except that it
+<div class="paragraph"><p>The <em>tformat:</em> format works exactly like <em>format:</em>, except that it
 provides "terminator" semantics instead of "separator" semantics. In
 other words, each commit has the message terminator character (usually a
 newline) appended, rather than a separator placed between entries.
@@ -877,7 +970,7 @@ $ git log -2 --pretty=tformat:%h 4da45bef \
 4da45be
 7134973</tt></pre>
 </div></div>
-<div class="para"><p>In addition, any unrecognized string that has a <tt>%</tt> in it is interpreted
+<div class="paragraph"><p>In addition, any unrecognized string that has a <tt>%</tt> in it is interpreted
 as if it has <tt>tformat:</tt> in front of it.  For example, these two are
 equivalent:</p></div>
 <div class="listingblock">
@@ -890,8 +983,8 @@ $ git log -2 --pretty=%h 4da45bef</tt></pre>
 </div>
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 git whatchanged -p v2.6.12.. include/scsi drivers/scsi
 </dt>
 <dd>
@@ -900,7 +993,7 @@ git whatchanged -p v2.6.12.. include/scsi drivers/scsi
         any file in the include/scsi or drivers/scsi subdirectories
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 git whatchanged --since="2 weeks ago" -- gitk
 </dt>
 <dd>
@@ -914,20 +1007,20 @@ git whatchanged --since="2 weeks ago" -- gitk
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and
-Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt; and
+Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-22 04:11:13 UTC
+Last updated 2010-01-21 17:44:19 UTC
 </div>
 </div>
 </body>

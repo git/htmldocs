@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-send-email(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-send-email(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,35 +412,35 @@ git-send-email(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git send-email</em> [options] &lt;file|directory|rev-list options&gt;&#8230;</p></div>
+<div class="paragraph"><p><em>git send-email</em> [options] &lt;file|directory|rev-list options&gt;&#8230;</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Takes the patches given on the command line and emails them out.
+<div class="paragraph"><p>Takes the patches given on the command line and emails them out.
 Patches can be specified as files, directories (which will send all
 files in the directory), or directly as a revision list.  In the
 last case, any format accepted by <a href="git-format-patch.html">git-format-patch(1)</a> can
 be passed to git send-email.</p></div>
-<div class="para"><p>The header of the email is configurable by command line options.  If not
+<div class="paragraph"><p>The header of the email is configurable by command line options.  If not
 specified on the command line, the user will be prompted with a ReadLine
 enabled interface to provide the necessary information.</p></div>
-<div class="para"><p>There are two formats accepted for patch files:</p></div>
-<div class="olist"><ol>
+<div class="paragraph"><p>There are two formats accepted for patch files:</p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 mbox format files
 </p>
-<div class="para"><p>This is what <a href="git-format-patch.html">git-format-patch(1)</a> generates.  Most headers and MIME
+<div class="paragraph"><p>This is what <a href="git-format-patch.html">git-format-patch(1)</a> generates.  Most headers and MIME
 formatting are ignored.</p></div>
 </li>
 <li>
 <p>
-The original format used by Greg Kroah-Hartman's <em>send_lots_of_email.pl</em>
+The original format used by Greg Kroah-Hartman&#8217;s <em>send_lots_of_email.pl</em>
 script
 </p>
-<div class="para"><p>This format expects the first line of the file to contain the "Cc:" value
+<div class="paragraph"><p>This format expects the first line of the file to contain the "Cc:" value
 and the "Subject:" of the message as the second line.</p></div>
 </li>
 </ol></div>
@@ -354,17 +448,17 @@ and the "Subject:" of the message as the second line.</p></div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <h3 id="_composing">Composing</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --annotate
 </dt>
 <dd>
 <p>
-        Review and edit each patch you're about to send. See the
+        Review and edit each patch you&#8217;re about to send. See the
         CONFIGURATION section for <em>sendemail.multiedit</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --bcc=&lt;address&gt;
 </dt>
 <dd>
@@ -372,9 +466,9 @@ and the "Subject:" of the message as the second line.</p></div>
         Specify a "Bcc:" value for each email. Default is the value of
         <em>sendemail.bcc</em>.
 </p>
-<div class="para"><p>The --bcc option must be repeated for each user you want on the bcc list.</p></div>
+<div class="paragraph"><p>The --bcc option must be repeated for each user you want on the bcc list.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --cc=&lt;address&gt;
 </dt>
 <dd>
@@ -382,9 +476,9 @@ and the "Subject:" of the message as the second line.</p></div>
         Specify a starting "Cc:" value for each email.
         Default is the value of <em>sendemail.cc</em>.
 </p>
-<div class="para"><p>The --cc option must be repeated for each user you want on the cc list.</p></div>
+<div class="paragraph"><p>The --cc option must be repeated for each user you want on the cc list.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --compose
 </dt>
 <dd>
@@ -392,15 +486,15 @@ and the "Subject:" of the message as the second line.</p></div>
         Invoke a text editor (see GIT_EDITOR in <a href="git-var.html">git-var(1)</a>)
         to edit an introductory message for the patch series.
 </p>
-<div class="para"><p>When <em>--compose</em> is used, git send-email will use the From, Subject, and
+<div class="paragraph"><p>When <em>--compose</em> is used, git send-email will use the From, Subject, and
 In-Reply-To headers specified in the message. If the body of the message
 (what you type after the headers and a blank line) only contains blank
-(or GIT: prefixed) lines the summary won't be sent, but From, Subject,
+(or GIT: prefixed) lines the summary won&#8217;t be sent, but From, Subject,
 and In-Reply-To headers will be used unless they are removed.</p></div>
-<div class="para"><p>Missing From or In-Reply-To headers will be prompted for.</p></div>
-<div class="para"><p>See the CONFIGURATION section for <em>sendemail.multiedit</em>.</p></div>
+<div class="paragraph"><p>Missing From or In-Reply-To headers will be prompted for.</p></div>
+<div class="paragraph"><p>See the CONFIGURATION section for <em>sendemail.multiedit</em>.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --from=&lt;address&gt;
 </dt>
 <dd>
@@ -413,7 +507,7 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         set, as returned by "git var -l".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --in-reply-to=&lt;identifier&gt;
 </dt>
 <dd>
@@ -425,7 +519,7 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         is not set, this will be prompted for.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --subject=&lt;string&gt;
 </dt>
 <dd>
@@ -435,7 +529,7 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         is not set, this will be prompted for.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --to=&lt;address&gt;
 </dt>
 <dd>
@@ -445,9 +539,9 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         value of the <em>sendemail.to</em> configuration value; if that is unspecified,
         and --to-cmd is not specified, this will be prompted for.
 </p>
-<div class="para"><p>The --to option must be repeated for each user you want on the to list.</p></div>
+<div class="paragraph"><p>The --to option must be repeated for each user you want on the to list.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --8bit-encoding=&lt;encoding&gt;
 </dt>
 <dd>
@@ -458,12 +552,12 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         <em>sendemail.assume8bitEncoding</em>; if that is unspecified, this
         will be prompted for if any non-ASCII files are encountered.
 </p>
-<div class="para"><p>Note that no attempts whatsoever are made to validate the encoding.</p></div>
+<div class="paragraph"><p>Note that no attempts whatsoever are made to validate the encoding.</p></div>
 </dd>
 </dl></div>
 <h3 id="_sending">Sending</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --envelope-sender=&lt;address&gt;
 </dt>
 <dd>
@@ -477,7 +571,7 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         unspecified, choosing the envelope sender is left to your MTA.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-encryption=&lt;encryption&gt;
 </dt>
 <dd>
@@ -487,7 +581,7 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         <em>sendemail.smtpencryption</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-domain=&lt;FQDN&gt;
 </dt>
 <dd>
@@ -499,7 +593,7 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         <em>sendemail.smtpdomain</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-pass[=&lt;password&gt;]
 </dt>
 <dd>
@@ -509,13 +603,13 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
         the password. Default is the value of <em>sendemail.smtppass</em>,
         however <em>--smtp-pass</em> always overrides this value.
 </p>
-<div class="para"><p>Furthermore, passwords need not be specified in configuration files
+<div class="paragraph"><p>Furthermore, passwords need not be specified in configuration files
 or on the command line. If a username has been specified (with
 <em>--smtp-user</em> or a <em>sendemail.smtpuser</em>), but no password has been
 specified (with <em>--smtp-pass</em> or <em>sendemail.smtppass</em>), then the
 user is prompted for a password while the input is masked for privacy.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-server=&lt;host&gt;
 </dt>
 <dd>
@@ -530,7 +624,7 @@ user is prompted for a password while the input is masked for privacy.</p></div>
         <tt>localhost</tt> otherwise.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-server-port=&lt;port&gt;
 </dt>
 <dd>
@@ -543,7 +637,7 @@ user is prompted for a password while the input is masked for privacy.</p></div>
         <em>sendemail.smtpserverport</em> configuration variable.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-server-option=&lt;option&gt;
 </dt>
 <dd>
@@ -552,11 +646,11 @@ user is prompted for a password while the input is masked for privacy.</p></div>
         Default value can be specified by the <em>sendemail.smtpserveroption</em>
         configuration option.
 </p>
-<div class="para"><p>The --smtp-server-option option must be repeated for each option you want
+<div class="paragraph"><p>The --smtp-server-option option must be repeated for each option you want
 to pass to the server. Likewise, different lines in the configuration files
 must be used for each option.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-ssl
 </dt>
 <dd>
@@ -564,7 +658,7 @@ must be used for each option.</p></div>
         Legacy alias for <em>--smtp-encryption ssl</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --smtp-user=&lt;user&gt;
 </dt>
 <dd>
@@ -576,8 +670,8 @@ must be used for each option.</p></div>
 </dd>
 </dl></div>
 <h3 id="_automating">Automating</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --to-cmd=&lt;command&gt;
 </dt>
 <dd>
@@ -588,7 +682,7 @@ must be used for each option.</p></div>
         Default is the value of <em>sendemail.tocmd</em> configuration value.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --cc-cmd=&lt;command&gt;
 </dt>
 <dd>
@@ -599,7 +693,7 @@ must be used for each option.</p></div>
         Default is the value of <em>sendemail.cccmd</em> configuration value.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]chain-reply-to
 </dt>
 <dd>
@@ -612,7 +706,7 @@ must be used for each option.</p></div>
         configuration variable can be used to enable it.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --identity=&lt;identity&gt;
 </dt>
 <dd>
@@ -623,7 +717,7 @@ must be used for each option.</p></div>
         the value of <em>sendemail.identity</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]signed-off-by-cc
 </dt>
 <dd>
@@ -633,7 +727,7 @@ must be used for each option.</p></div>
         value; if that is unspecified, default to --signed-off-by-cc.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --suppress-cc=&lt;category&gt;
 </dt>
 <dd>
@@ -641,7 +735,7 @@ must be used for each option.</p></div>
         Specify an additional category of recipients to suppress the
         auto-cc of:
 </p>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>author</em> will avoid including the patch author
@@ -686,11 +780,11 @@ must be used for each option.</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Default is the value of <em>sendemail.suppresscc</em> configuration value; if
+<div class="paragraph"><p>Default is the value of <em>sendemail.suppresscc</em> configuration value; if
 that is unspecified, default to <em>self</em> if --suppress-from is
 specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]suppress-from
 </dt>
 <dd>
@@ -700,7 +794,7 @@ specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p></div
         value; if that is unspecified, default to --no-suppress-from.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]thread
 </dt>
 <dd>
@@ -711,27 +805,27 @@ specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p></div
         wording) or to the first email (<tt>shallow</tt> threading) is
         governed by "--[no-]chain-reply-to".
 </p>
-<div class="para"><p>If disabled with "--no-thread", those headers will not be added
+<div class="paragraph"><p>If disabled with "--no-thread", those headers will not be added
 (unless specified with --in-reply-to).  Default is the value of the
 <em>sendemail.thread</em> configuration value; if that is unspecified,
 default to --thread.</p></div>
-<div class="para"><p>It is up to the user to ensure that no In-Reply-To header already
+<div class="paragraph"><p>It is up to the user to ensure that no In-Reply-To header already
 exists when <em>git send-email</em> is asked to add it (especially note that
 <em>git format-patch</em> can be configured to do the threading itself).
 Failure to do so may not produce the expected result in the
-recipient's MUA.</p></div>
+recipient&#8217;s MUA.</p></div>
 </dd>
 </dl></div>
 <h3 id="_administering">Administering</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --confirm=&lt;mode&gt;
 </dt>
 <dd>
 <p>
         Confirm just before sending:
 </p>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>always</em> will always confirm before sending
@@ -759,11 +853,11 @@ recipient's MUA.</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Default is the value of <em>sendemail.confirm</em> configuration value; if that
+<div class="paragraph"><p>Default is the value of <em>sendemail.confirm</em> configuration value; if that
 is unspecified, default to <em>auto</em> unless any of the suppress options
 have been specified, in which case default to <em>compose</em>.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --dry-run
 </dt>
 <dd>
@@ -771,7 +865,7 @@ have been specified, in which case default to <em>compose</em>.</p></div>
         Do everything except actually send the emails.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]format-patch
 </dt>
 <dd>
@@ -782,7 +876,7 @@ have been specified, in which case default to <em>compose</em>.</p></div>
         occurs, git send-email will fail.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -791,7 +885,7 @@ have been specified, in which case default to <em>compose</em>.</p></div>
         all that is output.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --[no-]validate
 </dt>
 <dd>
@@ -799,23 +893,23 @@ have been specified, in which case default to <em>compose</em>.</p></div>
         Perform sanity checks on patches.
         Currently, validation means the following:
 </p>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Warn of patches that contain lines longer than 998 characters; this
-                        is due to SMTP limits as described by http://www.ietf.org/rfc/rfc2821.txt.
+                        is due to SMTP limits as described by <a href="http://www.ietf.org/rfc/rfc2821.txt">http://www.ietf.org/rfc/rfc2821.txt</a>.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Default is the value of <em>sendemail.validate</em>; if this is not set,
+<div class="paragraph"><p>Default is the value of <em>sendemail.validate</em>; if this is not set,
 default to <em>--validate</em>.</p></div>
 </dd>
 </dl></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 sendemail.aliasesfile
 </dt>
 <dd>
@@ -824,7 +918,7 @@ sendemail.aliasesfile
         email aliases files.  You must also supply <em>sendemail.aliasfiletype</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 sendemail.aliasfiletype
 </dt>
 <dd>
@@ -833,7 +927,7 @@ sendemail.aliasfiletype
         one of <em>mutt</em>, <em>mailrc</em>, <em>pine</em>, <em>elm</em>, or <em>gnus</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 sendemail.multiedit
 </dt>
 <dd>
@@ -844,7 +938,7 @@ sendemail.multiedit
         after the other, spawning a new editor each time.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 sendemail.confirm
 </dt>
 <dd>
@@ -858,7 +952,7 @@ sendemail.confirm
 </div>
 <h2 id="_use_gmail_as_the_smtp_server">Use gmail as the smtp server</h2>
 <div class="sectionbody">
-<div class="para"><p>Add the following section to the config file:</p></div>
+<div class="paragraph"><p>Add the following section to the config file:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>[sendemail]
@@ -867,26 +961,26 @@ sendemail.confirm
         smtpuser = yourname@gmail.com
         smtpserverport = 587</tt></pre>
 </div></div>
-<div class="para"><p>Note: the following perl modules are required
+<div class="paragraph"><p>Note: the following perl modules are required
       Net::SMTP::SSL, MIME::Base64 and Authen::SASL</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Ryan Anderson &lt;ryan@michonline.com&gt;</p></div>
-<div class="para"><p>git-send-email is originally based upon
+<div class="paragraph"><p>Written by Ryan Anderson &lt;<a href="mailto:ryan@michonline.com">ryan@michonline.com</a>&gt;</p></div>
+<div class="paragraph"><p>git-send-email is originally based upon
 send_lots_of_email.pl by Greg Kroah-Hartman.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Ryan Anderson</p></div>
+<div class="paragraph"><p>Documentation by Ryan Anderson</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-27 06:08:22 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>

@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-clone(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-clone(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,37 +412,39 @@ git-clone(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git clone</em> [--template=&lt;template_directory&gt;]
+<div class="verseblock-content"><em>git clone</em> [--template=&lt;template_directory&gt;]
           [-l] [-s] [--no-hardlinks] [-q] [-n] [--bare] [--mirror]
           [-o &lt;name&gt;] [-b &lt;name&gt;] [-u &lt;upload-pack&gt;] [--reference &lt;repository&gt;]
-          [--depth &lt;depth&gt;] [--recursive] [--] &lt;repository&gt; [&lt;directory&gt;]</div></div>
+          [--depth &lt;depth&gt;] [--recursive] [--] &lt;repository&gt; [&lt;directory&gt;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Clones a repository into a newly created directory, creates
+<div class="paragraph"><p>Clones a repository into a newly created directory, creates
 remote-tracking branches for each branch in the cloned repository
 (visible using <tt>git branch -r</tt>), and creates and checks out an
-initial branch that is forked from the cloned repository's
+initial branch that is forked from the cloned repository&#8217;s
 currently active branch.</p></div>
-<div class="para"><p>After the clone, a plain <tt>git fetch</tt> without arguments will update
+<div class="paragraph"><p>After the clone, a plain <tt>git fetch</tt> without arguments will update
 all the remote-tracking branches, and a <tt>git pull</tt> without
 arguments will in addition merge the remote master branch into the
 current master branch, if any.</p></div>
-<div class="para"><p>This default configuration is achieved by creating references to
+<div class="paragraph"><p>This default configuration is achieved by creating references to
 the remote branch heads under <tt>refs/remotes/origin</tt> and
 by initializing <tt>remote.origin.url</tt> and <tt>remote.origin.fetch</tt>
 configuration variables.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --local
 </dt>
-<dt>
+<dt class="hdlist1">
 -l
 </dt>
 <dd>
@@ -367,7 +463,7 @@ configuration variables.</p></div>
         mechanism, <tt>--no-hardlinks</tt> can be used.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-hardlinks
 </dt>
 <dd>
@@ -377,10 +473,10 @@ configuration variables.</p></div>
         directory.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --shared
 </dt>
-<dt>
+<dt class="hdlist1">
 -s
 </dt>
 <dd>
@@ -391,7 +487,7 @@ configuration variables.</p></div>
         with the source repository.  The resulting repository
         starts out without any object of its own.
 </p>
-<div class="para"><p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
+<div class="paragraph"><p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
 it unless you understand what it does. If you clone your
 repository using this option and then delete branches (or use any
 other git command that makes any existing commit unreferenced) in the
@@ -400,16 +496,16 @@ These objects may be removed by normal git operations (such as <tt>git commit</t
 which automatically call <tt>git gc --auto</tt>. (See <a href="git-gc.html">git-gc(1)</a>.)
 If these objects are removed and were referenced by the cloned repository,
 then the cloned repository will become corrupt.</p></div>
-<div class="para"><p>Note that running <tt>git repack</tt> without the <tt>-l</tt> option in a repository
+<div class="paragraph"><p>Note that running <tt>git repack</tt> without the <tt>-l</tt> option in a repository
 cloned with <tt>-s</tt> will copy objects from the source repository into a pack
 in the cloned repository, removing the disk space savings of <tt>clone -s</tt>.
 It is safe, however, to run <tt>git gc</tt>, which uses the <tt>-l</tt> option by
 default.</p></div>
-<div class="para"><p>If you want to break the dependency of a repository cloned with <tt>-s</tt> on
+<div class="paragraph"><p>If you want to break the dependency of a repository cloned with <tt>-s</tt> on
 its source repository, you can simply run <tt>git repack -a</tt> to copy all
 objects from the source repository into a pack in the cloned repository.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --reference &lt;repository&gt;
 </dt>
 <dd>
@@ -421,25 +517,25 @@ objects from the source repository into a pack in the cloned repository.</p></di
         require fewer objects to be copied from the repository
         being cloned, reducing network and local storage costs.
 </p>
-<div class="para"><p><strong>NOTE</strong>: see the NOTE for the <tt>--shared</tt> option.</p></div>
+<div class="paragraph"><p><strong>NOTE</strong>: see the NOTE for the <tt>--shared</tt> option.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
 <dd>
 <p>
         Operate quietly.  Progress is not reported to the standard
-        error stream. This flag is also passed to the `rsync'
+        error stream. This flag is also passed to the &#8216;rsync&#8217;
         command when given.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --verbose
 </dt>
-<dt>
+<dt class="hdlist1">
 -v
 </dt>
 <dd>
@@ -448,7 +544,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         to the standard error stream.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --progress
 </dt>
 <dd>
@@ -459,10 +555,10 @@ objects from the source repository into a pack in the cloned repository.</p></di
         standard error stream is not directed to a terminal.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-checkout
 </dt>
-<dt>
+<dt class="hdlist1">
 -n
 </dt>
 <dd>
@@ -470,7 +566,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         No checkout of HEAD is performed after the clone is complete.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --bare
 </dt>
 <dd>
@@ -487,7 +583,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         configuration variables are created.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --mirror
 </dt>
 <dd>
@@ -500,10 +596,10 @@ objects from the source repository into a pack in the cloned repository.</p></di
         target repository.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --origin &lt;name&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -o &lt;name&gt;
 </dt>
 <dd>
@@ -512,24 +608,24 @@ objects from the source repository into a pack in the cloned repository.</p></di
         of the upstream repository, use <tt>&lt;name&gt;</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --branch &lt;name&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -b &lt;name&gt;
 </dt>
 <dd>
 <p>
         Instead of pointing the newly created HEAD to the branch pointed
-        to by the cloned repository's HEAD, point to <tt>&lt;name&gt;</tt> branch
+        to by the cloned repository&#8217;s HEAD, point to <tt>&lt;name&gt;</tt> branch
         instead. In a non-bare repository, this is the branch that will
         be checked out.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --upload-pack &lt;upload-pack&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 -u &lt;upload-pack&gt;
 </dt>
 <dd>
@@ -539,7 +635,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         run on the other end.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --template=&lt;template_directory&gt;
 </dt>
 <dd>
@@ -548,7 +644,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         (See the "TEMPLATE DIRECTORY" section of <a href="git-init.html">git-init(1)</a>.)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --depth &lt;depth&gt;
 </dt>
 <dd>
@@ -562,7 +658,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         as patches.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --recursive
 </dt>
 <dd>
@@ -575,7 +671,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         <tt>--no-checkout</tt>/<tt>-n</tt>, <tt>--bare</tt>, or <tt>--mirror</tt> is given)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;repository&gt;
 </dt>
 <dd>
@@ -585,7 +681,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         repositories.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;directory&gt;
 </dt>
 <dd>
@@ -601,13 +697,13 @@ objects from the source repository into a pack in the cloned repository.</p></di
 </div>
 <h2 id="_git_urls_a_id_urls_a">GIT URLS<a id="URLS"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>In general, URLs contain information about the transport protocol, the
+<div class="paragraph"><p>In general, URLs contain information about the transport protocol, the
 address of the remote server, and the path to the repository.
 Depending on the transport protocol, some of this information may be
 absent.</p></div>
-<div class="para"><p>Git natively supports ssh, git, http, https, ftp, ftps, and rsync
+<div class="paragraph"><p>Git natively supports ssh, git, http, https, ftp, ftps, and rsync
 protocols. The following syntaxes may be used with them:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 ssh://&#91;user@&#93;host.xz&#91;:port&#93;/path/to/repo.git/
@@ -634,16 +730,16 @@ rsync://host.xz/path/to/repo.git/
 </p>
 </li>
 </ul></div>
-<div class="para"><p>An alternative scp-like syntax may also be used with the ssh protocol:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>An alternative scp-like syntax may also be used with the ssh protocol:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 &#91;user@&#93;host.xz:path/to/repo.git/
 </p>
 </li>
 </ul></div>
-<div class="para"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 ssh://&#91;user@&#93;host.xz&#91;:port&#93;/~&#91;user&#93;/path/to/repo.git/
@@ -660,9 +756,9 @@ git://host.xz&#91;:port&#93;/~&#91;user&#93;/path/to/repo.git/
 </p>
 </li>
 </ul></div>
-<div class="para"><p>For local repositories, also supported by git natively, the following
+<div class="paragraph"><p>For local repositories, also supported by git natively, the following
 syntaxes may be used:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 /path/to/repo.git/
@@ -670,27 +766,27 @@ syntaxes may be used:</p></div>
 </li>
 <li>
 <p>
-file:///path/to/repo.git/
+<a href="file:///path/to/repo.git/">file:///path/to/repo.git/</a>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>These two syntaxes are mostly equivalent, except the former implies
+<div class="paragraph"><p>These two syntaxes are mostly equivalent, except the former implies
 --local option.</p></div>
-<div class="para"><p>When git doesn't know how to handle a certain transport protocol, it
+<div class="paragraph"><p>When git doesn&#8217;t know how to handle a certain transport protocol, it
 attempts to use the <em>remote-&lt;transport&gt;</em> remote helper, if one
 exists. To explicitly request a remote helper, the following syntax
 may be used:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 &lt;transport&gt;::&lt;address&gt;
 </p>
 </li>
 </ul></div>
-<div class="para"><p>where &lt;address&gt; may be a path, a server and path, or an arbitrary
+<div class="paragraph"><p>where &lt;address&gt; may be a path, a server and path, or an arbitrary
 URL-like string recognized by the specific remote helper being
 invoked. See <a href="git-remote-helpers.html">git-remote-helpers(1)</a> for details.</p></div>
-<div class="para"><p>If there are a large number of similarly-named remote repositories and
+<div class="paragraph"><p>If there are a large number of similarly-named remote repositories and
 you want to use a different format for them (such that the URLs you
 use will be rewritten into URLs that work), you can create a
 configuration section of the form:</p></div>
@@ -699,35 +795,35 @@ configuration section of the form:</p></div>
 <pre><tt>        [url "&lt;actual url base&gt;"]
                 insteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
-<div class="para"><p>For example, with this:</p></div>
+<div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
                 insteadOf = work:</tt></pre>
 </div></div>
-<div class="para"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
+<div class="paragraph"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
-<div class="para"><p>If you want to rewrite URLs for push only, you can create a
+<div class="paragraph"><p>If you want to rewrite URLs for push only, you can create a
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "&lt;actual url base&gt;"]
                 pushInsteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
-<div class="para"><p>For example, with this:</p></div>
+<div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        [url "ssh://example.org/"]
                 pushInsteadOf = git://example.org/</tt></pre>
 </div></div>
-<div class="para"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
+<div class="paragraph"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
 "ssh://example.org/path/to/repo.git" for pushes, but pulls will still
 use the original URL.</p></div>
 </div>
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Clone from upstream:
@@ -785,19 +881,19 @@ Create a repository on the kernel.org machine that borrows from Linus:
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-10-07 00:00:52 UTC
+Last updated 2010-11-06 00:41:57 UTC
 </div>
 </div>
 </body>
