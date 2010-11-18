@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.4.5" />
-<title>GIT API Documents</title>
+<title>sigchain API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -384,140 +384,58 @@ div#toc a:visited { color: blue; }
 </head>
 <body>
 <div id="header">
-<h1>GIT API Documents</h1>
+<h1>sigchain API</h1>
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>GIT has grown a set of internal API over time.  This collection
-documents them.</p></div>
-<div class="ulist"><ul>
+<div class="paragraph"><p>Code often wants to set a signal handler to clean up temporary files or
+other work-in-progress when we die unexpectedly. For multiple pieces of
+code to do this without conflicting, each piece of code must remember
+the old value of the handler and restore it either when:</p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<a href="api-allocation-growing.html">allocation growing API</a>
+The work-in-progress is finished, and the handler is no longer
+     necessary. The handler should revert to the original behavior
+     (either another handler, SIG_DFL, or SIG_IGN).
 </p>
 </li>
 <li>
 <p>
-<a href="api-builtin.html">builtin API</a>
+The signal is received. We should then do our cleanup, then chain
+     to the next handler (or die if it is SIG_DFL).
 </p>
 </li>
-<li>
-<p>
-<a href="api-decorate.html">decorate API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-diff.html">diff API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-directory-listing.html">directory listing API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-gitattributes.html">gitattributes API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-grep.html">grep API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-hash.html">hash API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-history-graph.html">history graph API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-in-core-index.html">in-core index API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-lockfile.html">lockfile API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-merge.html">merge API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-object-access.html">object access API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-parse-options.html">parse-options API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-quote.html">quote API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-remote.html">Remotes configuration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-revision-walking.html">revision walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-run-command.html">run-command API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-setup.html">setup API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-sigchain.html">sigchain API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-strbuf.html">strbuf API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-string-list.html">string-list API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-tree-walking.html">tree walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-xdiff-interface.html">xdiff interface API</a>
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>2007-11-24</p></div>
+</ol></div>
+<div class="paragraph"><p>Sigchain is a tiny library for keeping a stack of handlers. Your handler
+and installation code should look something like:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>  void clean_foo_on_signal(int sig)
+  {
+          clean_foo();
+          sigchain_pop(sig);
+          raise(sig);
+  }
+
+  void other_func()
+  {
+          sigchain_push_common(clean_foo_on_signal);
+          mess_up_foo();
+          clean_foo();
+  }</tt></pre>
+</div></div>
+<div class="paragraph"><p>Handlers are given the typdef of sigchain_fun. This is the same type
+that is given to signal() or sigaction(). It is perfectly reasonable to
+push SIG_DFL or SIG_IGN onto the stack.</p></div>
+<div class="paragraph"><p>You can sigchain_push and sigchain_pop individual signals. For
+convenience, sigchain_push_common will push the handler onto the stack
+for many common signals.</p></div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-11-18 00:52:24 UTC
+Last updated 2010-11-18 00:51:23 UTC
 </div>
 </div>
 </body>
