@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-branch(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-branch(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,47 +412,50 @@ git-branch(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git branch</em> [--color[=&lt;when&gt;] | --no-color] [-r | -a]
+<div class="verseblock-content"><em>git branch</em> [--color[=&lt;when&gt;] | --no-color] [-r | -a]
         [-v [--abbrev=&lt;length&gt; | --no-abbrev]]
         [(--merged | --no-merged | --contains) [&lt;commit&gt;]]
 <em>git branch</em> [--set-upstream | --track | --no-track] [-l] [-f] &lt;branchname&gt; [&lt;start-point&gt;]
 <em>git branch</em> (-m | -M) [&lt;oldbranch&gt;] &lt;newbranch&gt;
-<em>git branch</em> (-d | -D) [-r] &lt;branchname&gt;&#8230;</div></div>
+<em>git branch</em> (-d | -D) [-r] &lt;branchname&gt;&#8230;</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>With no arguments, existing branches are listed and the current branch will
+<div class="paragraph"><p>With no arguments, existing branches are listed and the current branch will
 be highlighted with an asterisk.  Option <tt>-r</tt> causes the remote-tracking
 branches to be listed, and option <tt>-a</tt> shows both.</p></div>
-<div class="para"><p>With <tt>--contains</tt>, shows only the branches that contain the named commit
+<div class="paragraph"><p>With <tt>--contains</tt>, shows only the branches that contain the named commit
 (in other words, the branches whose tip commits are descendants of the
 named commit).  With <tt>--merged</tt>, only branches merged into the named
 commit (i.e. the branches whose tip commits are reachable from the named
 commit) will be listed.  With <tt>--no-merged</tt> only branches not merged into
 the named commit will be listed.  If the &lt;commit&gt; argument is missing it
 defaults to <em>HEAD</em> (i.e. the tip of the current branch).</p></div>
-<div class="para"><p>The command's second form creates a new branch head named &lt;branchname&gt;
+<div class="paragraph"><p>The command&#8217;s second form creates a new branch head named &lt;branchname&gt;
 which points to the current <em>HEAD</em>, or &lt;start-point&gt; if given.</p></div>
-<div class="para"><p>Note that this will create the new branch, but it will not switch the
+<div class="paragraph"><p>Note that this will create the new branch, but it will not switch the
 working tree to it; use "git checkout &lt;newbranch&gt;" to switch to the
 new branch.</p></div>
-<div class="para"><p>When a local branch is started off a remote branch, git sets up the
+<div class="paragraph"><p>When a local branch is started off a remote-tracking branch, git sets up the
 branch so that <em>git pull</em> will appropriately merge from
-the remote branch. This behavior may be changed via the global
+the remote-tracking branch. This behavior may be changed via the global
 <tt>branch.autosetupmerge</tt> configuration flag. That setting can be
-overridden by using the <tt>--track</tt> and <tt>--no-track</tt> options.</p></div>
-<div class="para"><p>With a <em>-m</em> or <em>-M</em> option, &lt;oldbranch&gt; will be renamed to &lt;newbranch&gt;.
+overridden by using the <tt>--track</tt> and <tt>--no-track</tt> options, and
+changed later using <tt>git branch --set-upstream</tt>.</p></div>
+<div class="paragraph"><p>With a <em>-m</em> or <em>-M</em> option, &lt;oldbranch&gt; will be renamed to &lt;newbranch&gt;.
 If &lt;oldbranch&gt; had a corresponding reflog, it is renamed to match
 &lt;newbranch&gt;, and a reflog entry is created to remember the branch
 renaming. If &lt;newbranch&gt; exists, -M must be used to force the rename
 to happen.</p></div>
-<div class="para"><p>With a <tt>-d</tt> or <tt>-D</tt> option, <tt>&lt;branchname&gt;</tt> will be deleted.  You may
+<div class="paragraph"><p>With a <tt>-d</tt> or <tt>-D</tt> option, <tt>&lt;branchname&gt;</tt> will be deleted.  You may
 specify more than one branch for deletion.  If the branch currently
 has a reflog then the reflog will also be deleted.</p></div>
-<div class="para"><p>Use -r together with -d to delete remote-tracking branches. Note, that it
+<div class="paragraph"><p>Use -r together with -d to delete remote-tracking branches. Note, that it
 only makes sense to delete remote-tracking branches if they no longer exist
 in the remote repository or if <em>git fetch</em> was configured not to fetch
 them again. See also the <em>prune</em> subcommand of <a href="git-remote.html">git-remote(1)</a> for a
@@ -366,8 +463,8 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -d
 </dt>
 <dd>
@@ -377,7 +474,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         <tt>--track</tt> or <tt>--set-upstream</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -D
 </dt>
 <dd>
@@ -385,22 +482,22 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         Delete a branch irrespective of its merged status.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -l
 </dt>
 <dd>
 <p>
-        Create the branch's reflog.  This activates recording of
+        Create the branch&#8217;s reflog.  This activates recording of
         all changes made to the branch ref, enabling use of date
         based sha1 expressions such as "&lt;branchname&gt;@{yesterday}".
         Note that in non-bare repositories, reflogs are usually
         enabled by default by the <tt>core.logallrefupdates</tt> config option.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -409,7 +506,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         already. Without <tt>-f</tt> <em>git branch</em> refuses to change an existing branch.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m
 </dt>
 <dd>
@@ -417,7 +514,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         Move/rename a branch and the corresponding reflog.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -M
 </dt>
 <dd>
@@ -425,16 +522,17 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         Move/rename a branch even if the new branch name already exists.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --color[=&lt;when&gt;]
 </dt>
 <dd>
 <p>
-        Color branches to highlight current, local, and remote branches.
+        Color branches to highlight current, local, and
+        remote-tracking branches.
         The value must be always (the default), never, or auto.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-color
 </dt>
 <dd>
@@ -444,7 +542,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         Same as <tt>--color=never</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -r
 </dt>
 <dd>
@@ -452,7 +550,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         List or delete (if used with -d) the remote-tracking branches.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -a
 </dt>
 <dd>
@@ -460,10 +558,10 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         List both remote-tracking branches and local branches.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -v
 </dt>
-<dt>
+<dt class="hdlist1">
 --verbose
 </dt>
 <dd>
@@ -473,16 +571,16 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         the name of the upstream branch, as well.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --abbrev=&lt;length&gt;
 </dt>
 <dd>
 <p>
-        Alter the sha1's minimum display length in the output listing.
+        Alter the sha1&#8217;s minimum display length in the output listing.
         The default value is 7.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-abbrev
 </dt>
 <dd>
@@ -490,10 +588,10 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         Display the full sha1s in the output listing rather than abbreviating them.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -t
 </dt>
-<dt>
+<dt class="hdlist1">
 --track
 </dt>
 <dd>
@@ -505,13 +603,13 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         it directs <tt>git pull</tt> without arguments to pull from the
         upstream when the new branch is checked out.
 </p>
-<div class="para"><p>This behavior is the default when the start point is a remote branch.
+<div class="paragraph"><p>This behavior is the default when the start point is a remote-tracking branch.
 Set the branch.autosetupmerge configuration variable to <tt>false</tt> if you
 want <tt>git checkout</tt> and <tt>git branch</tt> to always behave as if <em>--no-track</em>
 were given. Set it to <tt>always</tt> if you want this behavior when the
-start-point is either a local or remote branch.</p></div>
+start-point is either a local or remote-tracking branch.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-track
 </dt>
 <dd>
@@ -520,7 +618,7 @@ start-point is either a local or remote branch.</p></div>
         branch.autosetupmerge configuration variable is true.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --set-upstream
 </dt>
 <dd>
@@ -531,7 +629,7 @@ start-point is either a local or remote branch.</p></div>
         branch points to is not changed.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --contains &lt;commit&gt;
 </dt>
 <dd>
@@ -539,7 +637,7 @@ start-point is either a local or remote branch.</p></div>
         Only list branches which contain the specified commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --merged [&lt;commit&gt;]
 </dt>
 <dd>
@@ -548,7 +646,7 @@ start-point is either a local or remote branch.</p></div>
         specified commit (HEAD if not specified).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-merged [&lt;commit&gt;]
 </dt>
 <dd>
@@ -557,7 +655,7 @@ start-point is either a local or remote branch.</p></div>
         specified commit (HEAD if not specified).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;branchname&gt;
 </dt>
 <dd>
@@ -568,7 +666,7 @@ start-point is either a local or remote branch.</p></div>
         may restrict the characters allowed in a branch name.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;start-point&gt;
 </dt>
 <dd>
@@ -578,7 +676,7 @@ start-point is either a local or remote branch.</p></div>
         option is omitted, the current HEAD will be used instead.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;oldbranch&gt;
 </dt>
 <dd>
@@ -586,7 +684,7 @@ start-point is either a local or remote branch.</p></div>
         The name of an existing branch to rename.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;newbranch&gt;
 </dt>
 <dd>
@@ -599,8 +697,8 @@ start-point is either a local or remote branch.</p></div>
 </div>
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 Start development from a known tag
 </dt>
 <dd>
@@ -608,10 +706,10 @@ Start development from a known tag
 <div class="content">
 <pre><tt>$ git clone git://git.kernel.org/pub/scm/.../linux-2.6 my2.6
 $ cd my2.6
-$ git branch my2.6.14 v2.6.14   <b>(1)</b>
+$ git branch my2.6.14 v2.6.14   <b>&lt;1&gt;</b>
 $ git checkout my2.6.14</tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 This step and the next one could be combined into a single step with
@@ -620,7 +718,7 @@ This step and the next one could be combined into a single step with
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Delete an unneeded branch
 </dt>
 <dd>
@@ -628,10 +726,10 @@ Delete an unneeded branch
 <div class="content">
 <pre><tt>$ git clone git://git.kernel.org/.../git.git my.git
 $ cd my.git
-$ git branch -d -r origin/todo origin/html origin/man   <b>(1)</b>
-$ git branch -D test                                    <b>(2)</b></tt></pre>
+$ git branch -d -r origin/todo origin/html origin/man   <b>&lt;1&gt;</b>
+$ git branch -D test                                    <b>&lt;2&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 Delete the remote-tracking branches "todo", "html" and "man". The next
@@ -651,12 +749,12 @@ is currently checked out) does not have all commits from the test branch.
 </div>
 <h2 id="_notes">Notes</h2>
 <div class="sectionbody">
-<div class="para"><p>If you are creating a branch that you want to checkout immediately, it is
+<div class="paragraph"><p>If you are creating a branch that you want to checkout immediately, it is
 easier to use the git checkout command with its <tt>-b</tt> option to create
 a branch and check it out with a single command.</p></div>
-<div class="para"><p>The options <tt>--contains</tt>, <tt>--merged</tt> and <tt>--no-merged</tt> serve three related
+<div class="paragraph"><p>The options <tt>--contains</tt>, <tt>--merged</tt> and <tt>--no-merged</tt> serve three related
 but different purposes:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>--contains &lt;commit&gt;</tt> is used to find all branches which will need
@@ -680,27 +778,27 @@ but different purposes:</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-check-ref-format.html">git-check-ref-format(1)</a>,
+<div class="paragraph"><p><a href="git-check-ref-format.html">git-check-ref-format(1)</a>,
 <a href="git-fetch.html">git-fetch(1)</a>,
 <a href="git-remote.html">git-remote(1)</a>,
 <a href="user-manual.html#what-is-a-branch">&#8220;Understanding history: What is
-a branch?&#8221;</a> in the Git User's Manual.</p></div>
+a branch?&#8221;</a> in the Git User&#8217;s Manual.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt; and Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:34 UTC
+Last updated 2010-11-25 03:13:40 UTC
 </div>
 </div>
 </body>

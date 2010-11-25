@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-checkout(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-checkout(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,25 +412,27 @@ git-checkout(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git checkout</em> [-q] [-f] [-m] [&lt;branch&gt;]
+<div class="verseblock-content"><em>git checkout</em> [-q] [-f] [-m] [&lt;branch&gt;]
 <em>git checkout</em> [-q] [-f] [-m] [[-b|-B|--orphan] &lt;new_branch&gt;] [&lt;start_point&gt;]
 <em>git checkout</em> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;paths&gt;&#8230;
-<em>git checkout</em> --patch [&lt;tree-ish&gt;] [--] [&lt;paths&gt;&#8230;]</div></div>
+<em>git checkout</em> --patch [&lt;tree-ish&gt;] [--] [&lt;paths&gt;&#8230;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Updates files in the working tree to match the version in the index
+<div class="paragraph"><p>Updates files in the working tree to match the version in the index
 or the specified tree.  If no paths are given, <em>git checkout</em> will
 also update <tt>HEAD</tt> to set the specified branch as the current
 branch.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>git checkout</em> [&lt;branch&gt;]
 </dt>
-<dt>
+<dt class="hdlist1">
 <em>git checkout</em> -b|-B &lt;new_branch&gt; [&lt;start point&gt;]
 </dt>
 <dd>
@@ -344,22 +440,22 @@ branch.</p></div>
         This form switches branches by updating the index, working
         tree, and HEAD to reflect the specified branch.
 </p>
-<div class="para"><p>If <tt>-b</tt> is given, a new branch is created as if <a href="git-branch.html">git-branch(1)</a>
+<div class="paragraph"><p>If <tt>-b</tt> is given, a new branch is created as if <a href="git-branch.html">git-branch(1)</a>
 were called and then checked out; in this case you can
 use the <tt>--track</tt> or <tt>--no-track</tt> options, which will be passed to
 <em>git branch</em>.  As a convenience, <tt>--track</tt> without <tt>-b</tt> implies branch
 creation; see the description of <tt>--track</tt> below.</p></div>
-<div class="para"><p>If <tt>-B</tt> is given, &lt;new_branch&gt; is created if it doesn't exist; otherwise, it
+<div class="paragraph"><p>If <tt>-B</tt> is given, &lt;new_branch&gt; is created if it doesn&#8217;t exist; otherwise, it
 is reset. This is the transactional equivalent of</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git branch -f &lt;branch&gt; [&lt;start point&gt;]
 $ git checkout &lt;branch&gt;</tt></pre>
 </div></div>
-<div class="para"><p>that is to say, the branch is not reset/created unless "git checkout" is
+<div class="paragraph"><p>that is to say, the branch is not reset/created unless "git checkout" is
 successful.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>git checkout</em> [--patch] [&lt;tree-ish&gt;] [--] &lt;pathspec&gt;&#8230;
 </dt>
 <dd>
@@ -373,7 +469,7 @@ successful.</p></div>
         (i.e.  commit, tag or tree) to update the index for the given
         paths before updating the working tree.
 </p>
-<div class="para"><p>The index may contain unmerged entries because of a previous failed merge.
+<div class="paragraph"><p>The index may contain unmerged entries because of a previous failed merge.
 By default, if you try to check out such an entry from the index, the
 checkout operation will fail and nothing will be checked out.
 Using <tt>-f</tt> will ignore these unmerged entries.  The contents from a
@@ -385,11 +481,11 @@ file can be discarded to re-create the original conflicted merge result.</p></di
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -397,10 +493,10 @@ file can be discarded to re-create the original conflicted merge result.</p></di
         Quiet, suppress feedback messages.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -409,13 +505,13 @@ file can be discarded to re-create the original conflicted merge result.</p></di
         working tree differs from HEAD.  This is used to throw away
         local changes.
 </p>
-<div class="para"><p>When checking out paths from the index, do not fail upon unmerged
+<div class="paragraph"><p>When checking out paths from the index, do not fail upon unmerged
 entries; instead, unmerged entries are ignored.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --ours
 </dt>
-<dt>
+<dt class="hdlist1">
 --theirs
 </dt>
 <dd>
@@ -424,7 +520,7 @@ entries; instead, unmerged entries are ignored.</p></div>
         (<em>ours</em>) or #3 (<em>theirs</em>) for unmerged paths.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -b
 </dt>
 <dd>
@@ -433,7 +529,7 @@ entries; instead, unmerged entries are ignored.</p></div>
         &lt;start_point&gt;; see <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -B
 </dt>
 <dd>
@@ -444,10 +540,10 @@ entries; instead, unmerged entries are ignored.</p></div>
         <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -t
 </dt>
-<dt>
+<dt class="hdlist1">
 --track
 </dt>
 <dd>
@@ -455,8 +551,8 @@ entries; instead, unmerged entries are ignored.</p></div>
         When creating a new branch, set up "upstream" configuration. See
         "--track" in <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
-<div class="para"><p>If no <em>-b</em> option is given, the name of the new branch will be
-derived from the remote branch.  If "remotes/" or "refs/remotes/"
+<div class="paragraph"><p>If no <em>-b</em> option is given, the name of the new branch will be
+derived from the remote-tracking branch.  If "remotes/" or "refs/remotes/"
 is prefixed it is stripped away, and then the part up to the
 next slash (which would be the nickname of the remote) is removed.
 This would tell us to use "hack" as the local branch when branching
@@ -465,7 +561,7 @@ off of "origin/hack" (or "remotes/origin/hack", or even
 guessing results in an empty name, the guessing is aborted.  You can
 explicitly give a name with <em>-b</em> in such a case.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-track
 </dt>
 <dd>
@@ -474,16 +570,16 @@ explicitly give a name with <em>-b</em> in such a case.</p></div>
         branch.autosetupmerge configuration variable is true.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -l
 </dt>
 <dd>
 <p>
-        Create the new branch's reflog; see <a href="git-branch.html">git-branch(1)</a> for
+        Create the new branch&#8217;s reflog; see <a href="git-branch.html">git-branch(1)</a> for
         details.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --orphan
 </dt>
 <dd>
@@ -494,26 +590,26 @@ explicitly give a name with <em>-b</em> in such a case.</p></div>
         history totally disconnected from all the other branches and
         commits.
 </p>
-<div class="para"><p>The index and the working tree are adjusted as if you had previously run
+<div class="paragraph"><p>The index and the working tree are adjusted as if you had previously run
 "git checkout &lt;start_point&gt;".  This allows you to start a new history
 that records a set of paths similar to &lt;start_point&gt; by easily running
 "git commit -a" to make the root commit.</p></div>
-<div class="para"><p>This can be useful when you want to publish the tree from a commit
+<div class="paragraph"><p>This can be useful when you want to publish the tree from a commit
 without exposing its full history. You might want to do this to publish
 an open source branch of a project whose current tree is "clean", but
 whose full history contains proprietary or otherwise encumbered bits of
 code.</p></div>
-<div class="para"><p>If you want to start a disconnected history that records a set of paths
+<div class="paragraph"><p>If you want to start a disconnected history that records a set of paths
 that is totally different from the one of &lt;start_point&gt;, then you should
 clear the index and the working tree right after creating the orphan
 branch by running "git rm -rf ." from the top level of the working tree.
 Afterwards you will be ready to prepare your new files, repopulating the
 working tree, by copying them from elsewhere, extracting a tarball, etc.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m
 </dt>
-<dt>
+<dt class="hdlist1">
 --merge
 </dt>
 <dd>
@@ -527,14 +623,14 @@ working tree, by copying them from elsewhere, extracting a tarball, etc.</p></di
         branch, your working tree contents, and the new branch
         is done, and you will be on the new branch.
 </p>
-<div class="para"><p>When a merge conflict happens, the index entries for conflicting
+<div class="paragraph"><p>When a merge conflict happens, the index entries for conflicting
 paths are left unmerged, and you need to resolve the conflicts
 and mark the resolved paths with <tt>git add</tt> (or <tt>git rm</tt> if the merge
 should result in deletion of the path).</p></div>
-<div class="para"><p>When checking out paths from the index, this option lets you recreate
+<div class="paragraph"><p>When checking out paths from the index, this option lets you recreate
 the conflicted merge in the specified paths.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --conflict=&lt;style&gt;
 </dt>
 <dd>
@@ -546,10 +642,10 @@ the conflicted merge in the specified paths.</p></div>
         "merge" style, shows the original contents).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -p
 </dt>
-<dt>
+<dt class="hdlist1">
 --patch
 </dt>
 <dd>
@@ -559,10 +655,10 @@ the conflicted merge in the specified paths.</p></div>
         tree.  The chosen hunks are then applied in reverse to the
         working tree (and if a &lt;tree-ish&gt; was specified, the index).
 </p>
-<div class="para"><p>This means that you can use <tt>git checkout -p</tt> to selectively discard
+<div class="paragraph"><p>This means that you can use <tt>git checkout -p</tt> to selectively discard
 edits from your current working tree.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;branch&gt;
 </dt>
 <dd>
@@ -573,14 +669,14 @@ edits from your current working tree.</p></div>
         commit, your HEAD becomes "detached" and you are no longer on
         any branch (see below for details).
 </p>
-<div class="para"><p>As a special case, the <tt>"@{-N}"</tt> syntax for the N-th last branch
+<div class="paragraph"><p>As a special case, the <tt>"@{-N}"</tt> syntax for the N-th last branch
 checks out the branch (instead of detaching).  You may also specify
 <tt>-</tt> which is synonymous with <tt>"@{-1}"</tt>.</p></div>
-<div class="para"><p>As a further special case, you may use <tt>"A...B"</tt> as a shortcut for the
+<div class="paragraph"><p>As a further special case, you may use <tt>"A...B"</tt> as a shortcut for the
 merge base of <tt>A</tt> and <tt>B</tt> if there is exactly one merge base. You can
 leave out at most one of <tt>A</tt> and <tt>B</tt>, in which case it defaults to <tt>HEAD</tt>.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;new_branch&gt;
 </dt>
 <dd>
@@ -588,7 +684,7 @@ leave out at most one of <tt>A</tt> and <tt>B</tt>, in which case it defaults to
         Name for the new branch.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;start_point&gt;
 </dt>
 <dd>
@@ -597,7 +693,7 @@ leave out at most one of <tt>A</tt> and <tt>B</tt>, in which case it defaults to
         <a href="git-branch.html">git-branch(1)</a> for details. Defaults to HEAD.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;tree-ish&gt;
 </dt>
 <dd>
@@ -610,7 +706,7 @@ leave out at most one of <tt>A</tt> and <tt>B</tt>, in which case it defaults to
 </div>
 <h2 id="_detached_head">Detached HEAD</h2>
 <div class="sectionbody">
-<div class="para"><p>It is sometimes useful to be able to <em>checkout</em> a commit that is
+<div class="paragraph"><p>It is sometimes useful to be able to <em>checkout</em> a commit that is
 not at the tip of one of your branches.  The most obvious
 example is to check out the commit at a tagged official release
 point, like this:</p></div>
@@ -618,17 +714,17 @@ point, like this:</p></div>
 <div class="content">
 <pre><tt>$ git checkout v2.6.18</tt></pre>
 </div></div>
-<div class="para"><p>Earlier versions of git did not allow this and asked you to
+<div class="paragraph"><p>Earlier versions of git did not allow this and asked you to
 create a temporary branch using the <tt>-b</tt> option, but starting from
 version 1.5.0, the above command <em>detaches</em> your HEAD from the
 current branch and directly points at the commit named by the tag
 (<tt>v2.6.18</tt> in the example above).</p></div>
-<div class="para"><p>You can use all git commands while in this state.  You can use
+<div class="paragraph"><p>You can use all git commands while in this state.  You can use
 <tt>git reset --hard $othercommit</tt> to further move around, for
 example.  You can make changes and create a new commit on top of
 a detached HEAD.  You can even create a merge by using <tt>git
 merge $othercommit</tt>.</p></div>
-<div class="para"><p>The state you are in while your HEAD is detached is not recorded
+<div class="paragraph"><p>The state you are in while your HEAD is detached is not recorded
 by any branch (which is natural --- you are not on any branch).
 What this means is that you can discard your temporary commits
 and merges by switching back to an existing branch (e.g. <tt>git
@@ -642,7 +738,7 @@ the reflog for HEAD where you were, e.g.</p></div>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 The following sequence checks out the <tt>master</tt> branch, reverts
@@ -651,12 +747,12 @@ mistake, and gets it back from the index.
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout master             <b>(1)</b>
-$ git checkout master~2 Makefile  <b>(2)</b>
+<pre><tt>$ git checkout master             <b>&lt;1&gt;</b>
+$ git checkout master~2 Makefile  <b>&lt;2&gt;</b>
 $ rm -f hello.c
-$ git checkout hello.c            <b>(3)</b></tt></pre>
+$ git checkout hello.c            <b>&lt;3&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 switch branch
@@ -671,7 +767,7 @@ take a file out of another commit
 <p>
 restore hello.c from the index
 </p>
-<div class="para"><p>If you have an unfortunate branch that is named <tt>hello.c</tt>, this
+<div class="paragraph"><p>If you have an unfortunate branch that is named <tt>hello.c</tt>, this
 step would be confused as an instruction to switch to that branch.
 You should instead write:</p></div>
 <div class="listingblock">
@@ -690,7 +786,7 @@ branch would be done using:
 <div class="content">
 <pre><tt>$ git checkout mytopic</tt></pre>
 </div></div>
-<div class="para"><p>However, your "wrong" branch and correct "mytopic" branch may
+<div class="paragraph"><p>However, your "wrong" branch and correct "mytopic" branch may
 differ in files that you have modified locally, in which case
 the above checkout would fail like this:</p></div>
 <div class="listingblock">
@@ -698,14 +794,14 @@ the above checkout would fail like this:</p></div>
 <pre><tt>$ git checkout mytopic
 error: You have local changes to 'frotz'; not switching branches.</tt></pre>
 </div></div>
-<div class="para"><p>You can give the <tt>-m</tt> flag to the command, which would try a
+<div class="paragraph"><p>You can give the <tt>-m</tt> flag to the command, which would try a
 three-way merge:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git checkout -m mytopic
 Auto-merging frotz</tt></pre>
 </div></div>
-<div class="para"><p>After this three-way merge, the local modifications are _not_
+<div class="paragraph"><p>After this three-way merge, the local modifications are <em>not</em>
 registered in your index file, so <tt>git diff</tt> would show you what
 changes you made since the tip of the new branch.</p></div>
 </li>
@@ -721,7 +817,7 @@ Auto-merging frotz
 ERROR: Merge conflict in frotz
 fatal: merge program failed</tt></pre>
 </div></div>
-<div class="para"><p>At this point, <tt>git diff</tt> shows the changes cleanly merged as in
+<div class="paragraph"><p>At this point, <tt>git diff</tt> shows the changes cleanly merged as in
 the previous example, as well as the changes in the conflicted
 files.  Edit and resolve the conflict and mark it resolved with
 <tt>git add</tt> as usual:</p></div>
@@ -735,19 +831,19 @@ $ git add frotz</tt></pre>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-28 05:49:36 UTC
+Last updated 2010-11-25 03:13:40 UTC
 </div>
 </div>
 </body>

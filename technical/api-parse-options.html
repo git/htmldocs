@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>parse-options API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -279,6 +347,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -291,8 +360,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -303,7 +381,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>parse-options API</title>
 </head>
 <body>
 <div id="header">
@@ -311,17 +388,17 @@ div#toc a:visited { color: blue; }
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="para"><p>The parse-options API is used to parse and massage options in git
+<div class="paragraph"><p>The parse-options API is used to parse and massage options in git
 and to provide a usage help with consistent look.</p></div>
 </div>
 </div>
 <h2 id="_basics">Basics</h2>
 <div class="sectionbody">
-<div class="para"><p>The argument vector <tt>argv[]</tt> may usually contain mandatory or optional
+<div class="paragraph"><p>The argument vector <tt>argv[]</tt> may usually contain mandatory or optional
 <em>non-option arguments</em>, e.g. a filename or a branch, and <em>options</em>.
 Options are optional arguments that start with a dash and
 that allow to change the behavior of a command.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 There are basically three types of options:
@@ -347,8 +424,8 @@ Options are case-sensitive.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>The parse-options API allows:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The parse-options API allows:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>sticked</em> and <em>separate form</em> of options with arguments.
@@ -384,7 +461,7 @@ Options and non-option arguments can clearly be separated using the <tt>--</tt>
 </div>
 <h2 id="_steps_to_parse_options">Steps to parse options</h2>
 <div class="sectionbody">
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <tt>#include "parse-options.h"</tt>
@@ -412,17 +489,17 @@ in <tt>cmd_foo(int argc, const char **argv, const char *prefix)</tt>
 <div class="content">
 <pre><tt>argc = parse_options(argc, argv, prefix, builtin_foo_options, builtin_foo_usage, flags);</tt></pre>
 </div></div>
-<div class="para"><p><tt>parse_options()</tt> will filter out the processed options of <tt>argv[]</tt> and leave the
+<div class="paragraph"><p><tt>parse_options()</tt> will filter out the processed options of <tt>argv[]</tt> and leave the
 non-option arguments in <tt>argv[]</tt>.
 <tt>argc</tt> is updated appropriately because of the assignment.</p></div>
-<div class="para"><p>You can also pass NULL instead of a usage array as the fifth parameter of
+<div class="paragraph"><p>You can also pass NULL instead of a usage array as the fifth parameter of
 parse_options(), to avoid displaying a help screen with usage info and
 option list.  This should only be done if necessary, e.g. to implement
 a limited parser for only a subset of the options that needs to be run
 before the full parser, which in turn shows the full help message.</p></div>
-<div class="para"><p>Flags are the bitwise-or of:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>Flags are the bitwise-or of:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>PARSE_OPT_KEEP_DASHDASH</tt>
 </dt>
 <dd>
@@ -431,7 +508,7 @@ before the full parser, which in turn shows the full help message.</p></div>
         non-option arguments.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>PARSE_OPT_STOP_AT_NON_OPTION</tt>
 </dt>
 <dd>
@@ -441,39 +518,39 @@ before the full parser, which in turn shows the full help message.</p></div>
         argument.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>PARSE_OPT_KEEP_ARGV0</tt>
 </dt>
 <dd>
 <p>
-        Keep the first argument, which contains the program name.  It's
+        Keep the first argument, which contains the program name.  It&#8217;s
         removed from argv[] by default.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>PARSE_OPT_KEEP_UNKNOWN</tt>
 </dt>
 <dd>
 <p>
-        Keep unknown arguments instead of erroring out.  This doesn't
+        Keep unknown arguments instead of erroring out.  This doesn&#8217;t
         work for all combinations of arguments as users might expect
-        it to do.  E.g. if the first argument in <tt>&#8212;unknown &#8212;known</tt>
-        takes a value (which we can't know), the second one is
+        it to do.  E.g. if the first argument in <tt>--unknown --known</tt>
+        takes a value (which we can&#8217;t know), the second one is
         mistakenly interpreted as a known option.  Similarly, if
         <tt>PARSE_OPT_STOP_AT_NON_OPTION</tt> is set, the second argument in
-        <tt>&#8212;unknown value</tt> will be mistakenly interpreted as a
+        <tt>--unknown value</tt> will be mistakenly interpreted as a
         non-option, not as a value belonging to the unknown option,
-        the parser early.  That's why parse_options() errors out if
+        the parser early.  That&#8217;s why parse_options() errors out if
         both options are set.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>PARSE_OPT_NO_INTERNAL_HELP</tt>
 </dt>
 <dd>
 <p>
-        By default, parse_options() handles <tt>-h</tt>, <tt>&#8212;help</tt> and
-        <tt>&#8212;help-all</tt> internally, by showing a help screen.  This option
+        By default, parse_options() handles <tt>-h</tt>, <tt>--help</tt> and
+        <tt>--help-all</tt> internally, by showing a help screen.  This option
         turns it off and allows one to add custom handlers for these
         options, or to just leave them unknown.
 </p>
@@ -484,11 +561,11 @@ before the full parser, which in turn shows the full help message.</p></div>
 </div>
 <h2 id="_data_structure">Data Structure</h2>
 <div class="sectionbody">
-<div class="para"><p>The main data structure is an array of the <tt>option</tt> struct,
+<div class="paragraph"><p>The main data structure is an array of the <tt>option</tt> struct,
 say <tt>static struct option builtin_add_options[]</tt>.
 There are some macros to easily define options:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>OPT__ABBREV(&amp;int_var)</tt>
 </dt>
 <dd>
@@ -496,39 +573,47 @@ There are some macros to easily define options:</p></div>
         Add <tt>--abbrev[=&lt;n&gt;]</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT__COLOR(&amp;int_var, description)</tt>
 </dt>
 <dd>
 <p>
-        Add <tt>--color[=&lt;when&gt;]</tt> and <tt>&#8212;no-color</tt>.
+        Add <tt>--color[=&lt;when&gt;]</tt> and <tt>--no-color</tt>.
 </p>
 </dd>
-<dt>
-<tt>OPT__DRY_RUN(&amp;int_var)</tt>
+<dt class="hdlist1">
+<tt>OPT__DRY_RUN(&amp;int_var, description)</tt>
 </dt>
 <dd>
 <p>
         Add <tt>-n, --dry-run</tt>.
 </p>
 </dd>
-<dt>
-<tt>OPT__QUIET(&amp;int_var)</tt>
+<dt class="hdlist1">
+<tt>OPT__FORCE(&amp;int_var, description)</tt>
+</dt>
+<dd>
+<p>
+        Add <tt>-f, --force</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>OPT__QUIET(&amp;int_var, description)</tt>
 </dt>
 <dd>
 <p>
         Add <tt>-q, --quiet</tt>.
 </p>
 </dd>
-<dt>
-<tt>OPT__VERBOSE(&amp;int_var)</tt>
+<dt class="hdlist1">
+<tt>OPT__VERBOSE(&amp;int_var, description)</tt>
 </dt>
 <dd>
 <p>
         Add <tt>-v, --verbose</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_GROUP(description)</tt>
 </dt>
 <dd>
@@ -538,7 +623,7 @@ There are some macros to easily define options:</p></div>
         Start the description with an upper-case letter.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_BOOLEAN(short, long, &amp;int_var, description)</tt>
 </dt>
 <dd>
@@ -547,7 +632,7 @@ There are some macros to easily define options:</p></div>
         <tt>int_var</tt> is incremented on each use.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_BIT(short, long, &amp;int_var, description, mask)</tt>
 </dt>
 <dd>
@@ -556,7 +641,7 @@ There are some macros to easily define options:</p></div>
         If used, <tt>int_var</tt> is bitwise-ored with <tt>mask</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_NEGBIT(short, long, &amp;int_var, description, mask)</tt>
 </dt>
 <dd>
@@ -565,7 +650,7 @@ There are some macros to easily define options:</p></div>
         If used, <tt>int_var</tt> is bitwise-anded with the inverted <tt>mask</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_SET_INT(short, long, &amp;int_var, description, integer)</tt>
 </dt>
 <dd>
@@ -574,7 +659,7 @@ There are some macros to easily define options:</p></div>
         If used, set <tt>int_var</tt> to <tt>integer</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_SET_PTR(short, long, &amp;ptr_var, description, ptr)</tt>
 </dt>
 <dd>
@@ -583,7 +668,7 @@ There are some macros to easily define options:</p></div>
         If used, set <tt>ptr_var</tt> to <tt>ptr</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_STRING(short, long, &amp;str_var, arg_str, description)</tt>
 </dt>
 <dd>
@@ -592,7 +677,7 @@ There are some macros to easily define options:</p></div>
         The string argument is put into <tt>str_var</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_INTEGER(short, long, &amp;int_var, description)</tt>
 </dt>
 <dd>
@@ -601,7 +686,7 @@ There are some macros to easily define options:</p></div>
         The integer is put into <tt>int_var</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_DATE(short, long, &amp;int_var, description)</tt>
 </dt>
 <dd>
@@ -610,7 +695,7 @@ There are some macros to easily define options:</p></div>
         The timestamp is put into <tt>int_var</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_CALLBACK(short, long, &amp;var, arg_str, description, func_ptr)</tt>
 </dt>
 <dd>
@@ -621,7 +706,7 @@ There are some macros to easily define options:</p></div>
         See <em>Option Callbacks</em> below for a more elaborate description.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_FILENAME(short, long, &amp;var, description)</tt>
 </dt>
 <dd>
@@ -631,7 +716,7 @@ There are some macros to easily define options:</p></div>
         the prefix argument of <tt>parse_options()</tt> to <tt>prefix_filename()</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_ARGUMENT(long, description)</tt>
 </dt>
 <dd>
@@ -639,7 +724,7 @@ There are some macros to easily define options:</p></div>
         Introduce a long-option argument that will be kept in <tt>argv[]</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_NUMBER_CALLBACK(&amp;var, description, func_ptr)</tt>
 </dt>
 <dd>
@@ -652,24 +737,24 @@ There are some macros to easily define options:</p></div>
         precedence over it.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>OPT_COLOR_FLAG(short, long, &amp;int_var, description)</tt>
 </dt>
 <dd>
 <p>
         Introduce an option that takes an optional argument that can
         have one of three values: "always", "never", or "auto".  If the
-        argument is not given, it defaults to "always".  The <tt>&#8212;no-</tt> form
-        works like <tt>&#8212;long=never</tt>; it cannot take an argument.  If
+        argument is not given, it defaults to "always".  The <tt>--no-</tt> form
+        works like <tt>--long=never</tt>; it cannot take an argument.  If
         "always", set <tt>int_var</tt> to 1; if "never", set <tt>int_var</tt> to 0; if
         "auto", set <tt>int_var</tt> to 1 if stdout is a tty or a pager,
         0 otherwise.
 </p>
 </dd>
 </dl></div>
-<div class="para"><p>The last element of the array must be <tt>OPT_END()</tt>.</p></div>
-<div class="para"><p>If not stated otherwise, interpret the arguments as follows:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The last element of the array must be <tt>OPT_END()</tt>.</p></div>
+<div class="paragraph"><p>If not stated otherwise, interpret the arguments as follows:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>short</tt> is a character for the short option
@@ -710,20 +795,20 @@ There are some macros to easily define options:</p></div>
 </div>
 <h2 id="_option_callbacks">Option Callbacks</h2>
 <div class="sectionbody">
-<div class="para"><p>The function must be defined in this form:</p></div>
+<div class="paragraph"><p>The function must be defined in this form:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>int func(const struct option *opt, const char *arg, int unset)</tt></pre>
 </div></div>
-<div class="para"><p>The callback mechanism is as follows:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The callback mechanism is as follows:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 Inside <tt>func</tt>, the only interesting member of the structure
-  given by <tt>opt</tt> is the void pointer <tt>opt\-&gt;value</tt>.
-  <tt>*opt\-&gt;value</tt> will be the value that is saved into <tt>var</tt>, if you
+  given by <tt>opt</tt> is the void pointer <tt>opt-&gt;value</tt>.
+  <tt>*opt-&gt;value</tt> will be the value that is saved into <tt>var</tt>, if you
   use <tt>OPT_CALLBACK()</tt>.
-  For example, do <tt>*(unsigned long *)opt\-&gt;value = 42;</tt> to get 42
+  For example, do <tt>*(unsigned long *)opt-&gt;value = 42;</tt> to get 42
   into an <tt>unsigned long</tt> variable.
 </p>
 </li>
@@ -742,16 +827,16 @@ If the user negates the option, <tt>arg</tt> is <tt>NULL</tt> and <tt>unset</tt>
 </div>
 <h2 id="_sophisticated_option_parsing">Sophisticated option parsing</h2>
 <div class="sectionbody">
-<div class="para"><p>If you need, for example, option callbacks with optional arguments
+<div class="paragraph"><p>If you need, for example, option callbacks with optional arguments
 or without arguments at all, or if you need other special cases,
 that are not handled by the macros above, you need to specify the
 members of the <tt>option</tt> structure manually.</p></div>
-<div class="para"><p>This is not covered in this document, but well documented
+<div class="paragraph"><p>This is not covered in this document, but well documented
 in <tt>parse-options.h</tt> itself.</p></div>
 </div>
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
-<div class="para"><p>See <tt>test-parse-options.c</tt> and
+<div class="paragraph"><p>See <tt>test-parse-options.c</tt> and
 <tt>builtin-add.c</tt>,
 <tt>builtin-clone.c</tt>,
 <tt>builtin-commit.c</tt>,
@@ -762,7 +847,7 @@ for real-world examples.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:13 UTC
+Last updated 2010-11-25 03:13:43 UTC
 </div>
 </div>
 </body>

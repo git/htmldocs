@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>gittutorial-2(7)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>gittutorial-2(7)</title>
 </head>
 <body>
 <div id="header">
@@ -318,21 +412,21 @@ gittutorial-2(7) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p>git *</p></div>
+<div class="paragraph"><p>git *</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>You should work through <a href="gittutorial.html">gittutorial(7)</a> before reading this tutorial.</p></div>
-<div class="para"><p>The goal of this tutorial is to introduce two fundamental pieces of
-git's architecture--the object database and the index file--and to
+<div class="paragraph"><p>You should work through <a href="gittutorial.html">gittutorial(7)</a> before reading this tutorial.</p></div>
+<div class="paragraph"><p>The goal of this tutorial is to introduce two fundamental pieces of
+git&#8217;s architecture&#8212;the object database and the index file&#8212;and to
 provide the reader with everything necessary to understand the rest
 of the git documentation.</p></div>
 </div>
 <h2 id="_the_git_object_database">The git object database</h2>
 <div class="sectionbody">
-<div class="para"><p>Let's start a new project and create a small amount of history:</p></div>
+<div class="paragraph"><p>Let&#8217;s start a new project and create a small amount of history:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ mkdir test-project
@@ -350,23 +444,23 @@ $ git commit -a -m "add emphasis"
 [master c4d59f3] add emphasis
  1 files changed, 1 insertions(+), 1 deletions(-)</tt></pre>
 </div></div>
-<div class="para"><p>What are the 7 digits of hex that git responded to the commit with?</p></div>
-<div class="para"><p>We saw in part one of the tutorial that commits have names like this.
+<div class="paragraph"><p>What are the 7 digits of hex that git responded to the commit with?</p></div>
+<div class="paragraph"><p>We saw in part one of the tutorial that commits have names like this.
 It turns out that every object in the git history is stored under
-a 40-digit hex name.  That name is the SHA1 hash of the object's
+a 40-digit hex name.  That name is the SHA1 hash of the object&#8217;s
 contents; among other things, this ensures that git will never store
 the same data twice (since identical data is given an identical SHA1
 name), and that the contents of a git object will never change (since
-that would change the object's name as well). The 7 char hex strings
+that would change the object&#8217;s name as well). The 7 char hex strings
 here are simply the abbreviation of such 40 character long strings.
 Abbreviations can be used everywhere where the 40 character strings
 can be used, so long as they are unambiguous.</p></div>
-<div class="para"><p>It is expected that the content of the commit object you created while
+<div class="paragraph"><p>It is expected that the content of the commit object you created while
 following the example above generates a different SHA1 hash than
 the one shown above because the commit object records the time when
 it was created and the name of the person performing the commit.</p></div>
-<div class="para"><p>We can ask git about this particular object with the <tt>cat-file</tt>
-command. Don't copy the 40 hex digits from this example but use those
+<div class="paragraph"><p>We can ask git about this particular object with the <tt>cat-file</tt>
+command. Don&#8217;t copy the 40 hex digits from this example but use those
 from your own version. Note that you can shorten it to only a few
 characters to save yourself typing all 40 hex digits:</p></div>
 <div class="listingblock">
@@ -380,7 +474,7 @@ committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
 
 initial commit</tt></pre>
 </div></div>
-<div class="para"><p>A tree can refer to one or more "blob" objects, each corresponding to
+<div class="paragraph"><p>A tree can refer to one or more "blob" objects, each corresponding to
 a file.  In addition, a tree can also refer to other tree objects,
 thus creating a directory hierarchy.  You can examine the contents of
 any tree using ls-tree (remember that a long enough initial portion
@@ -390,23 +484,23 @@ of the SHA1 will also work):</p></div>
 <pre><tt>$ git ls-tree 92b8b694
 100644 blob 3b18e512dba79e4c8300dd08aeb37f8e728b8dad    file.txt</tt></pre>
 </div></div>
-<div class="para"><p>Thus we see that this tree has one file in it.  The SHA1 hash is a
-reference to that file's data:</p></div>
+<div class="paragraph"><p>Thus we see that this tree has one file in it.  The SHA1 hash is a
+reference to that file&#8217;s data:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git cat-file -t 3b18e512
 blob</tt></pre>
 </div></div>
-<div class="para"><p>A "blob" is just file data, which we can also examine with cat-file:</p></div>
+<div class="paragraph"><p>A "blob" is just file data, which we can also examine with cat-file:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git cat-file blob 3b18e512
 hello world</tt></pre>
 </div></div>
-<div class="para"><p>Note that this is the old file data; so the object that git named in
+<div class="paragraph"><p>Note that this is the old file data; so the object that git named in
 its response to the initial tree was a tree with a snapshot of the
 directory state that was recorded by the first commit.</p></div>
-<div class="para"><p>All of these objects are stored under their SHA1 names inside the git
+<div class="paragraph"><p>All of these objects are stored under their SHA1 names inside the git
 directory:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -427,17 +521,17 @@ directory:</p></div>
 .git/objects/c4
 .git/objects/c4/d59f390b9cfd4318117afde11d601c1085f241</tt></pre>
 </div></div>
-<div class="para"><p>and the contents of these files is just the compressed data plus a
+<div class="paragraph"><p>and the contents of these files is just the compressed data plus a
 header identifying their length and their type.  The type is either a
 blob, a tree, a commit, or a tag.</p></div>
-<div class="para"><p>The simplest commit to find is the HEAD commit, which we can find
+<div class="paragraph"><p>The simplest commit to find is the HEAD commit, which we can find
 from .git/HEAD:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ cat .git/HEAD
 ref: refs/heads/master</tt></pre>
 </div></div>
-<div class="para"><p>As you can see, this tells us which branch we're currently on, and it
+<div class="paragraph"><p>As you can see, this tells us which branch we&#8217;re currently on, and it
 tells us this by naming a file under the .git directory, which itself
 contains a SHA1 name referring to a commit object, which we can
 examine with cat-file:</p></div>
@@ -455,7 +549,7 @@ committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143418702 -0500
 
 add emphasis</tt></pre>
 </div></div>
-<div class="para"><p>The "tree" object here refers to the new state of the tree:</p></div>
+<div class="paragraph"><p>The "tree" object here refers to the new state of the tree:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-tree d0492b36
@@ -463,7 +557,7 @@ add emphasis</tt></pre>
 $ git cat-file blob a0423896
 hello world!</tt></pre>
 </div></div>
-<div class="para"><p>and the "parent" object refers to the previous commit:</p></div>
+<div class="paragraph"><p>and the "parent" object refers to the previous commit:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git cat-file commit 54196cc2
@@ -473,23 +567,23 @@ committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
 
 initial commit</tt></pre>
 </div></div>
-<div class="para"><p>The tree object is the tree we examined first, and this commit is
+<div class="paragraph"><p>The tree object is the tree we examined first, and this commit is
 unusual in that it lacks any parent.</p></div>
-<div class="para"><p>Most commits have only one parent, but it is also common for a commit
+<div class="paragraph"><p>Most commits have only one parent, but it is also common for a commit
 to have multiple parents.   In that case the commit represents a
 merge, with the parent references pointing to the heads of the merged
 branches.</p></div>
-<div class="para"><p>Besides blobs, trees, and commits, the only remaining type of object
-is a "tag", which we won't discuss here; refer to <a href="git-tag.html">git-tag(1)</a>
+<div class="paragraph"><p>Besides blobs, trees, and commits, the only remaining type of object
+is a "tag", which we won&#8217;t discuss here; refer to <a href="git-tag.html">git-tag(1)</a>
 for details.</p></div>
-<div class="para"><p>So now we know how git uses the object database to represent a
-project's history:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>So now we know how git uses the object database to represent a
+project&#8217;s history:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 "commit" objects refer to "tree" objects representing the
     snapshot of a directory tree at a particular point in the
-    history, and refer to "parent" commits to show how they're
+    history, and refer to "parent" commits to show how they&#8217;re
     connected into the project history.
 </p>
 </li>
@@ -517,30 +611,30 @@ The name of the current branch is stored in .git/HEAD.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Note, by the way, that lots of commands take a tree as an argument.
+<div class="paragraph"><p>Note, by the way, that lots of commands take a tree as an argument.
 But as we can see above, a tree can be referred to in many different
-ways--by the SHA1 name for that tree, by the name of a commit that
+ways&#8212;by the SHA1 name for that tree, by the name of a commit that
 refers to the tree, by the name of a branch whose head refers to that
 tree, etc.--and most such commands can accept any of these names.</p></div>
-<div class="para"><p>In command synopses, the word "tree-ish" is sometimes used to
+<div class="paragraph"><p>In command synopses, the word "tree-ish" is sometimes used to
 designate such an argument.</p></div>
 </div>
 <h2 id="_the_index_file">The index file</h2>
 <div class="sectionbody">
-<div class="para"><p>The primary tool we've been using to create commits is <tt>git-commit
--a</tt>, which creates a commit including every change you've made to
+<div class="paragraph"><p>The primary tool we&#8217;ve been using to create commits is <tt>git-commit
+-a</tt>, which creates a commit including every change you&#8217;ve made to
 your working tree.  But what if you want to commit changes only to
 certain files?  Or only certain changes to certain files?</p></div>
-<div class="para"><p>If we look at the way commits are created under the cover, we'll see
+<div class="paragraph"><p>If we look at the way commits are created under the cover, we&#8217;ll see
 that there are more flexible ways creating commits.</p></div>
-<div class="para"><p>Continuing with our test-project, let's modify file.txt again:</p></div>
+<div class="paragraph"><p>Continuing with our test-project, let&#8217;s modify file.txt again:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ echo "hello world, again" &gt;&gt;file.txt</tt></pre>
 </div></div>
-<div class="para"><p>but this time instead of immediately making the commit, let's take an
+<div class="paragraph"><p>but this time instead of immediately making the commit, let&#8217;s take an
 intermediate step, and ask for diffs along the way to keep track of
-what's happening:</p></div>
+what&#8217;s happening:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git diff
@@ -552,8 +646,8 @@ what's happening:</p></div>
 $ git add file.txt
 $ git diff</tt></pre>
 </div></div>
-<div class="para"><p>The last diff is empty, but no new commits have been made, and the
-head still doesn't contain the new line:</p></div>
+<div class="paragraph"><p>The last diff is empty, but no new commits have been made, and the
+head still doesn&#8217;t contain the new line:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git diff HEAD
@@ -565,8 +659,8 @@ index a042389..513feba 100644
  hello world!
 +hello world, again</tt></pre>
 </div></div>
-<div class="para"><p>So <em>git diff</em> is comparing against something other than the head.
-The thing that it's comparing against is actually the index file,
+<div class="paragraph"><p>So <em>git diff</em> is comparing against something other than the head.
+The thing that it&#8217;s comparing against is actually the index file,
 which is stored in .git/index in a binary format, but whose contents
 we can examine with ls-files:</p></div>
 <div class="listingblock">
@@ -579,9 +673,9 @@ $ git cat-file blob 513feba2
 hello world!
 hello world, again</tt></pre>
 </div></div>
-<div class="para"><p>So what our <em>git add</em> did was store a new blob and then put
+<div class="paragraph"><p>So what our <em>git add</em> did was store a new blob and then put
 a reference to it in the index file.  If we modify the file again,
-we'll see that the new modifications are reflected in the <em>git diff</em>
+we&#8217;ll see that the new modifications are reflected in the <em>git diff</em>
 output:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -595,7 +689,7 @@ index 513feba..ba3da7b 100644
  hello world, again
 +again?</tt></pre>
 </div></div>
-<div class="para"><p>With the right arguments, <em>git diff</em> can also show us the difference
+<div class="paragraph"><p>With the right arguments, <em>git diff</em> can also show us the difference
 between the working directory and the last commit, or between the
 index and the last commit:</p></div>
 <div class="listingblock">
@@ -618,7 +712,7 @@ index a042389..513feba 100644
  hello world!
 +hello world, again</tt></pre>
 </div></div>
-<div class="para"><p>At any time, we can create a new commit using <em>git commit</em> (without
+<div class="paragraph"><p>At any time, we can create a new commit using <em>git commit</em> (without
 the "-a" option), and verify that the state committed only includes the
 changes stored in the index file, not the additional change that is
 still only in our working tree:</p></div>
@@ -635,31 +729,31 @@ index 513feba..ba3da7b 100644
  hello world, again
 +again?</tt></pre>
 </div></div>
-<div class="para"><p>So by default <em>git commit</em> uses the index to create the commit, not
+<div class="paragraph"><p>So by default <em>git commit</em> uses the index to create the commit, not
 the working tree; the "-a" option to commit tells it to first update
 the index with all changes in the working tree.</p></div>
-<div class="para"><p>Finally, it's worth looking at the effect of <em>git add</em> on the index
+<div class="paragraph"><p>Finally, it&#8217;s worth looking at the effect of <em>git add</em> on the index
 file:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ echo "goodbye, world" &gt;closing.txt
 $ git add closing.txt</tt></pre>
 </div></div>
-<div class="para"><p>The effect of the <em>git add</em> was to add one entry to the index file:</p></div>
+<div class="paragraph"><p>The effect of the <em>git add</em> was to add one entry to the index file:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git ls-files --stage
 100644 8b9743b20d4b15be3955fc8d5cd2b09cd2336138 0       closing.txt
 100644 513feba2e53ebbd2532419ded848ba19de88ba00 0       file.txt</tt></pre>
 </div></div>
-<div class="para"><p>And, as you can see with cat-file, this new entry refers to the
+<div class="paragraph"><p>And, as you can see with cat-file, this new entry refers to the
 current contents of the file:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git cat-file blob 8b9743b2
 goodbye, world</tt></pre>
 </div></div>
-<div class="para"><p>The "status" command is a useful way to get a quick summary of the
+<div class="paragraph"><p>The "status" command is a useful way to get a quick summary of the
 situation:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -670,22 +764,22 @@ situation:</p></div>
 #
 #       new file: closing.txt
 #
-# Changed but not updated:
+# Changes not staged for commit:
 #   (use "git add &lt;file&gt;..." to update what will be committed)
 #
 #       modified: file.txt
 #</tt></pre>
 </div></div>
-<div class="para"><p>Since the current state of closing.txt is cached in the index file,
+<div class="paragraph"><p>Since the current state of closing.txt is cached in the index file,
 it is listed as "Changes to be committed".  Since file.txt has
-changes in the working directory that aren't reflected in the index,
+changes in the working directory that aren&#8217;t reflected in the index,
 it is marked "changed but not updated".  At this point, running "git
 commit" would create a commit that added closing.txt (with its new
-contents), but that didn't modify file.txt.</p></div>
-<div class="para"><p>Also, note that a bare <tt>git diff</tt> shows the changes to file.txt, but
+contents), but that didn&#8217;t modify file.txt.</p></div>
+<div class="paragraph"><p>Also, note that a bare <tt>git diff</tt> shows the changes to file.txt, but
 not the addition of closing.txt, because the version of closing.txt
 in the index file is identical to the one in the working directory.</p></div>
-<div class="para"><p>In addition to being the staging area for new commits, the index file
+<div class="paragraph"><p>In addition to being the staging area for new commits, the index file
 is also populated from the object database when checking out a
 branch, and is used to hold the trees involved in a merge operation.
 See <a href="gitcore-tutorial.html">gitcore-tutorial(7)</a> and the relevant man
@@ -693,38 +787,38 @@ pages for details.</p></div>
 </div>
 <h2 id="_what_next">What next?</h2>
 <div class="sectionbody">
-<div class="para"><p>At this point you should know everything necessary to read the man
+<div class="paragraph"><p>At this point you should know everything necessary to read the man
 pages for any of the git commands; one good place to start would be
 with the commands mentioned in <a href="everyday.html">Everyday git</a>.  You
 should be able to find any unknown jargon in <a href="gitglossary.html">gitglossary(7)</a>.</p></div>
-<div class="para"><p>The <a href="user-manual.html">Git User's Manual</a> provides a more
+<div class="paragraph"><p>The <a href="user-manual.html">Git User&#8217;s Manual</a> provides a more
 comprehensive introduction to git.</p></div>
-<div class="para"><p><a href="gitcvs-migration.html">gitcvs-migration(7)</a> explains how to
+<div class="paragraph"><p><a href="gitcvs-migration.html">gitcvs-migration(7)</a> explains how to
 import a CVS repository into git, and shows how to use git in a
 CVS-like way.</p></div>
-<div class="para"><p>For some interesting examples of git use, see the
+<div class="paragraph"><p>For some interesting examples of git use, see the
 <a href="howto-index.html">howtos</a>.</p></div>
-<div class="para"><p>For git developers, <a href="gitcore-tutorial.html">gitcore-tutorial(7)</a> goes
+<div class="paragraph"><p>For git developers, <a href="gitcore-tutorial.html">gitcore-tutorial(7)</a> goes
 into detail on the lower-level git mechanisms involved in, for
 example, creating a new commit.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="gittutorial.html">gittutorial(7)</a>,
+<div class="paragraph"><p><a href="gittutorial.html">gittutorial(7)</a>,
 <a href="gitcvs-migration.html">gitcvs-migration(7)</a>,
 <a href="gitcore-tutorial.html">gitcore-tutorial(7)</a>,
 <a href="gitglossary.html">gitglossary(7)</a>,
 <a href="git-help.html">git-help(1)</a>,
 <a href="everyday.html">Everyday git</a>,
-<a href="user-manual.html">The Git User's Manual</a></p></div>
+<a href="user-manual.html">The Git User&#8217;s Manual</a></p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:05 UTC
+Last updated 2010-11-25 03:13:43 UTC
 </div>
 </div>
 </body>

@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>gittutorial(7)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>gittutorial(7)</title>
 </head>
 <body>
 <div id="header">
@@ -318,31 +412,31 @@ gittutorial(7) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p>git *</p></div>
+<div class="paragraph"><p>git *</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>This tutorial explains how to import a new project into git, make
+<div class="paragraph"><p>This tutorial explains how to import a new project into git, make
 changes to it, and share changes with other developers.</p></div>
-<div class="para"><p>If you are instead primarily interested in using git to fetch a project,
+<div class="paragraph"><p>If you are instead primarily interested in using git to fetch a project,
 for example, to test the latest version, you may prefer to start with
-the first two chapters of <a href="user-manual.html">The Git User's Manual</a>.</p></div>
-<div class="para"><p>First, note that you can get documentation for a command such as
+the first two chapters of <a href="user-manual.html">The Git User&#8217;s Manual</a>.</p></div>
+<div class="paragraph"><p>First, note that you can get documentation for a command such as
 <tt>git log --graph</tt> with:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ man git-log</tt></pre>
 </div></div>
-<div class="para"><p>or:</p></div>
+<div class="paragraph"><p>or:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git help log</tt></pre>
 </div></div>
-<div class="para"><p>With the latter, you can use the manual viewer of your choice; see
+<div class="paragraph"><p>With the latter, you can use the manual viewer of your choice; see
 <a href="git-help.html">git-help(1)</a> for more information.</p></div>
-<div class="para"><p>It is a good idea to introduce yourself to git with your name and
+<div class="paragraph"><p>It is a good idea to introduce yourself to git with your name and
 public email address before doing any operation.  The easiest
 way to do so is:</p></div>
 <div class="listingblock">
@@ -353,7 +447,7 @@ $ git config --global user.email you@yourdomain.example.com</tt></pre>
 </div>
 <h2 id="_importing_a_new_project">Importing a new project</h2>
 <div class="sectionbody">
-<div class="para"><p>Assume you have a tarball project.tar.gz with your initial work.  You
+<div class="paragraph"><p>Assume you have a tarball project.tar.gz with your initial work.  You
 can place it under git revision control as follows.</p></div>
 <div class="listingblock">
 <div class="content">
@@ -361,44 +455,44 @@ can place it under git revision control as follows.</p></div>
 $ cd project
 $ git init</tt></pre>
 </div></div>
-<div class="para"><p>Git will reply</p></div>
+<div class="paragraph"><p>Git will reply</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>Initialized empty Git repository in .git/</tt></pre>
 </div></div>
-<div class="para"><p>You've now initialized the working directory--you may notice a new
+<div class="paragraph"><p>You&#8217;ve now initialized the working directory&#8212;you may notice a new
 directory created, named ".git".</p></div>
-<div class="para"><p>Next, tell git to take a snapshot of the contents of all files under the
+<div class="paragraph"><p>Next, tell git to take a snapshot of the contents of all files under the
 current directory (note the <em>.</em>), with <em>git add</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git add .</tt></pre>
 </div></div>
-<div class="para"><p>This snapshot is now stored in a temporary staging area which git calls
+<div class="paragraph"><p>This snapshot is now stored in a temporary staging area which git calls
 the "index".  You can permanently store the contents of the index in the
 repository with <em>git commit</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit</tt></pre>
 </div></div>
-<div class="para"><p>This will prompt you for a commit message.  You've now stored the first
+<div class="paragraph"><p>This will prompt you for a commit message.  You&#8217;ve now stored the first
 version of your project in git.</p></div>
 </div>
 <h2 id="_making_changes">Making changes</h2>
 <div class="sectionbody">
-<div class="para"><p>Modify some files, then add their updated contents to the index:</p></div>
+<div class="paragraph"><p>Modify some files, then add their updated contents to the index:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git add file1 file2 file3</tt></pre>
 </div></div>
-<div class="para"><p>You are now ready to commit.  You can see what is about to be committed
+<div class="paragraph"><p>You are now ready to commit.  You can see what is about to be committed
 using <em>git diff</em> with the --cached option:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git diff --cached</tt></pre>
 </div></div>
-<div class="para"><p>(Without --cached, <em>git diff</em> will show you any changes that
-you've made but not yet added to the index.)  You can also get a brief
+<div class="paragraph"><p>(Without --cached, <em>git diff</em> will show you any changes that
+you&#8217;ve made but not yet added to the index.)  You can also get a brief
 summary of the situation with <em>git status</em>:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -412,22 +506,22 @@ summary of the situation with <em>git status</em>:</p></div>
 #       modified:   file3
 #</tt></pre>
 </div></div>
-<div class="para"><p>If you need to make any further adjustments, do so now, and then add any
+<div class="paragraph"><p>If you need to make any further adjustments, do so now, and then add any
 newly modified content to the index.  Finally, commit your changes with:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit</tt></pre>
 </div></div>
-<div class="para"><p>This will again prompt you for a message describing the change, and then
+<div class="paragraph"><p>This will again prompt you for a message describing the change, and then
 record a new version of the project.</p></div>
-<div class="para"><p>Alternatively, instead of running <em>git add</em> beforehand, you can use</p></div>
+<div class="paragraph"><p>Alternatively, instead of running <em>git add</em> beforehand, you can use</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit -a</tt></pre>
 </div></div>
-<div class="para"><p>which will automatically notice any modified (but not new) files, add
+<div class="paragraph"><p>which will automatically notice any modified (but not new) files, add
 them to the index, and commit, all in one step.</p></div>
-<div class="para"><p>A note on commit messages: Though not required, it's a good idea to
+<div class="paragraph"><p>A note on commit messages: Though not required, it&#8217;s a good idea to
 begin the commit message with a single short (less than 50 character)
 line summarizing the change, followed by a blank line and then a more
 thorough description.  Tools that turn commits into email, for
@@ -436,8 +530,8 @@ commit in the body.</p></div>
 </div>
 <h2 id="_git_tracks_content_not_files">Git tracks content not files</h2>
 <div class="sectionbody">
-<div class="para"><p>Many revision control systems provide an <tt>add</tt> command that tells the
-system to start tracking changes to a new file.  Git's <tt>add</tt> command
+<div class="paragraph"><p>Many revision control systems provide an <tt>add</tt> command that tells the
+system to start tracking changes to a new file.  Git&#8217;s <tt>add</tt> command
 does something simpler and more powerful: <em>git add</em> is used both for new
 and newly modified files, and in both cases it takes a snapshot of the
 given files and stages that content in the index, ready for inclusion in
@@ -445,17 +539,17 @@ the next commit.</p></div>
 </div>
 <h2 id="_viewing_project_history">Viewing project history</h2>
 <div class="sectionbody">
-<div class="para"><p>At any point you can view the history of your changes using</p></div>
+<div class="paragraph"><p>At any point you can view the history of your changes using</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git log</tt></pre>
 </div></div>
-<div class="para"><p>If you also want to see complete diffs at each step, use</p></div>
+<div class="paragraph"><p>If you also want to see complete diffs at each step, use</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git log -p</tt></pre>
 </div></div>
-<div class="para"><p>Often the overview of the change is useful to get a feel of
+<div class="paragraph"><p>Often the overview of the change is useful to get a feel of
 each step</p></div>
 <div class="listingblock">
 <div class="content">
@@ -464,24 +558,24 @@ each step</p></div>
 </div>
 <h2 id="_managing_branches">Managing branches</h2>
 <div class="sectionbody">
-<div class="para"><p>A single git repository can maintain multiple branches of
+<div class="paragraph"><p>A single git repository can maintain multiple branches of
 development.  To create a new branch named "experimental", use</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git branch experimental</tt></pre>
 </div></div>
-<div class="para"><p>If you now run</p></div>
+<div class="paragraph"><p>If you now run</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git branch</tt></pre>
 </div></div>
-<div class="para"><p>you'll get a list of all existing branches:</p></div>
+<div class="paragraph"><p>you&#8217;ll get a list of all existing branches:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>  experimental
 * master</tt></pre>
 </div></div>
-<div class="para"><p>The "experimental" branch is the one you just created, and the
+<div class="paragraph"><p>The "experimental" branch is the one you just created, and the
 "master" branch is a default branch that was created for you
 automatically.  The asterisk marks the branch you are currently on;
 type</p></div>
@@ -489,7 +583,7 @@ type</p></div>
 <div class="content">
 <pre><tt>$ git checkout experimental</tt></pre>
 </div></div>
-<div class="para"><p>to switch to the experimental branch.  Now edit a file, commit the
+<div class="paragraph"><p>to switch to the experimental branch.  Now edit a file, commit the
 change, and switch back to the master branch:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -497,94 +591,94 @@ change, and switch back to the master branch:</p></div>
 $ git commit -a
 $ git checkout master</tt></pre>
 </div></div>
-<div class="para"><p>Check that the change you made is no longer visible, since it was
-made on the experimental branch and you're back on the master branch.</p></div>
-<div class="para"><p>You can make a different change on the master branch:</p></div>
+<div class="paragraph"><p>Check that the change you made is no longer visible, since it was
+made on the experimental branch and you&#8217;re back on the master branch.</p></div>
+<div class="paragraph"><p>You can make a different change on the master branch:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>(edit file)
 $ git commit -a</tt></pre>
 </div></div>
-<div class="para"><p>at this point the two branches have diverged, with different changes
+<div class="paragraph"><p>at this point the two branches have diverged, with different changes
 made in each.  To merge the changes made in experimental into master, run</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git merge experimental</tt></pre>
 </div></div>
-<div class="para"><p>If the changes don't conflict, you're done.  If there are conflicts,
+<div class="paragraph"><p>If the changes don&#8217;t conflict, you&#8217;re done.  If there are conflicts,
 markers will be left in the problematic files showing the conflict;</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git diff</tt></pre>
 </div></div>
-<div class="para"><p>will show this.  Once you've edited the files to resolve the
+<div class="paragraph"><p>will show this.  Once you&#8217;ve edited the files to resolve the
 conflicts,</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit -a</tt></pre>
 </div></div>
-<div class="para"><p>will commit the result of the merge. Finally,</p></div>
+<div class="paragraph"><p>will commit the result of the merge. Finally,</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ gitk</tt></pre>
 </div></div>
-<div class="para"><p>will show a nice graphical representation of the resulting history.</p></div>
-<div class="para"><p>At this point you could delete the experimental branch with</p></div>
+<div class="paragraph"><p>will show a nice graphical representation of the resulting history.</p></div>
+<div class="paragraph"><p>At this point you could delete the experimental branch with</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git branch -d experimental</tt></pre>
 </div></div>
-<div class="para"><p>This command ensures that the changes in the experimental branch are
+<div class="paragraph"><p>This command ensures that the changes in the experimental branch are
 already in the current branch.</p></div>
-<div class="para"><p>If you develop on a branch crazy-idea, then regret it, you can always
+<div class="paragraph"><p>If you develop on a branch crazy-idea, then regret it, you can always
 delete the branch with</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git branch -D crazy-idea</tt></pre>
 </div></div>
-<div class="para"><p>Branches are cheap and easy, so this is a good way to try something
+<div class="paragraph"><p>Branches are cheap and easy, so this is a good way to try something
 out.</p></div>
 </div>
 <h2 id="_using_git_for_collaboration">Using git for collaboration</h2>
 <div class="sectionbody">
-<div class="para"><p>Suppose that Alice has started a new project with a git repository in
+<div class="paragraph"><p>Suppose that Alice has started a new project with a git repository in
 /home/alice/project, and that Bob, who has a home directory on the
 same machine, wants to contribute.</p></div>
-<div class="para"><p>Bob begins with:</p></div>
+<div class="paragraph"><p>Bob begins with:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>bob$ git clone /home/alice/project myrepo</tt></pre>
 </div></div>
-<div class="para"><p>This creates a new directory "myrepo" containing a clone of Alice's
+<div class="paragraph"><p>This creates a new directory "myrepo" containing a clone of Alice&#8217;s
 repository.  The clone is on an equal footing with the original
-project, possessing its own copy of the original project's history.</p></div>
-<div class="para"><p>Bob then makes some changes and commits them:</p></div>
+project, possessing its own copy of the original project&#8217;s history.</p></div>
+<div class="paragraph"><p>Bob then makes some changes and commits them:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>(edit files)
 bob$ git commit -a
 (repeat as necessary)</tt></pre>
 </div></div>
-<div class="para"><p>When he's ready, he tells Alice to pull changes from the repository
+<div class="paragraph"><p>When he&#8217;s ready, he tells Alice to pull changes from the repository
 at /home/bob/myrepo.  She does this with:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>alice$ cd /home/alice/project
 alice$ git pull /home/bob/myrepo master</tt></pre>
 </div></div>
-<div class="para"><p>This merges the changes from Bob's "master" branch into Alice's
+<div class="paragraph"><p>This merges the changes from Bob&#8217;s "master" branch into Alice&#8217;s
 current branch.  If Alice has made her own changes in the meantime,
 then she may need to manually fix any conflicts.</p></div>
-<div class="para"><p>The "pull" command thus performs two operations: it fetches changes
+<div class="paragraph"><p>The "pull" command thus performs two operations: it fetches changes
 from a remote branch, then merges them into the current branch.</p></div>
-<div class="para"><p>Note that in general, Alice would want her local changes committed before
-initiating this "pull".  If Bob's work conflicts with what Alice did since
+<div class="paragraph"><p>Note that in general, Alice would want her local changes committed before
+initiating this "pull".  If Bob&#8217;s work conflicts with what Alice did since
 their histories forked, Alice will use her working tree and the index to
 resolve conflicts, and existing local changes will interfere with the
 conflict resolution process (git will still perform the fetch but will
 refuse to merge --- Alice will have to get rid of her local changes in
 some way and pull again when this happens).</p></div>
-<div class="para"><p>Alice can peek at what Bob did without merging first, using the "fetch"
+<div class="paragraph"><p>Alice can peek at what Bob did without merging first, using the "fetch"
 command; this allows Alice to inspect what Bob did, using a special
 symbol "FETCH_HEAD", in order to determine if he has anything worth
 pulling, like this:</p></div>
@@ -593,35 +687,35 @@ pulling, like this:</p></div>
 <pre><tt>alice$ git fetch /home/bob/myrepo master
 alice$ git log -p HEAD..FETCH_HEAD</tt></pre>
 </div></div>
-<div class="para"><p>This operation is safe even if Alice has uncommitted local changes.
+<div class="paragraph"><p>This operation is safe even if Alice has uncommitted local changes.
 The range notation "HEAD..FETCH_HEAD" means "show everything that is reachable
 from the FETCH_HEAD but exclude anything that is reachable from HEAD".
 Alice already knows everything that leads to her current state (HEAD),
 and reviews what Bob has in his state (FETCH_HEAD) that she has not
 seen with this command.</p></div>
-<div class="para"><p>If Alice wants to visualize what Bob did since their histories forked
+<div class="paragraph"><p>If Alice wants to visualize what Bob did since their histories forked
 she can issue the following command:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ gitk HEAD..FETCH_HEAD</tt></pre>
 </div></div>
-<div class="para"><p>This uses the same two-dot range notation we saw earlier with <em>git log</em>.</p></div>
-<div class="para"><p>Alice may want to view what both of them did since they forked.
+<div class="paragraph"><p>This uses the same two-dot range notation we saw earlier with <em>git log</em>.</p></div>
+<div class="paragraph"><p>Alice may want to view what both of them did since they forked.
 She can use three-dot form instead of the two-dot form:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ gitk HEAD...FETCH_HEAD</tt></pre>
 </div></div>
-<div class="para"><p>This means "show everything that is reachable from either one, but
+<div class="paragraph"><p>This means "show everything that is reachable from either one, but
 exclude anything that is reachable from both of them".</p></div>
-<div class="para"><p>Please note that these range notation can be used with both gitk
+<div class="paragraph"><p>Please note that these range notation can be used with both gitk
 and "git log".</p></div>
-<div class="para"><p>After inspecting what Bob did, if there is nothing urgent, Alice may
-decide to continue working without pulling from Bob.  If Bob's history
+<div class="paragraph"><p>After inspecting what Bob did, if there is nothing urgent, Alice may
+decide to continue working without pulling from Bob.  If Bob&#8217;s history
 does have something Alice would immediately need, Alice may choose to
 stash her work-in-progress first, do a "pull", and then finally unstash
 her work-in-progress on top of the resulting history.</p></div>
-<div class="para"><p>When you are working in a small closely knit group, it is not
+<div class="paragraph"><p>When you are working in a small closely knit group, it is not
 unusual to interact with the same repository over and over
 again.  By defining <em>remote</em> repository shorthand, you can make
 it easier:</p></div>
@@ -629,44 +723,44 @@ it easier:</p></div>
 <div class="content">
 <pre><tt>alice$ git remote add bob /home/bob/myrepo</tt></pre>
 </div></div>
-<div class="para"><p>With this, Alice can perform the first part of the "pull" operation
+<div class="paragraph"><p>With this, Alice can perform the first part of the "pull" operation
 alone using the <em>git fetch</em> command without merging them with her own
 branch, using:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>alice$ git fetch bob</tt></pre>
 </div></div>
-<div class="para"><p>Unlike the longhand form, when Alice fetches from Bob using a
+<div class="paragraph"><p>Unlike the longhand form, when Alice fetches from Bob using a
 remote repository shorthand set up with <em>git remote</em>, what was
-fetched is stored in a remote tracking branch, in this case
+fetched is stored in a remote-tracking branch, in this case
 <tt>bob/master</tt>.  So after this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>alice$ git log -p master..bob/master</tt></pre>
 </div></div>
-<div class="para"><p>shows a list of all the changes that Bob made since he branched from
-Alice's master branch.</p></div>
-<div class="para"><p>After examining those changes, Alice
+<div class="paragraph"><p>shows a list of all the changes that Bob made since he branched from
+Alice&#8217;s master branch.</p></div>
+<div class="paragraph"><p>After examining those changes, Alice
 could merge the changes into her master branch:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>alice$ git merge bob/master</tt></pre>
 </div></div>
-<div class="para"><p>This <tt>merge</tt> can also be done by <em>pulling from her own remote
-tracking branch</em>, like this:</p></div>
+<div class="paragraph"><p>This <tt>merge</tt> can also be done by <em>pulling from her own remote-tracking
+branch</em>, like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>alice$ git pull . remotes/bob/master</tt></pre>
 </div></div>
-<div class="para"><p>Note that git pull always merges into the current branch,
+<div class="paragraph"><p>Note that git pull always merges into the current branch,
 regardless of what else is given on the command line.</p></div>
-<div class="para"><p>Later, Bob can update his repo with Alice's latest changes using</p></div>
+<div class="paragraph"><p>Later, Bob can update his repo with Alice&#8217;s latest changes using</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>bob$ git pull</tt></pre>
 </div></div>
-<div class="para"><p>Note that he doesn't need to give the path to Alice's repository;
-when Bob cloned Alice's repository, git stored the location of her
+<div class="paragraph"><p>Note that he doesn&#8217;t need to give the path to Alice&#8217;s repository;
+when Bob cloned Alice&#8217;s repository, git stored the location of her
 repository in the repository configuration, and that location is
 used for pulls:</p></div>
 <div class="listingblock">
@@ -674,31 +768,31 @@ used for pulls:</p></div>
 <pre><tt>bob$ git config --get remote.origin.url
 /home/alice/project</tt></pre>
 </div></div>
-<div class="para"><p>(The complete configuration created by <em>git clone</em> is visible using
+<div class="paragraph"><p>(The complete configuration created by <em>git clone</em> is visible using
 <tt>git config -l</tt>, and the <a href="git-config.html">git-config(1)</a> man page
 explains the meaning of each option.)</p></div>
-<div class="para"><p>Git also keeps a pristine copy of Alice's master branch under the
+<div class="paragraph"><p>Git also keeps a pristine copy of Alice&#8217;s master branch under the
 name "origin/master":</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>bob$ git branch -r
   origin/master</tt></pre>
 </div></div>
-<div class="para"><p>If Bob later decides to work from a different host, he can still
+<div class="paragraph"><p>If Bob later decides to work from a different host, he can still
 perform clones and pulls using the ssh protocol:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>bob$ git clone alice.org:/home/alice/project myrepo</tt></pre>
 </div></div>
-<div class="para"><p>Alternatively, git has a native protocol, or can use rsync or http;
+<div class="paragraph"><p>Alternatively, git has a native protocol, or can use rsync or http;
 see <a href="git-pull.html">git-pull(1)</a> for details.</p></div>
-<div class="para"><p>Git can also be used in a CVS-like mode, with a central repository
+<div class="paragraph"><p>Git can also be used in a CVS-like mode, with a central repository
 that various users push changes to; see <a href="git-push.html">git-push(1)</a> and
 <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
 </div>
 <h2 id="_exploring_history">Exploring history</h2>
 <div class="sectionbody">
-<div class="para"><p>Git history is represented as a series of interrelated commits.  We
+<div class="paragraph"><p>Git history is represented as a series of interrelated commits.  We
 have already seen that the <em>git log</em> command can list those commits.
 Note that first line of each git log entry also gives a name for the
 commit:</p></div>
@@ -711,13 +805,13 @@ Date:   Tue May 16 17:18:22 2006 -0700
 
     merge-base: Clarify the comments on post processing.</tt></pre>
 </div></div>
-<div class="para"><p>We can give this name to <em>git show</em> to see the details about this
+<div class="paragraph"><p>We can give this name to <em>git show</em> to see the details about this
 commit.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git show c82a22c39cbc32576f64f5c6b3f24b99ea8149c7</tt></pre>
 </div></div>
-<div class="para"><p>But there are other ways to refer to commits.  You can use any initial
+<div class="paragraph"><p>But there are other ways to refer to commits.  You can use any initial
 part of the name that is long enough to uniquely identify the commit:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -726,7 +820,7 @@ part of the name that is long enough to uniquely identify the commit:</p></div>
 $ git show HEAD         # the tip of the current branch
 $ git show experimental # the tip of the "experimental" branch</tt></pre>
 </div></div>
-<div class="para"><p>Every commit usually has one "parent" commit
+<div class="paragraph"><p>Every commit usually has one "parent" commit
 which points to the previous state of the project:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -734,22 +828,22 @@ which points to the previous state of the project:</p></div>
 $ git show HEAD^^ # to see the grandparent of HEAD
 $ git show HEAD~4 # to see the great-great grandparent of HEAD</tt></pre>
 </div></div>
-<div class="para"><p>Note that merge commits may have more than one parent:</p></div>
+<div class="paragraph"><p>Note that merge commits may have more than one parent:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git show HEAD^1 # show the first parent of HEAD (same as HEAD^)
 $ git show HEAD^2 # show the second parent of HEAD</tt></pre>
 </div></div>
-<div class="para"><p>You can also give commits names of your own; after running</p></div>
+<div class="paragraph"><p>You can also give commits names of your own; after running</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git tag v2.5 1b2e1d63ff</tt></pre>
 </div></div>
-<div class="para"><p>you can refer to 1b2e1d63ff by the name "v2.5".  If you intend to
+<div class="paragraph"><p>you can refer to 1b2e1d63ff by the name "v2.5".  If you intend to
 share this name with other people (for example, to identify a release
 version), you should create a "tag" object, and perhaps sign it; see
 <a href="git-tag.html">git-tag(1)</a> for details.</p></div>
-<div class="para"><p>Any git command that needs to know a commit can take any of these
+<div class="paragraph"><p>Any git command that needs to know a commit can take any of these
 names.  For example:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -759,29 +853,29 @@ $ git branch stable v2.5 # start a new branch named "stable" based
 $ git reset --hard HEAD^ # reset your current branch and working
                          # directory to its state at HEAD^</tt></pre>
 </div></div>
-<div class="para"><p>Be careful with that last command: in addition to losing any changes
+<div class="paragraph"><p>Be careful with that last command: in addition to losing any changes
 in the working directory, it will also remove all later commits from
 this branch.  If this branch is the only branch containing those
-commits, they will be lost.  Also, don't use <em>git reset</em> on a
+commits, they will be lost.  Also, don&#8217;t use <em>git reset</em> on a
 publicly-visible branch that other developers pull from, as it will
 force needless merges on other developers to clean up the history.
 If you need to undo changes that you have pushed, use <em>git revert</em>
 instead.</p></div>
-<div class="para"><p>The <em>git grep</em> command can search for strings in any version of your
+<div class="paragraph"><p>The <em>git grep</em> command can search for strings in any version of your
 project, so</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git grep "hello" v2.5</tt></pre>
 </div></div>
-<div class="para"><p>searches for all occurrences of "hello" in v2.5.</p></div>
-<div class="para"><p>If you leave out the commit name, <em>git grep</em> will search any of the
+<div class="paragraph"><p>searches for all occurrences of "hello" in v2.5.</p></div>
+<div class="paragraph"><p>If you leave out the commit name, <em>git grep</em> will search any of the
 files it manages in your current directory.  So</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git grep "hello"</tt></pre>
 </div></div>
-<div class="para"><p>is a quick way to search just the files that are tracked by git.</p></div>
-<div class="para"><p>Many git commands also take sets of commits, which can be specified
+<div class="paragraph"><p>is a quick way to search just the files that are tracked by git.</p></div>
+<div class="paragraph"><p>Many git commands also take sets of commits, which can be specified
 in a number of ways.  Here are some examples with <em>git log</em>:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -791,7 +885,7 @@ $ git log --since="2 weeks ago" # commits from the last 2 weeks
 $ git log v2.5.. Makefile       # commits since v2.5 which modify
                                 # Makefile</tt></pre>
 </div></div>
-<div class="para"><p>You can also give <em>git log</em> a "range" of commits where the first is not
+<div class="paragraph"><p>You can also give <em>git log</em> a "range" of commits where the first is not
 necessarily an ancestor of the second; for example, if the tips of
 the branches "stable" and "master" diverged from a common
 commit some time ago, then</p></div>
@@ -799,37 +893,37 @@ commit some time ago, then</p></div>
 <div class="content">
 <pre><tt>$ git log stable..master</tt></pre>
 </div></div>
-<div class="para"><p>will list commits made in the master branch but not in the
+<div class="paragraph"><p>will list commits made in the master branch but not in the
 stable branch, while</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git log master..stable</tt></pre>
 </div></div>
-<div class="para"><p>will show the list of commits made on the stable branch but not
+<div class="paragraph"><p>will show the list of commits made on the stable branch but not
 the master branch.</p></div>
-<div class="para"><p>The <em>git log</em> command has a weakness: it must present commits in a
+<div class="paragraph"><p>The <em>git log</em> command has a weakness: it must present commits in a
 list.  When the history has lines of development that diverged and
 then merged back together, the order in which <em>git log</em> presents
 those commits is meaningless.</p></div>
-<div class="para"><p>Most projects with multiple contributors (such as the Linux kernel,
+<div class="paragraph"><p>Most projects with multiple contributors (such as the Linux kernel,
 or git itself) have frequent merges, and <em>gitk</em> does a better job of
 visualizing their history.  For example,</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ gitk --since="2 weeks ago" drivers/</tt></pre>
 </div></div>
-<div class="para"><p>allows you to browse any commits from the last 2 weeks of commits
+<div class="paragraph"><p>allows you to browse any commits from the last 2 weeks of commits
 that modified files under the "drivers" directory.  (Note: you can
-adjust gitk's fonts by holding down the control key while pressing
+adjust gitk&#8217;s fonts by holding down the control key while pressing
 "-" or "+".)</p></div>
-<div class="para"><p>Finally, most commands that take filenames will optionally allow you
+<div class="paragraph"><p>Finally, most commands that take filenames will optionally allow you
 to precede any filename by a commit, to specify a particular version
 of the file:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git diff v2.5:Makefile HEAD:Makefile.in</tt></pre>
 </div></div>
-<div class="para"><p>You can also use <em>git show</em> to see any such file:</p></div>
+<div class="paragraph"><p>You can also use <em>git show</em> to see any such file:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git show v2.5:Makefile</tt></pre>
@@ -837,15 +931,15 @@ of the file:</p></div>
 </div>
 <h2 id="_next_steps">Next Steps</h2>
 <div class="sectionbody">
-<div class="para"><p>This tutorial should be enough to perform basic distributed revision
+<div class="paragraph"><p>This tutorial should be enough to perform basic distributed revision
 control for your projects.  However, to fully understand the depth
 and power of git you need to understand two simple ideas on which it
 is based:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 The object database is the rather elegant system used to
-    store the history of your project--files, directories, and
+    store the history of your project&#8212;files, directories, and
     commits.
 </p>
 </li>
@@ -857,12 +951,12 @@ The index file is a cache of the state of a directory tree,
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Part two of this tutorial explains the object
-database, the index file, and a few other odds and ends that you'll
+<div class="paragraph"><p>Part two of this tutorial explains the object
+database, the index file, and a few other odds and ends that you&#8217;ll
 need to make the most of git. You can find it at <a href="gittutorial-2.html">gittutorial-2(7)</a>.</p></div>
-<div class="para"><p>If you don't want to continue with that right away, a few other
+<div class="paragraph"><p>If you don&#8217;t want to continue with that right away, a few other
 digressions that may be interesting at this point are:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <a href="git-format-patch.html">git-format-patch(1)</a>, <a href="git-am.html">git-am(1)</a>: These convert
@@ -875,7 +969,7 @@ digressions that may be interesting at this point are:</p></div>
 <p>
 <a href="git-bisect.html">git-bisect(1)</a>: When there is a regression in your
     project, one way to track down the bug is by searching through
-    the history to find the exact commit that's to blame.  Git bisect
+    the history to find the exact commit that&#8217;s to blame.  Git bisect
     can help you perform a binary search for that commit.  It is
     smart enough to perform a close-to-optimal search even in the
     case of complex non-linear history with lots of merged branches.
@@ -901,22 +995,22 @@ digressions that may be interesting at this point are:</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="gittutorial-2.html">gittutorial-2(7)</a>,
+<div class="paragraph"><p><a href="gittutorial-2.html">gittutorial-2(7)</a>,
 <a href="gitcvs-migration.html">gitcvs-migration(7)</a>,
 <a href="gitcore-tutorial.html">gitcore-tutorial(7)</a>,
 <a href="gitglossary.html">gitglossary(7)</a>,
 <a href="git-help.html">git-help(1)</a>,
 <a href="gitworkflows.html">gitworkflows(7)</a>,
 <a href="everyday.html">Everyday git</a>,
-<a href="user-manual.html">The Git User's Manual</a></p></div>
+<a href="user-manual.html">The Git User&#8217;s Manual</a></p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:04 UTC
+Last updated 2010-11-25 03:13:43 UTC
 </div>
 </div>
 </body>

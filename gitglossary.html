@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>gitglossary(7)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>gitglossary(7)</title>
 </head>
 <body>
 <div id="header">
@@ -318,14 +412,14 @@ gitglossary(7) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p>*</p></div>
+<div class="paragraph"><p>*</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <a id="def_alternate_object_database"></a>alternate object database
 </dt>
 <dd>
@@ -335,7 +429,7 @@ gitglossary(7) Manual Page
         from another object database, which is called "alternate".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_bare_repository"></a>bare repository
 </dt>
 <dd>
@@ -351,7 +445,7 @@ gitglossary(7) Manual Page
         public repositories make bare repositories available.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_blob_object"></a>blob object
 </dt>
 <dd>
@@ -359,7 +453,7 @@ gitglossary(7) Manual Page
         Untyped <a href="#def_object">object</a>, e.g. the contents of a file.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_branch"></a>branch
 </dt>
 <dd>
@@ -375,7 +469,7 @@ gitglossary(7) Manual Page
         branch), and <a href="#def_HEAD">HEAD</a> points to that branch.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_cache"></a>cache
 </dt>
 <dd>
@@ -383,7 +477,7 @@ gitglossary(7) Manual Page
         Obsolete for: <a href="#def_index">index</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_chain"></a>chain
 </dt>
 <dd>
@@ -393,7 +487,7 @@ gitglossary(7) Manual Page
         <a href="#def_commit">commit</a> could be one of its <a href="#def_parent">parents</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_changeset"></a>changeset
 </dt>
 <dd>
@@ -403,7 +497,7 @@ gitglossary(7) Manual Page
         "changesets" with git.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_checkout"></a>checkout
 </dt>
 <dd>
@@ -416,7 +510,7 @@ gitglossary(7) Manual Page
         been pointed at a new <a href="#def_branch">branch</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_cherry-picking"></a>cherry-picking
 </dt>
 <dd>
@@ -429,7 +523,7 @@ gitglossary(7) Manual Page
         of the current <a href="#def_branch">branch</a> as a new commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_clean"></a>clean
 </dt>
 <dd>
@@ -439,7 +533,7 @@ gitglossary(7) Manual Page
         <a href="#def_head">head</a>. Also see "<a href="#def_dirty">dirty</a>".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_commit"></a>commit
 </dt>
 <dd>
@@ -451,12 +545,12 @@ gitglossary(7) Manual Page
         use the words "revision" or "version".  Also used as a short
         hand for <a href="#def_commit_object">commit object</a>.
 </p>
-<div class="para"><p>As a verb: The action of storing a new snapshot of the project's
+<div class="paragraph"><p>As a verb: The action of storing a new snapshot of the project&#8217;s
 state in the git history, by creating a new commit representing the current
 state of the <a href="#def_index">index</a> and advancing <a href="#def_HEAD">HEAD</a>
 to point at the new commit.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_commit_object"></a>commit object
 </dt>
 <dd>
@@ -468,7 +562,7 @@ to point at the new commit.</p></div>
         revision.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_core_git"></a>core git
 </dt>
 <dd>
@@ -477,7 +571,7 @@ to point at the new commit.</p></div>
         source code management tools.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_DAG"></a>DAG
 </dt>
 <dd>
@@ -488,7 +582,7 @@ to point at the new commit.</p></div>
         which begins and ends with the same <a href="#def_object">object</a>).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_dangling_object"></a>dangling object
 </dt>
 <dd>
@@ -499,18 +593,18 @@ to point at the new commit.</p></div>
         reference or <a href="#def_object">object</a> in the <a href="#def_repository">repository</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_detached_HEAD"></a>detached HEAD
 </dt>
 <dd>
 <p>
         Normally the <a href="#def_HEAD">HEAD</a> stores the name of a
         <a href="#def_branch">branch</a>.  However, git also allows you to <a href="#def_checkout">check out</a>
-        an arbitrary <a href="#def_commit">commit</a> that isn't necessarily the tip of any
+        an arbitrary <a href="#def_commit">commit</a> that isn&#8217;t necessarily the tip of any
         particular branch.  In this case HEAD is said to be "detached".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_dircache"></a>dircache
 </dt>
 <dd>
@@ -518,7 +612,7 @@ to point at the new commit.</p></div>
         You are <strong>waaaaay</strong> behind. See <a href="#def_index">index</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_directory"></a>directory
 </dt>
 <dd>
@@ -526,7 +620,7 @@ to point at the new commit.</p></div>
         The list you get with "ls" :-)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_dirty"></a>dirty
 </dt>
 <dd>
@@ -536,7 +630,7 @@ to point at the new commit.</p></div>
         <a href="#def_branch">branch</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_ent"></a>ent
 </dt>
 <dd>
@@ -546,7 +640,7 @@ to point at the new commit.</p></div>
         explanation. Avoid this term, not to confuse people.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_evil_merge"></a>evil merge
 </dt>
 <dd>
@@ -555,7 +649,7 @@ to point at the new commit.</p></div>
         do not appear in any <a href="#def_parent">parent</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_fast_forward"></a>fast-forward
 </dt>
 <dd>
@@ -566,23 +660,23 @@ to point at the new commit.</p></div>
         you have. In such these cases, you do not make a new <a href="#def_merge">merge</a>
         <a href="#def_commit">commit</a> but instead just update to his
         revision. This will happen frequently on a
-        <a href="#def_tracking_branch">tracking branch</a> of a remote
+        <a href="#def_remote_tracking_branch">remote-tracking branch</a> of a remote
         <a href="#def_repository">repository</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_fetch"></a>fetch
 </dt>
 <dd>
 <p>
         Fetching a <a href="#def_branch">branch</a> means to get the
-        branch's <a href="#def_head_ref">head ref</a> from a remote
+        branch&#8217;s <a href="#def_head_ref">head ref</a> from a remote
         <a href="#def_repository">repository</a>, to find out which objects are
         missing from the local <a href="#def_object_database">object database</a>,
         and to get them, too.  See also <a href="git-fetch.html">git-fetch(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_file_system"></a>file system
 </dt>
 <dd>
@@ -592,7 +686,7 @@ to point at the new commit.</p></div>
         efficiency and speed of git.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_git_archive"></a>git archive
 </dt>
 <dd>
@@ -600,7 +694,7 @@ to point at the new commit.</p></div>
         Synonym for <a href="#def_repository">repository</a> (for arch people).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_grafts"></a>grafts
 </dt>
 <dd>
@@ -612,15 +706,15 @@ to point at the new commit.</p></div>
         created. Configured via the <tt>.git/info/grafts</tt> file.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_hash"></a>hash
 </dt>
 <dd>
 <p>
-        In git's context, synonym to <a href="#def_object_name">object name</a>.
+        In git&#8217;s context, synonym to <a href="#def_object_name">object name</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_head"></a>head
 </dt>
 <dd>
@@ -631,7 +725,7 @@ to point at the new commit.</p></div>
         <a href="git-pack-refs.html">git-pack-refs(1)</a>.)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_HEAD"></a>HEAD
 </dt>
 <dd>
@@ -643,7 +737,7 @@ to point at the new commit.</p></div>
         reference an arbitrary commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_head_ref"></a>head ref
 </dt>
 <dd>
@@ -651,7 +745,7 @@ to point at the new commit.</p></div>
         A synonym for <a href="#def_head">head</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_hook"></a>hook
 </dt>
 <dd>
@@ -666,7 +760,7 @@ to point at the new commit.</p></div>
         of git you had to make them executable.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_index"></a>index
 </dt>
 <dd>
@@ -678,7 +772,7 @@ to point at the new commit.</p></div>
         when <a href="#def_merge">merging</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_index_entry"></a>index entry
 </dt>
 <dd>
@@ -689,7 +783,7 @@ to point at the new commit.</p></div>
         the index contains multiple versions of that file).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_master"></a>master
 </dt>
 <dd>
@@ -701,7 +795,7 @@ to point at the new commit.</p></div>
         purely by convention and is not required.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_merge"></a>merge
 </dt>
 <dd>
@@ -719,14 +813,14 @@ to point at the new commit.</p></div>
         conflict, manual intervention may be required to complete the
         merge.
 </p>
-<div class="para"><p>As a noun: unless it is a <a href="#def_fast_forward">fast-forward</a>, a
+<div class="paragraph"><p>As a noun: unless it is a <a href="#def_fast_forward">fast-forward</a>, a
 successful merge results in the creation of a new <a href="#def_commit">commit</a>
 representing the result of the merge, and having as
 <a href="#def_parent">parents</a> the tips of the merged <a href="#def_branch">branches</a>.
 This commit is referred to as a "merge commit", or sometimes just a
 "merge".</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_object"></a>object
 </dt>
 <dd>
@@ -736,7 +830,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         object can not be changed.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_object_database"></a>object database
 </dt>
 <dd>
@@ -746,7 +840,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         live in <tt>$GIT_DIR/objects/</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_object_identifier"></a>object identifier
 </dt>
 <dd>
@@ -754,18 +848,18 @@ This commit is referred to as a "merge commit", or sometimes just a
         Synonym for <a href="#def_object_name">object name</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_object_name"></a>object name
 </dt>
 <dd>
 <p>
         The unique identifier of an <a href="#def_object">object</a>. The <a href="#def_hash">hash</a>
-        of the object's contents using the Secure Hash Algorithm
+        of the object&#8217;s contents using the Secure Hash Algorithm
         1 and usually represented by the 40 character hexadecimal encoding of
         the <a href="#def_hash">hash</a> of the object.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_object_type"></a>object type
 </dt>
 <dd>
@@ -776,7 +870,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_object">object</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_octopus"></a>octopus
 </dt>
 <dd>
@@ -785,7 +879,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         intelligent predator.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_origin"></a>origin
 </dt>
 <dd>
@@ -793,12 +887,12 @@ This commit is referred to as a "merge commit", or sometimes just a
         The default upstream <a href="#def_repository">repository</a>. Most projects have
         at least one upstream project which they track. By default
         <em>origin</em> is used for that purpose. New upstream updates
-        will be fetched into remote <a href="#def_tracking_branch">tracking branches</a> named
+        will be fetched into remote <a href="#def_remote_tracking_branch">remote-tracking branches</a> named
         origin/name-of-upstream-branch, which you can see using
         <tt>git branch -r</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_pack"></a>pack
 </dt>
 <dd>
@@ -807,7 +901,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         or to transmit them efficiently).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_pack_index"></a>pack index
 </dt>
 <dd>
@@ -817,7 +911,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         pack.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_parent"></a>parent
 </dt>
 <dd>
@@ -827,7 +921,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         parents.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_pickaxe"></a>pickaxe
 </dt>
 <dd>
@@ -839,7 +933,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         particular line of text. See <a href="git-diff.html">git-diff(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_plumbing"></a>plumbing
 </dt>
 <dd>
@@ -847,7 +941,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         Cute name for <a href="#def_core_git">core git</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_porcelain"></a>porcelain
 </dt>
 <dd>
@@ -858,7 +952,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         interface than the <a href="#def_plumbing">plumbing</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_pull"></a>pull
 </dt>
 <dd>
@@ -867,14 +961,14 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_merge">merge</a> it.  See also <a href="git-pull.html">git-pull(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_push"></a>push
 </dt>
 <dd>
 <p>
-        Pushing a <a href="#def_branch">branch</a> means to get the branch's
+        Pushing a <a href="#def_branch">branch</a> means to get the branch&#8217;s
         <a href="#def_head_ref">head ref</a> from a remote <a href="#def_repository">repository</a>,
-        find out if it is a direct ancestor to the branch's local
+        find out if it is a direct ancestor to the branch&#8217;s local
         head ref, and in that case, putting all
         objects, which are <a href="#def_reachable">reachable</a> from the local
         head ref, and which are missing from the remote
@@ -884,7 +978,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         ancestor to the local head, the push fails.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_reachable"></a>reachable
 </dt>
 <dd>
@@ -899,7 +993,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         that they contain.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_rebase"></a>rebase
 </dt>
 <dd>
@@ -909,7 +1003,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         to the result.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_ref"></a>ref
 </dt>
 <dd>
@@ -919,18 +1013,18 @@ This commit is referred to as a "merge commit", or sometimes just a
         <tt>$GIT_DIR/refs/</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_reflog"></a>reflog
 </dt>
 <dd>
 <p>
         A reflog shows the local "history" of a ref.  In other words,
-        it can tell you what the 3rd last revision in _this_ repository
-        was, and what was the current state in _this_ repository,
+        it can tell you what the 3rd last revision in <em>this</em> repository
+        was, and what was the current state in <em>this</em> repository,
         yesterday 9:14pm.  See <a href="git-reflog.html">git-reflog(1)</a> for details.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_refspec"></a>refspec
 </dt>
 <dd>
@@ -948,7 +1042,20 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="git-push.html">git-push(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
+<a id="def_remote_tracking_branch"></a>remote-tracking branch
+</dt>
+<dd>
+<p>
+        A regular git <a href="#def_branch">branch</a> that is used to follow changes from
+        another <a href="#def_repository">repository</a>. A remote-tracking
+        branch should not contain direct modifications or have local commits
+        made to it. A remote-tracking branch can usually be
+        identified as the right-hand-side <a href="#def_ref">ref</a> in a Pull:
+        <a href="#def_refspec">refspec</a>.
+</p>
+</dd>
+<dt class="hdlist1">
 <a id="def_repository"></a>repository
 </dt>
 <dd>
@@ -961,7 +1068,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         via <a href="#def_alternate_object_database">alternates mechanism</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_resolve"></a>resolve
 </dt>
 <dd>
@@ -970,7 +1077,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_merge">merge</a> left behind.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_revision"></a>revision
 </dt>
 <dd>
@@ -980,7 +1087,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_commit_object">commit object</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_rewind"></a>rewind
 </dt>
 <dd>
@@ -989,7 +1096,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_head">head</a> to an earlier <a href="#def_revision">revision</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_SCM"></a>SCM
 </dt>
 <dd>
@@ -997,7 +1104,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         Source code management (tool).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_SHA1"></a>SHA1
 </dt>
 <dd>
@@ -1005,7 +1112,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         Synonym for <a href="#def_object_name">object name</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_shallow_repository"></a>shallow repository
 </dt>
 <dd>
@@ -1020,7 +1127,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         its history can be later deepened with <a href="git-fetch.html">git-fetch(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_symref"></a>symref
 </dt>
 <dd>
@@ -1033,7 +1140,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         command.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_tag"></a>tag
 </dt>
 <dd>
@@ -1043,12 +1150,12 @@ This commit is referred to as a "merge commit", or sometimes just a
         a tag is not changed by a <a href="#def_commit">commit</a>. Tags (not
         <a href="#def_tag_object">tag objects</a>) are stored in <tt>$GIT_DIR/refs/tags/</tt>. A
         git tag has nothing to do with a Lisp tag (which would be
-        called an <a href="#def_object_type">object type</a> in git's context). A
+        called an <a href="#def_object_type">object type</a> in git&#8217;s context). A
         tag is most typically used to mark a particular point in the
         commit ancestry <a href="#def_chain">chain</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_tag_object"></a>tag object
 </dt>
 <dd>
@@ -1059,7 +1166,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         signature, in which case it is called a "signed tag object".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_topic_branch"></a>topic branch
 </dt>
 <dd>
@@ -1071,20 +1178,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         related changes.
 </p>
 </dd>
-<dt>
-<a id="def_tracking_branch"></a>tracking branch
-</dt>
-<dd>
-<p>
-        A regular git <a href="#def_branch">branch</a> that is used to follow changes from
-        another <a href="#def_repository">repository</a>. A tracking
-        branch should not contain direct modifications or have local commits
-        made to it. A tracking branch can usually be
-        identified as the right-hand-side <a href="#def_ref">ref</a> in a Pull:
-        <a href="#def_refspec">refspec</a>.
-</p>
-</dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_tree"></a>tree
 </dt>
 <dd>
@@ -1093,7 +1187,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         (i.e. a stored representation of a working tree).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_tree_object"></a>tree object
 </dt>
 <dd>
@@ -1103,7 +1197,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_tree">tree</a> is equivalent to a <a href="#def_directory">directory</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_tree-ish"></a>tree-ish
 </dt>
 <dd>
@@ -1111,7 +1205,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         A <a href="#def_ref">ref</a> pointing to either a <a href="#def_commit_object">commit         object</a>, a <a href="#def_tree_object">tree object</a>, or a <a href="#def_tag_object">tag         object</a> pointing to a tag or commit or tree object.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_unmerged_index"></a>unmerged index
 </dt>
 <dd>
@@ -1120,7 +1214,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_index_entry">index entries</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_unreachable_object"></a>unreachable object
 </dt>
 <dd>
@@ -1129,7 +1223,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <a href="#def_branch">branch</a>, <a href="#def_tag">tag</a>, or any other reference.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_upstream_branch"></a>upstream branch
 </dt>
 <dd>
@@ -1140,13 +1234,13 @@ This commit is referred to as a "merge commit", or sometimes just a
         of <em>A</em> is <em>origin/B</em> sometimes we say "<em>A</em> is tracking <em>origin/B</em>".
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <a id="def_working_tree"></a>working tree
 </dt>
 <dd>
 <p>
         The tree of actual checked out files.  The working tree normally
-        contains the contents of the <a href="#def_HEAD">HEAD</a> commit's tree,
+        contains the contents of the <a href="#def_HEAD">HEAD</a> commit&#8217;s tree,
         plus any local changes that you have made but not yet committed.
 </p>
 </dd>
@@ -1154,19 +1248,19 @@ This commit is referred to as a "merge commit", or sometimes just a
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="gittutorial.html">gittutorial(7)</a>,
+<div class="paragraph"><p><a href="gittutorial.html">gittutorial(7)</a>,
 <a href="gittutorial-2.html">gittutorial-2(7)</a>,
 <a href="gitcvs-migration.html">gitcvs-migration(7)</a>,
 <a href="everyday.html">Everyday git</a>,
-<a href="user-manual.html">The Git User's Manual</a></p></div>
+<a href="user-manual.html">The Git User&#8217;s Manual</a></p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:05 UTC
+Last updated 2008-11-15 08:07:36 UTC
 </div>
 </div>
 </body>

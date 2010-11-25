@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-tag(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-tag(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,37 +412,39 @@ git-tag(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git tag</em> [-a | -s | -u &lt;key-id&gt;] [-f] [-m &lt;msg&gt; | -F &lt;file&gt;]
+<div class="verseblock-content"><em>git tag</em> [-a | -s | -u &lt;key-id&gt;] [-f] [-m &lt;msg&gt; | -F &lt;file&gt;]
         &lt;tagname&gt; [&lt;commit&gt; | &lt;object&gt;]
 <em>git tag</em> -d &lt;tagname&gt;&#8230;
 <em>git tag</em> [-n[&lt;num&gt;]] -l [--contains &lt;commit&gt;] [&lt;pattern&gt;]
-<em>git tag</em> -v &lt;tagname&gt;&#8230;</div></div>
+<em>git tag</em> -v &lt;tagname&gt;&#8230;</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Adds a tag reference in <tt>.git/refs/tags/</tt>.</p></div>
-<div class="para"><p>Unless <tt>-f</tt> is given, the tag must not yet exist in
+<div class="paragraph"><p>Adds a tag reference in <tt>.git/refs/tags/</tt>.</p></div>
+<div class="paragraph"><p>Unless <tt>-f</tt> is given, the tag must not yet exist in
 <tt>.git/refs/tags/</tt> directory.</p></div>
-<div class="para"><p>If one of <tt>-a</tt>, <tt>-s</tt>, or <tt>-u &lt;key-id&gt;</tt> is passed, the command
+<div class="paragraph"><p>If one of <tt>-a</tt>, <tt>-s</tt>, or <tt>-u &lt;key-id&gt;</tt> is passed, the command
 creates a <em>tag</em> object, and requires the tag message.  Unless
 <tt>-m &lt;msg&gt;</tt> or <tt>-F &lt;file&gt;</tt> is given, an editor is started for the user to type
 in the tag message.</p></div>
-<div class="para"><p>If <tt>-m &lt;msg&gt;</tt> or <tt>-F &lt;file&gt;</tt> is given and <tt>-a</tt>, <tt>-s</tt>, and <tt>-u &lt;key-id&gt;</tt>
+<div class="paragraph"><p>If <tt>-m &lt;msg&gt;</tt> or <tt>-F &lt;file&gt;</tt> is given and <tt>-a</tt>, <tt>-s</tt>, and <tt>-u &lt;key-id&gt;</tt>
 are absent, <tt>-a</tt> is implied.</p></div>
-<div class="para"><p>Otherwise just the SHA1 object name of the commit object is
+<div class="paragraph"><p>Otherwise just the SHA1 object name of the commit object is
 written (i.e. a lightweight tag).</p></div>
-<div class="para"><p>A GnuPG signed tag object will be created when <tt>-s</tt> or <tt>-u
+<div class="paragraph"><p>A GnuPG signed tag object will be created when <tt>-s</tt> or <tt>-u
 &lt;key-id&gt;</tt> is used.  When <tt>-u &lt;key-id&gt;</tt> is not used, the
 committer identity for the current user is used to find the
 GnuPG key for signing.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -a
 </dt>
 <dd>
@@ -356,15 +452,15 @@ GnuPG key for signing.</p></div>
         Make an unsigned, annotated tag object
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -s
 </dt>
 <dd>
 <p>
-        Make a GPG-signed tag, using the default e-mail address's key
+        Make a GPG-signed tag, using the default e-mail address&#8217;s key
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -u &lt;key-id&gt;
 </dt>
 <dd>
@@ -372,10 +468,10 @@ GnuPG key for signing.</p></div>
         Make a GPG-signed tag, using the given key
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -383,7 +479,7 @@ GnuPG key for signing.</p></div>
         Replace an existing tag with the given name (instead of failing)
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -d
 </dt>
 <dd>
@@ -391,7 +487,7 @@ GnuPG key for signing.</p></div>
         Delete existing tags with the given names.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -v
 </dt>
 <dd>
@@ -399,7 +495,7 @@ GnuPG key for signing.</p></div>
         Verify the gpg signature of the given tag names.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -n&lt;num&gt;
 </dt>
 <dd>
@@ -411,7 +507,7 @@ GnuPG key for signing.</p></div>
         If the tag is not annotated, the commit message is displayed instead.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -l &lt;pattern&gt;
 </dt>
 <dd>
@@ -420,7 +516,7 @@ GnuPG key for signing.</p></div>
         Typing "git tag" without arguments, also lists all tags.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --contains &lt;commit&gt;
 </dt>
 <dd>
@@ -428,7 +524,7 @@ GnuPG key for signing.</p></div>
         Only list tags which contain the specified commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m &lt;msg&gt;
 </dt>
 <dd>
@@ -440,7 +536,7 @@ GnuPG key for signing.</p></div>
         is given.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -F &lt;file&gt;
 </dt>
 <dd>
@@ -451,7 +547,7 @@ GnuPG key for signing.</p></div>
         is given.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;tagname&gt;
 </dt>
 <dd>
@@ -466,8 +562,8 @@ GnuPG key for signing.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="para"><p>By default, <em>git tag</em> in sign-with-default mode (-s) will use your
-committer identity (of the form "Your Name &lt;your@email.address&gt;") to
+<div class="paragraph"><p>By default, <em>git tag</em> in sign-with-default mode (-s) will use your
+committer identity (of the form "Your Name &lt;<a href="mailto:your@email.address">your@email.address</a>&gt;") to
 find a key.  If you want to use a different default key, you can specify
 it in the repository configuration as follows:</p></div>
 <div class="listingblock">
@@ -479,14 +575,14 @@ it in the repository configuration as follows:</p></div>
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
 <h3 id="_on_re_tagging">On Re-tagging</h3><div style="clear:left"></div>
-<div class="para"><p>What should you do when you tag a wrong commit and you would
+<div class="paragraph"><p>What should you do when you tag a wrong commit and you would
 want to re-tag?</p></div>
-<div class="para"><p>If you never pushed anything out, just re-tag it. Use "-f" to
-replace the old one. And you're done.</p></div>
-<div class="para"><p>But if you have pushed things out (or others could just read
+<div class="paragraph"><p>If you never pushed anything out, just re-tag it. Use "-f" to
+replace the old one. And you&#8217;re done.</p></div>
+<div class="paragraph"><p>But if you have pushed things out (or others could just read
 your repository directly), then others will have already seen
 the old tag. In that case you can do one of two things:</p></div>
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 The sane thing.
@@ -502,15 +598,15 @@ and be done with it.
 The insane thing.
 You really want to call the new version "X" too, <em>even though</em>
 others have already seen the old one. So just use <em>git tag -f</em>
-again, as if you hadn't already published the old one.
+again, as if you hadn&#8217;t already published the old one.
 </p>
 </li>
 </ol></div>
-<div class="para"><p>However, Git does <strong>not</strong> (and it should not) change tags behind
+<div class="paragraph"><p>However, Git does <strong>not</strong> (and it should not) change tags behind
 users back. So if somebody already got the old tag, doing a
-<em>git pull</em> on your tree shouldn't just make them overwrite the old
+<em>git pull</em> on your tree shouldn&#8217;t just make them overwrite the old
 one.</p></div>
-<div class="para"><p>If somebody got a release tag from you, you cannot just change
+<div class="paragraph"><p>If somebody got a release tag from you, you cannot just change
 the tag for them by updating your own one. This is a big
 security issue, in that people MUST be able to trust their
 tag-names.  If you really want to do the insane thing, you need
@@ -537,22 +633,22 @@ which should return 0123456789abcdef.. if you have the new version.
 
 Sorry for inconvenience.</tt></pre>
 </div></div>
-<div class="para"><p>Does this seem a bit complicated?  It <strong>should</strong> be. There is no
+<div class="paragraph"><p>Does this seem a bit complicated?  It <strong>should</strong> be. There is no
 way that it would be correct to just "fix" it behind peoples
 backs. People need to know that their tags might have been
 changed.</p></div>
 <h3 id="_on_automatic_following">On Automatic following</h3><div style="clear:left"></div>
-<div class="para"><p>If you are following somebody else's tree, you are most likely
-using tracking branches (<tt>refs/heads/origin</tt> in traditional
+<div class="paragraph"><p>If you are following somebody else&#8217;s tree, you are most likely
+using remote-tracking branches (<tt>refs/heads/origin</tt> in traditional
 layout, or <tt>refs/remotes/origin/master</tt> in the separate-remote
 layout).  You usually want the tags from the other end.</p></div>
-<div class="para"><p>On the other hand, if you are fetching because you would want a
+<div class="paragraph"><p>On the other hand, if you are fetching because you would want a
 one-shot merge from somebody else, you typically do not want to
 get tags from there.  This happens more often for people near
 the toplevel but not limited to them.  Mere mortals when pulling
 from each other do not necessarily want to automatically get
 private anchor point tags from the other person.</p></div>
-<div class="para"><p>You would notice "please pull" messages on the mailing list says
+<div class="paragraph"><p>You would notice "please pull" messages on the mailing list says
 repo URL and branch name alone.  This is designed to be easily
 cut&amp;pasted to a <em>git fetch</em> command line:</p></div>
 <div class="listingblock">
@@ -563,21 +659,21 @@ cut&amp;pasted to a <em>git fetch</em> command line:</p></div>
 
 to get the following updates...</tt></pre>
 </div></div>
-<div class="para"><p>becomes:</p></div>
+<div class="paragraph"><p>becomes:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git pull git://git..../proj.git master</tt></pre>
 </div></div>
-<div class="para"><p>In such a case, you do not want to automatically follow other's
+<div class="paragraph"><p>In such a case, you do not want to automatically follow other&#8217;s
 tags.</p></div>
-<div class="para"><p>One important aspect of git is it is distributed, and being
+<div class="paragraph"><p>One important aspect of git is it is distributed, and being
 distributed largely means there is no inherent "upstream" or
 "downstream" in the system.  On the face of it, the above
 example might seem to indicate that the tag namespace is owned
 by upper echelon of people and tags only flow downwards, but
 that is not the case.  It only shows that the usage pattern
 determines who are interested in whose tags.</p></div>
-<div class="para"><p>A one-shot pull is a sign that a commit history is now crossing
+<div class="paragraph"><p>A one-shot pull is a sign that a commit history is now crossing
 the boundary between one circle of people (e.g. "people who are
 primarily interested in the networking part of the kernel") who may
 have their own set of tags (e.g. "this is the third release
@@ -588,22 +684,22 @@ The latter are usually not interested in the detailed tags used
 internally in the former group (that is what "internal" means).
 That is why it is desirable not to follow tags automatically in
 this case.</p></div>
-<div class="para"><p>It may well be that among networking people, they may want to
+<div class="paragraph"><p>It may well be that among networking people, they may want to
 exchange the tags internal to their group, but in that workflow
-they are most likely tracking with each other's progress by
-having tracking branches.  Again, the heuristic to automatically
+they are most likely tracking with each other&#8217;s progress by
+having remote-tracking branches.  Again, the heuristic to automatically
 follow such tags is a good thing.</p></div>
 <h3 id="_on_backdating_tags">On Backdating Tags</h3><div style="clear:left"></div>
-<div class="para"><p>If you have imported some changes from another VCS and would like
+<div class="paragraph"><p>If you have imported some changes from another VCS and would like
 to add tags for major releases of your work, it is useful to be able
 to specify the date to embed inside of the tag object.  The data in
 the tag object affects, for example, the ordering of tags in the
 gitweb interface.</p></div>
-<div class="para"><p>To set the date used in future tag objects, set the environment
+<div class="paragraph"><p>To set the date used in future tag objects, set the environment
 variable GIT_COMMITTER_DATE to one or more of the date and time.  The
 date and time can be specified in a number of ways; the most common
 is "YYYY-MM-DD HH:MM".</p></div>
-<div class="para"><p>An example follows.</p></div>
+<div class="paragraph"><p>An example follows.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ GIT_COMMITTER_DATE="2006-10-02 10:31" git tag -s v1.0.1</tt></pre>
@@ -611,24 +707,24 @@ is "YYYY-MM-DD HH:MM".</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-check-ref-format.html">git-check-ref-format(1)</a>.</p></div>
+<div class="paragraph"><p><a href="git-check-ref-format.html">git-check-ref-format(1)</a>.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;,
-Junio C Hamano &lt;gitster@pobox.com&gt; and Chris Wright &lt;chrisw@osdl.org&gt;.</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;,
+Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt; and Chris Wright &lt;<a href="mailto:chrisw@osdl.org">chrisw@osdl.org</a>&gt;.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:00 UTC
+Last updated 2010-11-25 03:13:43 UTC
 </div>
 </div>
 </body>

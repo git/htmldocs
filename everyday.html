@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>Everyday GIT With 20 Commands Or So</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -279,6 +347,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -291,8 +360,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -303,7 +381,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>Everyday GIT With 20 Commands Or So</title>
 </head>
 <body>
 <div id="header">
@@ -311,23 +388,23 @@ div#toc a:visited { color: blue; }
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="para"><p><a href="#Individual Developer (Standalone)">[Individual Developer (Standalone)]</a> commands are essential for
+<div class="paragraph"><p><a href="#Individual Developer (Standalone)">[Individual Developer (Standalone)]</a> commands are essential for
 anybody who makes a commit, even for somebody who works alone.</p></div>
-<div class="para"><p>If you work with other people, you will need commands listed in
+<div class="paragraph"><p>If you work with other people, you will need commands listed in
 the <a href="#Individual Developer (Participant)">[Individual Developer (Participant)]</a> section as well.</p></div>
-<div class="para"><p>People who play the <a href="#Integrator">[Integrator]</a> role need to learn some more
+<div class="paragraph"><p>People who play the <a href="#Integrator">[Integrator]</a> role need to learn some more
 commands in addition to the above.</p></div>
-<div class="para"><p><a href="#Repository Administration">[Repository Administration]</a> commands are for system
+<div class="paragraph"><p><a href="#Repository Administration">[Repository Administration]</a> commands are for system
 administrators who are responsible for the care and feeding
 of git repositories.</p></div>
 </div>
 </div>
 <h2 id="_individual_developer_standalone_a_id_individual_developer_standalone_a">Individual Developer (Standalone)<a id="Individual Developer (Standalone)"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>A standalone individual developer does not exchange patches with
+<div class="paragraph"><p>A standalone individual developer does not exchange patches with
 other people, and works alone in a single repository, using the
 following commands.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <a href="git-init.html">git-init(1)</a> to create a new repository.
@@ -388,8 +465,8 @@ following commands.</p></div>
 </li>
 </ul></div>
 <h3 id="_examples">Examples</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 Use a tarball as a starting point for a new repository.
 </dt>
 <dd>
@@ -398,11 +475,11 @@ Use a tarball as a starting point for a new repository.
 <pre><tt>$ tar zxf frotz.tar.gz
 $ cd frotz
 $ git init
-$ git add . <b>(1)</b>
+$ git add . <b>&lt;1&gt;</b>
 $ git commit -m "import of frotz source tree."
-$ git tag v2.43 <b>(2)</b></tt></pre>
+$ git tag v2.43 <b>&lt;2&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 add everything under the current directory.
@@ -415,30 +492,30 @@ make a lightweight, unannotated tag.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Create a topic branch and develop.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b alsa-audio <b>(1)</b>
+<pre><tt>$ git checkout -b alsa-audio <b>&lt;1&gt;</b>
 $ edit/compile/test
-$ git checkout -- curses/ux_audio_oss.c <b>(2)</b>
-$ git add curses/ux_audio_alsa.c <b>(3)</b>
+$ git checkout -- curses/ux_audio_oss.c <b>&lt;2&gt;</b>
+$ git add curses/ux_audio_alsa.c <b>&lt;3&gt;</b>
 $ edit/compile/test
-$ git diff HEAD <b>(4)</b>
-$ git commit -a -s <b>(5)</b>
+$ git diff HEAD <b>&lt;4&gt;</b>
+$ git commit -a -s <b>&lt;5&gt;</b>
 $ edit/compile/test
-$ git reset --soft HEAD^ <b>(6)</b>
+$ git reset --soft HEAD^ <b>&lt;6&gt;</b>
 $ edit/compile/test
-$ git diff ORIG_HEAD <b>(7)</b>
-$ git commit -a -c ORIG_HEAD <b>(8)</b>
-$ git checkout master <b>(9)</b>
-$ git merge alsa-audio <b>(10)</b>
-$ git log --since='3 days ago' <b>(11)</b>
-$ git log v2.43.. curses/ <b>(12)</b></tt></pre>
+$ git diff ORIG_HEAD <b>&lt;7&gt;</b>
+$ git commit -a -c ORIG_HEAD <b>&lt;8&gt;</b>
+$ git checkout master <b>&lt;9&gt;</b>
+$ git merge alsa-audio <b>&lt;10&gt;</b>
+$ git log --since='3 days ago' <b>&lt;11&gt;</b>
+$ git log v2.43.. curses/ <b>&lt;12&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 create a new topic branch.
@@ -500,7 +577,7 @@ combined and include <tt>--max-count=10</tt> (show 10 commits),
 </li>
 <li>
 <p>
-view only the changes that touch what's in <tt>curses/</tt>
+view only the changes that touch what&#8217;s in <tt>curses/</tt>
 directory, since <tt>v2.43</tt> tag.
 </p>
 </li>
@@ -510,10 +587,10 @@ directory, since <tt>v2.43</tt> tag.
 </div>
 <h2 id="_individual_developer_participant_a_id_individual_developer_participant_a">Individual Developer (Participant)<a id="Individual Developer (Participant)"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>A developer working as a participant in a group project needs to
+<div class="paragraph"><p>A developer working as a participant in a group project needs to
 learn how to communicate with others, and uses these commands in
 addition to the ones needed by a standalone developer.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <a href="git-clone.html">git-clone(1)</a> from the upstream to prime your local
@@ -540,8 +617,8 @@ addition to the ones needed by a standalone developer.</p></div>
 </li>
 </ul></div>
 <h3 id="_examples_2">Examples</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 Clone the upstream and work on it.  Feed changes to upstream.
 </dt>
 <dd>
@@ -549,16 +626,16 @@ Clone the upstream and work on it.  Feed changes to upstream.
 <div class="content">
 <pre><tt>$ git clone git://git.kernel.org/pub/scm/.../torvalds/linux-2.6 my2.6
 $ cd my2.6
-$ edit/compile/test; git commit -a -s <b>(1)</b>
-$ git format-patch origin <b>(2)</b>
-$ git pull <b>(3)</b>
-$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <b>(4)</b>
-$ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <b>(5)</b>
-$ git reset --hard ORIG_HEAD <b>(6)</b>
-$ git gc <b>(7)</b>
-$ git fetch --tags <b>(8)</b></tt></pre>
+$ edit/compile/test; git commit -a -s <b>&lt;1&gt;</b>
+$ git format-patch origin <b>&lt;2&gt;</b>
+$ git pull <b>&lt;3&gt;</b>
+$ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <b>&lt;4&gt;</b>
+$ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <b>&lt;5&gt;</b>
+$ git reset --hard ORIG_HEAD <b>&lt;6&gt;</b>
+$ git gc <b>&lt;7&gt;</b>
+$ git fetch --tags <b>&lt;8&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 repeat as needed.
@@ -605,29 +682,29 @@ and store them under <tt>.git/refs/tags/</tt>.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Push into another repository.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>satellite$ git clone mothership:frotz frotz <b>(1)</b>
+<pre><tt>satellite$ git clone mothership:frotz frotz <b>&lt;1&gt;</b>
 satellite$ cd frotz
-satellite$ git config --get-regexp '^(remote|branch)\.' <b>(2)</b>
+satellite$ git config --get-regexp '^(remote|branch)\.' <b>&lt;2&gt;</b>
 remote.origin.url mothership:frotz
 remote.origin.fetch refs/heads/*:refs/remotes/origin/*
 branch.master.remote origin
 branch.master.merge refs/heads/master
 satellite$ git config remote.origin.push \
-           master:refs/remotes/satellite/master <b>(3)</b>
+           master:refs/remotes/satellite/master <b>&lt;3&gt;</b>
 satellite$ edit/compile/test/commit
-satellite$ git push origin <b>(4)</b>
+satellite$ git push origin <b>&lt;4&gt;</b>
 
 mothership$ cd frotz
 mothership$ git checkout master
-mothership$ git merge satellite/master <b>(5)</b></tt></pre>
+mothership$ git merge satellite/master <b>&lt;5&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 mothership machine has a frotz repository under your home
@@ -639,7 +716,7 @@ machine.
 <p>
 clone sets these configuration variables by default.
 It arranges <tt>git pull</tt> to fetch and store the branches of mothership
-machine to local <tt>remotes/origin/*</tt> tracking branches.
+machine to local <tt>remotes/origin/*</tt> remote-tracking branches.
 </p>
 </li>
 <li>
@@ -651,8 +728,8 @@ arrange <tt>git push</tt> to push local <tt>master</tt> branch to
 <li>
 <p>
 push will stash our work away on <tt>remotes/satellite/master</tt>
-tracking branch on the mothership machine.  You could use this as
-a back-up method.
+remote-tracking branch on the mothership machine.  You could use this
+as a back-up method.
 </p>
 </li>
 <li>
@@ -663,19 +740,19 @@ machine into the master branch.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Branch off of a specific tag.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b private2.6.14 v2.6.14 <b>(1)</b>
+<pre><tt>$ git checkout -b private2.6.14 v2.6.14 <b>&lt;1&gt;</b>
 $ edit/compile/test; git commit -a
 $ git checkout master
 $ git format-patch -k -m --stdout v2.6.14..private2.6.14 |
-  git am -3 -k <b>(2)</b></tt></pre>
+  git am -3 -k <b>&lt;2&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 create a private branch based on a well known (but somewhat behind)
@@ -694,11 +771,11 @@ without a formal "merging".
 </div>
 <h2 id="_integrator_a_id_integrator_a">Integrator<a id="Integrator"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>A fairly central person acting as the integrator in a group
+<div class="paragraph"><p>A fairly central person acting as the integrator in a group
 project receives changes made by others, reviews and integrates
 them and publishes the result for others to use, using these
 commands in addition to the ones needed by participants.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <a href="git-am.html">git-am(1)</a> to apply patches e-mailed in from your
@@ -728,35 +805,35 @@ commands in addition to the ones needed by participants.</p></div>
 </li>
 </ul></div>
 <h3 id="_examples_3">Examples</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 My typical GIT day.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git status <b>(1)</b>
-$ git show-branch <b>(2)</b>
-$ mailx <b>(3)</b>
+<pre><tt>$ git status <b>&lt;1&gt;</b>
+$ git show-branch <b>&lt;2&gt;</b>
+$ mailx <b>&lt;3&gt;</b>
 &amp; s 2 3 4 5 ./+to-apply
 &amp; s 7 8 ./+hold-linus
 &amp; q
 $ git checkout -b topic/one master
-$ git am -3 -i -s -u ./+to-apply <b>(4)</b>
+$ git am -3 -i -s -u ./+to-apply <b>&lt;4&gt;</b>
 $ compile/test
-$ git checkout -b hold/linus &amp;&amp; git am -3 -i -s -u ./+hold-linus <b>(5)</b>
-$ git checkout topic/one &amp;&amp; git rebase master <b>(6)</b>
-$ git checkout pu &amp;&amp; git reset --hard next <b>(7)</b>
-$ git merge topic/one topic/two &amp;&amp; git merge hold/linus <b>(8)</b>
+$ git checkout -b hold/linus &amp;&amp; git am -3 -i -s -u ./+hold-linus <b>&lt;5&gt;</b>
+$ git checkout topic/one &amp;&amp; git rebase master <b>&lt;6&gt;</b>
+$ git checkout pu &amp;&amp; git reset --hard next <b>&lt;7&gt;</b>
+$ git merge topic/one topic/two &amp;&amp; git merge hold/linus <b>&lt;8&gt;</b>
 $ git checkout maint
-$ git cherry-pick master~4 <b>(9)</b>
+$ git cherry-pick master~4 <b>&lt;9&gt;</b>
 $ compile/test
-$ git tag -s -m "GIT 0.99.9x" v0.99.9x <b>(10)</b>
-$ git fetch ko &amp;&amp; git show-branch master maint 'tags/ko-*' <b>(11)</b>
-$ git push ko <b>(12)</b>
-$ git push ko v0.99.9x <b>(13)</b></tt></pre>
+$ git tag -s -m "GIT 0.99.9x" v0.99.9x <b>&lt;10&gt;</b>
+$ git fetch ko &amp;&amp; git show-branch master maint 'tags/ko-*' <b>&lt;11&gt;</b>
+$ git push ko <b>&lt;12&gt;</b>
+$ git push ko v0.99.9x <b>&lt;13&gt;</b></tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 see what I was in the middle of doing, if any.
@@ -829,7 +906,7 @@ Push: next
 Push: +pu
 Push: maint</tt></pre>
 </div></div>
-<div class="para"><p>In the output from <tt>git show-branch</tt>, <tt>master</tt> should have
+<div class="paragraph"><p>In the output from <tt>git show-branch</tt>, <tt>master</tt> should have
 everything <tt>ko-master</tt> has, and <tt>next</tt> should have
 everything <tt>ko-next</tt> has.</p></div>
 </li>
@@ -849,9 +926,9 @@ push the tag out, too.
 </div>
 <h2 id="_repository_administration_a_id_repository_administration_a">Repository Administration<a id="Repository Administration"></a></h2>
 <div class="sectionbody">
-<div class="para"><p>A repository administrator uses the following tools to set up
+<div class="paragraph"><p>A repository administrator uses the following tools to set up
 and maintain access to the repository by developers.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <a href="git-daemon.html">git-daemon(1)</a> to allow anonymous download from
@@ -865,11 +942,11 @@ and maintain access to the repository by developers.</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p><a href="howto/update-hook-example.txt">update hook howto</a> has a good
+<div class="paragraph"><p><a href="howto/update-hook-example.txt">update hook howto</a> has a good
 example of managing a shared central repository.</p></div>
 <h3 id="_examples_4">Examples</h3><div style="clear:left"></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 We assume the following in /etc/services
 </dt>
 <dd>
@@ -879,7 +956,7 @@ We assume the following in /etc/services
 git             9418/tcp                # Git Version Control System</tt></pre>
 </div></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Run git-daemon to serve /pub/scm from inetd.
 </dt>
 <dd>
@@ -889,9 +966,9 @@ Run git-daemon to serve /pub/scm from inetd.
 git     stream  tcp     nowait  nobody \
   /usr/bin/git-daemon git-daemon --inetd --export-all /pub/scm</tt></pre>
 </div></div>
-<div class="para"><p>The actual configuration line should be on one line.</p></div>
+<div class="paragraph"><p>The actual configuration line should be on one line.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Run git-daemon to serve /pub/scm from xinetd.
 </dt>
 <dd>
@@ -913,24 +990,24 @@ service git
         log_on_failure  += USERID
 }</tt></pre>
 </div></div>
-<div class="para"><p>Check your xinetd(8) documentation and setup, this is from a Fedora system.
+<div class="paragraph"><p>Check your xinetd(8) documentation and setup, this is from a Fedora system.
 Others might be different.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 Give push/pull only access to developers.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ grep git /etc/passwd <b>(1)</b>
+<pre><tt>$ grep git /etc/passwd <b>&lt;1&gt;</b>
 alice:x:1000:1000::/home/alice:/usr/bin/git-shell
 bob:x:1001:1001::/home/bob:/usr/bin/git-shell
 cindy:x:1002:1002::/home/cindy:/usr/bin/git-shell
 david:x:1003:1003::/home/david:/usr/bin/git-shell
-$ grep git /etc/shells <b>(2)</b>
+$ grep git /etc/shells <b>&lt;2&gt;</b>
 /usr/bin/git-shell</tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 log-in shell is set to /usr/bin/git-shell, which does not
@@ -946,16 +1023,16 @@ as the login shell.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 CVS-style shared repository.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ grep git /etc/group <b>(1)</b>
+<pre><tt>$ grep git /etc/group <b>&lt;1&gt;</b>
 git:x:9418:alice,bob,cindy,david
 $ cd /home/devo.git
-$ ls -l <b>(2)</b>
+$ ls -l <b>&lt;2&gt;</b>
   lrwxrwxrwx   1 david git    17 Dec  4 22:40 HEAD -&gt; refs/heads/master
   drwxrwsr-x   2 david git  4096 Dec  4 22:40 branches
   -rw-rw-r--   1 david git    84 Dec  4 22:40 config
@@ -966,14 +1043,14 @@ $ ls -l <b>(2)</b>
   drwxrwsr-x   4 david git  4096 Dec  4 22:40 objects
   drwxrwsr-x   4 david git  4096 Nov  7 14:58 refs
   drwxrwsr-x   2 david git  4096 Dec  4 22:40 remotes
-$ ls -l hooks/update <b>(3)</b>
+$ ls -l hooks/update <b>&lt;3&gt;</b>
   -r-xr-xr-x   1 david git  3536 Dec  4 22:40 update
-$ cat info/allowed-users <b>(4)</b>
+$ cat info/allowed-users <b>&lt;4&gt;</b>
 refs/heads/master       alice\|cindy
 refs/heads/doc-update   bob
 refs/tags/v[0-9]*       david</tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 place the developers into the same git group.
@@ -999,17 +1076,17 @@ create and push version tags.
 </li>
 </ol></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 HTTP server to support dumb protocol transfer.
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>dev$ git update-server-info <b>(1)</b>
-dev$ ftp user@isp.example.com <b>(2)</b>
+<pre><tt>dev$ git update-server-info <b>&lt;1&gt;</b>
+dev$ ftp user@isp.example.com <b>&lt;2&gt;</b>
 ftp&gt; cp -r .git /home/user/myproject.git</tt></pre>
 </div></div>
-<div class="colist"><ol>
+<div class="colist arabic"><ol>
 <li>
 <p>
 make sure your info/refs and objects/info/packs are up-to-date
@@ -1026,7 +1103,7 @@ upload to public HTTP server hosted by your ISP.
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:07 UTC
+Last updated 2010-11-25 03:13:39 UTC
 </div>
 </div>
 </body>

@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-gc(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-gc(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,21 +412,21 @@ git-gc(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git gc</em> [--aggressive] [--auto] [--quiet] [--prune=&lt;date&gt; | --no-prune]</p></div>
+<div class="paragraph"><p><em>git gc</em> [--aggressive] [--auto] [--quiet] [--prune=&lt;date&gt; | --no-prune]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Runs a number of housekeeping tasks within the current repository,
+<div class="paragraph"><p>Runs a number of housekeeping tasks within the current repository,
 such as compressing file revisions (to reduce disk space and increase
 performance) and removing unreachable objects which may have been
 created from prior invocations of <em>git add</em>.</p></div>
-<div class="para"><p>Users are encouraged to run this task on a regular basis within
+<div class="paragraph"><p>Users are encouraged to run this task on a regular basis within
 each repository to maintain good disk space utilization and good
 operating performance.</p></div>
-<div class="para"><p>Some git commands may automatically run <em>git gc</em>; see the <tt>--auto</tt> flag
-below for details. If you know what you're doing and all you want is to
+<div class="paragraph"><p>Some git commands may automatically run <em>git gc</em>; see the <tt>--auto</tt> flag
+below for details. If you know what you&#8217;re doing and all you want is to
 disable this behavior permanently without further considerations, just do:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -341,8 +435,8 @@ disable this behavior permanently without further considerations, just do:</p></
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 --aggressive
 </dt>
 <dd>
@@ -355,7 +449,7 @@ disable this behavior permanently without further considerations, just do:</p></
         few hundred changesets or so.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --auto
 </dt>
 <dd>
@@ -365,19 +459,19 @@ disable this behavior permanently without further considerations, just do:</p></
         Some git commands run <tt>git gc --auto</tt> after performing
         operations that could create many loose objects.
 </p>
-<div class="para"><p>Housekeeping is required if there are too many loose objects or
+<div class="paragraph"><p>Housekeeping is required if there are too many loose objects or
 too many packs in the repository. If the number of loose objects
 exceeds the value of the <tt>gc.auto</tt> configuration variable, then
 all loose objects are combined into a single pack using
 <tt>git repack -d -l</tt>.  Setting the value of <tt>gc.auto</tt> to 0
 disables automatic packing of loose objects.</p></div>
-<div class="para"><p>If the number of packs exceeds the value of <tt>gc.autopacklimit</tt>,
+<div class="paragraph"><p>If the number of packs exceeds the value of <tt>gc.autopacklimit</tt>,
 then existing packs (except those marked with a <tt>.keep</tt> file)
 are consolidated into a single pack by using the <tt>-A</tt> option of
 <em>git repack</em>. Setting <tt>gc.autopacklimit</tt> to 0 disables
 automatic consolidation of packs.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --prune=&lt;date&gt;
 </dt>
 <dd>
@@ -387,7 +481,7 @@ automatic consolidation of packs.</p></div>
         option is on by default.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-prune
 </dt>
 <dd>
@@ -395,7 +489,7 @@ automatic consolidation of packs.</p></div>
         Do not prune any loose objects.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -407,12 +501,12 @@ automatic consolidation of packs.</p></div>
 </div>
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<div class="para"><p>The optional configuration variable <em>gc.reflogExpire</em> can be
-set to indicate how long historical entries within each branch's
+<div class="paragraph"><p>The optional configuration variable <em>gc.reflogExpire</em> can be
+set to indicate how long historical entries within each branch&#8217;s
 reflog should remain available in this repository.  The setting is
 expressed as a length of time, for example <em>90 days</em> or <em>3 months</em>.
 It defaults to <em>90 days</em>.</p></div>
-<div class="para"><p>The optional configuration variable <em>gc.reflogExpireUnreachable</em>
+<div class="paragraph"><p>The optional configuration variable <em>gc.reflogExpireUnreachable</em>
 can be set to indicate how long historical reflog entries which
 are not part of the current branch should remain available in
 this repository.  These types of entries are generally created as
@@ -420,8 +514,8 @@ a result of using <tt>git commit --amend</tt> or <tt>git rebase</tt> and are the
 commits prior to the amend or rebase occurring.  Since these changes
 are not part of the current project most users will want to expire
 them sooner.  This option defaults to <em>30 days</em>.</p></div>
-<div class="para"><p>The above two configuration variables can be given to a pattern.  For
-example, this sets non-default expiry values only to remote tracking
+<div class="paragraph"><p>The above two configuration variables can be given to a pattern.  For
+example, this sets non-default expiry values only to remote-tracking
 branches:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -429,61 +523,61 @@ branches:</p></div>
         reflogExpire = never
         reflogexpireUnreachable = 3 days</tt></pre>
 </div></div>
-<div class="para"><p>The optional configuration variable <em>gc.rerereresolved</em> indicates
+<div class="paragraph"><p>The optional configuration variable <em>gc.rerereresolved</em> indicates
 how long records of conflicted merge you resolved earlier are
 kept.  This defaults to 60 days.</p></div>
-<div class="para"><p>The optional configuration variable <em>gc.rerereunresolved</em> indicates
+<div class="paragraph"><p>The optional configuration variable <em>gc.rerereunresolved</em> indicates
 how long records of conflicted merge you have not resolved are
 kept.  This defaults to 15 days.</p></div>
-<div class="para"><p>The optional configuration variable <em>gc.packrefs</em> determines if
+<div class="paragraph"><p>The optional configuration variable <em>gc.packrefs</em> determines if
 <em>git gc</em> runs <em>git pack-refs</em>. This can be set to "nobare" to enable
 it within all non-bare repos or it can be set to a boolean value.
 This defaults to true.</p></div>
-<div class="para"><p>The optional configuration variable <em>gc.aggressiveWindow</em> controls how
+<div class="paragraph"><p>The optional configuration variable <em>gc.aggressiveWindow</em> controls how
 much time is spent optimizing the delta compression of the objects in
 the repository when the --aggressive option is specified.  The larger
 the value, the more time is spent optimizing the delta compression.  See
 the documentation for the --window' option in <a href="git-repack.html">git-repack(1)</a> for
 more details.  This defaults to 250.</p></div>
-<div class="para"><p>The optional configuration variable <em>gc.pruneExpire</em> controls how old
+<div class="paragraph"><p>The optional configuration variable <em>gc.pruneExpire</em> controls how old
 the unreferenced loose objects have to be before they are pruned.  The
 default is "2 weeks ago".</p></div>
 </div>
 <h2 id="_notes">Notes</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git gc</em> tries very hard to be safe about the garbage it collects. In
+<div class="paragraph"><p><em>git gc</em> tries very hard to be safe about the garbage it collects. In
 particular, it will keep not only objects referenced by your current set
-of branches and tags, but also objects referenced by the index, remote
-tracking branches, refs saved by <em>git filter-branch</em> in
+of branches and tags, but also objects referenced by the index,
+remote-tracking branches, refs saved by <em>git filter-branch</em> in
 refs/original/, or reflogs (which may reference commits in branches
 that were later amended or rewound).</p></div>
-<div class="para"><p>If you are expecting some objects to be collected and they aren't, check
+<div class="paragraph"><p>If you are expecting some objects to be collected and they aren&#8217;t, check
 all of those locations and decide whether it makes sense in your case to
 remove those references.</p></div>
 </div>
 <h2 id="_hooks">HOOKS</h2>
 <div class="sectionbody">
-<div class="para"><p>The <em>git gc --auto</em> command will run the <em>pre-auto-gc</em> hook.  See
+<div class="paragraph"><p>The <em>git gc --auto</em> command will run the <em>pre-auto-gc</em> hook.  See
 <a href="githooks.html">githooks(5)</a> for more information.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-prune.html">git-prune(1)</a>
+<div class="paragraph"><p><a href="git-prune.html">git-prune(1)</a>
 <a href="git-reflog.html">git-reflog(1)</a>
 <a href="git-repack.html">git-repack(1)</a>
 <a href="git-rerere.html">git-rerere(1)</a></p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Shawn O. Pearce &lt;spearce@spearce.org&gt;</p></div>
+<div class="paragraph"><p>Written by Shawn O. Pearce &lt;<a href="mailto:spearce@spearce.org">spearce@spearce.org</a>&gt;</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:44 UTC
+Last updated 2010-11-25 03:13:41 UTC
 </div>
 </div>
 </body>
