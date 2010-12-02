@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-commit(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-commit(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,21 +412,23 @@ git-commit(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git commit</em> [-a | --interactive] [-s] [-v] [-u&lt;mode&gt;] [--amend] [--dry-run]
+<div class="verseblock-content"><em>git commit</em> [-a | --interactive] [-s] [-v] [-u&lt;mode&gt;] [--amend] [--dry-run]
            [(-c | -C) &lt;commit&gt;] [-F &lt;file&gt; | -m &lt;msg&gt;] [--reset-author]
            [--allow-empty] [--allow-empty-message] [--no-verify] [-e] [--author=&lt;author&gt;]
-           [--date=&lt;date&gt;] [--cleanup=&lt;mode&gt;] [--status | --no-status] [--]
-           [[-i | -o ]&lt;file&gt;&#8230;]</div></div>
+           [--date=&lt;date&gt;] [--cleanup=&lt;mode&gt;] [--status | --no-status]
+           [-i | -o] [--] [&lt;file&gt;&#8230;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Stores the current contents of the index in a new commit along
+<div class="paragraph"><p>Stores the current contents of the index in a new commit along
 with a log message from the user describing the changes.</p></div>
-<div class="para"><p>The content to be added can be specified in several ways:</p></div>
-<div class="olist"><ol>
+<div class="paragraph"><p>The content to be added can be specified in several ways:</p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 by using <em>git add</em> to incrementally "add" changes to the
@@ -371,19 +467,19 @@ by using the --interactive switch with the <em>commit</em> command to decide one
 </p>
 </li>
 </ol></div>
-<div class="para"><p>The <tt>--dry-run</tt> option can be used to obtain a
+<div class="paragraph"><p>The <tt>--dry-run</tt> option can be used to obtain a
 summary of what is included by any of the above for the next
 commit by giving the same set of parameters (options and paths).</p></div>
-<div class="para"><p>If you make a commit and then find a mistake immediately after
+<div class="paragraph"><p>If you make a commit and then find a mistake immediately after
 that, you can recover from it with <em>git reset</em>.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -a
 </dt>
-<dt>
+<dt class="hdlist1">
 --all
 </dt>
 <dd>
@@ -393,10 +489,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         told git about are not affected.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -C &lt;commit&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --reuse-message=&lt;commit&gt;
 </dt>
 <dd>
@@ -406,10 +502,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         when creating the commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -c &lt;commit&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --reedit-message=&lt;commit&gt;
 </dt>
 <dd>
@@ -418,7 +514,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         the user can further edit the commit message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --reset-author
 </dt>
 <dd>
@@ -428,7 +524,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         This also renews the author timestamp.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --short
 </dt>
 <dd>
@@ -437,7 +533,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         <a href="git-status.html">git-status(1)</a> for details. Implies <tt>--dry-run</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --porcelain
 </dt>
 <dd>
@@ -447,7 +543,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         <tt>--dry-run</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -z
 </dt>
 <dd>
@@ -457,10 +553,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         format is given, implies the <tt>--porcelain</tt> output format.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -F &lt;file&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --file=&lt;file&gt;
 </dt>
 <dd>
@@ -469,19 +565,19 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         read the message from the standard input.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --author=&lt;author&gt;
 </dt>
 <dd>
 <p>
         Override the commit author. Specify an explicit author using the
-        standard <tt>A U Thor &lt;author@example.com&gt;</tt> format. Otherwise &lt;author&gt;
+        standard <tt>A U Thor &lt;<a href="mailto:author@example.com">author@example.com</a>&gt;</tt> format. Otherwise &lt;author&gt;
         is assumed to be a pattern and is used to search for an existing
         commit by that author (i.e. rev-list --all -i --author=&lt;author&gt;);
         the commit author is then copied from the first such commit found.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --date=&lt;date&gt;
 </dt>
 <dd>
@@ -489,10 +585,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         Override the author date used in the commit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m &lt;msg&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --message=&lt;msg&gt;
 </dt>
 <dd>
@@ -500,10 +596,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         Use the given &lt;msg&gt; as the commit message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -t &lt;file&gt;
 </dt>
-<dt>
+<dt class="hdlist1">
 --template=&lt;file&gt;
 </dt>
 <dd>
@@ -515,10 +611,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         overrides the <tt>commit.template</tt> configuration variable.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -s
 </dt>
-<dt>
+<dt class="hdlist1">
 --signoff
 </dt>
 <dd>
@@ -527,10 +623,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         log message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -n
 </dt>
-<dt>
+<dt class="hdlist1">
 --no-verify
 </dt>
 <dd>
@@ -539,7 +635,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         See also <a href="githooks.html">githooks(5)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --allow-empty
 </dt>
 <dd>
@@ -550,7 +646,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         is primarily for use by foreign SCM interface scripts.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --allow-empty-message
 </dt>
 <dd>
@@ -561,7 +657,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
        <a href="git-commit-tree.html">git-commit-tree(1)</a>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --cleanup=&lt;mode&gt;
 </dt>
 <dd>
@@ -576,10 +672,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         and <em>strip</em> removes both whitespace and commentary.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -e
 </dt>
-<dt>
+<dt class="hdlist1">
 --edit
 </dt>
 <dd>
@@ -590,7 +686,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         further edit the message taken from these sources.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --amend
 </dt>
 <dd>
@@ -600,27 +696,26 @@ that, you can recover from it with <em>git reset</em>.</p></div>
         (this includes the usual -i/-o and explicit paths), and the
         commit log editor is seeded with the commit message from the
         tip of the current branch. The commit you create replaces the
-        current tip &#8212; if it was a merge, it will have the parents of
-        the current tip as parents &#8212; so the current top commit is
+        current tip&#8201;&#8212;&#8201;if it was a merge, it will have the parents of
+        the current tip as parents&#8201;&#8212;&#8201;so the current top commit is
         discarded.
 </p>
-<div class="para"><p>It is a rough equivalent for:</p></div>
+<div class="paragraph"><p>It is a rough equivalent for:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        $ git reset --soft HEAD^
         $ ... do something else to come up with the right tree ...
-        $ git commit -c ORIG_HEAD
-</tt></pre>
+        $ git commit -c ORIG_HEAD</tt></pre>
 </div></div>
-<div class="para"><p>but can be used to amend a merge commit.</p></div>
-<div class="para"><p>You should understand the implications of rewriting history if you
+<div class="paragraph"><p>but can be used to amend a merge commit.</p></div>
+<div class="paragraph"><p>You should understand the implications of rewriting history if you
 amend a commit that has already been published.  (See the "RECOVERING
 FROM UPSTREAM REBASE" section in <a href="git-rebase.html">git-rebase(1)</a>.)</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -i
 </dt>
-<dt>
+<dt class="hdlist1">
 --include
 </dt>
 <dd>
@@ -631,10 +726,10 @@ FROM UPSTREAM REBASE" section in <a href="git-rebase.html">git-rebase(1)</a>.)</
         are concluding a conflicted merge.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -o
 </dt>
-<dt>
+<dt class="hdlist1">
 --only
 </dt>
 <dd>
@@ -650,20 +745,20 @@ FROM UPSTREAM REBASE" section in <a href="git-rebase.html">git-rebase(1)</a>.)</
         already been staged.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -u[&lt;mode&gt;]
 </dt>
-<dt>
+<dt class="hdlist1">
 --untracked-files[=&lt;mode&gt;]
 </dt>
 <dd>
 <p>
         Show untracked files (Default: <em>all</em>).
 </p>
-<div class="para"><p>The mode parameter is optional, and is used to specify
+<div class="paragraph"><p>The mode parameter is optional, and is used to specify
 the handling of untracked files.</p></div>
-<div class="para"><p>The possible options are:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>The possible options are:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>no</em>     - Show no untracked files
@@ -678,30 +773,30 @@ the handling of untracked files.</p></div>
 <p>
 <em>all</em>    - Also shows individual files in untracked directories.
 </p>
-<div class="para"><p>See <a href="git-config.html">git-config(1)</a> for configuration variable
+<div class="paragraph"><p>See <a href="git-config.html">git-config(1)</a> for configuration variable
 used to change the default for when the option is not
 specified.</p></div>
 </li>
 </ul></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -v
 </dt>
-<dt>
+<dt class="hdlist1">
 --verbose
 </dt>
 <dd>
 <p>
         Show unified diff between the HEAD commit and what
         would be committed at the bottom of the commit message
-        template.  Note that this diff output doesn't have its
+        template.  Note that this diff output doesn&#8217;t have its
         lines prefixed with <em>#</em>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -709,7 +804,7 @@ specified.</p></div>
         Suppress commit summary message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --dry-run
 </dt>
 <dd>
@@ -719,7 +814,7 @@ specified.</p></div>
         uncommitted and paths that are untracked.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --status
 </dt>
 <dd>
@@ -730,7 +825,7 @@ specified.</p></div>
         configuration variable commit.status.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --no-status
 </dt>
 <dd>
@@ -740,7 +835,7 @@ specified.</p></div>
         default commit message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --
 </dt>
 <dd>
@@ -748,7 +843,7 @@ specified.</p></div>
         Do not interpret any more arguments as options.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;file&gt;&#8230;
 </dt>
 <dd>
@@ -764,11 +859,11 @@ specified.</p></div>
 </div>
 <h2 id="_date_formats">DATE FORMATS</h2>
 <div class="sectionbody">
-<div class="para"><p>The GIT_AUTHOR_DATE, GIT_COMMITTER_DATE environment variables
+<div class="paragraph"><p>The GIT_AUTHOR_DATE, GIT_COMMITTER_DATE environment variables
 and the <tt>--date</tt> option
 support the following date formats:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 Git internal format
 </dt>
 <dd>
@@ -779,7 +874,7 @@ Git internal format
         For example CET (which is 2 hours ahead UTC) is <tt>+0200</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 RFC 2822
 </dt>
 <dd>
@@ -788,7 +883,7 @@ RFC 2822
         <tt>Thu, 07 Apr 2005 22:13:13 +0200</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 ISO 8601
 </dt>
 <dd>
@@ -811,11 +906,11 @@ ISO 8601
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="para"><p>When recording your own work, the contents of modified files in
+<div class="paragraph"><p>When recording your own work, the contents of modified files in
 your working tree are temporarily stored to a staging area
 called the "index" with <em>git add</em>.  A file can be
 reverted back, only in the index but not in the working tree,
-to that of the last commit with <tt>git reset HEAD &#8212; &lt;file&gt;</tt>,
+to that of the last commit with <tt>git reset HEAD&#8201;&#8212;&#8201;&lt;file&gt;</tt>,
 which effectively reverts <em>git add</em> and prevents the changes to
 this file from participating in the next commit.  After building
 the state to be committed incrementally with these commands,
@@ -829,7 +924,7 @@ $ git rm goodbye.c
 $ git add hello.c
 $ git commit</tt></pre>
 </div></div>
-<div class="para"><p>Instead of staging files after each individual change, you can
+<div class="paragraph"><p>Instead of staging files after each individual change, you can
 tell <tt>git commit</tt> to notice the changes to the files whose
 contents are tracked in
 your working tree and do corresponding <tt>git add</tt> and <tt>git rm</tt>
@@ -841,10 +936,10 @@ example if there is no other change in your working tree:</p></div>
 $ rm goodbye.c
 $ git commit -a</tt></pre>
 </div></div>
-<div class="para"><p>The command <tt>git commit -a</tt> first looks at your working tree,
+<div class="paragraph"><p>The command <tt>git commit -a</tt> first looks at your working tree,
 notices that you have modified hello.c and removed goodbye.c,
 and performs necessary <tt>git add</tt> and <tt>git rm</tt> for you.</p></div>
-<div class="para"><p>After staging changes to many files, you can alter the order the
+<div class="paragraph"><p>After staging changes to many files, you can alter the order the
 changes are recorded in, by giving pathnames to <tt>git commit</tt>.
 When pathnames are given, the command makes a commit that
 only records the changes made to the named paths:</p></div>
@@ -855,18 +950,17 @@ $ git add hello.c hello.h
 $ edit Makefile
 $ git commit Makefile</tt></pre>
 </div></div>
-<div class="para"><p>This makes a commit that records the modification to <tt>Makefile</tt>.
+<div class="paragraph"><p>This makes a commit that records the modification to <tt>Makefile</tt>.
 The changes staged for <tt>hello.c</tt> and <tt>hello.h</tt> are not included
-in the resulting commit.  However, their changes are not lost &#8212;
-they are still staged and merely held back.  After the above
+in the resulting commit.  However, their changes are not lost&#8201;&#8212;&#8201;they are still staged and merely held back.  After the above
 sequence, if you do:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit</tt></pre>
 </div></div>
-<div class="para"><p>this second commit would record the changes to <tt>hello.c</tt> and
+<div class="paragraph"><p>this second commit would record the changes to <tt>hello.c</tt> and
 <tt>hello.h</tt> as expected.</p></div>
-<div class="para"><p>After a merge (initiated by <em>git merge</em> or <em>git pull</em>) stops
+<div class="paragraph"><p>After a merge (initiated by <em>git merge</em> or <em>git pull</em>) stops
 because of conflicts, cleanly merged
 paths are already staged to be committed for you, and paths that
 conflicted are left in unmerged state.  You would have to first
@@ -880,14 +974,14 @@ unmerged: hello.c
 $ edit hello.c
 $ git add hello.c</tt></pre>
 </div></div>
-<div class="para"><p>After resolving conflicts and staging the result, <tt>git ls-files -u</tt>
+<div class="paragraph"><p>After resolving conflicts and staging the result, <tt>git ls-files -u</tt>
 would stop mentioning the conflicted path.  When you are done,
 run <tt>git commit</tt> to finally record the merge:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git commit</tt></pre>
 </div></div>
-<div class="para"><p>As with the case to record your own changes, you can use <tt>-a</tt>
+<div class="paragraph"><p>As with the case to record your own changes, you can use <tt>-a</tt>
 option to save typing.  One difference is that during a merge
 resolution, you cannot use <tt>git commit</tt> with pathnames to
 alter the order the changes are committed, because the merge
@@ -896,13 +990,13 @@ refuses to run when given pathnames (but see <tt>-i</tt> option).</p></div>
 </div>
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<div class="para"><p>Though not required, it's a good idea to begin the commit message
+<div class="paragraph"><p>Though not required, it&#8217;s a good idea to begin the commit message
 with a single short (less than 50 character) line summarizing the
 change, followed by a blank line and then a more thorough description.
 Tools that turn commits into email, for example, use the first line
 on the Subject: line and the rest of the commit in the body.</p></div>
-<div class="para"><p>At the core level, git is character encoding agnostic.</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>At the core level, git is character encoding agnostic.</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 The pathnames recorded in the index and in the tree objects
@@ -927,13 +1021,13 @@ The commit log messages are uninterpreted sequences of non-NUL
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Although we encourage that the commit log messages are encoded
+<div class="paragraph"><p>Although we encourage that the commit log messages are encoded
 in UTF-8, both the core and git Porcelain are designed not to
 force UTF-8 on projects.  If all participants of a particular
 project find it more convenient to use legacy encodings, git
 does not forbid it.  However, there are a few things to keep in
 mind.</p></div>
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 <em>git commit</em> and <em>git commit-tree</em> issues
@@ -947,7 +1041,7 @@ mind.</p></div>
 <pre><tt>[i18n]
         commitencoding = ISO-8859-1</tt></pre>
 </div></div>
-<div class="para"><p>Commit objects created with the above setting record the value
+<div class="paragraph"><p>Commit objects created with the above setting record the value
 of <tt>i18n.commitencoding</tt> in its <tt>encoding</tt> header.  This is to
 help other people who look at them later.  Lack of this header
 implies that the commit log message is encoded in UTF-8.</p></div>
@@ -965,31 +1059,31 @@ implies that the commit log message is encoded in UTF-8.</p></div>
 <pre><tt>[i18n]
         logoutputencoding = ISO-8859-1</tt></pre>
 </div></div>
-<div class="para"><p>If you do not have this configuration variable, the value of
+<div class="paragraph"><p>If you do not have this configuration variable, the value of
 <tt>i18n.commitencoding</tt> is used instead.</p></div>
 </li>
 </ol></div>
-<div class="para"><p>Note that we deliberately chose not to re-code the commit log
+<div class="paragraph"><p>Note that we deliberately chose not to re-code the commit log
 message when a commit is made to force UTF-8 at the commit
 object level, because re-coding to UTF-8 is not necessarily a
 reversible operation.</p></div>
 </div>
 <h2 id="_environment_and_configuration_variables">ENVIRONMENT AND CONFIGURATION VARIABLES</h2>
 <div class="sectionbody">
-<div class="para"><p>The editor used to edit the commit log message will be chosen from the
+<div class="paragraph"><p>The editor used to edit the commit log message will be chosen from the
 GIT_EDITOR environment variable, the core.editor configuration variable, the
 VISUAL environment variable, or the EDITOR environment variable (in that
 order).  See <a href="git-var.html">git-var(1)</a> for details.</p></div>
 </div>
 <h2 id="_hooks">HOOKS</h2>
 <div class="sectionbody">
-<div class="para"><p>This command can run <tt>commit-msg</tt>, <tt>prepare-commit-msg</tt>, <tt>pre-commit</tt>,
+<div class="paragraph"><p>This command can run <tt>commit-msg</tt>, <tt>prepare-commit-msg</tt>, <tt>pre-commit</tt>,
 and <tt>post-commit</tt> hooks.  See <a href="githooks.html">githooks(5)</a> for more
 information.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-add.html">git-add(1)</a>,
+<div class="paragraph"><p><a href="git-add.html">git-add(1)</a>,
 <a href="git-rm.html">git-rm(1)</a>,
 <a href="git-mv.html">git-mv(1)</a>,
 <a href="git-merge.html">git-merge(1)</a>,
@@ -997,16 +1091,16 @@ information.</p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt; and
-Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt; and
+Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:37 UTC
+Last updated 2010-12-02 14:18:06 UTC
 </div>
 </div>
 </body>
