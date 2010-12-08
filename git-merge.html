@@ -418,7 +418,8 @@ git-merge(1) Manual Page
 <div class="verseblock-content"><em>git merge</em> [-n] [--stat] [--no-commit] [--squash]
         [-s &lt;strategy&gt;] [-X &lt;strategy-option&gt;]
         [--[no-]rerere-autoupdate] [-m &lt;msg&gt;] &lt;commit&gt;&#8230;
-<em>git merge</em> &lt;msg&gt; HEAD &lt;commit&gt;&#8230;</div>
+<em>git merge</em> &lt;msg&gt; HEAD &lt;commit&gt;&#8230;
+<em>git merge</em> --abort</div>
 <div class="verseblock-attribution">
 </div></div>
 </div>
@@ -451,6 +452,13 @@ a log message from the user describing the changes.</p></div>
 <div class="paragraph"><p>The second syntax (&lt;msg&gt; <tt>HEAD</tt> &lt;commit&gt;&#8230;) is supported for
 historical reasons.  Do not use it from the command line or in
 new scripts.  It is the same as <tt>git merge -m &lt;msg&gt; &lt;commit&gt;&#8230;</tt>.</p></div>
+<div class="paragraph"><p>The third syntax ("<tt>git merge --abort</tt>") can only be run after the
+merge has resulted in conflicts. <em>git merge --abort</em> will abort the
+merge process and try to reconstruct the pre-merge state. However,
+if there were uncommitted changes when the merge started (and
+especially if those changes were further modified after the merge
+was started), <em>git merge --abort</em> will in some cases be unable to
+reconstruct the original (pre-merge) changes. Therefore:</p></div>
 <div class="paragraph"><p><strong>Warning</strong>: Running <em>git merge</em> with uncommitted changes is
 discouraged: while possible, it leaves you in a state that is hard to
 back out of in the case of a conflict.</p></div>
@@ -638,6 +646,21 @@ invocations.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--abort
+</dt>
+<dd>
+<p>
+        Abort the current conflict resolution process, and
+        try to reconstruct the pre-merge state.
+</p>
+<div class="paragraph"><p>If there were uncommitted worktree changes present when the merge
+started, <em>git merge --abort</em> will in some cases be unable to
+reconstruct these changes. It is therefore recommended to always
+commit or stash your changes before running <em>git merge</em>.</p></div>
+<div class="paragraph"><p><em>git merge --abort</em> is equivalent to <em>git reset --merge</em> when
+<tt>MERGE_HEAD</tt> is present.</p></div>
+</dd>
+<dt class="hdlist1">
 &lt;commit&gt;&#8230;
 </dt>
 <dd>
@@ -725,7 +748,7 @@ No other changes are made.  In particular, the local
 </li>
 </ol></div>
 <div class="paragraph"><p>If you tried a merge which resulted in complex conflicts and
-want to start over, you can recover with <tt>git reset --merge</tt>.</p></div>
+want to start over, you can recover with <tt>git merge --abort</tt>.</p></div>
 </div>
 <h2 id="_how_conflicts_are_presented">HOW CONFLICTS ARE PRESENTED</h2>
 <div class="sectionbody">
@@ -790,8 +813,8 @@ viewing the original.</p></div>
 <p>
 Decide not to merge.  The only clean-ups you need are to reset
    the index file to the <tt>HEAD</tt> commit to reverse 2. and to clean
-   up working tree changes made by 2. and 3.; <tt>git-reset --hard</tt> can
-   be used for this.
+   up working tree changes made by 2. and 3.; <tt>git merge --abort</tt>
+   can be used for this.
 </p>
 </li>
 <li>
@@ -1216,7 +1239,7 @@ branch.&lt;name&gt;.mergeoptions
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-11-06 00:41:57 UTC
+Last updated 2010-12-08 22:49:27 UTC
 </div>
 </div>
 </body>
