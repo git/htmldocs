@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>gitrevisions(7)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>gitrevisions(7)</title>
 </head>
 <body>
 <div id="header">
@@ -318,29 +412,29 @@ gitrevisions(7) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p>gitrevisions</p></div>
+<div class="paragraph"><p>gitrevisions</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Many Git commands take revision parameters as arguments. Depending on
+<div class="paragraph"><p>Many Git commands take revision parameters as arguments. Depending on
 the command, they denote a specific commit or, for commands which
 walk the revision graph (such as <a href="git-log.html">git-log(1)</a>), all commits which can
 be reached from that commit. In the latter case one can also specify a
 range of revisions explicitly.</p></div>
-<div class="para"><p>In addition, some Git commands (such as <a href="git-show.html">git-show(1)</a>) also take
+<div class="paragraph"><p>In addition, some Git commands (such as <a href="git-show.html">git-show(1)</a>) also take
 revision parameters which denote other objects than commits, e.g. blobs
 ("files") or trees ("directories of files").</p></div>
 </div>
 <h2 id="_specifying_revisions">SPECIFYING REVISIONS</h2>
 <div class="sectionbody">
-<div class="para"><p>A revision parameter typically, but not necessarily, names a
+<div class="paragraph"><p>A revision parameter typically, but not necessarily, names a
 commit object.  They use what is called an <em>extended SHA1</em>
 syntax.  Here are various ways to spell object names.  The
 ones listed near the end of this list are to name trees and
 blobs contained in a commit.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 The full SHA1 object name (40-byte hexadecimal string), or
@@ -366,7 +460,7 @@ A symbolic ref name.  E.g. <em>master</em> typically means the commit
   When ambiguous, a <tt>&lt;name&gt;</tt> is disambiguated by taking the
   first match in the following rules:
 </p>
-<div class="olist"><ol>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
 if <tt>$GIT_DIR/&lt;name&gt;</tt> exists, that is what you mean (this is usually
@@ -397,7 +491,7 @@ otherwise, <tt>refs/remotes/&lt;name&gt;</tt> if exists;
 <p>
 otherwise, <tt>refs/remotes/&lt;name&gt;/HEAD</tt> if exists.
 </p>
-<div class="para"><p>HEAD names the commit your changes in the working tree is based on.
+<div class="paragraph"><p>HEAD names the commit your changes in the working tree is based on.
 FETCH_HEAD records the branch you fetched from a remote repository
 with your last <em>git fetch</em> invocation.
 ORIG_HEAD is created by commands that moves your HEAD in a drastic
@@ -406,7 +500,7 @@ you can change the tip of the branch back to the state before you ran
 them easily.
 MERGE_HEAD records the commit(s) you are merging into your branch
 when you run <em>git merge</em>.</p></div>
-<div class="para"><p>Note that any of the <tt>refs/*</tt> cases above may come either from
+<div class="paragraph"><p>Note that any of the <tt>refs/*</tt> cases above may come either from
 the <tt>$GIT_DIR/refs</tt> directory or from the <tt>$GIT_DIR/packed-refs</tt> file.</p></div>
 </li>
 </ol></div>
@@ -514,6 +608,10 @@ A suffix <em>:</em> followed by a path (e.g. <tt>HEAD:README</tt>); this names t
   <em>:path</em> (with an empty part before the colon, e.g. <tt>:README</tt>)
   is a special case of the syntax described next: content
   recorded in the index at the given path.
+  A path starting with <em>./</em> or <em>../</em> is relative to current working directory.
+  The given path will be converted to be relative to working tree&#8217;s root directory.
+  This is most useful to address a blob or tree from a commit or tree that has
+  the same tree structure with the working tree.
 </p>
 </li>
 <li>
@@ -522,13 +620,13 @@ A colon, optionally followed by a stage number (0 to 3) and a
   colon, followed by a path (e.g. <tt>:0:README</tt>); this names a blob object in the
   index at the given path. Missing stage number (and the colon
   that follows it, e.g. <tt>:README</tt>) names a stage 0 entry. During a merge, stage
-  1 is the common ancestor, stage 2 is the target branch's version
+  1 is the common ancestor, stage 2 is the target branch&#8217;s version
   (typically the current branch), and stage 3 is the version from
   the branch being merged.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Here is an illustration, by Jon Loeliger.  Both commit nodes B
+<div class="paragraph"><p>Here is an illustration, by Jon Loeliger.  Both commit nodes B
 and C are parents of commit node A.  Parent commits are ordered
 left-to-right.</p></div>
 <div class="literalblock">
@@ -560,29 +658,29 @@ J = F^2  = B^3^2   = A^^3^2</tt></pre>
 </div>
 <h2 id="_specifying_ranges">SPECIFYING RANGES</h2>
 <div class="sectionbody">
-<div class="para"><p>History traversing commands such as <em>git log</em> operate on a set
+<div class="paragraph"><p>History traversing commands such as <em>git log</em> operate on a set
 of commits, not just a single commit.  To these commands,
 specifying a single revision with the notation described in the
 previous section means the set of commits reachable from that
 commit, following the commit ancestry chain.</p></div>
-<div class="para"><p>To exclude commits reachable from a commit, a prefix <tt>&#94;</tt>
+<div class="paragraph"><p>To exclude commits reachable from a commit, a prefix <tt>&#94;</tt>
 notation is used.  E.g. <tt>&#94;r1 r2</tt> means commits reachable
 from <tt>r2</tt> but exclude the ones reachable from <tt>r1</tt>.</p></div>
-<div class="para"><p>This set operation appears so often that there is a shorthand
+<div class="paragraph"><p>This set operation appears so often that there is a shorthand
 for it.  When you have two commits <tt>r1</tt> and <tt>r2</tt> (named according
 to the syntax explained in SPECIFYING REVISIONS above), you can ask
 for commits that are reachable from r2 excluding those that are reachable
 from r1 by <tt>&#94;r1 r2</tt> and it can be written as <tt>r1..r2</tt>.</p></div>
-<div class="para"><p>A similar notation <tt>r1...r2</tt> is called symmetric difference
+<div class="paragraph"><p>A similar notation <tt>r1...r2</tt> is called symmetric difference
 of <tt>r1</tt> and <tt>r2</tt> and is defined as
 <tt>r1 r2 --not $(git merge-base --all r1 r2)</tt>.
 It is the set of commits that are reachable from either one of
 <tt>r1</tt> or <tt>r2</tt> but not from both.</p></div>
-<div class="para"><p>Two other shorthands for naming a set that is formed by a commit
+<div class="paragraph"><p>Two other shorthands for naming a set that is formed by a commit
 and its parent commits exist.  The <tt>r1&#94;@</tt> notation means all
 parents of <tt>r1</tt>.  <tt>r1&#94;!</tt> includes commit <tt>r1</tt> but excludes
 all of its parents.</p></div>
-<div class="para"><p>Here are a handful of examples:</p></div>
+<div class="paragraph"><p>Here are a handful of examples:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>D                G H D
@@ -597,15 +695,15 @@ F^! D            G H D F</tt></pre>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-rev-parse.html">git-rev-parse(1)</a></p></div>
+<div class="paragraph"><p><a href="git-rev-parse.html">git-rev-parse(1)</a></p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-28 05:49:38 UTC
+Last updated 2010-07-15 22:23:57 UTC
 </div>
 </div>
 </body>

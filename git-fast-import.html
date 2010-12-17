@@ -547,6 +547,16 @@ the frontend program in use.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--cat-blob-fd=&lt;fd&gt;
+</dt>
+<dd>
+<p>
+        Specify the file descriptor that will be written to
+        when the <tt>cat-blob</tt> command is encountered in the stream.
+        The default behaviour is to write to <tt>stdout</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
 --export-pack-edges=&lt;file&gt;
 </dt>
 <dd>
@@ -809,6 +819,16 @@ and control the current import process.  More detailed discussion
         Causes fast-import to echo the entire line to its own
         standard output.  This command is optional and is not needed
         to perform an import.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>cat-blob</tt>
+</dt>
+<dd>
+<p>
+        Causes fast-import to print a blob in <em>cat-file --batch</em>
+        format to the file descriptor set with <tt>--cat-blob-fd</tt> or
+        <tt>stdout</tt> if unspecified.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1381,54 +1401,86 @@ remove the leading part of the line, for example:</p></div>
 <div class="paragraph"><p>Placing a <tt>progress</tt> command immediately after a <tt>checkpoint</tt> will
 inform the reader when the <tt>checkpoint</tt> has been completed and it
 can safely access the refs that fast-import updated.</p></div>
+<h3 id="_tt_cat_blob_tt"><tt>cat-blob</tt></h3><div style="clear:left"></div>
+<div class="paragraph"><p>Causes fast-import to print a blob to a file descriptor previously
+arranged with the <tt>--cat-blob-fd</tt> argument.  The command otherwise
+has no impact on the current import; its main purpose is to
+retrieve blobs that may be in fast-import&#8217;s memory but not
+accessible from the target repository.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'cat-blob' SP &lt;dataref&gt; LF</tt></pre>
+</div></div>
+<div class="paragraph"><p>The <tt>&lt;dataref&gt;</tt> can be either a mark reference (<tt>:&lt;idnum&gt;</tt>)
+set previously or a full 40-byte SHA-1 of a Git blob, preexisting or
+ready to be written.</p></div>
+<div class="paragraph"><p>output uses the same format as <tt>git cat-file --batch</tt>:</p></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;sha1&gt; SP 'blob' SP &lt;size&gt; LF
+&lt;contents&gt; LF</tt></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>This command can be used anywhere in the stream that comments are
+accepted.  In particular, the <tt>cat-blob</tt> command can be used in the
+middle of a commit but not in the middle of a <tt>data</tt> command.</p></div>
 <h3 id="_tt_feature_tt"><tt>feature</tt></h3><div style="clear:left"></div>
 <div class="paragraph"><p>Require that fast-import supports the specified feature, or abort if
 it does not.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>        'feature' SP &lt;feature&gt; LF</tt></pre>
+<pre><tt>        'feature' SP &lt;feature&gt; ('=' &lt;argument&gt;)? LF</tt></pre>
 </div></div>
-<div class="paragraph"><p>The &lt;feature&gt; part of the command may be any string matching
-^[a-zA-Z][a-zA-Z-]*$ and should be understood by fast-import.</p></div>
-<div class="paragraph"><p>Feature work identical as their option counterparts with the
-exception of the import-marks feature, see below.</p></div>
-<div class="paragraph"><p>The following features are currently supported:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
+<div class="paragraph"><p>The &lt;feature&gt; part of the command may be any one of the following:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 date-format
-</p>
-</li>
-<li>
-<p>
-import-marks
-</p>
-</li>
-<li>
-<p>
+</dt>
+<dt class="hdlist1">
 export-marks
-</p>
-</li>
-<li>
-<p>
+</dt>
+<dt class="hdlist1">
 relative-marks
-</p>
-</li>
-<li>
-<p>
+</dt>
+<dt class="hdlist1">
 no-relative-marks
-</p>
-</li>
-<li>
-<p>
+</dt>
+<dt class="hdlist1">
 force
+</dt>
+<dd>
+<p>
+        Act as though the corresponding command-line option with
+        a leading <em>--</em> was passed on the command line
+        (see OPTIONS, above).
 </p>
-</li>
-</ul></div>
-<div class="paragraph"><p>The import-marks behaves differently from when it is specified as
-commandline option in that only one "feature import-marks" is allowed
-per stream. Also, any --import-marks= specified on the commandline
-will override those from the stream (if any).</p></div>
+</dd>
+<dt class="hdlist1">
+import-marks
+</dt>
+<dd>
+<p>
+        Like --import-marks except in two respects: first, only one
+        "feature import-marks" command is allowed per stream;
+        second, an --import-marks= command-line option overrides
+        any "feature import-marks" command in the stream.
+</p>
+</dd>
+<dt class="hdlist1">
+cat-blob
+</dt>
+<dd>
+<p>
+        Ignored.  Versions of fast-import not supporting the
+        "cat-blob" command will exit with a message indicating so.
+        This lets the import error out early with a clear message,
+        rather than wasting time on the early part of an import
+        before the unsupported command is detected.
+</p>
+</dd>
+</dl></div>
 <h3 id="_tt_option_tt"><tt>option</tt></h3><div style="clear:left"></div>
 <div class="paragraph"><p>Processes the specified option so that git fast-import behaves in a
 way that suits the frontend&#8217;s needs.
@@ -1460,6 +1512,11 @@ import-marks
 <li>
 <p>
 export-marks
+</p>
+</li>
+<li>
+<p>
+cat-blob-fd
 </p>
 </li>
 <li>
@@ -1739,6 +1796,14 @@ and lazy loading of subtrees, allows fast-import to efficiently import
 projects with 2,000+ branches and 45,114+ files in a very limited
 memory footprint (less than 2.7 MiB per active branch).</p></div>
 </div>
+<h2 id="_signals">Signals</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Sending <strong>SIGUSR1</strong> to the <em>git fast-import</em> process ends the current
+packfile early, simulating a <tt>checkpoint</tt> command.  The impatient
+operator can use this facility to peek at the objects and refs from an
+import in progress, at the cost of some added running time and worse
+compression.</p></div>
+</div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Written by Shawn O. Pearce &lt;<a href="mailto:spearce@spearce.org">spearce@spearce.org</a>&gt;.</p></div>
@@ -1753,7 +1818,7 @@ memory footprint (less than 2.7 MiB per active branch).</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-11-06 00:41:57 UTC
+Last updated 2010-12-17 06:56:34 UTC
 </div>
 </div>
 </body>
