@@ -938,6 +938,11 @@ patterns are available:</p></div>
 </li>
 <li>
 <p>
+<tt>perl</tt> suitable for source code in the Perl language.
+</p>
+</li>
+<li>
+<p>
 <tt>php</tt> suitable for source code in the PHP language.
 </p>
 </li>
@@ -1029,6 +1034,33 @@ cache manually (e.g., because your version of "exif" was updated
 and now produces better output), you can remove the cache
 manually with <tt>git update-ref -d refs/notes/textconv/jpg</tt> (where
 "jpg" is the name of the diff driver, as in the example above).</p></div>
+<h4 id="_marking_files_as_binary">Marking files as binary</h4>
+<div class="paragraph"><p>Git usually guesses correctly whether a blob contains text or binary
+data by examining the beginning of the contents. However, sometimes you
+may want to override its decision, either because a blob contains binary
+data later in the file, or because the content, while technically
+composed of text characters, is opaque to a human reader. For example,
+many postscript files contain only ascii characters, but produce noisy
+and meaningless diffs.</p></div>
+<div class="paragraph"><p>The simplest way to mark a file as binary is to unset the diff
+attribute in the <tt>.gitattributes</tt> file:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>*.ps -diff</tt></pre>
+</div></div>
+<div class="paragraph"><p>This will cause git to generate <tt>Binary files differ</tt> (or a binary
+patch, if binary patches are enabled) instead of a regular diff.</p></div>
+<div class="paragraph"><p>However, one may also want to specify other diff driver attributes. For
+example, you might want to use <tt>textconv</tt> to convert postscript files to
+an ascii representation for human viewing, but otherwise treat them as
+binary files. You cannot specify both <tt>-diff</tt> and <tt>diff=ps</tt> attributes.
+The solution is to use the <tt>diff.*.binary</tt> config option:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[diff "ps"]
+  textconv = ps2ascii
+  binary = true</tt></pre>
+</div></div>
 <h3 id="_performing_a_three_way_merge">Performing a three-way merge</h3><div style="clear:left"></div>
 <h4 id="_tt_merge_tt"><tt>merge</tt></h4>
 <div class="paragraph"><p>The attribute <tt>merge</tt> affects how three versions of a file is
@@ -1330,7 +1362,7 @@ frotz   unspecified</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-01-06 00:34:27 UTC
+Last updated 2011-01-14 00:43:06 UTC
 </div>
 </div>
 </body>
