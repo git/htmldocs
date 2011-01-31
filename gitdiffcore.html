@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>gitdiffcore(7)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>gitdiffcore(7)</title>
 </head>
 <body>
 <div id="header">
@@ -318,13 +412,13 @@ gitdiffcore(7) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git diff</em> *</p></div>
+<div class="paragraph"><p><em>git diff</em> *</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>The diff commands <em>git diff-index</em>, <em>git diff-files</em>, and <em>git diff-tree</em>
+<div class="paragraph"><p>The diff commands <em>git diff-index</em>, <em>git diff-files</em>, and <em>git diff-tree</em>
 can be told to manipulate differences they find in
 unconventional ways before showing <em>diff</em> output.  The manipulation
 is collectively called "diffcore transformation".  This short note
@@ -333,9 +427,9 @@ that is easier to understand than the conventional kind.</p></div>
 </div>
 <h2 id="_the_chain_of_operation">The chain of operation</h2>
 <div class="sectionbody">
-<div class="para"><p>The <em>git diff-&#42;</em> family works by first comparing two sets of
+<div class="paragraph"><p>The <em>git diff-&#42;</em> family works by first comparing two sets of
 files:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>git diff-index</em> compares contents of a "tree" object and the
@@ -356,20 +450,20 @@ files:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>In all of these cases, the commands themselves first optionally limit
+<div class="paragraph"><p>In all of these cases, the commands themselves first optionally limit
 the two sets of files by any pathspecs given on their command-lines,
 and compare corresponding paths in the two resulting sets of files.</p></div>
-<div class="para"><p>The pathspecs are used to limit the world diff operates in.  They remove
+<div class="paragraph"><p>The pathspecs are used to limit the world diff operates in.  They remove
 the filepairs outside the specified sets of pathnames.  E.g. If the
 input set of filepairs included:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>:100644 100644 bcd1234... 0123456... M junkfile</tt></pre>
 </div></div>
-<div class="para"><p>but the command invocation was <tt>git diff-files myfile</tt>, then the
+<div class="paragraph"><p>but the command invocation was <tt>git diff-files myfile</tt>, then the
 junkfile entry would be removed from the list because only "myfile"
 is under consideration.</p></div>
-<div class="para"><p>The result of comparison is passed from these commands to what is
+<div class="paragraph"><p>The result of comparison is passed from these commands to what is
 internally called "diffcore", in a format similar to what is output
 when the -p option is not used.  E.g.</p></div>
 <div class="listingblock">
@@ -379,11 +473,11 @@ create         :000000 100644 0000000... 1234567... A file4
 delete         :100644 000000 1234567... 0000000... D file5
 unmerged       :000000 000000 0000000... 0000000... U file6</tt></pre>
 </div></div>
-<div class="para"><p>The diffcore mechanism is fed a list of such comparison results
+<div class="paragraph"><p>The diffcore mechanism is fed a list of such comparison results
 (each of which is called "filepair", although at this point each
 of them talks about a single file), and transforms such a list
 into another list.  There are currently 5 such transformations:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 diffcore-break
@@ -410,7 +504,7 @@ diffcore-order
 </p>
 </li>
 </ul></div>
-<div class="para"><p>These are applied in sequence.  The set of filepairs <em>git diff-&#42;</em>
+<div class="paragraph"><p>These are applied in sequence.  The set of filepairs <em>git diff-&#42;</em>
 commands find are used as the input to diffcore-break, and
 the output from diffcore-break is used as the input to the
 next transformation.  The final result is then passed to the
@@ -420,7 +514,7 @@ diff-patch format.</p></div>
 </div>
 <h2 id="_diffcore_break_for_splitting_up_complete_rewrites">diffcore-break: For Splitting Up "Complete Rewrites"</h2>
 <div class="sectionbody">
-<div class="para"><p>The second transformation in the chain is diffcore-break, and is
+<div class="paragraph"><p>The second transformation in the chain is diffcore-break, and is
 controlled by the -B option to the <em>git diff-&#42;</em> commands.  This is
 used to detect a filepair that represents "complete rewrite" and
 break such filepair into two filepairs that represent delete and
@@ -429,14 +523,14 @@ create.  E.g.  If the input contained this filepair:</p></div>
 <div class="content">
 <pre><tt>:100644 100644 bcd1234... 0123456... M file0</tt></pre>
 </div></div>
-<div class="para"><p>and if it detects that the file "file0" is completely rewritten,
+<div class="paragraph"><p>and if it detects that the file "file0" is completely rewritten,
 it changes it to:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>:100644 000000 bcd1234... 0000000... D file0
 :000000 100644 0000000... 0123456... A file0</tt></pre>
 </div></div>
-<div class="para"><p>For the purpose of breaking a filepair, diffcore-break examines
+<div class="paragraph"><p>For the purpose of breaking a filepair, diffcore-break examines
 the extent of changes between the contents of the files before
 and after modification (i.e. the contents that have "bcd1234&#8230;"
 and "0123456&#8230;" as their SHA1 content ID, in the above
@@ -451,7 +545,7 @@ after "-B" option (e.g. "-B75" to tell it to use 75%).</p></div>
 </div>
 <h2 id="_diffcore_rename_for_detection_renames_and_copies">diffcore-rename: For Detection Renames and Copies</h2>
 <div class="sectionbody">
-<div class="para"><p>This transformation is used to detect renames and copies, and is
+<div class="paragraph"><p>This transformation is used to detect renames and copies, and is
 controlled by the -M option (to detect renames) and the -C option
 (to detect copies as well) to the <em>git diff-&#42;</em> commands.  If the
 input contained these filepairs:</p></div>
@@ -460,14 +554,14 @@ input contained these filepairs:</p></div>
 <pre><tt>:100644 000000 0123456... 0000000... D fileX
 :000000 100644 0000000... 0123456... A file0</tt></pre>
 </div></div>
-<div class="para"><p>and the contents of the deleted file fileX is similar enough to
+<div class="paragraph"><p>and the contents of the deleted file fileX is similar enough to
 the contents of the created file file0, then rename detection
 merges these filepairs and creates:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>:100644 100644 0123456... 0123456... R100 fileX file0</tt></pre>
 </div></div>
-<div class="para"><p>When the "-C" option is used, the original contents of modified files,
+<div class="paragraph"><p>When the "-C" option is used, the original contents of modified files,
 and deleted files (and also unmodified files, if the
 "--find-copies-harder" option is used) are considered as candidates
 of the source files in rename/copy operation.  If the input were like
@@ -478,7 +572,7 @@ created file file0:</p></div>
 <pre><tt>:100644 100644 0123456... 1234567... M fileY
 :000000 100644 0000000... bcd3456... A file0</tt></pre>
 </div></div>
-<div class="para"><p>the original contents of fileY and the resulting contents of
+<div class="paragraph"><p>the original contents of fileY and the resulting contents of
 file0 are compared, and if they are similar enough, they are
 changed to:</p></div>
 <div class="listingblock">
@@ -486,13 +580,13 @@ changed to:</p></div>
 <pre><tt>:100644 100644 0123456... 1234567... M fileY
 :100644 100644 0123456... bcd3456... C100 fileY file0</tt></pre>
 </div></div>
-<div class="para"><p>In both rename and copy detection, the same "extent of changes"
+<div class="paragraph"><p>In both rename and copy detection, the same "extent of changes"
 algorithm used in diffcore-break is used to determine if two
 files are "similar enough", and can be customized to use
 a similarity score different from the default of 50% by giving a
 number after the "-M" or "-C" option (e.g. "-M8" to tell it to use
 8/10 = 80%).</p></div>
-<div class="para"><p>Note.  When the "-C" option is used with <tt>--find-copies-harder</tt>
+<div class="paragraph"><p>Note.  When the "-C" option is used with <tt>--find-copies-harder</tt>
 option, <em>git diff-&#42;</em> commands feed unmodified filepairs to
 diffcore mechanism as well as modified ones.  This lets the copy
 detector consider unmodified files as copy source candidates at
@@ -502,11 +596,11 @@ copied happened to have been modified in the same changeset.</p></div>
 </div>
 <h2 id="_diffcore_merge_broken_for_putting_complete_rewrites_back_together">diffcore-merge-broken: For Putting "Complete Rewrites" Back Together</h2>
 <div class="sectionbody">
-<div class="para"><p>This transformation is used to merge filepairs broken by
+<div class="paragraph"><p>This transformation is used to merge filepairs broken by
 diffcore-break, and not transformed into rename/copy by
 diffcore-rename, back into a single modification.  This always
 runs when diffcore-break is used.</p></div>
-<div class="para"><p>For the purpose of merging broken filepairs back, it uses a
+<div class="paragraph"><p>For the purpose of merging broken filepairs back, it uses a
 different "extent of changes" computation from the ones used by
 diffcore-break and diffcore-rename.  It counts only the deletion
 from the original, and does not count insertion.  If you removed
@@ -518,12 +612,12 @@ rename/copy detection, but if filepairs broken that way were not
 matched with other filepairs to create rename/copy, then this
 transformation merges them back into the original
 "modification".</p></div>
-<div class="para"><p>The "extent of changes" parameter can be tweaked from the
+<div class="paragraph"><p>The "extent of changes" parameter can be tweaked from the
 default 80% (that is, unless more than 80% of the original
 material is deleted, the broken pairs are merged back into a
 single modification) by giving a second number to -B option,
 like these:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 -B50/60 (give 50% "break score" to diffcore-break, use 60%
@@ -536,7 +630,7 @@ like these:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Note that earlier implementation left a broken pair as a separate
+<div class="paragraph"><p>Note that earlier implementation left a broken pair as a separate
 creation and deletion patches.  This was an unnecessary hack and
 the latest implementation always merges all the broken pairs
 back into modifications, but the resulting patch output is
@@ -547,16 +641,16 @@ version prefixed with <em>+</em>.</p></div>
 </div>
 <h2 id="_diffcore_pickaxe_for_detecting_addition_deletion_of_specified_string">diffcore-pickaxe: For Detecting Addition/Deletion of Specified String</h2>
 <div class="sectionbody">
-<div class="para"><p>This transformation is used to find filepairs that represent
+<div class="paragraph"><p>This transformation is used to find filepairs that represent
 changes that touch a specified string, and is controlled by the
 -S option and the <tt>--pickaxe-all</tt> option to the <em>git diff-&#42;</em>
 commands.</p></div>
-<div class="para"><p>When diffcore-pickaxe is in use, it checks if there are
+<div class="paragraph"><p>When diffcore-pickaxe is in use, it checks if there are
 filepairs whose "result" side and whose "origin" side have
 different number of specified string.  Such a filepair represents
 "the string appeared in this changeset".  It also checks for the
 opposite case that loses the specified string.</p></div>
-<div class="para"><p>When <tt>--pickaxe-all</tt> is not in effect, diffcore-pickaxe leaves
+<div class="paragraph"><p>When <tt>--pickaxe-all</tt> is not in effect, diffcore-pickaxe leaves
 only such filepairs that touch the specified string in its
 output.  When <tt>--pickaxe-all</tt> is used, diffcore-pickaxe leaves all
 filepairs intact if there is such a filepair, or makes the
@@ -566,14 +660,14 @@ changeset easier.</p></div>
 </div>
 <h2 id="_diffcore_order_for_sorting_the_output_based_on_filenames">diffcore-order: For Sorting the Output Based on Filenames</h2>
 <div class="sectionbody">
-<div class="para"><p>This is used to reorder the filepairs according to the user's
-(or project's) taste, and is controlled by the -O option to the
+<div class="paragraph"><p>This is used to reorder the filepairs according to the user&#8217;s
+(or project&#8217;s) taste, and is controlled by the -O option to the
 <em>git diff-&#42;</em> commands.</p></div>
-<div class="para"><p>This takes a text file each of whose lines is a shell glob
+<div class="paragraph"><p>This takes a text file each of whose lines is a shell glob
 pattern.  Filepairs that match a glob pattern on an earlier line
 in the file are output before ones that match a later line, and
 filepairs that do not match any glob pattern are output last.</p></div>
-<div class="para"><p>As an example, a typical orderfile for the core git probably
+<div class="paragraph"><p>As an example, a typical orderfile for the core git probably
 would look like this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -587,22 +681,22 @@ t</tt></pre>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-diff.html">git-diff(1)</a>,
+<div class="paragraph"><p><a href="git-diff.html">git-diff(1)</a>,
 <a href="git-diff-files.html">git-diff-files(1)</a>,
 <a href="git-diff-index.html">git-diff-index(1)</a>,
 <a href="git-diff-tree.html">git-diff-tree(1)</a>,
 <a href="git-format-patch.html">git-format-patch(1)</a>,
 <a href="git-log.html">git-log(1)</a>,
 <a href="gitglossary.html">gitglossary(7)</a>,
-<a href="user-manual.html">The Git User's Manual</a></p></div>
+<a href="user-manual.html">The Git User&#8217;s Manual</a></p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-30 00:03:01 UTC
+Last updated 2010-09-30 00:01:59 UTC
 </div>
 </div>
 </body>

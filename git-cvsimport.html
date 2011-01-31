@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-cvsimport(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-cvsimport(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,30 +412,32 @@ git-cvsimport(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git cvsimport</em> [-o &lt;branch-for-HEAD&gt;] [-h] [-v] [-d &lt;CVSROOT&gt;]
+<div class="verseblock-content"><em>git cvsimport</em> [-o &lt;branch-for-HEAD&gt;] [-h] [-v] [-d &lt;CVSROOT&gt;]
               [-A &lt;author-conv-file&gt;] [-p &lt;options-for-cvsps&gt;] [-P &lt;file&gt;]
               [-C &lt;git_repository&gt;] [-z &lt;fuzz&gt;] [-i] [-k] [-u] [-s &lt;subst&gt;]
               [-a] [-m] [-M &lt;regex&gt;] [-S &lt;regex&gt;] [-L &lt;commitlimit&gt;]
-              [-r &lt;remote&gt;] [-R] [&lt;CVS_module&gt;]</div></div>
+              [-r &lt;remote&gt;] [-R] [&lt;CVS_module&gt;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Imports a CVS repository into git. It will either create a new
+<div class="paragraph"><p>Imports a CVS repository into git. It will either create a new
 repository, or incrementally import into an existing one.</p></div>
-<div class="para"><p>Splitting the CVS log into patch sets is done by <em>cvsps</em>.
+<div class="paragraph"><p>Splitting the CVS log into patch sets is done by <em>cvsps</em>.
 At least version 2.1 is required.</p></div>
-<div class="para"><p><strong>WARNING:</strong> for certain situations the import leads to incorrect results.
+<div class="paragraph"><p><strong>WARNING:</strong> for certain situations the import leads to incorrect results.
 Please see the section <a href="#issues">ISSUES</a> for further reference.</p></div>
-<div class="para"><p>You should <strong>never</strong> do any work of your own on the branches that are
+<div class="paragraph"><p>You should <strong>never</strong> do any work of your own on the branches that are
 created by <em>git cvsimport</em>.  By default initial import will create and populate a
-"master" branch from the CVS repository's main branch which you're free
+"master" branch from the CVS repository&#8217;s main branch which you&#8217;re free
 to work with; after that, you need to <em>git merge</em> incremental imports, or
 any CVS branches, yourself.  It is advisable to specify a named remote via
 -r to separate and protect the incoming branches.</p></div>
-<div class="para"><p>If you intend to set up a shared public repository that all developers can
+<div class="paragraph"><p>If you intend to set up a shared public repository that all developers can
 read/write, or if you want to use <a href="git-cvsserver.html">git-cvsserver(1)</a>, then you
 probably want to make a bare clone of the imported repository,
 and use the clone as the shared repository.
@@ -349,8 +445,8 @@ See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -v
 </dt>
 <dd>
@@ -358,7 +454,7 @@ See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
         Verbosity: let <em>cvsimport</em> report what it is doing.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -d &lt;CVSROOT&gt;
 </dt>
 <dd>
@@ -370,7 +466,7 @@ See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
         <tt>CVSROOT</tt> environment variable.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;CVS_module&gt;
 </dt>
 <dd>
@@ -380,16 +476,16 @@ See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
         <tt>CVS/Repository</tt>.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -C &lt;target-dir&gt;
 </dt>
 <dd>
 <p>
-        The git repository to import to.  If the directory doesn't
+        The git repository to import to.  If the directory doesn&#8217;t
         exist, it will be created.  Default is the current directory.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -r &lt;remote&gt;
 </dt>
 <dd>
@@ -399,7 +495,7 @@ See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
         akin to the way <em>git clone</em> uses <em>origin</em> by default.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -o &lt;branch-for-HEAD&gt;
 </dt>
 <dd>
@@ -412,20 +508,20 @@ See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
         Use this option if you want to import into a different
         branch.
 </p>
-<div class="para"><p>Use <em>-o master</em> for continuing an import that was initially done by
+<div class="paragraph"><p>Use <em>-o master</em> for continuing an import that was initially done by
 the old cvs2git tool.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -i
 </dt>
 <dd>
 <p>
-        Import-only: don't perform a checkout after importing.  This option
+        Import-only: don&#8217;t perform a checkout after importing.  This option
         ensures the working directory and index remain untouched and will
         not create them if they do not exist.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -k
 </dt>
 <dd>
@@ -435,7 +531,7 @@ the old cvs2git tool.</p></div>
         to preserve compatibility with early imported trees.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -u
 </dt>
 <dd>
@@ -443,7 +539,7 @@ the old cvs2git tool.</p></div>
         Convert underscores in tag and branch names to dots.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -s &lt;subst&gt;
 </dt>
 <dd>
@@ -451,7 +547,7 @@ the old cvs2git tool.</p></div>
         Substitute the character "/" in branch names with &lt;subst&gt;
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -p &lt;options-for-cvsps&gt;
 </dt>
 <dd>
@@ -459,9 +555,9 @@ the old cvs2git tool.</p></div>
         Additional options for cvsps.
         The options <em>-u</em> and <em>-A</em> are implicit and should not be used here.
 </p>
-<div class="para"><p>If you need to pass multiple options, separate them with a comma.</p></div>
+<div class="paragraph"><p>If you need to pass multiple options, separate them with a comma.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -z &lt;fuzz&gt;
 </dt>
 <dd>
@@ -470,7 +566,7 @@ the old cvs2git tool.</p></div>
         cvsps defaults to 300s.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -P &lt;cvsps-output-file&gt;
 </dt>
 <dd>
@@ -479,7 +575,7 @@ the old cvs2git tool.</p></div>
         for debugging or when cvsps is being handled outside cvsimport.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -m
 </dt>
 <dd>
@@ -489,7 +585,7 @@ the old cvs2git tool.</p></div>
         branch name from the commit message.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -M &lt;regex&gt;
 </dt>
 <dd>
@@ -498,10 +594,10 @@ the old cvs2git tool.</p></div>
         regex. It can be used with <em>-m</em> to enable the default regexes
         as well. You must escape forward slashes.
 </p>
-<div class="para"><p>The regex must capture the source branch name in $1.</p></div>
-<div class="para"><p>This option can be used several times to provide several detection regexes.</p></div>
+<div class="paragraph"><p>The regex must capture the source branch name in $1.</p></div>
+<div class="paragraph"><p>This option can be used several times to provide several detection regexes.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -S &lt;regex&gt;
 </dt>
 <dd>
@@ -509,7 +605,7 @@ the old cvs2git tool.</p></div>
         Skip paths matching the regex.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -a
 </dt>
 <dd>
@@ -518,7 +614,7 @@ the old cvs2git tool.</p></div>
         skips commits that have a timestamp less than 10 minutes ago.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -L &lt;limit&gt;
 </dt>
 <dd>
@@ -527,7 +623,7 @@ the old cvs2git tool.</p></div>
         cvsimport leaks memory.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -A &lt;author-conv-file&gt;
 </dt>
 <dd>
@@ -539,20 +635,19 @@ the old cvs2git tool.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>        exon=Andreas Ericsson &lt;ae@op5.se&gt;
-        spawn=Simon Pawn &lt;spawn@frog-pond.org&gt;
-</tt></pre>
+        spawn=Simon Pawn &lt;spawn@frog-pond.org&gt;</tt></pre>
 </div></div>
-<div class="para"><p><em>git cvsimport</em> will make it appear as those authors had
+<div class="paragraph"><p><em>git cvsimport</em> will make it appear as those authors had
 their GIT_AUTHOR_NAME and GIT_AUTHOR_EMAIL set properly
 all along.</p></div>
-<div class="para"><p>For convenience, this data is saved to <tt>$GIT_DIR/cvs-authors</tt>
+<div class="paragraph"><p>For convenience, this data is saved to <tt>$GIT_DIR/cvs-authors</tt>
 each time the <em>-A</em> option is provided and read from that same
 file each time <em>git cvsimport</em> is run.</p></div>
-<div class="para"><p>It is not recommended to use this feature if you intend to
+<div class="paragraph"><p>It is not recommended to use this feature if you intend to
 export changes back to CVS again later with
 <em>git cvsexportcommit</em>.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -R
 </dt>
 <dd>
@@ -566,12 +661,12 @@ export changes back to CVS again later with
 <div class="content">
 <pre><tt>src/widget.c 1.1 1d862f173cdc7325b6fa6d2ae1cfd61fd1b512b7</tt></pre>
 </div></div>
-<div class="para"><p>The revision data is appended to the file if it already exists, for use when
+<div class="paragraph"><p>The revision data is appended to the file if it already exists, for use when
 doing incremental imports.</p></div>
-<div class="para"><p>This option may be useful if you have CVS revision numbers stored in commit
+<div class="paragraph"><p>This option may be useful if you have CVS revision numbers stored in commit
 messages, bug-tracking systems, email archives, and the like.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 -h
 </dt>
 <dd>
@@ -583,14 +678,14 @@ messages, bug-tracking systems, email archives, and the like.</p></div>
 </div>
 <h2 id="_output">OUTPUT</h2>
 <div class="sectionbody">
-<div class="para"><p>If <em>-v</em> is specified, the script reports what it is doing.</p></div>
-<div class="para"><p>Otherwise, success is indicated the Unix way, i.e. by simply exiting with
+<div class="paragraph"><p>If <em>-v</em> is specified, the script reports what it is doing.</p></div>
+<div class="paragraph"><p>Otherwise, success is indicated the Unix way, i.e. by simply exiting with
 a zero exit status.</p></div>
 </div>
 <h2 id="issues">ISSUES</h2>
 <div class="sectionbody">
-<div class="para"><p>Problems related to timestamps:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>Problems related to timestamps:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 If timestamps of commits in the CVS repository are not stable enough
@@ -612,8 +707,8 @@ If the timestamp order of different files cross the revision order
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Problems related to branches:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>Problems related to branches:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 Branches on which no commits have been made are not imported.
@@ -633,18 +728,18 @@ This applies to files added to the source branch <strong>after</strong> a daught
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Problems related to tags:</p></div>
-<div class="ilist"><ul>
+<div class="paragraph"><p>Problems related to tags:</p></div>
+<div class="ulist"><ul>
 <li>
 <p>
 Multiple tags on the same revision are not imported.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>If you suspect that any of these issues may apply to the repository you
+<div class="paragraph"><p>If you suspect that any of these issues may apply to the repository you
 want to import consider using these alternative tools which proved to be
 more stable in practice:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 cvs2git (part of cvs2svn), <tt>http://cvs2svn.tigris.org</tt>
@@ -659,20 +754,20 @@ parsecvs, <tt>http://cgit.freedesktop.org/~keithp/parsecvs</tt>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Matthias Urlichs &lt;smurf@smurf.noris.de&gt;, with help from
-various participants of the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Written by Matthias Urlichs &lt;<a href="mailto:smurf@smurf.noris.de">smurf@smurf.noris.de</a>&gt;, with help from
+various participants of the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Matthias Urlichs &lt;smurf@smurf.noris.de&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Matthias Urlichs &lt;<a href="mailto:smurf@smurf.noris.de">smurf@smurf.noris.de</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:38 UTC
+Last updated 2010-08-18 22:14:44 UTC
 </div>
 </div>
 </body>

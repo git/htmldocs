@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-remote-helpers(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-remote-helpers(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,65 +412,65 @@ git-remote-helpers(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git remote-&lt;transport&gt;</em> &lt;repository&gt; [&lt;URL&gt;]</p></div>
+<div class="paragraph"><p><em>git remote-&lt;transport&gt;</em> &lt;repository&gt; [&lt;URL&gt;]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Remote helper programs are normally not used directly by end users,
+<div class="paragraph"><p>Remote helper programs are normally not used directly by end users,
 but they are invoked by git when it needs to interact with remote
 repositories git does not support natively.  A given helper will
 implement a subset of the capabilities documented here. When git
 needs to interact with a repository using a remote helper, it spawns
-the helper as an independent process, sends commands to the helper's
-standard input, and expects results from the helper's standard
+the helper as an independent process, sends commands to the helper&#8217;s
+standard input, and expects results from the helper&#8217;s standard
 output. Because a remote helper runs as an independent process from
 git, there is no need to re-link git to add a new helper, nor any
 need to link the helper with the implementation of git.</p></div>
-<div class="para"><p>Every helper must support the "capabilities" command, which git will
+<div class="paragraph"><p>Every helper must support the "capabilities" command, which git will
 use to determine what other commands the helper will accept.  Other
 commands generally concern facilities like discovering and updating
 remote refs, transporting objects between the object database and
 the remote repository, and updating the local object store.</p></div>
-<div class="para"><p>Helpers supporting the <em>fetch</em> capability can discover refs from the
+<div class="paragraph"><p>Helpers supporting the <em>fetch</em> capability can discover refs from the
 remote repository and transfer objects reachable from those refs to
 the local object store. Helpers supporting the <em>push</em> capability can
 transfer local objects to the remote repository and update remote refs.</p></div>
-<div class="para"><p>Git comes with a "curl" family of remote helpers, that handle various
+<div class="paragraph"><p>Git comes with a "curl" family of remote helpers, that handle various
 transport protocols, such as <em>git-remote-http</em>, <em>git-remote-https</em>,
 <em>git-remote-ftp</em> and <em>git-remote-ftps</em>. They implement the capabilities
 <em>fetch</em>, <em>option</em>, and <em>push</em>.</p></div>
 </div>
 <h2 id="_invocation">INVOCATION</h2>
 <div class="sectionbody">
-<div class="para"><p>Remote helper programs are invoked with one or (optionally) two
+<div class="paragraph"><p>Remote helper programs are invoked with one or (optionally) two
 arguments. The first argument specifies a remote repository as in git;
 it is either the name of a configured remote or a URL. The second
 argument specifies a URL; it is usually of the form
 <em>&lt;transport&gt;://&lt;address&gt;</em>, but any arbitrary string is possible.</p></div>
-<div class="para"><p>When git encounters a URL of the form <em>&lt;transport&gt;://&lt;address&gt;</em>, where
+<div class="paragraph"><p>When git encounters a URL of the form <em>&lt;transport&gt;://&lt;address&gt;</em>, where
 <em>&lt;transport&gt;</em> is a protocol that it cannot handle natively, it
 automatically invokes <em>git remote-&lt;transport&gt;</em> with the full URL as
 the second argument. If such a URL is encountered directly on the
 command line, the first argument is the same as the second, and if it
 is encountered in a configured remote, the first argument is the name
 of that remote.</p></div>
-<div class="para"><p>A URL of the form <em>&lt;transport&gt;::&lt;address&gt;</em> explicitly instructs git to
+<div class="paragraph"><p>A URL of the form <em>&lt;transport&gt;::&lt;address&gt;</em> explicitly instructs git to
 invoke <em>git remote-&lt;transport&gt;</em> with <em>&lt;address&gt;</em> as the second
 argument. If such a URL is encountered directly on the command line,
 the first argument is <em>&lt;address&gt;</em>, and if it is encountered in a
 configured remote, the first argument is the name of that remote.</p></div>
-<div class="para"><p>Additionally, when a configured remote has <em>remote.&lt;name&gt;.vcs</em> set to
+<div class="paragraph"><p>Additionally, when a configured remote has <em>remote.&lt;name&gt;.vcs</em> set to
 <em>&lt;transport&gt;</em>, git explicitly invokes <em>git remote-&lt;transport&gt;</em> with
 <em>&lt;name&gt;</em> as the first argument. If set, the second argument is
 <em>remote.&lt;name&gt;.url</em>; otherwise, the second argument is omitted.</p></div>
 </div>
 <h2 id="_commands">COMMANDS</h2>
 <div class="sectionbody">
-<div class="para"><p>Commands are given by the caller on the helper's standard input, one per line.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>Commands are given by the caller on the helper&#8217;s standard input, one per line.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>capabilities</em>
 </dt>
 <dd>
@@ -388,7 +482,7 @@ configured remote, the first argument is the name of that remote.</p></div>
         error).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>list</em>
 </dt>
 <dd>
@@ -400,11 +494,11 @@ configured remote, the first argument is the name of that remote.</p></div>
         the name; unrecognized attributes are ignored. The list ends
         with a blank line.
 </p>
-<div class="para"><p>If <em>push</em> is supported this may be called as <em>list for-push</em>
+<div class="paragraph"><p>If <em>push</em> is supported this may be called as <em>list for-push</em>
 to obtain the current refs prior to sending one or more <em>push</em>
 commands to the helper.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>option</em> &lt;name&gt; &lt;value&gt;
 </dt>
 <dd>
@@ -416,9 +510,9 @@ commands to the helper.</p></div>
         for it).  Options should be set before other commands,
         and may influence the behavior of those commands.
 </p>
-<div class="para"><p>Supported if the helper has the "option" capability.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "option" capability.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>fetch</em> &lt;sha1&gt; &lt;name&gt;
 </dt>
 <dd>
@@ -430,12 +524,12 @@ commands to the helper.</p></div>
         same batch are complete. Only objects which were reported
         in the ref list with a sha1 may be fetched this way.
 </p>
-<div class="para"><p>Optionally may output a <em>lock &lt;file&gt;</em> line indicating a file under
+<div class="paragraph"><p>Optionally may output a <em>lock &lt;file&gt;</em> line indicating a file under
 GIT_DIR/objects/pack which is keeping a pack until refs can be
 suitably updated.</p></div>
-<div class="para"><p>Supported if the helper has the "fetch" capability.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "fetch" capability.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>push</em> +&lt;src&gt;:&lt;dst&gt;
 </dt>
 <dd>
@@ -444,16 +538,16 @@ suitably updated.</p></div>
         remote branch described by &lt;dst&gt;.  A batch sequence of
         one or more push commands is terminated with a blank line.
 </p>
-<div class="para"><p>Zero or more protocol options may be entered after the last <em>push</em>
-command, before the batch's terminating blank line.</p></div>
-<div class="para"><p>When the push is complete, outputs one or more <em>ok &lt;dst&gt;</em> or
+<div class="paragraph"><p>Zero or more protocol options may be entered after the last <em>push</em>
+command, before the batch&#8217;s terminating blank line.</p></div>
+<div class="paragraph"><p>When the push is complete, outputs one or more <em>ok &lt;dst&gt;</em> or
 <em>error &lt;dst&gt; &lt;why&gt;?</em> lines to indicate success or failure of
 each pushed ref.  The status report output is terminated by
 a blank line.  The option field &lt;why&gt; may be quoted in a C
 style string if it contains an LF.</p></div>
-<div class="para"><p>Supported if the helper has the "push" capability.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "push" capability.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>import</em> &lt;name&gt;
 </dt>
 <dd>
@@ -466,11 +560,11 @@ style string if it contains an LF.</p></div>
         by applying the refspecs from the "refspec" capability to the
         name of the ref.
 </p>
-<div class="para"><p>Especially useful for interoperability with a foreign versioning
+<div class="paragraph"><p>Especially useful for interoperability with a foreign versioning
 system.</p></div>
-<div class="para"><p>Supported if the helper has the "import" capability.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "import" capability.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>connect</em> &lt;service&gt;
 </dt>
 <dd>
@@ -481,37 +575,37 @@ system.</p></div>
         as service) on remote side. Valid replies to this command are
         empty line (connection established), <em>fallback</em> (no smart
         transport support, fall back to dumb transports) and just
-        exiting with error message printed (can't connect, don't
+        exiting with error message printed (can&#8217;t connect, don&#8217;t
         bother trying to fall back). After line feed terminating the
         positive (empty) response, the output of service starts. After
         the connection ends, the remote helper exits.
 </p>
-<div class="para"><p>Supported if the helper has the "connect" capability.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "connect" capability.</p></div>
 </dd>
 </dl></div>
-<div class="para"><p>If a fatal error occurs, the program writes the error message to
+<div class="paragraph"><p>If a fatal error occurs, the program writes the error message to
 stderr and exits. The caller should expect that a suitable error
 message has been printed if the child closes the connection without
 completing a valid response for the current command.</p></div>
-<div class="para"><p>Additional commands may be supported, as may be determined from
+<div class="paragraph"><p>Additional commands may be supported, as may be determined from
 capabilities reported by the helper.</p></div>
 </div>
 <h2 id="_capabilities">CAPABILITIES</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>fetch</em>
 </dt>
-<dt>
+<dt class="hdlist1">
 <em>option</em>
 </dt>
-<dt>
+<dt class="hdlist1">
 <em>push</em>
 </dt>
-<dt>
+<dt class="hdlist1">
 <em>import</em>
 </dt>
-<dt>
+<dt class="hdlist1">
 <em>connect</em>
 </dt>
 <dd>
@@ -519,7 +613,7 @@ capabilities reported by the helper.</p></div>
         This helper supports the corresponding command with the same name.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>refspec</em> <em>spec</em>
 </dt>
 <dd>
@@ -538,8 +632,8 @@ capabilities reported by the helper.</p></div>
 </div>
 <h2 id="_ref_list_attributes">REF LIST ATTRIBUTES</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>for-push</em>
 </dt>
 <dd>
@@ -549,7 +643,7 @@ capabilities reported by the helper.</p></div>
         opening a different type of connection to the destination.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>unchanged</em>
 </dt>
 <dd>
@@ -562,8 +656,8 @@ capabilities reported by the helper.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>option verbosity</em> &lt;N&gt;
 </dt>
 <dd>
@@ -576,7 +670,7 @@ capabilities reported by the helper.</p></div>
         command line.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>option progress</em> {<em>true</em>|<em>false</em>}
 </dt>
 <dd>
@@ -585,7 +679,7 @@ capabilities reported by the helper.</p></div>
         transport helper during a command.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>option depth</em> &lt;depth&gt;
 </dt>
 <dd>
@@ -593,7 +687,7 @@ capabilities reported by the helper.</p></div>
         Deepens the history of a shallow repository.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <em>option followtags</em> {<em>true</em>|<em>false</em>}
 </dt>
 <dd>
@@ -607,12 +701,12 @@ capabilities reported by the helper.</p></div>
 </p>
 </dd>
 </dl></div>
-<div class="para"><p><em>option dry-run</em> {<em>true</em>|<em>false</em>}:
+<div class="paragraph"><p><em>option dry-run</em> {<em>true</em>|<em>false</em>}:
         If true, pretend the operation completed successfully,
-        but don't actually change any repository data.  For most
+        but don&#8217;t actually change any repository data.  For most
         helpers this only applies to the <em>push</em>, if supported.</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <em>option servpath &lt;c-style-quoted-path&gt;</em>
 </dt>
 <dd>
@@ -627,19 +721,19 @@ capabilities reported by the helper.</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-remote.html">git-remote(1)</a></p></div>
+<div class="paragraph"><p><a href="git-remote.html">git-remote(1)</a></p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Daniel Barkalow and Ilari Liusvaara</p></div>
+<div class="paragraph"><p>Documentation by Daniel Barkalow and Ilari Liusvaara</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:54 UTC
+Last updated 2010-04-19 06:45:57 UTC
 </div>
 </div>
 </body>

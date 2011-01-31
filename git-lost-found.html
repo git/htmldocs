@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-lost-found(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-lost-found(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,27 +412,27 @@ git-lost-found(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git lost-found</em></p></div>
+<div class="paragraph"><p><em>git lost-found</em></p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p><strong>NOTE</strong>: this command is deprecated.  Use <a href="git-fsck.html">git-fsck(1)</a> with
+<div class="paragraph"><p><strong>NOTE</strong>: this command is deprecated.  Use <a href="git-fsck.html">git-fsck(1)</a> with
 the option <em>--lost-found</em> instead.</p></div>
-<div class="para"><p>Finds dangling commits and tags from the object database, and
+<div class="paragraph"><p>Finds dangling commits and tags from the object database, and
 creates refs to them in the .git/lost-found/ directory.  Commits and
 tags that dereference to commits are stored in .git/lost-found/commit,
 and other objects are stored in .git/lost-found/other.</p></div>
 </div>
 <h2 id="_output">OUTPUT</h2>
 <div class="sectionbody">
-<div class="para"><p>Prints to standard output the object names and one-line descriptions
+<div class="paragraph"><p>Prints to standard output the object names and one-line descriptions
 of any commits or tags found.</p></div>
 </div>
 <h2 id="_example">EXAMPLE</h2>
 <div class="sectionbody">
-<div class="para"><p>Suppose you run <em>git tag -f</em> and mistype the tag to overwrite.
+<div class="paragraph"><p>Suppose you run <em>git tag -f</em> and mistype the tag to overwrite.
 The ref to your tag is overwritten, but until you run <em>git
 prune</em>, the tag itself is still there.</p></div>
 <div class="listingblock">
@@ -347,13 +441,13 @@ prune</em>, the tag itself is still there.</p></div>
 [1ef2b196d909eed523d4f3c9bf54b78cdd6843c6] GIT 0.99.9c
 ...</tt></pre>
 </div></div>
-<div class="para"><p>Also you can use gitk to browse how any tags found relate to each
+<div class="paragraph"><p>Also you can use gitk to browse how any tags found relate to each
 other.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ gitk $(cd .git/lost-found/commit &amp;&amp; echo ??*)</tt></pre>
 </div></div>
-<div class="para"><p>After making sure you know which the object is the tag you are looking
+<div class="paragraph"><p>After making sure you know which the object is the tag you are looking
 for, you can reconnect it to your regular .git/refs hierarchy.</p></div>
 <div class="listingblock">
 <div class="content">
@@ -376,19 +470,19 @@ $ git rev-parse not-lost-anymore
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt;</p></div>
+<div class="paragraph"><p>Written by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:47 UTC
+Last updated 2008-09-19 06:28:28 UTC
 </div>
 </div>
 </body>

@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>diff API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -279,6 +347,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -291,8 +360,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -303,7 +381,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>diff API</title>
 </head>
 <body>
 <div id="header">
@@ -311,13 +388,13 @@ div#toc a:visited { color: blue; }
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="para"><p>The diff API is for programs that compare two sets of files (e.g. two
+<div class="paragraph"><p>The diff API is for programs that compare two sets of files (e.g. two
 trees, one tree and the index) and present the found difference in
 various ways.  The calling program is responsible for feeding the API
 pairs of files, one from the "old" set and the corresponding one from
 "new" set, that are different.  The library called through this API is
 called diffcore, and is responsible for two things.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 finding total rewrites (<tt>-B</tt>), renames (<tt>-M</tt>) and copies (<tt>-C</tt>), and
@@ -335,7 +412,7 @@ outputting the differences in various formats, as specified by the
 </div>
 <h2 id="_calling_sequence">Calling sequence</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 Prepare <tt>struct diff_options</tt> to record the set of diff options, and
@@ -382,44 +459,44 @@ Calling <tt>diff_flush()</tt> will produce the output.
 </div>
 <h2 id="_data_structures">Data structures</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>struct diff_filespec</tt>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>This is the internal representation for a single file (blob).  It
-records the blob object name (if known &#8212; for a work tree file it
+<div class="paragraph"><p>This is the internal representation for a single file (blob).  It
+records the blob object name (if known&#8201;&#8212;&#8201;for a work tree file it
 typically is a NUL SHA-1), filemode and pathname.  This is what the
 <tt>diff_addremove()</tt>, <tt>diff_change()</tt> and <tt>diff_unmerged()</tt> synthesize and
 feed <tt>diff_queue()</tt> function with.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>struct diff_filepair</tt>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>This records a pair of <tt>struct diff_filespec</tt>; the filespec for a file
+<div class="paragraph"><p>This records a pair of <tt>struct diff_filespec</tt>; the filespec for a file
 in the "old" set (i.e. preimage) is called <tt>one</tt>, and the filespec for a
 file in the "new" set (i.e. postimage) is called <tt>two</tt>.  A change that
 represents file creation has NULL in <tt>one</tt>, and file deletion has NULL
 in <tt>two</tt>.</p></div>
-<div class="para"><p>A <tt>filepair</tt> starts pointing at <tt>one</tt> and <tt>two</tt> that are from the same
+<div class="paragraph"><p>A <tt>filepair</tt> starts pointing at <tt>one</tt> and <tt>two</tt> that are from the same
 filename, but <tt>diffcore_std()</tt> can break pairs and match component
 filespecs with other filespecs from a different filepair to form new
 filepair.  This is called <em>rename detection</em>.</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>struct diff_queue</tt>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>This is a collection of filepairs.  Notable members are:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>This is a collection of filepairs.  Notable members are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>queue</tt>
 </dt>
 <dd>
@@ -428,7 +505,7 @@ filepair.  This is called <em>rename detection</em>.</p></div>
         dynamically grows as you add filepairs;
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>alloc</tt>
 </dt>
 <dd>
@@ -436,14 +513,14 @@ filepair.  This is called <em>rename detection</em>.</p></div>
         The allocated size of the <tt>queue</tt> array;
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>nr</tt>
 </dt>
 <dd>
 <p>
         The number of elements in the <tt>queue</tt> array.
 </p>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <tt>struct diff_options</tt>
@@ -452,11 +529,11 @@ filepair.  This is called <em>rename detection</em>.</p></div>
 </ul></div>
 </dd>
 </dl></div>
-<div class="para"><p>This describes the set of options the calling program wants to affect
+<div class="paragraph"><p>This describes the set of options the calling program wants to affect
 the operation of diffcore library with.</p></div>
-<div class="para"><p>Notable members are:</p></div>
-<div class="vlist"><dl>
-<dt>
+<div class="paragraph"><p>Notable members are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 <tt>output_format</tt>
 </dt>
 <dd>
@@ -464,7 +541,7 @@ the operation of diffcore library with.</p></div>
         The output format used when <tt>diff_flush()</tt> is run.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>context</tt>
 </dt>
 <dd>
@@ -472,7 +549,7 @@ the operation of diffcore library with.</p></div>
         Number of context lines to generate in patch output.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>break_opt</tt>, <tt>detect_rename</tt>, <tt>rename-score</tt>, <tt>rename_limit</tt>
 </dt>
 <dd>
@@ -481,7 +558,7 @@ the operation of diffcore library with.</p></div>
         and copies.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>abbrev</tt>
 </dt>
 <dd>
@@ -489,7 +566,7 @@ the operation of diffcore library with.</p></div>
         Number of hexdigits to abbreviate raw format output to.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>pickaxe</tt>
 </dt>
 <dd>
@@ -500,7 +577,7 @@ the operation of diffcore library with.</p></div>
         in its preimage and postimage of the diff_queue.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 <tt>flags</tt>
 </dt>
 <dd>
@@ -509,8 +586,8 @@ the operation of diffcore library with.</p></div>
         operation, but some do not have anything to do with the diffcore
         library.
 </p>
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 BINARY, TEXT
 </dt>
 <dd>
@@ -518,7 +595,7 @@ BINARY, TEXT
         Affects the way how a file that is seemingly binary is treated.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 FULL_INDEX
 </dt>
 <dd>
@@ -527,7 +604,7 @@ FULL_INDEX
         names on the "index" lines.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 FIND_COPIES_HARDER
 </dt>
 <dd>
@@ -536,7 +613,7 @@ FIND_COPIES_HARDER
         filepairs to allow copies from unmodified files be detected.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 COLOR_DIFF
 </dt>
 <dd>
@@ -544,7 +621,7 @@ COLOR_DIFF
         Output should be colored.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 COLOR_DIFF_WORDS
 </dt>
 <dd>
@@ -552,7 +629,7 @@ COLOR_DIFF_WORDS
         Output is a colored word-diff.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 NO_INDEX
 </dt>
 <dd>
@@ -561,7 +638,7 @@ NO_INDEX
         in random locations on the filesystem.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 ALLOW_EXTERNAL
 </dt>
 <dd>
@@ -570,7 +647,7 @@ ALLOW_EXTERNAL
         output routine.  Plumbing disables this to ensure stable output.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 QUIET
 </dt>
 <dd>
@@ -578,7 +655,7 @@ QUIET
         Do not show any output.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 REVERSE_DIFF
 </dt>
 <dd>
@@ -587,7 +664,7 @@ REVERSE_DIFF
         filepairs reversed; <tt>one</tt> is two, and <tt>two</tt> is one.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 EXIT_WITH_STATUS
 </dt>
 <dd>
@@ -597,7 +674,7 @@ EXIT_WITH_STATUS
         difference using program exit code.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 HAS_CHANGES
 </dt>
 <dd>
@@ -605,7 +682,7 @@ HAS_CHANGES
         Internal; used for optimization to see if there is any change.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 SILENT_ON_REMOVE
 </dt>
 <dd>
@@ -613,7 +690,7 @@ SILENT_ON_REMOVE
         Affects if diff-files shows removed files.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 RECURSIVE, TREE_IN_RECURSIVE
 </dt>
 <dd>
@@ -626,11 +703,11 @@ RECURSIVE, TREE_IN_RECURSIVE
 </dl></div>
 </dd>
 </dl></div>
-<div class="para"><p>(JC)</p></div>
+<div class="paragraph"><p>(JC)</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:57:10 UTC
+Last updated 2008-09-19 06:28:28 UTC
 </div>
 </div>
 </body>

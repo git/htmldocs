@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-status(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-status(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,27 +412,27 @@ git-status(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git status</em> [&lt;options&gt;&#8230;] [--] [&lt;pathspec&gt;&#8230;]</p></div>
+<div class="paragraph"><p><em>git status</em> [&lt;options&gt;&#8230;] [--] [&lt;pathspec&gt;&#8230;]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Displays paths that have differences between the index file and the
+<div class="paragraph"><p>Displays paths that have differences between the index file and the
 current HEAD commit, paths that have differences between the working
 tree and the index file, and paths in the working tree that are not
 tracked by git (and are not ignored by <a href="gitignore.html">gitignore(5)</a>). The first
-are what you _would_ commit by running <tt>git commit</tt>; the second and
-third are what you _could_ commit by running <em>git add</em> before running
+are what you <em>would</em> commit by running <tt>git commit</tt>; the second and
+third are what you <em>could</em> commit by running <em>git add</em> before running
 <tt>git commit</tt>.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -s
 </dt>
-<dt>
+<dt class="hdlist1">
 --short
 </dt>
 <dd>
@@ -346,10 +440,10 @@ third are what you _could_ commit by running <em>git add</em> before running
         Give the output in the short-format.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -b
 </dt>
-<dt>
+<dt class="hdlist1">
 --branch
 </dt>
 <dd>
@@ -357,7 +451,7 @@ third are what you _could_ commit by running <em>git add</em> before running
         Show the branch and tracking info even in short-format.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --porcelain
 </dt>
 <dd>
@@ -367,19 +461,19 @@ third are what you _could_ commit by running <em>git add</em> before running
         not to change in the future, making it safe for scripts.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -u[&lt;mode&gt;]
 </dt>
-<dt>
+<dt class="hdlist1">
 --untracked-files[=&lt;mode&gt;]
 </dt>
 <dd>
 <p>
         Show untracked files (Default: <em>all</em>).
 </p>
-<div class="para"><p>The mode parameter is optional, and is used to specify
+<div class="paragraph"><p>The mode parameter is optional, and is used to specify
 the handling of untracked files. The possible options are:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
 <em>no</em>     - Show no untracked files
@@ -396,11 +490,11 @@ the handling of untracked files. The possible options are:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>See <a href="git-config.html">git-config(1)</a> for configuration variable
+<div class="paragraph"><p>See <a href="git-config.html">git-config(1)</a> for configuration variable
 used to change the default for when the option is not
 specified.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --ignore-submodules[=&lt;when&gt;]
 </dt>
 <dd>
@@ -420,7 +514,7 @@ specified.</p></div>
         <tt>status.submodulesummary</tt> is set).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -z
 </dt>
 <dd>
@@ -433,37 +527,37 @@ specified.</p></div>
 </div>
 <h2 id="_output">OUTPUT</h2>
 <div class="sectionbody">
-<div class="para"><p>The output from this command is designed to be used as a commit
+<div class="paragraph"><p>The output from this command is designed to be used as a commit
 template comment, and all the output lines are prefixed with <em>#</em>.
 The default, long format, is designed to be human readable,
 verbose and descriptive.  They are subject to change in any time.</p></div>
-<div class="para"><p>The paths mentioned in the output, unlike many other git commands, are
+<div class="paragraph"><p>The paths mentioned in the output, unlike many other git commands, are
 made relative to the current directory if you are working in a
 subdirectory (this is on purpose, to help cutting and pasting). See
 the status.relativePaths config option below.</p></div>
-<div class="para"><p>In short-format, the status of each path is shown as</p></div>
+<div class="paragraph"><p>In short-format, the status of each path is shown as</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>XY PATH1 -&gt; PATH2</tt></pre>
 </div></div>
-<div class="para"><p>where <tt>PATH1</tt> is the path in the <tt>HEAD</tt>, and <tt> -&gt; PATH2</tt> part is
+<div class="paragraph"><p>where <tt>PATH1</tt> is the path in the <tt>HEAD</tt>, and ` &#8594; PATH2` part is
 shown only when <tt>PATH1</tt> corresponds to a different path in the
 index/worktree (i.e. the file is renamed). The <em>XY</em> is a two-letter
 status code.</p></div>
-<div class="para"><p>The fields (including the <tt>-&gt;</tt>) are separated from each other by a
+<div class="paragraph"><p>The fields (including the <tt>&#8594;</tt>) are separated from each other by a
 single space. If a filename contains whitespace or other nonprintable
 characters, that field will be quoted in the manner of a C string
 literal: surrounded by ASCII double quote (34) characters, and with
 interior special characters backslash-escaped.</p></div>
-<div class="para"><p>For paths with merge conflicts, <tt>X</tt> and <em>Y</em> show the modification
+<div class="paragraph"><p>For paths with merge conflicts, <tt>X</tt> and <em>Y</em> show the modification
 states of each side of the merge. For paths that do not have merge
 conflicts, <tt>X</tt> shows the status of the index, and <tt>Y</tt> shows the status
 of the work tree.  For untracked paths, <tt>XY</tt> are <tt>??</tt>.  Other status
 codes can be interpreted as follows:</p></div>
-<div class="ilist"><ul>
+<div class="ulist"><ul>
 <li>
 <p>
-<em> </em> = unmodified
+' ' = unmodified
 </p>
 </li>
 <li>
@@ -497,7 +591,7 @@ codes can be interpreted as follows:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Ignored files are not listed.</p></div>
+<div class="paragraph"><p>Ignored files are not listed.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>X          Y     Meaning
@@ -523,12 +617,12 @@ U           U    unmerged, both modified
 ?           ?    untracked
 -------------------------------------------------</tt></pre>
 </div></div>
-<div class="para"><p>If -b is used the short-format status is preceded by a line</p></div>
-<div class="para"><p>## branchname tracking info</p></div>
-<div class="para"><p>There is an alternate -z format recommended for machine parsing.  In
+<div class="paragraph"><p>If -b is used the short-format status is preceded by a line</p></div>
+<div class="paragraph"><p>## branchname tracking info</p></div>
+<div class="paragraph"><p>There is an alternate -z format recommended for machine parsing.  In
 that format, the status field is the same, but some other things
-change.  First, the <em>-&gt;</em> is omitted from rename entries and the field
-order is reversed (e.g <em>from -&gt; to</em> becomes <em>to from</em>). Second, a NUL
+change.  First, the <em>&#8594;</em> is omitted from rename entries and the field
+order is reversed (e.g <em>from &#8594; to</em> becomes <em>to from</em>). Second, a NUL
 (ASCII 0) follows each filename, replacing space as a field separator
 and the terminating newline (but a space still separates the status
 field from the first filename).  Third, filenames containing special
@@ -537,37 +631,37 @@ backslash-escaping is performed. Fourth, there is no branch line.</p></div>
 </div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="para"><p>The command honors <tt>color.status</tt> (or <tt>status.color</tt> &#8212; they
+<div class="paragraph"><p>The command honors <tt>color.status</tt> (or <tt>status.color</tt>&#8201;&#8212;&#8201;they
 mean the same thing and the latter is kept for backward
 compatibility) and <tt>color.status.&lt;slot&gt;</tt> configuration variables
 to colorize its output.</p></div>
-<div class="para"><p>If the config variable <tt>status.relativePaths</tt> is set to false, then all
+<div class="paragraph"><p>If the config variable <tt>status.relativePaths</tt> is set to false, then all
 paths shown are relative to the repository root, not to the current
 directory.</p></div>
-<div class="para"><p>If <tt>status.submodulesummary</tt> is set to a non zero number or true (identical
+<div class="paragraph"><p>If <tt>status.submodulesummary</tt> is set to a non zero number or true (identical
 to -1 or an unlimited number), the submodule summary will be enabled for
 the long format and a summary of commits for modified submodules will be
 shown (see --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>).</p></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="gitignore.html">gitignore(5)</a></p></div>
+<div class="paragraph"><p><a href="gitignore.html">gitignore(5)</a></p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Junio C Hamano &lt;gitster@pobox.com&gt;.</p></div>
+<div class="paragraph"><p>Written by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;.</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;git@vger.kernel.org&gt;.</p></div>
+<div class="paragraph"><p>Documentation by David Greaves, Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:58 UTC
+Last updated 2010-08-18 22:14:44 UTC
 </div>
 </div>
 </body>

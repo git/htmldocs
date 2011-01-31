@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-receive-pack(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-receive-pack(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,32 +412,32 @@ git-receive-pack(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="para"><p><em>git-receive-pack</em> &lt;directory&gt;</p></div>
+<div class="paragraph"><p><em>git-receive-pack</em> &lt;directory&gt;</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Invoked by <em>git send-pack</em> and updates the repository with the
+<div class="paragraph"><p>Invoked by <em>git send-pack</em> and updates the repository with the
 information fed from the remote end.</p></div>
-<div class="para"><p>This command is usually not invoked directly by the end user.
+<div class="paragraph"><p>This command is usually not invoked directly by the end user.
 The UI for the protocol is on the <em>git send-pack</em> side, and the
 program pair is meant to be used to push updates to remote
 repository.  For pull operations, see <a href="git-fetch-pack.html">git-fetch-pack(1)</a>.</p></div>
-<div class="para"><p>The command allows for creation and fast-forwarding of sha1 refs
+<div class="paragraph"><p>The command allows for creation and fast-forwarding of sha1 refs
 (heads/tags) on the remote end (strictly speaking, it is the
 local end <em>git-receive-pack</em> runs, but to the user who is sitting at
 the send-pack end, it is updating the remote.  Confused?)</p></div>
-<div class="para"><p>There are other real-world examples of using update and
+<div class="paragraph"><p>There are other real-world examples of using update and
 post-update hooks found in the Documentation/howto directory.</p></div>
-<div class="para"><p><em>git-receive-pack</em> honours the receive.denyNonFastForwards config
+<div class="paragraph"><p><em>git-receive-pack</em> honours the receive.denyNonFastForwards config
 option, which tells it if updates to a ref should be denied if they
 are not fast-forwards.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 &lt;directory&gt;
 </dt>
 <dd>
@@ -355,50 +449,50 @@ are not fast-forwards.</p></div>
 </div>
 <h2 id="_pre_receive_hook">pre-receive Hook</h2>
 <div class="sectionbody">
-<div class="para"><p>Before any ref is updated, if $GIT_DIR/hooks/pre-receive file exists
+<div class="paragraph"><p>Before any ref is updated, if $GIT_DIR/hooks/pre-receive file exists
 and is executable, it will be invoked once with no parameters.  The
 standard input of the hook will be one line per ref to be updated:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>sha1-old SP sha1-new SP refname LF</tt></pre>
 </div></div>
-<div class="para"><p>The refname value is relative to $GIT_DIR; e.g. for the master
+<div class="paragraph"><p>The refname value is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 values before
 each refname are the object names for the refname before and after
 the update.  Refs to be created will have sha1-old equal to 0{40},
 while refs to be deleted will have sha1-new equal to 0{40}, otherwise
 sha1-old and sha1-new should be valid objects in the repository.</p></div>
-<div class="para"><p>This hook is called before any refname is updated and before any
+<div class="paragraph"><p>This hook is called before any refname is updated and before any
 fast-forward checks are performed.</p></div>
-<div class="para"><p>If the pre-receive hook exits with a non-zero exit status no updates
+<div class="paragraph"><p>If the pre-receive hook exits with a non-zero exit status no updates
 will be performed, and the update, post-receive and post-update
 hooks will not be invoked either.  This can be useful to quickly
 bail out if the update is not to be supported.</p></div>
 </div>
 <h2 id="_update_hook">update Hook</h2>
 <div class="sectionbody">
-<div class="para"><p>Before each ref is updated, if $GIT_DIR/hooks/update file exists
+<div class="paragraph"><p>Before each ref is updated, if $GIT_DIR/hooks/update file exists
 and is executable, it is invoked once per ref, with three parameters:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>$GIT_DIR/hooks/update refname sha1-old sha1-new</tt></pre>
 </div></div>
-<div class="para"><p>The refname parameter is relative to $GIT_DIR; e.g. for the master
+<div class="paragraph"><p>The refname parameter is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 arguments are
 the object names for the refname before and after the update.
 Note that the hook is called before the refname is updated,
 so either sha1-old is 0{40} (meaning there is no such ref yet),
 or it should match what is recorded in refname.</p></div>
-<div class="para"><p>The hook should exit with non-zero status if it wants to disallow
+<div class="paragraph"><p>The hook should exit with non-zero status if it wants to disallow
 updating the named ref.  Otherwise it should exit with zero.</p></div>
-<div class="para"><p>Successful execution (a zero exit status) of this hook does not
+<div class="paragraph"><p>Successful execution (a zero exit status) of this hook does not
 ensure the ref will actually be updated, it is only a prerequisite.
 As such it is not a good idea to send notices (e.g. email) from
 this hook.  Consider using the post-receive hook instead.</p></div>
 </div>
 <h2 id="_post_receive_hook">post-receive Hook</h2>
 <div class="sectionbody">
-<div class="para"><p>After all refs were updated (or attempted to be updated), if any
+<div class="paragraph"><p>After all refs were updated (or attempted to be updated), if any
 ref update was successful, and if $GIT_DIR/hooks/post-receive
 file exists and is executable, it will be invoked once with no
 parameters.  The standard input of the hook will be one line
@@ -407,14 +501,14 @@ for each successfully updated ref:</p></div>
 <div class="content">
 <pre><tt>sha1-old SP sha1-new SP refname LF</tt></pre>
 </div></div>
-<div class="para"><p>The refname value is relative to $GIT_DIR; e.g. for the master
+<div class="paragraph"><p>The refname value is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 values before
 each refname are the object names for the refname before and after
 the update.  Refs that were created will have sha1-old equal to
 0{40}, while refs that were deleted will have sha1-new equal to
 0{40}, otherwise sha1-old and sha1-new should be valid objects in
 the repository.</p></div>
-<div class="para"><p>Using this hook, it is easy to generate mails describing the updates
+<div class="paragraph"><p>Using this hook, it is easy to generate mails describing the updates
 to the repository.  This example script sends one mail message per
 ref listing the commits pushed to the repository:</p></div>
 <div class="literalblock">
@@ -435,9 +529,9 @@ do
 done
 exit 0</tt></pre>
 </div></div>
-<div class="para"><p>The exit code from this hook invocation is ignored, however a
+<div class="paragraph"><p>The exit code from this hook invocation is ignored, however a
 non-zero exit code will generate an error message.</p></div>
-<div class="para"><p>Note that it is possible for refname to not have sha1-new when this
+<div class="paragraph"><p>Note that it is possible for refname to not have sha1-new when this
 hook runs.  This can easily occur if another user modifies the ref
 after it was updated by <em>git-receive-pack</em>, but before the hook was able
 to evaluate it.  It is recommended that hooks rely on sha1-new
@@ -445,14 +539,14 @@ rather than the current value of refname.</p></div>
 </div>
 <h2 id="_post_update_hook">post-update Hook</h2>
 <div class="sectionbody">
-<div class="para"><p>After all other processing, if at least one ref was updated, and
+<div class="paragraph"><p>After all other processing, if at least one ref was updated, and
 if $GIT_DIR/hooks/post-update file exists and is executable, then
 post-update will be called with the list of refs that have been updated.
 This can be used to implement any repository wide cleanup tasks.</p></div>
-<div class="para"><p>The exit code from this hook invocation is ignored; the only thing
+<div class="paragraph"><p>The exit code from this hook invocation is ignored; the only thing
 left for <em>git-receive-pack</em> to do at that point is to exit itself
 anyway.</p></div>
-<div class="para"><p>This hook can be used, for example, to run <tt>git update-server-info</tt>
+<div class="paragraph"><p>This hook can be used, for example, to run <tt>git update-server-info</tt>
 if the repository is packed and is served via a dumb transport.</p></div>
 <div class="literalblock">
 <div class="content">
@@ -462,23 +556,23 @@ exec git update-server-info</tt></pre>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="para"><p><a href="git-send-pack.html">git-send-pack(1)</a></p></div>
+<div class="paragraph"><p><a href="git-send-pack.html">git-send-pack(1)</a></p></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Linus Torvalds &lt;torvalds@osdl.org&gt;</p></div>
+<div class="paragraph"><p>Written by Linus Torvalds &lt;<a href="mailto:torvalds@osdl.org">torvalds@osdl.org</a>&gt;</p></div>
 </div>
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
-<div class="para"><p>Documentation by Junio C Hamano.</p></div>
+<div class="paragraph"><p>Documentation by Junio C Hamano.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:53 UTC
+Last updated 2010-01-21 17:44:19 UTC
 </div>
 </div>
 </body>

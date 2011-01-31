@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.2.5" />
+<meta name="generator" content="AsciiDoc 8.4.5" />
+<title>git-submodule(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -26,10 +27,12 @@ a:visited {
 
 em {
   font-style: italic;
+  color: navy;
 }
 
 strong {
   font-weight: bold;
+  color: #083194;
 }
 
 tt {
@@ -71,6 +74,10 @@ p {
   margin-bottom: 0.5em;
 }
 
+ul, ol, li > p {
+  margin-top: 0;
+}
+
 pre {
   padding: 0;
   margin: 0;
@@ -84,7 +91,7 @@ span#author {
 }
 span#email {
 }
-span#revision {
+span#revnumber, span#revdate, span#revremark {
   font-family: sans-serif;
 }
 
@@ -104,11 +111,13 @@ div#footer-badges {
   padding-bottom: 0.5em;
 }
 
-div#preamble,
+div#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-right: 10%;
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
@@ -123,6 +132,7 @@ div.content { /* Block element content. */
 
 /* Block element titles. */
 div.title, caption.title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   text-align: left;
@@ -149,22 +159,33 @@ div.sidebarblock > div.content {
   padding: 0.5em;
 }
 
-div.listingblock {
-  margin-right: 0%;
-}
 div.listingblock > div.content {
   border: 1px solid silver;
   background: #f4f4f4;
   padding: 0.5em;
 }
 
-div.quoteblock > div.content {
+div.quoteblock {
   padding-left: 2.0em;
+  margin-right: 10%;
 }
-
-div.attribution {
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
   text-align: right;
 }
+
+div.verseblock {
+  padding-left: 2.0em;
+  margin-right: 10%;
+}
+div.verseblock > div.content {
+  white-space: pre;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
 div.verseblock + div.attribution {
   text-align: left;
 }
@@ -187,13 +208,9 @@ div.exampleblock > div.content {
   padding: 0.5em;
 }
 
-div.verseblock div.content {
-  white-space: pre;
-}
-
 div.imageblock div.content { padding-left: 0; }
-div.imageblock img { border: 1px solid silver; }
 span.image img { border-style: none; }
+a.image:visited { color: white; }
 
 dl {
   margin-top: 0.8em;
@@ -202,17 +219,37 @@ dl {
 dt {
   margin-top: 0.5em;
   margin-bottom: 0;
-  font-style: italic;
+  font-style: normal;
+  color: navy;
 }
 dd > *:first-child {
-  margin-top: 0;
+  margin-top: 0.1em;
 }
 
 ul, ol {
     list-style-position: outside;
 }
-div.olist2 ol {
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
   list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
 }
 
 div.tableblock > table {
@@ -225,21 +262,52 @@ thead {
 tfoot {
   font-weight: bold;
 }
+td > div.verse {
+  white-space: pre;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
 
-div.hlist {
+
+div.hdlist {
   margin-top: 0.8em;
   margin-bottom: 0.8em;
 }
-div.hlist td {
-  padding-bottom: 5px;
+div.hdlist tr {
+  padding-bottom: 15px;
 }
-td.hlist1 {
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
   vertical-align: top;
-  font-style: italic;
+  font-style: normal;
   padding-right: 0.8em;
+  color: navy;
 }
-td.hlist2 {
+td.hdlist2 {
   vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
 }
 
 @media print {
@@ -271,7 +339,24 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-include1::./stylesheets/xhtml11-manpage.css[]
+/* Overrides for manpage documents */
+h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+h2 {
+  border-style: none;
+}
+div.sectionbody {
+  margin-left: 5%;
+}
+
+@media print {
+  div#toc { display: none; }
+}
+
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -280,6 +365,7 @@ div.sidebar-content {
   padding: 0.5em;
 }
 div.sidebar-title, div.image-title {
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   margin-top: 0.0em;
@@ -292,8 +378,17 @@ div.listingblock div.content {
   padding: 0.5em;
 }
 
-div.quoteblock-content {
-  padding-left: 2.0em;
+div.quoteblock-attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock-content {
+  white-space: pre;
+}
+div.verseblock-attribution {
+  padding-top: 0.75em;
+  text-align: left;
 }
 
 div.exampleblock-content {
@@ -304,7 +399,6 @@ div.exampleblock-content {
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
-<title>git-submodule(1)</title>
 </head>
 <body>
 <div id="header">
@@ -318,10 +412,10 @@ git-submodule(1) Manual Page
 </p>
 </div>
 </div>
-<h2>SYNOPSIS</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="content"><em>git submodule</em> [--quiet] add [-b branch] [-f|--force]
+<div class="verseblock-content"><em>git submodule</em> [--quiet] add [-b branch] [-f|--force]
               [--reference &lt;repository&gt;] [--] &lt;repository&gt; [&lt;path&gt;]
 <em>git submodule</em> [--quiet] status [--cached] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] init [--] [&lt;path&gt;&#8230;]
@@ -329,14 +423,16 @@ git-submodule(1) Manual Page
               [--reference &lt;repository&gt;] [--merge] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] summary [--cached|--files] [--summary-limit &lt;n&gt;] [commit] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] foreach [--recursive] &lt;command&gt;
-<em>git submodule</em> [--quiet] sync [--] [&lt;path&gt;&#8230;]</div></div>
+<em>git submodule</em> [--quiet] sync [--] [&lt;path&gt;&#8230;]</div>
+<div class="verseblock-attribution">
+</div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="para"><p>Submodules allow foreign repositories to be embedded within
+<div class="paragraph"><p>Submodules allow foreign repositories to be embedded within
 a dedicated subdirectory of the source tree, always pointed
 at a particular commit.</p></div>
-<div class="para"><p>They are not to be confused with remotes, which are meant mainly
+<div class="paragraph"><p>They are not to be confused with remotes, which are meant mainly
 for branches of the same project; submodules are meant for
 different projects you would like to make part of your source tree,
 while the history of the two projects still stays completely
@@ -348,7 +444,7 @@ add a remote for the other project and use the <em>subtree</em> merge strategy,
 instead of treating the other project as a submodule. Directories
 that come from both projects can be cloned and checked out as a whole
 if you choose to go that route.</p></div>
-<div class="para"><p>Submodules are composed from a so-called <tt>gitlink</tt> tree entry
+<div class="paragraph"><p>Submodules are composed from a so-called <tt>gitlink</tt> tree entry
 in the main repository that refers to a particular commit object
 within the inner repository that is completely separate.
 A record in the <tt>.gitmodules</tt> file at the root of the source
@@ -356,7 +452,7 @@ tree assigns a logical name to the submodule and describes
 the default URL the submodule shall be cloned from.
 The logical name can be used for overriding this URL within your
 local repository configuration (see <em>submodule init</em>).</p></div>
-<div class="para"><p>This command will manage the tree entries and contents of the
+<div class="paragraph"><p>This command will manage the tree entries and contents of the
 gitmodules file for you, as well as inspect the status of your
 submodules and update them.
 When adding a new submodule to the tree, the <em>add</em> subcommand
@@ -371,8 +467,8 @@ subcommand.</p></div>
 </div>
 <h2 id="_commands">COMMANDS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 add
 </dt>
 <dd>
@@ -381,31 +477,31 @@ add
         to the changeset to be committed next to the current
         project: the current project is termed the "superproject".
 </p>
-<div class="para"><p>This requires at least one argument: &lt;repository&gt;. The optional
+<div class="paragraph"><p>This requires at least one argument: &lt;repository&gt;. The optional
 argument &lt;path&gt; is the relative location for the cloned submodule
 to exist in the superproject. If &lt;path&gt; is not given, the
 "humanish" part of the source repository is used ("repo" for
 "/path/to/repo.git" and "foo" for "host.xz:foo/.git").</p></div>
-<div class="para"><p>&lt;repository&gt; is the URL of the new submodule's origin repository.
+<div class="paragraph"><p>&lt;repository&gt; is the URL of the new submodule&#8217;s origin repository.
 This may be either an absolute URL, or (if it begins with ./
-or ../), the location relative to the superproject's origin
+or ../), the location relative to the superproject&#8217;s origin
 repository.</p></div>
-<div class="para"><p>&lt;path&gt; is the relative location for the cloned submodule to
+<div class="paragraph"><p>&lt;path&gt; is the relative location for the cloned submodule to
 exist in the superproject. If &lt;path&gt; does not exist, then the
 submodule is created by cloning from the named URL. If &lt;path&gt; does
 exist and is already a valid git repository, then this is added
 to the changeset without cloning. This second form is provided
 to ease creating a new submodule from scratch, and presumes
 the user will later push the submodule to the given URL.</p></div>
-<div class="para"><p>In either case, the given URL is recorded into .gitmodules for
+<div class="paragraph"><p>In either case, the given URL is recorded into .gitmodules for
 use by subsequent users cloning the superproject. If the URL is
-given relative to the superproject's repository, the presumption
+given relative to the superproject&#8217;s repository, the presumption
 is the superproject and submodule repositories will be kept
 together in the same relative location, and only the
-superproject's URL needs to be provided: git-submodule will correctly
+superproject&#8217;s URL needs to be provided: git-submodule will correctly
 locate the submodule using the relative URL in .gitmodules.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 status
 </dt>
 <dd>
@@ -418,10 +514,10 @@ status
         does not match the SHA-1 found in the index of the containing
         repository. This command is the default command for <em>git submodule</em>.
 </p>
-<div class="para"><p>If <em>--recursive</em> is specified, this command will recurse into nested
+<div class="paragraph"><p>If <em>--recursive</em> is specified, this command will recurse into nested
 submodules, and show their status as well.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 init
 </dt>
 <dd>
@@ -437,7 +533,7 @@ init
         any submodule locations.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 update
 </dt>
 <dd>
@@ -448,13 +544,13 @@ update
         <em>--merge</em> is specified or the key <tt>submodule.$name.update</tt> is set to
         <tt>rebase</tt> or <tt>merge</tt>.
 </p>
-<div class="para"><p>If the submodule is not yet initialized, and you just want to use the
+<div class="paragraph"><p>If the submodule is not yet initialized, and you just want to use the
 setting as stored in .gitmodules, you can automatically initialize the
 submodule with the --init option.</p></div>
-<div class="para"><p>If <em>--recursive</em> is specified, this command will recurse into the
+<div class="paragraph"><p>If <em>--recursive</em> is specified, this command will recurse into the
 registered submodules, and update any nested submodules within.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 summary
 </dt>
 <dd>
@@ -465,11 +561,11 @@ summary
         index or working tree (switched by --cached) are shown. If the option
         --files is given, show the series of commits in the submodule between
         the index of the super project and the working tree of the submodule
-        (this option doesn't allow to use the --cached option or to provide an
+        (this option doesn&#8217;t allow to use the --cached option or to provide an
         explicit commit).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 foreach
 </dt>
 <dd>
@@ -490,11 +586,11 @@ foreach
         the processing to terminate. This can be overridden by adding <em>|| :</em>
         to the end of the command.
 </p>
-<div class="para"><p>As an example, +git submodule foreach 'echo $path &#96;git
-rev-parse HEAD&#96;'+ will show the path and currently checked out
+<div class="paragraph"><p>As an example, <tt>git submodule foreach 'echo $path &#96;git
+rev-parse HEAD&#96;'</tt> will show the path and currently checked out
 commit for each submodule.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 sync
 </dt>
 <dd>
@@ -504,18 +600,18 @@ sync
         submodule URLs change upstream and you need to update your local
         repositories accordingly.
 </p>
-<div class="para"><p>"git submodule sync" synchronizes all submodules while
-"git submodule sync &#8212; A" synchronizes submodule "A" only.</p></div>
+<div class="paragraph"><p>"git submodule sync" synchronizes all submodules while
+"git submodule sync&#8201;&#8212;&#8201;A" synchronizes submodule "A" only.</p></div>
 </dd>
 </dl></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="vlist"><dl>
-<dt>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 -q
 </dt>
-<dt>
+<dt class="hdlist1">
 --quiet
 </dt>
 <dd>
@@ -523,10 +619,10 @@ sync
         Only print error messages.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -b
 </dt>
-<dt>
+<dt class="hdlist1">
 --branch
 </dt>
 <dd>
@@ -534,10 +630,10 @@ sync
         Branch of repository to add as submodule.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -f
 </dt>
-<dt>
+<dt class="hdlist1">
 --force
 </dt>
 <dd>
@@ -546,7 +642,7 @@ sync
         Allow adding an otherwise ignored submodule path.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --cached
 </dt>
 <dd>
@@ -556,7 +652,7 @@ sync
         with this option, the commit stored in the index is used instead.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --files
 </dt>
 <dd>
@@ -566,10 +662,10 @@ sync
         when this option is used.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -n
 </dt>
-<dt>
+<dt class="hdlist1">
 --summary-limit
 </dt>
 <dd>
@@ -581,26 +677,26 @@ sync
         size is always limited to 1 for added/deleted/typechanged submodules.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 -N
 </dt>
-<dt>
+<dt class="hdlist1">
 --no-fetch
 </dt>
 <dd>
 <p>
         This option is only valid for the update command.
-        Don't fetch new objects from the remote site.
+        Don&#8217;t fetch new objects from the remote site.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --merge
 </dt>
 <dd>
 <p>
         This option is only valid for the update command.
         Merge the commit recorded in the superproject into the current branch
-        of the submodule. If this option is given, the submodule's HEAD will
+        of the submodule. If this option is given, the submodule&#8217;s HEAD will
         not be detached. If a merge failure prevents this process, you will
         have to resolve the resulting conflicts within the submodule with the
         usual conflict resolution tools.
@@ -608,21 +704,21 @@ sync
         implicit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --rebase
 </dt>
 <dd>
 <p>
         This option is only valid for the update command.
         Rebase the current branch onto the commit recorded in the
-        superproject. If this option is given, the submodule's HEAD will not
+        superproject. If this option is given, the submodule&#8217;s HEAD will not
         be detached. If a merge failure prevents this process, you will have
         to resolve these failures with <a href="git-rebase.html">git-rebase(1)</a>.
         If the key <tt>submodule.$name.update</tt> is set to <tt>rebase</tt>, this option is
         implicit.
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 --reference &lt;repository&gt;
 </dt>
 <dd>
@@ -631,10 +727,10 @@ sync
         commands sometimes need to clone a remote repository. In this case,
         this option will be passed to the <a href="git-clone.html">git-clone(1)</a> command.
 </p>
-<div class="para"><p><strong>NOTE</strong>: Do <strong>not</strong> use this option unless you have read the note
+<div class="paragraph"><p><strong>NOTE</strong>: Do <strong>not</strong> use this option unless you have read the note
 for <a href="git-clone.html">git-clone(1)</a>'s --reference and --shared options carefully.</p></div>
 </dd>
-<dt>
+<dt class="hdlist1">
 --recursive
 </dt>
 <dd>
@@ -645,7 +741,7 @@ for <a href="git-clone.html">git-clone(1)</a>'s --reference and --shared options
         in any nested submodules inside those submodules (and so on).
 </p>
 </dd>
-<dt>
+<dt class="hdlist1">
 &lt;path&gt;&#8230;
 </dt>
 <dd>
@@ -659,7 +755,7 @@ for <a href="git-clone.html">git-clone(1)</a>'s --reference and --shared options
 </div>
 <h2 id="_files">FILES</h2>
 <div class="sectionbody">
-<div class="para"><p>When initializing submodules, a .gitmodules file in the top-level directory
+<div class="paragraph"><p>When initializing submodules, a .gitmodules file in the top-level directory
 of the containing repository is used to find the url of each submodule.
 This file should be formatted in the same way as <tt>$GIT_DIR/config</tt>. The key
 to each submodule url is "submodule.$name.url".  See <a href="gitmodules.html">gitmodules(5)</a>
@@ -667,15 +763,15 @@ for details.</p></div>
 </div>
 <h2 id="_author">AUTHOR</h2>
 <div class="sectionbody">
-<div class="para"><p>Written by Lars Hjemli &lt;hjemli@gmail.com&gt;</p></div>
+<div class="paragraph"><p>Written by Lars Hjemli &lt;<a href="mailto:hjemli@gmail.com">hjemli@gmail.com</a>&gt;</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="para"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-09-18 23:56:59 UTC
+Last updated 2010-07-19 20:25:56 UTC
 </div>
 </div>
 </body>
