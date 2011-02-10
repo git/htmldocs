@@ -533,6 +533,28 @@ effect to your index in a row.</p></div>
         be performed.
 </p>
 </dd>
+<dt class="hdlist1">
+--strategy=&lt;strategy&gt;
+</dt>
+<dd>
+<p>
+        Use the given merge strategy.  Should only be used once.
+        See the MERGE STRATEGIES section in <a href="git-merge.html">git-merge(1)</a>
+        for details.
+</p>
+</dd>
+<dt class="hdlist1">
+-X&lt;option&gt;
+</dt>
+<dt class="hdlist1">
+--strategy-option=&lt;option&gt;
+</dt>
+<dd>
+<p>
+        Pass the merge strategy-specific option through to the
+        merge strategy.  See <a href="git-merge.html">git-merge(1)</a> for details.
+</p>
+</dd>
 </dl></div>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
@@ -604,6 +626,45 @@ git rev-list --reverse master -- README | git cherry-pick -n --stdin
 </p>
 </dd>
 </dl></div>
+<div class="paragraph"><p>The following sequence attempts to backport a patch, bails out because
+the code the patch applies to has changed too much, and then tries
+again, this time exercising more care about matching up context lines.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git cherry-pick topic^             <b>&lt;1&gt;</b>
+$ git diff                           <b>&lt;2&gt;</b>
+$ git reset --merge ORIG_HEAD        <b>&lt;3&gt;</b>
+$ git cherry-pick -Xpatience topic^  <b>&lt;4&gt;</b></tt></pre>
+</div></div>
+<div class="colist arabic"><ol>
+<li>
+<p>
+apply the change that would be shown by <tt>git show topic^</tt>.
+In this example, the patch does not apply cleanly, so
+information about the conflict is written to the index and
+working tree and no new commit results.
+</p>
+</li>
+<li>
+<p>
+summarize changes to be reconciled
+</p>
+</li>
+<li>
+<p>
+cancel the cherry-pick.  In other words, return to the
+pre-cherry-pick state, preserving any local modifications you had in
+the working tree.
+</p>
+</li>
+<li>
+<p>
+try to apply the change introduced by <tt>topic^</tt> again,
+spending extra time to avoid mistakes based on incorrectly matching
+context lines.
+</p>
+</li>
+</ol></div>
 </div>
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
@@ -623,7 +684,7 @@ git rev-list --reverse master -- README | git cherry-pick -n --stdin
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-12-03 00:43:00 UTC
+Last updated 2011-02-10 02:03:21 UTC
 </div>
 </div>
 </body>
