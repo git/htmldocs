@@ -416,6 +416,7 @@ git-checkout(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <div class="verseblock-content"><em>git checkout</em> [-q] [-f] [-m] [&lt;branch&gt;]
+<em>git checkout</em> [-q] [-f] [-m] [--detach] [&lt;commit&gt;]
 <em>git checkout</em> [-q] [-f] [-m] [[-b|-B|--orphan] &lt;new_branch&gt;] [&lt;start_point&gt;]
 <em>git checkout</em> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;paths&gt;&#8230;
 <em>git checkout</em> --patch [&lt;tree-ish&gt;] [--] [&lt;paths&gt;&#8230;]</div>
@@ -435,10 +436,13 @@ branch.</p></div>
 <dt class="hdlist1">
 <em>git checkout</em> -b|-B &lt;new_branch&gt; [&lt;start point&gt;]
 </dt>
+<dt class="hdlist1">
+<em>git checkout</em> [--detach] [&lt;commit&gt;]
+</dt>
 <dd>
 <p>
         This form switches branches by updating the index, working
-        tree, and HEAD to reflect the specified branch.
+        tree, and HEAD to reflect the specified branch or commit.
 </p>
 <div class="paragraph"><p>If <tt>-b</tt> is given, a new branch is created as if <a href="git-branch.html">git-branch(1)</a>
 were called and then checked out; in this case you can
@@ -580,6 +584,18 @@ explicitly give a name with <em>-b</em> in such a case.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--detach
+</dt>
+<dd>
+<p>
+        Rather than checking out a branch to work on it, check out a
+        commit for inspection and discardable experiments.
+        This is the default behavior of "git checkout &lt;commit&gt;" when
+        &lt;commit&gt; is not a branch name.  See the "DETACHED HEAD" section
+        below for details.
+</p>
+</dd>
+<dt class="hdlist1">
 --orphan
 </dt>
 <dd>
@@ -704,36 +720,143 @@ leave out at most one of <tt>A</tt> and <tt>B</tt>, in which case it defaults to
 </dd>
 </dl></div>
 </div>
-<h2 id="_detached_head">Detached HEAD</h2>
+<h2 id="_detached_head">DETACHED HEAD</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>It is sometimes useful to be able to <em>checkout</em> a commit that is
-not at the tip of one of your branches.  The most obvious
-example is to check out the commit at a tagged official release
-point, like this:</p></div>
+<div class="paragraph"><p>HEAD normally refers to a named branch (e.g. <em>master</em>). Meanwhile, each
+branch refers to a specific commit. Let&#8217;s look at a repo with three
+commits, one of them tagged, and with branch <em>master</em> checked out:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout v2.6.18</tt></pre>
+<pre><tt>           HEAD (refers to branch 'master')
+            |
+            v
+a---b---c  branch 'master' (refers to commit 'c')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</tt></pre>
 </div></div>
-<div class="paragraph"><p>Earlier versions of git did not allow this and asked you to
-create a temporary branch using the <tt>-b</tt> option, but starting from
-version 1.5.0, the above command <em>detaches</em> your HEAD from the
-current branch and directly points at the commit named by the tag
-(<tt>v2.6.18</tt> in the example above).</p></div>
-<div class="paragraph"><p>You can use all git commands while in this state.  You can use
-<tt>git reset --hard $othercommit</tt> to further move around, for
-example.  You can make changes and create a new commit on top of
-a detached HEAD.  You can even create a merge by using <tt>git
-merge $othercommit</tt>.</p></div>
-<div class="paragraph"><p>The state you are in while your HEAD is detached is not recorded
-by any branch (which is natural --- you are not on any branch).
-What this means is that you can discard your temporary commits
-and merges by switching back to an existing branch (e.g. <tt>git
-checkout master</tt>), and a later <tt>git prune</tt> or <tt>git gc</tt> would
-garbage-collect them.  If you did this by mistake, you can ask
-the reflog for HEAD where you were, e.g.</p></div>
+<div class="paragraph"><p>When a commit is created in this state, the branch is updated to refer to
+the new commit. Specifically, <em>git commit</em> creates a new commit <em>d</em>, whose
+parent is commit <em>c</em>, and then updates branch <em>master</em> to refer to new
+commit <em>d</em>. HEAD still refers to branch <em>master</em> and so indirectly now refers
+to commit <em>d</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log -g -2 HEAD</tt></pre>
+<pre><tt>$ edit; git add; git commit
+
+               HEAD (refers to branch 'master')
+                |
+                v
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</tt></pre>
+</div></div>
+<div class="paragraph"><p>It is sometimes useful to be able to checkout a commit that is not at
+the tip of any named branch, or even to create a new commit that is not
+referenced by a named branch. Let&#8217;s look at what happens when we
+checkout commit <em>b</em> (here we show two ways this may be done):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout v2.0  # or
+$ git checkout master^^
+
+   HEAD (refers to commit 'b')
+    |
+    v
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</tt></pre>
+</div></div>
+<div class="paragraph"><p>Notice that regardless of which checkout command we use, HEAD now refers
+directly to commit <em>b</em>. This is known as being in detached HEAD state.
+It means simply that HEAD refers to a specific commit, as opposed to
+referring to a named branch. Let&#8217;s see what happens when we create a commit:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ edit; git add; git commit
+
+     HEAD (refers to commit 'e')
+      |
+      v
+      e
+     /
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</tt></pre>
+</div></div>
+<div class="paragraph"><p>There is now a new commit <em>e</em>, but it is referenced only by HEAD. We can
+of course add yet another commit in this state:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ edit; git add; git commit
+
+         HEAD (refers to commit 'f')
+          |
+          v
+      e---f
+     /
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</tt></pre>
+</div></div>
+<div class="paragraph"><p>In fact, we can perform all the normal git operations. But, let&#8217;s look
+at what happens when we then checkout master:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout master
+
+               HEAD (refers to branch 'master')
+      e---f     |
+     /          v
+a---b---c---d  branch 'master' (refers to commit 'd')
+    ^
+    |
+  tag 'v2.0' (refers to commit 'b')</tt></pre>
+</div></div>
+<div class="paragraph"><p>It is important to realize that at this point nothing refers to commit
+<em>f</em>. Eventually commit <em>f</em> (and by extension commit <em>e</em>) will be deleted
+by the routine git garbage collection process, unless we create a reference
+before that happens. If we have not yet moved away from commit <em>f</em>,
+any of these will create a reference to it:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout -b foo   <b>&lt;1&gt;</b>
+$ git branch foo        <b>&lt;2&gt;</b>
+$ git tag foo           <b>&lt;3&gt;</b></tt></pre>
+</div></div>
+<div class="colist arabic"><ol>
+<li>
+<p>
+creates a new branch <em>foo</em>, which refers to commit <em>f</em>, and then
+updates HEAD to refer to branch <em>foo</em>. In other words, we&#8217;ll no longer
+be in detached HEAD state after this command.
+</p>
+</li>
+<li>
+<p>
+similarly creates a new branch <em>foo</em>, which refers to commit <em>f</em>,
+but leaves HEAD detached.
+</p>
+</li>
+<li>
+<p>
+creates a new tag <em>foo</em>, which refers to commit <em>f</em>,
+leaving HEAD detached.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>If we have moved away from commit <em>f</em>, then we must first recover its object
+name (typically by using git reflog), and then we can create a reference to
+it. For example, to see the last two commits to which HEAD referred, we
+can use either of these commands:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git reflog -2 HEAD # or
+$ git log -g -2 HEAD</tt></pre>
 </div></div>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
@@ -843,7 +966,7 @@ $ git add frotz</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-11-25 03:13:40 UTC
+Last updated 2011-02-28 06:40:45 UTC
 </div>
 </div>
 </body>
