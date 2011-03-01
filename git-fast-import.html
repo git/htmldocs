@@ -668,7 +668,8 @@ format simplifies development and debugging of frontend programs,
 especially when a higher level language such as Perl, Python or
 Ruby is being used.</p></div>
 <div class="paragraph"><p>fast-import is very strict about its input.  Where we say SP below we mean
-<strong>exactly</strong> one space.  Likewise LF means one (and only one) linefeed.
+<strong>exactly</strong> one space.  Likewise LF means one (and only one) linefeed
+and HT one (and only one) horizontal tab.
 Supplying additional whitespace characters will cause unexpected
 results, such as branch names or file names with leading or trailing
 spaces in their name, or early termination of fast-import when it encounters
@@ -838,6 +839,16 @@ and control the current import process.  More detailed discussion
         Causes fast-import to print a blob in <em>cat-file --batch</em>
         format to the file descriptor set with <tt>--cat-blob-fd</tt> or
         <tt>stdout</tt> if unspecified.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>ls</tt>
+</dt>
+<dd>
+<p>
+        Causes fast-import to print a line describing a directory
+        entry in <em>ls-tree</em> format to the file descriptor set with
+        <tt>--cat-blob-fd</tt> or <tt>stdout</tt> if unspecified.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1434,6 +1445,66 @@ ready to be written.</p></div>
 <div class="paragraph"><p>This command can be used anywhere in the stream that comments are
 accepted.  In particular, the <tt>cat-blob</tt> command can be used in the
 middle of a commit but not in the middle of a <tt>data</tt> command.</p></div>
+<h3 id="_tt_ls_tt"><tt>ls</tt></h3><div style="clear:left"></div>
+<div class="paragraph"><p>Prints information about the object at a path to a file descriptor
+previously arranged with the <tt>--cat-blob-fd</tt> argument.  This allows
+printing a blob from the active commit (with <tt>cat-blob</tt>) or copying a
+blob or tree from a previous commit for use in the current one (with
+<tt>filemodify</tt>).</p></div>
+<div class="paragraph"><p>The <tt>ls</tt> command can be used anywhere in the stream that comments are
+accepted, including the middle of a commit.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Reading from the active commit
+</dt>
+<dd>
+<p>
+        This form can only be used in the middle of a <tt>commit</tt>.
+        The path names a directory entry within fast-import&#8217;s
+        active commit.  The path must be quoted in this case.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'ls' SP &lt;path&gt; LF</tt></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Reading from a named tree
+</dt>
+<dd>
+<p>
+        The <tt>&lt;dataref&gt;</tt> can be a mark reference (<tt>:&lt;idnum&gt;</tt>) or the
+        full 40-byte SHA-1 of a Git tag, commit, or tree object,
+        preexisting or waiting to be written.
+        The path is relative to the top level of the tree
+        named by <tt>&lt;dataref&gt;</tt>.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        'ls' SP &lt;dataref&gt; SP &lt;path&gt; LF</tt></pre>
+</div></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>See <tt>filemodify</tt> above for a detailed description of <tt>&lt;path&gt;</tt>.</p></div>
+<div class="paragraph"><p>Output uses the same format as <tt>git ls-tree &lt;tree&gt; &#45;&#45; &lt;path&gt;</tt>:</p></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="literalblock">
+<div class="content">
+<pre><tt>&lt;mode&gt; SP ('blob' | 'tree' | 'commit') SP &lt;dataref&gt; HT &lt;path&gt; LF</tt></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>The &lt;dataref&gt; represents the blob, tree, or commit object at &lt;path&gt;
+and can be used in later <em>cat-blob</em>, <em>filemodify</em>, or <em>ls</em> commands.</p></div>
+<div class="paragraph"><p>If there is no file or subtree at that path, <em>git fast-import</em> will
+instead report</p></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="literalblock">
+<div class="content">
+<pre><tt>missing SP &lt;path&gt; LF</tt></pre>
+</div></div>
+</div></div>
 <h3 id="_tt_feature_tt"><tt>feature</tt></h3><div style="clear:left"></div>
 <div class="paragraph"><p>Require that fast-import supports the specified feature, or abort if
 it does not.</p></div>
@@ -1479,10 +1550,14 @@ import-marks
 <dt class="hdlist1">
 cat-blob
 </dt>
+<dt class="hdlist1">
+ls
+</dt>
 <dd>
 <p>
-        Ignored.  Versions of fast-import not supporting the
-        "cat-blob" command will exit with a message indicating so.
+        Require that the backend support the <em>cat-blob</em> or <em>ls</em> command.
+        Versions of fast-import not supporting the specified command
+        will exit with a message indicating so.
         This lets the import error out early with a clear message,
         rather than wasting time on the early part of an import
         before the unsupported command is detected.
@@ -1837,7 +1912,7 @@ compression.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-02-10 02:03:21 UTC
+Last updated 2011-03-01 01:02:17 UTC
 </div>
 </div>
 </body>
