@@ -598,7 +598,12 @@ that a program that terminates via "exit(-1)" leaves $? = 255, (see the
 exit(3) manual page), as the value is chopped with "&amp; 0377".</p></div>
 <div class="paragraph"><p>The special exit code 125 should be used when the current source code
 cannot be tested. If the script exits with this code, the current
-revision will be skipped (see <tt>git bisect skip</tt> above).</p></div>
+revision will be skipped (see <tt>git bisect skip</tt> above). 125 was chosen
+as the highest sensible value to use for this purpose, because 126 and 127
+are used by POSIX shells to signal specific error status (127 is for
+command not found, 126 is for command found but not executable---these
+details do not matter, as they are normal errors in the script, as far as
+"bisect run" is concerned).</p></div>
 <div class="paragraph"><p>You may often find that during a bisect session you want to have
 temporary modifications (e.g. s/#define DEBUG 0/#define DEBUG 1/ in a
 header file, or "revision that does not have this commit needs this
@@ -699,7 +704,7 @@ $ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-03-15 23:30:13 UTC
+Last updated 2011-03-20 19:41:42 UTC
 </div>
 </div>
 </body>

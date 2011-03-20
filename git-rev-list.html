@@ -500,215 +500,11 @@ used by commands as different as <em>git bisect</em> and
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<h3 id="_commit_formatting">Commit Formatting</h3><div style="clear:left"></div>
-<div class="paragraph"><p>Using these options, <a href="git-rev-list.html">git-rev-list(1)</a> will act similar to the
-more specialized family of commit log tools: <a href="git-log.html">git-log(1)</a>,
-<a href="git-show.html">git-show(1)</a>, and <a href="git-whatchanged.html">git-whatchanged(1)</a></p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
---pretty[=&lt;format&gt;]
-</dt>
-<dt class="hdlist1">
---format=&lt;format&gt;
-</dt>
-<dd>
-<p>
-        Pretty-print the contents of the commit logs in a given format,
-        where <em>&lt;format&gt;</em> can be one of <em>oneline</em>, <em>short</em>, <em>medium</em>,
-        <em>full</em>, <em>fuller</em>, <em>email</em>, <em>raw</em> and <em>format:&lt;string&gt;</em>.  See
-        the "PRETTY FORMATS" section for some additional details for each
-        format.  When omitted, the format defaults to <em>medium</em>.
-</p>
-<div class="paragraph"><p>Note: you can specify the default pretty format in the repository
-configuration (see <a href="git-config.html">git-config(1)</a>).</p></div>
-</dd>
-<dt class="hdlist1">
---abbrev-commit
-</dt>
-<dd>
-<p>
-        Instead of showing the full 40-byte hexadecimal commit object
-        name, show only a partial prefix.  Non default number of
-        digits can be specified with "--abbrev=&lt;n&gt;" (which also modifies
-        diff output, if it is displayed).
-</p>
-<div class="paragraph"><p>This should make "--pretty=oneline" a whole lot more readable for
-people using 80-column terminals.</p></div>
-</dd>
-<dt class="hdlist1">
---oneline
-</dt>
-<dd>
-<p>
-        This is a shorthand for "--pretty=oneline --abbrev-commit"
-        used together.
-</p>
-</dd>
-<dt class="hdlist1">
---encoding[=&lt;encoding&gt;]
-</dt>
-<dd>
-<p>
-        The commit objects record the encoding used for the log message
-        in their encoding header; this option can be used to tell the
-        command to re-code the commit log message in the encoding
-        preferred by the user.  For non plumbing commands this
-        defaults to UTF-8.
-</p>
-</dd>
-<dt class="hdlist1">
---no-notes
-</dt>
-<dt class="hdlist1">
---show-notes[=&lt;ref&gt;]
-</dt>
-<dd>
-<p>
-        Show the notes (see <a href="git-notes.html">git-notes(1)</a>) that annotate the
-        commit, when showing the commit log message.  This is the default
-        for <tt>git log</tt>, <tt>git show</tt> and <tt>git whatchanged</tt> commands when
-        there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option is
-        given on the command line.
-</p>
-<div class="paragraph"><p>With an optional argument, add this ref to the list of notes.  The ref
-is taken to be in <tt>refs/notes/</tt> if it is not qualified.</p></div>
-</dd>
-<dt class="hdlist1">
---[no-]standard-notes
-</dt>
-<dd>
-<p>
-        Enable or disable populating the notes ref list from the
-        <em>core.notesRef</em> and <em>notes.displayRef</em> variables (or
-        corresponding environment overrides).  Enabled by default.
-        See <a href="git-config.html">git-config(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
---relative-date
-</dt>
-<dd>
-<p>
-        Synonym for <tt>--date=relative</tt>.
-</p>
-</dd>
-<dt class="hdlist1">
---date=(relative|local|default|iso|rfc|short|raw)
-</dt>
-<dd>
-<p>
-        Only takes effect for dates shown in human-readable format, such
-        as when using "--pretty". <tt>log.date</tt> config variable sets a default
-        value for log command&#8217;s --date option.
-</p>
-<div class="paragraph"><p><tt>--date=relative</tt> shows dates relative to the current time,
-e.g. "2 hours ago".</p></div>
-<div class="paragraph"><p><tt>--date=local</tt> shows timestamps in user&#8217;s local timezone.</p></div>
-<div class="paragraph"><p><tt>--date=iso</tt> (or <tt>--date=iso8601</tt>) shows timestamps in ISO 8601 format.</p></div>
-<div class="paragraph"><p><tt>--date=rfc</tt> (or <tt>--date=rfc2822</tt>) shows timestamps in RFC 2822
-format, often found in E-mail messages.</p></div>
-<div class="paragraph"><p><tt>--date=short</tt> shows only date but not time, in <tt>YYYY-MM-DD</tt> format.</p></div>
-<div class="paragraph"><p><tt>--date=raw</tt> shows the date in the internal raw git format <tt>%s %z</tt> format.</p></div>
-<div class="paragraph"><p><tt>--date=default</tt> shows timestamps in the original timezone
-(either committer&#8217;s or author&#8217;s).</p></div>
-</dd>
-<dt class="hdlist1">
---header
-</dt>
-<dd>
-<p>
-        Print the contents of the commit in raw-format; each record is
-        separated with a NUL character.
-</p>
-</dd>
-<dt class="hdlist1">
---parents
-</dt>
-<dd>
-<p>
-        Print also the parents of the commit (in the form "commit parent&#8230;").
-        Also enables parent rewriting, see <em>History Simplification</em> below.
-</p>
-</dd>
-<dt class="hdlist1">
---children
-</dt>
-<dd>
-<p>
-        Print also the children of the commit (in the form "commit child&#8230;").
-        Also enables parent rewriting, see <em>History Simplification</em> below.
-</p>
-</dd>
-<dt class="hdlist1">
---timestamp
-</dt>
-<dd>
-<p>
-        Print the raw commit timestamp.
-</p>
-</dd>
-<dt class="hdlist1">
---left-right
-</dt>
-<dd>
-<p>
-        Mark which side of a symmetric diff a commit is reachable from.
-        Commits from the left side are prefixed with <tt>&lt;</tt> and those from
-        the right with <tt>&gt;</tt>.  If combined with <tt>--boundary</tt>, those
-        commits are prefixed with <tt>-</tt>.
-</p>
-<div class="paragraph"><p>For example, if you have this topology:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>             y---b---b  branch B
-            / \ /
-           /   .
-          /   / \
-         o---x---a---a  branch A</tt></pre>
-</div></div>
-<div class="paragraph"><p>you would get an output like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>        $ git rev-list --left-right --boundary --pretty=oneline A...B
-
-        &gt;bbbbbbb... 3rd on b
-        &gt;bbbbbbb... 2nd on b
-        &lt;aaaaaaa... 3rd on a
-        &lt;aaaaaaa... 2nd on a
-        -yyyyyyy... 1st on b
-        -xxxxxxx... 1st on a</tt></pre>
-</div></div>
-</dd>
-<dt class="hdlist1">
---graph
-</dt>
-<dd>
-<p>
-        Draw a text-based graphical representation of the commit history
-        on the left hand side of the output.  This may cause extra lines
-        to be printed in between commits, in order for the graph history
-        to be drawn properly.
-</p>
-<div class="paragraph"><p>This enables parent rewriting, see <em>History Simplification</em> below.</p></div>
-<div class="paragraph"><p>This implies the <em>--topo-order</em> option by default, but the
-<em>--date-order</em> option may also be specified.</p></div>
-</dd>
-<dt class="hdlist1">
---count
-</dt>
-<dd>
-<p>
-        Print a number stating how many commits would have been
-        listed, and suppress all other output.  When used together
-        with <em>--left-right</em>, instead print the counts for left and
-        right commits, separated by a tab.
-</p>
-</dd>
-</dl></div>
 <h3 id="_commit_limiting">Commit Limiting</h3><div style="clear:left"></div>
 <div class="paragraph"><p>Besides specifying a range of commits that should be listed using the
 special notations explained in the description, additional commit
-limiting may be applied.</p></div>
+limiting may be applied. Note that they are applied before commit
+ordering and formatting options, such as <em>--reverse</em>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 -n <em>number</em>
@@ -1509,6 +1305,211 @@ after all the sorted commit objects, there will be the same text as if
 <dd>
 <p>
         Overrides a previous --no-walk.
+</p>
+</dd>
+</dl></div>
+<h3 id="_commit_formatting">Commit Formatting</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Using these options, <a href="git-rev-list.html">git-rev-list(1)</a> will act similar to the
+more specialized family of commit log tools: <a href="git-log.html">git-log(1)</a>,
+<a href="git-show.html">git-show(1)</a>, and <a href="git-whatchanged.html">git-whatchanged(1)</a></p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--pretty[=&lt;format&gt;]
+</dt>
+<dt class="hdlist1">
+--format=&lt;format&gt;
+</dt>
+<dd>
+<p>
+        Pretty-print the contents of the commit logs in a given format,
+        where <em>&lt;format&gt;</em> can be one of <em>oneline</em>, <em>short</em>, <em>medium</em>,
+        <em>full</em>, <em>fuller</em>, <em>email</em>, <em>raw</em> and <em>format:&lt;string&gt;</em>.  See
+        the "PRETTY FORMATS" section for some additional details for each
+        format.  When omitted, the format defaults to <em>medium</em>.
+</p>
+<div class="paragraph"><p>Note: you can specify the default pretty format in the repository
+configuration (see <a href="git-config.html">git-config(1)</a>).</p></div>
+</dd>
+<dt class="hdlist1">
+--abbrev-commit
+</dt>
+<dd>
+<p>
+        Instead of showing the full 40-byte hexadecimal commit object
+        name, show only a partial prefix.  Non default number of
+        digits can be specified with "--abbrev=&lt;n&gt;" (which also modifies
+        diff output, if it is displayed).
+</p>
+<div class="paragraph"><p>This should make "--pretty=oneline" a whole lot more readable for
+people using 80-column terminals.</p></div>
+</dd>
+<dt class="hdlist1">
+--oneline
+</dt>
+<dd>
+<p>
+        This is a shorthand for "--pretty=oneline --abbrev-commit"
+        used together.
+</p>
+</dd>
+<dt class="hdlist1">
+--encoding[=&lt;encoding&gt;]
+</dt>
+<dd>
+<p>
+        The commit objects record the encoding used for the log message
+        in their encoding header; this option can be used to tell the
+        command to re-code the commit log message in the encoding
+        preferred by the user.  For non plumbing commands this
+        defaults to UTF-8.
+</p>
+</dd>
+<dt class="hdlist1">
+--no-notes
+</dt>
+<dt class="hdlist1">
+--show-notes[=&lt;ref&gt;]
+</dt>
+<dd>
+<p>
+        Show the notes (see <a href="git-notes.html">git-notes(1)</a>) that annotate the
+        commit, when showing the commit log message.  This is the default
+        for <tt>git log</tt>, <tt>git show</tt> and <tt>git whatchanged</tt> commands when
+        there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option is
+        given on the command line.
+</p>
+<div class="paragraph"><p>With an optional argument, add this ref to the list of notes.  The ref
+is taken to be in <tt>refs/notes/</tt> if it is not qualified.</p></div>
+</dd>
+<dt class="hdlist1">
+--[no-]standard-notes
+</dt>
+<dd>
+<p>
+        Enable or disable populating the notes ref list from the
+        <em>core.notesRef</em> and <em>notes.displayRef</em> variables (or
+        corresponding environment overrides).  Enabled by default.
+        See <a href="git-config.html">git-config(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+--relative-date
+</dt>
+<dd>
+<p>
+        Synonym for <tt>--date=relative</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
+--date=(relative|local|default|iso|rfc|short|raw)
+</dt>
+<dd>
+<p>
+        Only takes effect for dates shown in human-readable format, such
+        as when using "--pretty". <tt>log.date</tt> config variable sets a default
+        value for log command&#8217;s --date option.
+</p>
+<div class="paragraph"><p><tt>--date=relative</tt> shows dates relative to the current time,
+e.g. "2 hours ago".</p></div>
+<div class="paragraph"><p><tt>--date=local</tt> shows timestamps in user&#8217;s local timezone.</p></div>
+<div class="paragraph"><p><tt>--date=iso</tt> (or <tt>--date=iso8601</tt>) shows timestamps in ISO 8601 format.</p></div>
+<div class="paragraph"><p><tt>--date=rfc</tt> (or <tt>--date=rfc2822</tt>) shows timestamps in RFC 2822
+format, often found in E-mail messages.</p></div>
+<div class="paragraph"><p><tt>--date=short</tt> shows only date but not time, in <tt>YYYY-MM-DD</tt> format.</p></div>
+<div class="paragraph"><p><tt>--date=raw</tt> shows the date in the internal raw git format <tt>%s %z</tt> format.</p></div>
+<div class="paragraph"><p><tt>--date=default</tt> shows timestamps in the original timezone
+(either committer&#8217;s or author&#8217;s).</p></div>
+</dd>
+<dt class="hdlist1">
+--header
+</dt>
+<dd>
+<p>
+        Print the contents of the commit in raw-format; each record is
+        separated with a NUL character.
+</p>
+</dd>
+<dt class="hdlist1">
+--parents
+</dt>
+<dd>
+<p>
+        Print also the parents of the commit (in the form "commit parent&#8230;").
+        Also enables parent rewriting, see <em>History Simplification</em> below.
+</p>
+</dd>
+<dt class="hdlist1">
+--children
+</dt>
+<dd>
+<p>
+        Print also the children of the commit (in the form "commit child&#8230;").
+        Also enables parent rewriting, see <em>History Simplification</em> below.
+</p>
+</dd>
+<dt class="hdlist1">
+--timestamp
+</dt>
+<dd>
+<p>
+        Print the raw commit timestamp.
+</p>
+</dd>
+<dt class="hdlist1">
+--left-right
+</dt>
+<dd>
+<p>
+        Mark which side of a symmetric diff a commit is reachable from.
+        Commits from the left side are prefixed with <tt>&lt;</tt> and those from
+        the right with <tt>&gt;</tt>.  If combined with <tt>--boundary</tt>, those
+        commits are prefixed with <tt>-</tt>.
+</p>
+<div class="paragraph"><p>For example, if you have this topology:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>             y---b---b  branch B
+            / \ /
+           /   .
+          /   / \
+         o---x---a---a  branch A</tt></pre>
+</div></div>
+<div class="paragraph"><p>you would get an output like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>        $ git rev-list --left-right --boundary --pretty=oneline A...B
+
+        &gt;bbbbbbb... 3rd on b
+        &gt;bbbbbbb... 2nd on b
+        &lt;aaaaaaa... 3rd on a
+        &lt;aaaaaaa... 2nd on a
+        -yyyyyyy... 1st on b
+        -xxxxxxx... 1st on a</tt></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+--graph
+</dt>
+<dd>
+<p>
+        Draw a text-based graphical representation of the commit history
+        on the left hand side of the output.  This may cause extra lines
+        to be printed in between commits, in order for the graph history
+        to be drawn properly.
+</p>
+<div class="paragraph"><p>This enables parent rewriting, see <em>History Simplification</em> below.</p></div>
+<div class="paragraph"><p>This implies the <em>--topo-order</em> option by default, but the
+<em>--date-order</em> option may also be specified.</p></div>
+</dd>
+<dt class="hdlist1">
+--count
+</dt>
+<dd>
+<p>
+        Print a number stating how many commits would have been
+        listed, and suppress all other output.  When used together
+        with <em>--left-right</em>, instead print the counts for left and
+        right commits, separated by a tab.
 </p>
 </dd>
 </dl></div>
