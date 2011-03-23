@@ -642,27 +642,6 @@ $ git bisect run make test           # "make test" builds and tests</tt></pre>
 </li>
 <li>
 <p>
-Automatically bisect a broken test suite:
-</p>
-<div class="listingblock">
-<div class="content">
-<pre><tt>$ cat ~/test.sh
-#!/bin/sh
-make || exit 125                   # this skips broken builds
-make test                          # "make test" runs the test suite
-$ git bisect start v1.3 v1.1 --    # v1.3 is bad, v1.1 is good
-$ git bisect run ~/test.sh</tt></pre>
-</div></div>
-<div class="paragraph"><p>Here we use a "test.sh" custom script. In this script, if "make"
-fails, we skip the current commit.</p></div>
-<div class="paragraph"><p>It is safer to use a custom script outside the repository to prevent
-interactions between the bisect, make and test processes and the
-script.</p></div>
-<div class="paragraph"><p>"make test" should "exit 0", if the test suite passes, and
-"exit 1" otherwise.</p></div>
-</li>
-<li>
-<p>
 Automatically bisect a broken test case:
 </p>
 <div class="listingblock">
@@ -670,26 +649,64 @@ Automatically bisect a broken test case:
 <pre><tt>$ cat ~/test.sh
 #!/bin/sh
 make || exit 125                     # this skips broken builds
-~/check_test_case.sh                 # does the test case passes ?
+~/check_test_case.sh                 # does the test case pass?
 $ git bisect start HEAD HEAD~10 --   # culprit is among the last 10
 $ git bisect run ~/test.sh</tt></pre>
 </div></div>
-<div class="paragraph"><p>Here "check_test_case.sh" should "exit 0" if the test case passes,
+<div class="paragraph"><p>Here we use a "test.sh" custom script. In this script, if "make"
+fails, we skip the current commit.
+"check_test_case.sh" should "exit 0" if the test case passes,
 and "exit 1" otherwise.</p></div>
-<div class="paragraph"><p>It is safer if both "test.sh" and "check_test_case.sh" scripts are
+<div class="paragraph"><p>It is safer if both "test.sh" and "check_test_case.sh" are
 outside the repository to prevent interactions between the bisect,
 make and test processes and the scripts.</p></div>
 </li>
 <li>
 <p>
-Automatically bisect a broken test suite:
+Automatically bisect with temporary modifications (hot-fix):
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ cat ~/test.sh
+#!/bin/sh
+
+# tweak the working tree by merging the hot-fix branch
+# and then attempt a build
+if      git merge --no-commit hot-fix &amp;&amp;
+        make
+then
+        # run project specific test and report its status
+        ~/check_test_case.sh
+        status=$?
+else
+        # tell the caller this is untestable
+        status=125
+fi
+
+# undo the tweak to allow clean flipping to the next commit
+git reset --hard
+
+# return control
+exit $status</tt></pre>
+</div></div>
+<div class="paragraph"><p>This applies modifications from a hot-fix branch before each test run,
+e.g. in case your build or test environment changed so that older
+revisions may need a fix which newer ones have already. (Make sure the
+hot-fix branch is based off a commit which is contained in all revisions
+which you are bisecting, so that the merge does not pull in too much, or
+use <tt>git cherry-pick</tt> instead of <tt>git merge</tt>.)</p></div>
+</li>
+<li>
+<p>
+Automatically bisect a broken test case:
 </p>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ git bisect start HEAD HEAD~10 --   # culprit is among the last 10
 $ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"</tt></pre>
 </div></div>
-<div class="paragraph"><p>Does the same as the previous example, but on a single line.</p></div>
+<div class="paragraph"><p>This shows that you can do without a run script if you write the test
+on a single line.</p></div>
 </li>
 </ul></div>
 </div>
@@ -704,7 +721,7 @@ $ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-03-20 19:41:42 UTC
+Last updated 2011-03-23 05:39:52 UTC
 </div>
 </div>
 </body>
