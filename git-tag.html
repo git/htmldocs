@@ -632,12 +632,11 @@ You can test which tag you have by doing
 
 which should return 0123456789abcdef.. if you have the new version.
 
-Sorry for inconvenience.</tt></pre>
+Sorry for the inconvenience.</tt></pre>
 </div></div>
 <div class="paragraph"><p>Does this seem a bit complicated?  It <strong>should</strong> be. There is no
-way that it would be correct to just "fix" it behind peoples
-backs. People need to know that their tags might have been
-changed.</p></div>
+way that it would be correct to just "fix" it automatically.
+People need to know that their tags might have been changed.</p></div>
 <h3 id="_on_automatic_following">On Automatic following</h3><div style="clear:left"></div>
 <div class="paragraph"><p>If you are following somebody else&#8217;s tree, you are most likely
 using remote-tracking branches (<tt>refs/heads/origin</tt> in traditional
@@ -649,9 +648,10 @@ get tags from there.  This happens more often for people near
 the toplevel but not limited to them.  Mere mortals when pulling
 from each other do not necessarily want to automatically get
 private anchor point tags from the other person.</p></div>
-<div class="paragraph"><p>You would notice "please pull" messages on the mailing list says
-repo URL and branch name alone.  This is designed to be easily
-cut&amp;pasted to a <em>git fetch</em> command line:</p></div>
+<div class="paragraph"><p>Often, "please pull" messages on the mailing list just provide
+two pieces of information: a repo URL and a branch name; this
+is designed to be easily cut&amp;pasted at the end of a <em>git fetch</em>
+command line:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>Linus, please pull from
@@ -665,13 +665,13 @@ to get the following updates...</tt></pre>
 <div class="content">
 <pre><tt>$ git pull git://git..../proj.git master</tt></pre>
 </div></div>
-<div class="paragraph"><p>In such a case, you do not want to automatically follow other&#8217;s
-tags.</p></div>
-<div class="paragraph"><p>One important aspect of git is it is distributed, and being
-distributed largely means there is no inherent "upstream" or
+<div class="paragraph"><p>In such a case, you do not want to automatically follow the other
+person&#8217;s tags.</p></div>
+<div class="paragraph"><p>One important aspect of git is its distributed nature, which
+largely means there is no inherent "upstream" or
 "downstream" in the system.  On the face of it, the above
 example might seem to indicate that the tag namespace is owned
-by upper echelon of people and tags only flow downwards, but
+by the upper echelon of people and that tags only flow downwards, but
 that is not the case.  It only shows that the usage pattern
 determines who are interested in whose tags.</p></div>
 <div class="paragraph"><p>A one-shot pull is a sign that a commit history is now crossing
@@ -687,24 +687,69 @@ That is why it is desirable not to follow tags automatically in
 this case.</p></div>
 <div class="paragraph"><p>It may well be that among networking people, they may want to
 exchange the tags internal to their group, but in that workflow
-they are most likely tracking with each other&#8217;s progress by
+they are most likely tracking each other&#8217;s progress by
 having remote-tracking branches.  Again, the heuristic to automatically
 follow such tags is a good thing.</p></div>
 <h3 id="_on_backdating_tags">On Backdating Tags</h3><div style="clear:left"></div>
 <div class="paragraph"><p>If you have imported some changes from another VCS and would like
 to add tags for major releases of your work, it is useful to be able
-to specify the date to embed inside of the tag object.  The data in
+to specify the date to embed inside of the tag object; such data in
 the tag object affects, for example, the ordering of tags in the
 gitweb interface.</p></div>
 <div class="paragraph"><p>To set the date used in future tag objects, set the environment
-variable GIT_COMMITTER_DATE to one or more of the date and time.  The
-date and time can be specified in a number of ways; the most common
-is "YYYY-MM-DD HH:MM".</p></div>
-<div class="paragraph"><p>An example follows.</p></div>
+variable GIT_COMMITTER_DATE (see the later discussion of possible
+values; the most common form is "YYYY-MM-DD HH:MM").</p></div>
+<div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>$ GIT_COMMITTER_DATE="2006-10-02 10:31" git tag -s v1.0.1</tt></pre>
 </div></div>
+</div>
+<h2 id="_date_formats">DATE FORMATS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The GIT_AUTHOR_DATE, GIT_COMMITTER_DATE environment variables
+support the following date formats:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Git internal format
+</dt>
+<dd>
+<p>
+        It is <tt>&lt;unix timestamp&gt; &lt;timezone offset&gt;</tt>, where <tt>&lt;unix
+        timestamp&gt;</tt> is the number of seconds since the UNIX epoch.
+        <tt>&lt;timezone offset&gt;</tt> is a positive or negative offset from UTC.
+        For example CET (which is 2 hours ahead UTC) is <tt>+0200</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
+RFC 2822
+</dt>
+<dd>
+<p>
+        The standard email format as described by RFC 2822, for example
+        <tt>Thu, 07 Apr 2005 22:13:13 +0200</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
+ISO 8601
+</dt>
+<dd>
+<p>
+        Time and date specified by the ISO 8601 standard, for example
+        <tt>2005-04-07T22:13:13</tt>. The parser accepts a space instead of the
+        <tt>T</tt> character as well.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">In addition, the date part is accepted in the following formats:
+<tt>YYYY.MM.DD</tt>, <tt>MM/DD/YYYY</tt> and <tt>DD.MM.YYYY</tt>.</td>
+</tr></table>
+</div>
+</dd>
+</dl></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
@@ -716,7 +761,7 @@ is "YYYY-MM-DD HH:MM".</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-03-15 23:30:14 UTC
+Last updated 2011-03-29 02:09:41 UTC
 </div>
 </div>
 </body>
