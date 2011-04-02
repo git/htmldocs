@@ -414,7 +414,26 @@ git-init(1) Manual Page
 </div>
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><em>git init</em> [-q | --quiet] [--bare] [--template=&lt;template_directory&gt;] [--shared[=&lt;permissions&gt;]] [directory]</p></div>
+<div class="paragraph"><p><em>git init</em> [-q | --quiet] [--bare] [--template=&lt;template_directory&gt;]
+          [--separate-git-dir|-L &lt;git dir&gt;]
+          [--shared[=&lt;permissions&gt;]] [directory]</p></div>
+</div>
+<h2 id="_description">DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This command creates an empty git repository - basically a <tt>.git</tt>
+directory with subdirectories for <tt>objects</tt>, <tt>refs/heads</tt>,
+<tt>refs/tags</tt>, and template files.  An initial <tt>HEAD</tt> file that
+references the HEAD of the master branch is also created.</p></div>
+<div class="paragraph"><p>If the <tt>$GIT_DIR</tt> environment variable is set then it specifies a path
+to use instead of <tt>./.git</tt> for the base of the repository.</p></div>
+<div class="paragraph"><p>If the object storage directory is specified via the
+<tt>$GIT_OBJECT_DIRECTORY</tt> environment variable then the sha1 directories
+are created underneath - otherwise the default <tt>$GIT_DIR/objects</tt>
+directory is used.</p></div>
+<div class="paragraph"><p>Running <em>git init</em> in an existing repository is safe. It will not
+overwrite things that are already there. The primary reason for
+rerunning <em>git init</em> is to pick up newly added templates (or to move
+the repository to another place if --separate-git-dir is given).</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -446,6 +465,22 @@ current working directory.
 <p>
 Specify the directory from which templates will be used.  (See the "TEMPLATE
 DIRECTORY" section below.)
+</p>
+</dd>
+<dt class="hdlist1">
+-L=&lt;git dir&gt;
+</dt>
+<dt class="hdlist1">
+--separate-git-dir=&lt;git dir&gt;
+</dt>
+<dd>
+<p>
+Instead of initializing the repository where it is supposed to be,
+place a filesytem-agnostic git symbolic link there, pointing to the
+specified git path, and initialize a git repository at the path. The
+result is git repository can be separated from working tree. If this
+is reinitialization, the repository will be moved to the specified
+path.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -504,28 +539,6 @@ in shared repositories, so that you cannot force a non fast-forwarding push
 into it.</p></div>
 <div class="paragraph"><p>If you name a (possibly non-existent) directory at the end of the command
 line, the command is run inside the directory (possibly after creating it).</p></div>
-</div>
-<h2 id="_description">DESCRIPTION</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>This command creates an empty git repository - basically a <tt>.git</tt> directory
-with subdirectories for <tt>objects</tt>, <tt>refs/heads</tt>, <tt>refs/tags</tt>, and
-template files.
-An initial <tt>HEAD</tt> file that references the HEAD of the master branch
-is also created.</p></div>
-<div class="paragraph"><p>If the <tt>$GIT_DIR</tt> environment variable is set then it specifies a path
-to use instead of <tt>./.git</tt> for the base of the repository.</p></div>
-<div class="paragraph"><p>If the object storage directory is specified via the <tt>$GIT_OBJECT_DIRECTORY</tt>
-environment variable then the sha1 directories are created underneath -
-otherwise the default <tt>$GIT_DIR/objects</tt> directory is used.</p></div>
-<div class="paragraph"><p>Running <em>git init</em> in an existing repository is safe. It will not overwrite
-things that are already there. The primary reason for rerunning <em>git init</em>
-is to pick up newly added templates.</p></div>
-<div class="paragraph"><p>Note that <em>git init</em> is the same as <em>git init-db</em>.  The command
-was primarily meant to initialize the object database, but over
-time it has become responsible for setting up the other aspects
-of the repository, such as installing the default hooks and
-setting the configuration variables.  The old name is retained
-for backward compatibility reasons.</p></div>
 </div>
 <h2 id="_template_directory">TEMPLATE DIRECTORY</h2>
 <div class="sectionbody">
@@ -592,7 +605,7 @@ add all existing file to the index
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-03-15 23:30:13 UTC
+Last updated 2011-04-02 04:31:58 UTC
 </div>
 </div>
 </body>
