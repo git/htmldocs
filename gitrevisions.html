@@ -429,215 +429,263 @@ revision parameters which denote other objects than commits, e.g. blobs
 </div>
 <h2 id="_specifying_revisions">SPECIFYING REVISIONS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>A revision parameter typically, but not necessarily, names a
-commit object.  They use what is called an <em>extended SHA1</em>
+<div class="paragraph"><p>A revision parameter <em>&lt;rev&gt;</em> typically, but not necessarily, names a
+commit object.  It uses what is called an <em>extended SHA1</em>
 syntax.  Here are various ways to spell object names.  The
-ones listed near the end of this list are to name trees and
+ones listed near the end of this list name trees and
 blobs contained in a commit.</p></div>
-<div class="ulist"><ul>
-<li>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>&lt;sha1&gt;</em>, e.g. <em>dae86e1950b1277e545cee180551750029cfe735</em>, <em>dae86e</em>
+</dt>
+<dd>
 <p>
-The full SHA1 object name (40-byte hexadecimal string), or
-  a substring of such that is unique within the repository.
+  The full SHA1 object name (40-byte hexadecimal string), or
+  a leading substring that is unique within the repository.
   E.g. dae86e1950b1277e545cee180551750029cfe735 and dae86e both
-  name the same commit object if there are no other object in
+  name the same commit object if there is no other object in
   your repository whose object name starts with dae86e.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;describeOutput&gt;</em>, e.g. <em>v1.7.4.2-679-g3bee7fb</em>
+</dt>
+<dd>
 <p>
-An output from <em>git describe</em>; i.e. a closest tag, optionally
+  Output from <tt>git describe</tt>; i.e. a closest tag, optionally
   followed by a dash and a number of commits, followed by a dash, a
-  <tt>g</tt>, and an abbreviated object name.
+  <em>g</em>, and an abbreviated object name.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;refname&gt;</em>, e.g. <em>master</em>, <em>heads/master</em>, <em>refs/heads/master</em>
+</dt>
+<dd>
 <p>
-A symbolic ref name.  E.g. <em>master</em> typically means the commit
-  object referenced by refs/heads/master.  If you
-  happen to have both heads/master and tags/master, you can
+  A symbolic ref name.  E.g. <em>master</em> typically means the commit
+  object referenced by <em>refs/heads/master</em>.  If you
+  happen to have both <em>heads/master</em> and <em>tags/master</em>, you can
   explicitly say <em>heads/master</em> to tell git which one you mean.
-  When ambiguous, a <tt>&lt;name&gt;</tt> is disambiguated by taking the
+  When ambiguous, a <em>&lt;name&gt;</em> is disambiguated by taking the
   first match in the following rules:
 </p>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-if <tt>$GIT_DIR/&lt;name&gt;</tt> exists, that is what you mean (this is usually
-    useful only for <tt>HEAD</tt>, <tt>FETCH_HEAD</tt>, <tt>ORIG_HEAD</tt>, <tt>MERGE_HEAD</tt>
-    and <tt>CHERRY_PICK_HEAD</tt>);
+If <em>$GIT_DIR/&lt;name&gt;</em> exists, that is what you mean (this is usually
+    useful only for <em>HEAD</em>, <em>FETCH_HEAD</em>, <em>ORIG_HEAD</em>, <em>MERGE_HEAD</em>
+    and <em>CHERRY_PICK_HEAD</em>);
 </p>
 </li>
 <li>
 <p>
-otherwise, <tt>refs/&lt;name&gt;</tt> if exists;
+otherwise, <em>refs/&lt;name&gt;</em> if it exists;
 </p>
 </li>
 <li>
 <p>
-otherwise, <tt>refs/tags/&lt;name&gt;</tt> if exists;
+otherwise, <em>refs/tags/&lt;refname&gt;</em> if it exists;
 </p>
 </li>
 <li>
 <p>
-otherwise, <tt>refs/heads/&lt;name&gt;</tt> if exists;
+otherwise, <em>refs/heads/&lt;name&gt;</em> if it exists;
 </p>
 </li>
 <li>
 <p>
-otherwise, <tt>refs/remotes/&lt;name&gt;</tt> if exists;
+otherwise, <em>refs/remotes/&lt;name&gt;</em> if it exists;
 </p>
 </li>
 <li>
 <p>
-otherwise, <tt>refs/remotes/&lt;name&gt;/HEAD</tt> if exists.
+otherwise, <em>refs/remotes/&lt;name&gt;/HEAD</em> if it exists.
 </p>
-<div class="paragraph"><p>HEAD names the commit your changes in the working tree is based on.
-FETCH_HEAD records the branch you fetched from a remote repository
-with your last <em>git fetch</em> invocation.
-ORIG_HEAD is created by commands that moves your HEAD in a drastic
-way, to record the position of the HEAD before their operation, so that
-you can change the tip of the branch back to the state before you ran
-them easily.
-MERGE_HEAD records the commit(s) you are merging into your branch
-when you run <em>git merge</em>.
-CHERRY_PICK_HEAD records the commit you are cherry-picking
-when you run <em>git cherry-pick</em>.</p></div>
-<div class="paragraph"><p>Note that any of the <tt>refs/*</tt> cases above may come either from
-the <tt>$GIT_DIR/refs</tt> directory or from the <tt>$GIT_DIR/packed-refs</tt> file.</p></div>
+<div class="paragraph"><p><em>HEAD</em> names the commit on which you based the changes in the working tree.
+<em>FETCH_HEAD</em> records the branch which you fetched from a remote repository
+with your last <tt>git fetch</tt> invocation.
+<em>ORIG_HEAD</em> is created by commands that move your <em>HEAD</em> in a drastic
+way, to record the position of the <em>HEAD</em> before their operation, so that
+you can easily change the tip of the branch back to the state before you ran
+them.
+<em>MERGE_HEAD</em> records the commit(s) which you are merging into your branch
+when you run <tt>git merge</tt>.
+<em>CHERRY_PICK_HEAD</em> records the commit which you are cherry-picking
+when you run <tt>git cherry-pick</tt>.</p></div>
+<div class="paragraph"><p>Note that any of the <em>refs/*</em> cases above may come either from
+the <em>$GIT_DIR/refs</em> directory or from the <em>$GIT_DIR/packed-refs</em> file.</p></div>
 </li>
 </ol></div>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;refname&gt;@{&lt;date&gt;}</em>, e.g. <em>master@{yesterday}</em>, <em>HEAD@{5 minutes ago}</em>
+</dt>
+<dd>
 <p>
-A ref followed by the suffix <em>@</em> with a date specification
+  A ref followed by the suffix <em>@</em> with a date specification
   enclosed in a brace
   pair (e.g. <em>{yesterday}</em>, <em>{1 month 2 weeks 3 days 1 hour 1
-  second ago}</em> or <em>{1979-02-26 18:30:00}</em>) to specify the value
+  second ago}</em> or <em>{1979-02-26 18:30:00}</em>) specifies the value
   of the ref at a prior point in time.  This suffix may only be
   used immediately following a ref name and the ref must have an
-  existing log ($GIT_DIR/logs/&lt;ref&gt;). Note that this looks up the state
+  existing log (<em>$GIT_DIR/logs/&lt;ref&gt;</em>). Note that this looks up the state
   of your <strong>local</strong> ref at a given time; e.g., what was in your local
-  <tt>master</tt> branch last week. If you want to look at commits made during
-  certain times, see <tt>--since</tt> and <tt>--until</tt>.
+  <em>master</em> branch last week. If you want to look at commits made during
+  certain times, see <em>--since</em> and <em>--until</em>.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;refname&gt;@{&lt;n&gt;}</em>, e.g. <em>master@{1}</em>
+</dt>
+<dd>
 <p>
-A ref followed by the suffix <em>@</em> with an ordinal specification
-  enclosed in a brace pair (e.g. <em>{1}</em>, <em>{15}</em>) to specify
+  A ref followed by the suffix <em>@</em> with an ordinal specification
+  enclosed in a brace pair (e.g. <em>{1}</em>, <em>{15}</em>) specifies
   the n-th prior value of that ref.  For example <em>master@{1}</em>
   is the immediate prior value of <em>master</em> while <em>master@{5}</em>
   is the 5th prior value of <em>master</em>. This suffix may only be used
   immediately following a ref name and the ref must have an existing
-  log ($GIT_DIR/logs/&lt;ref&gt;).
+  log (<em>$GIT_DIR/logs/&lt;refname&gt;</em>).
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>@{&lt;n&gt;}</em>, e.g. <em>@{1}</em>
+</dt>
+<dd>
 <p>
-You can use the <em>@</em> construct with an empty ref part to get at a
-  reflog of the current branch. For example, if you are on the
-  branch <em>blabla</em>, then <em>@{1}</em> means the same as <em>blabla@{1}</em>.
+  You can use the <em>@</em> construct with an empty ref part to get at a
+  reflog entry of the current branch. For example, if you are on
+  branch <em>blabla</em> then <em>@{1}</em> means the same as <em>blabla@{1}</em>.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>@{-&lt;n&gt;}</em>, e.g. <em>@{-1}</em>
+</dt>
+<dd>
 <p>
-The special construct <em>@{-&lt;n&gt;}</em> means the &lt;n&gt;th branch checked out
+  The construct <em>@{-&lt;n&gt;}</em> means the &lt;n&gt;th branch checked out
   before the current one.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;refname&gt;@{upstream}</em>, e.g. <em>master@{upstream}</em>, <em>@{u}</em>
+</dt>
+<dd>
 <p>
-The suffix <em>@{upstream}</em> to a ref (short form <em>ref@{u}</em>) refers to
-  the branch the ref is set to build on top of.  Missing ref defaults
+  The suffix <em>@{upstream}</em> to a ref (short form <em>&lt;refname&gt;@{u}</em>) refers to
+  the branch the ref is set to build on top of.  A missing ref defaults
   to the current branch.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;</em>, e.g. <em>HEAD&#94;, v1.5.1&#94;0</em>
+</dt>
+<dd>
 <p>
-A suffix <em>&#94;</em> to a revision parameter (e.g. <em>HEAD&#94;</em>) means the first parent of
+  A suffix <em>&#94;</em> to a revision parameter means the first parent of
   that commit object.  <em>&#94;&lt;n&gt;</em> means the &lt;n&gt;th parent (i.e.
-  <em>rev&#94;</em>
-  is equivalent to <em>rev&#94;1</em>).  As a special rule,
-  <em>rev&#94;0</em> means the commit itself and is used when <em>rev</em> is the
+  <em>&lt;rev&gt;&#94;</em>
+  is equivalent to <em>&lt;rev&gt;&#94;1</em>).  As a special rule,
+  <em>&lt;rev&gt;&#94;0</em> means the commit itself and is used when <em>&lt;rev&gt;</em> is the
   object name of a tag object that refers to a commit object.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#126;&lt;n&gt;</em>, e.g. <em>master&#126;3</em>
+</dt>
+<dd>
 <p>
-A suffix <em>&#126;&lt;n&gt;</em> to a revision parameter means the commit
+  A suffix <em>&#126;&lt;n&gt;</em> to a revision parameter means the commit
   object that is the &lt;n&gt;th generation grand-parent of the named
-  commit object, following only the first parent.  I.e. rev~3 is
-  equivalent to rev&#94;&#94;&#94; which is equivalent to
-  rev&#94;1&#94;1&#94;1.  See below for a illustration of
+  commit object, following only the first parents.  I.e. <em>&lt;rev&gt;&#126;3</em> is
+  equivalent to <em>&lt;rev&gt;&#94;&#94;&#94;</em> which is equivalent to
+  <em>&lt;rev&gt;&#94;1&#94;1&#94;1</em>.  See below for an illustration of
   the usage of this form.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;{&lt;type&gt;}</em>, e.g. <em>v0.99.8&#94;{commit}</em>
+</dt>
+<dd>
 <p>
-A suffix <em>&#94;</em> followed by an object type name enclosed in
-  brace pair (e.g. <tt>v0.99.8&#94;{commit}</tt>) means the object
+  A suffix <em>&#94;</em> followed by an object type name enclosed in
+  brace pair means the object
   could be a tag, and dereference the tag recursively until an
   object of that type is found or the object cannot be
-  dereferenced anymore (in which case, barf).  <tt>rev&#94;0</tt>
-  introduced earlier is a short-hand for <tt>rev&#94;{commit}</tt>.
+  dereferenced anymore (in which case, barf).  <em>&lt;rev&gt;&#94;0</em>
+  is a short-hand for <em>&lt;rev&gt;&#94;{commit}</em>.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;{}</em>, e.g. <em>v0.99.8&#94;{}</em>
+</dt>
+<dd>
 <p>
-A suffix <em>&#94;</em> followed by an empty brace pair
-  (e.g. <tt>v0.99.8&#94;{}</tt>) means the object could be a tag,
+  A suffix <em>&#94;</em> followed by an empty brace pair
+  means the object could be a tag,
   and dereference the tag recursively until a non-tag object is
   found.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;{/&lt;text&gt;}</em>, e.g. <em>HEAD^{/fix nasty bug}</em>
+</dt>
+<dd>
 <p>
-A suffix <em>&#94;</em> to a revision parameter followed by a brace
-  pair that contains a text led by a slash (e.g. <tt>HEAD^{/fix nasty bug}</tt>):
-  this is the same as <tt>:/fix nasty bug</tt> syntax below except that
+  A suffix <em>&#94;</em> to a revision parameter, followed by a brace
+  pair that contains a text led by a slash,
+  is the same as the <em>:/fix nasty bug</em> syntax below except that
   it returns the youngest matching commit which is reachable from
-  the ref before <em>&#94;</em>.
+  the <em>&lt;rev&gt;</em> before <em>&#94;</em>.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>:/&lt;text&gt;</em>, e.g. <em>:/fix nasty bug</em>
+</dt>
+<dd>
 <p>
-A colon, followed by a slash, followed by a text (e.g. <tt>:/fix nasty bug</tt>): this names
+  A colon, followed by a slash, followed by a text, names
   a commit whose commit message matches the specified regular expression.
   This name returns the youngest matching commit which is
   reachable from any ref.  If the commit message starts with a
-  <em>!</em>, you have to repeat that;  the special sequence <em>:/!</em>,
-  followed by something else than <em>!</em> is reserved for now.
+  <em>!</em> you have to repeat that;  the special sequence <em>:/!</em>,
+  followed by something else than <em>!</em>, is reserved for now.
   The regular expression can match any part of the commit message. To
-  match messages starting with a string, one can use e.g. <tt>:/^foo</tt>.
+  match messages starting with a string, one can use e.g. <em>:/^foo</em>.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;:&lt;path&gt;</em>, e.g. <em>HEAD:README</em>, <em>:README</em>, <em>master:./README</em>
+</dt>
+<dd>
 <p>
-A suffix <em>:</em> followed by a path (e.g. <tt>HEAD:README</tt>); this names the blob or tree
+  A suffix <em>:</em> followed by a path names the blob or tree
   at the given path in the tree-ish object named by the part
   before the colon.
-  <em>:path</em> (with an empty part before the colon, e.g. <tt>:README</tt>)
+  <em>:path</em> (with an empty part before the colon)
   is a special case of the syntax described next: content
   recorded in the index at the given path.
-  A path starting with <em>./</em> or <em>../</em> is relative to current working directory.
-  The given path will be converted to be relative to working tree&#8217;s root directory.
+  A path starting with <em>./</em> or <em>../</em> is relative to the current working directory.
+  The given path will be converted to be relative to the working tree&#8217;s root directory.
   This is most useful to address a blob or tree from a commit or tree that has
-  the same tree structure with the working tree.
+  the same tree structure as the working tree.
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+<em>:&lt;n&gt;:&lt;path&gt;</em>, e.g. <em>:0:README</em>, <em>:README</em>
+</dt>
+<dd>
 <p>
-A colon, optionally followed by a stage number (0 to 3) and a
-  colon, followed by a path (e.g. <tt>:0:README</tt>); this names a blob object in the
-  index at the given path. Missing stage number (and the colon
-  that follows it, e.g. <tt>:README</tt>) names a stage 0 entry. During a merge, stage
+  A colon, optionally followed by a stage number (0 to 3) and a
+  colon, followed by a path, names a blob object in the
+  index at the given path. A missing stage number (and the colon
+  that follows it) names a stage 0 entry. During a merge, stage
   1 is the common ancestor, stage 2 is the target branch&#8217;s version
   (typically the current branch), and stage 3 is the version from
-  the branch being merged.
+  the branch which is being merged.
 </p>
-</li>
-</ul></div>
+</dd>
+</dl></div>
 <div class="paragraph"><p>Here is an illustration, by Jon Loeliger.  Both commit nodes B
 and C are parents of commit node A.  Parent commits are ordered
 left-to-right.</p></div>
@@ -670,27 +718,27 @@ J = F^2  = B^3^2   = A^^3^2</tt></pre>
 </div>
 <h2 id="_specifying_ranges">SPECIFYING RANGES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>History traversing commands such as <em>git log</em> operate on a set
+<div class="paragraph"><p>History traversing commands such as <tt>git log</tt> operate on a set
 of commits, not just a single commit.  To these commands,
 specifying a single revision with the notation described in the
 previous section means the set of commits reachable from that
 commit, following the commit ancestry chain.</p></div>
-<div class="paragraph"><p>To exclude commits reachable from a commit, a prefix <tt>&#94;</tt>
-notation is used.  E.g. <tt>&#94;r1 r2</tt> means commits reachable
-from <tt>r2</tt> but exclude the ones reachable from <tt>r1</tt>.</p></div>
+<div class="paragraph"><p>To exclude commits reachable from a commit, a prefix <em>&#94;</em>
+notation is used.  E.g. <em>&#94;r1 r2</em> means commits reachable
+from <em>r2</em> but exclude the ones reachable from <em>r1</em>.</p></div>
 <div class="paragraph"><p>This set operation appears so often that there is a shorthand
-for it.  When you have two commits <tt>r1</tt> and <tt>r2</tt> (named according
+for it.  When you have two commits <em>r1</em> and <em>r2</em> (named according
 to the syntax explained in SPECIFYING REVISIONS above), you can ask
 for commits that are reachable from r2 excluding those that are reachable
-from r1 by <tt>&#94;r1 r2</tt> and it can be written as <tt>r1..r2</tt>.</p></div>
-<div class="paragraph"><p>A similar notation <tt>r1...r2</tt> is called symmetric difference
-of <tt>r1</tt> and <tt>r2</tt> and is defined as
-<tt>r1 r2 --not $(git merge-base --all r1 r2)</tt>.
+from r1 by <em>&#94;r1 r2</em> and it can be written as <em>r1..r2</em>.</p></div>
+<div class="paragraph"><p>A similar notation <em>r1...r2</em> is called symmetric difference
+of <em>r1</em> and <em>r2</em> and is defined as
+<em>r1 r2 --not $(git merge-base --all r1 r2)</em>.
 It is the set of commits that are reachable from either one of
-<tt>r1</tt> or <tt>r2</tt> but not from both.</p></div>
+<em>r1</em> or <em>r2</em> but not from both.</p></div>
 <div class="paragraph"><p>Two other shorthands for naming a set that is formed by a commit
-and its parent commits exist.  The <tt>r1&#94;@</tt> notation means all
-parents of <tt>r1</tt>.  <tt>r1&#94;!</tt> includes commit <tt>r1</tt> but excludes
+and its parent commits exist.  The <em>r1&#94;@</em> notation means all
+parents of <em>r1</em>.  <em>r1&#94;!</em> includes commit <em>r1</em> but excludes
 all of its parents.</p></div>
 <div class="paragraph"><p>Here are a handful of examples:</p></div>
 <div class="literalblock">
