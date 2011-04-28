@@ -72,6 +72,10 @@ endif::git-format-patch[]
 	a cut-off percent (3% by default) are not shown. The cut-off percent
 	can be set with `--dirstat=<limit>`. Changes in a child directory are not
 	counted for the parent directory, unless `--cumulative` is used.
++
+Note that the `--dirstat` option computes the changes while ignoring
+the amount of pure code movements within a file.  In other words,
+rearranging lines in a file is not counted as much as other changes.
 
 --dirstat-by-file[=<limit>]::
 	Same as `--dirstat`, but counts changed files instead of lines.
@@ -258,6 +262,19 @@ endif::git-log[]
 	copy.  This is a very expensive operation for large
 	projects, so use it with caution.  Giving more than one
 	`-C` option has the same effect.
+
+-D::
+--irreversible-delete::
+	Omit the preimage for deletes, i.e. print only the header but not
+	the diff between the preimage and `/dev/null`. The resulting patch
+	is not meant to be applied with `patch` nor `git apply`; this is
+	solely for people who want to just concentrate on reviewing the
+	text after the change. In addition, the output obviously lack
+	enough information to apply such a patch in reverse, even manually,
+	hence the name of the option.
++
+When used together with `-B`, omit also the preimage in the deletion part
+of a delete/create pair.
 
 -l<num>::
 	The `-M` and `-C` options require O(n^2) processing time where n
