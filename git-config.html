@@ -1695,7 +1695,9 @@ it will be treated as a shell command.  For example, defining
 "git new" is equivalent to running the shell command
 "gitk --all --not ORIG_HEAD".  Note that shell commands will be
 executed from the top-level directory of a repository, which may
-not necessarily be the current directory.</p></div>
+not necessarily be the current directory.
+<em>GIT_PREFIX</em> is set as returned by running <em>git rev-parse --show-prefix</em>
+from the original current directory. See <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p></div>
 </dd>
 <dt class="hdlist1">
 am.keepcr
@@ -1887,10 +1889,16 @@ color.diff
 </dt>
 <dd>
 <p>
-        When set to <tt>always</tt>, always use colors in patch.
-        When false (or <tt>never</tt>), never.  When set to <tt>true</tt> or <tt>auto</tt>, use
-        colors only when the output is to the terminal. Defaults to false.
+        Whether to use ANSI escape sequences to add color to patches.
+        If this is set to <tt>always</tt>, <a href="git-diff.html">git-diff(1)</a>,
+        <a href="git-log.html">git-log(1)</a>, and <a href="git-show.html">git-show(1)</a> will use color
+        for all patches.  If it is set to <tt>true</tt> or <tt>auto</tt>, those
+        commands will only use color when output is to the terminal.
+        Defaults to false.
 </p>
+<div class="paragraph"><p>This does not affect <a href="git-format-patch.html">git-format-patch(1)</a> nor the
+<em>git-diff-&#42;</em> plumbing commands.  Can be overridden on the
+command line with the <tt>--color[=&lt;when&gt;]</tt> option.</p></div>
 </dd>
 <dt class="hdlist1">
 color.diff.&lt;slot&gt;
@@ -2070,11 +2078,15 @@ color.ui
 </dt>
 <dd>
 <p>
-        When set to <tt>always</tt>, always use colors in all git commands which
-        are capable of colored output. When false (or <tt>never</tt>), never. When
-        set to <tt>true</tt> or <tt>auto</tt>, use colors only when the output is to the
-        terminal. When more specific variables of color.* are set, they always
-        take precedence over this setting. Defaults to false.
+        This variable determines the default value for variables such
+        as <tt>color.diff</tt> and <tt>color.grep</tt> that control the use of color
+        per command family. Its scope will expand as more commands learn
+        configuration to set a default for the <tt>--color</tt> option.  Set it
+        to <tt>always</tt> if you want all output not intended for machine
+        consumption to use color, to <tt>true</tt> or <tt>auto</tt> if you want such
+        output to use color when written to the terminal, or to <tt>false</tt> or
+        <tt>never</tt> if you prefer git commands not to use color unless enabled
+        explicitly with some other configuration or the <tt>--color</tt> option.
 </p>
 </dd>
 <dt class="hdlist1">
