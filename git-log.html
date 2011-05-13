@@ -2085,27 +2085,81 @@ $ git log -2 --pretty=%h 4da45bef</tt></pre>
 </p>
 </dd>
 <dt class="hdlist1">
---dirstat[=&lt;limit&gt;]
+--dirstat[=&lt;param1,param2,&#8230;&gt;]
 </dt>
 <dd>
 <p>
-        Output the distribution of relative amount of changes (number of lines added or
-        removed) for each sub-directory. Directories with changes below
-        a cut-off percent (3% by default) are not shown. The cut-off percent
-        can be set with <tt>--dirstat=&lt;limit&gt;</tt>. Changes in a child directory are not
-        counted for the parent directory, unless <tt>--cumulative</tt> is used.
+        Output the distribution of relative amount of changes for each
+        sub-directory. The behavior of <tt>--dirstat</tt> can be customized by
+        passing it a comma separated list of parameters.
+        The defaults are controlled by the <tt>diff.dirstat</tt> configuration
+        variable (see <a href="git-config.html">git-config(1)</a>).
+        The following parameters are available:
 </p>
-<div class="paragraph"><p>Note that the <tt>--dirstat</tt> option computes the changes while ignoring
-the amount of pure code movements within a file.  In other words,
-rearranging lines in a file is not counted as much as other changes.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<tt>changes</tt>
+</dt>
+<dd>
+<p>
+        Compute the dirstat numbers by counting the lines that have been
+        removed from the source, or added to the destination. This ignores
+        the amount of pure code movements within a file.  In other words,
+        rearranging lines in a file is not counted as much as other changes.
+        This is the default behavior when no parameter is given.
+</p>
 </dd>
 <dt class="hdlist1">
---dirstat-by-file[=&lt;limit&gt;]
+<tt>lines</tt>
 </dt>
 <dd>
 <p>
-        Same as <tt>--dirstat</tt>, but counts changed files instead of lines.
+        Compute the dirstat numbers by doing the regular line-based diff
+        analysis, and summing the removed/added line counts. (For binary
+        files, count 64-byte chunks instead, since binary files have no
+        natural concept of lines). This is a more expensive <tt>--dirstat</tt>
+        behavior than the <tt>changes</tt> behavior, but it does count rearranged
+        lines within a file as much as other changes. The resulting output
+        is consistent with what you get from the other <tt>--*stat</tt> options.
 </p>
+</dd>
+<dt class="hdlist1">
+<tt>files</tt>
+</dt>
+<dd>
+<p>
+        Compute the dirstat numbers by counting the number of files changed.
+        Each changed file counts equally in the dirstat analysis. This is
+        the computationally cheapest <tt>--dirstat</tt> behavior, since it does
+        not have to look at the file contents at all.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>cumulative</tt>
+</dt>
+<dd>
+<p>
+        Count changes in a child directory for the parent directory as well.
+        Note that when using <tt>cumulative</tt>, the sum of the percentages
+        reported may exceed 100%. The default (non-cumulative) behavior can
+        be specified with the <tt>noncumulative</tt> parameter.
+</p>
+</dd>
+<dt class="hdlist1">
+&lt;limit&gt;
+</dt>
+<dd>
+<p>
+        An integer parameter specifies a cut-off percent (3% by default).
+        Directories contributing less than this percentage of the changes
+        are not shown in the output.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Example: The following will count changed files, while ignoring
+directories with less than 10% of the total amount of changed files,
+and accumulating child directory counts in the parent directories:
+<tt>--dirstat=files,10,cumulative</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --summary
