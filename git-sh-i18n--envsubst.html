@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.4.5" />
-<title>git-annotate(1)</title>
+<title>git-sh-i18n&#8212;envsubst(1)</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -403,250 +403,27 @@ div#toc a:visited { color: blue; }
 <body>
 <div id="header">
 <h1>
-git-annotate(1) Manual Page
+git-sh-i18n&#8212;envsubst(1) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-annotate -
-   Annotate file lines with commit information
+<p>git-sh-i18n--envsubst -
+   Git's own envsubst(1) for i18n fallbacks
 </p>
 </div>
-</div>
-<h2 id="_synopsis">SYNOPSIS</h2>
-<div class="sectionbody">
-<div class="paragraph"><p><em>git annotate</em> [options] file [revision]</p></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Annotates each line in the given file with information from the commit
-which introduced the line. Optionally annotates from a given revision.</p></div>
-<div class="paragraph"><p>The only difference between this command and <a href="git-blame.html">git-blame(1)</a> is that
-they use slightly different output formats, and this command exists only
-for backward compatibility to support existing scripts, and provide a more
-familiar command name for people coming from other SCM systems.</p></div>
-</div>
-<h2 id="_options">OPTIONS</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
--b
-</dt>
-<dd>
-<p>
-        Show blank SHA-1 for boundary commits.  This can also
-        be controlled via the <tt>blame.blankboundary</tt> config option.
-</p>
-</dd>
-<dt class="hdlist1">
---root
-</dt>
-<dd>
-<p>
-        Do not treat root commits as boundaries.  This can also be
-        controlled via the <tt>blame.showroot</tt> config option.
-</p>
-</dd>
-<dt class="hdlist1">
---show-stats
-</dt>
-<dd>
-<p>
-        Include additional statistics at the end of blame output.
-</p>
-</dd>
-<dt class="hdlist1">
--L &lt;start&gt;,&lt;end&gt;
-</dt>
-<dd>
-<p>
-        Annotate only the given line range.  &lt;start&gt; and &lt;end&gt; can take
-        one of these forms:
-</p>
-<div class="ulist"><ul>
-<li>
-<p>
-number
-</p>
-<div class="paragraph"><p>If &lt;start&gt; or &lt;end&gt; is a number, it specifies an
-absolute line number (lines count from 1).</p></div>
-</li>
-<li>
-<p>
-/regex/
-</p>
-<div class="paragraph"><p>This form will use the first line matching the given
-POSIX regex.  If &lt;end&gt; is a regex, it will search
-starting at the line given by &lt;start&gt;.</p></div>
-</li>
-<li>
-<p>
-+offset or -offset
-</p>
-<div class="paragraph"><p>This is only valid for &lt;end&gt; and will specify a number
-of lines before or after the line given by &lt;start&gt;.</p></div>
-</li>
-</ul></div>
-</dd>
-<dt class="hdlist1">
--l
-</dt>
-<dd>
-<p>
-        Show long rev (Default: off).
-</p>
-</dd>
-<dt class="hdlist1">
--t
-</dt>
-<dd>
-<p>
-        Show raw timestamp (Default: off).
-</p>
-</dd>
-<dt class="hdlist1">
--S &lt;revs-file&gt;
-</dt>
-<dd>
-<p>
-        Use revisions from revs-file instead of calling <a href="git-rev-list.html">git-rev-list(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
---reverse
-</dt>
-<dd>
-<p>
-        Walk history forward instead of backward. Instead of showing
-        the revision in which a line appeared, this shows the last
-        revision in which a line has existed. This requires a range of
-        revision like START..END where the path to blame exists in
-        START.
-</p>
-</dd>
-<dt class="hdlist1">
--p
-</dt>
-<dt class="hdlist1">
---porcelain
-</dt>
-<dd>
-<p>
-        Show in a format designed for machine consumption.
-</p>
-</dd>
-<dt class="hdlist1">
---line-porcelain
-</dt>
-<dd>
-<p>
-        Show the porcelain format, but output commit information for
-        each line, not just the first time a commit is referenced.
-        Implies --porcelain.
-</p>
-</dd>
-<dt class="hdlist1">
---incremental
-</dt>
-<dd>
-<p>
-        Show the result incrementally in a format designed for
-        machine consumption.
-</p>
-</dd>
-<dt class="hdlist1">
---encoding=&lt;encoding&gt;
-</dt>
-<dd>
-<p>
-        Specifies the encoding used to output author names
-        and commit summaries. Setting it to <tt>none</tt> makes blame
-        output unconverted data. For more information see the
-        discussion about encoding in the <a href="git-log.html">git-log(1)</a>
-        manual page.
-</p>
-</dd>
-<dt class="hdlist1">
---contents &lt;file&gt;
-</dt>
-<dd>
-<p>
-        When &lt;rev&gt; is not specified, the command annotates the
-        changes starting backwards from the working tree copy.
-        This flag makes the command pretend as if the working
-        tree copy has the contents of the named file (specify
-        <tt>-</tt> to make the command read from the standard input).
-</p>
-</dd>
-<dt class="hdlist1">
---date &lt;format&gt;
-</dt>
-<dd>
-<p>
-        The value is one of the following alternatives:
-        {relative,local,default,iso,rfc,short}. If --date is not
-        provided, the value of the blame.date config variable is
-        used. If the blame.date config variable is also not set, the
-        iso format is used. For more information, See the discussion
-        of the --date option at <a href="git-log.html">git-log(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
--M|&lt;num&gt;|
-</dt>
-<dd>
-<p>
-        Detect moved or copied lines within a file. When a commit
-        moves or copies a block of lines (e.g. the original file
-        has A and then B, and the commit changes it to B and then
-        A), the traditional <em>blame</em> algorithm notices only half of
-        the movement and typically blames the lines that were moved
-        up (i.e. B) to the parent and assigns blame to the lines that
-        were moved down (i.e. A) to the child commit.  With this
-        option, both groups of lines are blamed on the parent by
-        running extra passes of inspection.
-</p>
-<div class="paragraph"><p>&lt;num&gt; is optional but it is the lower bound on the number of
-alphanumeric characters that git must detect as moving/copying
-within a file for it to associate those lines with the parent
-commit. The default value is 20.</p></div>
-</dd>
-<dt class="hdlist1">
--C|&lt;num&gt;|
-</dt>
-<dd>
-<p>
-        In addition to <tt>-M</tt>, detect lines moved or copied from other
-        files that were modified in the same commit.  This is
-        useful when you reorganize your program and move code
-        around across files.  When this option is given twice,
-        the command additionally looks for copies from other
-        files in the commit that creates the file. When this
-        option is given three times, the command additionally
-        looks for copies from other files in any commit.
-</p>
-<div class="paragraph"><p>&lt;num&gt; is optional but it is the lower bound on the number of
-alphanumeric characters that git must detect as moving/copying
-between files for it to associate those lines with the parent
-commit. And the default value is 40. If there are more than one
-<tt>-C</tt> options given, the &lt;num&gt; argument of the last <tt>-C</tt> will
-take effect.</p></div>
-</dd>
-<dt class="hdlist1">
--h
-</dt>
-<dt class="hdlist1">
---help
-</dt>
-<dd>
-<p>
-        Show help message.
-</p>
-</dd>
-</dl></div>
-</div>
-<h2 id="_see_also">SEE ALSO</h2>
-<div class="sectionbody">
-<div class="paragraph"><p><a href="git-blame.html">git-blame(1)</a></p></div>
+<div class="paragraph"><p>This is not a command the end user would want to run.  Ever.
+This documentation is meant for people who are studying the
+plumbing scripts and/or are writing new ones.</p></div>
+<div class="paragraph"><p>git-sh-i18n&#8212;envsubst is Git&#8217;s stripped-down copy of the GNU
+<tt>envsubst(1)</tt> program that comes with the GNU gettext package. It&#8217;s
+used internally by <a href="git-sh-i18n.html">git-sh-i18n(1)</a> to interpolate the variables
+passed to the the <tt>eval_gettext</tt> function.</p></div>
+<div class="paragraph"><p>No promises are made about the interface, or that this
+program won&#8217;t disappear without warning in the next version
+of Git. Don&#8217;t use it.</p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -654,7 +431,7 @@ take effect.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-03-15 23:30:13 UTC
+Last updated 2011-05-23 23:05:02 UTC
 </div>
 </div>
 </body>
