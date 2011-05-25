@@ -1034,6 +1034,42 @@ cache manually (e.g., because your version of "exif" was updated
 and now produces better output), you can remove the cache
 manually with <tt>git update-ref -d refs/notes/textconv/jpg</tt> (where
 "jpg" is the name of the diff driver, as in the example above).</p></div>
+<h4 id="_choosing_textconv_versus_external_diff">Choosing textconv versus external diff</h4>
+<div class="paragraph"><p>If you want to show differences between binary or specially-formatted
+blobs in your repository, you can choose to use either an external diff
+command, or to use textconv to convert them to a diff-able text format.
+Which method you choose depends on your exact situation.</p></div>
+<div class="paragraph"><p>The advantage of using an external diff command is flexibility. You are
+not bound to find line-oriented changes, nor is it necessary for the
+output to resemble unified diff. You are free to locate and report
+changes in the most appropriate way for your data format.</p></div>
+<div class="paragraph"><p>A textconv, by comparison, is much more limiting. You provide a
+transformation of the data into a line-oriented text format, and git
+uses its regular diff tools to generate the output. There are several
+advantages to choosing this method:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Ease of use. It is often much simpler to write a binary to text
+   transformation than it is to perform your own diff. In many cases,
+   existing programs can be used as textconv filters (e.g., exif,
+   odt2txt).
+</p>
+</li>
+<li>
+<p>
+Git diff features. By performing only the transformation step
+   yourself, you can still utilize many of git&#8217;s diff features,
+   including colorization, word-diff, and combined diffs for merges.
+</p>
+</li>
+<li>
+<p>
+Caching. Textconv caching can speed up repeated diffs, such as those
+   you might trigger by running <tt>git log -p</tt>.
+</p>
+</li>
+</ol></div>
 <h4 id="_marking_files_as_binary">Marking files as binary</h4>
 <div class="paragraph"><p>Git usually guesses correctly whether a blob contains text or binary
 data by examining the beginning of the contents. However, sometimes you
@@ -1362,7 +1398,7 @@ frotz   unspecified</tt></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-03-19 01:35:18 UTC
+Last updated 2011-05-25 23:59:09 UTC
 </div>
 </div>
 </body>
