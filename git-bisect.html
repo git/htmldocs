@@ -426,7 +426,7 @@ on the subcommand:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><tt>git bisect help
-git bisect start [&lt;bad&gt; [&lt;good&gt;...]] [--] [&lt;paths&gt;...]
+git bisect start [--no-checkout] [&lt;bad&gt; [&lt;good&gt;...]] [--] [&lt;paths&gt;...]
 git bisect bad [&lt;rev&gt;]
 git bisect good [&lt;rev&gt;...]
 git bisect skip [(&lt;rev&gt;|&lt;range&gt;)...]
@@ -620,6 +620,22 @@ rewind the tree to the pristine state.  Finally the script should exit
 with the status of the real test to let the "git bisect run" command loop
 determine the eventual outcome of the bisect session.</p></div>
 </div>
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--no-checkout
+</dt>
+<dd>
+<div class="paragraph"><p>Do not checkout the new working tree at each iteration of the bisection
+process. Instead just update a special reference named <em>BISECT_HEAD</em> to make
+it point to the commit that should be tested.</p></div>
+<div class="paragraph"><p>This option may be useful when the test you would perform in each step
+does not require a checked out tree.</p></div>
+<div class="paragraph"><p>If the repository is bare, <tt>--no-checkout</tt> is assumed.</p></div>
+</dd>
+</dl></div>
+</div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
@@ -711,6 +727,25 @@ $ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"</tt></pre>
 <div class="paragraph"><p>This shows that you can do without a run script if you write the test
 on a single line.</p></div>
 </li>
+<li>
+<p>
+Locate a good region of the object graph in a damaged repository
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git bisect start HEAD &lt;known-good-commit&gt; [ &lt;boundary-commit&gt; ... ] --no-checkout
+$ git bisect run sh -c '
+        GOOD=$(git for-each-ref "--format=%(objectname)" refs/bisect/good-*) &amp;&amp;
+        git rev-list --objects BISECT_HEAD --not $GOOD &gt;tmp.$$ &amp;&amp;
+        git pack-objects --stdout &gt;/dev/null &lt;tmp.$$
+        rc=$?
+        rm -f tmp.$$
+        test $rc = 0'</tt></pre>
+</div></div>
+<div class="paragraph"><p>In this case, when <em>git bisect run</em> finishes, bisect/bad will refer to a commit that
+has at least one parent whose reachable graph is fully traversable in the sense
+required by <em>git pack objects</em>.</p></div>
+</li>
 </ul></div>
 </div>
 <h2 id="_see_also">SEE ALSO</h2>
@@ -724,7 +759,7 @@ on a single line.</p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-07-23 00:49:30 UTC
+Last updated 2011-08-18 06:09:28 UTC
 </div>
 </div>
 </body>
