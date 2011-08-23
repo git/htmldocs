@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.4.5" />
-<title>GIT API Documents</title>
+<title>ref iteration API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -384,145 +384,121 @@ div#toc a:visited { color: blue; }
 </head>
 <body>
 <div id="header">
-<h1>GIT API Documents</h1>
+<h1>ref iteration API</h1>
 </div>
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>GIT has grown a set of internal API over time.  This collection
-documents them.</p></div>
+<div class="paragraph"><p>Iteration of refs is done by using an iterate function which will call a
+callback function for every ref. The callback function has this
+signature:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>int handle_one_ref(const char *refname, const unsigned char *sha1,
+                   int flags, void *cb_data);</tt></pre>
+</div></div>
+<div class="paragraph"><p>There are different kinds of iterate functions which all take a
+callback of this type. The callback is then called for each found ref
+until the callback returns nonzero. The returned value is then also
+returned by the iterate function.</p></div>
+</div>
+</div>
+<h2 id="_iteration_functions">Iteration functions</h2>
+<div class="sectionbody">
 <div class="ulist"><ul>
 <li>
 <p>
-<a href="api-allocation-growing.html">allocation growing API</a>
+<tt>head_ref()</tt> just iterates the head ref.
 </p>
 </li>
 <li>
 <p>
-<a href="api-builtin.html">builtin API</a>
+<tt>for_each_ref()</tt> iterates all refs.
 </p>
 </li>
 <li>
 <p>
-<a href="api-decorate.html">decorate API</a>
+<tt>for_each_ref_in()</tt> iterates all refs which have a defined prefix and
+  strips that prefix from the passed variable refname.
 </p>
 </li>
 <li>
 <p>
-<a href="api-diff.html">diff API</a>
+<tt>for_each_tag_ref()</tt>, <tt>for_each_branch_ref()</tt>, <tt>for_each_remote_ref()</tt>,
+  <tt>for_each_replace_ref()</tt> iterate refs from the respective area.
 </p>
 </li>
 <li>
 <p>
-<a href="api-directory-listing.html">directory listing API</a>
+<tt>for_each_glob_ref()</tt> iterates all refs that match the specified glob
+  pattern.
 </p>
 </li>
 <li>
 <p>
-<a href="api-gitattributes.html">gitattributes API</a>
+<tt>for_each_glob_ref_in()</tt> the previous and <tt>for_each_ref_in()</tt> combined.
 </p>
 </li>
 <li>
 <p>
-<a href="api-grep.html">grep API</a>
+<tt>head_ref_submodule()</tt>, <tt>for_each_ref_submodule()</tt>,
+  <tt>for_each_ref_in_submodule()</tt>, <tt>for_each_tag_ref_submodule()</tt>,
+  <tt>for_each_branch_ref_submodule()</tt>, <tt>for_each_remote_ref_submodule()</tt>
+  do the same as the functions descibed above but for a specified
+  submodule.
 </p>
 </li>
 <li>
 <p>
-<a href="api-hash.html">hash API</a>
+<tt>for_each_rawref()</tt> can be used to learn about broken ref and symref.
 </p>
 </li>
 <li>
 <p>
-<a href="api-history-graph.html">history graph API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-in-core-index.html">in-core index API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-lockfile.html">lockfile API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-merge.html">merge API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-object-access.html">object access API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-parse-options.html">parse-options API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-quote.html">quote API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-ref-iteration.html">ref iteration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-remote.html">Remotes configuration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-revision-walking.html">revision walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-run-command.html">run-command API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-setup.html">setup API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-sigchain.html">sigchain API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-strbuf.html">strbuf API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-string-list.html">string-list API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-tree-walking.html">tree walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-xdiff-interface.html">xdiff interface API</a>
+<tt>for_each_reflog()</tt> iterates each reflog file.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>2007-11-24</p></div>
 </div>
+<h2 id="_submodules">Submodules</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If you want to iterate the refs of a submodule you first need to add the
+submodules object database. You can do this by a code-snippet like
+this:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>const char *path = "path/to/submodule"
+if (!add_submodule_odb(path))
+        die("Error submodule '%s' not populated.", path);</tt></pre>
+</div></div>
+<div class="paragraph"><p><tt>add_submodule_odb()</tt> will return an non-zero value on success. If you
+do not do this you will get an error for each ref that it does not point
+to a valid object.</p></div>
+<div class="paragraph"><p>Note: As a side-effect of this you can not safely assume that all
+objects you lookup are available in superproject. All submodule objects
+will be available the same way as the superprojects objects.</p></div>
+</div>
+<h2 id="_example">Example:</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="content">
+<pre><tt>static int handle_remote_ref(const char *refname,
+                const unsigned char *sha1, int flags, void *cb_data)
+{
+        struct strbuf *output = cb_data;
+        strbuf_addf(output, "%s\n", refname);
+        return 0;
+}
+
+...
+
+        struct strbuf output = STRBUF_INIT;
+        for_each_remote_ref(handle_remote_ref, &amp;output);
+        printf("%s", output.buf);</tt></pre>
+</div></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-08-23 18:10:07 UTC
+Last updated 2011-08-23 18:10:04 UTC
 </div>
 </div>
 </body>
