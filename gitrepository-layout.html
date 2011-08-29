@@ -433,35 +433,24 @@ objects
         Object store associated with this repository.  Usually
         an object store is self sufficient (i.e. all the objects
         that are referred to by an object found in it are also
-        found in it), but there are couple of ways to violate
-        it.
+        found in it), but there are a few ways to violate it.
 </p>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-You could populate the repository by running a commit walker
-without <tt>-a</tt> option.  Depending on which options are given, you
-could have only commit objects without associated blobs and
-trees this way, for example.  A repository with this kind of
-incomplete object store is not suitable to be published to the
-outside world but sometimes useful for private repository.
+You could have an incomplete but locally usable repository
+by creating a shallow clone.  See <a href="git-clone.html">git-clone(1)</a>.
 </p>
 </li>
 <li>
 <p>
-You also could have an incomplete but locally usable repository
-by cloning shallowly.  See <a href="git-clone.html">git-clone(1)</a>.
-</p>
-</li>
-<li>
-<p>
-You can be using <tt>objects/info/alternates</tt> mechanism, or
-<tt>$GIT_ALTERNATE_OBJECT_DIRECTORIES</tt> mechanism to <em>borrow</em>
+You could be using the <tt>objects/info/alternates</tt> or
+<tt>$GIT_ALTERNATE_OBJECT_DIRECTORIES</tt> mechanisms to <em>borrow</em>
 objects from other object stores.  A repository with this kind
 of incomplete object store is not suitable to be published for
 use with dumb transports but otherwise is OK as long as
-<tt>objects/info/alternates</tt> points at the right object stores
-it borrows from.
+<tt>objects/info/alternates</tt> points at the object stores it
+borrows from.
 </p>
 </li>
 </ol></div>
@@ -471,12 +460,12 @@ objects/[0-9a-f][0-9a-f]
 </dt>
 <dd>
 <p>
-        Traditionally, each object is stored in its own file.
-        They are split into 256 subdirectories using the first
-        two letters from its object name to keep the number of
-        directory entries <tt>objects</tt> directory itself needs to
-        hold.  Objects found here are often called <em>unpacked</em>
-        (or <em>loose</em>) objects.
+        A newly created object is stored in its own file.
+        The objects are splayed over 256 subdirectories using
+        the first two characters of the sha1 object name to
+        keep the number of directory entries in <tt>objects</tt>
+        itself to a manageable number. Objects found
+        here are often called <em>unpacked</em> (or <em>loose</em>) objects.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -543,7 +532,7 @@ refs
 <dd>
 <p>
         References are stored in subdirectories of this
-        directory.  The <em>git prune</em> command knows to keep
+        directory.  The <em>git prune</em> command knows to preserve
         objects reachable from refs found in this directory and
         its subdirectories.
 </p>
@@ -602,9 +591,8 @@ HEAD
 </p>
 <div class="paragraph"><p>HEAD can also record a specific commit directly, instead of
 being a symref to point at the current branch.  Such a state
-is often called <em>detached HEAD</em>, and almost all commands work
-identically as normal.  See <a href="git-checkout.html">git-checkout(1)</a> for
-details.</p></div>
+is often called <em>detached HEAD.</em>  See <a href="git-checkout.html">git-checkout(1)</a>
+for details.</p></div>
 </dd>
 <dt class="hdlist1">
 branches
@@ -612,10 +600,12 @@ branches
 <dd>
 <p>
         A slightly deprecated way to store shorthands to be used
-        to specify URL to <em>git fetch</em>, <em>git pull</em> and <em>git push</em>
-        commands is to store a file in <tt>branches/&lt;name&gt;</tt> and
-        give <em>name</em> to these commands in place of <em>repository</em>
-        argument.
+        to specify a URL to <em>git fetch</em>, <em>git pull</em> and <em>git push</em>.
+        A file can be stored as <tt>branches/&lt;name&gt;</tt> and then
+        <em>name</em> can be given to these commands in place of
+        <em>repository</em> argument.  See the REMOTES section in
+        <a href="git-fetch.html">git-fetch(1)</a> for details.  This mechanism is legacy
+        and not likely to be found in modern repositories.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -695,9 +685,11 @@ remotes
 </dt>
 <dd>
 <p>
-        Stores shorthands to be used to give URL and default
-        refnames to interact with remote repository to
-        <em>git fetch</em>, <em>git pull</em> and <em>git push</em> commands.
+        Stores shorthands for URL and default refnames for use
+        when interacting with remote repositories via <em>git fetch</em>,
+        <em>git pull</em> and <em>git push</em> commands.  See the REMOTES section
+        in <a href="git-fetch.html">git-fetch(1)</a> for details.  This mechanism is legacy
+        and not likely to be found in modern repositories.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -755,7 +747,7 @@ shallow
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2010-08-18 22:14:44 UTC
+Last updated 2011-08-29 07:12:17 UTC
 </div>
 </div>
 </body>
