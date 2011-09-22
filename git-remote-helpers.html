@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.4.5" />
+<meta name="generator" content="AsciiDoc 8.5.2" />
 <title>git-remote-helpers(1)</title>
 <style type="text/css">
 /* Debug borders */
@@ -118,12 +118,14 @@ div#preamble {
 div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
-  margin-top: 1.5em;
+  margin-top: 1.0em;
   margin-bottom: 1.5em;
 }
 div.admonitionblock {
-  margin-top: 2.5em;
-  margin-bottom: 2.5em;
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
 }
 
 div.content { /* Block element content. */
@@ -165,19 +167,19 @@ div.listingblock > div.content {
   padding: 0.5em;
 }
 
-div.quoteblock {
-  padding-left: 2.0em;
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
   margin-right: 10%;
+  border-left: 5px solid #dddddd;
+  color: #777777;
 }
+
 div.quoteblock > div.attribution {
   padding-top: 0.5em;
   text-align: right;
 }
 
-div.verseblock {
-  padding-left: 2.0em;
-  margin-right: 10%;
-}
 div.verseblock > div.content {
   white-space: pre;
 }
@@ -200,12 +202,12 @@ div.admonitionblock .icon {
 }
 div.admonitionblock td.content {
   padding-left: 0.5em;
-  border-left: 2px solid silver;
+  border-left: 3px solid #dddddd;
 }
 
 div.exampleblock > div.content {
-  border-left: 2px solid silver;
-  padding: 0.5em;
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
 }
 
 div.imageblock div.content { padding-left: 0; }
@@ -255,7 +257,7 @@ div.compact div, div.compact div {
 div.tableblock > table {
   border: 3px solid #527bbd;
 }
-thead {
+thead, p.table.header {
   font-family: sans-serif;
   font-weight: bold;
 }
@@ -310,8 +312,40 @@ div.hdlist.compact tr {
   background: yellow;
 }
 
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+
 @media print {
   div#footer-badges { display: none; }
+}
+
+div#toc {
+  margin-bottom: 2.5em;
 }
 
 div#toctitle {
@@ -392,13 +426,146 @@ div.verseblock-attribution {
 }
 
 div.exampleblock-content {
-  border-left: 2px solid silver;
+  border-left: 3px solid #dddddd;
   padding-left: 0.5em;
 }
 
 /* IE6 sets dynamically generated links as visited. */
 div#toc a:visited { color: blue; }
 </style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){asciidoc.footnotes();}
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  var cont = document.getElementById("content");
+  var noteholder = document.getElementById("footnotes");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      // Use [\s\S] in place of . so multi-line matches work.
+      // Because JavaScript has no s (dotall) regex flag.
+      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      spans[i].innerHTML =
+        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+        "' title='View footnote' class='footnote'>" + n + "</a>]";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+}
+
+}
+/*]]>*/
+</script>
 </head>
 <body>
 <div id="header">
@@ -412,6 +579,7 @@ git-remote-helpers(1) Manual Page
 </p>
 </div>
 </div>
+<div id="content">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
@@ -431,19 +599,189 @@ standard input, and expects results from the helper&#8217;s standard
 output. Because a remote helper runs as an independent process from
 git, there is no need to re-link git to add a new helper, nor any
 need to link the helper with the implementation of git.</p></div>
-<div class="paragraph"><p>Every helper must support the "capabilities" command, which git will
-use to determine what other commands the helper will accept.  Other
-commands generally concern facilities like discovering and updating
-remote refs, transporting objects between the object database and
-the remote repository, and updating the local object store.</p></div>
-<div class="paragraph"><p>Helpers supporting the <em>fetch</em> capability can discover refs from the
-remote repository and transfer objects reachable from those refs to
-the local object store. Helpers supporting the <em>push</em> capability can
-transfer local objects to the remote repository and update remote refs.</p></div>
+<div class="paragraph"><p>Every helper must support the "capabilities" command, which git
+uses to determine what other commands the helper will accept.  Those
+other commands can be used to discover and update remote refs,
+transport objects between the object database and the remote repository,
+and update the local object store.</p></div>
 <div class="paragraph"><p>Git comes with a "curl" family of remote helpers, that handle various
 transport protocols, such as <em>git-remote-http</em>, <em>git-remote-https</em>,
 <em>git-remote-ftp</em> and <em>git-remote-ftps</em>. They implement the capabilities
 <em>fetch</em>, <em>option</em>, and <em>push</em>.</p></div>
+</div>
+<h2 id="_input_format">INPUT FORMAT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Git sends the remote helper a list of commands on standard input, one
+per line.  The first command is always the <em>capabilities</em> command, in
+response to which the remote helper must print a list of the
+capabilities it supports (see below) followed by a blank line.  The
+response to the capabilities command determines what commands Git uses
+in the remainder of the command stream.</p></div>
+<div class="paragraph"><p>The command stream is terminated by a blank line.  In some cases
+(indicated in the documentation of the relevant commands), this blank
+line is followed by a payload in some other protocol (e.g., the pack
+protocol), while in others it indicates the end of input.</p></div>
+<h3 id="_capabilities">Capabilities</h3><div style="clear:left"></div>
+<div class="paragraph"><p>Each remote helper is expected to support only a subset of commands.
+The operations a helper supports are declared to git in the response
+to the <tt>capabilities</tt> command (see COMMANDS, below).</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>option</em>
+</dt>
+<dd>
+<p>
+        For specifying settings like <tt>verbosity</tt> (how much output to
+        write to stderr) and <tt>depth</tt> (how much history is wanted in the
+        case of a shallow clone) that affect how other commands are
+        carried out.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>connect</em>
+</dt>
+<dd>
+<p>
+        For fetching and pushing using git&#8217;s native packfile protocol
+        that requires a bidirectional, full-duplex connection.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>push</em>
+</dt>
+<dd>
+<p>
+        For listing remote refs and pushing specified objects from the
+        local object store to remote refs.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>fetch</em>
+</dt>
+<dd>
+<p>
+        For listing remote refs and fetching the associated history to
+        the local object store.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>import</em>
+</dt>
+<dd>
+<p>
+        For listing remote refs and fetching the associated history as
+        a fast-import stream.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>refspec</em> &lt;refspec&gt;
+</dt>
+<dd>
+<p>
+        This modifies the <em>import</em> capability, allowing the produced
+        fast-import stream to modify refs in a private namespace
+        instead of writing to refs/heads or refs/remotes directly.
+        It is recommended that all importers providing the <em>import</em>
+        capability use this.
+</p>
+<div class="paragraph"><p>A helper advertising the capability
+<tt>refspec refs/heads/&#42;:refs/svn/origin/branches/&#42;</tt>
+is saying that, when it is asked to <tt>import refs/heads/topic</tt>, the
+stream it outputs will update the <tt>refs/svn/origin/branches/topic</tt>
+ref.</p></div>
+<div class="paragraph"><p>This capability can be advertised multiple times.  The first
+applicable refspec takes precedence.  The left-hand of refspecs
+advertised with this capability must cover all refs reported by
+the list command.  If no <em>refspec</em> capability is advertised,
+there is an implied <tt>refspec &#42;:&#42;</tt>.</p></div>
+</dd>
+</dl></div>
+<h3 id="_capabilities_for_pushing">Capabilities for Pushing</h3><div style="clear:left"></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>connect</em>
+</dt>
+<dd>
+<p>
+        Can attempt to connect to <em>git receive-pack</em> (for pushing),
+        <em>git upload-pack</em>, etc for communication using the
+        packfile protocol.
+</p>
+<div class="paragraph"><p>Supported commands: <em>connect</em>.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>push</em>
+</dt>
+<dd>
+<p>
+        Can discover remote refs and push local commits and the
+        history leading up to them to new or existing remote refs.
+</p>
+<div class="paragraph"><p>Supported commands: <em>list for-push</em>, <em>push</em>.</p></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>If a helper advertises both <em>connect</em> and <em>push</em>, git will use
+<em>connect</em> if possible and fall back to <em>push</em> if the helper requests
+so when connecting (see the <em>connect</em> command under COMMANDS).</p></div>
+<h3 id="_capabilities_for_fetching">Capabilities for Fetching</h3><div style="clear:left"></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>connect</em>
+</dt>
+<dd>
+<p>
+        Can try to connect to <em>git upload-pack</em> (for fetching),
+        <em>git receive-pack</em>, etc for communication using the
+        packfile protocol.
+</p>
+<div class="paragraph"><p>Supported commands: <em>connect</em>.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>fetch</em>
+</dt>
+<dd>
+<p>
+        Can discover remote refs and transfer objects reachable from
+        them to the local object store.
+</p>
+<div class="paragraph"><p>Supported commands: <em>list</em>, <em>fetch</em>.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>import</em>
+</dt>
+<dd>
+<p>
+        Can discover remote refs and output objects reachable from
+        them as a stream in fast-import format.
+</p>
+<div class="paragraph"><p>Supported commands: <em>list</em>, <em>import</em>.</p></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>If a helper advertises <em>connect</em>, git will use it if possible and
+fall back to another capability if the helper requests so when
+connecting (see the <em>connect</em> command under COMMANDS).
+When choosing between <em>fetch</em> and <em>import</em>, git prefers <em>fetch</em>.
+Other frontends may have some other order of preference.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>refspec</em> &lt;refspec&gt;
+</dt>
+<dd>
+<p>
+        This modifies the <em>import</em> capability.
+</p>
+<div class="paragraph"><p>A helper advertising
+<tt>refspec refs/heads/&#42;:refs/svn/origin/branches/&#42;</tt>
+in its capabilities is saying that, when it handles
+<tt>import refs/heads/topic</tt>, the stream it outputs will update the
+<tt>refs/svn/origin/branches/topic</tt> ref.</p></div>
+<div class="paragraph"><p>This capability can be advertised multiple times.  The first
+applicable refspec takes precedence.  The left-hand of refspecs
+advertised with this capability must cover all refs reported by
+the list command.  If no <em>refspec</em> capability is advertised,
+there is an implied <tt>refspec &#42;:&#42;</tt>.</p></div>
+</dd>
+</dl></div>
 </div>
 <h2 id="_invocation">INVOCATION</h2>
 <div class="sectionbody">
@@ -542,8 +880,23 @@ suitably updated.</p></div>
 <p>
         Pushes the given local &lt;src&gt; commit or branch to the
         remote branch described by &lt;dst&gt;.  A batch sequence of
-        one or more push commands is terminated with a blank line.
+        one or more <em>push</em> commands is terminated with a blank line
+        (if there is only one reference to push, a single <em>push</em> command
+        is followed by a blank line). For example, the following would
+        be two batches of <em>push</em>, the first asking the remote-helper
+        to push the local ref <em>master</em> to the remote ref <em>master</em> and
+        the local <em>HEAD</em> to the remote <em>branch</em>, and the second
+        asking to push ref <em>foo</em> to ref <em>bar</em> (forced update requested
+        by the <em>+</em>).
 </p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>push refs/heads/master:refs/heads/master
+push HEAD:refs/heads/branch
+\n
+push +refs/heads/foo:refs/heads/bar
+\n</tt></pre>
+</div></div>
 <div class="paragraph"><p>Zero or more protocol options may be entered after the last <em>push</em>
 command, before the batch&#8217;s terminating blank line.</p></div>
 <div class="paragraph"><p>When the push is complete, outputs one or more <em>ok &lt;dst&gt;</em> or
@@ -568,6 +921,10 @@ style string if it contains an LF.</p></div>
 </p>
 <div class="paragraph"><p>Especially useful for interoperability with a foreign versioning
 system.</p></div>
+<div class="paragraph"><p>Just like <em>push</em>, a batch sequence of one or more <em>import</em> is
+terminated with a blank line. For each batch of <em>import</em>, the remote
+helper should produce a fast-import stream terminated by a <em>done</em>
+command.</p></div>
 <div class="paragraph"><p>Supported if the helper has the "import" capability.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -595,46 +952,6 @@ message has been printed if the child closes the connection without
 completing a valid response for the current command.</p></div>
 <div class="paragraph"><p>Additional commands may be supported, as may be determined from
 capabilities reported by the helper.</p></div>
-</div>
-<h2 id="_capabilities">CAPABILITIES</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<em>fetch</em>
-</dt>
-<dt class="hdlist1">
-<em>option</em>
-</dt>
-<dt class="hdlist1">
-<em>push</em>
-</dt>
-<dt class="hdlist1">
-<em>import</em>
-</dt>
-<dt class="hdlist1">
-<em>connect</em>
-</dt>
-<dd>
-<p>
-        This helper supports the corresponding command with the same name.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>refspec</em> <em>spec</em>
-</dt>
-<dd>
-<p>
-        When using the import command, expect the source ref to have
-        been written to the destination ref. The earliest applicable
-        refspec takes precedence. For example
-        "refs/heads/&#42;:refs/svn/origin/branches/&#42;" means
-        that, after an "import refs/heads/name", the script has written to
-        refs/svn/origin/branches/name. If this capability is used at
-        all, it must cover all refs reported by the list command; if
-        it is not used, it is effectively "&#42;:&#42;"
-</p>
-</dd>
-</dl></div>
 </div>
 <h2 id="_ref_list_attributes">REF LIST ATTRIBUTES</h2>
 <div class="sectionbody">
@@ -728,14 +1045,17 @@ capabilities reported by the helper.</p></div>
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><a href="git-remote.html">git-remote(1)</a></p></div>
+<div class="paragraph"><p><a href="git-remote-testgit.html">git-remote-testgit(1)</a></p></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
+</div>
+<div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-08-02 00:08:47 UTC
+Last updated 2011-09-21 23:01:14 PDT
 </div>
 </div>
 </body>

@@ -157,6 +157,17 @@ Skip "branches" and "tags" of first level directories;;
 	affecting the working tree; and the 'rebase' command will be
 	able to update the working tree with the latest changes.
 
+--preserve-empty-dirs;;
+	Create a placeholder file in the local Git repository for each
+	empty directory fetched from Subversion.  This includes directories
+	that become empty by removing all entries in the Subversion
+	repository (but not the directory itself).  The placeholder files
+	are also tracked and removed when no longer necessary.
+
+--placeholder-filename=<filename>;;
+	Set the name of placeholder files created by --preserve-empty-dirs.
+	Default: ".gitignore"
+
 'rebase'::
 	This fetches revisions from the SVN parent of the current HEAD
 	and rebases the current (uncommitted to SVN) work against it.
@@ -211,8 +222,17 @@ discouraged.
 	Add the given merge information during the dcommit
 	(e.g. `--mergeinfo="/branches/foo:1-10"`). All svn server versions can
 	store this information (as a property), and svn clients starting from
-	version 1.5 can make use of it. 'git svn' currently does not use it
-	and does not set it automatically.
+	version 1.5 can make use of it. To specify merge information from multiple
+	branches, use a single space character between the branches
+	(`--mergeinfo="/branches/foo:1-10 /branches/bar:3,5-6,8"`)
++
+[verse]
+config key: svn.pushmergeinfo
++
+This option will cause git-svn to attempt to automatically populate the
+svn:mergeinfo property in the SVN repository when possible. Currently, this can
+only be done when dcommitting non-fast-forward merges where all parents but the
+first have already been pushed into SVN.
 
 'branch'::
 	Create a branch in the SVN repository.
