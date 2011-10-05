@@ -1235,7 +1235,7 @@ core.fileMode
 <dd>
 <p>
         If false, the executable bit differences between the index and
-        the working copy are ignored; useful on broken filesystems like FAT.
+        the working tree are ignored; useful on broken filesystems like FAT.
         See <a href="git-update-index.html">git-update-index(1)</a>.
 </p>
 <div class="paragraph"><p>The default is true, except <a href="git-clone.html">git-clone(1)</a> or <a href="git-init.html">git-init(1)</a>
@@ -1280,7 +1280,7 @@ core.trustctime
 <dd>
 <p>
         If false, the ctime differences between the index and the
-        working copy are ignored; useful when the inode change time
+        working tree are ignored; useful when the inode change time
         is regularly modified by something outside Git (file system
         crawlers and some backup systems).
         See <a href="git-update-index.html">git-update-index(1)</a>. True by default.
@@ -1421,7 +1421,7 @@ core.ignoreStat
         If true, commands which modify both the working tree and the index
         will mark the updated paths with the "assume unchanged" bit in the
         index. These marked files are then assumed to stay unchanged in the
-        working copy, until you mark them otherwise manually - Git will not
+        working tree, until you mark them otherwise manually - Git will not
         detect the file changes by lstat() calls. This is useful on systems
         where those are very slow, such as Microsoft Windows.
         See <a href="git-update-index.html">git-update-index(1)</a>.
@@ -2615,6 +2615,18 @@ fetch.recurseSubmodules
         value), fetch and pull will only recurse into a populated submodule
         when its superproject retrieves a commit that updates the submodule&#8217;s
         reference.
+</p>
+</dd>
+<dt class="hdlist1">
+fetch.fsckObjects
+</dt>
+<dd>
+<p>
+        If it is set to true, git-fetch-pack will check all fetched
+        objects. It will abort in the case of a malformed object or a
+        broken link. The result of an abort are only dangling objects.
+        Defaults to false. If not set, the value of <tt>transfer.fsckObjects</tt>
+        is used instead.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3851,7 +3863,8 @@ notes.rewriteRef
         You may also specify this configuration several times.
 </p>
 <div class="paragraph"><p>Does not have a default value; you must configure this variable to
-enable note rewriting.</p></div>
+enable note rewriting.  Set it to <tt>refs/notes/commits</tt> to enable
+rewriting for the default commit notes.</p></div>
 <div class="paragraph"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_REF</tt>
 environment variable, which must be a colon separated list of refs or
 globs.</p></div>
@@ -4100,7 +4113,8 @@ receive.fsckObjects
         If it is set to true, git-receive-pack will check all received
         objects. It will abort in the case of a malformed object or a
         broken link. The result of an abort are only dangling objects.
-        Defaults to false.
+        Defaults to false. If not set, the value of <tt>transfer.fsckObjects</tt>
+        is used instead.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4570,6 +4584,16 @@ tar.umask
         world write bit.  The special value "user" indicates that the
         archiving user&#8217;s umask will be used instead.  See umask(2) and
         <a href="git-archive.html">git-archive(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+transfer.fsckObjects
+</dt>
+<dd>
+<p>
+        When <tt>fetch.fsckObjects</tt> or <tt>receive.fsckObjects</tt> are
+        not set, the value of this variable is used instead.
+        Defaults to false.
 </p>
 </dd>
 <dt class="hdlist1">

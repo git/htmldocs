@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.5.2" />
-<title>git-for-each-ref(1)</title>
+<title>argv-array API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -373,24 +373,6 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
-  padding-top: 0.5em;
-  padding-bottom: 0.5em;
-  border-top: 2px solid silver;
-  border-bottom: 2px solid silver;
-}
-h2 {
-  border-style: none;
-}
-div.sectionbody {
-  margin-left: 5%;
-}
-
-@media print {
-  div#toc { display: none; }
-}
-
 /* Workarounds for IE6's broken and incomplete CSS2. */
 
 div.sidebar-content {
@@ -569,278 +551,81 @@ footnotes: function () {
 </head>
 <body>
 <div id="header">
-<h1>
-git-for-each-ref(1) Manual Page
-</h1>
-<h2>NAME</h2>
-<div class="sectionbody">
-<p>git-for-each-ref -
-   Output information on each ref
-</p>
-</div>
+<h1>argv-array API</h1>
 </div>
 <div id="content">
-<h2 id="_synopsis">SYNOPSIS</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="verseblock">
-<div class="verseblock-content"><em>git for-each-ref</em> [--count=&lt;count&gt;] [--shell|--perl|--python|--tcl]
-                   [(--sort=&lt;key&gt;)&#8230;] [--format=&lt;format&gt;] [&lt;pattern&gt;&#8230;]</div>
-<div class="verseblock-attribution">
-</div></div>
+<div class="paragraph"><p>The argv-array API allows one to dynamically build and store
+NULL-terminated lists.  An argv-array maintains the invariant that the
+<tt>argv</tt> member always points to a non-NULL array, and that the array is
+always NULL-terminated at the element pointed to by <tt>argv[argc]</tt>. This
+makes the result suitable for passing to functions expecting to receive
+argv from main(), or the <a href="api-run-command.html">run-command API</a>.</p></div>
+<div class="paragraph"><p>The <a href="api-string-list.html">string-list API</a> is similar, but cannot be
+used for these purposes; instead of storing a straight string pointer,
+it contains an item structure with a <tt>util</tt> field that is not compatible
+with the traditional argv interface.</p></div>
+<div class="paragraph"><p>Each <tt>argv_array</tt> manages its own memory. Any strings pushed into the
+array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 </div>
-<h2 id="_description">DESCRIPTION</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Iterate over all refs that match <tt>&lt;pattern&gt;</tt> and show them
-according to the given <tt>&lt;format&gt;</tt>, after sorting them according
-to the given set of <tt>&lt;key&gt;</tt>.  If <tt>&lt;count&gt;</tt> is given, stop after
-showing that many refs.  The interpolated values in <tt>&lt;format&gt;</tt>
-can optionally be quoted as string literals in the specified
-host language allowing their direct evaluation in that language.</p></div>
 </div>
-<h2 id="_options">OPTIONS</h2>
+<h2 id="_data_structures">Data Structures</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-&lt;count&gt;
+<tt>struct argv_array</tt>
 </dt>
 <dd>
 <p>
-        By default the command shows all refs that match
-        <tt>&lt;pattern&gt;</tt>.  This option makes it stop after showing
-        that many refs.
-</p>
-</dd>
-<dt class="hdlist1">
-&lt;key&gt;
-</dt>
-<dd>
-<p>
-        A field name to sort on.  Prefix <tt>-</tt> to sort in
-        descending order of the value.  When unspecified,
-        <tt>refname</tt> is used.  You may use the --sort=&lt;key&gt; option
-        multiple times, in which case the last key becomes the primary
-        key.
-</p>
-</dd>
-<dt class="hdlist1">
-&lt;format&gt;
-</dt>
-<dd>
-<p>
-        A string that interpolates <tt>%(fieldname)</tt> from the
-        object pointed at by a ref being shown.  If <tt>fieldname</tt>
-        is prefixed with an asterisk (<tt>*</tt>) and the ref points
-        at a tag object, the value for the field in the object
-        tag refers is used.  When unspecified, defaults to
-        <tt>%(objectname) SPC %(objecttype) TAB %(refname)</tt>.
-        It also interpolates <tt>%%</tt> to <tt>%</tt>, and <tt>%xx</tt> where <tt>xx</tt>
-        are hex digits interpolates to character with hex code
-        <tt>xx</tt>; for example <tt>%00</tt> interpolates to <tt>\0</tt> (NUL),
-        <tt>%09</tt> to <tt>\t</tt> (TAB) and <tt>%0a</tt> to <tt>\n</tt> (LF).
-</p>
-</dd>
-<dt class="hdlist1">
-&lt;pattern&gt;&#8230;
-</dt>
-<dd>
-<p>
-        If one or more patterns are given, only refs are shown that
-        match against at least one pattern, either using fnmatch(3) or
-        literally, in the latter case matching completely or from the
-        beginning up to a slash.
-</p>
-</dd>
-<dt class="hdlist1">
---shell
-</dt>
-<dt class="hdlist1">
---perl
-</dt>
-<dt class="hdlist1">
---python
-</dt>
-<dt class="hdlist1">
---tcl
-</dt>
-<dd>
-<p>
-        If given, strings that substitute <tt>%(fieldname)</tt>
-        placeholders are quoted as string literals suitable for
-        the specified host language.  This is meant to produce
-        a scriptlet that can directly be `eval`ed.
+        A single array. This should be initialized by assignment from
+        <tt>ARGV_ARRAY_INIT</tt>, or by calling <tt>argv_array_init</tt>. The <tt>argv</tt>
+        member contains the actual array; the <tt>argc</tt> member contains the
+        number of elements in the array, not including the terminating
+        NULL.
 </p>
 </dd>
 </dl></div>
 </div>
-<h2 id="_field_names">FIELD NAMES</h2>
+<h2 id="_functions">Functions</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Various values from structured fields in referenced objects can
-be used to interpolate into the resulting output, or as sort
-keys.</p></div>
-<div class="paragraph"><p>For all objects, the following names can be used:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-refname
+<tt>argv_array_init</tt>
 </dt>
 <dd>
 <p>
-        The name of the ref (the part after $GIT_DIR/).
-        For a non-ambiguous short name of the ref append <tt>:short</tt>.
-        The option core.warnAmbiguousRefs is used to select the strict
-        abbreviation mode.
+        Initialize an array. This is no different than assigning from
+        <tt>ARGV_ARRAY_INIT</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-objecttype
+<tt>argv_array_push</tt>
 </dt>
 <dd>
 <p>
-        The type of the object (<tt>blob</tt>, <tt>tree</tt>, <tt>commit</tt>, <tt>tag</tt>).
+        Push a copy of a string onto the end of the array.
 </p>
 </dd>
 <dt class="hdlist1">
-objectsize
+<tt>argv_array_pushf</tt>
 </dt>
 <dd>
 <p>
-        The size of the object (the same as <em>git cat-file -s</em> reports).
+        Format a string and push it onto the end of the array. This is a
+        convenience wrapper combining <tt>strbuf_addf</tt> and <tt>argv_array_push</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-objectname
+<tt>argv_array_clear</tt>
 </dt>
 <dd>
 <p>
-        The object name (aka SHA-1).
-        For a non-ambiguous abbreviation of the object name append <tt>:short</tt>.
-</p>
-</dd>
-<dt class="hdlist1">
-upstream
-</dt>
-<dd>
-<p>
-        The name of a local ref which can be considered &#8220;upstream&#8221;
-        from the displayed ref. Respects <tt>:short</tt> in the same way as
-        <tt>refname</tt> above.
+        Free all memory associated with the array and return it to the
+        initial, empty state.
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>In addition to the above, for commit and tag objects, the header
-field names (<tt>tree</tt>, <tt>parent</tt>, <tt>object</tt>, <tt>type</tt>, and <tt>tag</tt>) can
-be used to specify the value in the header field.</p></div>
-<div class="paragraph"><p>Fields that have name-email-date tuple as its value (<tt>author</tt>,
-<tt>committer</tt>, and <tt>tagger</tt>) can be suffixed with <tt>name</tt>, <tt>email</tt>,
-and <tt>date</tt> to extract the named component.</p></div>
-<div class="paragraph"><p>The complete message in a commit and tag object is <tt>contents</tt>.
-Its first line is <tt>contents:subject</tt>, the remaining lines
-are <tt>contents:body</tt> and the optional GPG signature
-is <tt>contents:signature</tt>.</p></div>
-<div class="paragraph"><p>For sorting purposes, fields with numeric values sort in numeric
-order (<tt>objectsize</tt>, <tt>authordate</tt>, <tt>committerdate</tt>, <tt>taggerdate</tt>).
-All other fields are used to sort in their byte-value order.</p></div>
-<div class="paragraph"><p>In any case, a field name that refers to a field inapplicable to
-the object referred by the ref does not cause an error.  It
-returns an empty string instead.</p></div>
-<div class="paragraph"><p>As a special case for the date-type fields, you may specify a format for
-the date by adding one of <tt>:default</tt>, <tt>:relative</tt>, <tt>:short</tt>, <tt>:local</tt>,
-<tt>:iso8601</tt> or <tt>:rfc2822</tt> to the end of the fieldname; e.g.
-<tt>%(taggerdate:relative)</tt>.</p></div>
-</div>
-<h2 id="_examples">EXAMPLES</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>An example directly producing formatted text.  Show the most recent
-3 tagged commits:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>#!/bin/sh
-
-git for-each-ref --count=3 --sort='-*authordate' \
---format='From: %(*authorname) %(*authoremail)
-Subject: %(*subject)
-Date: %(*authordate)
-Ref: %(*refname)
-
-%(*body)
-' 'refs/tags'</tt></pre>
-</div></div>
-<div class="paragraph"><p>A simple example showing the use of shell eval on the output,
-demonstrating the use of --shell.  List the prefixes of all heads:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>#!/bin/sh
-
-git for-each-ref --shell --format="ref=%(refname)" refs/heads | \
-while read entry
-do
-        eval "$entry"
-        echo `dirname $ref`
-done</tt></pre>
-</div></div>
-<div class="paragraph"><p>A bit more elaborate report on tags, demonstrating that the format
-may be an entire script:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>#!/bin/sh
-
-fmt='
-        r=%(refname)
-        t=%(*objecttype)
-        T=${r#refs/tags/}
-
-        o=%(*objectname)
-        n=%(*authorname)
-        e=%(*authoremail)
-        s=%(*subject)
-        d=%(*authordate)
-        b=%(*body)
-
-        kind=Tag
-        if test "z$t" = z
-        then
-                # could be a lightweight tag
-                t=%(objecttype)
-                kind="Lightweight tag"
-                o=%(objectname)
-                n=%(authorname)
-                e=%(authoremail)
-                s=%(subject)
-                d=%(authordate)
-                b=%(body)
-        fi
-        echo "$kind $T points at a $t object $o"
-        if test "z$t" = zcommit
-        then
-                echo "The commit was authored by $n $e
-at $d, and titled
-
-    $s
-
-Its message reads as:
-"
-                echo "$b" | sed -e "s/^/    /"
-                echo
-        fi
-'
-
-eval=`git for-each-ref --shell --format="$fmt" \
-        --sort='*objecttype' \
-        --sort=-taggerdate \
-        refs/tags`
-eval "$eval"</tt></pre>
-</div></div>
-</div>
-<h2 id="_author">Author</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Written by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;.</p></div>
-</div>
-<h2 id="_documentation">Documentation</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Documentation by Junio C Hamano and the git-list &lt;<a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a>&gt;.</p></div>
-</div>
-<h2 id="_git">GIT</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
