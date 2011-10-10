@@ -583,8 +583,9 @@ git-check-ref-format(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git check-ref-format</em> &lt;refname&gt;
-<em>git check-ref-format</em> --print &lt;refname&gt;
+<div class="verseblock-content"><em>git check-ref-format</em> [--normalize]
+       [--[no-]allow-onelevel] [--refspec-pattern]
+       &lt;refname&gt;
 <em>git check-ref-format</em> --branch &lt;branchname-shorthand&gt;</div>
 <div class="verseblock-attribution">
 </div></div>
@@ -605,14 +606,15 @@ if refs are packed by <tt>git gc</tt>).</p></div>
 <p>
 They can include slash <tt>/</tt> for hierarchical (directory)
   grouping, but no slash-separated component can begin with a
-  dot <tt>.</tt>.
+  dot <tt>.</tt> or end with the sequence <tt>.lock</tt>.
 </p>
 </li>
 <li>
 <p>
 They must contain at least one <tt>/</tt>. This enforces the presence of a
   category like <tt>heads/</tt>, <tt>tags/</tt> etc. but the actual names are not
-  restricted.
+  restricted.  If the <tt>--allow-onelevel</tt> option is used, this rule
+  is waived.
 </p>
 </li>
 <li>
@@ -624,18 +626,26 @@ They cannot have two consecutive dots <tt>..</tt> anywhere.
 <p>
 They cannot have ASCII control characters (i.e. bytes whose
   values are lower than \040, or \177 <tt>DEL</tt>), space, tilde <tt>~</tt>,
-  caret <tt>&#94;</tt>, colon <tt>:</tt>, question-mark <tt>?</tt>, asterisk <tt>*</tt>,
-  or open bracket <tt>[</tt> anywhere.
+  caret <tt>&#94;</tt>, or colon <tt>:</tt> anywhere.
 </p>
 </li>
 <li>
 <p>
-They cannot end with a slash <tt>/</tt> nor a dot <tt>.</tt>.
+They cannot have question-mark <tt>?</tt>, asterisk <tt>&#42;</tt>, or open
+  bracket <tt>[</tt> anywhere.  See the <tt>--refspec-pattern</tt> option below for
+  an exception to this rule.
 </p>
 </li>
 <li>
 <p>
-They cannot end with the sequence <tt>.lock</tt>.
+They cannot begin or end with a slash <tt>/</tt> or contain multiple
+  consecutive slashes (see the <tt>--normalize</tt> option below for an
+  exception to this rule)
+</p>
+</li>
+<li>
+<p>
+They cannot end with a dot <tt>.</tt>.
 </p>
 </li>
 <li>
@@ -681,14 +691,54 @@ at-open-brace <tt>@{</tt> is used as a notation to access a reflog entry.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>With the <tt>--print</tt> option, if <em>refname</em> is acceptable, it prints the
-canonicalized name of a hypothetical reference with that name.  That is,
-it prints <em>refname</em> with any extra <tt>/</tt> characters removed.</p></div>
 <div class="paragraph"><p>With the <tt>--branch</tt> option, it expands the &#8220;previous branch syntax&#8221;
 <tt>@{-n}</tt>.  For example, <tt>@{-1}</tt> is a way to refer the last branch you
 were on.  This option should be used by porcelains to accept this
 syntax anywhere a branch name is expected, so they can act as if you
 typed the branch name.</p></div>
+</div>
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--allow-onelevel
+</dt>
+<dt class="hdlist1">
+--no-allow-onelevel
+</dt>
+<dd>
+<p>
+        Controls whether one-level refnames are accepted (i.e.,
+        refnames that do not contain multiple <tt>/</tt>-separated
+        components).  The default is <tt>--no-allow-onelevel</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
+--refspec-pattern
+</dt>
+<dd>
+<p>
+        Interpret &lt;refname&gt; as a reference name pattern for a refspec
+        (as used with remote repositories).  If this option is
+        enabled, &lt;refname&gt; is allowed to contain a single <tt>&#42;</tt>
+        in place of a one full pathname component (e.g.,
+        <tt>foo/&#42;/bar</tt> but not <tt>foo/bar&#42;</tt>).
+</p>
+</dd>
+<dt class="hdlist1">
+--normalize
+</dt>
+<dd>
+<p>
+        Normalize <em>refname</em> by removing any leading slash (<tt>/</tt>)
+        characters and collapsing runs of adjacent slashes between
+        name components into a single slash.  Iff the normalized
+        refname is valid then print it to standard output and exit
+        with a status of 0.  (<tt>--print</tt> is a deprecated way to spell
+        <tt>--normalize</tt>.)
+</p>
+</dd>
+</dl></div>
 </div>
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
@@ -708,7 +758,7 @@ Determine the reference name to use for a new branch:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ ref=$(git check-ref-format --print "refs/heads/$newbranch") ||
+<pre><tt>$ ref=$(git check-ref-format --normalize "refs/heads/$newbranch") ||
 die "we do not like '$newbranch' as a branch name."</tt></pre>
 </div></div>
 </li>
@@ -722,7 +772,7 @@ die "we do not like '$newbranch' as a branch name."</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-09-21 23:01:14 PDT
+Last updated 2011-10-10 16:42:04 PDT
 </div>
 </div>
 </body>
