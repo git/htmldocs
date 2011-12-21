@@ -575,7 +575,7 @@ git-stripspace(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-stripspace -
-   Filter out empty lines
+   Remove unnecessary whitespace
 </p>
 </div>
 </div>
@@ -583,13 +583,42 @@ git-stripspace(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git stripspace</em> [-s | --strip-comments] &lt; &lt;stream&gt;</div>
+<div class="verseblock-content"><em>git stripspace</em> [-s | --strip-comments] &lt; input</div>
 <div class="verseblock-attribution">
 </div></div>
 </div>
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Remove multiple empty lines, and empty lines at beginning and end.</p></div>
+<div class="paragraph"><p>Clean the input in the manner used by <em>git</em> for text such as commit
+messages, notes, tags and branch descriptions.</p></div>
+<div class="paragraph"><p>With no arguments, this will:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+remove trailing whitespace from all lines
+</p>
+</li>
+<li>
+<p>
+collapse multiple consecutive empty lines into one empty line
+</p>
+</li>
+<li>
+<p>
+remove empty lines from the beginning and end of the input
+</p>
+</li>
+<li>
+<p>
+add a missing <em>\n</em> to the last line if necessary.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In the case where the input consists entirely of whitespace characters, no
+output will be produced.</p></div>
+<div class="paragraph"><p><strong>NOTE</strong>: This is intended for cleaning metadata, prefer the <tt>--whitespace=fix</tt>
+mode of <a href="git-apply.html">git-apply(1)</a> for correcting whitespace of patches or files in
+the repository.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
@@ -602,18 +631,51 @@ git-stripspace(1) Manual Page
 </dt>
 <dd>
 <p>
-        In addition to empty lines, also strip lines starting with <em>#</em>.
-</p>
-</dd>
-<dt class="hdlist1">
-&lt;stream&gt;
-</dt>
-<dd>
-<p>
-        Byte stream to act on.
+        Skip and remove all lines starting with <em>#</em>.
 </p>
 </dd>
 </dl></div>
+</div>
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Given the following noisy input with <em>$</em> indicating the end of a line:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>|A brief introduction   $
+|   $
+|$
+|A new paragraph$
+|# with a commented-out line    $
+|explaining lots of stuff.$
+|$
+|# An old paragraph, also commented-out. $
+|      $
+|The end.$
+|  $</tt></pre>
+</div></div>
+<div class="paragraph"><p>Use <em>git stripspace</em> with no arguments to obtain:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>|A brief introduction$
+|$
+|A new paragraph$
+|# with a commented-out line$
+|explaining lots of stuff.$
+|$
+|# An old paragraph, also commented-out.$
+|$
+|The end.$</tt></pre>
+</div></div>
+<div class="paragraph"><p>Use <em>git stripspace --strip-comments</em> to obtain:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>|A brief introduction$
+|$
+|A new paragraph$
+|explaining lots of stuff.$
+|$
+|The end.$</tt></pre>
+</div></div>
 </div>
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
@@ -623,7 +685,7 @@ git-stripspace(1) Manual Page
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-15 13:45:02 PDT
+Last updated 2011-12-21 14:30:17 PDT
 </div>
 </div>
 </body>
