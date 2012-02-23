@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.5.2" />
-<title>GIT API Documents</title>
+<title>config API</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -551,168 +551,203 @@ footnotes: function () {
 </head>
 <body>
 <div id="header">
-<h1>GIT API Documents</h1>
+<h1>config API</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>GIT has grown a set of internal API over time.  This collection
-documents them.</p></div>
+<div class="paragraph"><p>The config API gives callers a way to access git configuration files
+(and files which have the same syntax). See <a href="git-config.html">git-config(1)</a> for a
+discussion of the config file syntax.</p></div>
+</div>
+</div>
+<h2 id="_general_usage">General Usage</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Config files are parsed linearly, and each variable found is passed to a
+caller-provided callback function. The callback function is responsible
+for any actions to be taken on the config option, and is free to ignore
+some options. It is not uncommon for the configuration to be parsed
+several times during the run of a git program, with different callbacks
+picking out different variables useful to themselves.</p></div>
+<div class="paragraph"><p>A config callback function takes three parameters:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<a href="api-allocation-growing.html">allocation growing API</a>
+the name of the parsed variable. This is in canonical "flat" form: the
+  section, subsection, and variable segments will be separated by dots,
+  and the section and variable segments will be all lowercase. E.g.,
+  <tt>core.ignorecase</tt>, <tt>diff.SomeType.textconv</tt>.
 </p>
 </li>
 <li>
 <p>
-<a href="api-argv-array.html">argv-array API</a>
+the value of the found variable, as a string. If the variable had no
+  value specified, the value will be NULL (typically this means it
+  should be interpreted as boolean true).
 </p>
 </li>
 <li>
 <p>
-<a href="api-builtin.html">builtin API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-config.html">config API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-credentials.html">credentials API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-decorate.html">decorate API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-diff.html">diff API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-directory-listing.html">directory listing API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-gitattributes.html">gitattributes API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-grep.html">grep API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-hash.html">hash API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-history-graph.html">history graph API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-in-core-index.html">in-core index API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-lockfile.html">lockfile API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-merge.html">merge API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-object-access.html">object access API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-parse-options.html">parse-options API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-quote.html">quote API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-ref-iteration.html">ref iteration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-remote.html">Remotes configuration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-revision-walking.html">revision walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-run-command.html">run-command API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-setup.html">setup API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-sha1-array.html">sha1-array API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-sigchain.html">sigchain API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-strbuf.html">strbuf API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-string-list.html">string-list API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-tree-walking.html">tree walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-xdiff-interface.html">xdiff interface API</a>
+a void pointer passed in by the caller of the config API; this can
+  contain callback-specific data
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>2007-11-24</p></div>
+<div class="paragraph"><p>A config callback should return 0 for success, or -1 if the variable
+could not be parsed properly.</p></div>
 </div>
+<h2 id="_basic_config_querying">Basic Config Querying</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Most programs will simply want to look up variables in all config files
+that git knows about, using the normal precedence rules. To do this,
+call <tt>git_config</tt> with a callback function and void data pointer.</p></div>
+<div class="paragraph"><p><tt>git_config</tt> will read all config sources in order of increasing
+priority. Thus a callback should typically overwrite previously-seen
+entries with new ones (e.g., if both the user-wide <tt>~/.gitconfig</tt> and
+repo-specific <tt>.git/config</tt> contain <tt>color.ui</tt>, the config machinery
+will first feed the user-wide one to the callback, and then the
+repo-specific one; by overwriting, the higher-priority repo-specific
+value is left at the end).</p></div>
+<div class="paragraph"><p>The <tt>git_config_with_options</tt> function lets the caller examine config
+while adjusting some of the default behavior of <tt>git_config</tt>. It should
+almost never be used by "regular" git code that is looking up
+configuration variables. It is intended for advanced callers like
+<tt>git-config</tt>, which are intentionally tweaking the normal config-lookup
+process. It takes two extra parameters:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<tt>filename</tt>
+</dt>
+<dd>
+<p>
+If this parameter is non-NULL, it specifies the name of a file to
+parse for configuration, rather than looking in the usual files. Regular
+<tt>git_config</tt> defaults to <tt>NULL</tt>.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>respect_includes</tt>
+</dt>
+<dd>
+<p>
+Specify whether include directives should be followed in parsed files.
+Regular <tt>git_config</tt> defaults to <tt>1</tt>.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>There is a special version of <tt>git_config</tt> called <tt>git_config_early</tt>.
+This version takes an additional parameter to specify the repository
+config, instead of having it looked up via <tt>git_path</tt>. This is useful
+early in a git program before the repository has been found. Unless
+you&#8217;re working with early setup code, you probably don&#8217;t want to use
+this.</p></div>
+</div>
+<h2 id="_reading_specific_files">Reading Specific Files</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>To read a specific file in git-config format, use
+<tt>git_config_from_file</tt>. This takes the same callback and data parameters
+as <tt>git_config</tt>.</p></div>
+</div>
+<h2 id="_value_parsing_helpers">Value Parsing Helpers</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>To aid in parsing string values, the config API provides callbacks with
+a number of helper functions, including:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<tt>git_config_int</tt>
+</dt>
+<dd>
+<p>
+Parse the string to an integer, including unit factors. Dies on error;
+otherwise, returns the parsed result.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>git_config_ulong</tt>
+</dt>
+<dd>
+<p>
+Identical to <tt>git_config_int</tt>, but for unsigned longs.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>git_config_bool</tt>
+</dt>
+<dd>
+<p>
+Parse a string into a boolean value, respecting keywords like "true" and
+"false". Integer values are converted into true/false values (when they
+are non-zero or zero, respectively). Other values cause a die(). If
+parsing is successful, the return value is the result.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>git_config_bool_or_int</tt>
+</dt>
+<dd>
+<p>
+Same as <tt>git_config_bool</tt>, except that integers are returned as-is, and
+an <tt>is_bool</tt> flag is unset.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>git_config_maybe_bool</tt>
+</dt>
+<dd>
+<p>
+Same as <tt>git_config_bool</tt>, except that it returns -1 on error rather
+than dying.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>git_config_string</tt>
+</dt>
+<dd>
+<p>
+Allocates and copies the value string into the <tt>dest</tt> parameter; if no
+string is given, prints an error message and returns -1.
+</p>
+</dd>
+<dt class="hdlist1">
+<tt>git_config_pathname</tt>
+</dt>
+<dd>
+<p>
+Similar to <tt>git_config_string</tt>, but expands <tt><sub></tt> or <tt></sub>user</tt> into the
+user&#8217;s home directory when found at the beginning of the path.
+</p>
+</dd>
+</dl></div>
+</div>
+<h2 id="_include_directives">Include Directives</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>By default, the config parser does not respect include directives.
+However, a caller can use the special <tt>git_config_include</tt> wrapper
+callback to support them. To do so, you simply wrap your "real" callback
+function and data pointer in a <tt>struct config_include_data</tt>, and pass
+the wrapper to the regular config-reading functions. For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>int read_file_with_include(const char *file, config_fn_t fn, void *data)
+{
+        struct config_include_data inc = CONFIG_INCLUDE_INIT;
+        inc.fn = fn;
+        inc.data = data;
+        return git_config_from_file(git_config_include, file, &amp;inc);
+}</tt></pre>
+</div></div>
+<div class="paragraph"><p><tt>git_config</tt> respects includes automatically. The lower-level
+<tt>git_config_from_file</tt> does not.</p></div>
+</div>
+<h2 id="_writing_config_files">Writing Config Files</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>TODO</p></div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-02-23 14:45:32 PDT
+Last updated 2012-02-23 14:45:28 PDT
 </div>
 </div>
 </body>
