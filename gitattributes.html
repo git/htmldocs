@@ -888,15 +888,24 @@ fed the blob object from its standard input, and its standard
 output is used to update the worktree file.  Similarly, the
 <tt>clean</tt> command is used to convert the contents of worktree file
 upon checkin.</p></div>
-<div class="paragraph"><p>A missing filter driver definition in the config is not an error
-but makes the filter a no-op passthru.</p></div>
-<div class="paragraph"><p>The content filtering is done to massage the content into a
-shape that is more convenient for the platform, filesystem, and
-the user to use.  The key phrase here is "more convenient" and not
-"turning something unusable into usable".  In other words, the
-intent is that if someone unsets the filter driver definition,
-or does not have the appropriate filter program, the project
-should still be usable.</p></div>
+<div class="paragraph"><p>One use of the content filtering is to massage the content into a shape
+that is more convenient for the platform, filesystem, and the user to use.
+For this mode of operation, the key phrase here is "more convenient" and
+not "turning something unusable into usable".  In other words, the intent
+is that if someone unsets the filter driver definition, or does not have
+the appropriate filter program, the project should still be usable.</p></div>
+<div class="paragraph"><p>Another use of the content filtering is to store the content that cannot
+be directly used in the repository (e.g. a UUID that refers to the true
+content stored outside git, or an encrypted content) and turn it into a
+usable form upon checkout (e.g. download the external content, or decrypt
+the encrypted content).</p></div>
+<div class="paragraph"><p>These two filters behave differently, and by default, a filter is taken as
+the former, massaging the contents into more convenient shape.  A missing
+filter driver definition in the config, or a filter driver that exits with
+a non-zero status, is not an error but makes the filter a no-op passthru.</p></div>
+<div class="paragraph"><p>You can declare that a filter turns a content that by itself is unusable
+into a usable content by setting the filter.&lt;driver&gt;.required configuration
+variable to <tt>true</tt>.</p></div>
 <div class="paragraph"><p>For example, in .gitattributes, you would assign the <tt>filter</tt>
 attribute for paths.</p></div>
 <div class="listingblock">
@@ -923,6 +932,15 @@ section on merging below.</p></div>
 input that is already correctly indented.  In this case, the lack of a
 smudge filter means that the clean filter <em>must</em> accept its own output
 without modifying it.</p></div>
+<div class="paragraph"><p>If a filter <em>must</em> succeed in order to make the stored contents usable,
+you can declare that the filter is <tt>required</tt>, in the configuration:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[filter "crypt"]
+        clean = openssl enc ...
+        smudge = openssl enc -d ...
+        required</tt></pre>
+</div></div>
 <div class="paragraph"><p>Sequence "%f" on the filter command line is replaced with the name of
 the file the filter is working on.  A filter might use this in keyword
 substitution.  For example:</p></div>
@@ -1580,7 +1598,7 @@ frotz   unspecified</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-12-06 16:26:11 PDT
+Last updated 2012-02-28 15:40:09 PDT
 </div>
 </div>
 </body>
