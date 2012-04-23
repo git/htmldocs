@@ -731,9 +731,10 @@ the frontend program in use.</p></div>
 </dt>
 <dd>
 <p>
-        Specify the file descriptor that will be written to
-        when the <tt>cat-blob</tt> command is encountered in the stream.
-        The default behaviour is to write to <tt>stdout</tt>.
+        Write responses to <tt>cat-blob</tt> and <tt>ls</tt> queries to the
+        file descriptor &lt;fd&gt; instead of <tt>stdout</tt>.  Allows <tt>progress</tt>
+        output intended for the end-user to be separated from other
+        output.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1642,6 +1643,8 @@ ready to be written.</p></div>
 <div class="paragraph"><p>This command can be used anywhere in the stream that comments are
 accepted.  In particular, the <tt>cat-blob</tt> command can be used in the
 middle of a commit but not in the middle of a <tt>data</tt> command.</p></div>
+<div class="paragraph"><p>See &#8220;Responses To Commands&#8221; below for details about how to read
+this output safely.</p></div>
 <h3 id="_tt_ls_tt"><tt>ls</tt></h3><div style="clear:left"></div>
 <div class="paragraph"><p>Prints information about the object at a path to a file descriptor
 previously arranged with the <tt>--cat-blob-fd</tt> argument.  This allows
@@ -1702,6 +1705,8 @@ instead report</p></div>
 <pre><tt>missing SP &lt;path&gt; LF</tt></pre>
 </div></div>
 </div></div>
+<div class="paragraph"><p>See &#8220;Responses To Commands&#8221; below for details about how to read
+this output safely.</p></div>
 <h3 id="_tt_feature_tt"><tt>feature</tt></h3><div style="clear:left"></div>
 <div class="paragraph"><p>Require that fast-import supports the specified feature, or abort if
 it does not.</p></div>
@@ -1839,6 +1844,35 @@ This can be used to tell fast-import to finish early.</p></div>
 <div class="paragraph"><p>If the <tt>--done</tt> command line option or <tt>feature done</tt> command is
 in use, the <tt>done</tt> command is mandatory and marks the end of the
 stream.</p></div>
+</div>
+<h2 id="_responses_to_commands">Responses To Commands</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>New objects written by fast-import are not available immediately.
+Most fast-import commands have no visible effect until the next
+checkpoint (or completion).  The frontend can send commands to
+fill fast-import&#8217;s input pipe without worrying about how quickly
+they will take effect, which improves performance by simplifying
+scheduling.</p></div>
+<div class="paragraph"><p>For some frontends, though, it is useful to be able to read back
+data from the current repository as it is being updated (for
+example when the source material describes objects in terms of
+patches to be applied to previously imported objects).  This can
+be accomplished by connecting the frontend and fast-import via
+bidirectional pipes:</p></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="literalblock">
+<div class="content">
+<pre><tt>mkfifo fast-import-output
+frontend &lt;fast-import-output |
+git fast-import &gt;fast-import-output</tt></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>A frontend set up this way can use <tt>progress</tt>, <tt>ls</tt>, and <tt>cat-blob</tt>
+commands to read information from the import in progress.</p></div>
+<div class="paragraph"><p>To avoid deadlock, such frontends must completely consume any
+pending output from <tt>progress</tt>, <tt>ls</tt>, and <tt>cat-blob</tt> before
+performing writes to fast-import that might block.</p></div>
 </div>
 <h2 id="_crash_reports">Crash Reports</h2>
 <div class="sectionbody">
@@ -2126,7 +2160,7 @@ compression.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-15 13:45:02 PDT
+Last updated 2012-04-23 13:55:31 PDT
 </div>
 </div>
 </body>
