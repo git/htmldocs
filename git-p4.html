@@ -742,7 +742,7 @@ privileges in p4, which can be granted using <em>p4 protect</em>.</p></div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <h3 id="_general_options">General options</h3><div style="clear:left"></div>
-<div class="paragraph"><p>All commands except clone accept this option.</p></div>
+<div class="paragraph"><p>All commands except clone accept these options.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 --git-dir &lt;dir&gt;
@@ -750,6 +750,14 @@ privileges in p4, which can be granted using <em>p4 protect</em>.</p></div>
 <dd>
 <p>
         Set the <em>GIT_DIR</em> environment variable.  See <a href="git.html">git(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+--verbose
+</dt>
+<dd>
+<p>
+        Provide more progress information.
 </p>
 </dd>
 </dl></div>
@@ -805,20 +813,21 @@ git repository:</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---verbose
-</dt>
-<dd>
-<p>
-        Provide more progress information.
-</p>
-</dd>
-<dt class="hdlist1">
 --detect-labels
 </dt>
 <dd>
 <p>
         Query p4 for labels associated with the depot paths, and add
-        them as tags in git.
+        them as tags in git. Limited usefulness as only imports labels
+        associated with new changelists. Deprecated.
+</p>
+</dd>
+<dt class="hdlist1">
+--import-labels
+</dt>
+<dd>
+<p>
+        Import labels from p4 into git.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -902,14 +911,6 @@ options described above.</p></div>
 <div class="paragraph"><p>These options can be used to modify <em>git p4 submit</em> behavior.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
---verbose
-</dt>
-<dd>
-<p>
-        Provide more progress information.
-</p>
-</dd>
-<dt class="hdlist1">
 --origin &lt;commit&gt;
 </dt>
 <dd>
@@ -937,6 +938,27 @@ options described above.</p></div>
 <p>
         Re-author p4 changes before submitting to p4.  This option
         requires p4 admin privileges.
+</p>
+</dd>
+<dt class="hdlist1">
+--export-labels
+</dt>
+<dd>
+<p>
+        Export tags from git as p4 labels. Tags found in git are applied
+        to the perforce working directory.
+</p>
+</dd>
+</dl></div>
+<h3 id="_rebase_options">Rebase options</h3><div style="clear:left"></div>
+<div class="paragraph"><p>These options can be used to modify <em>git p4 rebase</em> behavior.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--import-labels
+</dt>
+<dd>
+<p>
+        Import p4 labels.
 </p>
 </dd>
 </dl></div>
@@ -1166,6 +1188,32 @@ git config --add git-p4.branchList main:branchB</tt></pre>
 </div></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
+git-p4.ignoredP4Labels
+</dt>
+<dd>
+<p>
+        List of p4 labels to ignore. This is built automatically as
+        unimportable labels are discovered.
+</p>
+</dd>
+<dt class="hdlist1">
+git-p4.importLabels
+</dt>
+<dd>
+<p>
+        Import p4 labels into git, as per --import-labels.
+</p>
+</dd>
+<dt class="hdlist1">
+git-p4.labelImportRegexp
+</dt>
+<dd>
+<p>
+        Only p4 labels matching this regular expression will be imported. The
+        default value is <em>[a-zA-Z0-9_\-.]+$</em>.
+</p>
+</dd>
+<dt class="hdlist1">
 git-p4.useClientSpec
 </dt>
 <dd>
@@ -1266,10 +1314,29 @@ git-p4.skipUserNameCheck
 </dd>
 </dl></div>
 <div class="paragraph"><p>git-p4.attemptRCSCleanup:
-    If enabled, <em>git p4 submit</em> will attempt to cleanup RCS keywords
-    ($Header$, etc). These would otherwise cause merge conflicts and prevent
-    the submit going ahead. This option should be considered experimental at
-    present.</p></div>
+        If enabled, <em>git p4 submit</em> will attempt to cleanup RCS keywords
+        ($Header$, etc). These would otherwise cause merge conflicts and prevent
+        the submit going ahead. This option should be considered experimental at
+        present.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+git-p4.exportLabels
+</dt>
+<dd>
+<p>
+        Export git tags to p4 labels, as per --export-labels.
+</p>
+</dd>
+<dt class="hdlist1">
+git-p4.labelExportRegexp
+</dt>
+<dd>
+<p>
+        Only p4 labels matching this regular expression will be exported. The
+        default value is <em>[a-zA-Z0-9_\-.]+$</em>.
+</p>
+</dd>
+</dl></div>
 </div>
 <h2 id="_implementation_details">IMPLEMENTATION DETAILS</h2>
 <div class="sectionbody">
@@ -1306,7 +1373,7 @@ Each commit imported by <em>git p4</em> has a line at the end of the log
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-04-23 13:55:31 PDT
+Last updated 2012-04-30 15:35:49 PDT
 </div>
 </div>
 </body>
