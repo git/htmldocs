@@ -583,9 +583,9 @@ git-rebase(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git rebase</em> [-i | --interactive] [options] [--onto &lt;newbase&gt;]
+<div class="verseblock-content"><em>git rebase</em> [-i | --interactive] [options] [--exec &lt;cmd&gt;] [--onto &lt;newbase&gt;]
         [&lt;upstream&gt;] [&lt;branch&gt;]
-<em>git rebase</em> [-i | --interactive] [options] --onto &lt;newbase&gt;
+<em>git rebase</em> [-i | --interactive] [options] [--exec &lt;cmd&gt;] --onto &lt;newbase&gt;
         --root [&lt;branch&gt;]
 <em>git rebase</em> --continue | --skip | --abort</div>
 <div class="verseblock-attribution">
@@ -782,7 +782,7 @@ rebase.autosquash
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-&lt;newbase&gt;
+--onto &lt;newbase&gt;
 </dt>
 <dd>
 <p>
@@ -1041,6 +1041,35 @@ the reversion" (see the
 <div class="paragraph"><p>This uses the <tt>--interactive</tt> machinery internally, but combining it
 with the <tt>--interactive</tt> option explicitly is generally not a good
 idea unless you know what you are doing (see BUGS below).</p></div>
+</dd>
+<dt class="hdlist1">
+-x &lt;cmd&gt;
+</dt>
+<dt class="hdlist1">
+--exec &lt;cmd&gt;
+</dt>
+<dd>
+<p>
+        Append "exec &lt;cmd&gt;" after each line creating a commit in the
+        final history. &lt;cmd&gt; will be interpreted as one or more shell
+        commands.
+</p>
+<div class="paragraph"><p>This option can only be used with the <tt>--interactive</tt> option
+(see INTERACTIVE MODE below).</p></div>
+<div class="paragraph"><p>You may execute several commands by either using one instance of <tt>--exec</tt>
+with several commands:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git rebase -i --exec "cmd1 &amp;&amp; cmd2 &amp;&amp; ..."</tt></pre>
+</div></div>
+<div class="paragraph"><p>or by giving more than one <tt>--exec</tt>:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>git rebase -i --exec "cmd1" --exec "cmd2" --exec ...</tt></pre>
+</div></div>
+<div class="paragraph"><p>If <tt>--autosquash</tt> is used, "exec" lines will not be appended for
+the intermediate commits, and will only appear at the end of each
+squash/fixup series.</p></div>
 </dd>
 <dt class="hdlist1">
 --root
@@ -1440,6 +1469,23 @@ continue with <tt>git rebase --continue</tt>.</p></div>
 in <tt>$SHELL</tt>, or the default shell if <tt>$SHELL</tt> is not set), so you can
 use shell features (like "cd", "&gt;", ";" &#8230;). The command is run from
 the root of the working tree.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git rebase -i --exec "make test"</tt></pre>
+</div></div>
+<div class="paragraph"><p>This command lets you check that intermediate commits are compilable.
+The todo list becomes like that:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>pick 5928aea one
+exec make test
+pick 04d0fda two
+exec make test
+pick ba46169 three
+exec make test
+pick f4593f9 four
+exec make test</tt></pre>
+</div></div>
 </div>
 <h2 id="_splitting_commits">SPLITTING COMMITS</h2>
 <div class="sectionbody">
@@ -1657,7 +1703,7 @@ reorder commits tend to produce counterintuitive results.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-05-02 15:00:44 PDT
+Last updated 2012-06-28 16:04:22 PDT
 </div>
 </div>
 </body>
