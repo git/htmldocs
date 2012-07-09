@@ -728,11 +728,12 @@ you use <em>--global</em> option without $HOME being properly set (ret=128).
 </dt>
 <dd>
 <p>
-        For writing options: write to global ~/.gitconfig file rather than
-        the repository .git/config.
+        For writing options: write to global <sub>/.gitconfig file rather than
+        the repository .git/config, write to $XDG_CONFIG_HOME/git/config file
+        if this file exists and the </sub>/.gitconfig file doesn&#8217;t.
 </p>
-<div class="paragraph"><p>For reading options: read only from global ~/.gitconfig rather than
-from all available files.</p></div>
+<div class="paragraph"><p>For reading options: read only from global ~/.gitconfig and from
+$XDG_CONFIG_HOME/git/config rather than from all available files.</p></div>
 <div class="paragraph"><p>See also <a href="#FILES">[FILES]</a>.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -911,7 +912,7 @@ rather than from all available files.</p></div>
 </div>
 <h2 id="FILES">FILES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>If not set explicitly with <em>--file</em>, there are three files where
+<div class="paragraph"><p>If not set explicitly with <em>--file</em>, there are four files where
 <em>git config</em> will search for configuration options:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -929,6 +930,19 @@ $GIT_DIR/config
 <p>
         User-specific configuration file. Also called "global"
         configuration file.
+</p>
+</dd>
+<dt class="hdlist1">
+$XDG_CONFIG_HOME/git/config
+</dt>
+<dd>
+<p>
+        Second user-specific configuration file. If $XDG_CONFIG_HOME is not set
+        or empty, $HOME/.config/git/config will be used. Any single-valued
+        variable set in this file will be overwritten by whatever is in
+        ~/.gitconfig.  It is a good idea not to create this file if
+        you sometimes use older versions of Git, as support for this
+        file was added fairly recently.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1705,7 +1719,9 @@ core.excludesfile
         <em>.git/info/exclude</em>, git looks into this file for patterns
         of files which are not meant to be tracked.  "<tt>~/</tt>" is expanded
         to the value of <tt>$HOME</tt> and "<tt>~user/</tt>" to the specified user&#8217;s
-        home directory.  See <a href="gitignore.html">gitignore(5)</a>.
+        home directory. Its default value is $XDG_CONFIG_HOME/git/ignore.
+        If $XDG_CONFIG_HOME is either not set or empty, $HOME/.config/git/ignore
+        is used instead. See <a href="gitignore.html">gitignore(5)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1730,7 +1746,9 @@ core.attributesfile
         In addition to <em>.gitattributes</em> (per-directory) and
         <em>.git/info/attributes</em>, git looks into this file for attributes
         (see <a href="gitattributes.html">gitattributes(5)</a>). Path expansions are made the same
-        way as for <tt>core.excludesfile</tt>.
+        way as for <tt>core.excludesfile</tt>. Its default value is
+        $XDG_CONFIG_HOME/git/attributes. If $XDG_CONFIG_HOME is either not
+        set or empty, $HOME/.config/git/attributes is used instead.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5026,7 +5044,7 @@ web.browser
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-05-25 13:02:12 PDT
+Last updated 2012-07-09 13:33:29 PDT
 </div>
 </div>
 </body>
