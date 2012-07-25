@@ -634,20 +634,20 @@ blobs contained in a commit.</p></div>
   object referenced by <em>refs/heads/master</em>.  If you
   happen to have both <em>heads/master</em> and <em>tags/master</em>, you can
   explicitly say <em>heads/master</em> to tell git which one you mean.
-  When ambiguous, a <em>&lt;name&gt;</em> is disambiguated by taking the
+  When ambiguous, a <em>&lt;refname&gt;</em> is disambiguated by taking the
   first match in the following rules:
 </p>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-If <em>$GIT_DIR/&lt;name&gt;</em> exists, that is what you mean (this is usually
+If <em>$GIT_DIR/&lt;refname&gt;</em> exists, that is what you mean (this is usually
     useful only for <em>HEAD</em>, <em>FETCH_HEAD</em>, <em>ORIG_HEAD</em>, <em>MERGE_HEAD</em>
     and <em>CHERRY_PICK_HEAD</em>);
 </p>
 </li>
 <li>
 <p>
-otherwise, <em>refs/&lt;name&gt;</em> if it exists;
+otherwise, <em>refs/&lt;refname&gt;</em> if it exists;
 </p>
 </li>
 <li>
@@ -657,17 +657,17 @@ otherwise, <em>refs/tags/&lt;refname&gt;</em> if it exists;
 </li>
 <li>
 <p>
-otherwise, <em>refs/heads/&lt;name&gt;</em> if it exists;
+otherwise, <em>refs/heads/&lt;refname&gt;</em> if it exists;
 </p>
 </li>
 <li>
 <p>
-otherwise, <em>refs/remotes/&lt;name&gt;</em> if it exists;
+otherwise, <em>refs/remotes/&lt;refname&gt;</em> if it exists;
 </p>
 </li>
 <li>
 <p>
-otherwise, <em>refs/remotes/&lt;name&gt;/HEAD</em> if it exists.
+otherwise, <em>refs/remotes/&lt;refname&gt;/HEAD</em> if it exists.
 </p>
 <div class="paragraph"><p><em>HEAD</em> names the commit on which you based the changes in the working tree.
 <em>FETCH_HEAD</em> records the branch which you fetched from a remote repository
@@ -908,6 +908,65 @@ It is the set of commits that are reachable from either one of
 and its parent commits exist.  The <em>r1&#94;@</em> notation means all
 parents of <em>r1</em>.  <em>r1&#94;!</em> includes commit <em>r1</em> but excludes
 all of its parents.</p></div>
+<div class="paragraph"><p>To summarize:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>&lt;rev&gt;</em>
+</dt>
+<dd>
+<p>
+        Include commits that are reachable from (i.e. ancestors of)
+        &lt;rev&gt;.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>&#94;&lt;rev&gt;</em>
+</dt>
+<dd>
+<p>
+        Exclude commits that are reachable from (i.e. ancestors of)
+        &lt;rev&gt;.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev1&gt;..&lt;rev2&gt;</em>
+</dt>
+<dd>
+<p>
+        Include commits that are reachable from &lt;rev2&gt; but exclude
+        those that are reachable from &lt;rev1&gt;.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev1&gt;...&lt;rev2&gt;</em>
+</dt>
+<dd>
+<p>
+        Include commits that are reachable from either &lt;rev1&gt; or
+        &lt;rev2&gt; but exclude those that are reachable from both.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;@</em>, e.g. <em>HEAD&#94;@</em>
+</dt>
+<dd>
+<p>
+  A suffix <em>&#94;</em> followed by an at sign is the same as listing
+  all parents of <em>&lt;rev&gt;</em> (meaning, include anything reachable from
+  its parents, but not the commit itself).
+</p>
+</dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;!</em>, e.g. <em>HEAD&#94;!</em>
+</dt>
+<dd>
+<p>
+  A suffix <em>&#94;</em> followed by an exclamation mark is the same
+  as giving commit <em>&lt;rev&gt;</em> and then all its parents prefixed with
+  <em>&#94;</em> to exclude them (and their ancestors).
+</p>
+</dd>
+</dl></div>
 <div class="paragraph"><p>Here are a handful of examples:</p></div>
 <div class="literalblock">
 <div class="content">
@@ -915,9 +974,12 @@ all of its parents.</p></div>
 D F              G H I J D F
 ^G D             H D
 ^D B             E I J F B
+B..C             C
 B...C            G H D E B C
 ^D B C           E I J F B C
+C                I J F C
 C^@              I J F
+C^!              C
 F^! D            G H D F</tt></pre>
 </div></div>
 </div>
