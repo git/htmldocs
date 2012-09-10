@@ -15,6 +15,10 @@ preference configuration variable "push.default" to change this, and
 "git push" will warn about the upcoming change until you set this
 variable.
 
+"git branch --set-upstream" is deprecated and may be removed in a
+relatively distant future.  "git branch [-u|--set-upstream-to]" has
+been introduced with a saner order of arguments.
+
 
 Updates since v1.7.12
 ---------------------
@@ -23,6 +27,16 @@ UI, Workflows & Features
 
  * A credential helper for Win32 to allow access to the keychain of
    the logged-in user has been added.
+
+ * A credential helper to allow access to the Gnome keyring has been
+   added.
+
+ * It was tempting to say "git branch --set-upstream origin/master",
+   but that tells Git to arrange the local branch "origin/master" to
+   integrate with the currently checked out branch, which is highly
+   unlikely what the user meant.  The option is deprecated; use the
+   new "--set-upstream-to" (with a short-and-sweet "-u") option
+   instead.
 
  * "git cherry-pick" learned the "--allow-empty-message" option to
    allow it to replay a commit without any log message.
@@ -57,6 +71,13 @@ Performance, Internal Implementation, etc. (please report possible regressions)
  * Compatibility wrapper around some mkdir(2) implementations that
    reject parameter with trailing slash has been introduced.
 
+ * The heuristics to detect and silently convert latin1 to utf8 when
+   we were told to use utf-8 in the log message has been transplanted
+   from "mailinfo" to "commit" and "commit-tree".
+
+ * Messages given by "git <subcommand> -h" from many subcommands have
+   been marked for translation.
+
 Also contains minor documentation updates and code clean-ups.
 
 
@@ -66,6 +87,61 @@ Fixes since v1.7.12
 Unless otherwise noted, all the fixes since v1.7.12 in the
 maintenance track are contained in this release (see release notes
 to them for details).
+
+ * "git cherry-pick A C B" used to replay changes in A and then B and
+   then C if these three commits had committer timestamps in that
+   order, which is not what the user who said "A C B" naturally
+   expects.
+   (merge a73e22e mz/cherry-pick-cmdline-order later to maint).
+
+ * "git show --quiet" ought to be a synonym for "git show -s", but
+   wasn't.
+   (merge f9c75d8 jk/maint-quiet-is-synonym-to-s-in-log later to maint).
+
+ * "git p4", when "--use-client-spec" and "--detect-branches" are used
+   together, misdetected branches.
+   (merge 21ef5df pw/p4-use-client-spec-branch-detection later to maint).
+
+ * Output from "git branch -v" contains "(no branch)" that could be
+   localized, but the code to align it along with the names of
+   branches were counting in bytes, not in display columns.
+   (merge 1452bd6 nd/branch-v-alignment later to maint).
+
+ * "git for-each-ref" did not currectly support more than one --sort
+   option.
+   (merge 3b51222 kk/maint-for-each-ref-multi-sort later to maint).
+
+ * Pushing to smart HTTP server with recent Git fails without having
+   the username in the URL to force authentication, if the server is
+   configured to allow GET anonymously, while requiring authentication
+   for POST.
+   (merge b81401c jk/maint-http-half-auth-push later to maint).
+
+ * When looking for $HOME/.gitconfig etc., it is OK if we cannot read
+   them because they do not exist, but we did not diagnose existing
+   files that we cannot read.
+
+ * The synopsis said "checkout [-B branch]" to make it clear the
+   branch name is a parameter to the option, but the heading for the
+   option description was "-B::", not "-B branch::", making the
+   documentation misleading.  There may be room in documentation pages
+   of other commands for similar improvements (hint, hint).
+   (merge 45aaf03 jc/maint-doc-checkout-b-always-takes-branch-name later to maint).
+
+ * "git log .." errored out saying it is both rev range and a path
+   when there is no disambiguating "--" is on the command line.
+   Update the command line parser to interpret ".." as a path in such
+   a case.
+   (merge 003c84f jc/dotdot-is-parent-directory later to maint).
+
+ * "git apply -p0" did not parse pathnames on "diff --git" line
+   correctly.  This caused patches that had pathnames in no other
+   places to be mistakenly rejected (most notably, binary patch that
+   does not rename nor change mode).  Textual patches, renames or mode
+   changes have preimage and postimage pathnames in different places
+   in a form that can be parsed unambiguously and did not suffer from
+   this problem.
+   (merge 6a2abdc jc/apply-binary-p0 later to maint).
 
  * The exit status code from "git config" was way overspecified while
    being incorrect.  The implementation has been updated to give the
@@ -113,43 +189,5 @@ to them for details).
    did not advertise that they are available.  fetch-pack has been
    fixed not to do so.
 
- * The reflog entries left by "git rebase" and "git rebase -i" were
-   inconsistent (the interactive one gave an abbreviated object name).
-   (merge 1af221e mg/rebase-i-onto-reflog-in-full later to maint).
-
- * When the user exports a non-default IFS without HT, scripts that
-   rely on being able to parse "ls-files -s | while read a b c..."
-   start to fail.  Protect them from such a misconfiguration.
-   (merge 785063e jc/maint-protect-sh-from-ifs later to maint).
-
- * "git prune" without "-v" used to warn about leftover temporary
-   files (which is an indication of an earlier aborted operation).
-   (merge 90b29cb bc/prune-info later to maint).
-
- * When "git push" triggered the automatic gc on the receiving end, a
-   message from "git prune" that said it was removing cruft leaked to
-   the standard output, breaking the communication protocol.
-   (merge 4b7f2fa bc/receive-pack-stdout-protection later to maint).
-
- * "git diff" had a confusion between taking data from a path in the
-   working tree and taking data from an object that happens to have
-   name 0{40} recorded in a tree.
-   (merge c479d14 jk/maint-null-in-trees later to maint).
-
  * The output from "git diff -B" for a file that ends with an
    incomplete line did not put "\ No newline..." on a line of its own.
-
- * "git send-email" did not unquote encoded words that appear on the
-   header correctly, and lost "_" from strings.
-   (merge b622d4d tr/maint-send-email-2047 later to maint).
-
- * When the user gives an argument that can be taken as both a
-   revision name and a pathname without disambiguating with "--", we
-   used to give a help message "Use '--' to separate".  The message
-   has been clarified to show where that '--' goes on the command
-   line.
-   (merge 4d4b573 mm/die-with-dashdash-help later to maint).
-
- * "gitweb" when used with PATH_INFO failed to notice directories with
-   SP (and other characters that need URL-style quoting) in them.
-   (merge cacfc09 js/gitweb-path-info-unquote later to maint).
