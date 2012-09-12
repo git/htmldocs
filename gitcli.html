@@ -618,11 +618,30 @@ Without disambiguating <tt>--</tt>, git makes a reasonable guess, but errors
    you have to say either <tt>git diff HEAD --</tt> or <tt>git diff -- HEAD</tt> to
    disambiguate.
 </p>
-</li>
-</ul></div>
 <div class="paragraph"><p>When writing a script that is expected to handle random user-input, it is
 a good practice to make it explicit which arguments are which by placing
 disambiguating <tt>--</tt> at appropriate places.</p></div>
+</li>
+<li>
+<p>
+Many commands allow wildcards in paths, but you need to protect
+   them from getting globbed by the shell.  These two mean different
+   things:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git checkout -- *.c
+$ git checkout -- \*.c</tt></pre>
+</div></div>
+<div class="paragraph"><p>The former lets your shell expand the fileglob, and you are asking
+the dot-C files in your working tree to be overwritten with the version
+in the index.  The latter passes the <tt>*.c</tt> to Git, and you are asking
+the paths in the index that match the pattern to be checked out to your
+working tree.  After running <tt>git add hello.c; rm hello.c</tt>, you will <em>not</em>
+see <tt>hello.c</tt> in your working tree with the former, but with the latter
+you will.</p></div>
+</li>
+</ul></div>
 <div class="paragraph"><p>Here are the rules regarding the "flags" that you should follow when you are
 scripting git:</p></div>
 <div class="ulist"><ul>
@@ -785,7 +804,7 @@ information.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-08-22 12:54:47 PDT
+Last updated 2012-09-12 15:56:23 PDT
 </div>
 </div>
 </body>

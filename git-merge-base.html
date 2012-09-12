@@ -585,6 +585,7 @@ git-merge-base(1) Manual Page
 <div class="verseblock">
 <div class="verseblock-content"><em>git merge-base</em> [-a|--all] &lt;commit&gt; &lt;commit&gt;&#8230;
 <em>git merge-base</em> [-a|--all] --octopus &lt;commit&gt;&#8230;
+<em>git merge-base</em> --is-ancestor &lt;commit&gt; &lt;commit&gt;
 <em>git merge-base</em> --independent &lt;commit&gt;&#8230;</div>
 <div class="verseblock-attribution">
 </div></div>
@@ -630,6 +631,16 @@ from <a href="git-show-branch.html">git-show-branch(1)</a> when used with the <t
         among the commits given, list those which cannot be reached
         from any other.  This mimics the behavior of <em>git show-branch
         --independent</em>.
+</p>
+</dd>
+<dt class="hdlist1">
+--is-ancestor
+</dt>
+<dd>
+<p>
+        Check if the first &lt;commit&gt; is an ancestor of the second &lt;commit&gt;,
+        and exit with status 0 if true, or with status 1 if not.
+        Errors are signaled by a non-zero status that is not 1.
 </p>
 </dd>
 </dl></div>
@@ -701,6 +712,27 @@ the best common ancestor of all commits.</p></div>
 <div class="paragraph"><p>both <em>1</em> and <em>2</em> are merge-bases of A and B.  Neither one is better than
 the other (both are <em>best</em> merge bases).  When the <tt>--all</tt> option is not given,
 it is unspecified which best one is output.</p></div>
+<div class="paragraph"><p>A common idiom to check "fast-forward-ness" between two commits A
+and B is (or at least used to be) to compute the merge base between
+A and B, and check if it is the same as A, in which case, A is an
+ancestor of B.  You will see this idiom used often in older scripts.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>A=$(git rev-parse --verify A)
+if test "$A" = "$(git merge-base A B)"
+then
+        ... A is an ancestor of B ...
+fi</tt></pre>
+</div></div>
+<div class="paragraph"><p>In modern git, you can say this in a more direct way:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>if git merge-base --is-ancestor A B
+then
+        ... A is an ancestor of B ...
+fi</tt></pre>
+</div></div>
+<div class="paragraph"><p>instead.</p></div>
 </div>
 <h2 id="_see_also">See also</h2>
 <div class="sectionbody">
@@ -716,7 +748,7 @@ it is unspecified which best one is output.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-15 13:45:02 PDT
+Last updated 2012-09-12 15:56:23 PDT
 </div>
 </div>
 </body>
