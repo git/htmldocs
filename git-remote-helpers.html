@@ -695,6 +695,25 @@ advertised with this capability must cover all refs reported by
 the list command.  If no <em>refspec</em> capability is advertised,
 there is an implied <tt>refspec *:*</tt>.</p></div>
 </dd>
+<dt class="hdlist1">
+<em>bidi-import</em>
+</dt>
+<dd>
+<p>
+        The fast-import commands <em>cat-blob</em> and <em>ls</em> can be used by remote-helpers
+        to retrieve information about blobs and trees that already exist in
+        fast-import&#8217;s memory. This requires a channel from fast-import to the
+        remote-helper.
+        If it is advertised in addition to "import", git establishes a pipe from
+        fast-import to the remote-helper&#8217;s stdin.
+        It follows that git and fast-import are both connected to the
+        remote-helper&#8217;s stdin. Because git can send multiple commands to
+        the remote-helper it is required that helpers that use <em>bidi-import</em>
+        buffer all <em>import</em> commands of a batch before sending data to fast-import.
+        This is to prevent mixing commands and fast-import responses on the
+        helper&#8217;s stdin.
+</p>
+</dd>
 </dl></div>
 <h3 id="_capabilities_for_pushing">Capabilities for Pushing</h3><div style="clear:left"></div>
 <div class="dlist"><dl>
@@ -925,7 +944,11 @@ system.</p></div>
 terminated with a blank line. For each batch of <em>import</em>, the remote
 helper should produce a fast-import stream terminated by a <em>done</em>
 command.</p></div>
-<div class="paragraph"><p>Supported if the helper has the "import" capability.</p></div>
+<div class="paragraph"><p>Note that if the <em>bidi-import</em> capability is used the complete batch
+sequence has to be buffered before starting to send data to fast-import
+to prevent mixing of commands and fast-import responses on the helper&#8217;s
+stdin.</p></div>
+<div class="paragraph"><p>Supported if the helper has the <em>import</em> capability.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>connect</em> &lt;service&gt;
@@ -1055,7 +1078,7 @@ capabilities reported by the helper.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-05-02 15:00:44 PDT
+Last updated 2012-11-13 14:31:09 PDT
 </div>
 </div>
 </body>
