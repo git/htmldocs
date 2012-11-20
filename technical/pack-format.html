@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.5.2" />
-<title>GIT Howto Index</title>
+<title>GIT pack format</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -551,131 +551,255 @@ footnotes: function () {
 </head>
 <body>
 <div id="header">
-<h1>GIT Howto Index</h1>
+<h1>GIT pack format</h1>
 </div>
 <div id="content">
-<div id="preamble">
+<h2 id="_pack_pack_files_have_the_following_format">pack-*.pack files have the following format:</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Here is a collection of mailing list postings made by various
-people describing how they use git in their workflow.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<a href="howto/maintain-git.html">maintain-git</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
+A header appears at the beginning and consists of the following:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>4-byte signature:
+    The signature is: {'P', 'A', 'C', 'K'}</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>4-byte version number (network byte order):
+    GIT currently accepts version number 2 or 3 but
+    generates version 2 only.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>4-byte number of objects contained in the pack (network byte order)</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Observation: we cannot have more than 4G versions ;-) and
+more than 4G objects in a pack.</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+The header is followed by number of object entries, each of
+     which looks like this:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>(undeltified representation)
+n-byte type and length (3-bit type, (n-1)*7+4-bit length)
+compressed data</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>(deltified representation)
+n-byte type and length (3-bit type, (n-1)*7+4-bit length)
+20-byte base object name
+compressed delta data</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>Observation: length of each object is encoded in a variable
+length format and is not constrained to 32-bit or anything.</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+The trailer records 20-byte SHA1 checksum of all of the above.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Imagine that git development is racing along as usual, when our friendly
-neighborhood maintainer is struck down by a wayward bus. Out of the
-hordes of suckers (loyal developers), you have been tricked (chosen) to
-step up as the new maintainer. This howto will show you "how to" do it.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/rebase-from-internal-branch.html">rebase-from-internal-branch</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>In this article, JC talks about how he rebases the
-public "pu" branch using the core GIT tools when he updates
-the "master" branch, and how "rebase" works.  Also discussed
-is how this applies to individual developers who sends patches
-upstream.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/rebuild-from-update-hook.html">rebuild-from-update-hook</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>In this how-to article, JC talks about how he
-uses the post-update hook to automate git documentation page
-shown at <a href="http://www.kernel.org/pub/software/scm/git/docs/">http://www.kernel.org/pub/software/scm/git/docs/</a>.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/recover-corrupted-blob-object.html">recover-corrupted-blob-object</a> by Linus Torvalds &lt;<a href="mailto:torvalds@linux-foundation.org">torvalds@linux-foundation.org</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Some tricks to reconstruct blob objects in order to fix
-a corrupted repository.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/revert-a-faulty-merge.html">revert-a-faulty-merge</a> by Linus Torvalds &lt;<a href="mailto:torvalds@linux-foundation.org">torvalds@linux-foundation.org</a>&gt;, Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Sometimes a branch that was already merged to the mainline
-is later found to be faulty.  Linus and Junio give guidance on
-recovering from such a premature merge and continuing development
-after the offending branch is fixed.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/revert-branch-rebase.html">revert-branch-rebase</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>In this article, JC gives a small real-life example of using
-<em>git revert</em> command, and using a temporary branch and tag for safety
-and easier sanity checking.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/separating-topic-branches.html">separating-topic-branches</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>In this article, JC describes how to separate topic branches.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/setup-git-server-over-http.html">setup-git-server-over-http</a> by Rutger Nijlunsing &lt;<a href="mailto:rutger@nospam.com">rutger@nospam.com</a>&gt;
-</p>
-</li>
-<li>
-<p>
-<a href="howto/update-hook-example.html">update-hook-example</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt; and Carl Baldwin &lt;<a href="mailto:cnb@fc.hp.com">cnb@fc.hp.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>An example hooks/update script is presented to
-implement repository maintenance policies, such as who can push
-into which branch and who can make a tag.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/use-git-daemon.html">use-git-daemon</a>
-</p>
-</li>
-<li>
-<p>
-<a href="howto/using-merge-subtree.html">using-merge-subtree</a> by Sean &lt;<a href="mailto:seanlkml@sympatico.ca">seanlkml@sympatico.ca</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>In this article, Sean demonstrates how one can use the subtree merge
-strategy.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="howto/using-signed-tag-in-pull-request.html">using-signed-tag-in-pull-request</a> by Junio C Hamano &lt;<a href="mailto:gitster@pobox.com">gitster@pobox.com</a>&gt;
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Beginning v1.7.9, a contributor can push a signed tag to her
-publishing repository and ask her integrator to pull it. This assures the
-integrator that the pulled history is authentic and allows others to
-later validate it.</p></div>
 </div>
+<h2 id="_original_version_1_pack_idx_files_have_the_following_format">Original (version 1) pack-*.idx files have the following format:</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+The header consists of 256 4-byte network byte order
+    integers.  N-th entry of this table records the number of
+    objects in the corresponding pack, the first byte of whose
+    object name is less than or equal to N.  This is called the
+    <em>first-level fan-out</em> table.
+</p>
+</li>
+<li>
+<p>
+The header is followed by sorted 24-byte entries, one entry
+    per object in the pack.  Each entry is:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>4-byte network byte order integer, recording where the
+object is stored in the packfile as the offset from the
+beginning.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>20-byte object name.</tt></pre>
+</div></div>
+</li>
+<li>
+<p>
+The file is concluded with a trailer:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>A copy of the 20-byte SHA1 checksum at the end of
+corresponding packfile.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>20-byte SHA1-checksum of all of the above.</tt></pre>
+</div></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Pack Idx file:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>        --  +--------------------------------+
+fanout      | fanout[0] = 2 (for example)    |-.
+table       +--------------------------------+ |
+            | fanout[1]                      | |
+            +--------------------------------+ |
+            | fanout[2]                      | |
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ |
+            | fanout[255] = total objects    |---.
+        --  +--------------------------------+ | |
+main        | offset                         | | |
+index       | object name 00XXXXXXXXXXXXXXXX | | |
+table       +--------------------------------+ | |
+            | offset                         | | |
+            | object name 00XXXXXXXXXXXXXXXX | | |
+            +--------------------------------+&lt;+ |
+          .-| offset                         |   |
+          | | object name 01XXXXXXXXXXXXXXXX |   |
+          | +--------------------------------+   |
+          | | offset                         |   |
+          | | object name 01XXXXXXXXXXXXXXXX |   |
+          | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~   |
+          | | offset                         |   |
+          | | object name FFXXXXXXXXXXXXXXXX |   |
+        --| +--------------------------------+&lt;--+
+trailer   | | packfile checksum              |
+          | +--------------------------------+
+          | | idxfile checksum               |
+          | +--------------------------------+
+          .-------.
+                  |
+Pack file entry: &lt;+</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>packed object header:
+   1-byte size extension bit (MSB)
+          type (next 3 bit)
+          size0 (lower 4-bit)
+   n-byte sizeN (as long as MSB is set, each 7-bit)
+           size0..sizeN form 4+7+7+..+7 bit integer, size0
+           is the least significant part, and sizeN is the
+           most significant part.
+packed object data:
+   If it is not DELTA, then deflated bytes (the size above
+           is the size before compression).
+   If it is REF_DELTA, then
+     20-byte base object name SHA1 (the size above is the
+           size of the delta data that follows).
+     delta data, deflated.
+   If it is OFS_DELTA, then
+     n-byte offset (see below) interpreted as a negative
+           offset from the type-byte of the header of the
+           ofs-delta entry (the size above is the size of
+           the delta data that follows).
+     delta data, deflated.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>offset encoding:
+     n bytes with MSB set in all but the last one.
+     The offset is then the number constructed by
+     concatenating the lower 7 bit of each byte, and
+     for n &gt;= 2 adding 2^7 + 2^14 + ... + 2^(7*(n-1))
+     to the result.</tt></pre>
+</div></div>
+</div>
+<h2 id="_version_2_pack_idx_files_support_packs_larger_than_4_gib_and">Version 2 pack-*.idx files support packs larger than 4 GiB, and</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><tt>have some other reorganizations.  They have the format:</tt></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+A 4-byte magic number <em>\377tOc</em> which is an unreasonable
+    fanout[0] value.
+</p>
+</li>
+<li>
+<p>
+A 4-byte version number (= 2)
+</p>
+</li>
+<li>
+<p>
+A 256-entry fan-out table just like v1.
+</p>
+</li>
+<li>
+<p>
+A table of sorted 20-byte SHA1 object names.  These are
+    packed together without offset values to reduce the cache
+    footprint of the binary search for a specific object name.
+</p>
+</li>
+<li>
+<p>
+A table of 4-byte CRC32 values of the packed object data.
+    This is new in v2 so compressed data can be copied directly
+    from pack to pack during repacking without undetected
+    data corruption.
+</p>
+</li>
+<li>
+<p>
+A table of 4-byte offset values (in network byte order).
+    These are usually 31-bit pack file offsets, but large
+    offsets are encoded as an index into the next table with
+    the msbit set.
+</p>
+</li>
+<li>
+<p>
+A table of 8-byte offset entries (empty for pack files less
+    than 2 GiB).  Pack files are organized with heavily used
+    objects toward the front, so most object references should
+    not need to refer to this table.
+</p>
+</li>
+<li>
+<p>
+The same trailer as a v1 pack file:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>A copy of the 20-byte SHA1 checksum at the end of
+corresponding packfile.</tt></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>20-byte SHA1-checksum of all of the above.</tt></pre>
+</div></div>
+</li>
+</ul></div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-20 13:06:03 PDT
+Last updated 2012-11-20 13:06:02 PDT
 </div>
 </div>
 </body>
