@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.5.2" />
-<title>GIT API Documents</title>
+<title>Integrating new subcommands</title>
 <style type="text/css">
 /* Debug borders */
 p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
@@ -551,173 +551,125 @@ footnotes: function () {
 </head>
 <body>
 <div id="header">
-<h1>GIT API Documents</h1>
+<h1>Integrating new subcommands</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>GIT has grown a set of internal API over time.  This collection
-documents them.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<a href="api-allocation-growing.html">allocation growing API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-argv-array.html">argv-array API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-builtin.html">builtin API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-command.html">Integrating new subcommands</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-config.html">config API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-credentials.html">credentials API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-decorate.html">decorate API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-diff.html">diff API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-directory-listing.html">directory listing API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-gitattributes.html">gitattributes API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-grep.html">grep API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-hash.html">hash API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-history-graph.html">history graph API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-in-core-index.html">in-core index API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-lockfile.html">lockfile API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-merge.html">merge API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-object-access.html">object access API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-parse-options.html">parse-options API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-quote.html">quote API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-ref-iteration.html">ref iteration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-remote.html">Remotes configuration API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-revision-walking.html">revision walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-run-command.html">run-command API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-setup.html">setup API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-sha1-array.html">sha1-array API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-sigchain.html">sigchain API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-strbuf.html">strbuf API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-string-list.html">string-list API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-tree-walking.html">tree walking API</a>
-</p>
-</li>
-<li>
-<p>
-<a href="api-xdiff-interface.html">xdiff interface API</a>
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>2007-11-24</p></div>
+<div class="paragraph"><p>This is how-to documentation for people who want to add extension
+commands to git.  It should be read alongside api-builtin.txt.</p></div>
 </div>
+</div>
+<h2 id="_runtime_environment">Runtime environment</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>git subcommands are standalone executables that live in the git exec
+path, normally /usr/lib/git-core.  The git executable itself is a
+thin wrapper that knows where the subcommands live, and runs them by
+passing command-line arguments to them.</p></div>
+<div class="paragraph"><p>(If "git foo" is not found in the git exec path, the wrapper
+will look in the rest of your $PATH for it.  Thus, it&#8217;s possible
+to write local git extensions that don&#8217;t live in system space.)</p></div>
+</div>
+<h2 id="_implementation_languages">Implementation languages</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Most subcommands are written in C or shell.  A few are written in
+Perl.</p></div>
+<div class="paragraph"><p>While we strongly encourage coding in portable C for portability,
+these specific scripting languages are also acceptable.  We won&#8217;t
+accept more without a very strong technical case, as we don&#8217;t want
+to broaden the git suite&#8217;s required dependencies.  Import utilities,
+surgical tools, remote helpers and other code at the edges of the
+git suite are more lenient and we allow Python (and even Tcl/tk),
+but they should not be used for core functions.</p></div>
+<div class="paragraph"><p>This may change in the future.  Especially Python is not allowed in
+core because we need better Python integration in the git Windows
+installer before we can be confident people in that environment
+won&#8217;t experience an unacceptably large loss of capability.</p></div>
+<div class="paragraph"><p>C commands are normally written as single modules, named after the
+command, that link a collection of functions called libgit.  Thus,
+your command <em>git-foo</em> would normally be implemented as a single
+"git-foo.c" (or "builtin/foo.c" if it is to be linked to the main
+binary); this organization makes it easy for people reading the code
+to find things.</p></div>
+<div class="paragraph"><p>See the CodingGuidelines document for other guidance on what we consider
+good practice in C and shell, and api-builtin.txt for the support
+functions available to built-in commands written in C.</p></div>
+</div>
+<h2 id="_what_every_extension_command_needs">What every extension command needs</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>You must have a man page, written in asciidoc (this is what git help
+followed by your subcommand name will display).  Be aware that there is
+a local asciidoc configuration and macros which you should use.  It&#8217;s
+often helpful to start by cloning an existing page and replacing the
+text content.</p></div>
+<div class="paragraph"><p>You must have a test, written to report in TAP (Test Anything Protocol).
+Tests are executables (usually shell scripts) that live in the <em>t</em>
+subdirectory of the tree.  Each test name begins with <em>t</em> and a sequence
+number that controls where in the test sequence it will be executed;
+conventionally the rest of the name stem is that of the command
+being tested.</p></div>
+<div class="paragraph"><p>Read the file t/README to learn more about the conventions to be used
+in writing tests, and the test support library.</p></div>
+</div>
+<h2 id="_integrating_a_command">Integrating a command</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Here are the things you need to do when you want to merge a new
+subcommand into the git tree.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Don&#8217;t forget to sign off your patch!
+</p>
+</li>
+<li>
+<p>
+Append your command name to one of the variables BUILTIN_OBJS,
+EXTRA_PROGRAMS, SCRIPT_SH, SCRIPT_PERL or SCRIPT_PYTHON.
+</p>
+</li>
+<li>
+<p>
+Drop its test in the t directory.
+</p>
+</li>
+<li>
+<p>
+If your command is implemented in an interpreted language with a
+p-code intermediate form, make sure .gitignore in the main directory
+includes a pattern entry that ignores such files.  Python .pyc and
+.pyo files will already be covered.
+</p>
+</li>
+<li>
+<p>
+If your command has any dependency on a particular version of
+your language, document it in the INSTALL file.
+</p>
+</li>
+<li>
+<p>
+There is a file command-list.txt in the distribution main directory
+that categorizes commands by type, so they can be listed in appropriate
+subsections in the documentation&#8217;s summary command list.  Add an entry
+for yours.  To understand the categories, look at git-cmmands.txt
+in the main directory.
+</p>
+</li>
+<li>
+<p>
+Give the maintainer one paragraph to include in the RelNotes file
+to describe the new feature; a good place to do so is in the cover
+letter [PATCH 0/n].
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>That&#8217;s all there is to it.</p></div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-29 14:51:02 PDT
+Last updated 2012-11-29 14:50:58 PDT
 </div>
 </div>
 </body>
