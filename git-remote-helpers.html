@@ -609,6 +609,33 @@ transport protocols, such as <em>git-remote-http</em>, <em>git-remote-https</em>
 <em>git-remote-ftp</em> and <em>git-remote-ftps</em>. They implement the capabilities
 <em>fetch</em>, <em>option</em>, and <em>push</em>.</p></div>
 </div>
+<h2 id="_invocation">INVOCATION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Remote helper programs are invoked with one or (optionally) two
+arguments. The first argument specifies a remote repository as in git;
+it is either the name of a configured remote or a URL. The second
+argument specifies a URL; it is usually of the form
+<em>&lt;transport&gt;://&lt;address&gt;</em>, but any arbitrary string is possible.
+The <em>GIT_DIR</em> environment variable is set up for the remote helper
+and can be used to determine where to store additional data or from
+which directory to invoke auxiliary git commands.</p></div>
+<div class="paragraph"><p>When git encounters a URL of the form <em>&lt;transport&gt;://&lt;address&gt;</em>, where
+<em>&lt;transport&gt;</em> is a protocol that it cannot handle natively, it
+automatically invokes <em>git remote-&lt;transport&gt;</em> with the full URL as
+the second argument. If such a URL is encountered directly on the
+command line, the first argument is the same as the second, and if it
+is encountered in a configured remote, the first argument is the name
+of that remote.</p></div>
+<div class="paragraph"><p>A URL of the form <em>&lt;transport&gt;::&lt;address&gt;</em> explicitly instructs git to
+invoke <em>git remote-&lt;transport&gt;</em> with <em>&lt;address&gt;</em> as the second
+argument. If such a URL is encountered directly on the command line,
+the first argument is <em>&lt;address&gt;</em>, and if it is encountered in a
+configured remote, the first argument is the name of that remote.</p></div>
+<div class="paragraph"><p>Additionally, when a configured remote has <em>remote.&lt;name&gt;.vcs</em> set to
+<em>&lt;transport&gt;</em>, git explicitly invokes <em>git remote-&lt;transport&gt;</em> with
+<em>&lt;name&gt;</em> as the first argument. If set, the second argument is
+<em>remote.&lt;name&gt;.url</em>; otherwise, the second argument is omitted.</p></div>
+</div>
 <h2 id="_input_format">INPUT FORMAT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Git sends the remote helper a list of commands on standard input, one
@@ -625,97 +652,10 @@ protocol), while in others it indicates the end of input.</p></div>
 <div class="paragraph"><p>Each remote helper is expected to support only a subset of commands.
 The operations a helper supports are declared to git in the response
 to the <tt>capabilities</tt> command (see COMMANDS, below).</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<em>option</em>
-</dt>
-<dd>
-<p>
-        For specifying settings like <tt>verbosity</tt> (how much output to
-        write to stderr) and <tt>depth</tt> (how much history is wanted in the
-        case of a shallow clone) that affect how other commands are
-        carried out.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>connect</em>
-</dt>
-<dd>
-<p>
-        For fetching and pushing using git&#8217;s native packfile protocol
-        that requires a bidirectional, full-duplex connection.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>push</em>
-</dt>
-<dd>
-<p>
-        For listing remote refs and pushing specified objects from the
-        local object store to remote refs.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>fetch</em>
-</dt>
-<dd>
-<p>
-        For listing remote refs and fetching the associated history to
-        the local object store.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>import</em>
-</dt>
-<dd>
-<p>
-        For listing remote refs and fetching the associated history as
-        a fast-import stream.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>refspec</em> &lt;refspec&gt;
-</dt>
-<dd>
-<p>
-        This modifies the <em>import</em> capability, allowing the produced
-        fast-import stream to modify refs in a private namespace
-        instead of writing to refs/heads or refs/remotes directly.
-        It is recommended that all importers providing the <em>import</em>
-        capability use this.
-</p>
-<div class="paragraph"><p>A helper advertising the capability
-<tt>refspec refs/heads/*:refs/svn/origin/branches/*</tt>
-is saying that, when it is asked to <tt>import refs/heads/topic</tt>, the
-stream it outputs will update the <tt>refs/svn/origin/branches/topic</tt>
-ref.</p></div>
-<div class="paragraph"><p>This capability can be advertised multiple times.  The first
-applicable refspec takes precedence.  The left-hand of refspecs
-advertised with this capability must cover all refs reported by
-the list command.  If no <em>refspec</em> capability is advertised,
-there is an implied <tt>refspec *:*</tt>.</p></div>
-</dd>
-<dt class="hdlist1">
-<em>bidi-import</em>
-</dt>
-<dd>
-<p>
-        The fast-import commands <em>cat-blob</em> and <em>ls</em> can be used by remote-helpers
-        to retrieve information about blobs and trees that already exist in
-        fast-import&#8217;s memory. This requires a channel from fast-import to the
-        remote-helper.
-        If it is advertised in addition to "import", git establishes a pipe from
-        fast-import to the remote-helper&#8217;s stdin.
-        It follows that git and fast-import are both connected to the
-        remote-helper&#8217;s stdin. Because git can send multiple commands to
-        the remote-helper it is required that helpers that use <em>bidi-import</em>
-        buffer all <em>import</em> commands of a batch before sending data to fast-import.
-        This is to prevent mixing commands and fast-import responses on the
-        helper&#8217;s stdin.
-</p>
-</dd>
-</dl></div>
-<h3 id="_capabilities_for_pushing">Capabilities for Pushing</h3><div style="clear:left"></div>
+<div class="paragraph"><p>In the following, we list all defined capabilities and for
+each we list which commands a helper with that capability
+must provide.</p></div>
+<h4 id="_capabilities_for_pushing">Capabilities for Pushing</h4>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 <em>connect</em>
@@ -723,8 +663,9 @@ there is an implied <tt>refspec *:*</tt>.</p></div>
 <dd>
 <p>
         Can attempt to connect to <em>git receive-pack</em> (for pushing),
-        <em>git upload-pack</em>, etc for communication using the
-        packfile protocol.
+        <em>git upload-pack</em>, etc for communication using
+        git&#8217;s native packfile protocol. This
+        requires a bidirectional, full-duplex connection.
 </p>
 <div class="paragraph"><p>Supported commands: <em>connect</em>.</p></div>
 </dd>
@@ -738,11 +679,23 @@ there is an implied <tt>refspec *:*</tt>.</p></div>
 </p>
 <div class="paragraph"><p>Supported commands: <em>list for-push</em>, <em>push</em>.</p></div>
 </dd>
+<dt class="hdlist1">
+<em>export</em>
+</dt>
+<dd>
+<p>
+        Can discover remote refs and push specified objects from a
+        fast-import stream to remote refs.
+</p>
+<div class="paragraph"><p>Supported commands: <em>list for-push</em>, <em>export</em>.</p></div>
+</dd>
 </dl></div>
-<div class="paragraph"><p>If a helper advertises both <em>connect</em> and <em>push</em>, git will use
-<em>connect</em> if possible and fall back to <em>push</em> if the helper requests
-so when connecting (see the <em>connect</em> command under COMMANDS).</p></div>
-<h3 id="_capabilities_for_fetching">Capabilities for Fetching</h3><div style="clear:left"></div>
+<div class="paragraph"><p>If a helper advertises <em>connect</em>, git will use it if possible and
+fall back to another capability if the helper requests so when
+connecting (see the <em>connect</em> command under COMMANDS).
+When choosing between <em>push</em> and <em>export</em>, git prefers <em>push</em>.
+Other frontends may have some other order of preference.</p></div>
+<h4 id="_capabilities_for_fetching">Capabilities for Fetching</h4>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 <em>connect</em>
@@ -751,7 +704,8 @@ so when connecting (see the <em>connect</em> command under COMMANDS).</p></div>
 <p>
         Can try to connect to <em>git upload-pack</em> (for fetching),
         <em>git receive-pack</em>, etc for communication using the
-        packfile protocol.
+        git&#8217;s native packfile protocol. This
+        requires a bidirectional, full-duplex connection.
 </p>
 <div class="paragraph"><p>Supported commands: <em>connect</em>.</p></div>
 </dd>
@@ -781,53 +735,82 @@ fall back to another capability if the helper requests so when
 connecting (see the <em>connect</em> command under COMMANDS).
 When choosing between <em>fetch</em> and <em>import</em>, git prefers <em>fetch</em>.
 Other frontends may have some other order of preference.</p></div>
+<h4 id="_miscellaneous_capabilities">Miscellaneous capabilities</h4>
 <div class="dlist"><dl>
+<dt class="hdlist1">
+<em>option</em>
+</dt>
+<dd>
+<p>
+        For specifying settings like <tt>verbosity</tt> (how much output to
+        write to stderr) and <tt>depth</tt> (how much history is wanted in the
+        case of a shallow clone) that affect how other commands are
+        carried out.
+</p>
+</dd>
 <dt class="hdlist1">
 <em>refspec</em> &lt;refspec&gt;
 </dt>
 <dd>
 <p>
-        This modifies the <em>import</em> capability.
+        This modifies the <em>import</em> capability, allowing the produced
+        fast-import stream to modify refs in a private namespace
+        instead of writing to refs/heads or refs/remotes directly.
+        It is recommended that all importers providing the <em>import</em>
+        capability use this.
 </p>
-<div class="paragraph"><p>A helper advertising
+<div class="paragraph"><p>A helper advertising the capability
 <tt>refspec refs/heads/*:refs/svn/origin/branches/*</tt>
-in its capabilities is saying that, when it handles
-<tt>import refs/heads/topic</tt>, the stream it outputs will update the
-<tt>refs/svn/origin/branches/topic</tt> ref.</p></div>
+is saying that, when it is asked to <tt>import refs/heads/topic</tt>, the
+stream it outputs will update the <tt>refs/svn/origin/branches/topic</tt>
+ref.</p></div>
 <div class="paragraph"><p>This capability can be advertised multiple times.  The first
 applicable refspec takes precedence.  The left-hand of refspecs
 advertised with this capability must cover all refs reported by
 the list command.  If no <em>refspec</em> capability is advertised,
 there is an implied <tt>refspec *:*</tt>.</p></div>
 </dd>
+<dt class="hdlist1">
+<em>bidi-import</em>
+</dt>
+<dd>
+<p>
+        This modifies the <em>import</em> capability.
+        The fast-import commands <em>cat-blob</em> and <em>ls</em> can be used by remote-helpers
+        to retrieve information about blobs and trees that already exist in
+        fast-import&#8217;s memory. This requires a channel from fast-import to the
+        remote-helper.
+        If it is advertised in addition to "import", git establishes a pipe from
+        fast-import to the remote-helper&#8217;s stdin.
+        It follows that git and fast-import are both connected to the
+        remote-helper&#8217;s stdin. Because git can send multiple commands to
+        the remote-helper it is required that helpers that use <em>bidi-import</em>
+        buffer all <em>import</em> commands of a batch before sending data to fast-import.
+        This is to prevent mixing commands and fast-import responses on the
+        helper&#8217;s stdin.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>export-marks</em> &lt;file&gt;
+</dt>
+<dd>
+<p>
+        This modifies the <em>export</em> capability, instructing git to dump the
+        internal marks table to &lt;file&gt; when complete. For details,
+        read up on <em>--export-marks=&lt;file&gt;</em> in <a href="git-fast-export.html">git-fast-export(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>import-marks</em> &lt;file&gt;
+</dt>
+<dd>
+<p>
+        This modifies the <em>export</em> capability, instructing git to load the
+        marks specified in &lt;file&gt; before processing any input. For details,
+        read up on <em>--import-marks=&lt;file&gt;</em> in <a href="git-fast-export.html">git-fast-export(1)</a>.
+</p>
+</dd>
 </dl></div>
-</div>
-<h2 id="_invocation">INVOCATION</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Remote helper programs are invoked with one or (optionally) two
-arguments. The first argument specifies a remote repository as in git;
-it is either the name of a configured remote or a URL. The second
-argument specifies a URL; it is usually of the form
-<em>&lt;transport&gt;://&lt;address&gt;</em>, but any arbitrary string is possible.
-The <em>GIT_DIR</em> environment variable is set up for the remote helper
-and can be used to determine where to store additional data or from
-which directory to invoke auxiliary git commands.</p></div>
-<div class="paragraph"><p>When git encounters a URL of the form <em>&lt;transport&gt;://&lt;address&gt;</em>, where
-<em>&lt;transport&gt;</em> is a protocol that it cannot handle natively, it
-automatically invokes <em>git remote-&lt;transport&gt;</em> with the full URL as
-the second argument. If such a URL is encountered directly on the
-command line, the first argument is the same as the second, and if it
-is encountered in a configured remote, the first argument is the name
-of that remote.</p></div>
-<div class="paragraph"><p>A URL of the form <em>&lt;transport&gt;::&lt;address&gt;</em> explicitly instructs git to
-invoke <em>git remote-&lt;transport&gt;</em> with <em>&lt;address&gt;</em> as the second
-argument. If such a URL is encountered directly on the command line,
-the first argument is <em>&lt;address&gt;</em>, and if it is encountered in a
-configured remote, the first argument is the name of that remote.</p></div>
-<div class="paragraph"><p>Additionally, when a configured remote has <em>remote.&lt;name&gt;.vcs</em> set to
-<em>&lt;transport&gt;</em>, git explicitly invokes <em>git remote-&lt;transport&gt;</em> with
-<em>&lt;name&gt;</em> as the first argument. If set, the second argument is
-<em>remote.&lt;name&gt;.url</em>; otherwise, the second argument is omitted.</p></div>
 </div>
 <h2 id="_commands">COMMANDS</h2>
 <div class="sectionbody">
@@ -840,10 +823,11 @@ configured remote, the first argument is the name of that remote.</p></div>
 <p>
         Lists the capabilities of the helper, one per line, ending
         with a blank line. Each capability may be preceded with <em>*</em>,
-        which marks them mandatory for git version using the remote
-        helper to understand (unknown mandatory capability is fatal
-        error).
+        which marks them mandatory for git versions using the remote
+        helper to understand. Any unknown mandatory capability is a
+        fatal error.
 </p>
+<div class="paragraph"><p>Support for this command is mandatory.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>list</em>
@@ -857,9 +841,23 @@ configured remote, the first argument is the name of that remote.</p></div>
         the name; unrecognized attributes are ignored. The list ends
         with a blank line.
 </p>
-<div class="paragraph"><p>If <em>push</em> is supported this may be called as <em>list for-push</em>
-to obtain the current refs prior to sending one or more <em>push</em>
-commands to the helper.</p></div>
+<div class="paragraph"><p>See REF LIST ATTRIBUTES for a list of currently defined attributes.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "fetch" or "import" capability.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>list for-push</em>
+</dt>
+<dd>
+<p>
+        Similar to <em>list</em>, except that it is used if and only if
+        the caller wants to the resulting ref list to prepare
+        push commands.
+        A helper supporting both push and fetch can use this
+        to distinguish for which operation the output of <em>list</em>
+        is going to be used, possibly reducing the amount
+        of work that needs to be performed.
+</p>
+<div class="paragraph"><p>Supported if the helper has the "push" or "export" capability.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>option</em> &lt;name&gt; &lt;value&gt;
@@ -873,6 +871,7 @@ commands to the helper.</p></div>
         for it).  Options should be set before other commands,
         and may influence the behavior of those commands.
 </p>
+<div class="paragraph"><p>See OPTIONS for a list of currently defined options.</p></div>
 <div class="paragraph"><p>Supported if the helper has the "option" capability.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -885,7 +884,7 @@ commands to the helper.</p></div>
         per line, terminated with a blank line.
         Outputs a single blank line when all fetch commands in the
         same batch are complete. Only objects which were reported
-        in the ref list with a sha1 may be fetched this way.
+        in the output of <em>list</em> with a sha1 may be fetched this way.
 </p>
 <div class="paragraph"><p>Optionally may output a <em>lock &lt;file&gt;</em> line indicating a file under
 GIT_DIR/objects/pack which is keeping a pack until refs can be
@@ -948,7 +947,25 @@ command.</p></div>
 sequence has to be buffered before starting to send data to fast-import
 to prevent mixing of commands and fast-import responses on the helper&#8217;s
 stdin.</p></div>
-<div class="paragraph"><p>Supported if the helper has the <em>import</em> capability.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "import" capability.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>export</em>
+</dt>
+<dd>
+<p>
+        Instructs the remote helper that any subsequent input is
+        part of a fast-import stream (generated by <em>git fast-export</em>)
+        containing objects which should be pushed to the remote.
+</p>
+<div class="paragraph"><p>Especially useful for interoperability with a foreign versioning
+system.</p></div>
+<div class="paragraph"><p>The <em>export-marks</em> and <em>import-marks</em> capabilities, if specified,
+affect this command in so far as they are passed on to <em>git
+fast-export</em>, which then will load/store a table of marks for
+local objects. This can be used to implement for incremental
+operations.</p></div>
+<div class="paragraph"><p>Supported if the helper has the "export" capability.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>connect</em> &lt;service&gt;
@@ -978,17 +995,10 @@ capabilities reported by the helper.</p></div>
 </div>
 <h2 id="_ref_list_attributes">REF LIST ATTRIBUTES</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>The <em>list</em> command produces a list of refs in which each ref
+may be followed by a list of attributes. The following ref list
+attributes are defined.</p></div>
 <div class="dlist"><dl>
-<dt class="hdlist1">
-<em>for-push</em>
-</dt>
-<dd>
-<p>
-        The caller wants to use the ref list to prepare push
-        commands.  A helper might chose to acquire the ref list by
-        opening a different type of connection to the destination.
-</p>
-</dd>
 <dt class="hdlist1">
 <em>unchanged</em>
 </dt>
@@ -1002,6 +1012,8 @@ capabilities reported by the helper.</p></div>
 </div>
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>The following options are defined and (under suitable circumstances)
+set by git if the remote helper has the <em>option</em> capability.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 <em>option verbosity</em> &lt;n&gt;
@@ -1078,7 +1090,7 @@ capabilities reported by the helper.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-13 14:31:09 PDT
+Last updated 2012-12-13 12:34:41 PDT
 </div>
 </div>
 </body>
