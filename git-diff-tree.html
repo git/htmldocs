@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>git-diff-tree(1)</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,69 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border-top: 2px solid silver;
   border-bottom: 2px solid silver;
 }
-h2 {
+body.manpage h2 {
   border-style: none;
 }
-div.sectionbody {
-  margin-left: 5%;
+body.manpage div.sectionbody {
+  margin-left: 3em;
 }
 
 @media print {
-  div#toc { display: none; }
+  body.manpage div#toc { display: none; }
 }
 
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
-}
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
-}
-
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
-}
-
-div.quoteblock-attribution {
-  padding-top: 0.5em;
-  text-align: right;
-}
-
-div.verseblock-content {
-  white-space: pre;
-}
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
-}
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
-}
-
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -477,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -497,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -524,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -561,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="manpage">
 <div id="header">
 <h1>
 git-diff-tree(1) Manual Page
@@ -580,15 +742,18 @@ git-diff-tree(1) Manual Page
 </div>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git diff-tree</em> [--stdin] [-m] [-s] [-v] [--no-commit-id] [--pretty]
+<pre class="content"><em>git diff-tree</em> [--stdin] [-m] [-s] [-v] [--no-commit-id] [--pretty]
               [-t] [-r] [-c | --cc] [--root] [&lt;common diff options&gt;]
-              &lt;tree-ish&gt; [&lt;tree-ish&gt;] [&lt;path&gt;&#8230;]</div>
-<div class="verseblock-attribution">
+              &lt;tree-ish&gt; [&lt;tree-ish&gt;] [&lt;path&gt;&#8230;]</pre>
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Compares the content and mode of the blobs found via two tree objects.</p></div>
@@ -596,6 +761,8 @@ git-diff-tree(1) Manual Page
 (see --stdin below).</p></div>
 <div class="paragraph"><p>Note that <em>git diff-tree</em> can use the tree encapsulated in a commit object.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -624,7 +791,7 @@ git-diff-tree(1) Manual Page
 <p>
         Generate diffs with &lt;n&gt; lines of context instead of
         the usual three.
-        Implies <tt>-p</tt>.
+        Implies <code>-p</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -641,7 +808,7 @@ git-diff-tree(1) Manual Page
 </dt>
 <dd>
 <p>
-        Synonym for <tt>-p --raw</tt>.
+        Synonym for <code>-p --raw</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -678,29 +845,29 @@ git-diff-tree(1) Manual Page
         will be used for the filename part, and the rest for the graph
         part. Maximum width defaults to terminal width, or 80 columns
         if not connected to a terminal, and can be overridden by
-        <tt>&lt;width&gt;</tt>. The width of the filename part can be limited by
-        giving another width <tt>&lt;name-width&gt;</tt> after a comma. The width
+        <code>&lt;width&gt;</code>. The width of the filename part can be limited by
+        giving another width <code>&lt;name-width&gt;</code> after a comma. The width
         of the graph part can be limited by using
-        <tt>--stat-graph-width=&lt;width&gt;</tt> (affects all commands generating
-        a stat graph) or by setting <tt>diff.statGraphWidth=&lt;width&gt;</tt>
-        (does not affect <tt>git format-patch</tt>).
-        By giving a third parameter <tt>&lt;count&gt;</tt>, you can limit the
-        output to the first <tt>&lt;count&gt;</tt> lines, followed by <tt>...</tt> if
+        <code>--stat-graph-width=&lt;width&gt;</code> (affects all commands generating
+        a stat graph) or by setting <code>diff.statGraphWidth=&lt;width&gt;</code>
+        (does not affect <code>git format-patch</code>).
+        By giving a third parameter <code>&lt;count&gt;</code>, you can limit the
+        output to the first <code>&lt;count&gt;</code> lines, followed by <code>...</code> if
         there are more.
 </p>
-<div class="paragraph"><p>These parameters can also be set individually with <tt>--stat-width=&lt;width&gt;</tt>,
-<tt>--stat-name-width=&lt;name-width&gt;</tt> and <tt>--stat-count=&lt;count&gt;</tt>.</p></div>
+<div class="paragraph"><p>These parameters can also be set individually with <code>--stat-width=&lt;width&gt;</code>,
+<code>--stat-name-width=&lt;name-width&gt;</code> and <code>--stat-count=&lt;count&gt;</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 --numstat
 </dt>
 <dd>
 <p>
-        Similar to <tt>--stat</tt>, but shows number of added and
+        Similar to <code>--stat</code>, but shows number of added and
         deleted lines in decimal notation and pathname without
         abbreviation, to make it more machine friendly.  For
-        binary files, outputs two <tt>-</tt> instead of saying
-        <tt>0 0</tt>.
+        binary files, outputs two <code>-</code> instead of saying
+        <code>0 0</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -708,7 +875,7 @@ git-diff-tree(1) Manual Page
 </dt>
 <dd>
 <p>
-        Output only the last line of the <tt>--stat</tt> format containing total
+        Output only the last line of the <code>--stat</code> format containing total
         number of modified files, as well as number of added and deleted
         lines.
 </p>
@@ -719,15 +886,17 @@ git-diff-tree(1) Manual Page
 <dd>
 <p>
         Output the distribution of relative amount of changes for each
-        sub-directory. The behavior of <tt>--dirstat</tt> can be customized by
+        sub-directory. The behavior of <code>--dirstat</code> can be customized by
         passing it a comma separated list of parameters.
-        The defaults are controlled by the <tt>diff.dirstat</tt> configuration
+        The defaults are controlled by the <code>diff.dirstat</code> configuration
         variable (see <a href="git-config.html">git-config(1)</a>).
         The following parameters are available:
 </p>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>changes</tt>
+<code>changes</code>
 </dt>
 <dd>
 <p>
@@ -739,39 +908,39 @@ git-diff-tree(1) Manual Page
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>lines</tt>
+<code>lines</code>
 </dt>
 <dd>
 <p>
         Compute the dirstat numbers by doing the regular line-based diff
         analysis, and summing the removed/added line counts. (For binary
         files, count 64-byte chunks instead, since binary files have no
-        natural concept of lines). This is a more expensive <tt>--dirstat</tt>
-        behavior than the <tt>changes</tt> behavior, but it does count rearranged
+        natural concept of lines). This is a more expensive <code>--dirstat</code>
+        behavior than the <code>changes</code> behavior, but it does count rearranged
         lines within a file as much as other changes. The resulting output
-        is consistent with what you get from the other <tt>--*stat</tt> options.
+        is consistent with what you get from the other <code>--*stat</code> options.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>files</tt>
+<code>files</code>
 </dt>
 <dd>
 <p>
         Compute the dirstat numbers by counting the number of files changed.
         Each changed file counts equally in the dirstat analysis. This is
-        the computationally cheapest <tt>--dirstat</tt> behavior, since it does
+        the computationally cheapest <code>--dirstat</code> behavior, since it does
         not have to look at the file contents at all.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>cumulative</tt>
+<code>cumulative</code>
 </dt>
 <dd>
 <p>
         Count changes in a child directory for the parent directory as well.
-        Note that when using <tt>cumulative</tt>, the sum of the percentages
+        Note that when using <code>cumulative</code>, the sum of the percentages
         reported may exceed 100%. The default (non-cumulative) behavior can
-        be specified with the <tt>noncumulative</tt> parameter.
+        be specified with the <code>noncumulative</code> parameter.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -785,10 +954,11 @@ git-diff-tree(1) Manual Page
 </p>
 </dd>
 </dl></div>
+</div></div>
 <div class="paragraph"><p>Example: The following will count changed files, while ignoring
 directories with less than 10% of the total amount of changed files,
 and accumulating child directory counts in the parent directories:
-<tt>--dirstat=files,10,cumulative</tt>.</p></div>
+<code>--dirstat=files,10,cumulative</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 --summary
@@ -804,7 +974,7 @@ and accumulating child directory counts in the parent directories:
 </dt>
 <dd>
 <p>
-        Synonym for <tt>-p --stat</tt>.
+        Synonym for <code>-p --stat</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -812,11 +982,11 @@ and accumulating child directory counts in the parent directories:
 </dt>
 <dd>
 <p>
-        When <tt>--raw</tt>, <tt>--numstat</tt>, <tt>--name-only</tt> or <tt>--name-status</tt> has been
+        When <code>--raw</code>, <code>--numstat</code>, <code>--name-only</code> or <code>--name-status</code> has been
         given, do not munge pathnames and use NULs as output field terminators.
 </p>
 <div class="paragraph"><p>Without this option, each pathname output will have TAB, LF, double quotes,
-and backslash characters replaced with <tt>\t</tt>, <tt>\n</tt>, <tt>\"</tt>, and <tt>\\</tt>,
+and backslash characters replaced with <code>\t</code>, <code>\n</code>, <code>\"</code>, and <code>\\</code>,
 respectively, and the pathname will be enclosed in double quotes if
 any of those replacements occurred.</p></div>
 </dd>
@@ -834,7 +1004,7 @@ any of those replacements occurred.</p></div>
 <dd>
 <p>
         Show only names and status of changed files. See the description
-        of the <tt>--diff-filter</tt> option on what the status letters mean.
+        of the <code>--diff-filter</code> option on what the status letters mean.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -842,13 +1012,13 @@ any of those replacements occurred.</p></div>
 </dt>
 <dd>
 <p>
-        Specify how differences in submodules are shown.  When <tt>--submodule</tt>
-        or <tt>--submodule=log</tt> is given, the <em>log</em> format is used.  This format lists
-        the commits in the range like <a href="git-submodule.html">git-submodule(1)</a> <tt>summary</tt> does.
-        Omitting the <tt>--submodule</tt> option or specifying <tt>--submodule=short</tt>,
+        Specify how differences in submodules are shown.  When <code>--submodule</code>
+        or <code>--submodule=log</code> is given, the <em>log</em> format is used.  This format lists
+        the commits in the range like <a href="git-submodule.html">git-submodule(1)</a> <code>summary</code> does.
+        Omitting the <code>--submodule</code> option or specifying <code>--submodule=short</code>,
         uses the <em>short</em> format. This format just shows the names of the commits
         at the beginning and end of the range.  Can be tweaked via the
-        <tt>diff.submodule</tt> configuration variable.
+        <code>diff.submodule</code> configuration variable.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -857,8 +1027,8 @@ any of those replacements occurred.</p></div>
 <dd>
 <p>
         Show colored diff.
-        The value must be <tt>always</tt> (the default for <tt>&lt;when&gt;</tt>), <tt>never</tt>, or <tt>auto</tt>.
-        The default value is <tt>never</tt>.
+        The value must be <code>always</code> (the default for <code>&lt;when&gt;</code>), <code>never</code>, or <code>auto</code>.
+        The default value is <code>never</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -867,7 +1037,7 @@ any of those replacements occurred.</p></div>
 <dd>
 <p>
         Turn off colored diff.
-        It is the same as <tt>--color=never</tt>.
+        It is the same as <code>--color=never</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -877,16 +1047,18 @@ any of those replacements occurred.</p></div>
 <p>
         Show a word diff, using the &lt;mode&gt; to delimit changed words.
         By default, words are delimited by whitespace; see
-        <tt>--word-diff-regex</tt> below.  The &lt;mode&gt; defaults to <em>plain</em>, and
+        <code>--word-diff-regex</code> below.  The &lt;mode&gt; defaults to <em>plain</em>, and
         must be one of:
 </p>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
 color
 </dt>
 <dd>
 <p>
-        Highlight changed words using only colors.  Implies <tt>--color</tt>.
+        Highlight changed words using only colors.  Implies <code>--color</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -894,7 +1066,7 @@ plain
 </dt>
 <dd>
 <p>
-        Show words as <tt>[-removed-]</tt> and <tt>{+added+}</tt>.  Makes no
+        Show words as <code>[-removed-]</code> and <code>{+added+}</code>.  Makes no
         attempts to escape the delimiters if they appear in the input,
         so the output may be ambiguous.
 </p>
@@ -906,10 +1078,10 @@ porcelain
 <p>
         Use a special line-based format intended for script
         consumption.  Added/removed/unchanged runs are printed in the
-        usual unified diff format, starting with a <tt>+</tt>/<tt>-</tt>/` `
+        usual unified diff format, starting with a <code>+</code>/<code>-</code>/` `
         character at the beginning of the line and extending to the
         end of the line.  Newlines in the input are represented by a
-        tilde <tt>~</tt> on a line of its own.
+        tilde <code>~</code> on a line of its own.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -921,6 +1093,7 @@ none
 </p>
 </dd>
 </dl></div>
+</div></div>
 <div class="paragraph"><p>Note that despite the name of the first mode, color is used to
 highlight the changed parts in all modes if enabled.</p></div>
 </dd>
@@ -931,12 +1104,12 @@ highlight the changed parts in all modes if enabled.</p></div>
 <p>
         Use &lt;regex&gt; to decide what a word is, instead of considering
         runs of non-whitespace to be a word.  Also implies
-        <tt>--word-diff</tt> unless it was already enabled.
+        <code>--word-diff</code> unless it was already enabled.
 </p>
 <div class="paragraph"><p>Every non-overlapping match of the
 &lt;regex&gt; is considered a word.  Anything between these matches is
 considered whitespace and ignored(!) for the purposes of finding
-differences.  You may want to append <tt>|[^[:space:]]</tt> to your regular
+differences.  You may want to append <code>|[^[:space:]]</code> to your regular
 expression to make sure that it matches all non-whitespace characters.
 A match that contains a newline is silently truncated(!) at the
 newline.</p></div>
@@ -950,8 +1123,8 @@ override configuration settings.</p></div>
 </dt>
 <dd>
 <p>
-        Equivalent to <tt>--word-diff=color</tt> plus (if a regex was
-        specified) <tt>--word-diff-regex=&lt;regex&gt;</tt>.
+        Equivalent to <code>--word-diff=color</code> plus (if a regex was
+        specified) <code>--word-diff-regex=&lt;regex&gt;</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -969,7 +1142,7 @@ override configuration settings.</p></div>
 <dd>
 <p>
         Warn if changes introduce whitespace errors.  What are
-        considered whitespace errors is controlled by <tt>core.whitespace</tt>
+        considered whitespace errors is controlled by <code>core.whitespace</code>
         configuration.  By default, trailing whitespaces (including
         lines that solely consist of whitespaces) and a space character
         that is immediately followed by a tab character inside the
@@ -993,8 +1166,8 @@ override configuration settings.</p></div>
 </dt>
 <dd>
 <p>
-        In addition to <tt>--full-index</tt>, output a binary diff that
-        can be applied with <tt>git-apply</tt>.
+        In addition to <code>--full-index</code>, output a binary diff that
+        can be applied with <code>git-apply</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1005,9 +1178,9 @@ override configuration settings.</p></div>
         Instead of showing the full 40-byte hexadecimal object
         name in diff-raw format output and diff-tree header
         lines, show only a partial prefix.  This is
-        independent of the <tt>--full-index</tt> option above, which controls
+        independent of the <code>--full-index</code> option above, which controls
         the diff-patch output format.  Non default number of
-        digits can be specified with <tt>--abbrev=&lt;n&gt;</tt>.
+        digits can be specified with <code>--abbrev=&lt;n&gt;</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1025,15 +1198,15 @@ override configuration settings.</p></div>
 not as a series of deletion and insertion mixed together with a very
 few lines that happen to match textually as the context, but as a
 single deletion of everything old followed by a single insertion of
-everything new, and the number <tt>m</tt> controls this aspect of the -B
-option (defaults to 60%). <tt>-B/70%</tt> specifies that less than 30% of the
+everything new, and the number <code>m</code> controls this aspect of the -B
+option (defaults to 60%). <code>-B/70%</code> specifies that less than 30% of the
 original should remain in the result for git to consider it a total
 rewrite (i.e. otherwise the resulting patch will be a series of
 deletion and insertion mixed together with context lines).</p></div>
 <div class="paragraph"><p>When used with -M, a totally-rewritten file is also considered as the
 source of a rename (usually -M only considers a file that disappeared
-as the source of a rename), and the number <tt>n</tt> controls this aspect of
-the -B option (defaults to 50%). <tt>-B20%</tt> specifies that a change with
+as the source of a rename), and the number <code>n</code> controls this aspect of
+the -B option (defaults to 50%). <code>-B20%</code> specifies that a change with
 addition and deletion compared to 20% or more of the file&#8217;s size are
 eligible for being picked up as a possible source of a rename to
 another file.</p></div>
@@ -1047,11 +1220,15 @@ another file.</p></div>
 <dd>
 <p>
         Detect renames.
-        If <tt>n</tt> is specified, it is a threshold on the similarity
+        If <code>n</code> is specified, it is a threshold on the similarity
         index (i.e. amount of addition/deletions compared to the
-        file&#8217;s size). For example, <tt>-M90%</tt> means git should consider a
+        file&#8217;s size). For example, <code>-M90%</code> means git should consider a
         delete/add pair to be a rename if more than 90% of the file
-        hasn&#8217;t changed.
+        hasn&#8217;t changed.  Without a <code>%</code> sign, the number is to be read as
+        a fraction, with a decimal point before it.  I.e., <code>-M5</code> becomes
+        0.5, and is thus the same as <code>-M50%</code>.  Similarly, <code>-M05</code> is
+        the same as <code>-M5%</code>.  To limit detection to exact renames, use
+        <code>-M100%</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1062,8 +1239,8 @@ another file.</p></div>
 </dt>
 <dd>
 <p>
-        Detect copies as well as renames.  See also <tt>--find-copies-harder</tt>.
-        If <tt>n</tt> is specified, it has the same meaning as for <tt>-M&lt;n&gt;</tt>.
+        Detect copies as well as renames.  See also <code>--find-copies-harder</code>.
+        If <code>n</code> is specified, it has the same meaning as for <code>-M&lt;n&gt;</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1071,13 +1248,13 @@ another file.</p></div>
 </dt>
 <dd>
 <p>
-        For performance reasons, by default, <tt>-C</tt> option finds copies only
+        For performance reasons, by default, <code>-C</code> option finds copies only
         if the original file of the copy was modified in the same
         changeset.  This flag makes the command
         inspect unmodified files as candidates for the source of
         copy.  This is a very expensive operation for large
         projects, so use it with caution.  Giving more than one
-        <tt>-C</tt> option has the same effect.
+        <code>-C</code> option has the same effect.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1089,14 +1266,14 @@ another file.</p></div>
 <dd>
 <p>
         Omit the preimage for deletes, i.e. print only the header but not
-        the diff between the preimage and <tt>/dev/null</tt>. The resulting patch
-        is not meant to be applied with <tt>patch</tt> nor <tt>git apply</tt>; this is
+        the diff between the preimage and <code>/dev/null</code>. The resulting patch
+        is not meant to be applied with <code>patch</code> nor <code>git apply</code>; this is
         solely for people who want to just concentrate on reviewing the
         text after the change. In addition, the output obviously lack
         enough information to apply such a patch in reverse, even manually,
         hence the name of the option.
 </p>
-<div class="paragraph"><p>When used together with <tt>-B</tt>, omit also the preimage in the deletion part
+<div class="paragraph"><p>When used together with <code>-B</code>, omit also the preimage in the deletion part
 of a delete/create pair.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1104,7 +1281,7 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        The <tt>-M</tt> and <tt>-C</tt> options require O(n^2) processing time where n
+        The <code>-M</code> and <code>-C</code> options require O(n^2) processing time where n
         is the number of potential rename/copy targets.  This
         option prevents rename/copy detection from running if
         the number of rename/copy targets exceeds the specified
@@ -1116,13 +1293,13 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Select only files that are Added (<tt>A</tt>), Copied (<tt>C</tt>),
-        Deleted (<tt>D</tt>), Modified (<tt>M</tt>), Renamed (<tt>R</tt>), have their
-        type (i.e. regular file, symlink, submodule, &#8230;) changed (<tt>T</tt>),
-        are Unmerged (<tt>U</tt>), are
-        Unknown (<tt>X</tt>), or have had their pairing Broken (<tt>B</tt>).
+        Select only files that are Added (<code>A</code>), Copied (<code>C</code>),
+        Deleted (<code>D</code>), Modified (<code>M</code>), Renamed (<code>R</code>), have their
+        type (i.e. regular file, symlink, submodule, &#8230;) changed (<code>T</code>),
+        are Unmerged (<code>U</code>), are
+        Unknown (<code>X</code>), or have had their pairing Broken (<code>B</code>).
         Any combination of the filter characters (including none) can be used.
-        When <tt>*</tt> (All-or-none) is added to the combination, all
+        When <code>*</code> (All-or-none) is added to the combination, all
         paths are selected if there is any file that matches
         other criteria in the comparison; if there is no file
         that matches other criteria, nothing is selected.
@@ -1153,7 +1330,7 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        When <tt>-S</tt> or <tt>-G</tt> finds a change, show all the changes in that
+        When <code>-S</code> or <code>-G</code> finds a change, show all the changes in that
         changeset, not just the files that contain the change
         in &lt;string&gt;.
 </p>
@@ -1278,7 +1455,7 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Disable all output of the program. Implies <tt>--exit-code</tt>.
+        Disable all output of the program. Implies <code>--exit-code</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1378,7 +1555,7 @@ of a delete/create pair.</p></div>
 <p>
         If provided, the results are limited to a subset of files
         matching one of these prefix strings.
-        i.e., file matches <tt>/^&lt;pattern1&gt;|&lt;pattern2&gt;|.../</tt>
+        i.e., file matches <code>/^&lt;pattern1&gt;|&lt;pattern2&gt;|.../</code>
         Note that this parameter does not provide any wildcard or regexp
         features.
 </p>
@@ -1497,7 +1674,7 @@ people using 80-column terminals.</p></div>
 <dd>
 <p>
         Show the full 40-byte hexadecimal commit object name. This negates
-        <tt>--abbrev-commit</tt> and those options which imply it such as
+        <code>--abbrev-commit</code> and those options which imply it such as
         "--oneline". It also overrides the <em>log.abbrevCommit</em> variable.
 </p>
 </dd>
@@ -1529,15 +1706,15 @@ people using 80-column terminals.</p></div>
 <p>
         Show the notes (see <a href="git-notes.html">git-notes(1)</a>) that annotate the
         commit, when showing the commit log message.  This is the default
-        for <tt>git log</tt>, <tt>git show</tt> and <tt>git whatchanged</tt> commands when
-        there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option given
+        for <code>git log</code>, <code>git show</code> and <code>git whatchanged</code> commands when
+        there is no <code>--pretty</code>, <code>--format</code> nor <code>--oneline</code> option given
         on the command line.
 </p>
 <div class="paragraph"><p>By default, the notes shown are from the notes refs listed in the
 <em>core.notesRef</em> and <em>notes.displayRef</em> variables (or corresponding
 environment overrides). See <a href="git-config.html">git-config(1)</a> for more details.</p></div>
 <div class="paragraph"><p>With an optional <em>&lt;ref&gt;</em> argument, show this notes ref instead of the
-default notes ref(s). The ref is taken to be in <tt>refs/notes/</tt> if it
+default notes ref(s). The ref is taken to be in <code>refs/notes/</code> if it
 is not qualified.</p></div>
 <div class="paragraph"><p>Multiple --notes options can be combined to control which notes are
 being displayed. Examples: "--notes=foo" will show only notes from
@@ -1549,7 +1726,7 @@ being displayed. Examples: "--notes=foo" will show only notes from
 </dt>
 <dd>
 <p>
-        Do not show notes. This negates the above <tt>--notes</tt> option, by
+        Do not show notes. This negates the above <code>--notes</code> option, by
         resetting the list of notes refs from which notes are shown.
         Options are parsed in the order given on the command line, so e.g.
         "--notes --notes=foo --no-notes --notes=bar" will only show notes
@@ -1574,7 +1751,7 @@ being displayed. Examples: "--notes=foo" will show only notes from
 <dd>
 <p>
         Check the validity of a signed commit object by passing the signature
-        to <tt>gpg --verify</tt> and show the output.
+        to <code>gpg --verify</code> and show the output.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1627,6 +1804,8 @@ being displayed. Examples: "--notes=foo" will show only notes from
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_pretty_formats">PRETTY FORMATS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If the commit is a merge, and if the pretty-format
@@ -1651,7 +1830,7 @@ built-in formats:</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;sha1&gt; &lt;title line&gt;</tt></pre>
+<pre><code>&lt;sha1&gt; &lt;title line&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>This is designed to be as compact as possible.</p></div>
 </li>
@@ -1661,12 +1840,12 @@ built-in formats:</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
-Author: &lt;author&gt;</tt></pre>
+<pre><code>commit &lt;sha1&gt;
+Author: &lt;author&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -1675,17 +1854,17 @@ Author: &lt;author&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
+<pre><code>commit &lt;sha1&gt;
 Author: &lt;author&gt;
-Date:   &lt;author date&gt;</tt></pre>
+Date:   &lt;author date&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -1694,17 +1873,17 @@ Date:   &lt;author date&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
+<pre><code>commit &lt;sha1&gt;
 Author: &lt;author&gt;
-Commit: &lt;committer&gt;</tt></pre>
+Commit: &lt;committer&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -1713,19 +1892,19 @@ Commit: &lt;committer&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
+<pre><code>commit &lt;sha1&gt;
 Author:     &lt;author&gt;
 AuthorDate: &lt;author date&gt;
 Commit:     &lt;committer&gt;
-CommitDate: &lt;committer date&gt;</tt></pre>
+CommitDate: &lt;committer date&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -1734,14 +1913,14 @@ CommitDate: &lt;committer date&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>From &lt;sha1&gt; &lt;date&gt;
+<pre><code>From &lt;sha1&gt; &lt;date&gt;
 From: &lt;author&gt;
 Date: &lt;author date&gt;
-Subject: [PATCH] &lt;title line&gt;</tt></pre>
+Subject: [PATCH] &lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -1767,8 +1946,8 @@ instead of <em>\n</em>.</p></div>
 would show something like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>The author of fe6e0ee was Junio C Hamano, 23 hours ago
-The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;</tt></pre>
+<pre><code>The author of fe6e0ee was Junio C Hamano, 23 hours ago
+The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;</code></pre>
 </div></div>
 <div class="paragraph"><p>The placeholders are:</p></div>
 <div class="ulist"><ul>
@@ -1944,12 +2123,12 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-<em>%gD</em>: reflog selector, e.g., <tt>refs/stash@{1}</tt>
+<em>%gD</em>: reflog selector, e.g., <code>refs/stash@{1}</code>
 </p>
 </li>
 <li>
 <p>
-<em>%gd</em>: shortened reflog selector, e.g., <tt>stash@{1}</tt>
+<em>%gd</em>: shortened reflog selector, e.g., <code>stash@{1}</code>
 </p>
 </li>
 <li>
@@ -2037,16 +2216,16 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 <div class="title">Note</div>
 </td>
 <td class="content">Some placeholders may depend on other options given to the
-revision traversal engine. For example, the <tt>%g*</tt> reflog options will
+revision traversal engine. For example, the <code>%g*</code> reflog options will
 insert an empty string unless we are traversing reflog entries (e.g., by
-<tt>git log -g</tt>). The <tt>%d</tt> placeholder will use the "short" decoration
-format if <tt>--decorate</tt> was not already provided on the command line.</td>
+<code>git log -g</code>). The <code>%d</code> placeholder will use the "short" decoration
+format if <code>--decorate</code> was not already provided on the command line.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>If you add a <tt>+</tt> (plus sign) after <em>%</em> of a placeholder, a line-feed
+<div class="paragraph"><p>If you add a <code>+</code> (plus sign) after <em>%</em> of a placeholder, a line-feed
 is inserted immediately before the expansion if and only if the
 placeholder expands to a non-empty string.</p></div>
-<div class="paragraph"><p>If you add a <tt>-</tt> (minus sign) after <em>%</em> of a placeholder, line-feeds that
+<div class="paragraph"><p>If you add a <code>-</code> (minus sign) after <em>%</em> of a placeholder, line-feeds that
 immediately precede the expansion are deleted if and only if the
 placeholder expands to an empty string.</p></div>
 <div class="paragraph"><p>If you add a ` ` (space) after <em>%</em> of a placeholder, a space
@@ -2066,7 +2245,7 @@ terminated with a new line, just as the "oneline" format does.
 For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log -2 --pretty=format:%h 4da45bef \
+<pre><code>$ git log -2 --pretty=format:%h 4da45bef \
   | perl -pe '$_ .= " -- NO NEWLINE\n" unless /\n/'
 4da45be
 7134973 -- NO NEWLINE
@@ -2074,49 +2253,51 @@ For example:</p></div>
 $ git log -2 --pretty=tformat:%h 4da45bef \
   | perl -pe '$_ .= " -- NO NEWLINE\n" unless /\n/'
 4da45be
-7134973</tt></pre>
+7134973</code></pre>
 </div></div>
-<div class="paragraph"><p>In addition, any unrecognized string that has a <tt>%</tt> in it is interpreted
-as if it has <tt>tformat:</tt> in front of it.  For example, these two are
+<div class="paragraph"><p>In addition, any unrecognized string that has a <code>%</code> in it is interpreted
+as if it has <code>tformat:</code> in front of it.  For example, these two are
 equivalent:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log -2 --pretty=tformat:%h 4da45bef
-$ git log -2 --pretty=%h 4da45bef</tt></pre>
+<pre><code>$ git log -2 --pretty=tformat:%h 4da45bef
+$ git log -2 --pretty=%h 4da45bef</code></pre>
 </div></div>
 </li>
 </ul></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_limiting_output">Limiting Output</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If you&#8217;re only interested in differences in a subset of files, for
 example some architecture-specific files, you might do:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git diff-tree -r &lt;tree-ish&gt; &lt;tree-ish&gt; arch/ia64 include/asm-ia64</tt></pre>
+<pre><code>git diff-tree -r &lt;tree-ish&gt; &lt;tree-ish&gt; arch/ia64 include/asm-ia64</code></pre>
 </div></div>
 <div class="paragraph"><p>and it will only show you what changed in those two directories.</p></div>
-<div class="paragraph"><p>Or if you are searching for what changed in just <tt>kernel/sched.c</tt>, just do</p></div>
+<div class="paragraph"><p>Or if you are searching for what changed in just <code>kernel/sched.c</code>, just do</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git diff-tree -r &lt;tree-ish&gt; &lt;tree-ish&gt; kernel/sched.c</tt></pre>
+<pre><code>git diff-tree -r &lt;tree-ish&gt; &lt;tree-ish&gt; kernel/sched.c</code></pre>
 </div></div>
 <div class="paragraph"><p>and it will ignore all differences to other files.</p></div>
 <div class="paragraph"><p>The pattern is always the prefix, and is matched exactly.  There are no
 wildcards.  Even stricter, it has to match a complete path component.
-I.e. "foo" does not pick up <tt>foobar.h</tt>.  "foo" does match <tt>foo/bar.h</tt>
+I.e. "foo" does not pick up <code>foobar.h</code>.  "foo" does match <code>foo/bar.h</code>
 so it can be used to name subdirectories.</p></div>
 <div class="paragraph"><p>An example of normal usage is:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>torvalds@ppc970:~/git&gt; git diff-tree --abbrev 5319e4
-:100664 100664 ac348b... a01513...    git-fsck-objects.c</tt></pre>
+<pre><code>torvalds@ppc970:~/git&gt; git diff-tree --abbrev 5319e4
+:100664 100664 ac348b... a01513...    git-fsck-objects.c</code></pre>
 </div></div>
 <div class="paragraph"><p>which tells you that the last commit changed just one file (it&#8217;s from
 this one:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>commit 3c6f7ca19ad4043e9e72fa94106f352897e651a8
+<pre><code>commit 3c6f7ca19ad4043e9e72fa94106f352897e651a8
 tree 5319e4d609cdd282069cc4dce33c1db559539b03
 parent b4e628ea30d5ab3606119d2ea5caeab141d38df7
 author Linus Torvalds &lt;torvalds@ppc970.osdl.org&gt; Sat Apr 9 12:02:30 2005
@@ -2125,10 +2306,12 @@ committer Linus Torvalds &lt;torvalds@ppc970.osdl.org&gt; Sat Apr 9 12:02:30 200
 Make "git-fsck-objects" print out all the root commits it finds.
 
 Once I do the reference tracking, I'll also make it print out all the
-HEAD commits it finds, which is even more interesting.</tt></pre>
+HEAD commits it finds, which is even more interesting.</code></pre>
 </div></div>
 <div class="paragraph"><p>in case you care).</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_raw_output_format">Raw output format</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The raw output format from "git-diff-index", "git-diff-tree",
@@ -2175,12 +2358,12 @@ line per changed file.</p></div>
 <div class="paragraph"><p>An output line is formatted this way:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>in-place edit  :100644 100644 bcd1234... 0123456... M file0
+<pre><code>in-place edit  :100644 100644 bcd1234... 0123456... M file0
 copy-edit      :100644 100644 abcd123... 1234567... C68 file1 file2
 rename-edit    :100644 100644 abcd123... 1234567... R86 file1 file3
 create         :000000 100644 0000000... 1234567... A file4
 delete         :100644 000000 1234567... 0000000... D file5
-unmerged       :000000 000000 0000000... 0000000... U file6</tt></pre>
+unmerged       :000000 000000 0000000... 0000000... U file6</code></pre>
 </div></div>
 <div class="paragraph"><p>That is, from the left to the right:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -2312,12 +2495,14 @@ and it is out of sync with the index.</p></div>
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>:100644 100644 5be4a4...... 000000...... M file.c</tt></pre>
+<pre><code>:100644 100644 5be4a4...... 000000...... M file.c</code></pre>
 </div></div>
-<div class="paragraph"><p>When <tt>-z</tt> option is not used, TAB, LF, and backslash characters
-in pathnames are represented as <tt>\t</tt>, <tt>\n</tt>, and <tt>\\</tt>,
+<div class="paragraph"><p>When <code>-z</code> option is not used, TAB, LF, and backslash characters
+in pathnames are represented as <code>\t</code>, <code>\n</code>, and <code>\\</code>,
 respectively.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_diff_format_for_merges">diff format for merges</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>"git-diff-tree", "git-diff-files" and "git-diff --raw"
@@ -2354,11 +2539,13 @@ single path, only for "dst"
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>::100644 100644 100644 fabadb8... cc95eb0... 4866510... MM      describe.c</tt></pre>
+<pre><code>::100644 100644 100644 fabadb8... cc95eb0... 4866510... MM      describe.c</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that <em>combined diff</em> lists only files which were modified from
 all parents.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_generating_patches_with_p">Generating patches with -p</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>When "git-diff-index", "git-diff-tree", or "git-diff-files" are run
@@ -2376,12 +2563,12 @@ It is preceded with a "git diff" header that looks like this:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>diff --git a/file1 b/file2</tt></pre>
+<pre><code>diff --git a/file1 b/file2</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>a/</tt> and <tt>b/</tt> filenames are the same unless rename/copy is
+<div class="paragraph"><p>The <code>a/</code> and <code>b/</code> filenames are the same unless rename/copy is
 involved.  Especially, even for a creation or a deletion,
-<tt>/dev/null</tt> is <em>not</em> used in place of the <tt>a/</tt> or <tt>b/</tt> filenames.</p></div>
-<div class="paragraph"><p>When rename/copy is involved, <tt>file1</tt> and <tt>file2</tt> show the
+<code>/dev/null</code> is <em>not</em> used in place of the <code>a/</code> or <code>b/</code> filenames.</p></div>
+<div class="paragraph"><p>When rename/copy is involved, <code>file1</code> and <code>file2</code> show the
 name of the source file of the rename/copy and the name of
 the file that rename/copy produces, respectively.</p></div>
 </li>
@@ -2391,7 +2578,7 @@ It is followed by one or more extended header lines:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>old mode &lt;mode&gt;
+<pre><code>old mode &lt;mode&gt;
 new mode &lt;mode&gt;
 deleted file mode &lt;mode&gt;
 new file mode &lt;mode&gt;
@@ -2401,11 +2588,11 @@ rename from &lt;path&gt;
 rename to &lt;path&gt;
 similarity index &lt;number&gt;
 dissimilarity index &lt;number&gt;
-index &lt;hash&gt;..&lt;hash&gt; &lt;mode&gt;</tt></pre>
+index &lt;hash&gt;..&lt;hash&gt; &lt;mode&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>File modes are printed as 6-digit octal numbers including the file type
 and file permission bits.</p></div>
-<div class="paragraph"><p>Path names in extended headers do not include the <tt>a/</tt> and <tt>b/</tt> prefixes.</p></div>
+<div class="paragraph"><p>Path names in extended headers do not include the <code>a/</code> and <code>b/</code> prefixes.</p></div>
 <div class="paragraph"><p>The similarity index is the percentage of unchanged lines, and
 the dissimilarity index is the percentage of changed lines.  It
 is a rounded down integer, followed by a percent sign.  The
@@ -2419,33 +2606,35 @@ separate lines indicate the old and the new mode.</p></div>
 <li>
 <p>
 TAB, LF, double quote and backslash characters in pathnames
-    are represented as <tt>\t</tt>, <tt>\n</tt>, <tt>\"</tt> and <tt>\\</tt>, respectively.
+    are represented as <code>\t</code>, <code>\n</code>, <code>\"</code> and <code>\\</code>, respectively.
     If there is need for such substitution then the whole
     pathname is put in double quotes.
 </p>
 </li>
 <li>
 <p>
-All the <tt>file1</tt> files in the output refer to files before the
-    commit, and all the <tt>file2</tt> files refer to files after the commit.
+All the <code>file1</code> files in the output refer to files before the
+    commit, and all the <code>file2</code> files refer to files after the commit.
     It is incorrect to apply each change to each file sequentially.  For
     example, this patch will swap a and b:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>diff --git a/a b/b
+<pre><code>diff --git a/a b/b
 rename from a
 rename to b
 diff --git a/b b/a
 rename from b
-rename to a</tt></pre>
+rename to a</code></pre>
 </div></div>
 </li>
 </ol></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_combined_diff_format">combined diff format</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Any diff-generating command can take the &#8216;-c` or <tt>--cc</tt> option to
+<div class="paragraph"><p>Any diff-generating command can take the &#8216;-c` or <code>--cc</code> option to
 produce a <em>combined diff</em> when showing a merge. This is the default
 format when showing merges with <a href="git-diff.html">git-diff(1)</a> or
 <a href="git-show.html">git-show(1)</a>. Note also that you can give the `-m&#8217; option to any
@@ -2454,7 +2643,7 @@ of a merge.</p></div>
 <div class="paragraph"><p>A <em>combined diff</em> format looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>diff --combined describe.c
+<pre><code>diff --combined describe.c
 index fabadb8,cc95eb0..4866510
 --- a/describe.c
 +++ b/describe.c
@@ -2480,7 +2669,7 @@ index fabadb8,cc95eb0..4866510
  +
         if (!initialized) {
                 initialized = 1;
-                for_each_ref(get_name);</tt></pre>
+                for_each_ref(get_name);</code></pre>
 </div></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -2490,12 +2679,12 @@ It is preceded with a "git diff" header, that looks like
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>diff --combined file</tt></pre>
+<pre><code>diff --combined file</code></pre>
 </div></div>
 <div class="paragraph"><p>or like this (when <em>--cc</em> option is used):</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>diff --cc file</tt></pre>
+<pre><code>diff --cc file</code></pre>
 </div></div>
 </li>
 <li>
@@ -2505,12 +2694,12 @@ It is followed by one or more extended header lines
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>index &lt;hash&gt;,&lt;hash&gt;..&lt;hash&gt;
+<pre><code>index &lt;hash&gt;,&lt;hash&gt;..&lt;hash&gt;
 mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;
 new file mode &lt;mode&gt;
-deleted file mode &lt;mode&gt;,&lt;mode&gt;</tt></pre>
+deleted file mode &lt;mode&gt;,&lt;mode&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;</tt> line appears only if at least one of
+<div class="paragraph"><p>The <code>mode &lt;mode&gt;,&lt;mode&gt;..&lt;mode&gt;</code> line appears only if at least one of
 the &lt;mode&gt; is different from the rest. Extended headers with
 information about detected contents movement (renames and
 copying detection) are designed to work with diff of two
@@ -2522,74 +2711,76 @@ It is followed by two-line from-file/to-file header
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>--- a/file
-+++ b/file</tt></pre>
+<pre><code>--- a/file
++++ b/file</code></pre>
 </div></div>
 <div class="paragraph"><p>Similar to two-line header for traditional <em>unified</em> diff
-format, <tt>/dev/null</tt> is used to signal created or deleted
+format, <code>/dev/null</code> is used to signal created or deleted
 files.</p></div>
 </li>
 <li>
 <p>
 Chunk header format is modified to prevent people from
-     accidentally feeding it to <tt>patch -p1</tt>. Combined diff format
+     accidentally feeding it to <code>patch -p1</code>. Combined diff format
      was created for review of merge commit changes, and was not
      meant for apply. The change is similar to the change in the
      extended <em>index</em> header:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>@@@ &lt;from-file-range&gt; &lt;from-file-range&gt; &lt;to-file-range&gt; @@@</tt></pre>
+<pre><code>@@@ &lt;from-file-range&gt; &lt;from-file-range&gt; &lt;to-file-range&gt; @@@</code></pre>
 </div></div>
-<div class="paragraph"><p>There are (number of parents + 1) <tt>@</tt> characters in the chunk
+<div class="paragraph"><p>There are (number of parents + 1) <code>@</code> characters in the chunk
 header for combined diff format.</p></div>
 </li>
 </ol></div>
 <div class="paragraph"><p>Unlike the traditional <em>unified</em> diff format, which shows two
-files A and B with a single column that has <tt>-</tt> (minus&#8201;&#8212;&#8201;appears in A but removed in B), <tt>+</tt> (plus&#8201;&#8212;&#8201;missing in A but
-added to B), or <tt>" "</tt> (space&#8201;&#8212;&#8201;unchanged) prefix, this format
+files A and B with a single column that has <code>-</code> (minus&#8201;&#8212;&#8201;appears in A but removed in B), <code>+</code> (plus&#8201;&#8212;&#8201;missing in A but
+added to B), or <code>" "</code> (space&#8201;&#8212;&#8201;unchanged) prefix, this format
 compares two or more files file1, file2,&#8230; with one file X, and
 shows how X differs from each of fileN.  One column for each of
 fileN is prepended to the output line to note how X&#8217;s line is
 different from it.</p></div>
-<div class="paragraph"><p>A <tt>-</tt> character in the column N means that the line appears in
-fileN but it does not appear in the result.  A <tt>+</tt> character
+<div class="paragraph"><p>A <code>-</code> character in the column N means that the line appears in
+fileN but it does not appear in the result.  A <code>+</code> character
 in the column N means that the line appears in the result,
 and fileN does not have that line (in other words, the line was
 added, from the point of view of that parent).</p></div>
 <div class="paragraph"><p>In the above example output, the function signature was changed
-from both files (hence two <tt>-</tt> removals from both file1 and
-file2, plus <tt>++</tt> to mean one line that was added does not appear
+from both files (hence two <code>-</code> removals from both file1 and
+file2, plus <code>++</code> to mean one line that was added does not appear
 in either file1 nor file2).  Also eight other lines are the same
-from file1 but do not appear in file2 (hence prefixed with <tt>+</tt>).</p></div>
-<div class="paragraph"><p>When shown by <tt>git diff-tree -c</tt>, it compares the parents of a
+from file1 but do not appear in file2 (hence prefixed with <code>+</code>).</p></div>
+<div class="paragraph"><p>When shown by <code>git diff-tree -c</code>, it compares the parents of a
 merge commit with the merge result (i.e. file1..fileN are the
-parents).  When shown by <tt>git diff-files -c</tt>, it compares the
+parents).  When shown by <code>git diff-files -c</code>, it compares the
 two unresolved merge parents with the working tree file
 (i.e. file1 is stage 2 aka "our version", file2 is stage 3 aka
 "their version").</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_other_diff_formats">other diff formats</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <tt>--summary</tt> option describes newly added, deleted, renamed and
-copied files.  The <tt>--stat</tt> option adds diffstat(1) graph to the
+<div class="paragraph"><p>The <code>--summary</code> option describes newly added, deleted, renamed and
+copied files.  The <code>--stat</code> option adds diffstat(1) graph to the
 output.  These options can be combined with other options, such as
-<tt>-p</tt>, and are meant for human consumption.</p></div>
-<div class="paragraph"><p>When showing a change that involves a rename or a copy, <tt>--stat</tt> output
+<code>-p</code>, and are meant for human consumption.</p></div>
+<div class="paragraph"><p>When showing a change that involves a rename or a copy, <code>--stat</code> output
 formats the pathnames compactly by combining common prefix and suffix of
-the pathnames.  For example, a change that moves <tt>arch/i386/Makefile</tt> to
-<tt>arch/x86/Makefile</tt> while modifying 4 lines will be shown like this:</p></div>
+the pathnames.  For example, a change that moves <code>arch/i386/Makefile</code> to
+<code>arch/x86/Makefile</code> while modifying 4 lines will be shown like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>arch/{i386 =&gt; x86}/Makefile    |   4 +--</tt></pre>
+<pre><code>arch/{i386 =&gt; x86}/Makefile    |   4 +--</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>--numstat</tt> option gives the diffstat(1) information but is designed
-for easier machine consumption.  An entry in <tt>--numstat</tt> output looks
+<div class="paragraph"><p>The <code>--numstat</code> option gives the diffstat(1) information but is designed
+for easier machine consumption.  An entry in <code>--numstat</code> output looks
 like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>1       2       README
-3       1       arch/{i386 =&gt; x86}/Makefile</tt></pre>
+<pre><code>1       2       README
+3       1       arch/{i386 =&gt; x86}/Makefile</code></pre>
 </div></div>
 <div class="paragraph"><p>That is, from left to right:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -2624,11 +2815,11 @@ a newline.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>When <tt>-z</tt> output option is in effect, the output is formatted this way:</p></div>
+<div class="paragraph"><p>When <code>-z</code> output option is in effect, the output is formatted this way:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>1       2       README NUL
-3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL</tt></pre>
+<pre><code>1       2       README NUL
+3       1       NUL arch/i386/Makefile NUL arch/x86/Makefile NUL</code></pre>
 </div></div>
 <div class="paragraph"><p>That is:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -2678,21 +2869,24 @@ a NUL.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>The extra <tt>NUL</tt> before the preimage path in renamed case is to allow
+<div class="paragraph"><p>The extra <code>NUL</code> before the preimage path in renamed case is to allow
 scripts that read the output to tell if the current record being read is
 a single-path record or a rename/copy record without reading ahead.
-After reading added and deleted lines, reading up to <tt>NUL</tt> would yield
-the pathname, but if that is <tt>NUL</tt>, the record will show two paths.</p></div>
+After reading added and deleted lines, reading up to <code>NUL</code> would yield
+the pathname, but if that is <code>NUL</code>, the record will show two paths.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
+</div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-15 13:45:02 PDT
+Last updated 2011-11-15 13:45:02 PST
 </div>
 </div>
 </body>
