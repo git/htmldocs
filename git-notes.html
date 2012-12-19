@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>git-notes(1)</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,69 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border-top: 2px solid silver;
   border-bottom: 2px solid silver;
 }
-h2 {
+body.manpage h2 {
   border-style: none;
 }
-div.sectionbody {
-  margin-left: 5%;
+body.manpage div.sectionbody {
+  margin-left: 3em;
 }
 
 @media print {
-  div#toc { display: none; }
+  body.manpage div#toc { display: none; }
 }
 
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
-}
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
-}
-
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
-}
-
-div.quoteblock-attribution {
-  padding-top: 0.5em;
-  text-align: right;
-}
-
-div.verseblock-content {
-  white-space: pre;
-}
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
-}
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
-}
-
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -477,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -497,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -524,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -561,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="manpage">
 <div id="header">
 <h1>
 git-notes(1) Manual Page
@@ -580,10 +742,11 @@ git-notes(1) Manual Page
 </div>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git notes</em> [list [&lt;object&gt;]]
+<pre class="content"><em>git notes</em> [list [&lt;object&gt;]]
 <em>git notes</em> add [-f] [-F &lt;file&gt; | -m &lt;msg&gt; | (-c | -C) &lt;object&gt;] [&lt;object&gt;]
 <em>git notes</em> copy [-f] ( --stdin | &lt;from-object&gt; &lt;to-object&gt; )
 <em>git notes</em> append [-F &lt;file&gt; | -m &lt;msg&gt; | (-c | -C) &lt;object&gt;] [&lt;object&gt;]
@@ -594,15 +757,17 @@ git-notes(1) Manual Page
 <em>git notes</em> merge --abort [-v | -q]
 <em>git notes</em> remove [--ignore-missing] [--stdin] [&lt;object&gt;&#8230;]
 <em>git notes</em> prune [-n | -v]
-<em>git notes</em> get-ref</div>
-<div class="verseblock-attribution">
+<em>git notes</em> get-ref</pre>
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Adds, removes, or reads notes attached to objects, without touching
 the objects themselves.</p></div>
-<div class="paragraph"><p>By default, notes are saved to and read from <tt>refs/notes/commits</tt>, but
+<div class="paragraph"><p>By default, notes are saved to and read from <code>refs/notes/commits</code>, but
 this default can be overridden.  See the OPTIONS, CONFIGURATION, and
 ENVIRONMENT sections below.  If this ref does not exist, it will be
 quietly created when it is first needed to store a note.</p></div>
@@ -611,15 +776,17 @@ changing the commit itself. Notes can be shown by <em>git log</em> along with
 the original commit message. To distinguish these notes from the
 message stored in the commit object, the notes are indented like the
 message, after an unindented line saying "Notes (&lt;refname&gt;):" (or
-"Notes:" for <tt>refs/notes/commits</tt>).</p></div>
-<div class="paragraph"><p>Notes can also be added to patches prepared with <tt>git format-patch</tt> by
-using the <tt>--notes</tt> option. Such notes are added as a patch commentary
+"Notes:" for <code>refs/notes/commits</code>).</p></div>
+<div class="paragraph"><p>Notes can also be added to patches prepared with <code>git format-patch</code> by
+using the <code>--notes</code> option. Such notes are added as a patch commentary
 after a three dash separator line.</p></div>
 <div class="paragraph"><p>To change which notes are shown by <em>git log</em>, see the
 "notes.displayRef" configuration in <a href="git-log.html">git-log(1)</a>.</p></div>
 <div class="paragraph"><p>See the "notes.rewrite.&lt;command&gt;" configuration for a way to carry
 notes across commands that rewrite commits.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_subcommands">SUBCOMMANDS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -640,10 +807,10 @@ add
 <dd>
 <p>
         Add notes for a given object (defaults to HEAD). Abort if the
-        object already has notes (use <tt>-f</tt> to overwrite existing notes).
-        However, if you&#8217;re using <tt>add</tt> interactively (using an editor
+        object already has notes (use <code>-f</code> to overwrite existing notes).
+        However, if you&#8217;re using <code>add</code> interactively (using an editor
         to supply the notes contents), then - instead of aborting -
-        the existing notes will be opened in the editor (like the <tt>edit</tt>
+        the existing notes will be opened in the editor (like the <code>edit</code>
         subcommand).
 </p>
 </dd>
@@ -656,16 +823,16 @@ copy
         Abort if the second object already has notes, or if the first
         object has none (use -f to overwrite existing notes to the
         second object). This subcommand is equivalent to:
-        <tt>git notes add [-f] -C $(git notes list &lt;from-object&gt;) &lt;to-object&gt;</tt>
+        <code>git notes add [-f] -C $(git notes list &lt;from-object&gt;) &lt;to-object&gt;</code>
 </p>
-<div class="paragraph"><p>In <tt>--stdin</tt> mode, take lines in the format</p></div>
+<div class="paragraph"><p>In <code>--stdin</code> mode, take lines in the format</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&lt;from-object&gt; SP &lt;to-object&gt; [ SP &lt;rest&gt; ] LF</tt></pre>
+<pre><code>&lt;from-object&gt; SP &lt;to-object&gt; [ SP &lt;rest&gt; ] LF</code></pre>
 </div></div>
 <div class="paragraph"><p>on standard input, and copy the notes from each &lt;from-object&gt; to its
-corresponding &lt;to-object&gt;.  (The optional <tt>&lt;rest&gt;</tt> is ignored so that
-the command can read the input given to the <tt>post-rewrite</tt> hook.)</p></div>
+corresponding &lt;to-object&gt;.  (The optional <code>&lt;rest&gt;</code> is ignored so that
+the command can read the input given to the <code>post-rewrite</code> hook.)</p></div>
 </dd>
 <dt class="hdlist1">
 append
@@ -705,7 +872,7 @@ merge
 <div class="paragraph"><p>If conflicts arise and a strategy for automatically resolving
 conflicting notes (see the -s/--strategy option) is not given,
 the "manual" resolver is used. This resolver checks out the
-conflicting notes in a special worktree (<tt>.git/NOTES_MERGE_WORKTREE</tt>),
+conflicting notes in a special worktree (<code>.git/NOTES_MERGE_WORKTREE</code>),
 and instructs the user to manually resolve the conflicts there.
 When done, the user can either finalize the merge with
 <em>git notes merge --commit</em>, or abort the merge with
@@ -719,7 +886,7 @@ remove
         Remove the notes for given objects (defaults to HEAD). When
         giving zero or one object from the command line, this is
         equivalent to specifying an empty note message to
-        the <tt>edit</tt> subcommand.
+        the <code>edit</code> subcommand.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -741,6 +908,8 @@ get-ref
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -765,9 +934,9 @@ get-ref
 <dd>
 <p>
         Use the given note message (instead of prompting).
-        If multiple <tt>-m</tt> options are given, their values
+        If multiple <code>-m</code> options are given, their values
         are concatenated as separate paragraphs.
-        Lines starting with <tt>#</tt> and empty lines other than a
+        Lines starting with <code>#</code> and empty lines other than a
         single line between paragraphs will be stripped out.
 </p>
 </dd>
@@ -781,7 +950,7 @@ get-ref
 <p>
         Take the note message from the given file.  Use <em>-</em> to
         read the note message from the standard input.
-        Lines starting with <tt>#</tt> and empty lines other than a
+        Lines starting with <code>#</code> and empty lines other than a
         single line between paragraphs will be stripped out.
 </p>
 </dd>
@@ -794,7 +963,7 @@ get-ref
 <dd>
 <p>
         Take the given blob object (for example, another note) as the
-        note message. (Use <tt>git notes copy &lt;object&gt;</tt> instead to
+        note message. (Use <code>git notes copy &lt;object&gt;</code> instead to
         copy notes between objects.)
 </p>
 </dd>
@@ -817,7 +986,7 @@ get-ref
 <p>
         Manipulate the notes tree in &lt;ref&gt;.  This overrides
         <em>GIT_NOTES_REF</em> and the "core.notesRef" configuration.  The ref
-        is taken to be in <tt>refs/notes/</tt> if it is not qualified.
+        is taken to be in <code>refs/notes/</code> if it is not qualified.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -916,6 +1085,8 @@ get-ref
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Commit notes are blobs containing extra information about an object
@@ -924,24 +1095,26 @@ are taken from notes refs.  A notes ref is usually a branch which
 contains "files" whose paths are the object names for the objects
 they describe, with some directory separators included for performance
 reasons <span class="footnote"><br />[Permitted pathnames have the form
-<em>ab</em><tt>/</tt><em>cd</em><tt>/</tt><em>ef</em><tt>/</tt><em>&#8230;</em><tt>/</tt><em>abcdef&#8230;</em>: a sequence of directory
+<em>ab</em><code>/</code><em>cd</em><code>/</code><em>ef</em><code>/</code><em>&#8230;</em><code>/</code><em>abcdef&#8230;</em>: a sequence of directory
 names of two hexadecimal digits each followed by a filename with the
 rest of the object ID.]<br /></span>.</p></div>
 <div class="paragraph"><p>Every notes change creates a new commit at the specified notes ref.
 You can therefore inspect the history of the notes by invoking, e.g.,
-<tt>git log -p notes/commits</tt>.  Currently the commit message only records
+<code>git log -p notes/commits</code>.  Currently the commit message only records
 which operation triggered the update, and the commit authorship is
 determined according to the usual rules (see <a href="git-commit.html">git-commit(1)</a>).
 These details may change in the future.</p></div>
 <div class="paragraph"><p>It is also permitted for a notes ref to point directly to a tree
 object, in which case the history of the notes can be read with
-<tt>git log -p -g &lt;refname&gt;</tt>.</p></div>
+<code>git log -p -g &lt;refname&gt;</code>.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_notes_merge_strategies">NOTES MERGE STRATEGIES</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The default notes merge strategy is "manual", which checks out
 conflicting notes in a special work tree for resolving notes conflicts
-(<tt>.git/NOTES_MERGE_WORKTREE</tt>), and instructs the user to resolve the
+(<code>.git/NOTES_MERGE_WORKTREE</code>), and instructs the user to resolve the
 conflicts in that work tree.
 When done, the user can either finalize the merge with
 <em>git notes merge --commit</em>, or abort the merge with
@@ -963,35 +1136,39 @@ Note that if either the local or remote version contain duplicate lines
 prior to the merge, these will also be removed by this notes merge
 strategy.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>You can use notes to add annotations with information that was not
 available at the time a commit was written.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git notes add -m 'Tested-by: Johannes Sixt &lt;j6t@kdbg.org&gt;' 72a144e2
+<pre><code>$ git notes add -m 'Tested-by: Johannes Sixt &lt;j6t@kdbg.org&gt;' 72a144e2
 $ git show -s 72a144e
 [...]
     Signed-off-by: Junio C Hamano &lt;gitster@pobox.com&gt;
 
 Notes:
-    Tested-by: Johannes Sixt &lt;j6t@kdbg.org&gt;</tt></pre>
+    Tested-by: Johannes Sixt &lt;j6t@kdbg.org&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>In principle, a note is a regular Git blob, and any kind of
 (non-)format is accepted.  You can binary-safely create notes from
 arbitrary files using <em>git hash-object</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ cc *.c
+<pre><code>$ cc *.c
 $ blob=$(git hash-object -w a.out)
-$ git notes --ref=built add -C "$blob" HEAD</tt></pre>
+$ git notes --ref=built add -C "$blob" HEAD</code></pre>
 </div></div>
-<div class="paragraph"><p>(You cannot simply use <tt>git notes --ref=built add -F a.out HEAD</tt>
+<div class="paragraph"><p>(You cannot simply use <code>git notes --ref=built add -F a.out HEAD</code>
 because that is not binary-safe.)
 Of course, it doesn&#8217;t make much sense to display non-text-format notes
 with <em>git log</em>, so if you use such notes, you&#8217;ll probably need to write
 some special-purpose tools to do something useful with them.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -1001,7 +1178,7 @@ core.notesRef
 <dd>
 <p>
         Notes ref to read and manipulate instead of
-        <tt>refs/notes/commits</tt>.  Must be an unabbreviated ref name.
+        <code>refs/notes/commits</code>.  Must be an unabbreviated ref name.
         This setting can be overridden through the environment and
         command line.
 </p>
@@ -1012,7 +1189,7 @@ notes.displayRef
 <dd>
 <p>
         Which ref (or refs, if a glob or specified more than once), in
-        addition to the default set by <tt>core.notesRef</tt> or
+        addition to the default set by <code>core.notesRef</code> or
         <em>GIT_NOTES_REF</em>, to read notes from when showing commit
         messages with the <em>git log</em> family of commands.
         This setting can be overridden on the command line or by the
@@ -1025,10 +1202,10 @@ notes.rewrite.&lt;command&gt;
 </dt>
 <dd>
 <p>
-        When rewriting commits with &lt;command&gt; (currently <tt>amend</tt> or
-        <tt>rebase</tt>), if this variable is <tt>false</tt>, git will not copy
+        When rewriting commits with &lt;command&gt; (currently <code>amend</code> or
+        <code>rebase</code>), if this variable is <code>false</code>, git will not copy
         notes from the original to the rewritten commit.  Defaults to
-        <tt>true</tt>.  See also "<tt>notes.rewriteRef</tt>" below.
+        <code>true</code>.  See also "<code>notes.rewriteRef</code>" below.
 </p>
 <div class="paragraph"><p>This setting can be overridden by the <em>GIT_NOTES_REWRITE_REF</em>
 environment variable.</p></div>
@@ -1039,10 +1216,10 @@ notes.rewriteMode
 <dd>
 <p>
         When copying notes during a rewrite, what to do if the target
-        commit already has a note.  Must be one of <tt>overwrite</tt>,
-        <tt>concatenate</tt>, and <tt>ignore</tt>.  Defaults to <tt>concatenate</tt>.
+        commit already has a note.  Must be one of <code>overwrite</code>,
+        <code>concatenate</code>, and <code>ignore</code>.  Defaults to <code>concatenate</code>.
 </p>
-<div class="paragraph"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_MODE</tt>
+<div class="paragraph"><p>This setting can be overridden with the <code>GIT_NOTES_REWRITE_MODE</code>
 environment variable.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1061,6 +1238,8 @@ enable note rewriting.</p></div>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_environment">ENVIRONMENT</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -1069,8 +1248,8 @@ enable note rewriting.</p></div>
 </dt>
 <dd>
 <p>
-        Which ref to manipulate notes from, instead of <tt>refs/notes/commits</tt>.
-        This overrides the <tt>core.notesRef</tt> setting.
+        Which ref to manipulate notes from, instead of <code>refs/notes/commits</code>.
+        This overrides the <code>core.notesRef</code> setting.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1079,10 +1258,10 @@ enable note rewriting.</p></div>
 <dd>
 <p>
         Colon-delimited list of refs or globs indicating which refs,
-        in addition to the default from <tt>core.notesRef</tt> or
+        in addition to the default from <code>core.notesRef</code> or
         <em>GIT_NOTES_REF</em>, to read notes from when showing commit
         messages.
-        This overrides the <tt>notes.displayRef</tt> setting.
+        This overrides the <code>notes.displayRef</code> setting.
 </p>
 <div class="paragraph"><p>A warning will be issued for refs that do not exist, but a glob that
 does not match any refs is silently ignored.</p></div>
@@ -1094,8 +1273,8 @@ does not match any refs is silently ignored.</p></div>
 <p>
         When copying notes during a rewrite, what to do if the target
         commit already has a note.
-        Must be one of <tt>overwrite</tt>, <tt>concatenate</tt>, and <tt>ignore</tt>.
-        This overrides the <tt>core.rewriteMode</tt> setting.
+        Must be one of <code>overwrite</code>, <code>concatenate</code>, and <code>ignore</code>.
+        This overrides the <code>core.rewriteMode</code> setting.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1108,28 +1287,35 @@ does not match any refs is silently ignored.</p></div>
         refs or globs.
 </p>
 <div class="paragraph"><p>If not set in the environment, the list of notes to copy depends
-on the <tt>notes.rewrite.&lt;command&gt;</tt> and <tt>notes.rewriteRef</tt> settings.</p></div>
+on the <code>notes.rewrite.&lt;command&gt;</code> and <code>notes.rewriteRef</code> settings.</p></div>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_author">Author</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Written by Johannes Schindelin &lt;<a href="mailto:johannes.schindelin@gmx.de">johannes.schindelin@gmx.de</a>&gt; and
 Johan Herland &lt;<a href="mailto:johan@herland.net">johan@herland.net</a>&gt;</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_documentation">Documentation</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Documentation by Johannes Schindelin and Johan Herland</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(7)</a> suite</p></div>
 </div>
 </div>
+</div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-15 13:11:54 PDT
+Last updated 2012-11-15 13:11:54 PST
 </div>
 </div>
 </body>

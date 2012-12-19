@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>git-cvsserver(1)</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,69 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border-top: 2px solid silver;
   border-bottom: 2px solid silver;
 }
-h2 {
+body.manpage h2 {
   border-style: none;
 }
-div.sectionbody {
-  margin-left: 5%;
+body.manpage div.sectionbody {
+  margin-left: 3em;
 }
 
 @media print {
-  div#toc { display: none; }
+  body.manpage div#toc { display: none; }
 }
 
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
-}
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
-}
-
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
-}
-
-div.quoteblock-attribution {
-  padding-top: 0.5em;
-  text-align: right;
-}
-
-div.verseblock-content {
-  white-space: pre;
-}
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
-}
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
-}
-
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -477,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -497,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -524,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -561,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="manpage">
 <div id="header">
 <h1>
 git-cvsserver(1) Manual Page
@@ -580,25 +742,28 @@ git-cvsserver(1) Manual Page
 </div>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>SSH:</p></div>
 <div class="verseblock">
-<div class="verseblock-content">export CVS_SERVER="git cvsserver"
-<em>cvs</em> -d :ext:user@server/path/repo.git co &lt;HEAD_name&gt;</div>
-<div class="verseblock-attribution">
+<pre class="content">export CVS_SERVER="git cvsserver"
+<em>cvs</em> -d :ext:user@server/path/repo.git co &lt;HEAD_name&gt;</pre>
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>pserver (/etc/inetd.conf):</p></div>
 <div class="verseblock">
-<div class="verseblock-content">cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</div>
-<div class="verseblock-attribution">
+<pre class="content">cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</pre>
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>Usage:</p></div>
 <div class="verseblock">
-<div class="verseblock-content"><em>git-cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</div>
-<div class="verseblock-attribution">
+<pre class="content"><em>git-cvsserver</em> [options] [pserver|server] [&lt;directory&gt; &#8230;]</pre>
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>All these options obviously only make sense if enforced by the server side.
@@ -626,7 +791,7 @@ Don&#8217;t allow recursing into subdirectories
 </dt>
 <dd>
 <p>
-Don&#8217;t check for <tt>gitcvs.enabled</tt> in config. You also have to specify a list
+Don&#8217;t check for <code>gitcvs.enabled</code> in config. You also have to specify a list
 of allowed directories (see below) if you want to use this option.
 </p>
 </dd>
@@ -662,12 +827,14 @@ Print usage information and exit
 <p>
 You can specify a list of allowed directories. If no directories
 are given, all are allowed. This is an additional restriction, gitcvs
-access still needs to be enabled by the <tt>gitcvs.enabled</tt> config option
+access still needs to be enabled by the <code>gitcvs.enabled</code> config option
 unless <em>--export-all</em> was given, too.
 </p>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This application is a CVS emulation layer for git.</p></div>
@@ -677,6 +844,8 @@ not all switches are implemented.</p></div>
 <div class="paragraph"><p>Testing has been done using both the CLI CVS client, and the Eclipse CVS
 plugin. Most functionality works fine with both of these clients.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_limitations">LIMITATIONS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>CVS clients cannot tag, branch or perform GIT merges.</p></div>
@@ -684,6 +853,8 @@ plugin. Most functionality works fine with both of these clients.</p></div>
 from what most CVS users would expect since in CVS modules usually represent
 one or more directories.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_installation">INSTALLATION</h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
@@ -692,9 +863,11 @@ one or more directories.</p></div>
 If you are going to offer CVS access via pserver, add a line in
    /etc/inetd.conf like
 </p>
+<div class="openblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre><tt>   cvspserver stream tcp nowait nobody git-cvsserver pserver</tt></pre>
+<pre><code>   cvspserver stream tcp nowait nobody git-cvsserver pserver</code></pre>
 </div></div>
 <div class="paragraph"><p>Note: Some inetd servers let you specify the name of the executable
 independently of the value of argv[0] (i.e. the name the program assumes
@@ -702,7 +875,7 @@ it was executed with). In this case the correct line in /etc/inetd.conf
 looks like</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</tt></pre>
+<pre><code>   cvspserver stream tcp nowait nobody /usr/bin/git-cvsserver git-cvsserver pserver</code></pre>
 </div></div>
 <div class="paragraph"><p>Only anonymous access is provided by pserve by default. To commit you
 will have to create pserver accounts, simply add a gitcvs.authdb
@@ -710,15 +883,15 @@ setting in the config file of the repositories you want the cvsserver
 to allow writes to, for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   [gitcvs]
-        authdb = /etc/cvsserver/passwd</tt></pre>
+<pre><code>   [gitcvs]
+        authdb = /etc/cvsserver/passwd</code></pre>
 </div></div>
 <div class="paragraph"><p>The format of these files is username followed by the crypted password,
 for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   myuser:$1Oyx5r9mdGZ2
-   myuser:$1$BA)@$vbnMJMDym7tA32AamXrm./</tt></pre>
+<pre><code>   myuser:$1Oyx5r9mdGZ2
+   myuser:$1$BA)@$vbnMJMDym7tA32AamXrm./</code></pre>
 </div></div>
 <div class="paragraph"><p>You can use the <em>htpasswd</em> facility that comes with Apache to make these
 files, but Apache&#8217;s MD5 crypt method differs from the one used by most C
@@ -726,57 +899,61 @@ library&#8217;s crypt() function, so don&#8217;t use the -m option.</p></div>
 <div class="paragraph"><p>Alternatively you can produce the password with perl&#8217;s crypt() operator:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   perl -e 'my ($user, $pass) = @ARGV; printf "%s:%s\n", $user, crypt($user, $pass)' $USER password</tt></pre>
+<pre><code>   perl -e 'my ($user, $pass) = @ARGV; printf "%s:%s\n", $user, crypt($user, $pass)' $USER password</code></pre>
 </div></div>
 <div class="paragraph"><p>Then provide your password via the pserver method, for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   cvs -d:pserver:someuser:somepassword &lt;at&gt; server/path/repo.git co &lt;HEAD_name&gt;</tt></pre>
+<pre><code>   cvs -d:pserver:someuser:somepassword &lt;at&gt; server/path/repo.git co &lt;HEAD_name&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>No special setup is needed for SSH access, other than having GIT tools
 in the PATH. If you have clients that do not accept the CVS_SERVER
-environment variable, you can rename <em>git-cvsserver</em> to <tt>cvs</tt>.</p></div>
+environment variable, you can rename <em>git-cvsserver</em> to <code>cvs</code>.</p></div>
 <div class="paragraph"><p>Note: Newer CVS versions (&gt;= 1.12.11) also support specifying
 CVS_SERVER directly in CVSROOT like</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>cvs -d ":ext;CVS_SERVER=git cvsserver:user@server/path/repo.git" co &lt;HEAD_name&gt;</tt></pre>
+<pre><code>cvs -d ":ext;CVS_SERVER=git cvsserver:user@server/path/repo.git" co &lt;HEAD_name&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>This has the advantage that it will be saved in your <em>CVS/Root</em> files and
 you don&#8217;t need to worry about always setting the correct environment
 variable.  SSH users restricted to <em>git-shell</em> don&#8217;t need to override the default
-with CVS_SERVER (and shouldn&#8217;t) as <em>git-shell</em> understands <tt>cvs</tt> to mean
+with CVS_SERVER (and shouldn&#8217;t) as <em>git-shell</em> understands <code>cvs</code> to mean
 <em>git-cvsserver</em> and pretends that the other end runs the real <em>cvs</em> better.</p></div>
+</div></div>
 </li>
 <li>
 <p>
 For each repo that you want accessible from CVS you need to edit config in
    the repo and add the following section.
 </p>
+<div class="openblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre><tt>   [gitcvs]
+<pre><code>   [gitcvs]
         enabled=1
         # optional for debugging
-        logfile=/path/to/logfile</tt></pre>
+        logfile=/path/to/logfile</code></pre>
 </div></div>
 <div class="paragraph"><p>Note: you need to ensure each user that is going to invoke <em>git-cvsserver</em> has
 write access to the log file and to the database (see
 <a href="#dbbackend">Database Backend</a>. If you want to offer write access over
 SSH, the users of course also need write access to the git repository itself.</p></div>
 <div class="paragraph"><p>You also need to ensure that each repository is "bare" (without a git index
-file) for <tt>cvs commit</tt> to work. See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
+file) for <code>cvs commit</code> to work. See <a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p></div>
 <div class="paragraph" id="configaccessmethod"><p>All configuration variables can also be overridden for a specific method of
 access. Valid method names are "ext" (for SSH access) and "pserver". The
 following example configuration would disable pserver access while still
 allowing access over SSH.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>   [gitcvs]
+<pre><code>   [gitcvs]
         enabled=0
 
    [gitcvs "ext"]
-        enabled=1</tt></pre>
+        enabled=1</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -787,10 +964,13 @@ If you didn&#8217;t specify the CVSROOT/CVS_SERVER directly in the checkout comm
    directory should point at the appropriate git repo.  As above, for SSH clients
    <em>not</em> restricted to <em>git-shell</em>, CVS_SERVER should be set to <em>git-cvsserver</em>.
 </p>
+<div class="openblock">
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre><tt>     export CVSROOT=:ext:user@server:/var/git/project.git
-     export CVS_SERVER="git cvsserver"</tt></pre>
+<pre><code>     export CVSROOT=:ext:user@server:/var/git/project.git
+     export CVS_SERVER="git cvsserver"</code></pre>
+</div></div>
 </div></div>
 </li>
 <li>
@@ -807,23 +987,25 @@ For SSH clients that will make commits, make sure their server-side
 Clients should now be able to check out the project. Use the CVS <em>module</em>
    name to indicate what GIT <em>head</em> you want to check out.  This also sets the
    name of your newly checked-out directory, unless you tell it otherwise with
-   <tt>-d &lt;dir_name&gt;</tt>.  For example, this checks out <em>master</em> branch to the
-   <tt>project-master</tt> directory:
+   <code>-d &lt;dir_name&gt;</code>.  For example, this checks out <em>master</em> branch to the
+   <code>project-master</code> directory:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>     cvs co -d project-master master</tt></pre>
+<pre><code>     cvs co -d project-master master</code></pre>
 </div></div>
 </li>
 </ol></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="dbbackend">Database Backend</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><em>git-cvsserver</em> uses one database per git head (i.e. CVS module) to
 store information about the repository to maintain consistent
 CVS revision numbers. The database needs to be
 updated (i.e. written to) after every commit.</p></div>
-<div class="paragraph"><p>If the commit is done directly by using <tt>git</tt> (as opposed to
+<div class="paragraph"><p>If the commit is done directly by using <code>git</code> (as opposed to
 using <em>git-cvsserver</em>) the update will need to happen on the
 next repository access by <em>git-cvsserver</em>, independent of
 access method and requested operation.</p></div>
@@ -832,7 +1014,7 @@ the pserver method), <em>git-cvsserver</em> should have write access to
 the database to work reliably (otherwise you need to make sure
 that the database is up-to-date any time <em>git-cvsserver</em> is executed).</p></div>
 <div class="paragraph"><p>By default it uses SQLite databases in the git directory, named
-<tt>gitcvs.&lt;module_name&gt;.sqlite</tt>. Note that the SQLite backend creates
+<code>gitcvs.&lt;module_name&gt;.sqlite</code>. Note that the SQLite backend creates
 temporary files in the same directory as the database file on
 write so it might not be enough to grant the users using
 <em>git-cvsserver</em> write access to the database file without granting
@@ -843,17 +1025,18 @@ Example: For merged branches, <em>git-cvsserver</em> only tracks
 one branch of development, and after a <em>git merge</em> an
 incrementally updated database may track a different branch
 than a database regenerated from scratch, causing inconsistent
-CVS revision numbers. <tt>git-cvsserver</tt> has no way of knowing which
+CVS revision numbers. <code>git-cvsserver</code> has no way of knowing which
 branch it would have picked if it had been run incrementally
 pre-merge. So if you have to fully or partially (from old
 backup) regenerate the database, you should be suspicious
 of pre-existing CVS sandboxes.</p></div>
 <div class="paragraph"><p>You can configure the database backend with the following
 configuration variables:</p></div>
-<h3 id="_configuring_database_backend">Configuring database backend</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_configuring_database_backend">Configuring database backend</h3>
 <div class="paragraph"><p><em>git-cvsserver</em> uses the Perl DBI module. Please also read
 its documentation if changing these variables, especially
-about <tt>DBI-&gt;connect()</tt>.</p></div>
+about <code>DBI-&gt;connect()</code>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 gitcvs.dbname
@@ -863,7 +1046,7 @@ gitcvs.dbname
         Database name. The exact meaning depends on the
         selected database driver, for SQLite this is a filename.
         Supports variable substitution (see below). May
-        not contain semicolons (<tt>;</tt>).
+        not contain semicolons (<code>;</code>).
         Default: <em>%Ggitcvs.%m.sqlite</em>
 </p>
 </dd>
@@ -877,7 +1060,7 @@ gitcvs.dbdriver
         with <em>DBD::SQLite</em>, reported to work with
         <em>DBD::Pg</em>, and reported <strong>not</strong> to work with <em>DBD::mysql</em>.
         Please regard this as an experimental feature. May not
-        contain colons (<tt>:</tt>).
+        contain colons (<code>:</code>).
         Default: <em>SQLite</em>
 </p>
 </dd>
@@ -886,7 +1069,7 @@ gitcvs.dbuser
 </dt>
 <dd>
 <p>
-        Database user. Only useful if setting <tt>dbdriver</tt>, since
+        Database user. Only useful if setting <code>dbdriver</code>, since
         SQLite has no concept of database users. Supports variable
         substitution (see below).
 </p>
@@ -896,7 +1079,7 @@ gitcvs.dbpass
 </dt>
 <dd>
 <p>
-        Database password.  Only useful if setting <tt>dbdriver</tt>, since
+        Database password.  Only useful if setting <code>dbdriver</code>, since
         SQLite has no concept of database passwords.
 </p>
 </dd>
@@ -912,8 +1095,9 @@ gitcvs.dbTableNamePrefix
 </dd>
 </dl></div>
 <div class="paragraph"><p>All variables can also be set per access method, see <a href="#configaccessmethod">above</a>.</p></div>
+<div class="sect3">
 <h4 id="_variable_substitution">Variable substitution</h4>
-<div class="paragraph"><p>In <tt>dbdriver</tt> and <tt>dbuser</tt> you can use the following variables:</p></div>
+<div class="paragraph"><p>In <code>dbdriver</code> and <code>dbuser</code> you can use the following variables:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 %G
@@ -929,8 +1113,8 @@ gitcvs.dbTableNamePrefix
 <dd>
 <p>
         git directory name, where all characters except for
-        alpha-numeric ones, <tt>.</tt>, and <tt>-</tt> are replaced with
-        <tt>_</tt> (this should make it easier to use the directory
+        alpha-numeric ones, <code>.</code>, and <code>-</code> are replaced with
+        <code>_</code> (this should make it easier to use the directory
         name in a filename if wanted)
 </p>
 </dd>
@@ -962,6 +1146,10 @@ gitcvs.dbTableNamePrefix
 </dd>
 </dl></div>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_environment">ENVIRONMENT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>These variables obviate the need for command-line options in some
@@ -973,6 +1161,8 @@ git-cvsserver, as described above.</p></div>
 <div class="paragraph"><p>When these environment variables are set, the corresponding
 command-line arguments may not be used.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_eclipse_cvs_client_notes">Eclipse CVS Client Notes</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>To get a checkout with the Eclipse CVS client:</p></div>
@@ -1005,13 +1195,15 @@ Pick <em>HEAD</em> when it asks what branch/tag to check out. Untick the
 <div class="paragraph"><p>Protocol notes: If you are using anonymous access via pserver, just select that.
 Those using SSH access should choose the <em>ext</em> protocol, and configure <em>ext</em>
 access on the Preferences&#8594;Team&#8594;CVS&#8594;ExtConnection pane. Set CVS_SERVER to
-"<tt>git cvsserver</tt>". Note that password support is not good when using <em>ext</em>,
+"<code>git cvsserver</code>". Note that password support is not good when using <em>ext</em>,
 you will definitely want to have SSH keys setup.</p></div>
 <div class="paragraph"><p>Alternatively, you can just use the non-standard extssh protocol that Eclipse
 offer. In that case CVS_SERVER is ignored, and you will have to replace
-the cvs utility on the server with <em>git-cvsserver</em> or manipulate your <tt>.bashrc</tt>
+the cvs utility on the server with <em>git-cvsserver</em> or manipulate your <code>.bashrc</code>
 so that calling <em>cvs</em> effectively calls <em>git-cvsserver</em>.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_clients_known_to_work">Clients known to work</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
@@ -1037,39 +1229,48 @@ TortoiseCVS
 </li>
 </ul></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_operations_supported">Operations supported</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>All the operations required for normal use are supported, including
 checkout, diff, status, update, log, add, remove, commit.
 Legacy monitoring operations are not supported (edit, watch and related).
 Exports and tagging (tags and branches) are not supported at this stage.</p></div>
-<h3 id="_crlf_line_ending_conversions">CRLF Line Ending Conversions</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_crlf_line_ending_conversions">CRLF Line Ending Conversions</h3>
 <div class="paragraph"><p>By default the server leaves the <em>-k</em> mode blank for all files,
 which causes the CVS client to treat them as a text files, subject
 to end-of-line conversion on some platforms.</p></div>
 <div class="paragraph"><p>You can make the server use the end-of-line conversion attributes to
-set the <em>-k</em> modes for files by setting the <tt>gitcvs.usecrlfattr</tt>
+set the <em>-k</em> modes for files by setting the <code>gitcvs.usecrlfattr</code>
 config variable.  See <a href="gitattributes.html">gitattributes(5)</a> for more information
 about end-of-line conversion.</p></div>
-<div class="paragraph"><p>Alternatively, if <tt>gitcvs.usecrlfattr</tt> config is not enabled
+<div class="paragraph"><p>Alternatively, if <code>gitcvs.usecrlfattr</code> config is not enabled
 or the attributes do not allow automatic detection for a filename, then
-the server uses the <tt>gitcvs.allbinary</tt> config for the default setting.
-If <tt>gitcvs.allbinary</tt> is set, then file not otherwise
+the server uses the <code>gitcvs.allbinary</code> config for the default setting.
+If <code>gitcvs.allbinary</code> is set, then file not otherwise
 specified will default to <em>-kb</em> mode. Otherwise the <em>-k</em> mode
-is left blank. But if <tt>gitcvs.allbinary</tt> is set to "guess", then
+is left blank. But if <code>gitcvs.allbinary</code> is set to "guess", then
 the correct <em>-k</em> mode will be guessed based on the contents of
 the file.</p></div>
 <div class="paragraph"><p>For best consistency with <em>cvs</em>, it is probably best to override the
-defaults by setting <tt>gitcvs.usecrlfattr</tt> to true,
-and <tt>gitcvs.allbinary</tt> to "guess".</p></div>
+defaults by setting <code>gitcvs.usecrlfattr</code> to true,
+and <code>gitcvs.allbinary</code> to "guess".</p></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_dependencies">Dependencies</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><em>git-cvsserver</em> depends on DBD::SQLite.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+</div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>

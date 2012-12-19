@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>Everyday GIT With 20 Commands Or So</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,51 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
 }
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
   font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
 }
 
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
 }
 
-div.quoteblock-attribution {
-  padding-top: 0.5em;
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
   text-align: right;
 }
 
-div.verseblock-content {
-  white-space: pre;
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
 }
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
 }
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
 }
 
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -459,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -479,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -506,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -543,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="article">
 <div id="header">
 <h1>Everyday GIT With 20 Commands Or So</h1>
 </div>
@@ -567,6 +747,7 @@ administrators who are responsible for the care and feeding
 of git repositories.</p></div>
 </div>
 </div>
+<div class="sect1">
 <h2 id="_individual_developer_standalone_a_id_individual_developer_standalone_a">Individual Developer (Standalone)<a id="Individual Developer (Standalone)"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>A standalone individual developer does not exchange patches with
@@ -632,7 +813,8 @@ following commands.</p></div>
 </p>
 </li>
 </ul></div>
-<h3 id="_examples">Examples</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_examples">Examples</h3>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Use a tarball as a starting point for a new repository.
@@ -640,12 +822,12 @@ Use a tarball as a starting point for a new repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ tar zxf frotz.tar.gz
+<pre><code>$ tar zxf frotz.tar.gz
 $ cd frotz
 $ git init
 $ git add . <b>&lt;1&gt;</b>
 $ git commit -m "import of frotz source tree."
-$ git tag v2.43 <b>&lt;2&gt;</b></tt></pre>
+$ git tag v2.43 <b>&lt;2&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -666,7 +848,7 @@ Create a topic branch and develop.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b alsa-audio <b>&lt;1&gt;</b>
+<pre><code>$ git checkout -b alsa-audio <b>&lt;1&gt;</b>
 $ edit/compile/test
 $ git checkout -- curses/ux_audio_oss.c <b>&lt;2&gt;</b>
 $ git add curses/ux_audio_alsa.c <b>&lt;3&gt;</b>
@@ -681,7 +863,7 @@ $ git commit -a -c ORIG_HEAD <b>&lt;8&gt;</b>
 $ git checkout master <b>&lt;9&gt;</b>
 $ git merge alsa-audio <b>&lt;10&gt;</b>
 $ git log --since='3 days ago' <b>&lt;11&gt;</b>
-$ git log v2.43.. curses/ <b>&lt;12&gt;</b></tt></pre>
+$ git log v2.43.. curses/ <b>&lt;12&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -691,13 +873,13 @@ create a new topic branch.
 </li>
 <li>
 <p>
-revert your botched changes in <tt>curses/ux_audio_oss.c</tt>.
+revert your botched changes in <code>curses/ux_audio_oss.c</code>.
 </p>
 </li>
 <li>
 <p>
 you need to tell git if you added a new file; removal and
-modification will be caught if you do <tt>git commit -a</tt> later.
+modification will be caught if you do <code>git commit -a</code> later.
 </p>
 </li>
 <li>
@@ -739,20 +921,23 @@ merge a topic branch into your master branch.
 <li>
 <p>
 review commit logs; other forms to limit output can be
-combined and include <tt>--max-count=10</tt> (show 10 commits),
-<tt>--until=2005-12-10</tt>, etc.
+combined and include <code>--max-count=10</code> (show 10 commits),
+<code>--until=2005-12-10</code>, etc.
 </p>
 </li>
 <li>
 <p>
-view only the changes that touch what&#8217;s in <tt>curses/</tt>
-directory, since <tt>v2.43</tt> tag.
+view only the changes that touch what&#8217;s in <code>curses/</code>
+directory, since <code>v2.43</code> tag.
 </p>
 </li>
 </ol></div>
 </dd>
 </dl></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_individual_developer_participant_a_id_individual_developer_participant_a">Individual Developer (Participant)<a id="Individual Developer (Participant)"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>A developer working as a participant in a group project needs to
@@ -784,7 +969,8 @@ addition to the ones needed by a standalone developer.</p></div>
 </p>
 </li>
 </ul></div>
-<h3 id="_examples_2">Examples</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_examples_2">Examples</h3>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Clone the upstream and work on it.  Feed changes to upstream.
@@ -792,7 +978,7 @@ Clone the upstream and work on it.  Feed changes to upstream.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git clone git://git.kernel.org/pub/scm/.../torvalds/linux-2.6 my2.6
+<pre><code>$ git clone git://git.kernel.org/pub/scm/.../torvalds/linux-2.6 my2.6
 $ cd my2.6
 $ edit/compile/test; git commit -a -s <b>&lt;1&gt;</b>
 $ git format-patch origin <b>&lt;2&gt;</b>
@@ -801,7 +987,7 @@ $ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <b>&lt;4&gt;</b>
 $ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <b>&lt;5&gt;</b>
 $ git reset --hard ORIG_HEAD <b>&lt;6&gt;</b>
 $ git gc <b>&lt;7&gt;</b>
-$ git fetch --tags <b>&lt;8&gt;</b></tt></pre>
+$ git fetch --tags <b>&lt;8&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -816,7 +1002,7 @@ extract patches from your branch for e-mail submission.
 </li>
 <li>
 <p>
-<tt>git pull</tt> fetches from <tt>origin</tt> by default and merges into the
+<code>git pull</code> fetches from <code>origin</code> by default and merges into the
 current branch.
 </p>
 </li>
@@ -844,8 +1030,8 @@ garbage collect leftover objects from reverted pull.
 </li>
 <li>
 <p>
-from time to time, obtain official tags from the <tt>origin</tt>
-and store them under <tt>.git/refs/tags/</tt>.
+from time to time, obtain official tags from the <code>origin</code>
+and store them under <code>.git/refs/tags/</code>.
 </p>
 </li>
 </ol></div>
@@ -856,7 +1042,7 @@ Push into another repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>satellite$ git clone mothership:frotz frotz <b>&lt;1&gt;</b>
+<pre><code>satellite$ git clone mothership:frotz frotz <b>&lt;1&gt;</b>
 satellite$ cd frotz
 satellite$ git config --get-regexp '^(remote|branch)\.' <b>&lt;2&gt;</b>
 remote.origin.url mothership:frotz
@@ -870,7 +1056,7 @@ satellite$ git push origin <b>&lt;4&gt;</b>
 
 mothership$ cd frotz
 mothership$ git checkout master
-mothership$ git merge satellite/master <b>&lt;5&gt;</b></tt></pre>
+mothership$ git merge satellite/master <b>&lt;5&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -883,19 +1069,19 @@ machine.
 <li>
 <p>
 clone sets these configuration variables by default.
-It arranges <tt>git pull</tt> to fetch and store the branches of mothership
-machine to local <tt>remotes/origin/*</tt> remote-tracking branches.
+It arranges <code>git pull</code> to fetch and store the branches of mothership
+machine to local <code>remotes/origin/*</code> remote-tracking branches.
 </p>
 </li>
 <li>
 <p>
-arrange <tt>git push</tt> to push local <tt>master</tt> branch to
-<tt>remotes/satellite/master</tt> branch of the mothership machine.
+arrange <code>git push</code> to push local <code>master</code> branch to
+<code>remotes/satellite/master</code> branch of the mothership machine.
 </p>
 </li>
 <li>
 <p>
-push will stash our work away on <tt>remotes/satellite/master</tt>
+push will stash our work away on <code>remotes/satellite/master</code>
 remote-tracking branch on the mothership machine.  You could use this
 as a back-up method.
 </p>
@@ -914,11 +1100,11 @@ Branch off of a specific tag.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b private2.6.14 v2.6.14 <b>&lt;1&gt;</b>
+<pre><code>$ git checkout -b private2.6.14 v2.6.14 <b>&lt;1&gt;</b>
 $ edit/compile/test; git commit -a
 $ git checkout master
 $ git format-patch -k -m --stdout v2.6.14..private2.6.14 |
-  git am -3 -k <b>&lt;2&gt;</b></tt></pre>
+  git am -3 -k <b>&lt;2&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -929,7 +1115,7 @@ tag.
 </li>
 <li>
 <p>
-forward port all changes in <tt>private2.6.14</tt> branch to <tt>master</tt> branch
+forward port all changes in <code>private2.6.14</code> branch to <code>master</code> branch
 without a formal "merging".
 </p>
 </li>
@@ -937,6 +1123,9 @@ without a formal "merging".
 </dd>
 </dl></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_integrator_a_id_integrator_a">Integrator<a id="Integrator"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>A fairly central person acting as the integrator in a group
@@ -972,7 +1161,8 @@ commands in addition to the ones needed by participants.</p></div>
 </p>
 </li>
 </ul></div>
-<h3 id="_examples_3">Examples</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_examples_3">Examples</h3>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 My typical GIT day.
@@ -980,7 +1170,7 @@ My typical GIT day.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git status <b>&lt;1&gt;</b>
+<pre><code>$ git status <b>&lt;1&gt;</b>
 $ git show-branch <b>&lt;2&gt;</b>
 $ mailx <b>&lt;3&gt;</b>
 &amp; s 2 3 4 5 ./+to-apply
@@ -999,7 +1189,7 @@ $ compile/test
 $ git tag -s -m "GIT 0.99.9x" v0.99.9x <b>&lt;10&gt;</b>
 $ git fetch ko &amp;&amp; git show-branch master maint 'tags/ko-*' <b>&lt;11&gt;</b>
 $ git push ko <b>&lt;12&gt;</b>
-$ git push ko v0.99.9x <b>&lt;13&gt;</b></tt></pre>
+$ git push ko v0.99.9x <b>&lt;13&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1038,7 +1228,7 @@ master, nor exposed as a part of a stable branch.
 </li>
 <li>
 <p>
-restart <tt>pu</tt> every time from the next.
+restart <code>pu</code> every time from the next.
 </p>
 </li>
 <li>
@@ -1059,12 +1249,12 @@ create a signed tag.
 <li>
 <p>
 make sure I did not accidentally rewind master beyond what I
-already pushed out.  <tt>ko</tt> shorthand points at the repository I have
+already pushed out.  <code>ko</code> shorthand points at the repository I have
 at kernel.org, and looks like this:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ cat .git/remotes/ko
+<pre><code>$ cat .git/remotes/ko
 URL: kernel.org:/pub/scm/git/git.git
 Pull: master:refs/tags/ko-master
 Pull: next:refs/tags/ko-next
@@ -1072,11 +1262,11 @@ Pull: maint:refs/tags/ko-maint
 Push: master
 Push: next
 Push: +pu
-Push: maint</tt></pre>
+Push: maint</code></pre>
 </div></div>
-<div class="paragraph"><p>In the output from <tt>git show-branch</tt>, <tt>master</tt> should have
-everything <tt>ko-master</tt> has, and <tt>next</tt> should have
-everything <tt>ko-next</tt> has.</p></div>
+<div class="paragraph"><p>In the output from <code>git show-branch</code>, <code>master</code> should have
+everything <code>ko-master</code> has, and <code>next</code> should have
+everything <code>ko-next</code> has.</p></div>
 </li>
 <li>
 <p>
@@ -1092,6 +1282,9 @@ push the tag out, too.
 </dd>
 </dl></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_repository_administration_a_id_repository_administration_a">Repository Administration<a id="Repository Administration"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>A repository administrator uses the following tools to set up
@@ -1112,7 +1305,8 @@ and maintain access to the repository by developers.</p></div>
 </ul></div>
 <div class="paragraph"><p><a href="howto/update-hook-example.txt">update hook howto</a> has a good
 example of managing a shared central repository.</p></div>
-<h3 id="_examples_4">Examples</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_examples_4">Examples</h3>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 We assume the following in /etc/services
@@ -1120,8 +1314,8 @@ We assume the following in /etc/services
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ grep 9418 /etc/services
-git             9418/tcp                # Git Version Control System</tt></pre>
+<pre><code>$ grep 9418 /etc/services
+git             9418/tcp                # Git Version Control System</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1130,9 +1324,9 @@ Run git-daemon to serve /pub/scm from inetd.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ grep git /etc/inetd.conf
+<pre><code>$ grep git /etc/inetd.conf
 git     stream  tcp     nowait  nobody \
-  /usr/bin/git-daemon git-daemon --inetd --export-all /pub/scm</tt></pre>
+  /usr/bin/git-daemon git-daemon --inetd --export-all /pub/scm</code></pre>
 </div></div>
 <div class="paragraph"><p>The actual configuration line should be on one line.</p></div>
 </dd>
@@ -1142,7 +1336,7 @@ Run git-daemon to serve /pub/scm from xinetd.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ cat /etc/xinetd.d/git-daemon
+<pre><code>$ cat /etc/xinetd.d/git-daemon
 # default: off
 # description: The git server offers access to git repositories
 service git
@@ -1156,7 +1350,7 @@ service git
         server          = /usr/bin/git-daemon
         server_args     = --inetd --export-all --base-path=/pub/scm
         log_on_failure  += USERID
-}</tt></pre>
+}</code></pre>
 </div></div>
 <div class="paragraph"><p>Check your xinetd(8) documentation and setup, this is from a Fedora system.
 Others might be different.</p></div>
@@ -1167,19 +1361,19 @@ Give push/pull only access to developers.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ grep git /etc/passwd <b>&lt;1&gt;</b>
+<pre><code>$ grep git /etc/passwd <b>&lt;1&gt;</b>
 alice:x:1000:1000::/home/alice:/usr/bin/git-shell
 bob:x:1001:1001::/home/bob:/usr/bin/git-shell
 cindy:x:1002:1002::/home/cindy:/usr/bin/git-shell
 david:x:1003:1003::/home/david:/usr/bin/git-shell
 $ grep git /etc/shells <b>&lt;2&gt;</b>
-/usr/bin/git-shell</tt></pre>
+/usr/bin/git-shell</code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
 <p>
 log-in shell is set to /usr/bin/git-shell, which does not
-allow anything but <tt>git push</tt> and <tt>git pull</tt>.  The users should
+allow anything but <code>git push</code> and <code>git pull</code>.  The users should
 get an ssh access to the machine.
 </p>
 </li>
@@ -1197,7 +1391,7 @@ CVS-style shared repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ grep git /etc/group <b>&lt;1&gt;</b>
+<pre><code>$ grep git /etc/group <b>&lt;1&gt;</b>
 git:x:9418:alice,bob,cindy,david
 $ cd /home/devo.git
 $ ls -l <b>&lt;2&gt;</b>
@@ -1216,7 +1410,7 @@ $ ls -l hooks/update <b>&lt;3&gt;</b>
 $ cat info/allowed-users <b>&lt;4&gt;</b>
 refs/heads/master       alice\|cindy
 refs/heads/doc-update   bob
-refs/tags/v[0-9]*       david</tt></pre>
+refs/tags/v[0-9]*       david</code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1250,9 +1444,9 @@ HTTP server to support dumb protocol transfer.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>dev$ git update-server-info <b>&lt;1&gt;</b>
+<pre><code>dev$ git update-server-info <b>&lt;1&gt;</b>
 dev$ ftp user@isp.example.com <b>&lt;2&gt;</b>
-ftp&gt; cp -r .git /home/user/myproject.git</tt></pre>
+ftp&gt; cp -r .git /home/user/myproject.git</code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1268,6 +1462,8 @@ upload to public HTTP server hosted by your ISP.
 </ol></div>
 </dd>
 </dl></div>
+</div>
+</div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>

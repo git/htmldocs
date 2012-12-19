@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>git-whatchanged(1)</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,69 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border-top: 2px solid silver;
   border-bottom: 2px solid silver;
 }
-h2 {
+body.manpage h2 {
   border-style: none;
 }
-div.sectionbody {
-  margin-left: 5%;
+body.manpage div.sectionbody {
+  margin-left: 3em;
 }
 
 @media print {
-  div#toc { display: none; }
+  body.manpage div#toc { display: none; }
 }
 
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
-}
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
-}
-
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
-}
-
-div.quoteblock-attribution {
-  padding-top: 0.5em;
-  text-align: right;
-}
-
-div.verseblock-content {
-  white-space: pre;
-}
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
-}
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
-}
-
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -477,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -497,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -524,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -561,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="manpage">
 <div id="header">
 <h1>
 git-whatchanged(1) Manual Page
@@ -580,13 +742,16 @@ git-whatchanged(1) Manual Page
 </div>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git whatchanged</em> &lt;option&gt;&#8230;</div>
-<div class="verseblock-attribution">
+<pre class="content"><em>git whatchanged</em> &lt;option&gt;&#8230;</pre>
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Shows commit logs and diff output each commit introduces.  The
@@ -595,6 +760,8 @@ command internally invokes <em>git rev-list</em> piped to
 these commands.</p></div>
 <div class="paragraph"><p>This manual page describes only the most frequently used options.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -682,7 +849,7 @@ people using 80-column terminals.</p></div>
 <dd>
 <p>
         Show the full 40-byte hexadecimal commit object name. This negates
-        <tt>--abbrev-commit</tt> and those options which imply it such as
+        <code>--abbrev-commit</code> and those options which imply it such as
         "--oneline". It also overrides the <em>log.abbrevCommit</em> variable.
 </p>
 </dd>
@@ -714,15 +881,15 @@ people using 80-column terminals.</p></div>
 <p>
         Show the notes (see <a href="git-notes.html">git-notes(1)</a>) that annotate the
         commit, when showing the commit log message.  This is the default
-        for <tt>git log</tt>, <tt>git show</tt> and <tt>git whatchanged</tt> commands when
-        there is no <tt>--pretty</tt>, <tt>--format</tt> nor <tt>--oneline</tt> option given
+        for <code>git log</code>, <code>git show</code> and <code>git whatchanged</code> commands when
+        there is no <code>--pretty</code>, <code>--format</code> nor <code>--oneline</code> option given
         on the command line.
 </p>
 <div class="paragraph"><p>By default, the notes shown are from the notes refs listed in the
 <em>core.notesRef</em> and <em>notes.displayRef</em> variables (or corresponding
 environment overrides). See <a href="git-config.html">git-config(1)</a> for more details.</p></div>
 <div class="paragraph"><p>With an optional <em>&lt;ref&gt;</em> argument, show this notes ref instead of the
-default notes ref(s). The ref is taken to be in <tt>refs/notes/</tt> if it
+default notes ref(s). The ref is taken to be in <code>refs/notes/</code> if it
 is not qualified.</p></div>
 <div class="paragraph"><p>Multiple --notes options can be combined to control which notes are
 being displayed. Examples: "--notes=foo" will show only notes from
@@ -734,7 +901,7 @@ being displayed. Examples: "--notes=foo" will show only notes from
 </dt>
 <dd>
 <p>
-        Do not show notes. This negates the above <tt>--notes</tt> option, by
+        Do not show notes. This negates the above <code>--notes</code> option, by
         resetting the list of notes refs from which notes are shown.
         Options are parsed in the order given on the command line, so e.g.
         "--notes --notes=foo --no-notes --notes=bar" will only show notes
@@ -759,11 +926,13 @@ being displayed. Examples: "--notes=foo" will show only notes from
 <dd>
 <p>
         Check the validity of a signed commit object by passing the signature
-        to <tt>gpg --verify</tt> and show the output.
+        to <code>gpg --verify</code> and show the output.
 </p>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_pretty_formats">PRETTY FORMATS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If the commit is a merge, and if the pretty-format
@@ -788,7 +957,7 @@ built-in formats:</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;sha1&gt; &lt;title line&gt;</tt></pre>
+<pre><code>&lt;sha1&gt; &lt;title line&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>This is designed to be as compact as possible.</p></div>
 </li>
@@ -798,12 +967,12 @@ built-in formats:</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
-Author: &lt;author&gt;</tt></pre>
+<pre><code>commit &lt;sha1&gt;
+Author: &lt;author&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -812,17 +981,17 @@ Author: &lt;author&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
+<pre><code>commit &lt;sha1&gt;
 Author: &lt;author&gt;
-Date:   &lt;author date&gt;</tt></pre>
+Date:   &lt;author date&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -831,17 +1000,17 @@ Date:   &lt;author date&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
+<pre><code>commit &lt;sha1&gt;
 Author: &lt;author&gt;
-Commit: &lt;committer&gt;</tt></pre>
+Commit: &lt;committer&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -850,19 +1019,19 @@ Commit: &lt;committer&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>commit &lt;sha1&gt;
+<pre><code>commit &lt;sha1&gt;
 Author:     &lt;author&gt;
 AuthorDate: &lt;author date&gt;
 Commit:     &lt;committer&gt;
-CommitDate: &lt;committer date&gt;</tt></pre>
+CommitDate: &lt;committer date&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;title line&gt;</tt></pre>
+<pre><code>&lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -871,14 +1040,14 @@ CommitDate: &lt;committer date&gt;</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>From &lt;sha1&gt; &lt;date&gt;
+<pre><code>From &lt;sha1&gt; &lt;date&gt;
 From: &lt;author&gt;
 Date: &lt;author date&gt;
-Subject: [PATCH] &lt;title line&gt;</tt></pre>
+Subject: [PATCH] &lt;title line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;full commit message&gt;</tt></pre>
+<pre><code>&lt;full commit message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -904,8 +1073,8 @@ instead of <em>\n</em>.</p></div>
 would show something like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>The author of fe6e0ee was Junio C Hamano, 23 hours ago
-The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;</tt></pre>
+<pre><code>The author of fe6e0ee was Junio C Hamano, 23 hours ago
+The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff input.&lt;&lt;</code></pre>
 </div></div>
 <div class="paragraph"><p>The placeholders are:</p></div>
 <div class="ulist"><ul>
@@ -1081,12 +1250,12 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-<em>%gD</em>: reflog selector, e.g., <tt>refs/stash@{1}</tt>
+<em>%gD</em>: reflog selector, e.g., <code>refs/stash@{1}</code>
 </p>
 </li>
 <li>
 <p>
-<em>%gd</em>: shortened reflog selector, e.g., <tt>stash@{1}</tt>
+<em>%gd</em>: shortened reflog selector, e.g., <code>stash@{1}</code>
 </p>
 </li>
 <li>
@@ -1174,16 +1343,16 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 <div class="title">Note</div>
 </td>
 <td class="content">Some placeholders may depend on other options given to the
-revision traversal engine. For example, the <tt>%g*</tt> reflog options will
+revision traversal engine. For example, the <code>%g*</code> reflog options will
 insert an empty string unless we are traversing reflog entries (e.g., by
-<tt>git log -g</tt>). The <tt>%d</tt> placeholder will use the "short" decoration
-format if <tt>--decorate</tt> was not already provided on the command line.</td>
+<code>git log -g</code>). The <code>%d</code> placeholder will use the "short" decoration
+format if <code>--decorate</code> was not already provided on the command line.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>If you add a <tt>+</tt> (plus sign) after <em>%</em> of a placeholder, a line-feed
+<div class="paragraph"><p>If you add a <code>+</code> (plus sign) after <em>%</em> of a placeholder, a line-feed
 is inserted immediately before the expansion if and only if the
 placeholder expands to a non-empty string.</p></div>
-<div class="paragraph"><p>If you add a <tt>-</tt> (minus sign) after <em>%</em> of a placeholder, line-feeds that
+<div class="paragraph"><p>If you add a <code>-</code> (minus sign) after <em>%</em> of a placeholder, line-feeds that
 immediately precede the expansion are deleted if and only if the
 placeholder expands to an empty string.</p></div>
 <div class="paragraph"><p>If you add a ` ` (space) after <em>%</em> of a placeholder, a space
@@ -1203,7 +1372,7 @@ terminated with a new line, just as the "oneline" format does.
 For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log -2 --pretty=format:%h 4da45bef \
+<pre><code>$ git log -2 --pretty=format:%h 4da45bef \
   | perl -pe '$_ .= " -- NO NEWLINE\n" unless /\n/'
 4da45be
 7134973 -- NO NEWLINE
@@ -1211,24 +1380,26 @@ For example:</p></div>
 $ git log -2 --pretty=tformat:%h 4da45bef \
   | perl -pe '$_ .= " -- NO NEWLINE\n" unless /\n/'
 4da45be
-7134973</tt></pre>
+7134973</code></pre>
 </div></div>
-<div class="paragraph"><p>In addition, any unrecognized string that has a <tt>%</tt> in it is interpreted
-as if it has <tt>tformat:</tt> in front of it.  For example, these two are
+<div class="paragraph"><p>In addition, any unrecognized string that has a <code>%</code> in it is interpreted
+as if it has <code>tformat:</code> in front of it.  For example, these two are
 equivalent:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log -2 --pretty=tformat:%h 4da45bef
-$ git log -2 --pretty=%h 4da45bef</tt></pre>
+<pre><code>$ git log -2 --pretty=tformat:%h 4da45bef
+$ git log -2 --pretty=%h 4da45bef</code></pre>
 </div></div>
 </li>
 </ul></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_examples">Examples</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>git whatchanged -p v2.6.12.. include/scsi drivers/scsi</tt>
+<code>git whatchanged -p v2.6.12.. include/scsi drivers/scsi</code>
 </dt>
 <dd>
 <p>
@@ -1237,7 +1408,7 @@ $ git log -2 --pretty=%h 4da45bef</tt></pre>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git whatchanged --since="2 weeks ago" -- gitk</tt>
+<code>git whatchanged --since="2 weeks ago" -- gitk</code>
 </dt>
 <dd>
 <p>
@@ -1248,9 +1419,12 @@ $ git log -2 --pretty=%h 4da45bef</tt></pre>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+</div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>

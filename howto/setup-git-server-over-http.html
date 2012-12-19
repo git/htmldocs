@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>How to setup git server over http</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,51 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
 }
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
   font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
 }
 
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
 }
 
-div.quoteblock-attribution {
-  padding-top: 0.5em;
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
   text-align: right;
 }
 
-div.verseblock-content {
-  white-space: pre;
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
 }
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
 }
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
 }
 
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -459,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -479,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -506,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -543,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="article">
 <div id="header">
 <h1>How to setup git server over http</h1>
 </div>
@@ -569,10 +749,10 @@ Have an Apache web-server
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian:
+<pre><code>On Debian:
   $ apt-get install apache2
   To get apache2 by default started,
-  edit /etc/default/apache2 and set NO_START=0</tt></pre>
+  edit /etc/default/apache2 and set NO_START=0</code></pre>
 </div></div>
 </li>
 <li>
@@ -581,11 +761,11 @@ can edit the configuration of it.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>This could be found under /etc/httpd, or refer to your Apache documentation.</tt></pre>
+<pre><code>This could be found under /etc/httpd, or refer to your Apache documentation.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian: this means being able to edit files under /etc/apache2</tt></pre>
+<pre><code>On Debian: this means being able to edit files under /etc/apache2</code></pre>
 </div></div>
 </li>
 <li>
@@ -594,19 +774,19 @@ can restart it.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>'apachectl --graceful' might do. If it doesn't, just stop and
+<pre><code>'apachectl --graceful' might do. If it doesn't, just stop and
 restart apache. Be warning that active connections to your server
-might be aborted by this.</tt></pre>
+might be aborted by this.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian:
+<pre><code>On Debian:
   $ /etc/init.d/apache2 restart
 or
   $ /etc/init.d/apache2 force-reload
   (which seems to do the same)
 This adds symlinks from the /etc/apache2/mods-enabled to
-/etc/apache2/mods-available.</tt></pre>
+/etc/apache2/mods-available.</code></pre>
 </div></div>
 </li>
 <li>
@@ -630,6 +810,7 @@ either have git installed on the server or have a webdav client on
 preconfigured WebDAV server.</p></div>
 </div>
 </div>
+<div class="sect1">
 <h2 id="_step_1_setup_a_bare_git_repository">Step 1: setup a bare GIT repository</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>At the time of writing, git-http-push cannot remotely create a GIT
@@ -642,37 +823,37 @@ by Apache. As an example we take /usr/local/apache2, but try "grep
 DocumentRoot /where/ever/httpd.conf" to find your root:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ cd /usr/local/apache/htdocs
-$ mkdir my-new-repo.git</tt></pre>
+<pre><code>$ cd /usr/local/apache/htdocs
+$ mkdir my-new-repo.git</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian:</tt></pre>
+<pre><code>On Debian:</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ cd /var/www
-$ mkdir my-new-repo.git</tt></pre>
+<pre><code>$ cd /var/www
+$ mkdir my-new-repo.git</code></pre>
 </div></div>
 <div class="paragraph"><p>Initialize a bare repository</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ cd my-new-repo.git
-$ git --bare init</tt></pre>
+<pre><code>$ cd my-new-repo.git
+$ git --bare init</code></pre>
 </div></div>
 <div class="paragraph"><p>Change the ownership to your web-server&#8217;s credentials. Use "grep <sup>User
 httpd.conf" and "grep </sup>Group httpd.conf" to find out:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ chown -R www.www .</tt></pre>
+<pre><code>$ chown -R www.www .</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian:</tt></pre>
+<pre><code>On Debian:</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ chown -R www-data.www-data .</tt></pre>
+<pre><code>$ chown -R www-data.www-data .</code></pre>
 </div></div>
 <div class="paragraph"><p>If you do not know which user Apache runs as, you can alternatively do
 a "chmod -R a+w .", inspect the files which are created later on, and
@@ -681,32 +862,34 @@ set the permissions appropriately.</p></div>
 a directory listing. If not, check whether apache started up
 successfully.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_step_2_enable_dav_on_this_repository">Step 2: enable DAV on this repository</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>First make sure the dav_module is loaded. For this, insert in httpd.conf:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>LoadModule dav_module libexec/httpd/libdav.so
-AddModule mod_dav.c</tt></pre>
+<pre><code>LoadModule dav_module libexec/httpd/libdav.so
+AddModule mod_dav.c</code></pre>
 </div></div>
 <div class="paragraph"><p>Also make sure that this line exists which is the file used for
 locking DAV operations:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>DAVLockDB "/usr/local/apache2/temp/DAV.lock"</tt></pre>
+<pre><code>DAVLockDB "/usr/local/apache2/temp/DAV.lock"</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian these steps can be performed with:</tt></pre>
+<pre><code>On Debian these steps can be performed with:</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Enable the dav and dav_fs modules of apache:
+<pre><code>Enable the dav and dav_fs modules of apache:
 $ a2enmod dav_fs
 (just to be sure. dav_fs might be unneeded, I don't know)
 $ a2enmod dav
 The DAV lock is located in /etc/apache2/mods-available/dav_fs.conf:
-  DAVLockDB /var/lock/apache2/DAVLock</tt></pre>
+  DAVLockDB /var/lock/apache2/DAVLock</code></pre>
 </div></div>
 <div class="paragraph"><p>Of course, it can point somewhere else, but the string is actually just a
 prefix in some Apache configurations, and therefore the <em>directory</em> has to
@@ -714,32 +897,32 @@ be writable by the user Apache runs as.</p></div>
 <div class="paragraph"><p>Then, add something like this to your httpd.conf</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;Location /my-new-repo.git&gt;
+<pre><code>&lt;Location /my-new-repo.git&gt;
    DAV on
    AuthType Basic
    AuthName "Git"
    AuthUserFile /usr/local/apache2/conf/passwd.git
    Require valid-user
-&lt;/Location&gt;</tt></pre>
+&lt;/Location&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian:
-  Create (or add to) /etc/apache2/conf.d/git.conf :</tt></pre>
+<pre><code>On Debian:
+  Create (or add to) /etc/apache2/conf.d/git.conf :</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>&lt;Location /my-new-repo.git&gt;
+<pre><code>&lt;Location /my-new-repo.git&gt;
    DAV on
    AuthType Basic
    AuthName "Git"
    AuthUserFile /etc/apache2/passwd.git
    Require valid-user
-&lt;/Location&gt;</tt></pre>
+&lt;/Location&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Debian automatically reads all files under /etc/apache2/conf.d.</tt></pre>
+<pre><code>Debian automatically reads all files under /etc/apache2/conf.d.</code></pre>
 </div></div>
 <div class="paragraph"><p>The password file can be somewhere else, but it has to be readable by
 Apache and preferably not readable by the world.</p></div>
@@ -747,8 +930,8 @@ Apache and preferably not readable by the world.</p></div>
     $ htpasswd -c /usr/local/apache2/conf/passwd.git &lt;user&gt;</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian:
-  $ htpasswd -c /etc/apache2/passwd.git &lt;user&gt;</tt></pre>
+<pre><code>On Debian:
+  $ htpasswd -c /etc/apache2/passwd.git &lt;user&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>You will be asked a password, and the file is created. Subsequent calls
 to htpasswd should omit the <em>-c</em> option, since you want to append to the
@@ -760,16 +943,16 @@ password.</p></div>
 <div class="paragraph"><p>On Debian:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>To test the WebDAV part, do:</tt></pre>
+<pre><code>To test the WebDAV part, do:</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ apt-get install litmus
-$ litmus http://&lt;servername&gt;/my-new-repo.git &lt;username&gt; &lt;password&gt;</tt></pre>
+<pre><code>$ apt-get install litmus
+$ litmus http://&lt;servername&gt;/my-new-repo.git &lt;username&gt; &lt;password&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Most tests should pass.</tt></pre>
+<pre><code>Most tests should pass.</code></pre>
 </div></div>
 <div class="paragraph"><p>A command line tool to test WebDAV is cadaver. If you prefer GUIs, for
 example, konqueror can open WebDAV URLs as "webdav://&#8230;" or
@@ -778,6 +961,8 @@ example, konqueror can open WebDAV URLs as "webdav://&#8230;" or
 WebDAV. For this, do Internet Explorer &#8594; Open Location &#8594;
 <a href="http://&lt;servername&gt;/my-new-repo.git">http://&lt;servername&gt;/my-new-repo.git</a> [x] Open as webfolder &#8594; login .</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_step_3_setup_the_client">Step 3: setup the client</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Make sure that you have HTTP support, i.e. your git was built with
@@ -787,9 +972,9 @@ no argument should display a usage message.</p></div>
 asked to input your password a <em>lot</em> of times):</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>machine &lt;servername&gt;
+<pre><code>machine &lt;servername&gt;
 login &lt;username&gt;
-password &lt;password&gt;</tt></pre>
+password &lt;password&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>&#8230;and set permissions:
      chmod 600 ~/.netrc</p></div>
@@ -798,7 +983,7 @@ instead of the server name.</p></div>
 <div class="paragraph"><p>To check whether all is OK, do:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>curl --netrc --location -v http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git/HEAD</tt></pre>
+<pre><code>curl --netrc --location -v http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git/HEAD</code></pre>
 </div></div>
 <div class="paragraph"><p>&#8230;this should give something like <em>ref: refs/heads/master</em>, which is
 the content of the file HEAD on the server.</p></div>
@@ -806,24 +991,28 @@ the content of the file HEAD on the server.</p></div>
 you want to export:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ git-config remote.upload.url \
-    http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git/</tt></pre>
+<pre><code>$ git-config remote.upload.url \
+    http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git/</code></pre>
 </div></div>
 <div class="paragraph"><p>It is important to put the last <em>/</em>; Without it, the server will send
 a redirect which git-http-push does not (yet) understand, and git-http-push
 will repeat the request infinitely.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_step_4_make_the_initial_push">Step 4: make the initial push</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>From your client repository, do</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ git push upload master</tt></pre>
+<pre><code>$ git push upload master</code></pre>
 </div></div>
 <div class="paragraph"><p>This pushes branch <em>master</em> (which is assumed to be the branch you
 want to export) to repository called <em>upload</em>, which we previously
 defined with git-config.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_using_a_proxy">Using a proxy:</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If you have to access the WebDAV server from behind an HTTP(S) proxy,
@@ -831,12 +1020,14 @@ set the variable <em>all_proxy</em> to <em>http://proxy-host.com:port</em>, or
 <em>http://login-on-proxy:passwd-on-proxy@proxy-host.com:port</em>. See <em>man
 curl</em> for details.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_troubleshooting">Troubleshooting:</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If git-http-push says</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Error: no DAV locking support on remote repo http://...</tt></pre>
+<pre><code>Error: no DAV locking support on remote repo http://...</code></pre>
 </div></div>
 <div class="paragraph"><p>then it means the web-server did not accept your authentication. Make sure
 that the user name and password matches in httpd.conf, .netrc and the URL
@@ -850,7 +1041,7 @@ code). So (22/404) means something like <em>not found</em> at the server.</p></d
 <div class="paragraph"><p>Reading /usr/local/apache2/logs/error_log is often helpful.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>On Debian: Read /var/log/apache2/error.log instead.</tt></pre>
+<pre><code>On Debian: Read /var/log/apache2/error.log instead.</code></pre>
 </div></div>
 <div class="paragraph"><p>If you access HTTPS locations, git may fail verifying the SSL
 certificate (this is return code 60). Setting http.sslVerify=false can
@@ -862,10 +1053,11 @@ help diagnosing the problem, but removes security checks.</p></div>
   Matthieu Moy &lt;<a href="mailto:Matthieu.Moy@imag.fr">Matthieu.Moy@imag.fr</a>&gt;</p></div>
 </div>
 </div>
+</div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-20 13:06:06 PDT
+Last updated 2012-12-18 16:39:21 PST
 </div>
 </div>
 </body>

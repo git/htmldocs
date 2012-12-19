@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>Fighting regressions with git bisect</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,51 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
 }
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
   font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
 }
 
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
 }
 
-div.quoteblock-attribution {
-  padding-top: 0.5em;
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
   text-align: right;
 }
 
-div.verseblock-content {
-  white-space: pre;
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
 }
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
 }
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
 }
 
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -459,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -479,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -506,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -543,20 +700,44 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="article">
 <div id="header">
 <h1>Fighting regressions with git bisect</h1>
 <span id="author">Christian Couder</span><br />
-<span id="email"><tt>&lt;<a href="mailto:chriscool@tuxfamily.org">chriscool@tuxfamily.org</a>&gt;</tt></span><br />
+<span id="email"><code>&lt;<a href="mailto:chriscool@tuxfamily.org">chriscool@tuxfamily.org</a>&gt;</code></span><br />
 <span id="revdate">2009/11/08</span>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_abstract">Abstract</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>"git bisect" enables software users and developers to easily find the
@@ -567,6 +748,8 @@ explain how to take advantage of "git bisect" to improve current
 practices. And we discuss how "git bisect" could improve in the
 future.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_introduction_to_git_bisect">Introduction to "git bisect"</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Git is a Distributed Version Control system (DVCS) created by Linus
@@ -592,15 +775,18 @@ more than one "first bad commit" in the commit space we are searching.</p></div>
 <div class="paragraph"><p>So "git bisect" is designed to help find a "first bad commit". And to
 be as efficient as possible, it tries to perform a binary search.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_fighting_regressions_overview">Fighting regressions overview</h2>
 <div class="sectionbody">
-<h3 id="_regressions_a_big_problem">Regressions: a big problem</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_regressions_a_big_problem">Regressions: a big problem</h3>
 <div class="paragraph"><p>Regressions are a big problem in the software industry. But it&#8217;s
 difficult to put some real numbers behind that claim.</p></div>
 <div class="paragraph"><p>There are some numbers about bugs in general, like a NIST study in
 2002 <a href="#1">[1]</a> that said:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>Software bugs, or errors, are so prevalent and so detrimental that
 they cost the U.S. economy an estimated $59.5 billion annually, or
 about 0.6 percent of the gross domestic product, according to a newly
@@ -617,31 +803,31 @@ to the development stages in which they are introduced. Currently,
 over half of all errors are not found until "downstream" in the
 development process or during post-sale software use.</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>And then:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>Software developers already spend approximately 80 percent of
 development costs on identifying and correcting defects, and yet few
 products of any type other than software are shipped with such high
 levels of errors.</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>Eventually the conclusion started with:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>The path to higher software quality is significantly improved software
 testing.</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>There are other estimates saying that 80% of the cost related to
 software is about maintenance <a href="#2">[2]</a>.</p></div>
 <div class="paragraph"><p>Though, according to Wikipedia <a href="#3">[3]</a>:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>A common perception of maintenance is that it is merely fixing
 bugs. However, studies and surveys over the years have indicated that
 the majority, over 80%, of the maintenance effort is used for
@@ -649,7 +835,7 @@ non-corrective actions (Pigosky 1997). This perception is perpetuated
 by users submitting problem reports that in reality are functionality
 enhancements to the system.</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>But we can guess that improving on existing software is very costly
 because you have to watch out for regressions. At least this would
@@ -675,19 +861,21 @@ continues after the release.</p></div>
 <div class="paragraph"><p>And then this is what Ingo Molnar (a well known linux kernel
 developer) says about his use of git bisect:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>I most actively use it during the merge window (when a lot of trees
 get merged upstream and when the influx of bugs is the highest) - and
 yes, there have been cases that i used it multiple times a day. My
 average is roughly once a day.</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>So regressions are fought all the time by developers, and indeed it is
 well known that bugs should be fixed as soon as possible, so as soon
 as they are found. That&#8217;s why it is interesting to have good tools for
 this purpose.</p></div>
-<h3 id="_other_tools_to_fight_regressions">Other tools to fight regressions</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_other_tools_to_fight_regressions">Other tools to fight regressions</h3>
 <div class="paragraph"><p>So what are the tools used to fight regressions? They are nearly the
 same as those used to fight regular bugs. The only specific tools are
 test suites and tools similar as "git bisect".</p></div>
@@ -702,7 +890,7 @@ configuration after each commit. So if you have for each release: N
 configurations, M commits and T test cases, you should perform:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>N * M * T tests</tt></pre>
+<pre><code>N * M * T tests</code></pre>
 </div></div>
 <div class="paragraph"><p>where N, M and T are all growing with the size your software.</p></div>
 <div class="paragraph"><p>So very soon it will not be possible to completely test everything.</p></div>
@@ -713,9 +901,13 @@ emulate a bisection process or you will perhaps bluntly test each
 commit backward starting from the "bad" commit you have which may be
 very wasteful.</p></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_git_bisect_overview">"git bisect" overview</h2>
 <div class="sectionbody">
-<h3 id="_starting_a_bisection">Starting a bisection</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_starting_a_bisection">Starting a bisection</h3>
 <div class="paragraph"><p>The first "git bisect" subcommand to use is "git bisect start" to
 start the search. Then bounds must be set to limit the commit
 space. This is done usually by giving one "bad" and at least one
@@ -723,17 +915,17 @@ space. This is done usually by giving one "bad" and at least one
 start" like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect start [BAD [GOOD...]]</tt></pre>
+<pre><code>$ git bisect start [BAD [GOOD...]]</code></pre>
 </div></div>
 <div class="paragraph"><p>or they can be set using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect bad [COMMIT]</tt></pre>
+<pre><code>$ git bisect bad [COMMIT]</code></pre>
 </div></div>
 <div class="paragraph"><p>and:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect good [COMMIT...]</tt></pre>
+<pre><code>$ git bisect good [COMMIT...]</code></pre>
 </div></div>
 <div class="paragraph"><p>where BAD, GOOD and COMMIT are all names that can be resolved to a
 commit.</p></div>
@@ -741,9 +933,9 @@ commit.</p></div>
 user to test it, like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect start v2.6.27 v2.6.25
+<pre><code>$ git bisect start v2.6.27 v2.6.25
 Bisecting: 10928 revisions left to test after this (roughly 14 steps)
-[2ec65f8b89ea003c27ff7723525a2ee335a2b393] x86: clean up using max_low_pfn on 32-bit</tt></pre>
+[2ec65f8b89ea003c27ff7723525a2ee335a2b393] x86: clean up using max_low_pfn on 32-bit</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that the example that we will use is really a toy example, we
 will be looking for the first commit that has a version like
@@ -751,7 +943,9 @@ will be looking for the first commit that has a version like
 in the top level Makefile. This is a toy example because there are
 better ways to find this commit with git than using "git bisect" (for
 example "git blame" or "git log -S&lt;string&gt;").</p></div>
-<h3 id="_driving_a_bisection_manually">Driving a bisection manually</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_driving_a_bisection_manually">Driving a bisection manually</h3>
 <div class="paragraph"><p>At this point there are basically 2 ways to drive the search. It can
 be driven manually by the user or it can be driven automatically by a
 script or a command.</p></div>
@@ -761,15 +955,15 @@ using the "git bisect good" or "git bisect bad" commands respectively
 that have been described above. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect bad
+<pre><code>$ git bisect bad
 Bisecting: 5480 revisions left to test after this (roughly 13 steps)
-[66c0b394f08fd89236515c1c84485ea712a157be] KVM: kill file-&gt;f_count abuse in kvm</tt></pre>
+[66c0b394f08fd89236515c1c84485ea712a157be] KVM: kill file-&gt;f_count abuse in kvm</code></pre>
 </div></div>
 <div class="paragraph"><p>And after a few more steps like that, "git bisect" will eventually
 find a first bad commit:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect bad
+<pre><code>$ git bisect bad
 2ddcca36c8bcfa251724fe342c8327451988be0d is the first bad commit
 commit 2ddcca36c8bcfa251724fe342c8327451988be0d
 Author: Linus Torvalds &lt;torvalds@linux-foundation.org&gt;
@@ -777,13 +971,13 @@ Date:   Sat May 3 11:59:44 2008 -0700
 
     Linux 2.6.26-rc1
 
-:100644 100644 5cf82581... 4492984e... M      Makefile</tt></pre>
+:100644 100644 5cf82581... 4492984e... M      Makefile</code></pre>
 </div></div>
 <div class="paragraph"><p>At this point we can see what the commit does, check it out (if it&#8217;s
 not already checked out) or tinker with it, for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git show HEAD
+<pre><code>$ git show HEAD
 commit 2ddcca36c8bcfa251724fe342c8327451988be0d
 Author: Linus Torvalds &lt;torvalds@linux-foundation.org&gt;
 Date:   Sat May 3 11:59:44 2008 -0700
@@ -803,25 +997,27 @@ index 5cf8258..4492984 100644
 +EXTRAVERSION = -rc1
  NAME = Funky Weasel is Jiggy wit it
 
- # *DOCUMENTATION*</tt></pre>
+ # *DOCUMENTATION*</code></pre>
 </div></div>
 <div class="paragraph"><p>And when we are finished we can use "git bisect reset" to go back to
 the branch we were in before we started bisecting:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect reset
+<pre><code>$ git bisect reset
 Checking out files: 100% (21549/21549), done.
 Previous HEAD position was 2ddcca3... Linux 2.6.26-rc1
-Switched to branch 'master'</tt></pre>
+Switched to branch 'master'</code></pre>
 </div></div>
-<h3 id="_driving_a_bisection_automatically">Driving a bisection automatically</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_driving_a_bisection_automatically">Driving a bisection automatically</h3>
 <div class="paragraph"><p>The other way to drive the bisection process is to tell "git bisect"
 to launch a script or command at each bisection step to know if the
 current commit is "good" or "bad". To do that, we use the "git bisect
 run" command. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect start v2.6.27 v2.6.25
+<pre><code>$ git bisect start v2.6.27 v2.6.25
 Bisecting: 10928 revisions left to test after this (roughly 14 steps)
 [2ec65f8b89ea003c27ff7723525a2ee335a2b393] x86: clean up using max_low_pfn on 32-bit
 $
@@ -847,7 +1043,7 @@ Date:   Sat May 3 11:59:44 2008 -0700
     Linux 2.6.26-rc1
 
 :100644 100644 5cf82581... 4492984e... M      Makefile
-bisect run success</tt></pre>
+bisect run success</code></pre>
 </div></div>
 <div class="paragraph"><p>In this example, we passed "grep <em>^SUBLEVEL = 25</em> Makefile" as
 parameter to "git bisect run". This means that at each step, the grep
@@ -862,7 +1058,9 @@ example if the command passed takes too long to complete, because you
 can kill it with a signal and it will stop the bisection process.</p></div>
 <div class="paragraph"><p>It can also be useful in scripts passed to "git bisect run" to "exit
 255" if some very abnormal situation is detected.</p></div>
-<h3 id="_avoiding_untestable_commits">Avoiding untestable commits</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_avoiding_untestable_commits">Avoiding untestable commits</h3>
 <div class="paragraph"><p>Sometimes it happens that the current state cannot be tested, for
 example if it does not compile because there was a bug preventing it
 at that time. This is what the special exit code 125 is for. It tells
@@ -883,30 +1081,36 @@ tell for sure which commit introduced the regression.</p></div>
 special code 125) you could get a result like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>There are only 'skip'ped commits left to test.
+<pre><code>There are only 'skip'ped commits left to test.
 The first bad commit could be any of:
 15722f2fa328eaba97022898a305ffc8172db6b1
 78e86cf3e850bd755bb71831f42e200626fbd1e0
 e15b73ad3db9b48d7d1ade32f8cd23a751fe0ace
 070eab2303024706f2924822bfec8b9847e4ac1b
-We cannot bisect more!</tt></pre>
+We cannot bisect more!</code></pre>
 </div></div>
-<h3 id="_saving_a_log_and_replaying_it">Saving a log and replaying it</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_saving_a_log_and_replaying_it">Saving a log and replaying it</h3>
 <div class="paragraph"><p>If you want to show other people your bisection process, you can get a
 log using for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect log &gt; bisect_log.txt</tt></pre>
+<pre><code>$ git bisect log &gt; bisect_log.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>And it is possible to replay it using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect replay bisect_log.txt</tt></pre>
+<pre><code>$ git bisect replay bisect_log.txt</code></pre>
 </div></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_git_bisect_details">"git bisect" details</h2>
 <div class="sectionbody">
-<h3 id="_bisection_algorithm">Bisection algorithm</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_bisection_algorithm">Bisection algorithm</h3>
 <div class="paragraph"><p>As the Git commits form a directed acyclic graph (DAG), finding the
 best bisection commit to test at each step is not so simple. Anyway
 Linus found and implemented a "truly stupid" algorithm, later improved
@@ -920,7 +1124,7 @@ b) are not ancestor of a "good" commit (excluding the "good" commits).</p></div>
 <div class="paragraph"><p>For example if we start with a graph like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>G-Y-G-W-W-W-X-X-X-X
+<pre><code>G-Y-G-W-W-W-X-X-X-X
            \ /
             W-W-B
            /
@@ -928,18 +1132,18 @@ Y---G-W---W
  \ /   \
 Y-Y     X-X-X-X
 
--&gt; time goes this way -&gt;</tt></pre>
+-&gt; time goes this way -&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>where B is the "bad" commit, "G" are "good" commits and W, X, and Y
 are other commits, we will get the following graph after this first
 step:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>W-W-W
+<pre><code>W-W-W
      \
       W-W-B
      /
-W---W</tt></pre>
+W---W</code></pre>
 </div></div>
 <div class="paragraph"><p>So only the W and B commits will be kept. Because commits X and Y will
 have been removed by rules a) and b) respectively, and because commits
@@ -948,16 +1152,16 @@ G are removed by rule b) too.</p></div>
 given by:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git rev-list BAD --not GOOD1 GOOD2...</tt></pre>
+<pre><code>git rev-list BAD --not GOOD1 GOOD2...</code></pre>
 </div></div>
 <div class="paragraph"><p>Also note that we don&#8217;t require the commits that are kept to be
 descendants of a "good" commit. So in the following example, commits W
 and Z will be kept:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>G-W-W-W-B
+<pre><code>G-W-W-W-B
    /
-Z-Z</tt></pre>
+Z-Z</code></pre>
 </div></div>
 <div class="paragraph"><p>2) starting from the "good" ends of the graph, associate to each
 commit the number of ancestors it has plus one</p></div>
@@ -965,21 +1169,21 @@ commit the number of ancestors it has plus one</p></div>
 and D are some parents of some "good" commits:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>A-B-C
+<pre><code>A-B-C
      \
       F-G-H
      /
-D---E</tt></pre>
+D---E</code></pre>
 </div></div>
 <div class="paragraph"><p>this will give:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>1 2 3
+<pre><code>1 2 3
 A-B-C
      \6 7 8
       F-G-H
 1   2/
-D---E</tt></pre>
+D---E</code></pre>
 </div></div>
 <div class="paragraph"><p>3) associate to each commit: min(X, N - X)</p></div>
 <div class="paragraph"><p>where X is the value associated to the commit in step 2) and N is the
@@ -987,12 +1191,12 @@ total number of commits in the graph.</p></div>
 <div class="paragraph"><p>In the above example we have N = 8, so this will give:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>1 2 3
+<pre><code>1 2 3
 A-B-C
      \2 1 0
       F-G-H
 1   2/
-D---E</tt></pre>
+D---E</code></pre>
 </div></div>
 <div class="paragraph"><p>4) the best bisection point is the commit with the highest associated
 number</p></div>
@@ -1003,27 +1207,31 @@ greater than N/2. So during steps 2) and 3), if we would associate N/2
 to a commit, then we know this is the best bisection point. So in this
 case we can just stop processing any other commit and return the
 current commit.</p></div>
-<h3 id="_bisection_algorithm_debugging">Bisection algorithm debugging</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_bisection_algorithm_debugging">Bisection algorithm debugging</h3>
 <div class="paragraph"><p>For any commit graph, you can see the number associated with each
 commit using "git rev-list --bisect-all".</p></div>
 <div class="paragraph"><p>For example, for the above graph, a command like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git rev-list --bisect-all BAD --not GOOD1 GOOD2</tt></pre>
+<pre><code>$ git rev-list --bisect-all BAD --not GOOD1 GOOD2</code></pre>
 </div></div>
 <div class="paragraph"><p>would output something like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>e15b73ad3db9b48d7d1ade32f8cd23a751fe0ace (dist=3)
+<pre><code>e15b73ad3db9b48d7d1ade32f8cd23a751fe0ace (dist=3)
 15722f2fa328eaba97022898a305ffc8172db6b1 (dist=2)
 78e86cf3e850bd755bb71831f42e200626fbd1e0 (dist=2)
 a1939d9a142de972094af4dde9a544e577ddef0e (dist=2)
 070eab2303024706f2924822bfec8b9847e4ac1b (dist=1)
 a3864d4f32a3bf5ed177ddef598490a08760b70d (dist=1)
 a41baa717dd74f1180abf55e9341bc7a0bb9d556 (dist=1)
-9e622a6dad403b71c40979743bb9d5be17b16bd6 (dist=0)</tt></pre>
+9e622a6dad403b71c40979743bb9d5be17b16bd6 (dist=0)</code></pre>
 </div></div>
-<h3 id="_bisection_algorithm_discussed">Bisection algorithm discussed</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_bisection_algorithm_discussed">Bisection algorithm discussed</h3>
 <div class="paragraph"><p>First let&#8217;s define "best bisection point". We will say that a commit X
 is a best bisection point or a best bisection commit if knowing its
 state ("good" or "bad") gives as much information as possible whether
@@ -1032,7 +1240,7 @@ the state of the commit happens to be "good" or "bad".</p></div>
 following function is maximum:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>f(X) = min(information_if_good(X), information_if_bad(X))</tt></pre>
+<pre><code>f(X) = min(information_if_good(X), information_if_bad(X))</code></pre>
 </div></div>
 <div class="paragraph"><p>where information_if_good(X) is the information we get if X is good
 and information_if_bad(X) is the information we get if X is bad.</p></div>
@@ -1053,7 +1261,7 @@ the graph..</p></div>
 "good", so we want to say that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>information_if_good(X) = number_of_ancestors(X)  (TRUE)</tt></pre>
+<pre><code>information_if_good(X) = number_of_ancestors(X)  (TRUE)</code></pre>
 </div></div>
 <div class="paragraph"><p>And this is true because at step 1) b) we remove the ancestors of the
 "good" commits.</p></div>
@@ -1061,7 +1269,7 @@ the graph..</p></div>
 "bad", so we want to say that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>information_if_bad(X) = number_of_descendants(X)  (WRONG)</tt></pre>
+<pre><code>information_if_bad(X) = number_of_descendants(X)  (WRONG)</code></pre>
 </div></div>
 <div class="paragraph"><p>But this is wrong because at step 1) a) we keep only the ancestors of
 the bad commit. So we get more information when a commit is marked as
@@ -1075,52 +1283,52 @@ commits in the graph except those that are ancestors of the new "bad"
 commit. This means that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>information_if_bad(X) = N - number_of_ancestors(X)  (TRUE)</tt></pre>
+<pre><code>information_if_bad(X) = N - number_of_ancestors(X)  (TRUE)</code></pre>
 </div></div>
 <div class="paragraph"><p>where N is the number of commits in the (cleaned up) graph.</p></div>
 <div class="paragraph"><p>So in the end this means that to find the best bisection commits we
 should maximize the function:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>f(X) = min(number_of_ancestors(X), N - number_of_ancestors(X))</tt></pre>
+<pre><code>f(X) = min(number_of_ancestors(X), N - number_of_ancestors(X))</code></pre>
 </div></div>
 <div class="paragraph"><p>And this is nice because at step 2) we compute number_of_ancestors(X)
 and so at step 3) we compute f(X).</p></div>
 <div class="paragraph"><p>Let&#8217;s take the following graph as an example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>            G-H-I-J
+<pre><code>            G-H-I-J
            /       \
 A-B-C-D-E-F         O
            \       /
-            K-L-M-N</tt></pre>
+            K-L-M-N</code></pre>
 </div></div>
 <div class="paragraph"><p>If we compute the following non optimal function on it:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>g(X) = min(number_of_ancestors(X), number_of_descendants(X))</tt></pre>
+<pre><code>g(X) = min(number_of_ancestors(X), number_of_descendants(X))</code></pre>
 </div></div>
 <div class="paragraph"><p>we get:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>            4 3 2 1
+<pre><code>            4 3 2 1
             G-H-I-J
 1 2 3 4 5 6/       \0
 A-B-C-D-E-F         O
            \       /
             K-L-M-N
-            4 3 2 1</tt></pre>
+            4 3 2 1</code></pre>
 </div></div>
 <div class="paragraph"><p>but with the algorithm used by git bisect we get:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>            7 7 6 5
+<pre><code>            7 7 6 5
             G-H-I-J
 1 2 3 4 5 6/       \0
 A-B-C-D-E-F         O
            \       /
             K-L-M-N
-            7 7 6 5</tt></pre>
+            7 7 6 5</code></pre>
 </div></div>
 <div class="paragraph"><p>So we chose G, H, K or L as the best bisection point, which is better
 than F. Because if for example L is bad, then we will know not only
@@ -1129,7 +1337,9 @@ bad commit (since we suppose that there is only one first bad commit
 and it must be an ancestor of L).</p></div>
 <div class="paragraph"><p>So the current algorithm seems to be the best possible given what we
 initially supposed.</p></div>
-<h3 id="_skip_algorithm">Skip algorithm</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_skip_algorithm">Skip algorithm</h3>
 <div class="paragraph"><p>When some commits have been skipped (using "git bisect skip"), then
 the bisection algorithm is the same for step 1) to 3). But then we use
 roughly the following steps:</p></div>
@@ -1144,7 +1354,9 @@ number between 0 and 1</p></div>
 <div class="paragraph"><p>11) multiply the result by the number of commits in the filtered list
 to get an index into this list</p></div>
 <div class="paragraph"><p>12) return the commit at the computed index</p></div>
-<h3 id="_skip_algorithm_discussed">Skip algorithm discussed</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_skip_algorithm_discussed">Skip algorithm discussed</h3>
 <div class="paragraph"><p>After step 7) (in the skip algorithm), we could check if the second
 commit has been skipped and return it if it is not the case. And in
 fact that was the algorithm we used from when "git bisect skip" was
@@ -1178,7 +1390,9 @@ commit, and that is on another branch, before using the PRNG. Because
 if such a commit exists, then it is not very likely to be untestable
 too, so it will probably give more information than a nearly randomly
 chosen one.</p></div>
-<h3 id="_checking_merge_bases">Checking merge bases</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_checking_merge_bases">Checking merge bases</h3>
 <div class="paragraph"><p>There is another tweak in the bisection algorithm that has not been
 described in the "bisection algorithm" above.</p></div>
 <div class="paragraph"><p>We supposed in the previous examples that the "good" commits were
@@ -1195,9 +1409,9 @@ descendants.</p></div>
 forked of the main branch at a commit named "D" like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>A-B-C-D-E-F-G  &lt;--main
+<pre><code>A-B-C-D-E-F-G  &lt;--main
        \
-        H-I-J  &lt;--dev</tt></pre>
+        H-I-J  &lt;--dev</code></pre>
 </div></div>
 <div class="paragraph"><p>The commit "D" is called a "merge base" for branch "main" and "dev"
 because it&#8217;s the best common ancestor for these branches for a merge.</p></div>
@@ -1210,7 +1424,7 @@ too.</p></div>
 <div class="paragraph"><p>So we would be left with only:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>H-I-J</tt></pre>
+<pre><code>H-I-J</code></pre>
 </div></div>
 <div class="paragraph"><p>But what happens if the first bad commit is "B" and if it has been
 fixed in the "main" branch by commit "F"?</p></div>
@@ -1228,7 +1442,7 @@ development branch that is not on the maintenance branch. They should
 be able to start bisecting using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect start dev main</tt></pre>
+<pre><code>$ git bisect start dev main</code></pre>
 </div></div>
 <div class="paragraph"><p>To enable that additional nice feature, when a bisection is started
 and when some good commits are not ancestors of the bad commit, we
@@ -1239,8 +1453,8 @@ out and tested.</p></div>
 is stopped with a message like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>The merge base BBBBBB is bad.
-This means the bug has been fixed between BBBBBB and [GGGGGG,...].</tt></pre>
+<pre><code>The merge base BBBBBB is bad.
+This means the bug has been fixed between BBBBBB and [GGGGGG,...].</code></pre>
 </div></div>
 <div class="paragraph"><p>where BBBBBB is the sha1 hash of the bad merge base and [GGGGGG,&#8230;]
 is a comma separated list of the sha1 of the good commits.</p></div>
@@ -1249,9 +1463,9 @@ continues, but the following message is printed for each skipped merge
 base:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>Warning: the merge base between BBBBBB and [GGGGGG,...] must be skipped.
+<pre><code>Warning: the merge base between BBBBBB and [GGGGGG,...] must be skipped.
 So we cannot be sure the first bad commit is between MMMMMM and BBBBBB.
-We continue anyway.</tt></pre>
+We continue anyway.</code></pre>
 </div></div>
 <div class="paragraph"><p>where BBBBBB is the sha1 hash of the bad commit, MMMMMM is the sha1
 hash of the merge base that is skipped and [GGGGGG,&#8230;]  is a comma
@@ -1259,9 +1473,13 @@ separated list of the sha1 of the good commits.</p></div>
 <div class="paragraph"><p>So if there is no bad merge base, the bisection process continues as
 usual after this step.</p></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_best_bisecting_practices">Best bisecting practices</h2>
 <div class="sectionbody">
-<h3 id="_using_test_suites_and_git_bisect_together">Using test suites and git bisect together</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_using_test_suites_and_git_bisect_together">Using test suites and git bisect together</h3>
 <div class="paragraph"><p>If you both have a test suite and use git bisect, then it becomes less
 important to check that all tests pass after each commit. Though of
 course it is probably a good idea to have some checks to avoid
@@ -1273,7 +1491,7 @@ configurations. And when some tests don&#8217;t pass you can use "git
 bisect" (or better "git bisect run"). So you should perform roughly:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>c * N * T + b * M * log2(M) tests</tt></pre>
+<pre><code>c * N * T + b * M * log2(M) tests</code></pre>
 </div></div>
 <div class="paragraph"><p>where c is the number of rounds of test (so a small constant) and b is
 the ratio of bug per commit (hopefully a small constant too).</p></div>
@@ -1294,30 +1512,36 @@ subject to a virtuous circle:</p></div>
 <div class="paragraph"><p>more tests &#8658; easier to create tests &#8658; easier to bisect &#8658; more tests</p></div>
 <div class="paragraph"><p>So test suites and "git bisect" are complementary tools that are very
 powerful and efficient when used together.</p></div>
-<h3 id="_bisecting_build_failures">Bisecting build failures</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_bisecting_build_failures">Bisecting build failures</h3>
 <div class="paragraph"><p>You can very easily automatically bisect broken builds using something
 like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect start BAD GOOD
-$ git bisect run make</tt></pre>
+<pre><code>$ git bisect start BAD GOOD
+$ git bisect run make</code></pre>
 </div></div>
-<h3 id="_passing_sh_c_some_commands_to_git_bisect_run">Passing sh -c "some commands" to "git bisect run"</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_passing_sh_c_some_commands_to_git_bisect_run">Passing sh -c "some commands" to "git bisect run"</h3>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect run sh -c "make || exit 125; ./my_app | grep 'good output'"</tt></pre>
+<pre><code>$ git bisect run sh -c "make || exit 125; ./my_app | grep 'good output'"</code></pre>
 </div></div>
 <div class="paragraph"><p>On the other hand if you do this often, then it can be worth having
 scripts to avoid too much typing.</p></div>
-<h3 id="_finding_performance_regressions">Finding performance regressions</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_finding_performance_regressions">Finding performance regressions</h3>
 <div class="paragraph"><p>Here is an example script that comes slightly modified from a real
 world script used by Junio Hamano <a href="#4">[4]</a>.</p></div>
 <div class="paragraph"><p>This script can be passed to "git bisect run" to find the commit that
 introduced a performance regression:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>#!/bin/sh
+<pre><code>#!/bin/sh
 
 # Build errors are not what I am interested in.
 make my_app || exit 255
@@ -1343,9 +1567,11 @@ else
         # It has already finished (the $pid process was no more),
         # and we are happy.
         exit 0
-fi</tt></pre>
+fi</code></pre>
 </div></div>
-<h3 id="_following_general_best_practices">Following general best practices</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_following_general_best_practices">Following general best practices</h3>
 <div class="paragraph"><p>It is obviously a good idea not to have commits with changes that
 knowingly break things, even if some other commits later fix the
 breakage.</p></div>
@@ -1358,7 +1584,9 @@ only reviewed by the committer.</p></div>
 <div class="paragraph"><p>Another good idea is to have good commit messages. They can be very
 helpful to understand why some changes were made.</p></div>
 <div class="paragraph"><p>These general best practices are very helpful if you bisect often.</p></div>
-<h3 id="_avoiding_bug_prone_merges">Avoiding bug prone merges</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_avoiding_bug_prone_merges">Avoiding bug prone merges</h3>
 <div class="paragraph"><p>First merges by themselves can introduce some regressions even when
 the merge needs no source code conflict resolution. This is because a
 semantic change can happen in one branch while the other branch is not
@@ -1380,7 +1608,9 @@ branch.</p></div>
 many topic branches instead of only long version related branches.</p></div>
 <div class="paragraph"><p>And testing can be done more often in special integration branches
 like linux-next for the linux kernel.</p></div>
-<h3 id="_adapting_your_work_flow">Adapting your work-flow</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_adapting_your_work_flow">Adapting your work-flow</h3>
 <div class="paragraph"><p>A special work-flow to process regressions can give great results.</p></div>
 <div class="paragraph"><p>Here is an example of a work-flow used by Andreas Ericsson:</p></div>
 <div class="ulist"><ul>
@@ -1407,7 +1637,7 @@ commit both the fix and the test script (and if needed more tests)
 </ul></div>
 <div class="paragraph"><p>And here is what Andreas said about this work-flow <a href="#5">[5]</a>:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>To give some hard figures, we used to have an average report-to-fix
 cycle of 142.6 hours (according to our somewhat weird bug-tracker
 which just measures wall-clock time). Since we moved to git, we&#8217;ve
@@ -1417,7 +1647,7 @@ bugs (we&#8217;re quite proud of how lazy we are to let git find the bugs
 for us). Each new release results in ~40% fewer bugs (almost certainly
 due to how we now feel about writing tests).</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>Clearly this work-flow uses the virtuous circle between test suites
 and "git bisect". In fact it makes it the standard procedure to deal
@@ -1428,7 +1658,9 @@ merge,&#8230; These practices all improve the bisectability of the commit
 graph, by making it easier and more useful to bisect.</p></div>
 <div class="paragraph"><p>So a good work-flow should be designed around the above points. That
 is making bisecting easier, more useful and standard.</p></div>
-<h3 id="_involving_qa_people_and_if_possible_end_users">Involving QA people and if possible end users</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_involving_qa_people_and_if_possible_end_users">Involving QA people and if possible end users</h3>
 <div class="paragraph"><p>One nice about "git bisect" is that it is not only a developer
 tool. It can effectively be used by QA people or even end users (if
 they have access to the source code or if they can get access to all
@@ -1438,14 +1670,14 @@ of whether it was ok to always ask end user to bisect, and very good
 points were made to support the point of view that it is ok.</p></div>
 <div class="paragraph"><p>For example David Miller wrote <a href="#6">[6]</a>:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>What people don&#8217;t get is that this is a situation where the "end node
 principle" applies. When you have limited resources (here: developers)
 you don&#8217;t push the bulk of the burden upon them. Instead you push
 things out to the resource you have a lot of, the end nodes (here:
 users), so that the situation actually scales.</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>This means that it is often "cheaper" if QA people or end users can do
 it.</p></div>
@@ -1458,12 +1690,14 @@ it will be easier to understand and then fix the bug.</p></div>
 <div class="paragraph"><p>For open source projects it can be a good way to get more useful
 contributions from end users, and to introduce them to QA and
 development activities.</p></div>
-<h3 id="_using_complex_scripts">Using complex scripts</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_using_complex_scripts">Using complex scripts</h3>
 <div class="paragraph"><p>In some cases like for kernel development it can be worth developing
 complex scripts to be able to fully automate bisecting.</p></div>
 <div class="paragraph"><p>Here is what Ingo Molnar says about that <a href="#7">[7]</a>:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>i have a fully automated bootup-hang bisection script. It is based on
 "git-bisect run". I run the script, it builds and boots kernels fully
 automatically, and when the bootup fails (the script notices that via
@@ -1473,9 +1707,11 @@ the script raises my attention via a beep and i power cycle the test
 box. (yeah, i should make use of a managed power outlet to 100%
 automate it)</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
-<h3 id="_combining_test_suites_git_bisect_and_other_systems_together">Combining test suites, git bisect and other systems together</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_combining_test_suites_git_bisect_and_other_systems_together">Combining test suites, git bisect and other systems together</h3>
 <div class="paragraph"><p>We have seen that test suites an git bisect are very powerful when
 used together. It can be even more powerful if you can combine them
 with other systems.</p></div>
@@ -1486,9 +1722,13 @@ launched, and its result can be emailed to the author of the first bad
 commit found by "git bisect", and perhaps other people too. And a new
 entry in the bug tracking system could be automatically created too.</p></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_the_future_of_bisecting">The future of bisecting</h2>
 <div class="sectionbody">
-<h3 id="_git_replace">"git replace"</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_git_replace">"git replace"</h3>
 <div class="paragraph"><p>We saw earlier that "git bisect skip" is now using a PRNG to try to
 avoid areas in the commit graph where commits are untestable. The
 problem is that sometimes the first bad commit will be in an
@@ -1501,7 +1741,7 @@ fixing commit).</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</tt></pre>
+<pre><code>...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</code></pre>
 </div></div>
 <div class="paragraph"><p>where we know that Y is good and BFC is bad, and where BBC and X1 to
 X6 are untestable.</p></div>
@@ -1514,16 +1754,16 @@ BFC also rebased on.</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'
+<pre><code>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'
      /
-...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</tt></pre>
+...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</code></pre>
 </div></div>
 <div class="paragraph"><p>where commits quoted with ' have been rebased.</p></div>
 <div class="paragraph"><p>You can easily create such a branch with Git using interactive rebase.</p></div>
 <div class="paragraph"><p>For example using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git rebase -i Y Z</tt></pre>
+<pre><code>$ git rebase -i Y Z</code></pre>
 </div></div>
 <div class="paragraph"><p>and then moving BFC after BBC and squashing it.</p></div>
 <div class="paragraph"><p>After that you can start bisecting as usual in the new branch and you
@@ -1531,7 +1771,7 @@ should eventually find the first bad commit.</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git bisect start Z' Y</tt></pre>
+<pre><code>$ git bisect start Z' Y</code></pre>
 </div></div>
 <div class="paragraph"><p>If you are using "git bisect run", you can use the same manual fix up
 as above, and then start another "git bisect run" in the special
@@ -1563,9 +1803,9 @@ the project sharing the special branches and the replacements.</p></div>
 <div class="paragraph"><p>With the example above that would give:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'-...
+<pre><code>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'-...
      /
-...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z</tt></pre>
+...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z</code></pre>
 </div></div>
 <div class="paragraph"><p>That&#8217;s why the "git replace" command was created. Technically it
 stores replacements "refs" in the "refs/replace/" hierarchy. These
@@ -1585,7 +1825,9 @@ if the replacement refs that are useful only for bisecting would be in
 "refs/replace/bisect/". This way the replacement refs could be used
 only for bisecting, while other refs directly in "refs/replace/" would
 be used nearly all the time.</p></div>
-<h3 id="_bisecting_sporadic_bugs">Bisecting sporadic bugs</h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_bisecting_sporadic_bugs">Bisecting sporadic bugs</h3>
 <div class="paragraph"><p>Another possible improvement to "git bisect" would be to optionally
 add some redundancy to the tests performed so that it would be more
 reliable when tracking sporadic bugs.</p></div>
@@ -1604,18 +1846,21 @@ bisection using a fixed bisect log.</p></div>
 on Github that does something like that using Bayesian Search Theory
 <a href="#9">[9]</a>:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>BBChop is like <em>git bisect</em> (or equivalent), but works when your bug
 is intermittent. That is, it works in the presence of false negatives
 (when a version happens to work this time even though it contains the
 bug). It assumes that there are no false positives (in principle, the
 same approach would work, but adding it may be non-trivial).</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>But BBChop is independent of any VCS and it would be easier for Git
 users to have something integrated in Git.</p></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_conclusion">Conclusion</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>We have seen that regressions are an important problem, and that "git
@@ -1630,7 +1875,7 @@ useful. To back up that last claim, let&#8217;s give the final word to Ingo
 Molnar when he was asked by the author how much time does he think
 "git bisect" saves him when he uses it:</p></div>
 <div class="quoteblock">
-<div class="quoteblock-content">
+<div class="content">
 <div class="paragraph"><p>a <em>lot</em>.</p></div>
 <div class="paragraph"><p>About ten years ago did i do my first <em>bisection</em> of a Linux patch
 queue. That was prior the Git (and even prior the BitKeeper) days. I
@@ -1653,9 +1898,11 @@ layout dependent.</p></div>
 <div class="paragraph"><p>So git bisect is unconditional goodness - and feel free to quote that
 ;-)</p></div>
 </div>
-<div class="quoteblock-attribution">
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_acknowledgements">Acknowledgements</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Many thanks to Junio Hamano for his help in reviewing this paper, for
@@ -1675,6 +1922,8 @@ Shawn O. Pierce, Jeff King, Sam Vilain, Jon Seymour.</p></div>
 <div class="paragraph"><p>Many thanks to the Linux-Kongress program committee for choosing the
 author to given a talk and for publishing this paper.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_references">References</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
@@ -1726,10 +1975,11 @@ author to given a talk and for publishing this paper.</p></div>
 </ul></div>
 </div>
 </div>
+</div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-20 13:06:02 PDT
+Last updated 2012-11-20 13:06:02 PST
 </div>
 </div>
 </body>

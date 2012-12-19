@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>git-fetch(1)</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,69 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border-top: 2px solid silver;
   border-bottom: 2px solid silver;
 }
-h2 {
+body.manpage h2 {
   border-style: none;
 }
-div.sectionbody {
-  margin-left: 5%;
+body.manpage div.sectionbody {
+  margin-left: 3em;
 }
 
 @media print {
-  div#toc { display: none; }
+  body.manpage div#toc { display: none; }
 }
 
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
-}
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
-}
-
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
-}
-
-div.quoteblock-attribution {
-  padding-top: 0.5em;
-  text-align: right;
-}
-
-div.verseblock-content {
-  white-space: pre;
-}
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
-}
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
-}
-
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -477,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -497,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -524,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -561,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="manpage">
 <div id="header">
 <h1>
 git-fetch(1) Manual Page
@@ -580,22 +742,25 @@ git-fetch(1) Manual Page
 </div>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git fetch</em> [&lt;options&gt;] [&lt;repository&gt; [&lt;refspec&gt;&#8230;]]
+<pre class="content"><em>git fetch</em> [&lt;options&gt;] [&lt;repository&gt; [&lt;refspec&gt;&#8230;]]
 <em>git fetch</em> [&lt;options&gt;] &lt;group&gt;
 <em>git fetch</em> --multiple [&lt;options&gt;] [(&lt;repository&gt; | &lt;group&gt;)&#8230;]
-<em>git fetch</em> --all [&lt;options&gt;]</div>
-<div class="verseblock-attribution">
+<em>git fetch</em> --all [&lt;options&gt;]</pre>
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Fetches named heads or tags from one or more other repositories,
 along with the objects necessary to complete them.</p></div>
 <div class="paragraph"><p>The ref names and their object names of fetched refs are stored
-in <tt>.git/FETCH_HEAD</tt>.  This information is left for a later merge
+in <code>.git/FETCH_HEAD</code>.  This information is left for a later merge
 operation done by <em>git merge</em>.</p></div>
 <div class="paragraph"><p>When &lt;refspec&gt; stores the fetched result in remote-tracking branches,
 the tags that point at these branches are automatically
@@ -609,6 +774,8 @@ or from several repositories at once if &lt;group&gt; is given and
 there is a remotes.&lt;group&gt; entry in the configuration file.
 (See <a href="git-config.html">git-config(1)</a>).</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -629,8 +796,8 @@ there is a remotes.&lt;group&gt; entry in the configuration file.
 <dd>
 <p>
         Append ref names and object names of fetched refs to the
-        existing contents of <tt>.git/FETCH_HEAD</tt>.  Without this
-        option old data in <tt>.git/FETCH_HEAD</tt> will be overwritten.
+        existing contents of <code>.git/FETCH_HEAD</code>.  Without this
+        option old data in <code>.git/FETCH_HEAD</code> will be overwritten.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -639,7 +806,7 @@ there is a remotes.&lt;group&gt; entry in the configuration file.
 <dd>
 <p>
         Deepen the history of a <em>shallow</em> repository created by
-        <tt>git clone</tt> with <tt>--depth=&lt;depth&gt;</tt> option (see <a href="git-clone.html">git-clone(1)</a>)
+        <code>git clone</code> with <code>--depth=&lt;depth&gt;</code> option (see <a href="git-clone.html">git-clone(1)</a>)
         to the specified number of commits from the tip of each remote
         branch history. Tags for the deepened commits are not fetched.
 </p>
@@ -660,10 +827,10 @@ there is a remotes.&lt;group&gt; entry in the configuration file.
 </dt>
 <dd>
 <p>
-        When <em>git fetch</em> is used with <tt>&lt;rbranch&gt;:&lt;lbranch&gt;</tt>
+        When <em>git fetch</em> is used with <code>&lt;rbranch&gt;:&lt;lbranch&gt;</code>
         refspec, it refuses to update the local branch
-        <tt>&lt;lbranch&gt;</tt> unless the remote branch <tt>&lt;rbranch&gt;</tt> it
-        fetches is a descendant of <tt>&lt;lbranch&gt;</tt>.  This option
+        <code>&lt;lbranch&gt;</code> unless the remote branch <code>&lt;rbranch&gt;</code> it
+        fetches is a descendant of <code>&lt;lbranch&gt;</code>.  This option
         overrides that check.
 </p>
 </dd>
@@ -869,13 +1036,13 @@ there is a remotes.&lt;group&gt; entry in the configuration file.
 <dd>
 <p>
         The format of a &lt;refspec&gt; parameter is an optional plus
-        <tt>+</tt>, followed by the source ref &lt;src&gt;, followed
-        by a colon <tt>:</tt>, followed by the destination ref &lt;dst&gt;.
+        <code>+</code>, followed by the source ref &lt;src&gt;, followed
+        by a colon <code>:</code>, followed by the destination ref &lt;dst&gt;.
 </p>
 <div class="paragraph"><p>The remote ref that matches &lt;src&gt;
 is fetched, and if &lt;dst&gt; is not empty string, the local
 ref that matches it is fast-forwarded using &lt;src&gt;.
-If the optional plus <tt>+</tt> is used, the local ref
+If the optional plus <code>+</code> is used, the local ref
 is updated even if it does not result in a fast-forward
 update.</p></div>
 <div class="admonitionblock">
@@ -888,7 +1055,7 @@ modified in non-linear ways such as being rewound and
 rebased frequently, then a pull will attempt a merge with
 an older version of itself, likely conflict, and fail.
 It is under these conditions that you would want to use
-the <tt>+</tt> sign to indicate non-fast-forward updates will
+the <code>+</code> sign to indicate non-fast-forward updates will
 be needed.  There is currently no easy way to determine
 or declare that a branch will be made available in a
 repository with this behavior; the pulling user simply
@@ -901,16 +1068,16 @@ must know this is the expected usage pattern for a branch.</td>
 <div class="title">Note</div>
 </td>
 <td class="content">You never do your own development on branches that appear
-on the right hand side of a &lt;refspec&gt; colon on <tt>Pull:</tt> lines;
+on the right hand side of a &lt;refspec&gt; colon on <code>Pull:</code> lines;
 they are to be updated by <em>git fetch</em>.  If you intend to do
-development derived from a remote branch <tt>B</tt>, have a <tt>Pull:</tt>
-line to track it (i.e. <tt>Pull: B:remote-B</tt>), and have a separate
-branch <tt>my-B</tt> to do your development on top of it.  The latter
-is created by <tt>git branch my-B remote-B</tt> (or its equivalent <tt>git
-checkout -b my-B remote-B</tt>).  Run <tt>git fetch</tt> to keep track of
+development derived from a remote branch <code>B</code>, have a <code>Pull:</code>
+line to track it (i.e. <code>Pull: B:remote-B</code>), and have a separate
+branch <code>my-B</code> to do your development on top of it.  The latter
+is created by <code>git branch my-B remote-B</code> (or its equivalent <code>git
+checkout -b my-B remote-B</code>).  Run <code>git fetch</code> to keep track of
 the progress of the remote side, and when you see something new
 on the remote branch, merge it into your development branch with
-<tt>git pull . remote-B</tt>, while you are on <tt>my-B</tt> branch.</td>
+<code>git pull . remote-B</code>, while you are on <code>my-B</code> branch.</td>
 </tr></table>
 </div>
 <div class="admonitionblock">
@@ -920,13 +1087,13 @@ on the remote branch, merge it into your development branch with
 </td>
 <td class="content">There is a difference between listing multiple &lt;refspec&gt;
 directly on <em>git pull</em> command line and having multiple
-<tt>Pull:</tt> &lt;refspec&gt; lines for a &lt;repository&gt; and running
+<code>Pull:</code> &lt;refspec&gt; lines for a &lt;repository&gt; and running
 <em>git pull</em> command without any explicit &lt;refspec&gt; parameters.
 &lt;refspec&gt; listed explicitly on the command line are always
 merged into the current branch after fetching.  In other words,
 if you list more than one remote refs, you would be making
 an Octopus.  While <em>git pull</em> run without any explicit &lt;refspec&gt;
-parameter takes default &lt;refspec&gt;s from <tt>Pull:</tt> lines, it
+parameter takes default &lt;refspec&gt;s from <code>Pull:</code> lines, it
 merges only the first &lt;refspec&gt; found into the current branch,
 after fetching all the remote refs.  This is because making an
 Octopus from remote refs is rarely done, while keeping track
@@ -938,7 +1105,7 @@ is often useful.</td>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
+<code>tag &lt;tag&gt;</code> means the same as <code>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</code>;
   it requests fetching everything up to the given tag.
 </p>
 </li>
@@ -953,6 +1120,8 @@ A parameter &lt;ref&gt; without a colon is equivalent to
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git_urls_a_id_urls_a">GIT URLS<a id="URLS"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>In general, URLs contain information about the transport protocol, the
@@ -1054,15 +1223,15 @@ use will be rewritten into URLs that work), you can create a
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "&lt;actual url base&gt;"]
-                insteadOf = &lt;other url base&gt;</tt></pre>
+<pre><code>        [url "&lt;actual url base&gt;"]
+                insteadOf = &lt;other url base&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "git://git.host.xz/"]
+<pre><code>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
-                insteadOf = work:</tt></pre>
+                insteadOf = work:</code></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
@@ -1070,102 +1239,112 @@ rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "&lt;actual url base&gt;"]
-                pushInsteadOf = &lt;other url base&gt;</tt></pre>
+<pre><code>        [url "&lt;actual url base&gt;"]
+                pushInsteadOf = &lt;other url base&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "ssh://example.org/"]
-                pushInsteadOf = git://example.org/</tt></pre>
+<pre><code>        [url "ssh://example.org/"]
+                pushInsteadOf = git://example.org/</code></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
 "ssh://example.org/path/to/repo.git" for pushes, but pulls will still
 use the original URL.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_remotes_a_id_remotes_a">REMOTES<a id="REMOTES"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The name of one of the following can be used instead
-of a URL as <tt>&lt;repository&gt;</tt> argument:</p></div>
+of a URL as <code>&lt;repository&gt;</code> argument:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-a remote in the git configuration file: <tt>$GIT_DIR/config</tt>,
+a remote in the git configuration file: <code>$GIT_DIR/config</code>,
 </p>
 </li>
 <li>
 <p>
-a file in the <tt>$GIT_DIR/remotes</tt> directory, or
+a file in the <code>$GIT_DIR/remotes</code> directory, or
 </p>
 </li>
 <li>
 <p>
-a file in the <tt>$GIT_DIR/branches</tt> directory.
+a file in the <code>$GIT_DIR/branches</code> directory.
 </p>
 </li>
 </ul></div>
 <div class="paragraph"><p>All of these also allow you to omit the refspec from the command line
 because they each contain a refspec which git will use by default.</p></div>
-<h3 id="_named_remote_in_configuration_file">Named remote in configuration file</h3><div style="clear:left"></div>
+<div class="sect2">
+<h3 id="_named_remote_in_configuration_file">Named remote in configuration file</h3>
 <div class="paragraph"><p>You can choose to provide the name of a remote which you had previously
 configured using <a href="git-remote.html">git-remote(1)</a>, <a href="git-config.html">git-config(1)</a>
-or even by a manual edit to the <tt>$GIT_DIR/config</tt> file.  The URL of
+or even by a manual edit to the <code>$GIT_DIR/config</code> file.  The URL of
 this remote will be used to access the repository.  The refspec
 of this remote will be used by default when you do
 not provide a refspec on the command line.  The entry in the
 config file would appear like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [remote "&lt;name&gt;"]
+<pre><code>        [remote "&lt;name&gt;"]
                 url = &lt;url&gt;
                 pushurl = &lt;pushurl&gt;
                 push = &lt;refspec&gt;
-                fetch = &lt;refspec&gt;</tt></pre>
+                fetch = &lt;refspec&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>&lt;pushurl&gt;</tt> is used for pushes only. It is optional and defaults
-to <tt>&lt;url&gt;</tt>.</p></div>
-<h3 id="_named_file_in_tt_git_dir_remotes_tt">Named file in <tt>$GIT_DIR/remotes</tt></h3><div style="clear:left"></div>
+<div class="paragraph"><p>The <code>&lt;pushurl&gt;</code> is used for pushes only. It is optional and defaults
+to <code>&lt;url&gt;</code>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_named_file_in_code_git_dir_remotes_code">Named file in <code>$GIT_DIR/remotes</code></h3>
 <div class="paragraph"><p>You can choose to provide the name of a
-file in <tt>$GIT_DIR/remotes</tt>.  The URL
+file in <code>$GIT_DIR/remotes</code>.  The URL
 in this file will be used to access the repository.  The refspec
 in this file will be used as default when you do not
 provide a refspec on the command line.  This file should have the
 following format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        URL: one of the above URL format
+<pre><code>        URL: one of the above URL format
         Push: &lt;refspec&gt;
-        Pull: &lt;refspec&gt;</tt></pre>
+        Pull: &lt;refspec&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>Push:</tt> lines are used by <em>git push</em> and
-<tt>Pull:</tt> lines are used by <em>git pull</em> and <em>git fetch</em>.
-Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
+<div class="paragraph"><p><code>Push:</code> lines are used by <em>git push</em> and
+<code>Pull:</code> lines are used by <em>git pull</em> and <em>git fetch</em>.
+Multiple <code>Push:</code> and <code>Pull:</code> lines may
 be specified for additional branch mappings.</p></div>
-<h3 id="_named_file_in_tt_git_dir_branches_tt">Named file in <tt>$GIT_DIR/branches</tt></h3><div style="clear:left"></div>
+</div>
+<div class="sect2">
+<h3 id="_named_file_in_code_git_dir_branches_code">Named file in <code>$GIT_DIR/branches</code></h3>
 <div class="paragraph"><p>You can choose to provide the name of a
-file in <tt>$GIT_DIR/branches</tt>.
+file in <code>$GIT_DIR/branches</code>.
 The URL in this file will be used to access the repository.
 This file should have the following format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        &lt;url&gt;#&lt;head&gt;</tt></pre>
+<pre><code>        &lt;url&gt;#&lt;head&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>&lt;url&gt;</tt> is required; <tt>#&lt;head&gt;</tt> is optional.</p></div>
+<div class="paragraph"><p><code>&lt;url&gt;</code> is required; <code>#&lt;head&gt;</code> is optional.</p></div>
 <div class="paragraph"><p>Depending on the operation, git will use one of the following
 refspecs, if you don&#8217;t provide one on the command line.
-<tt>&lt;branch&gt;</tt> is the name of this file in <tt>$GIT_DIR/branches</tt> and
-<tt>&lt;head&gt;</tt> defaults to <tt>master</tt>.</p></div>
+<code>&lt;branch&gt;</code> is the name of this file in <code>$GIT_DIR/branches</code> and
+<code>&lt;head&gt;</code> defaults to <code>master</code>.</p></div>
 <div class="paragraph"><p>git fetch uses:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</tt></pre>
+<pre><code>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>git push uses:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        HEAD:refs/heads/&lt;head&gt;</tt></pre>
+<pre><code>        HEAD:refs/heads/&lt;head&gt;</code></pre>
 </div></div>
 </div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
@@ -1175,7 +1354,7 @@ Update the remote-tracking branches:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch origin</tt></pre>
+<pre><code>$ git fetch origin</code></pre>
 </div></div>
 <div class="paragraph"><p>The above command copies all branches from the remote refs/heads/
 namespace and stores them to the local refs/remotes/origin/ namespace,
@@ -1188,16 +1367,18 @@ Using refspecs explicitly:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch origin +pu:pu maint:tmp</tt></pre>
+<pre><code>$ git fetch origin +pu:pu maint:tmp</code></pre>
 </div></div>
-<div class="paragraph"><p>This updates (or creates, as necessary) branches <tt>pu</tt> and <tt>tmp</tt> in
+<div class="paragraph"><p>This updates (or creates, as necessary) branches <code>pu</code> and <code>tmp</code> in
 the local repository by fetching from the branches (respectively)
-<tt>pu</tt> and <tt>maint</tt> from the remote repository.</p></div>
-<div class="paragraph"><p>The <tt>pu</tt> branch will be updated even if it is does not fast-forward,
-because it is prefixed with a plus sign; <tt>tmp</tt> will not be.</p></div>
+<code>pu</code> and <code>maint</code> from the remote repository.</p></div>
+<div class="paragraph"><p>The <code>pu</code> branch will be updated even if it is does not fast-forward,
+because it is prefixed with a plus sign; <code>tmp</code> will not be.</p></div>
 </li>
 </ul></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Using --recurse-submodules can only fetch new commits in already checked
@@ -1207,19 +1388,24 @@ fetched, making it impossible to check out that submodule later without
 having to do a fetch again. This is expected to be fixed in a future git
 version.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><a href="git-pull.html">git-pull(1)</a></p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
+</div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-15 13:45:02 PDT
+Last updated 2011-11-15 13:45:02 PST
 </div>
 </div>
 </body>

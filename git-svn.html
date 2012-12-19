@@ -2,15 +2,25 @@
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.5.2" />
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.8" />
 <title>git-svn(1)</title>
 <style type="text/css">
-/* Debug borders */
-p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
-/*
-  border: 1px solid red;
-*/
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
 }
 
 body {
@@ -35,13 +45,8 @@ strong {
   color: #083194;
 }
 
-tt {
-  color: navy;
-}
-
 h1, h2, h3, h4, h5, h6 {
   color: #527bbd;
-  font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
   line-height: 1.3;
@@ -59,9 +64,11 @@ h3 {
 h3 + * {
   clear: left;
 }
+h5 {
+  font-size: 1.0em;
+}
 
 div.sectionbody {
-  font-family: serif;
   margin-left: 0;
 }
 
@@ -77,45 +84,48 @@ p {
 ul, ol, li > p {
   margin-top: 0;
 }
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
 
-span#author {
+
+#author {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
 }
-span#email {
+#email {
 }
-span#revnumber, span#revdate, span#revremark {
-  font-family: sans-serif;
+#revnumber, #revdate, #revremark {
 }
 
-div#footer {
-  font-family: sans-serif;
+#footer {
   font-size: small;
   border-top: 2px solid silver;
   padding-top: 0.5em;
   margin-top: 4.0em;
 }
-div#footer-text {
+#footer-text {
   float: left;
   padding-bottom: 0.5em;
 }
-div#footer-badges {
+#footer-badges {
   float: right;
   padding-bottom: 0.5em;
 }
 
-div#preamble {
+#preamble {
   margin-top: 1.5em;
   margin-bottom: 1.5em;
 }
-div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.imageblock, div.exampleblock, div.verseblock,
 div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
 div.admonitionblock {
   margin-top: 1.0em;
@@ -135,7 +145,6 @@ div.content { /* Block element content. */
 /* Block element titles. */
 div.title, caption.title {
   color: #527bbd;
-  font-family: sans-serif;
   font-weight: bold;
   text-align: left;
   margin-top: 1.0em;
@@ -157,13 +166,15 @@ div.content + div.title {
 
 div.sidebarblock > div.content {
   background: #ffffee;
-  border: 1px solid silver;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
   padding: 0.5em;
 }
 
 div.listingblock > div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
   padding: 0.5em;
 }
 
@@ -171,8 +182,8 @@ div.quoteblock, div.verseblock {
   padding-left: 1.0em;
   margin-left: 1.0em;
   margin-right: 10%;
-  border-left: 5px solid #dddddd;
-  color: #777777;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
 }
 
 div.quoteblock > div.attribution {
@@ -180,8 +191,9 @@ div.quoteblock > div.attribution {
   text-align: right;
 }
 
-div.verseblock > div.content {
-  white-space: pre;
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
 }
 div.verseblock > div.attribution {
   padding-top: 0.75em;
@@ -254,35 +266,12 @@ div.compact div, div.compact div {
   margin-bottom: 0.1em;
 }
 
-div.tableblock > table {
-  border: 3px solid #527bbd;
-}
-thead, p.table.header {
-  font-family: sans-serif;
-  font-weight: bold;
-}
 tfoot {
   font-weight: bold;
 }
 td > div.verse {
   white-space: pre;
 }
-p.table {
-  margin-top: 0;
-}
-/* Because the table frame attribute is overriden by CSS in most browsers. */
-div.tableblock > table[frame="void"] {
-  border-style: none;
-}
-div.tableblock > table[frame="hsides"] {
-  border-left-style: none;
-  border-right-style: none;
-}
-div.tableblock > table[frame="vsides"] {
-  border-top-style: none;
-  border-bottom-style: none;
-}
-
 
 div.hdlist {
   margin-top: 0.8em;
@@ -339,25 +328,32 @@ span.footnote, span.footnoteref {
   min-width: 100px;
 }
 
-
-@media print {
-  div#footer-badges { display: none; }
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
 }
 
-div#toc {
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
   margin-bottom: 2.5em;
 }
 
-div#toctitle {
+#toctitle {
   color: #527bbd;
-  font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
   margin-top: 1.0em;
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -373,69 +369,173 @@ div.toclevel4 {
   margin-left: 6em;
   font-size: 0.9em;
 }
-/* Overrides for manpage documents */
-h1 {
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   border-top: 2px solid silver;
   border-bottom: 2px solid silver;
 }
-h2 {
+body.manpage h2 {
   border-style: none;
 }
-div.sectionbody {
-  margin-left: 5%;
+body.manpage div.sectionbody {
+  margin-left: 3em;
 }
 
 @media print {
-  div#toc { display: none; }
+  body.manpage div#toc { display: none; }
 }
 
-/* Workarounds for IE6's broken and incomplete CSS2. */
 
-div.sidebar-content {
-  background: #ffffee;
-  border: 1px solid silver;
-  padding: 0.5em;
-}
-div.sidebar-title, div.image-title {
-  color: #527bbd;
-  font-family: sans-serif;
-  font-weight: bold;
-  margin-top: 0.0em;
-  margin-bottom: 0.5em;
-}
-
-div.listingblock div.content {
-  border: 1px solid silver;
-  background: #f4f4f4;
-  padding: 0.5em;
-}
-
-div.quoteblock-attribution {
-  padding-top: 0.5em;
-  text-align: right;
-}
-
-div.verseblock-content {
-  white-space: pre;
-}
-div.verseblock-attribution {
-  padding-top: 0.75em;
-  text-align: left;
-}
-
-div.exampleblock-content {
-  border-left: 3px solid #dddddd;
-  padding-left: 0.5em;
-}
-
-/* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-window.onload = function(){asciidoc.footnotes();}
 var asciidoc = {  // Namespace.
 
 /////////////////////////////////////////////////////////////////////
@@ -477,7 +577,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -497,6 +597,25 @@ toc: function (toclevels) {
   }
 
   var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
   var entries = tocEntries(document.getElementById("content"), toclevels);
   for (var i = 0; i < entries.length; ++i) {
     var entry = entries[i];
@@ -524,24 +643,44 @@ toc: function (toclevels) {
  */
 
 footnotes: function () {
-  var cont = document.getElementById("content");
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
   var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
   var spans = cont.getElementsByTagName("span");
   var refs = {};
   var n = 0;
   for (i=0; i<spans.length; i++) {
     if (spans[i].className == "footnote") {
       n++;
-      // Use [\s\S] in place of . so multi-line matches work.
-      // Because JavaScript has no s (dotall) regex flag.
-      note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
       noteholder.innerHTML +=
         "<div class='footnote' id='_footnote_" + n + "'>" +
         "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
         n + "</a>. " + note + "</div>";
-      spans[i].innerHTML =
-        "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-        "' title='View footnote' class='footnote'>" + n + "</a>]";
       var id =spans[i].getAttribute("id");
       if (id != null) refs["#"+id] = n;
     }
@@ -561,13 +700,36 @@ footnotes: function () {
       }
     }
   }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
 }
 
 }
+asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body>
+<body class="manpage">
 <div id="header">
 <h1>
 git-svn(1) Manual Page
@@ -580,13 +742,16 @@ git-svn(1) Manual Page
 </div>
 </div>
 <div id="content">
+<div class="sect1">
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<div class="verseblock-content"><em>git svn</em> &lt;command&gt; [options] [arguments]</div>
-<div class="verseblock-attribution">
+<pre class="content"><em>git svn</em> &lt;command&gt; [options] [arguments]</pre>
+<div class="attribution">
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><em>git svn</em> is a simple conduit for changesets between Subversion and git.
@@ -600,6 +765,8 @@ It can also follow branches and tags in any layout with the -T/-t/-b options
 repository can be updated from Subversion by the <em>fetch</em> command and
 Subversion updated from git by the <em>dcommit</em> command.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_commands">COMMANDS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -770,7 +937,7 @@ Subversion updated from git by the <em>dcommit</em> command.</p></div>
 <p>
         Store Git commit times in the local timezone instead of UTC.  This
         makes <em>git log</em> (even without --date=local) show the same times
-        that <tt>svn log</tt> would in the local timezone.
+        that <code>svn log</code> would in the local timezone.
 </p>
 <div class="paragraph"><p>This doesn&#8217;t interfere with interoperating with the Subversion
 repository you cloned from, but if you wish for your local Git
@@ -798,12 +965,14 @@ the same local timezone.</p></div>
         <em>rebase</em>, etc) on a given repository.
 </p>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn-remote.&lt;name&gt;.ignore-paths</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn-remote.&lt;name&gt;.ignore-paths</pre>
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>If the ignore-paths config key is set and the command line option is
 also given, both regular expressions will be used.</p></div>
 <div class="paragraph"><p>Examples:</p></div>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
 Skip "doc*" directory for every fetch
@@ -811,7 +980,7 @@ Skip "doc*" directory for every fetch
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>--ignore-paths="^doc"</tt></pre>
+<pre><code>--ignore-paths="^doc"</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -820,10 +989,11 @@ Skip "branches" and "tags" of first level directories
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>--ignore-paths="^[^/]+/(?:branches|tags)"</tt></pre>
+<pre><code>--ignore-paths="^[^/]+/(?:branches|tags)"</code></pre>
 </div></div>
 </dd>
 </dl></div>
+</div></div>
 </dd>
 <dt class="hdlist1">
 --log-window-size=&lt;n&gt;
@@ -886,7 +1056,7 @@ Skip "branches" and "tags" of first level directories
         This fetches revisions from the SVN parent of the current HEAD
         and rebases the current (uncommitted to SVN) work against it.
 </p>
-<div class="paragraph"><p>This works similarly to <tt>svn update</tt> or <em>git pull</em> except that
+<div class="paragraph"><p>This works similarly to <code>svn update</code> or <em>git pull</em> except that
 it preserves linear history with <em>git rebase</em> instead of
 <em>git merge</em> for ease of dcommitting with <em>git svn</em>.</p></div>
 <div class="paragraph"><p>This accepts all options that <em>git svn fetch</em> and <em>git rebase</em>
@@ -939,14 +1109,14 @@ branch, not on the current branch.</p></div>
 <p>
         Commit to this SVN URL (the full path).  This is intended to
         allow existing <em>git svn</em> repositories created with one transport
-        method (e.g. <tt>svn://</tt> or <tt>http://</tt> for anonymous read) to be
+        method (e.g. <code>svn://</code> or <code>http://</code> for anonymous read) to be
         reused if a user is later given access to an alternate transport
-        method (e.g. <tt>svn+ssh://</tt> or <tt>https://</tt>) for commit.
+        method (e.g. <code>svn+ssh://</code> or <code>https://</code>) for commit.
 </p>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn-remote.&lt;name&gt;.commiturl
-config key: svn.commiturl (overwrites all svn-remote.&lt;name&gt;.commiturl options)</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn-remote.&lt;name&gt;.commiturl
+config key: svn.commiturl (overwrites all svn-remote.&lt;name&gt;.commiturl options)</pre>
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>Using this option for any other purpose (don&#8217;t ask) is very strongly
 discouraged.</p></div>
@@ -957,15 +1127,15 @@ discouraged.</p></div>
 <dd>
 <p>
         Add the given merge information during the dcommit
-        (e.g. <tt>--mergeinfo="/branches/foo:1-10"</tt>). All svn server versions can
+        (e.g. <code>--mergeinfo="/branches/foo:1-10"</code>). All svn server versions can
         store this information (as a property), and svn clients starting from
         version 1.5 can make use of it. To specify merge information from multiple
         branches, use a single space character between the branches
-        (<tt>--mergeinfo="/branches/foo:1-10 /branches/bar:3,5-6,8"</tt>)
+        (<code>--mergeinfo="/branches/foo:1-10 /branches/bar:3,5-6,8"</code>)
 </p>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.pushmergeinfo</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.pushmergeinfo</pre>
+<div class="attribution">
 </div></div>
 <div class="paragraph"><p>This option will cause git-svn to attempt to automatically populate the
 svn:mergeinfo property in the SVN repository when possible. Currently, this can
@@ -1034,8 +1204,8 @@ first have already been pushed into SVN.</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git config --get-all svn-remote.&lt;name&gt;.branches
-git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
+<pre><code>git config --get-all svn-remote.&lt;name&gt;.branches
+git config --get-all svn-remote.&lt;name&gt;.tags</code></pre>
 </div></div>
 <div class="paragraph"><p>where &lt;name&gt; is the name of the SVN repository as specified by the -R option to
 <em>init</em> (or "svn" by default).</p></div>
@@ -1061,7 +1231,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git config --get-all svn-remote.&lt;name&gt;.commiturl</tt></pre>
+<pre><code>git config --get-all svn-remote.&lt;name&gt;.commiturl</code></pre>
 </div></div>
 </dd>
 </dl></div>
@@ -1084,6 +1254,8 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
         users refer to -r/--revision numbers.
 </p>
 <div class="paragraph"><p>The following features from &#8216;svn log&#8217; are supported:</p></div>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
 -r &lt;n&gt;[:&lt;n&gt;]
@@ -1127,7 +1299,10 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </p>
 </dd>
 </dl></div>
+</div></div>
 <div class="paragraph"><p>New features:</p></div>
+<div class="openblock">
+<div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
 --show-commit
@@ -1146,6 +1321,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </p>
 </dd>
 </dl></div>
+</div></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -1250,12 +1426,12 @@ environment). This command has the same behaviour.</td>
 <dd>
 <p>
         Commits the diff of two tree-ish arguments from the
-        command-line.  This command does not rely on being inside an <tt>git svn
-        init</tt>-ed repository.  This command takes three arguments, (a) the
+        command-line.  This command does not rely on being inside an <code>git svn
+        init</code>-ed repository.  This command takes three arguments, (a) the
         original tree to diff against, (b) the new tree result, (c) the
         URL of the target Subversion repository.  The final argument
         (URL) may be omitted if you are working from a <em>git svn</em>-aware
-        repository (that has been <tt>init</tt>-ed with <em>git svn</em>).
+        repository (that has been <code>init</code>-ed with <em>git svn</em>).
         The -r&lt;revision&gt; option is required for this.
 </p>
 </dd>
@@ -1359,41 +1535,43 @@ Assume you have local changes in "master", but you need to refetch "r2".
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    r1---r2---r3 remotes/git-svn
+<pre><code>    r1---r2---r3 remotes/git-svn
                 \
-                 A---B master</tt></pre>
+                 A---B master</code></pre>
 </div></div>
 <div class="paragraph"><p>Fix the ignore-paths or SVN permissions problem that caused "r2" to
 be incomplete in the first place.  Then:</p></div>
 <div class="verseblock">
-<div class="verseblock-content">git svn reset -r2 -p
-git svn fetch</div>
-<div class="verseblock-attribution">
+<pre class="content">git svn reset -r2 -p
+git svn fetch</pre>
+<div class="attribution">
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    r1---r2'--r3' remotes/git-svn
+<pre><code>    r1---r2'--r3' remotes/git-svn
       \
-       r2---r3---A---B master</tt></pre>
+       r2---r3---A---B master</code></pre>
 </div></div>
 <div class="paragraph"><p>Then fixup "master" with <em>git rebase</em>.
 Do NOT use <em>git merge</em> or your history will not be compatible with a
 future <em>dcommit</em>!</p></div>
 <div class="verseblock">
-<div class="verseblock-content">git rebase --onto remotes/git-svn A^ master</div>
-<div class="verseblock-attribution">
+<pre class="content">git rebase --onto remotes/git-svn A^ master</pre>
+<div class="attribution">
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    r1---r2'--r3' remotes/git-svn
+<pre><code>    r1---r2'--r3' remotes/git-svn
                 \
-                 A'--B' master</tt></pre>
+                 A'--B' master</code></pre>
 </div></div>
 </dd>
 </dl></div>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -1453,8 +1631,8 @@ removed by default if there are no files left in them.  git
 cannot version empty directories.  Enabling this flag will make
 the commit to SVN act like git.</p></div>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.rmdir</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.rmdir</pre>
+<div class="attribution">
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1471,8 +1649,8 @@ the commit to SVN act like git.</p></div>
 default for objects that are commits, and forced on when committing
 tree objects.</p></div>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.edit</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.edit</pre>
+<div class="attribution">
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1488,9 +1666,9 @@ tree objects.</p></div>
 <div class="paragraph"><p>They are both passed directly to <em>git diff-tree</em>; see
 <a href="git-diff-tree.html">git-diff-tree(1)</a> for more information.</p></div>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.l
-config key: svn.findcopiesharder</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.l
+config key: svn.findcopiesharder</pre>
+<div class="attribution">
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1505,7 +1683,7 @@ config key: svn.findcopiesharder</div>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        loginname = Joe User &lt;user@example.com&gt;</tt></pre>
+<pre><code>        loginname = Joe User &lt;user@example.com&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>If this option is specified and <em>git svn</em> encounters an SVN
 committer name that does not exist in the authors-file, <em>git svn</em>
@@ -1513,8 +1691,8 @@ will abort operation. The user will then have to add the
 appropriate entry.  Re-running the previous <em>git svn</em> command
 after the authors-file is modified should continue operation.</p></div>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.authorsfile</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.authorsfile</pre>
+<div class="attribution">
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1557,9 +1735,9 @@ to fetch before repacking.  This defaults to repacking every
 1000 commits fetched if no argument is specified.</p></div>
 <div class="paragraph"><p>--repack-flags are passed directly to <em>git repack</em>.</p></div>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.repack
-config key: svn.repackflags</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.repack
+config key: svn.repackflags</pre>
+<div class="attribution">
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1612,7 +1790,7 @@ creating the branch or tag.</p></div>
 <dd>
 <p>
         When retrieving svn commits into git (as part of <em>fetch</em>, <em>rebase</em>, or
-        <em>dcommit</em> operations), look for the first <tt>From:</tt> or <tt>Signed-off-by:</tt> line
+        <em>dcommit</em> operations), look for the first <code>From:</code> or <code>Signed-off-by:</code> line
         in the log message and use that as the author string.
 </p>
 </dd>
@@ -1623,13 +1801,15 @@ creating the branch or tag.</p></div>
 <p>
         When committing to svn from git (as part of <em>commit-diff</em>, <em>set-tree</em> or <em>dcommit</em>
         operations), if the existing log message doesn&#8217;t already have a
-        <tt>From:</tt> or <tt>Signed-off-by:</tt> line, append a <tt>From:</tt> line based on the
-        git commit&#8217;s author string.  If you use this, then <tt>--use-log-author</tt>
+        <code>From:</code> or <code>Signed-off-by:</code> line, append a <code>From:</code> line based on the
+        git commit&#8217;s author string.  If you use this, then <code>--use-log-author</code>
         will retrieve a valid author string for all commits.
 </p>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_advanced_options">ADVANCED OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -1672,12 +1852,14 @@ creating the branch or tag.</p></div>
         --no-follow-parent to disable it.
 </p>
 <div class="verseblock">
-<div class="verseblock-content">config key: svn.followparent</div>
-<div class="verseblock-attribution">
+<pre class="content">config key: svn.followparent</pre>
+<div class="attribution">
 </div></div>
 </dd>
 </dl></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_config_file_only_options">CONFIG FILE-ONLY OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -1822,12 +2004,14 @@ and these settings should never be changed once they are set.</p></div>
 section because they affect the <em>git-svn-id:</em> metadata line, except
 for rewriteRoot and rewriteUUID which can be used together.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_basic_examples">BASIC EXAMPLES</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Tracking and contributing to the trunk of a Subversion-managed project:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt># Clone a repo (like git clone):
+<pre><code># Clone a repo (like git clone):
         git svn clone http://svn.example.com/project/trunk
 # Enter the newly cloned directory:
         cd trunk
@@ -1842,13 +2026,13 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 # as well as automatically updating your working HEAD:
         git svn dcommit
 # Append svn:ignore settings to the default git exclude file:
-        git svn show-ignore &gt;&gt; .git/info/exclude</tt></pre>
+        git svn show-ignore &gt;&gt; .git/info/exclude</code></pre>
 </div></div>
 <div class="paragraph"><p>Tracking and contributing to an entire Subversion-managed project
 (complete with a trunk, tags and branches):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt># Clone a repo (like git clone):
+<pre><code># Clone a repo (like git clone):
         git svn clone http://svn.example.com/project -T trunk -b branches -t tags
 # View all branches and tags you have cloned:
         git branch -r
@@ -1858,7 +2042,7 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 # with the appropriate name):
         git reset --hard remotes/trunk
 # You may only dcommit to one branch/tag/trunk at a time.  The usage
-# of dcommit/rebase/show-ignore should be the same as above.</tt></pre>
+# of dcommit/rebase/show-ignore should be the same as above.</code></pre>
 </div></div>
 <div class="paragraph"><p>The initial <em>git svn clone</em> can be quite time-consuming
 (especially for large Subversion repositories). If multiple
@@ -1868,7 +2052,7 @@ do the initial <em>git svn clone</em> to a repository on a server and
 have each person clone that repository with <em>git clone</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt># Do the initial import on a server
+<pre><code># Do the initial import on a server
         ssh server "cd /pub &amp;&amp; git svn clone http://svn.example.com/project
 # Clone locally - make sure the refs/remotes/ space matches the server
         mkdir project
@@ -1885,9 +2069,11 @@ have each person clone that repository with <em>git clone</em>:</p></div>
 # Initialize 'git svn' locally (be sure to use the same URL and -T/-b/-t options as were used on server)
         git svn init http://svn.example.com/project
 # Pull the latest changes from Subversion
-        git svn rebase</tt></pre>
+        git svn rebase</code></pre>
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_rebase_vs_pull_merge">REBASE VS. PULL/MERGE</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Prefer to use <em>git svn rebase</em> or <em>git rebase</em>, rather than
@@ -1897,12 +2083,14 @@ respect to the upstream SVN repository and allow the use of the preferred
 <em>git svn dcommit</em> subcommand to push unintegrated commits back into SVN.</p></div>
 <div class="paragraph"><p>Originally, <em>git svn</em> recommended that developers pulled or merged from
 the <em>git svn</em> branch.  This was because the author favored
-<tt>git svn set-tree B</tt> to commit a single head rather than the
-<tt>git svn set-tree A..B</tt> notation to commit multiple commits. Use of
-<em>git pull</em> or <em>git merge</em> with <tt>git svn set-tree A..B</tt> will cause non-linear
+<code>git svn set-tree B</code> to commit a single head rather than the
+<code>git svn set-tree A..B</code> notation to commit multiple commits. Use of
+<em>git pull</em> or <em>git merge</em> with <code>git svn set-tree A..B</code> will cause non-linear
 history to be flattened when committing into SVN and this can lead to merge
 commits unexpectedly reversing previous commits in SVN.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_merge_tracking">MERGE TRACKING</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>While <em>git svn</em> can track
@@ -1912,6 +2100,8 @@ inside git back upstream to SVN users.  Therefore it is advised that
 users keep history as linear as possible inside git to ease
 compatibility with SVN (see the CAVEATS section below).</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_caveats">CAVEATS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>For the sake of simplicity and interoperating with Subversion,
@@ -1929,7 +2119,7 @@ branch.</p></div>
 attempt to commit on top of the SVN commit named in</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>git log --grep=^git-svn-id: --first-parent -1</tt></pre>
+<pre><code>git log --grep=^git-svn-id: --first-parent -1</code></pre>
 </div></div>
 <div class="paragraph"><p>You <em>must</em> therefore ensure that the most recent commit of the branch
 you want to dcommit to is the <em>first</em> parent of the merge.  Chaos will
@@ -1955,10 +2145,12 @@ the .git/config file so that the branches and tags are associated with
 different name spaces.  For example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>branches = stable/*:refs/remotes/svn/stable/*
-branches = debug/*:refs/remotes/svn/debug/*</tt></pre>
+<pre><code>branches = stable/*:refs/remotes/svn/stable/*
+branches = debug/*:refs/remotes/svn/debug/*</code></pre>
 </div></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>We ignore all SVN properties except svn:executable.  Any unhandled
@@ -1970,6 +2162,8 @@ the possible corner cases (git doesn&#8217;t do it, either).  Committing
 renamed and copied files is fully supported if they&#8217;re similar enough
 for git to detect them.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><em>git svn</em> stores [svn-remote] configuration information in the
@@ -1981,11 +2175,11 @@ configured with multiple projects glob expansions such those
 listed below are allowed:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>[svn-remote "project-a"]
+<pre><code>[svn-remote "project-a"]
         url = http://server.org/svn
         fetch = trunk/project-a:refs/remotes/project-a/trunk
         branches = branches/*/project-a:refs/remotes/project-a/branches/*
-        tags = tags/*/project-a:refs/remotes/project-a/tags/*</tt></pre>
+        tags = tags/*/project-a:refs/remotes/project-a/tags/*</code></pre>
 </div></div>
 <div class="paragraph"><p>Keep in mind that the <em>*</em> (asterisk) wildcard of the local ref
 (right of the <em>:</em>) <strong>must</strong> be the farthest right path component;
@@ -1997,30 +2191,35 @@ should be manually entered with a text-editor or using <em>git config</em>.</p><
 comma-separated list of names within braces. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>[svn-remote "huge-project"]
+<pre><code>[svn-remote "huge-project"]
         url = http://server.org/svn
         fetch = trunk/src:refs/remotes/trunk
         branches = branches/{red,green}/src:refs/remotes/branches/*
-        tags = tags/{1.0,2.0}/src:refs/remotes/tags/*</tt></pre>
+        tags = tags/{1.0,2.0}/src:refs/remotes/tags/*</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that git-svn keeps track of the highest revision in which a branch
 or tag has appeared. If the subset of branches or tags is changed after
 fetching, then .git/svn/.metadata must be manually edited to remove (or
 reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><a href="git-rebase.html">git-rebase(1)</a></p></div>
 </div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
+</div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-13 14:31:09 PDT
+Last updated 2012-11-13 14:31:09 PST
 </div>
 </div>
 </body>
