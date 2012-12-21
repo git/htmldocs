@@ -764,24 +764,40 @@ also update <code>HEAD</code> to set the specified branch as the current
 branch.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<em>git checkout</em> [&lt;branch&gt;]
-</dt>
-<dt class="hdlist1">
-<em>git checkout</em> -b|-B &lt;new_branch&gt; [&lt;start point&gt;]
-</dt>
-<dt class="hdlist1">
-<em>git checkout</em> [--detach] [&lt;commit&gt;]
+<em>git checkout</em> &lt;branch&gt;
 </dt>
 <dd>
 <p>
-        This form switches branches by updating the index, working
-        tree, and HEAD to reflect the specified branch or commit.
+        To prepare for working on &lt;branch&gt;, switch to it by updating
+        the index and the files in the working tree, and by pointing
+        HEAD at the branch. Local modifications to the files in the
+        working tree are kept, so that they can be committed to the
+        &lt;branch&gt;.
 </p>
-<div class="paragraph"><p>If <code>-b</code> is given, a new branch is created as if <a href="git-branch.html">git-branch(1)</a>
-were called and then checked out; in this case you can
-use the <code>--track</code> or <code>--no-track</code> options, which will be passed to
-<em>git branch</em>.  As a convenience, <code>--track</code> without <code>-b</code> implies branch
-creation; see the description of <code>--track</code> below.</p></div>
+<div class="paragraph"><p>If &lt;branch&gt; is not found but there does exist a tracking branch in
+exactly one remote (call it &lt;remote&gt;) with a matching name, treat as
+equivalent to</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git checkout -b &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</code></pre>
+</div></div>
+<div class="paragraph"><p>You could omit &lt;branch&gt;, in which case the command degenerates to
+"check out the current branch", which is a glorified no-op with a
+rather expensive side-effects to show only the tracking information,
+if exists, for the current branch.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>git checkout</em> -b|-B &lt;new_branch&gt; [&lt;start point&gt;]
+</dt>
+<dd>
+<p>
+        Specifying <code>-b</code> causes a new branch to be created as if
+        <a href="git-branch.html">git-branch(1)</a> were called and then checked out.  In
+        this case you can use the <code>--track</code> or <code>--no-track</code> options,
+        which will be passed to <em>git branch</em>.  As a convenience,
+        <code>--track</code> without <code>-b</code> implies branch creation; see the
+        description of <code>--track</code> below.
+</p>
 <div class="paragraph"><p>If <code>-B</code> is given, &lt;new_branch&gt; is created if it doesn&#8217;t exist; otherwise, it
 is reset. This is the transactional equivalent of</p></div>
 <div class="listingblock">
@@ -791,6 +807,26 @@ $ git checkout &lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>that is to say, the branch is not reset/created unless "git checkout" is
 successful.</p></div>
+</dd>
+<dt class="hdlist1">
+<em>git checkout</em> --detach [&lt;branch&gt;]
+</dt>
+<dt class="hdlist1">
+<em>git checkout</em> &lt;commit&gt;
+</dt>
+<dd>
+<p>
+        Prepare to work on top of &lt;commit&gt;, by detaching HEAD at it
+        (see "DETACHED HEAD" section), and updating the index and the
+        files in the working tree.  Local modifications to the files
+        in the working tree are kept, so that the resulting working
+        tree will be the state recorded in the commit plus the local
+        modifications.
+</p>
+<div class="paragraph"><p>Passing <code>--detach</code> forces this behavior in the case of a &lt;branch&gt; (without
+the option, giving a branch name to the command would check out the branch,
+instead of detaching HEAD at it), or the current commit,
+if no &lt;branch&gt; is specified.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>git checkout</em> [-p|--patch] [&lt;tree-ish&gt;] [--] &lt;pathspec&gt;&#8230;
@@ -1313,7 +1349,7 @@ $ git add frotz</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-09-12 15:56:23 PDT
+Last updated 2012-12-21 15:43:33 PST
 </div>
 </div>
 </body>
