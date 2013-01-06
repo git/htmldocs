@@ -750,7 +750,7 @@ git-submodule(1) Manual Page
               [--reference &lt;repository&gt;] [--] &lt;repository&gt; [&lt;path&gt;]
 <em>git submodule</em> [--quiet] status [--cached] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] init [--] [&lt;path&gt;&#8230;]
-<em>git submodule</em> [--quiet] update [--init] [-N|--no-fetch] [--rebase]
+<em>git submodule</em> [--quiet] update [--init] [--remote] [-N|--no-fetch] [--rebase]
               [--reference &lt;repository&gt;] [--merge] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] summary [--cached|--files] [(-n|--summary-limit) &lt;n&gt;]
               [commit] [--] [&lt;path&gt;&#8230;]
@@ -988,6 +988,8 @@ sync
 <dd>
 <p>
         Branch of repository to add as submodule.
+        The name of the branch is recorded as <code>submodule.&lt;path&gt;.branch</code> in
+        <code>.gitmodules</code> for <code>update --remote</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1040,6 +1042,30 @@ sync
         (the default). This limit only applies to modified submodules. The
         size is always limited to 1 for added/deleted/typechanged submodules.
 </p>
+</dd>
+<dt class="hdlist1">
+--remote
+</dt>
+<dd>
+<p>
+        This option is only valid for the update command.  Instead of using
+        the superproject&#8217;s recorded SHA-1 to update the submodule, use the
+        status of the submodule&#8217;s remote tracking branch.  The remote used
+        is branch&#8217;s remote (<code>branch.&lt;name&gt;.remote</code>), defaulting to <code>origin</code>.
+        The remote branch used defaults to <code>master</code>, but the branch name may
+        be overridden by setting the <code>submodule.&lt;name&gt;.branch</code> option in
+        either <code>.gitmodules</code> or <code>.git/config</code> (with <code>.git/config</code> taking
+        precedence).
+</p>
+<div class="paragraph"><p>This works for any of the supported update procedures (<code>--checkout</code>,
+<code>--rebase</code>, etc.).  The only change is the source of the target SHA-1.
+For example, <code>submodule update --remote --merge</code> will merge upstream
+submodule changes into the submodules, while <code>submodule update
+--merge</code> will merge superproject gitlink changes into the submodules.</p></div>
+<div class="paragraph"><p>In order to ensure a current tracking branch state, <code>update --remote</code>
+fetches the submodule&#8217;s remote repository before calculating the
+SHA-1.  If you don&#8217;t want to fetch, you should use <code>submodule update
+--remote --no-fetch</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 -N
@@ -1158,7 +1184,7 @@ for details.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-11-21 13:58:35 PST
+Last updated 2013-01-06 01:05:36 PST
 </div>
 </div>
 </body>

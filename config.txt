@@ -140,10 +140,11 @@ advice.*::
 	can tell Git that you do not need help by setting these to 'false':
 +
 --
-	pushNonFastForward::
+	pushUpdateRejected::
 		Set this variable to 'false' if you want to disable
-		'pushNonFFCurrent', 'pushNonFFDefault', and
-		'pushNonFFMatching' simultaneously.
+		'pushNonFFCurrent', 'pushNonFFDefault',
+		'pushNonFFMatching', and 'pushAlreadyExists'
+		simultaneously.
 	pushNonFFCurrent::
 		Advice shown when linkgit:git-push[1] fails due to a
 		non-fast-forward update to the current branch.
@@ -158,6 +159,9 @@ advice.*::
 		'matching refs' explicitly (i.e. you used ':', or
 		specified a refspec that isn't your current branch) and
 		it resulted in a non-fast-forward error.
+	pushAlreadyExists::
+		Shown when linkgit:git-push[1] rejects an update that
+		does not qualify for fast-forwarding (e.g., a tag.)
 	statusHints::
 		Show directions on how to proceed from the current
 		state in the output of linkgit:git-status[1], in
@@ -1517,6 +1521,14 @@ mailmap.file::
 	subdirectory, or somewhere outside of the repository itself.
 	See linkgit:git-shortlog[1] and linkgit:git-blame[1].
 
+mailmap.blob::
+	Like `mailmap.file`, but consider the value as a reference to a
+	blob in the repository. If both `mailmap.file` and
+	`mailmap.blob` are given, both are parsed, with entries from
+	`mailmap.file` taking precedence. In a bare repository, this
+	defaults to `HEAD:.mailmap`. In a non-bare repository, it
+	defaults to empty.
+
 man.viewer::
 	Specify the programs that may be used to display help in the
 	'man' format. See linkgit:git-help[1].
@@ -1994,6 +2006,12 @@ submodule.<name>.update::
 	by 'git submodule init'; edit them to override the
 	URL and other values found in the `.gitmodules` file.  See
 	linkgit:git-submodule[1] and linkgit:gitmodules[5] for details.
+
+submodule.<name>.branch::
+	The remote branch name for a submodule, used by `git submodule
+	update --remote`.  Set this option to override the value found in
+	the `.gitmodules` file.  See linkgit:git-submodule[1] and
+	linkgit:gitmodules[5] for details.
 
 submodule.<name>.fetchRecurseSubmodules::
 	This option can be used to control recursive fetching of this
