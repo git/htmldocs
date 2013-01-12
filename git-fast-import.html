@@ -775,6 +775,52 @@ the frontend program in use.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
+--force
+</dt>
+<dd>
+<p>
+        Force updating modified existing branches, even if doing
+        so would cause commits to be lost (as the new commit does
+        not contain the old commit).
+</p>
+</dd>
+<dt class="hdlist1">
+--quiet
+</dt>
+<dd>
+<p>
+        Disable all non-fatal output, making fast-import silent when it
+        is successful.  This option disables the output shown by
+        --stats.
+</p>
+</dd>
+<dt class="hdlist1">
+--stats
+</dt>
+<dd>
+<p>
+        Display some basic statistics about the objects fast-import has
+        created, the packfiles they were stored into, and the
+        memory used by fast-import during this run.  Showing this output
+        is currently the default, but can be disabled with --quiet.
+</p>
+</dd>
+</dl></div>
+<div class="sect2">
+<h3 id="_options_for_frontends">Options for Frontends</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--cat-blob-fd=&lt;fd&gt;
+</dt>
+<dd>
+<p>
+        Write responses to <code>cat-blob</code> and <code>ls</code> queries to the
+        file descriptor &lt;fd&gt; instead of <code>stdout</code>.  Allows <code>progress</code>
+        output intended for the end-user to be separated from other
+        output.
+</p>
+</dd>
+<dt class="hdlist1">
 --date-format=&lt;fmt&gt;
 </dt>
 <dd>
@@ -786,53 +832,21 @@ the frontend program in use.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---force
+--done
 </dt>
 <dd>
 <p>
-        Force updating modified existing branches, even if doing
-        so would cause commits to be lost (as the new commit does
-        not contain the old commit).
+        Terminate with error if there is no <code>done</code> command at the end of
+        the stream.  This option might be useful for detecting errors
+        that cause the frontend to terminate before it has started to
+        write a stream.
 </p>
 </dd>
-<dt class="hdlist1">
---max-pack-size=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        Maximum size of each output packfile.
-        The default is unlimited.
-</p>
-</dd>
-<dt class="hdlist1">
---big-file-threshold=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        Maximum size of a blob that fast-import will attempt to
-        create a delta for, expressed in bytes.  The default is 512m
-        (512 MiB).  Some importers may wish to lower this on systems
-        with constrained memory.
-</p>
-</dd>
-<dt class="hdlist1">
---depth=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        Maximum delta depth, for blob and tree deltification.
-        Default is 10.
-</p>
-</dd>
-<dt class="hdlist1">
---active-branches=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        Maximum number of branches to maintain active at once.
-        See &#8220;Memory Utilization&#8221; below for details.  Default is 5.
-</p>
-</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_locations_of_marks_files">Locations of Marks Files</h3>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 --export-marks=&lt;file&gt;
 </dt>
@@ -870,7 +884,7 @@ the frontend program in use.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---relative-marks
+--[no-]relative-marks
 </dt>
 <dd>
 <p>
@@ -881,39 +895,41 @@ the frontend program in use.</p></div>
         to the .git/info/fast-import directory. However, other
         importers may use a different location.
 </p>
+<div class="paragraph"><p>Relative and non-relative marks may be combined by interweaving
+--(no-)-relative-marks with the --(import|export)-marks= options.</p></div>
 </dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_performance_and_compression_tuning">Performance and Compression Tuning</h3>
+<div class="dlist"><dl>
 <dt class="hdlist1">
---no-relative-marks
+--active-branches=&lt;n&gt;
 </dt>
 <dd>
 <p>
-        Negates a previous --relative-marks. Allows for combining
-        relative and non-relative marks by interweaving
-        --(no-)-relative-marks with the --(import|export)-marks=
-        options.
+        Maximum number of branches to maintain active at once.
+        See &#8220;Memory Utilization&#8221; below for details.  Default is 5.
 </p>
 </dd>
 <dt class="hdlist1">
---cat-blob-fd=&lt;fd&gt;
+--big-file-threshold=&lt;n&gt;
 </dt>
 <dd>
 <p>
-        Write responses to <code>cat-blob</code> and <code>ls</code> queries to the
-        file descriptor &lt;fd&gt; instead of <code>stdout</code>.  Allows <code>progress</code>
-        output intended for the end-user to be separated from other
-        output.
+        Maximum size of a blob that fast-import will attempt to
+        create a delta for, expressed in bytes.  The default is 512m
+        (512 MiB).  Some importers may wish to lower this on systems
+        with constrained memory.
 </p>
 </dd>
 <dt class="hdlist1">
---done
+--depth=&lt;n&gt;
 </dt>
 <dd>
 <p>
-        Terminate with error if there is no <code>done</code> command at the
-        end of the stream.
-        This option might be useful for detecting errors that
-        cause the frontend to terminate before it has started to
-        write a stream.
+        Maximum delta depth, for blob and tree deltification.
+        Default is 10.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -931,27 +947,16 @@ the frontend program in use.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---quiet
+--max-pack-size=&lt;n&gt;
 </dt>
 <dd>
 <p>
-        Disable all non-fatal output, making fast-import silent when it
-        is successful.  This option disables the output shown by
-        --stats.
-</p>
-</dd>
-<dt class="hdlist1">
---stats
-</dt>
-<dd>
-<p>
-        Display some basic statistics about the objects fast-import has
-        created, the packfiles they were stored into, and the
-        memory used by fast-import during this run.  Showing this output
-        is currently the default, but can be disabled with --quiet.
+        Maximum size of each output packfile.
+        The default is unlimited.
 </p>
 </dd>
 </dl></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2439,7 +2444,7 @@ compression.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-01-08 16:14:48 PST
+Last updated 2013-01-12 00:25:04 PST
 </div>
 </div>
 </body>
