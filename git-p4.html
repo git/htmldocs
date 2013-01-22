@@ -877,6 +877,10 @@ be used for the p4 content.</p></div>
 will be fetched and consulted first during a <em>git p4 sync</em>.  Since
 importing directly from p4 is considerably slower than pulling changes
 from a git remote, this can be useful in a multi-developer environment.</p></div>
+<div class="paragraph"><p>If there are multiple branches, doing <em>git p4 sync</em> will automatically
+use the "BRANCH DETECTION" algorithm to try to partition new changes
+into the right branch.  This can be overridden with the <em>--branch</em>
+option to specify just a single branch to update.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_rebase">Rebase</h3>
@@ -953,9 +957,11 @@ subsequent <em>sync</em> operations.</p></div>
 <dd>
 <p>
         Import changes into given branch.  If the branch starts with
-        <em>refs/</em>, it will be used as is, otherwise the path <em>refs/heads/</em>
-        will be prepended.  The default branch is <em>master</em>.  If used
-        with an initial clone, no HEAD will be checked out.
+        <em>refs/</em>, it will be used as is.  Otherwise if it does not start
+        with <em>p4/</em>, that prefix is added.  The branch is assumed to
+        name a remote tracking, but this can be modified using
+        <em>--import-local</em>, or by giving a full ref name.  The default
+        branch is <em>master</em>.
 </p>
 <div class="paragraph"><p>This example imports a new remote "p4/proj2" into an existing
 git repository:</p></div>
@@ -1166,6 +1172,16 @@ options described above.</p></div>
         skipped, or to quit trying to apply commits, without prompting.
 </p>
 </dd>
+<dt class="hdlist1">
+--branch &lt;branch&gt;
+</dt>
+<dd>
+<p>
+        After submitting, sync this named branch instead of the default
+        p4/master.  See the "Sync options" section above for more
+        information.
+</p>
+</dd>
 </dl></div>
 </div>
 <div class="sect2">
@@ -1304,8 +1320,10 @@ presence of the p4 branch.  Without p4 branches, the same result will
 occur with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git config git-p4.branchList main:branch1
-git p4 clone --detect-branches //depot@all</code></pre>
+<pre><code>git init depot
+cd depot
+git config git-p4.branchList main:branch1
+git p4 clone --detect-branches //depot@all .</code></pre>
 </div></div>
 </div>
 </div>
@@ -1625,7 +1643,7 @@ Each commit imported by <em>git p4</em> has a line at the end of the log
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-09-18 15:30:10 PDT
+Last updated 2013-01-22 11:18:46 PST
 </div>
 </div>
 </body>
