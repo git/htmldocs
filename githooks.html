@@ -892,6 +892,34 @@ save and restore any form of metadata associated with the working tree
 for an example of how to do this.</p></div>
 </div>
 <div class="sect2">
+<h3 id="_pre_push">pre-push</h3>
+<div class="paragraph"><p>This hook is called by <em>git push</em> and can be used to prevent a push from taking
+place.  The hook is called with two parameters which provide the name and
+location of the destination remote, if a named remote is not being used both
+values will be the same.</p></div>
+<div class="paragraph"><p>Information about what is to be pushed is provided on the hook&#8217;s standard
+input with lines of the form:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>&lt;local ref&gt; SP &lt;local sha1&gt; SP &lt;remote ref&gt; SP &lt;remote sha1&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>For instance, if the command <code>git push origin master:foreign</code> were run the
+hook would receive a line like the following:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>refs/heads/master 67890 refs/heads/foreign 12345</code></pre>
+</div></div>
+<div class="paragraph"><p>although the full, 40-character SHA1s would be supplied.  If the foreign ref
+does not yet exist the <code>&lt;remote SHA1&gt;</code> will be 40 <code>0</code>.  If a ref is to be
+deleted, the <code>&lt;local ref&gt;</code> will be supplied as <code>(delete)</code> and the <code>&lt;local
+SHA1&gt;</code> will be 40 <code>0</code>.  If the local commit was specified by something other
+than a name which could be expanded (such as <code>HEAD~</code>, or a SHA1) it will be
+supplied as it was originally given.</p></div>
+<div class="paragraph"><p>If this hook exits with a non-zero status, <em>git push</em> will abort without
+pushing anything.  Information about why the push is rejected may be sent
+to the user by writing to standard error.</p></div>
+</div>
+<div class="sect2">
 <h3 id="pre-receive">pre-receive</h3>
 <div class="paragraph"><p>This hook is invoked by <em>git-receive-pack</em> on the remote repository,
 which happens when a <em>git push</em> is done on a local repository.
@@ -1065,7 +1093,7 @@ processed by rebase.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-05-02 15:00:44 PDT
+Last updated 2013-01-25 13:32:06 PST
 </div>
 </div>
 </body>

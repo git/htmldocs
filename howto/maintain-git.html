@@ -734,13 +734,14 @@ asciidoc.install();
 <h1>How to maintain Git</h1>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_activities">Activities</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The maintainer&#8217;s git time is spent on three activities.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Communication (60%)
+Communication (45%)
 </p>
 <div class="literalblock">
 <div class="content">
@@ -751,7 +752,7 @@ suggesting alternatives to, and rejecting patches.</code></pre>
 </li>
 <li>
 <p>
-Integration (30%)
+Integration (50%)
 </p>
 <div class="literalblock">
 <div class="content">
@@ -763,7 +764,7 @@ releases, and making announcements.</code></pre>
 </li>
 <li>
 <p>
-Own development (10%)
+Own development (5%)
 </p>
 <div class="literalblock">
 <div class="content">
@@ -771,16 +772,26 @@ Own development (10%)
 </div></div>
 </li>
 </ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_policy">The Policy</h2>
+<div class="sectionbody">
 <div class="paragraph"><p>The policy on Integration is informally mentioned in "A Note
 from the maintainer" message, which is periodically posted to
 this mailing list after each feature release is made.</p></div>
-<div class="paragraph"><p>The policy.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 Feature releases are numbered as vX.Y.Z and are meant to
    contain bugfixes and enhancements in any area, including
    functionality, performance and usability, without regression.
+</p>
+</li>
+<li>
+<p>
+One release cycle for a feature release is expected to last for
+   eight to ten weeks.
 </p>
 </li>
 <li>
@@ -823,15 +834,18 @@ Maintenance releases are numbered as vX.Y.Z.W and are meant
 </li>
 <li>
 <p>
-The tips of <em>master</em>, <em>maint</em> and <em>next</em> branches will always
-   fast-forward, to allow people to build their own
-   customization on top of them.
+The tips of <em>master</em> and <em>maint</em> branches will not be rewound to
+   allow people to build their own customization on top of them.
+   Early in a new development cycle, <em>next</em> is rewound to the tip of
+   <em>master</em> once, but otherwise it will not be rewound until the end
+   of the cycle.
 </p>
 </li>
 <li>
 <p>
-Usually <em>master</em> contains all of <em>maint</em>, <em>next</em> contains all
-   of <em>master</em> and <em>pu</em> contains all of <em>next</em>.
+Usually <em>master</em> contains all of <em>maint</em> and <em>next</em> contains all
+   of <em>master</em>.  <em>pu</em> contains all the topics merged to <em>next</em>, but
+   is rebuilt directly on <em>master</em>.
 </p>
 </li>
 <li>
@@ -848,16 +862,29 @@ The <em>next</em> branch is where new action takes place, and the
 </p>
 </li>
 </ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_a_typical_git_day">A Typical Git Day</h2>
+<div class="sectionbody">
 <div class="paragraph"><p>A typical git day for the maintainer implements the above policy
 by doing the following:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Scan mailing list and #git channel log.  Respond with review
-   comments, suggestions etc.  Kibitz.  Collect potentially
-   usable patches from the mailing list.  Patches about a single
-   topic go to one mailbox (I read my mail in Gnus, and type
-   \C-o to save/append messages in files in mbox format).
+Scan mailing list.  Respond with review comments, suggestions
+   etc.  Kibitz.  Collect potentially usable patches from the
+   mailing list.  Patches about a single topic go to one mailbox (I
+   read my mail in Gnus, and type \C-o to save/append messages in
+   files in mbox format).
+</p>
+</li>
+<li>
+<p>
+Write his own patches to address issues raised on the list but
+   nobody has stepped up solving.  Send it out just like other
+   contributors do, and pick them up just like patches from other
+   contributors (see above).
 </p>
 </li>
 <li>
@@ -885,6 +912,11 @@ Obviously correct fixes that pertain to the tip of <em>maint</em>
 Obviously correct fixes that pertain to the tip of <em>master</em>
      are directly applied to <em>master</em>.
 </p>
+</li>
+<li>
+<p>
+Other topics are not handled in this step.
+</p>
 <div class="literalblock">
 <div class="content">
 <pre><code>This step is done with "git am".</code></pre>
@@ -892,57 +924,38 @@ Obviously correct fixes that pertain to the tip of <em>master</em>
 <div class="literalblock">
 <div class="content">
 <pre><code>$ git checkout master    ;# or "git checkout maint"
-$ git am -3 -s mailbox
+$ git am -sc3 mailbox
 $ make test</code></pre>
 </div></div>
-</li>
-<li>
-<p>
-Merge downwards (maint&#8594;master):
-</p>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git checkout master
-$ git merge maint
-$ make test</code></pre>
+<pre><code>In practice, almost no patch directly goes to 'master' or
+'maint'.</code></pre>
 </div></div>
 </li>
 <li>
 <p>
 Review the last issue of "What&#8217;s cooking" message, review the
-   topics scheduled for merging upwards (topic&#8594;master and
-   topic&#8594;maint), and merge.
+   topics ready for merging (topic&#8594;master and topic&#8594;maint).  Use
+   "Meta/cook -w" script (where Meta/ contains a checkout of the
+   <em>todo</em> branch) to aid this step.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><code>And perform the merge.  Use "Meta/Reintegrate -e" script (see
+later) to aid this step.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ Meta/cook -w last-issue-of-whats-cooking.mbox</code></pre>
+</div></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>$ git checkout master    ;# or "git checkout maint"
-$ git merge ai/topic     ;# or "git merge ai/maint-topic"
+$ echo ai/topic | Meta/Reintegrate -e ;# "git merge ai/topic"
 $ git log -p ORIG_HEAD.. ;# final review
 $ git diff ORIG_HEAD..   ;# final review
-$ make test              ;# final review
-$ git branch -d ai/topic ;# or "git branch -d ai/maint-topic"</code></pre>
-</div></div>
-</li>
-<li>
-<p>
-Merge downwards (maint&#8594;master) if needed:
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout master
-$ git merge maint
-$ make test</code></pre>
-</div></div>
-</li>
-<li>
-<p>
-Merge downwards (master&#8594;next) if needed:
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout next
-$ git merge master
-$ make test</code></pre>
+$ make test              ;# final review</code></pre>
 </div></div>
 </li>
 <li>
@@ -957,9 +970,9 @@ Anything unobvious that is applicable to <em>master</em> (in other
      and not in <em>master</em>) is applied to a new topic branch that
      is forked from the tip of <em>master</em>.  This includes both
      enhancements and unobvious fixes to <em>master</em>.  A topic
-     branch is named as ai/topic where "ai" is typically
-     author&#8217;s initial and "topic" is a descriptive name of the
-     topic (in other words, "what&#8217;s the series is about").
+     branch is named as ai/topic where "ai" is two-letter string
+     named after author&#8217;s initial and "topic" is a descriptive name
+     of the topic (in other words, "what&#8217;s the series is about").
 </p>
 </li>
 <li>
@@ -996,7 +1009,8 @@ Replacement patches to an existing topic are accepted only
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git am -3 -s mailbox</code></pre>
+<pre><code>$ git checkout ai/topic ;# or "git checkout -b ai/topic master"
+$ git am -sc3 mailbox</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -1012,8 +1026,9 @@ Replacement patches to an existing topic are accepted only
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git reset --hard ai/topic~$n
-$ git am -3 -s 000*.txt</code></pre>
+<pre><code>$ git checkout ai/topic
+$ git reset --hard ai/topic~$n
+$ git am -sc3 -s 000*.txt</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -1024,133 +1039,261 @@ as time permits.</code></pre>
 </li>
 <li>
 <p>
-Update "What&#8217;s cooking" message to review the updates to
-   existing topics, newly added topics and graduated topics.
+Merge maint to master as needed:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>This step is helped with Meta/cook script (where Meta/ contains
-a checkout of the 'todo' branch).</code></pre>
+<pre><code>$ git checkout master
+$ git merge maint
+$ make test</code></pre>
 </div></div>
 </li>
 <li>
 <p>
-Merge topics to <em>next</em>.  For each branch whose tip is not
-   merged to <em>next</em>, one of three things can happen:
-</p>
-</li>
-<li>
-<p>
-The commits are all next-worthy; merge the topic to next:
+Merge master to next as needed:
 </p>
 <div class="literalblock">
 <div class="content">
 <pre><code>$ git checkout next
-$ git merge ai/topic     ;# or "git merge ai/maint-topic"
+$ git merge master
 $ make test</code></pre>
 </div></div>
+</li>
+<li>
+<p>
+Review the last issue of "What&#8217;s cooking" again and see if topics
+   that are ready to be merged to <em>next</em> are still in good shape
+   (e.g. has there any new issue identified on the list with the
+   series?)
+</p>
+</li>
+<li>
+<p>
+Prepare <em>jch</em> branch, which is used to represent somewhere
+   between <em>master</em> and <em>pu</em> and often is slightly ahead of <em>next</em>.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ Meta/Reintegrate master..pu &gt;Meta/redo-jch.sh</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>The result is a script that lists topics to be merged in order to
+rebuild 'pu' as the input to Meta/Reintegrate script.  Remove
+later topics that should not be in 'jch' yet.  Add a line that
+consists of '### match next' before the name of the first topic
+in the output that should be in 'jch' but not in 'next' yet.</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Now we are ready to start merging topics to <em>next</em>.  For each
+   branch whose tip is not merged to <em>next</em>, one of three things can
+   happen:
+</p>
+</li>
+<li>
+<p>
+The commits are all next-worthy; merge the topic to next;
+</p>
 </li>
 <li>
 <p>
 The new parts are of mixed quality, but earlier ones are
-     next-worthy; merge the early parts to next:
+     next-worthy; merge the early parts to next;
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout next
-$ git merge ai/topic~2   ;# the tip two are dubious
-$ make test</code></pre>
-</div></div>
 </li>
 <li>
 <p>
 Nothing is next-worthy; do not do anything.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><code>This step is aided with Meta/redo-jch.sh script created earlier.
+If a topic that was already in 'next' gained a patch, the script
+would list it as "ai/topic~1".  To include the new patch to the
+updated 'next', drop the "~1" part; to keep it excluded, do not
+touch the line.  If a topic that was not in 'next' should be
+merged to 'next', add it at the end of the list.  Then:</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git checkout -B jch master
+$ Meta/redo-jch.sh -c1</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>to rebuild the 'jch' branch from scratch.  "-c1" tells the script
+to stop merging at the first line that begins with '###'
+(i.e. the "### match next" line you added earlier).</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>At this point, build-test the result.  It may reveal semantic
+conflicts (e.g. a topic renamed a variable, another added a new
+reference to the variable under its old name), in which case
+prepare an appropriate merge-fix first (see appendix), and
+rebuild the 'jch' branch from scratch, starting at the tip of
+'master'.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Then do the same to 'next'</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git checkout next
+$ sh Meta/redo-jch.sh -c1 -e</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>The "-e" option allows the merge message that comes from the
+history of the topic and the comments in the "What's cooking" to
+be edited.  The resulting tree should match 'jch' as the same set
+of topics are merged on 'master'; otherwise there is a mismerge.
+Investigate why and do not proceed until the mismerge is found
+and rectified.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git diff jch next</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>When all is well, clean up the redo-jch.sh script with</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ sh Meta/redo-jch.sh -u</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>This removes topics listed in the script that have already been
+merged to 'master'.  This may lose '### match next' marker;
+add it again to the appropriate place when it happens.</code></pre>
+</div></div>
 </li>
 <li>
 <p>
-[<strong> OBSOLETE </strong>] Optionally rebase topics that do not have any commit
-   in next yet, when they can take advantage of low-level framework
-   change that is merged to <em>master</em> already.
+Rebuild <em>pu</em>.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git rebase master ai/topic</code></pre>
+<pre><code>$ Meta/Reintegrate master..pu &gt;Meta/redo-pu.sh</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>This step is helped with Meta/git-topic.perl script to
-identify which topic is rebaseable.  There also is a
-pre-rebase hook to make sure that topics that are already in
-'next' are not rebased beyond the merged commit.</code></pre>
+<pre><code>Edit the result by adding new topics that are not still in 'pu'
+in the script.  Then</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git checkout -B pu jch
+$ sh Meta/redo-pu.sh</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>When all is well, clean up the redo-pu.sh script with</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ sh Meta/redo-pu.sh -u</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Double check by running</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git branch --no-merged pu</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>to see there is no unexpected leftover topics.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>At this point, build-test the result for semantic conflicts, and
+if there are, prepare an appropriate merge-fix first (see
+appendix), and rebuild the 'pu' branch from scratch, starting at
+the tip of 'jch'.</code></pre>
 </div></div>
 </li>
 <li>
 <p>
-[<strong> OBSOLETE </strong>] Rebuild "pu" to merge the tips of topics not in <em>next</em>.
+Update "What&#8217;s cooking" message to review the updates to
+   existing topics, newly added topics and graduated topics.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git checkout pu
-$ git reset --hard next
-$ git merge ai/topic     ;# repeat for all remaining topics
-$ make test</code></pre>
+<pre><code>This step is helped with Meta/cook script.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>This step is helped with Meta/PU script</code></pre>
+<pre><code>$ Meta/cook</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>This script inspects the history between master..pu, finds tips
+of topic branches, compares what it found with the current
+contents in Meta/whats-cooking.txt, and updates that file.
+Topics not listed in the file but are found in master..pu are
+added to the "New topics" section, topics listed in the file that
+are no longer found in master..pu are moved to the "Graduated to
+master" section, and topics whose commits changed their states
+(e.g. used to be only in 'pu', now merged to 'next') are updated
+with change markers "&lt;&lt;" and "&gt;&gt;".</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Look for lines enclosed in "&lt;&lt;" and "&gt;&gt;"; they hold contents from
+old file that are replaced by this integration round.  After
+verifying them, remove the old part.  Review the description for
+each topic and update its doneness and plan as needed.  To review
+the updated plan, run</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ Meta/cook -w</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>which will pick up comments given to the topics, such as "Will
+merge to 'next'", etc. (see Meta/cook script to learn what kind
+of phrases are supported).</code></pre>
 </div></div>
 </li>
 <li>
 <p>
-Push four integration branches to a private repository at
-   k.org and run "make test" on all of them.
+Compile, test and install all four (five) integration branches;
+   Meta/Dothem script may aid this step.
 </p>
 </li>
 <li>
 <p>
-Push four integration branches to /pub/scm/git/git.git at
-   k.org.  This triggers its post-update hook which:
+Format documentation if the <em>master</em> branch was updated;
+   Meta/dodoc.sh script may aid this step.
 </p>
-<div class="literalblock">
-<div class="content">
-<pre><code>(1) runs "git pull" in $HOME/git-doc/ repository to pull
-    'master' just pushed out;</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>(2) runs "make doc" in $HOME/git-doc/, install the generated
-    documentation in staging areas, which are separate
-    repositories that have html and man branches checked
-    out.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>(3) runs "git commit" in the staging areas, and run "git
-    push" back to /pub/scm/git/git.git/ to update the html
-    and man branches.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>(4) installs generated documentation to /pub/software/scm/git/docs/
-    to be viewed from http://www.kernel.org/</code></pre>
-</div></div>
 </li>
 <li>
 <p>
-Fetch html and man branches back from k.org, and push four
-   integration branches and the two documentation branches to
-   repo.or.cz and other mirrors.
+Push the integration branches out to public places; Meta/pushall
+   script may aid this step.
 </p>
 </li>
 </ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_observations">Observations</h2>
+<div class="sectionbody">
 <div class="paragraph"><p>Some observations to be made.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Each topic is tested individually, and also together with
-   other topics cooking in <em>next</em>.  Until it matures, none part
-   of it is merged to <em>master</em>.
+Each topic is tested individually, and also together with other
+   topics cooking first in <em>pu</em>, then in <em>jch</em> and then in <em>next</em>.
+   Until it matures, no part of it is merged to <em>master</em>.
 </p>
 </li>
 <li>
@@ -1158,7 +1301,7 @@ Each topic is tested individually, and also together with
 A topic already in <em>next</em> can get fixes while still in
    <em>next</em>.  Such a topic will have many merges to <em>next</em> (in
    other words, "git log --first-parent next" will show many
-   "Merge ai/topic to next" for the same topic.
+   "Merge branch <em>ai/topic</em> to next" for the same topic.
 </p>
 </li>
 <li>
@@ -1200,11 +1343,92 @@ Being in the <em>next</em> branch is not a guarantee for a topic to
 </ul></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_appendix">Appendix</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_preparing_a_merge_fix">Preparing a "merge-fix"</h3>
+<div class="paragraph"><p>A merge of two topics may not textually conflict but still have
+conflict at the semantic level. A classic example is for one topic
+to rename an variable and all its uses, while another topic adds a
+new use of the variable under its old name. When these two topics
+are merged together, the reference to the variable newly added by
+the latter topic will still use the old name in the result.</p></div>
+<div class="paragraph"><p>The Meta/Reintegrate script that is used by redo-jch and redo-pu
+scripts implements a crude but usable way to work this issue around.
+When the script merges branch $X, it checks if "refs/merge-fix/$X"
+exists, and if so, the effect of it is squashed into the result of
+the mechanical merge.  In other words,</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ echo $X | Meta/Reintegrate</code></pre>
+</div></div>
+<div class="paragraph"><p>is roughly equivalent to this sequence:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git merge --rerere-autoupdate $X
+$ git commit
+$ git cherry-pick -n refs/merge-fix/$X
+$ git commit --amend</code></pre>
+</div></div>
+<div class="paragraph"><p>The goal of this "prepare a merge-fix" step is to come up with a
+commit that can be squashed into a result of mechanical merge to
+correct semantic conflicts.</p></div>
+<div class="paragraph"><p>After finding that the result of merging branch "ai/topic" to an
+integration branch had such a semantic conflict, say pu~4, check the
+problematic merge out on a detached HEAD, edit the working tree to
+fix the semantic conflict, and make a separate commit to record the
+fix-up:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git checkout pu~4
+$ git show -s --pretty=%s ;# double check
+Merge branch 'ai/topic' to pu
+$ edit
+$ git commit -m 'merge-fix/ai/topic' -a</code></pre>
+</div></div>
+<div class="paragraph"><p>Then make a reference "refs/merge-fix/ai/topic" to point at this
+result:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git update-ref refs/merge-fix/ai/topic HEAD</code></pre>
+</div></div>
+<div class="paragraph"><p>Then double check the result by asking Meta/Reintegrate to redo the
+merge:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ git checkout pu~5 ;# the parent of the problem merge
+$ echo ai/topic | Meta/Reintegrate
+$ git diff pu~4</code></pre>
+</div></div>
+<div class="paragraph"><p>This time, because you prepared refs/merge-fix/ai/topic, the
+resulting merge should have been tweaked to include the fix for the
+semantic conflict.</p></div>
+<div class="paragraph"><p>Note that this assumes that the order in which conflicting branches
+are merged does not change.  If the reason why merging ai/topic
+branch needs this merge-fix is because another branch merged earlier
+to the integration branch changed the underlying assumption ai/topic
+branch made (e.g. ai/topic branch added a site to refer to a
+variable, while the other branch renamed that variable and adjusted
+existing use sites), and if you changed redo-jch (or redo-pu) script
+to merge ai/topic branch before the other branch, then the above
+merge-fix should not be applied while merging ai/topic, but should
+instead be applied while merging the other branch.  You would need
+to move the fix to apply to the other branch, perhaps like this:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ mf=refs/merge-fix
+$ git update-ref $mf/$the_other_branch $mf/ai/topic
+$ git update-ref -d $mf/ai/topic</code></pre>
+</div></div>
+</div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-12-31 16:06:41 PST
+Last updated 2013-01-25 13:32:11 PST
 </div>
 </div>
 </body>
