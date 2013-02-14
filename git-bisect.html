@@ -816,7 +816,7 @@ will have been left with the first bad kernel revision in "refs/bisect/bad".</p>
 <div class="sect2">
 <h3 id="_bisect_reset">Bisect reset</h3>
 <div class="paragraph"><p>After a bisect session, to clean up the bisection state and return to
-the original HEAD, issue the following command:</p></div>
+the original HEAD (i.e., to quit bisecting), issue the following command:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ git bisect reset</code></pre>
@@ -1001,7 +1001,8 @@ Automatically bisect a broken build between v1.2 and HEAD:
 <div class="listingblock">
 <div class="content">
 <pre><code>$ git bisect start HEAD v1.2 --      # HEAD is bad, v1.2 is good
-$ git bisect run make                # "make" builds the app</code></pre>
+$ git bisect run make                # "make" builds the app
+$ git bisect reset                   # quit the bisect session</code></pre>
 </div></div>
 </li>
 <li>
@@ -1011,7 +1012,8 @@ Automatically bisect a test failure between origin and HEAD:
 <div class="listingblock">
 <div class="content">
 <pre><code>$ git bisect start HEAD origin --    # HEAD is bad, origin is good
-$ git bisect run make test           # "make test" builds and tests</code></pre>
+$ git bisect run make test           # "make test" builds and tests
+$ git bisect reset                   # quit the bisect session</code></pre>
 </div></div>
 </li>
 <li>
@@ -1025,7 +1027,8 @@ Automatically bisect a broken test case:
 make || exit 125                     # this skips broken builds
 ~/check_test_case.sh                 # does the test case pass?
 $ git bisect start HEAD HEAD~10 --   # culprit is among the last 10
-$ git bisect run ~/test.sh</code></pre>
+$ git bisect run ~/test.sh
+$ git bisect reset                   # quit the bisect session</code></pre>
 </div></div>
 <div class="paragraph"><p>Here we use a "test.sh" custom script. In this script, if "make"
 fails, we skip the current commit.
@@ -1077,7 +1080,8 @@ Automatically bisect a broken test case:
 <div class="listingblock">
 <div class="content">
 <pre><code>$ git bisect start HEAD HEAD~10 --   # culprit is among the last 10
-$ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"</code></pre>
+$ git bisect run sh -c "make || exit 125; ~/check_test_case.sh"
+$ git bisect reset                   # quit the bisect session</code></pre>
 </div></div>
 <div class="paragraph"><p>This shows that you can do without a run script if you write the test
 on a single line.</p></div>
@@ -1095,7 +1099,9 @@ $ git bisect run sh -c '
         git pack-objects --stdout &gt;/dev/null &lt;tmp.$$
         rc=$?
         rm -f tmp.$$
-        test $rc = 0'</code></pre>
+        test $rc = 0'
+
+$ git bisect reset                   # quit the bisect session</code></pre>
 </div></div>
 <div class="paragraph"><p>In this case, when <em>git bisect run</em> finishes, bisect/bad will refer to a commit that
 has at least one parent whose reachable graph is fully traversable in the sense
@@ -1121,7 +1127,7 @@ required by <em>git pack objects</em>.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-02-05 21:07:26 PST
+Last updated 2013-02-14 13:10:12 PST
 </div>
 </div>
 </body>
