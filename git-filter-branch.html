@@ -798,9 +798,11 @@ argument is always evaluated in the shell context using the <em>eval</em> comman
 Prior to that, the $GIT_COMMIT environment variable will be set to contain
 the id of the commit being rewritten.  Also, GIT_AUTHOR_NAME,
 GIT_AUTHOR_EMAIL, GIT_AUTHOR_DATE, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL,
-and GIT_COMMITTER_DATE are set according to the current commit.  The values
-of these variables after the filters have run, are used for the new commit.
-If any evaluation of &lt;command&gt; returns a non-zero exit status, the whole
+and GIT_COMMITTER_DATE are taken from the current commit and exported to
+the environment, in order to affect the author and committer identities of
+the replacement commit created by <a href="git-commit-tree.html">git-commit-tree(1)</a> after the
+filters have run.</p></div>
+<div class="paragraph"><p>If any evaluation of &lt;command&gt; returns a non-zero exit status, the whole
 operation will be aborted.</p></div>
 <div class="paragraph"><p>A <em>map</em> function is available that takes an "original sha1 id" argument
 and outputs a "rewritten sha1 id" if the commit has been already
@@ -1110,6 +1112,25 @@ of which is a merge), use this command:</p></div>
         echo "Acked-by: Bugs Bunny &lt;bunny@bugzilla.org&gt;"
 ' HEAD~10..HEAD</code></pre>
 </div></div>
+<div class="paragraph"><p>The <code>--env-filter</code> option can be used to modify committer and/or author
+identity.  For example, if you found out that your commits have the wrong
+identity due to a misconfigured user.email, you can make a correction,
+before publishing the project, like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>git filter-branch --env-filter '
+        if test "$GIT_AUTHOR_EMAIL" = "root@localhost"
+        then
+                GIT_AUTHOR_EMAIL=john@example.com
+                export GIT_AUTHOR_EMAIL
+        fi
+        if test "$GIT_COMMITTER_EMAIL" = "root@localhost"
+        then
+                GIT_COMMITTER_EMAIL=john@example.com
+                export GIT_COMMITTER_EMAIL
+        fi
+' -- --all</code></pre>
+</div></div>
 <div class="paragraph"><p>To restrict rewriting to only part of the history, specify a revision
 range in addition to the new branch name.  The new branch name will
 point to the top-most revision that a <em>git rev-list</em> of this range
@@ -1215,7 +1236,7 @@ Garbage collect all unreferenced objects with <code>git gc --prune=now</code>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-02-05 21:07:26 PST
+Last updated 2013-03-19 16:06:22 PDT
 </div>
 </div>
 </body>
