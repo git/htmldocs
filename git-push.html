@@ -761,6 +761,15 @@ necessary to complete the given refs.</p></div>
 <div class="paragraph"><p>You can make interesting things happen to a repository
 every time you push into it, by setting up <em>hooks</em> there.  See
 documentation for <a href="git-receive-pack.html">git-receive-pack(1)</a>.</p></div>
+<div class="paragraph"><p>When the command line does not specify where to push with the
+<code>&lt;repository&gt;</code> argument, <code>branch.*.remote</code> configuration for the
+current branch is consulted to determine where to push.  If the
+configuration is missing, it defaults to <em>origin</em>.</p></div>
+<div class="paragraph"><p>When the command line does not specify what to push with <code>&lt;refspec&gt;...</code>
+arguments or <code>--all</code>, <code>--mirror</code>, <code>--tags</code> options, the command finds
+the default <code>&lt;refspec&gt;</code> by consulting <code>remote.*.push</code> configuration,
+and if it is not found, honors <code>push.default</code> configuration to decide
+what to push (See gitlink:git-config[1] for the meaning of <code>push.default</code>).</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -783,13 +792,10 @@ documentation for <a href="git-receive-pack.html">git-receive-pack(1)</a>.</p></
 </dt>
 <dd>
 <p>
+        Specify what destination ref to update with what source object.
         The format of a &lt;refspec&gt; parameter is an optional plus
-        <code>+</code>, followed by the source ref &lt;src&gt;, followed
+        <code>+</code>, followed by the source object &lt;src&gt;, followed
         by a colon <code>:</code>, followed by the destination ref &lt;dst&gt;.
-        It is used to specify with what &lt;src&gt; object the &lt;dst&gt; ref
-        in the remote repository is to be updated.  If not specified,
-        the behavior of the command is controlled by the <code>push.default</code>
-        configuration variable.
 </p>
 <div class="paragraph"><p>The &lt;src&gt; is often the name of the branch you would want to push, but
 it can be any arbitrary "SHA-1 expression", such as <code>master~4</code> or
@@ -811,10 +817,7 @@ the remote repository.</p></div>
 <div class="paragraph"><p>The special refspec <code>:</code> (or <code>+:</code> to allow non-fast-forward updates)
 directs Git to push "matching" branches: for every branch that exists on
 the local side, the remote side is updated if a branch of the same name
-already exists on the remote side.  This is the default operation mode
-if no explicit refspec is found (that is neither on the command line
-nor in any Push line of the corresponding remotes file---see below) and
-no <code>push.default</code> configuration variable is set.</p></div>
+already exists on the remote side.</p></div>
 </dd>
 <dt class="hdlist1">
 --all
@@ -1631,7 +1634,7 @@ a <code>git gc</code> command on the origin repository.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-02-05 21:07:26 PST
+Last updated 2013-03-21 15:47:21 PDT
 </div>
 </div>
 </body>
