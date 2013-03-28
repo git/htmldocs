@@ -854,7 +854,8 @@ set to <code>no</code> at the beginning of them.</p></div>
 <dd>
 <p>
         Create a merge commit even when the merge resolves as a
-        fast-forward.
+        fast-forward.  This is the default behaviour when merging an
+        annotated (and possibly signed) tag.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1134,6 +1135,27 @@ No other changes are made.  In particular, the local
 </ol></div>
 <div class="paragraph"><p>If you tried a merge which resulted in complex conflicts and
 want to start over, you can recover with <code>git merge --abort</code>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_merging_tag">MERGING TAG</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>When merging an annotated (and possibly signed) tag, Git always
+creates a merge commit even if a fast-forward merge is possible, and
+the commit message template is prepared with the tag message.
+Additionally, if the tag is signed, the signature check is reported
+as a comment in the message template. See also <a href="git-tag.html">git-tag(1)</a>.</p></div>
+<div class="paragraph"><p>When you want to just integrate with the work leading to the commit
+that happens to be tagged, e.g. synchronizing with an upstream
+release point, you may not want to make an unnecessary merge commit.</p></div>
+<div class="paragraph"><p>In such a case, you can "unwrap" the tag yourself before feeding it
+to <code>git merge</code>, or pass <code>--ff-only</code> when you do not have any work on
+your own. e.g.</p></div>
+<div class="paragraph"><p>---
+git fetch origin
+git merge v1.2.3^0
+git merge --ff-only v1.2.3
+---</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1754,7 +1776,7 @@ branch.&lt;name&gt;.mergeoptions
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-02-05 21:07:26 PST
+Last updated 2013-03-28 16:23:57 PDT
 </div>
 </div>
 </body>
