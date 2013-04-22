@@ -847,7 +847,29 @@ SetEnv GIT_HTTP_EXPORT_ALL
 ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/</code></pre>
 </div></div>
 <div class="paragraph"><p>To enable anonymous read access but authenticated write access,
-require authorization with a LocationMatch directive:</p></div>
+require authorization for both the initial ref advertisement (which we
+detect as a push via the service parameter in the query string), and the
+receive-pack invocation itself:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>RewriteCond %{QUERY_STRING} service=git-receive-pack [OR]
+RewriteCond %{REQUEST_URI} /git-receive-pack$
+RewriteRule ^/git/ - [E=AUTHREQUIRED:yes]
+
+&lt;LocationMatch "^/git/"&gt;
+        Order Deny,Allow
+        Deny from env=AUTHREQUIRED
+
+        AuthType Basic
+        AuthName "Git Access"
+        Require group committers
+        Satisfy Any
+        ...
+&lt;/LocationMatch&gt;</code></pre>
+</div></div>
+<div class="paragraph"><p>If you do not have <code>mod_rewrite</code> available to match against the query
+string, it is sufficient to just protect <code>git-receive-pack</code> itself,
+like:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>&lt;LocationMatch "^/git/.*/git-receive-pack$"&gt;
@@ -857,6 +879,14 @@ require authorization with a LocationMatch directive:</p></div>
         ...
 &lt;/LocationMatch&gt;</code></pre>
 </div></div>
+<div class="paragraph"><p>In this mode, the server will not request authentication until the
+client actually starts the object negotiation phase of the push, rather
+than during the initial contact.  For this reason, you must also enable
+the <code>http.receivepack</code> config option in any repositories that should
+accept a push. The default behavior, if <code>http.receivepack</code> is not set,
+is to reject any pushes by unauthenticated users; the initial request
+will therefore report <code>403 Forbidden</code> to the client, without even giving
+an opportunity for authentication.</p></div>
 <div class="paragraph"><p>To require authentication for both reads and writes, use a Location
 directive around the repository, or one of its parent directories:</p></div>
 <div class="listingblock">
@@ -924,6 +954,56 @@ ScriptAliasMatch \
                         git-(upload|receive)-pack))$" \
         /usr/libexec/git-core/git-http-backend/$1
 ScriptAlias /git/ /var/www/cgi-bin/gitweb.cgi/</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Lighttpd
+</dt>
+<dd>
+<p>
+        Ensure that <code>mod_cgi</code>, <code>mod_alias, `mod_auth</code>, <code>mod_setenv</code> are
+        loaded, then set <code>GIT_PROJECT_ROOT</code> appropriately and redirect
+        all requests to the CGI:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>alias.url += ( "/git" =&gt; "/usr/lib/git-core/git-http-backend" )
+$HTTP["url"] =~ "^/git" {
+        cgi.assign = ("" =&gt; "")
+        setenv.add-environment = (
+                "GIT_PROJECT_ROOT" =&gt; "/var/www/git",
+                "GIT_HTTP_EXPORT_ALL" =&gt; ""
+        )
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>To enable anonymous read access but authenticated write access:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$HTTP["querystring"] =~ "service=git-receive-pack" {
+        include "git-auth.conf"
+}
+$HTTP["url"] =~ "^/git/.*/git-receive-pack$" {
+        include "git-auth.conf"
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>where <code>git-auth.conf</code> looks something like:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>auth.require = (
+        "/" =&gt; (
+                "method" =&gt; "basic",
+                "realm" =&gt; "Git Access",
+                "require" =&gt; "valid-user"
+               )
+)
+# ...and set up auth.backend here</code></pre>
+</div></div>
+<div class="paragraph"><p>To require authentication for both reads and writes:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$HTTP["url"] =~ "^/git/private" {
+        include "git-auth.conf"
+}</code></pre>
 </div></div>
 </dd>
 </dl></div>
@@ -999,7 +1079,7 @@ invoked by the <em>git-receive-pack</em>.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-02-05 21:07:26 PST
+Last updated 2013-04-21 19:25:38 PDT
 </div>
 </div>
 </body>
