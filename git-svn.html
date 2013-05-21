@@ -1212,18 +1212,19 @@ first have already been pushed into SVN.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
--d
+-d&lt;path&gt;
 </dt>
 <dt class="hdlist1">
---destination
+--destination=&lt;path&gt;
 </dt>
 <dd>
 <p>
         If more than one --branches (or --tags) option was given to the <em>init</em>
         or <em>clone</em> command, you must provide the location of the branch (or
-        tag) you wish to create in the SVN repository.  The value of this
-        option must match one of the paths specified by a --branches (or
-        --tags) option.  You can see these paths with the commands
+        tag) you wish to create in the SVN repository.  &lt;path&gt; specifies which
+        path to use to create the branch or tag and should match the pattern
+        on the left-hand side of one of the configured branches or tags
+        refspecs.  You can see these refspecs with the commands
 </p>
 <div class="literalblock">
 <div class="content">
@@ -1256,6 +1257,16 @@ git config --get-all svn-remote.&lt;name&gt;.tags</code></pre>
 <div class="content">
 <pre><code>git config --get-all svn-remote.&lt;name&gt;.commiturl</code></pre>
 </div></div>
+</dd>
+<dt class="hdlist1">
+--parents
+</dt>
+<dd>
+<p>
+        Create parent folders. This parameter is equivalent to the parameter
+        --parents on svn cp commands and is useful for non-standard repository
+        layouts.
+</p>
 </dd>
 </dl></div>
 </dd>
@@ -2317,6 +2328,23 @@ comma-separated list of names within braces. For example:</p></div>
         branches = branches/{red,green}/src:refs/remotes/branches/*
         tags = tags/{1.0,2.0}/src:refs/remotes/tags/*</code></pre>
 </div></div>
+<div class="paragraph"><p>Multiple fetch, branches, and tags keys are supported:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>[svn-remote "messy-repo"]
+        url = http://server.org/svn
+        fetch = trunk/project-a:refs/remotes/project-a/trunk
+        fetch = branches/demos/june-project-a-demo:refs/remotes/project-a/demos/june-demo
+        branches = branches/server/*:refs/remotes/project-a/branches/*
+        branches = branches/demos/2011/*:refs/remotes/project-a/2011-demos/*
+        tags = tags/server/*:refs/remotes/project-a/tags/*</code></pre>
+</div></div>
+<div class="paragraph"><p>Creating a branch in such a configuration requires disambiguating which
+location to use using the -d or --destination flag:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git svn branch -d branches/server release-2-3-0</code></pre>
+</div></div>
 <div class="paragraph"><p>Note that git-svn keeps track of the highest revision in which a branch
 or tag has appeared. If the subset of branches or tags is changed after
 fetching, then .git/svn/.metadata must be manually edited to remove (or
@@ -2339,7 +2367,7 @@ reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-05-12 22:10:57 PDT
+Last updated 2013-05-20 17:14:12 PDT
 </div>
 </div>
 </body>
