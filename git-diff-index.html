@@ -1359,20 +1359,38 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Look for differences that introduce or remove an instance of
-        &lt;string&gt;. Note that this is different than the string simply
-        appearing in diff output; see the <em>pickaxe</em> entry in
-        <a href="gitdiffcore.html">gitdiffcore(7)</a> for more details.
+        Look for differences that change the number of occurrences of
+        the specified string (i.e. addition/deletion) in a file.
+        Intended for the scripter&#8217;s use.
 </p>
+<div class="paragraph"><p>It is useful when you&#8217;re looking for an exact block of code (like a
+struct), and want to know the history of that block since it first
+came into being: use the feature iteratively to feed the interesting
+block in the preimage back into <code>-S</code>, and keep going until you get the
+very first version of the block.</p></div>
 </dd>
 <dt class="hdlist1">
 -G&lt;regex&gt;
 </dt>
 <dd>
 <p>
-        Look for differences whose added or removed line matches
-        the given &lt;regex&gt;.
+        Look for differences whose patch text contains added/removed
+        lines that match &lt;regex&gt;.
 </p>
+<div class="paragraph"><p>To illustrate the difference between <code>-S&lt;regex&gt; --pickaxe-regex</code> and
+<code>-G&lt;regex&gt;</code>, consider a commit with the following diff in the same
+file:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>+    return !regexec(regexp, two-&gt;ptr, 1, &amp;regmatch, 0);
+...
+-    hit = !regexec(regexp, mf2.ptr, 1, &amp;regmatch, 0);</code></pre>
+</div></div>
+<div class="paragraph"><p>While <code>git log -G"regexec\(regexp"</code> will show this commit, <code>git log
+-S"regexec\(regexp" --pickaxe-regex</code> will not (because the number of
+occurrences of that string did not change).</p></div>
+<div class="paragraph"><p>See the <em>pickaxe</em> entry in <a href="gitdiffcore.html">gitdiffcore(7)</a> for more
+information.</p></div>
 </dd>
 <dt class="hdlist1">
 --pickaxe-all
@@ -1389,8 +1407,8 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Make the &lt;string&gt; not a plain string but an extended POSIX
-        regex to match.
+        Treat the &lt;string&gt; given to <code>-S</code> as an extended POSIX regular
+        expression to match.
 </p>
 </dd>
 <dt class="hdlist1">
