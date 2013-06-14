@@ -1318,8 +1318,8 @@ See also <a href="git-reflog.html">git-reflog(1)</a>.</p></div>
 </dt>
 <dd>
 <p>
-        Output uninteresting commits at the boundary, which are usually
-        not shown.
+        Output excluded boundary commits. Boundary commits are
+        prefixed with <code>-</code>.
 </p>
 </dd>
 </dl></div>
@@ -1421,13 +1421,13 @@ illustrate the differences between simplification settings.  We assume
 that you are filtering for a file <code>foo</code> in this commit graph:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>          .-A---M---N---O---P
-         /     /   /   /   /
-        I     B   C   D   E
-         \   /   /   /   /
-          `-------------'</code></pre>
+<pre><code>          .-A---M---N---O---P---Q
+         /     /   /   /   /   /
+        I     B   C   D   E   Y
+         \   /   /   /   /   /
+          `-------------'   X</code></pre>
 </div></div>
-<div class="paragraph"><p>The horizontal line of history A---P is taken to be the first parent of
+<div class="paragraph"><p>The horizontal line of history A---Q is taken to be the first parent of
 each merge.  The commits are:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1463,8 +1463,14 @@ In <code>A</code>, <code>foo</code> contains just "foo".
 <li>
 <p>
 <code>E</code> changes <code>quux</code> to "xyzzy", and its merge <code>P</code> combines the
-  strings to "quux xyzzy".  Despite appearing interesting, <code>P</code> is
-  TREESAME to all parents.
+  strings to "quux xyzzy".  <code>P</code> is TREESAME to <code>O</code>, but not to <code>E</code>.
+</p>
+</li>
+<li>
+<p>
+<code>X</code> is an indpendent root commit that added a new file <code>side</code>, and <code>Y</code>
+  modified it. <code>Y</code> is TREESAME to <code>X</code>. Its merge <code>Q</code> added <code>side</code> to <code>P</code>, and
+  <code>Q</code> is TREESAME to <code>P</code>, but not to <code>Y</code>.
 </p>
 </li>
 </ul></div>
@@ -1513,9 +1519,9 @@ parent lines.</p></div>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        I  A  B  N  D  O</code></pre>
+<pre><code>        I  A  B  N  D  O  P  Q</code></pre>
 </div></div>
-<div class="paragraph"><p><code>P</code> and <code>M</code> were excluded because they are TREESAME to a parent.  <code>E</code>,
+<div class="paragraph"><p><code>M</code> was excluded because it is TREESAME to both parents.  <code>E</code>,
 <code>C</code> and <code>B</code> were all walked, but only <code>B</code> was !TREESAME, so the others
 do not appear.</p></div>
 <div class="paragraph"><p>Note that without parent rewriting, it is not really possible to talk
@@ -1535,7 +1541,7 @@ Along each parent, prune away commits that are not included
 themselves.  This results in</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>          .-A---M---N---O---P
+<pre><code>          .-A---M---N---O---P---Q
          /     /   /   /   /
         I     B   /   D   /
          \   /   /   /   /
@@ -1544,7 +1550,7 @@ themselves.  This results in</p></div>
 <div class="paragraph"><p>Compare to <em>--full-history</em> without rewriting above.  Note that <code>E</code>
 was pruned away because it is TREESAME, but the parent list of P was
 rewritten to contain <code>E</code>'s parent <code>I</code>.  The same happened for <code>C</code> and
-<code>N</code>.  Note also that <code>P</code> was included despite being TREESAME.</p></div>
+<code>N</code>, and <code>X</code>, <code>Y</code> and <code>Q</code>.</p></div>
 </dd>
 </dl></div>
 <div class="paragraph"><p>In addition to the above settings, you can change whether TREESAME
@@ -1591,8 +1597,9 @@ Set <code>C'</code> to <code>C</code>.
 <li>
 <p>
 Replace each parent <code>P</code> of <code>C'</code> with its simplification <code>P'</code>.  In
-  the process, drop parents that are ancestors of other parents, and
-  remove duplicates.
+  the process, drop parents that are ancestors of other parents or that are
+  root commits TREESAME to an empty tree, and remove duplicates, but take care
+  to never drop all parents that we are TREESAME to.
 </p>
 </li>
 <li>
@@ -1614,7 +1621,7 @@ If after this parent rewriting, <code>C'</code> is a root or merge commit (has
          \   /       /
           `---------'</code></pre>
 </div></div>
-<div class="paragraph"><p>Note the major differences in <code>N</code> and <code>P</code> over <em>--full-history</em>:</p></div>
+<div class="paragraph"><p>Note the major differences in <code>N</code>, <code>P</code> and <code>Q</code> over <em>--full-history</em>:</p></div>
 <div class="openblock">
 <div class="content">
 <div class="ulist"><ul>
@@ -1628,6 +1635,13 @@ If after this parent rewriting, <code>C'</code> is a root or merge commit (has
 <p>
 <code>P</code>'s parent list similarly had <code>I</code> removed.  <code>P</code> was then
   removed completely, because it had one parent and is TREESAME.
+</p>
+</li>
+<li>
+<p>
+<code>Q</code>'s parent list had <code>Y</code> simplified to <code>X</code>. <code>X</code> was then removed, because it
+  was a TREESAME root. <code>Q</code> was then removed completely, because it had one
+  parent and is TREESAME.
 </p>
 </li>
 </ul></div>
