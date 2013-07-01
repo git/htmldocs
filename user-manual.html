@@ -16,8 +16,8 @@ project in mind, here are some interesting examples:</p><pre class="literallayou
 $ git clone git://git.kernel.org/pub/scm/git/git.git
         # the Linux kernel (approx. 640MB download):
 $ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git</pre><p>The initial clone may be time-consuming for a large project, but you
-will only need to clone once.</p><p>The clone command creates a new directory named after the project (<code class="literal">git</code>
-or <code class="literal">linux-2.6</code> in the examples above).  After you cd into this
+will only need to clone once.</p><p>The clone command creates a new directory named after the project
+(<code class="literal">git</code> or <code class="literal">linux</code> in the examples above).  After you cd into this
 directory, you will see that it contains a copy of the project files,
 called the <a class="link" href="#def_working_tree">working tree</a>, together with a special
 top-level directory named <code class="literal">.git</code>, which contains all the information
@@ -218,19 +218,25 @@ at the new commits.</p><p>The command <code class="literal">git fetch</code>, wi
 remote-tracking branches to the latest version found in her
 repository.  It will not touch any of your own branches—not even the
 "master" branch that was created for you on clone.</p></div><div class="section" title="Fetching branches from other repositories"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="fetching-branches"></a>Fetching branches from other repositories</h2></div></div></div><p>You can also track branches from repositories other than the one you
-cloned from, using <a class="ulink" href="git-remote.html" target="_top">git-remote(1)</a>:</p><pre class="literallayout">$ git remote add linux-nfs git://linux-nfs.org/pub/nfs-2.6.git
-$ git fetch linux-nfs
-* refs/remotes/linux-nfs/master: storing branch 'master' ...
-  commit: bf81b46</pre><p>New remote-tracking branches will be stored under the shorthand name
-that you gave <code class="literal">git remote add</code>, in this case <code class="literal">linux-nfs</code>:</p><pre class="literallayout">$ git branch -r
-linux-nfs/master
-origin/master</pre><p>If you run <code class="literal">git fetch &lt;remote&gt;</code> later, the remote-tracking branches
+cloned from, using <a class="ulink" href="git-remote.html" target="_top">git-remote(1)</a>:</p><pre class="literallayout">$ git remote add staging git://git.kernel.org/.../gregkh/staging.git
+$ git fetch staging
+...
+From git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging
+ * [new branch]      master     -&gt; staging/master
+ * [new branch]      staging-linus -&gt; staging/staging-linus
+ * [new branch]      staging-next -&gt; staging/staging-next</pre><p>New remote-tracking branches will be stored under the shorthand name
+that you gave <code class="literal">git remote add</code>, in this case <code class="literal">staging</code>:</p><pre class="literallayout">$ git branch -r
+  origin/HEAD -&gt; origin/master
+  origin/master
+  staging/master
+  staging/staging-linus
+  staging/staging-next</pre><p>If you run <code class="literal">git fetch &lt;remote&gt;</code> later, the remote-tracking branches
 for the named <code class="literal">&lt;remote&gt;</code> will be updated.</p><p>If you examine the file <code class="literal">.git/config</code>, you will see that Git has added
 a new stanza:</p><pre class="literallayout">$ cat .git/config
 ...
-[remote "linux-nfs"]
-        url = git://linux-nfs.org/pub/nfs-2.6.git
-        fetch = +refs/heads/*:refs/remotes/linux-nfs/*
+[remote "staging"]
+        url = git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging.git
+        fetch = +refs/heads/*:refs/remotes/staging/*
 ...</pre><p>This is what causes Git to track the remote’s branches; you may modify
 or delete these configuration options by editing <code class="literal">.git/config</code> with a
 text editor.  (See the "CONFIGURATION FILE" section of
@@ -729,7 +735,7 @@ will stop, and you can fix the conflicts as described in
 "<a class="link" href="#resolving-a-merge" title="Resolving a merge">Resolving a merge</a>".  (The <code class="literal">-3</code> option tells
 Git to perform a merge; if you would prefer it just to abort and
 leave your tree and index untouched, you may omit that option.)</p><p>Once the index is updated with the results of the conflict
-resolution, instead of creating a new commit, just run</p><pre class="literallayout">$ git am --resolved</pre><p>and Git will create the commit for you and continue applying the
+resolution, instead of creating a new commit, just run</p><pre class="literallayout">$ git am --continue</pre><p>and Git will create the commit for you and continue applying the
 remaining patches from the mailbox.</p><p>The final result will be a series of commits, one for each patch in
 the original mailbox, with authorship and commit log message each
 taken from the message containing each patch.</p></div><div class="section" title="Public Git repositories"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="public-repositories"></a>Public Git repositories</h2></div></div></div><p>Another way to submit changes to a project is to tell the maintainer
@@ -866,7 +872,7 @@ A "release" tree into which tested patches are moved for final sanity
    him a "please pull" request.)
 </li></ul></div><p>He also uses a set of temporary branches ("topic branches"), each
 containing a logical grouping of patches.</p><p>To set this up, first create your work tree by cloning Linus’s public
-tree:</p><pre class="literallayout">$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git work
+tree:</p><pre class="literallayout">$ git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git work
 $ cd work</pre><p>Linus’s tree will be stored in the remote-tracking branch named origin/master,
 and can be updated using <a class="ulink" href="git-fetch.html" target="_top">git-fetch(1)</a>; you can track other
 public trees using <a class="ulink" href="git-remote.html" target="_top">git-remote(1)</a> to set up a "remote" and
@@ -886,7 +892,7 @@ from the release branch.</p><p>A few configuration variables (see <a class="ulin
 make it easy to push both branches to your public tree.  (See
 <a class="xref" href="#setting-up-a-public-repository" title="Setting up a public repository">the section called “Setting up a public repository”</a>.)</p><pre class="literallayout">$ cat &gt;&gt; .git/config &lt;&lt;EOF
 [remote "mytree"]
-        url =  master.kernel.org:/pub/scm/linux/kernel/git/aegl/linux-2.6.git
+        url =  master.kernel.org:/pub/scm/linux/kernel/git/aegl/linux.git
         push = release
         push = test
 EOF</pre><p>Then you can push both the test and release trees using
