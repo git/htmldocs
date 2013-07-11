@@ -5062,61 +5062,72 @@ push.default
 </dt>
 <dd>
 <p>
-        Defines the action <code>git push</code> should take if no refspec is given
-        on the command line, no refspec is configured in the remote, and
-        no refspec is implied by any of the options given on the command
-        line. Possible values are:
+        Defines the action <code>git push</code> should take if no refspec is
+        explicitly given.  Different values are well-suited for
+        specific workflows; for instance, in a purely central workflow
+        (i.e. the fetch source is equal to the push destination),
+        <code>upstream</code> is probably what you want.  Possible values are:
 </p>
 <div class="openblock">
 <div class="content">
 <div class="ulist"><ul>
 <li>
 <p>
-<code>nothing</code> - do not push anything.
+<code>nothing</code> - do not push anything (error out) unless a refspec is
+  explicitly given. This is primarily meant for people who want to
+  avoid mistakes by always being explicit.
 </p>
 </li>
 <li>
 <p>
-<code>matching</code> - push all branches having the same name in both ends.
-  This is for those who prepare all the branches into a publishable
-  shape and then push them out with a single command.  It is not
-  appropriate for pushing into a repository shared by multiple users,
-  since locally stalled branches will attempt a non-fast forward push
-  if other users updated the branch.
- <br />
-  This is currently the default, but Git 2.0 will change the default
-  to <code>simple</code>.
+<code>current</code> - push the current branch to update a branch with the same
+  name on the receiving end.  Works in both central and non-central
+  workflows.
 </p>
 </li>
 <li>
 <p>
-<code>upstream</code> - push the current branch to its upstream branch
-  (<code>tracking</code> is a deprecated synonym for this).
-  With this, <code>git push</code> will update the same remote ref as the one which
-  is merged by <code>git pull</code>, making <code>push</code> and <code>pull</code> symmetrical.
-  See "branch.&lt;name&gt;.merge" for how to configure the upstream branch.
+<code>upstream</code> - push the current branch back to the branch whose
+  changes are usually integrated into the current branch (which is
+  called <code>@{upstream}</code>).  This mode only makes sense if you are
+  pushing to the same repository you would normally pull from
+  (i.e. central workflow).
 </p>
 </li>
 <li>
 <p>
-<code>simple</code> - like <code>upstream</code>, but refuses to push if the upstream
-  branch&#8217;s name is different from the local one. This is the safest
-  option and is well-suited for beginners. It will become the default
-  in Git 2.0.
+<code>simple</code> - in centralized workflow, work like <code>upstream</code> with an
+  added safety to refuse to push if the upstream branch&#8217;s name is
+  different from the local one.
 </p>
+<div class="paragraph"><p>When pushing to a remote that is different from the remote you normally
+pull from, work as <code>current</code>.  This is the safest option and is suited
+for beginners.</p></div>
+<div class="paragraph"><p>This mode will become the default in Git 2.0.</p></div>
 </li>
 <li>
 <p>
-<code>current</code> - push the current branch to a branch of the same name.
+<code>matching</code> - push all branches having the same name on both ends.
+  This makes the repository you are pushing to remember the set of
+  branches that will be pushed out (e.g. if you always push <em>maint</em>
+  and <em>master</em> there and no other branches, the repository you push
+  to will have these two branches, and your local <em>maint</em> and
+  <em>master</em> will be pushed there).
 </p>
+<div class="paragraph"><p>To use this mode effectively, you have to make sure <em>all</em> the
+branches you would push out are ready to be pushed out before
+running <em>git push</em>, as the whole point of this mode is to allow you
+to push all of the branches in one go.  If you usually finish work
+on only one branch and push out the result, while other branches are
+unfinished, this mode is not for you.  Also this mode is not
+suitable for pushing into a shared central repository, as other
+people may add new branches there, or update the tip of existing
+branches outside your control.</p></div>
+<div class="paragraph"><p>This is currently the default, but Git 2.0 will change the default
+to <code>simple</code>.</p></div>
 </li>
 </ul></div>
 </div></div>
-<div class="paragraph"><p>The <code>simple</code>, <code>current</code> and <code>upstream</code> modes are for those who want to
-push out a single branch after finishing work, even when the other
-branches are not yet ready to be pushed out. If you are working with
-other people to push into the same shared repository, you would want
-to use one of these.</p></div>
 </dd>
 <dt class="hdlist1">
 rebase.stat
@@ -5559,6 +5570,24 @@ status.relativePaths
         current directory. Setting this variable to <code>false</code> shows paths
         relative to the repository root (this was the default for Git
         prior to v1.5.4).
+</p>
+</dd>
+<dt class="hdlist1">
+status.short
+</dt>
+<dd>
+<p>
+        Set to true to enable --short by default in <a href="git-status.html">git-status(1)</a>.
+        The option --no-short takes precedence over this variable.
+</p>
+</dd>
+<dt class="hdlist1">
+status.branch
+</dt>
+<dd>
+<p>
+        Set to true to enable --branch by default in <a href="git-status.html">git-status(1)</a>.
+        The option --no-branch takes precedence over this variable.
 </p>
 </dd>
 <dt class="hdlist1">
