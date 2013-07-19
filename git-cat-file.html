@@ -838,19 +838,27 @@ stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></d
 <dt class="hdlist1">
 --batch
 </dt>
+<dt class="hdlist1">
+--batch=&lt;format&gt;
+</dt>
 <dd>
 <p>
-        Print the SHA-1, type, size, and contents of each object provided on
-        stdin. May not be combined with any other options or arguments.
+        Print object information and contents for each object provided
+        on stdin.  May not be combined with any other options or arguments.
+        See the section <code>BATCH OUTPUT</code> below for details.
 </p>
 </dd>
 <dt class="hdlist1">
 --batch-check
 </dt>
+<dt class="hdlist1">
+--batch-check=&lt;format&gt;
+</dt>
 <dd>
 <p>
-        Print the SHA-1, type, and size of each object provided on stdin. May not
-        be combined with any other options or arguments.
+        Print object information for each object provided on stdin.  May
+        not be combined with any other options or arguments.  See the
+        section <code>BATCH OUTPUT</code> below for details.
 </p>
 </dd>
 </dl></div>
@@ -865,25 +873,101 @@ stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></d
 <div class="paragraph"><p>If <em>-p</em> is specified, the contents of &lt;object&gt; are pretty-printed.</p></div>
 <div class="paragraph"><p>If &lt;type&gt; is specified, the raw (though uncompressed) contents of the &lt;object&gt;
 will be returned.</p></div>
-<div class="paragraph"><p>If <em>--batch</em> is specified, output of the following form is printed for each
-object specified on stdin:</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_batch_output">BATCH OUTPUT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If <code>--batch</code> or <code>--batch-check</code> is given, <code>cat-file</code> will read objects
+from stdin, one per line, and print information about them.</p></div>
+<div class="paragraph"><p>Each line is split at the first whitespace boundary. All characters
+before that whitespace are considered as a whole object name, and are
+parsed as if given to <a href="git-rev-parse.html">git-rev-parse(1)</a>. Characters after that
+whitespace can be accessed using the <code>%(rest)</code> atom (see below).</p></div>
+<div class="paragraph"><p>You can specify the information shown for each object by using a custom
+<code>&lt;format&gt;</code>. The <code>&lt;format&gt;</code> is copied literally to stdout for each
+object, with placeholders of the form <code>%(atom)</code> expanded, followed by a
+newline. The available atoms are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>objectname</code>
+</dt>
+<dd>
+<p>
+        The 40-hex object name of the object.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>objecttype</code>
+</dt>
+<dd>
+<p>
+        The type of of the object (the same as <code>cat-file -t</code> reports).
+</p>
+</dd>
+<dt class="hdlist1">
+<code>objectsize</code>
+</dt>
+<dd>
+<p>
+        The size, in bytes, of the object (the same as <code>cat-file -s</code>
+        reports).
+</p>
+</dd>
+<dt class="hdlist1">
+<code>objectsize:disk</code>
+</dt>
+<dd>
+<p>
+        The size, in bytes, that the object takes up on disk. See the
+        note about on-disk sizes in the <code>CAVEATS</code> section below.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>rest</code>
+</dt>
+<dd>
+<p>
+        The text (if any) found after the first run of whitespace on the
+        input line (i.e., the "rest" of the line).
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>If no format is specified, the default format is <code>%(objectname)
+%(objecttype) %(objectsize)</code>.</p></div>
+<div class="paragraph"><p>If <code>--batch</code> is specified, the object information is followed by the
+object contents (consisting of <code>%(objectsize)</code> bytes), followed by a
+newline.</p></div>
+<div class="paragraph"><p>For example, <code>--batch</code> without a custom format would produce:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>&lt;sha1&gt; SP &lt;type&gt; SP &lt;size&gt; LF
 &lt;contents&gt; LF</code></pre>
 </div></div>
-<div class="paragraph"><p>If <em>--batch-check</em> is specified, output of the following form is printed for
-each object specified on stdin:</p></div>
+<div class="paragraph"><p>Whereas <code>--batch-check='%(objectname) %(objecttype)'</code> would produce:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>&lt;sha1&gt; SP &lt;type&gt; SP &lt;size&gt; LF</code></pre>
+<pre><code>&lt;sha1&gt; SP &lt;type&gt; LF</code></pre>
 </div></div>
-<div class="paragraph"><p>For both <em>--batch</em> and <em>--batch-check</em>, output of the following form is printed
-for each object specified on stdin that does not exist in the repository:</p></div>
+<div class="paragraph"><p>If a name is specified on stdin that cannot be resolved to an object in
+the repository, then <code>cat-file</code> will ignore any custom format and print:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>&lt;object&gt; SP missing LF</code></pre>
 </div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_caveats">CAVEATS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Note that the sizes of objects on disk are reported accurately, but care
+should be taken in drawing conclusions about which refs or objects are
+responsible for disk usage. The size of a packed non-delta object may be
+much larger than the size of objects which delta against it, but the
+choice of which object is the base and which is the delta is arbitrary
+and is subject to change during a repack. Note also that multiple copies
+of an object may be present in the object database; in this case, it is
+undefined which copy&#8217;s size will be reported.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -896,7 +980,7 @@ for each object specified on stdin that does not exist in the repository:</p></d
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-04-21 19:25:38 PDT
+Last updated 2013-07-18 17:36:26 PDT
 </div>
 </div>
 </body>
