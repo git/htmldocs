@@ -746,7 +746,7 @@ git-clean(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git clean</em> [-d] [-f] [-n] [-q] [-e &lt;pattern&gt;] [-x | -X] [--] &lt;path&gt;&#8230;</pre>
+<pre class="content"><em>git clean</em> [-d] [-f] [-i] [-n] [-q] [-e &lt;pattern&gt;] [-x | -X] [--] &lt;path&gt;&#8230;</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -787,7 +787,20 @@ are affected.</p></div>
 <dd>
 <p>
         If the Git configuration variable clean.requireForce is not set
-        to false, <em>git clean</em> will refuse to run unless given -f or -n.
+        to false, <em>git clean</em> will refuse to run unless given -f, -n or
+        -i.
+</p>
+</dd>
+<dt class="hdlist1">
+-i
+</dt>
+<dt class="hdlist1">
+--interactive
+</dt>
+<dd>
+<p>
+        Show what would be done and clean files interactively. See
+        &#8220;Interactive mode&#8221; for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -852,6 +865,92 @@ are affected.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_interactive_mode">Interactive mode</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>When the command enters the interactive mode, it shows the
+files and directories to be cleaned, and goes into its
+interactive command loop.</p></div>
+<div class="paragraph"><p>The command loop shows the list of subcommands available, and
+gives a prompt "What now&gt; ".  In general, when the prompt ends
+with a single <em>&gt;</em>, you can pick only one of the choices given
+and type return, like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>    *** Commands ***
+        1: clean                2: filter by pattern    3: select by numbers
+        4: ask each             5: quit                 6: help
+    What now&gt; 1</code></pre>
+</div></div>
+<div class="paragraph"><p>You also could say <code>c</code> or <code>clean</code> above as long as the choice is unique.</p></div>
+<div class="paragraph"><p>The main command loop has 6 subcommands.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+clean
+</dt>
+<dd>
+<p>
+   Start cleaning files and directories, and then quit.
+</p>
+</dd>
+<dt class="hdlist1">
+filter by pattern
+</dt>
+<dd>
+<p>
+   This shows the files and directories to be deleted and issues an
+   "Input ignore patterns&gt;&gt;" prompt. You can input space-seperated
+   patterns to exclude files and directories from deletion.
+   E.g. "*.c *.h" will excludes files end with ".c" and ".h" from
+   deletion. When you are satisfied with the filtered result, press
+   ENTER (empty) back to the main menu.
+</p>
+</dd>
+<dt class="hdlist1">
+select by numbers
+</dt>
+<dd>
+<p>
+   This shows the files and directories to be deleted and issues an
+   "Select items to delete&gt;&gt;" prompt. When the prompt ends with double
+   <em>&gt;&gt;</em> like this, you can make more than one selection, concatenated
+   with whitespace or comma.  Also you can say ranges.  E.g. "2-5 7,9"
+   to choose 2,3,4,5,7,9 from the list.  If the second number in a
+   range is omitted, all remaining patches are taken.  E.g. "7-" to
+   choose 7,8,9 from the list.  You can say <em>*</em> to choose everything.
+   Also when you are satisfied with the filtered result, press ENTER
+   (empty) back to the main menu.
+</p>
+</dd>
+<dt class="hdlist1">
+ask each
+</dt>
+<dd>
+<p>
+  This will start to clean, and you must confirm one by one in order
+  to delete items. Please note that this action is not as efficient
+  as the above two actions.
+</p>
+</dd>
+<dt class="hdlist1">
+quit
+</dt>
+<dd>
+<p>
+  This lets you quit without do cleaning.
+</p>
+</dd>
+<dt class="hdlist1">
+help
+</dt>
+<dd>
+<p>
+  Show brief usage of interactive git-clean.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><a href="gitignore.html">gitignore(5)</a></p></div>
@@ -867,7 +966,7 @@ are affected.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-02-05 21:07:26 PST
+Last updated 2013-07-22 12:19:08 PDT
 </div>
 </div>
 </body>
