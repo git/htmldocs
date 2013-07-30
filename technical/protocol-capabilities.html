@@ -749,10 +749,11 @@ did not say it supports.</p></div>
 was sent.  Server MUST NOT ignore capabilities that client requested
 and server advertised.  As a consequence of these rules, server MUST
 NOT advertise capabilities it does not understand.</p></div>
-<div class="paragraph"><p>The <em>report-status</em> and <em>delete-refs</em> capabilities are sent and
+<div class="paragraph"><p>The <em>report-status</em>, <em>delete-refs</em>, and <em>quiet</em> capabilities are sent and
 recognized by the receive-pack (push to server) process.</p></div>
-<div class="paragraph"><p>The <em>ofs-delta</em> capability is sent and recognized by both upload-pack
-and receive-pack protocols.</p></div>
+<div class="paragraph"><p>The <em>ofs-delta</em> and <em>side-band-64k</em> capabilities are sent and recognized
+by both upload-pack and receive-pack protocols.  The <em>agent</em> capability
+may optionally be sent in both protocols.</p></div>
 <div class="paragraph"><p>All other capabilities are only recognized by the upload-pack (fetch
 from server) process.</p></div>
 </div>
@@ -849,6 +850,21 @@ send/read OBJ_OFS_DELTA (aka type 6) in a packfile.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_agent">agent</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The server may optionally send a capability of the form <code>agent=X</code> to
+notify the client that the server is running version <code>X</code>. The client may
+optionally return its own agent string by responding with an <code>agent=Y</code>
+capability (but it MUST NOT do so if the server did not mention the
+agent capability). The <code>X</code> and <code>Y</code> strings may contain any printable
+ASCII characters except space (i.e., the byte range 32 &lt; x &lt; 127), and
+are typically of the form "package/version" (e.g., "git/1.8.3.1"). The
+agent strings are purely informative for statistics and debugging
+purposes, and MUST NOT be used to programatically assume the presence
+or absence of particular features.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_shallow">shallow</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This capability adds "deepen", "shallow" and "unshallow" commands to
@@ -892,7 +908,7 @@ of whether or not there are tags available.</p></div>
 <div class="sect1">
 <h2 id="_report_status">report-status</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The upload-pack process can receive a <em>report-status</em> capability,
+<div class="paragraph"><p>The receive-pack process can receive a <em>report-status</em> capability,
 which tells it that the client wants a report of what happened after
 a packfile upload and reference update.  If the pushing client requests
 this capability, after unpacking and updating references the server
@@ -912,11 +928,30 @@ simply informs the client that it can be sent zero-id values
 to delete references.</p></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_quiet">quiet</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If the receive-pack server advertises the <em>quiet</em> capability, it is
+capable of silencing human-readable progress output which otherwise may
+be shown when processing the received pack. A send-pack client should
+respond with the <em>quiet</em> capability to suppress server-side progress
+reporting if the local progress reporting is also being suppressed
+(e.g., via <code>push -q</code>, or if stderr does not go to a tty).</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_allow_tip_sha1_in_want">allow-tip-sha1-in-want</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If the upload-pack server advertises this capability, fetch-pack may
+send "want" lines with SHA-1s that exist at the server but are not
+advertised by upload-pack.</p></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-11-15 13:45:02 PST
+Last updated 2013-07-30 11:09:47 PDT
 </div>
 </div>
 </body>
