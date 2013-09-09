@@ -748,6 +748,7 @@ git-push(1) Manual Page
 <div class="verseblock">
 <pre class="content"><em>git push</em> [--all | --mirror | --tags] [--follow-tags] [-n | --dry-run] [--receive-pack=&lt;git-receive-pack&gt;]
            [--repo=&lt;repository&gt;] [-f | --force] [--prune] [-v | --verbose] [-u | --set-upstream]
+           [--force-with-lease[=&lt;refname&gt;[:&lt;expect&gt;]]]
            [--no-verify] [&lt;repository&gt; [&lt;refspec&gt;&#8230;]]</pre>
 <div class="attribution">
 </div></div>
@@ -923,6 +924,57 @@ already exists on the remote side.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--[no-]force-with-lease
+</dt>
+<dt class="hdlist1">
+--force-with-lease=&lt;refname&gt;
+</dt>
+<dt class="hdlist1">
+--force-with-lease=&lt;refname&gt;:&lt;expect&gt;
+</dt>
+<dd>
+<p>
+        Usually, "git push" refuses to update a remote ref that is
+        not an ancestor of the local ref used to overwrite it.
+</p>
+<div class="paragraph"><p>This option bypasses the check, but instead requires that the
+current value of the ref to be the expected value.  "git push"
+fails otherwise.</p></div>
+<div class="paragraph"><p>Imagine that you have to rebase what you have already published.
+You will have to bypass the "must fast-forward" rule in order to
+replace the history you originally published with the rebased history.
+If somebody else built on top of your original history while you are
+rebasing, the tip of the branch at the remote may advance with her
+commit, and blindly pushing with <code>--force</code> will lose her work.</p></div>
+<div class="paragraph"><p>This option allows you to say that you expect the history you are
+updating is what you rebased and want to replace. If the remote ref
+still points at the commit you specified, you can be sure that no
+other people did anything to the ref (it is like taking a "lease" on
+the ref without explicitly locking it, and you update the ref while
+making sure that your earlier "lease" is still valid).</p></div>
+<div class="paragraph"><p><code>--force-with-lease</code> alone, without specifying the details, will protect
+all remote refs that are going to be updated by requiring their
+current value to be the same as the remote-tracking branch we have
+for them, unless specified with a <code>--force-with-lease=&lt;refname&gt;:&lt;expect&gt;</code>
+option that explicitly states what the expected value is.</p></div>
+<div class="paragraph"><p><code>--force-with-lease=&lt;refname&gt;</code>, without specifying the expected value, will
+protect the named ref (alone), if it is going to be updated, by
+requiring its current value to be the same as the remote-tracking
+branch we have for it.</p></div>
+<div class="paragraph"><p><code>--force-with-lease=&lt;refname&gt;:&lt;expect&gt;</code> will protect the named ref (alone),
+if it is going to be updated, by requiring its current value to be
+the same as the specified value &lt;expect&gt; (which is allowed to be
+different from the remote-tracking branch we have for the refname,
+or we do not even have to have such a remote-tracking branch when
+this form is used).</p></div>
+<div class="paragraph"><p>Note that all forms other than <code>--force-with-lease=&lt;refname&gt;:&lt;expect&gt;</code>
+that specifies the expected current value of the ref explicitly are
+still experimental and their semantics may change as we gain experience
+with this feature.</p></div>
+<div class="paragraph"><p>"--no-force-with-lease" will cancel all the previous --force-with-lease on the
+command line.</p></div>
+</dd>
+<dt class="hdlist1">
 -f
 </dt>
 <dt class="hdlist1">
@@ -932,18 +984,20 @@ already exists on the remote side.</p></div>
 <p>
         Usually, the command refuses to update a remote ref that is
         not an ancestor of the local ref used to overwrite it.
-        This flag disables the check.  This can cause the
-        remote repository to lose commits; use it with care.
-        Note that <code>--force</code> applies to all the refs that are pushed,
-        hence using it with <code>push.default</code> set to <code>matching</code> or with
-        multiple push destinations configured with <code>remote.*.push</code>
-        may overwrite refs other than the current branch (including
-        local refs that are strictly behind their remote counterpart).
-        To force a push to only one branch, use a <code>+</code> in front of the
-        refspec to push (e.g <code>git push origin +master</code> to force a push
-        to the <code>master</code> branch). See the <code>&lt;refspec&gt;...</code> section above
-        for details.
+        Also, when <code>--force-with-lease</code> option is used, the command refuses
+        to update a remote ref whose current value does not match
+        what is expected.
 </p>
+<div class="paragraph"><p>This flag disables these checks, and can cause the remote repository
+to lose commits; use it with care.</p></div>
+<div class="paragraph"><p>Note that <code>--force</code> applies to all the refs that are pushed, hence
+using it with <code>push.default</code> set to <code>matching</code> or with multiple push
+destinations configured with <code>remote.*.push</code> may overwrite refs
+other than the current branch (including local refs that are
+strictly behind their remote counterpart).  To force a push to only
+one branch, use a <code>+</code> in front of the refspec to push (e.g <code>git push
+origin +master</code> to force a push to the <code>master</code> branch). See the
+<code>&lt;refspec&gt;...</code> section above for details.</p></div>
 </dd>
 <dt class="hdlist1">
 --repo=&lt;repository&gt;
@@ -1668,7 +1722,7 @@ a <code>git gc</code> command on the origin repository.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-09-09 15:34:20 PDT
 </div>
 </div>
 </body>

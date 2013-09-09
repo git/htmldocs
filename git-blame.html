@@ -747,7 +747,7 @@ git-blame(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git blame</em> [-c] [-b] [-l] [--root] [-t] [-f] [-n] [-s] [-e] [-p] [-w] [--incremental]
-            [-L n,m | -L :fn] [-S &lt;revs-file&gt;] [-M] [-C] [-C] [-C] [--since=&lt;date&gt;]
+            [-L &lt;range&gt;] [-S &lt;revs-file&gt;] [-M] [-C] [-C] [-C] [--since=&lt;date&gt;]
             [--abbrev=&lt;n&gt;] [&lt;rev&gt; | --contents &lt;file&gt; | --reverse &lt;rev&gt;] [--] &lt;file&gt;</pre>
 <div class="attribution">
 </div></div>
@@ -758,7 +758,8 @@ git-blame(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Annotates each line in the given file with information from the revision which
 last modified the line. Optionally, start annotating from the given revision.</p></div>
-<div class="paragraph"><p>The command can also limit the range of lines annotated.</p></div>
+<div class="paragraph"><p>When specified one or more times, <code>-L</code> restricts annotation to the requested
+lines.</p></div>
 <div class="paragraph"><p>The origin of lines is automatically followed across whole-file
 renames (currently there is no option to turn the rename-following
 off). To follow lines moved from one file to another, or to follow
@@ -818,10 +819,11 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</code></pre>
 </dt>
 <dd>
 <p>
-        Annotate only the given line range.  &lt;start&gt; and &lt;end&gt; are optional.
-        &#8220;-L &lt;start&gt;&#8221; or &#8220;-L &lt;start&gt;,&#8221; spans from &lt;start&gt; to end of file.
-        &#8220;-L ,&lt;end&gt;&#8221; spans from start of file to &lt;end&gt;.
+        Annotate only the given line range. May be specified multiple times.
+        Overlapping ranges are allowed.
 </p>
+<div class="paragraph"><p>&lt;start&gt; and &lt;end&gt; are optional. &#8220;-L &lt;start&gt;&#8221; or &#8220;-L &lt;start&gt;,&#8221; spans from
+&lt;start&gt; to end of file. &#8220;-L ,&lt;end&gt;&#8221; spans from start of file to &lt;end&gt;.</p></div>
 <div class="paragraph"><p>&lt;start&gt; and &lt;end&gt; can take one of these forms:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -836,7 +838,10 @@ absolute line number (lines count from 1).</p></div>
 /regex/
 </p>
 <div class="paragraph"><p>This form will use the first line matching the given
-POSIX regex.  If &lt;end&gt; is a regex, it will search
+POSIX regex. If &lt;start&gt; is a regex, it will search from the end of
+the previous <code>-L</code> range, if any, otherwise from the start of file.
+If &lt;start&gt; is &#8220;^/regex/&#8221;, it will search from the start of file.
+If &lt;end&gt; is a regex, it will search
 starting at the line given by &lt;start&gt;.</p></div>
 </li>
 <li>
@@ -846,15 +851,12 @@ starting at the line given by &lt;start&gt;.</p></div>
 <div class="paragraph"><p>This is only valid for &lt;end&gt; and will specify a number
 of lines before or after the line given by &lt;start&gt;.</p></div>
 </li>
-<li>
-<p>
-:regex
-</p>
-<div class="paragraph"><p>If the option&#8217;s argument is of the form :regex, it denotes the range
-from the first funcname line that matches &lt;regex&gt;, up to the next
-funcname line.</p></div>
-</li>
 </ul></div>
+<div class="paragraph"><p>If &#8220;:&lt;regex&gt;&#8221; is given in place of &lt;start&gt; and &lt;end&gt;, it denotes the range
+from the first funcname line that matches &lt;regex&gt;, up to the next
+funcname line. &#8220;:&lt;regex&gt;&#8221; searches from the end of the previous <code>-L</code> range,
+if any, otherwise from the start of file.
+&#8220;^:&lt;regex&gt;&#8221; searches from the start of file.</p></div>
 </dd>
 <dt class="hdlist1">
 -l
@@ -1169,7 +1171,9 @@ sort | uniq -c | sort -rn</code></pre>
 <div class="sectionbody">
 <div class="paragraph"><p>Unlike <em>git blame</em> and <em>git annotate</em> in older versions of git, the extent
 of the annotation can be limited to both line ranges and revision
-ranges.  When you are interested in finding the origin for
+ranges. The <code>-L</code> option, which limits annotation to a range of lines, may be
+specified multiple times.</p></div>
+<div class="paragraph"><p>When you are interested in finding the origin for
 lines 40-60 for file <code>foo</code>, you can use the <code>-L</code> option like so
 (they mean the same thing&#8201;&#8212;&#8201;both ask for 21 lines starting at
 line 40):</p></div>
@@ -1377,7 +1381,7 @@ the email address.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-09-09 15:34:20 PDT
 </div>
 </div>
 </body>

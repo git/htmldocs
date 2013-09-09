@@ -2291,10 +2291,50 @@ colon.</p><p class="simpara">In the long form, the leading colon <code class="li
 parenthesis <code class="literal">(</code>, a comma-separated list of zero or more "magic words",
 and a close parentheses <code class="literal">)</code>, and the remainder is the pattern to match
 against the path.</p><p class="simpara">The "magic signature" consists of an ASCII symbol that is not
-alphanumeric. Currently only the slash <code class="literal">/</code> is recognized as a
-"magic signature": it makes the pattern match from the root of
-the working tree, even when you are running the command from
-inside a subdirectory.</p><p class="simpara">A pathspec with only a colon means "there is no pathspec". This form
+alphanumeric.</p><div class="variablelist"><dl><dt><span class="term">
+top <code class="literal">/</code>
+</span></dt><dd>
+        The magic word <code class="literal">top</code> (mnemonic: <code class="literal">/</code>) makes the pattern match
+        from the root of the working tree, even when you are running
+        the command from inside a subdirectory.
+</dd><dt><span class="term">
+literal
+</span></dt><dd>
+        Wildcards in the pattern such as <code class="literal">*</code> or <code class="literal">?</code> are treated
+        as literal characters.
+</dd><dt><span class="term">
+icase
+</span></dt><dd>
+        Case insensitive match.
+</dd><dt><span class="term">
+glob
+</span></dt><dd><p class="simpara">
+        Git treats the pattern as a shell glob suitable for
+        consumption by fnmatch(3) with the FNM_PATHNAME flag:
+        wildcards in the pattern will not match a / in the pathname.
+        For example, "Documentation/*.html" matches
+        "Documentation/git.html" but not "Documentation/ppc/ppc.html"
+        or "tools/perf/Documentation/perf.html".
+</p><p class="simpara">Two consecutive asterisks ("<code class="literal">**</code>") in patterns matched against
+full pathname may have special meaning:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+A leading "<code class="literal">**</code>" followed by a slash means match in all
+   directories. For example, "<code class="literal">**/foo</code>" matches file or directory
+   "<code class="literal">foo</code>" anywhere, the same as pattern "<code class="literal">foo</code>". "**/foo/bar"
+   matches file or directory "<code class="literal">bar</code>" anywhere that is directly
+   under directory "<code class="literal">foo</code>".
+</li><li class="listitem">
+A trailing "/<span class="strong"><strong>" matches everything inside. For example,
+   "abc/</strong></span>" matches all files inside directory "abc", relative
+   to the location of the <code class="literal">.gitignore</code> file, with infinite depth.
+</li><li class="listitem">
+A slash followed by two consecutive asterisks then a slash
+   matches zero or more directories. For example, "<code class="literal">a/**/b</code>"
+   matches "<code class="literal">a/b</code>", "<code class="literal">a/x/b</code>", "<code class="literal">a/x/y/b</code>" and so on.
+</li><li class="listitem"><p class="simpara">
+Other consecutive asterisks are considered invalid.
+</p><p class="simpara">Glob magic is incompatible with literal magic.</p></li></ul></div></dd></dl></div><p class="simpara">Currently only the slash <code class="literal">/</code> is recognized as the "magic signature",
+but it is envisioned that we will support more types of magic in later
+versions of Git.</p><p class="simpara">A pathspec with only a colon means "there is no pathspec". This form
 should not be combined with other pathspec.</p></dd><dt><span class="term">
 <a name="def_parent"></a>parent
 </span></dt><dd>

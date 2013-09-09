@@ -752,6 +752,7 @@ git-config(1) Manual Page
 <em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get name [value_regex]
 <em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-all name [value_regex]
 <em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-regexp name_regex [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [type] [-z|--null] --get-urlmatch name URL
 <em>git config</em> [&lt;file-option&gt;] --unset name [value_regex]
 <em>git config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
 <em>git config</em> [&lt;file-option&gt;] --rename-section old_name new_name
@@ -884,6 +885,19 @@ you try to use an invalid regexp (ret=6).
         case-sensitive and done against a canonicalized version of the key
         in which section and variable names are lowercased, but subsection
         names are not.
+</p>
+</dd>
+<dt class="hdlist1">
+--get-urlmatch name URL
+</dt>
+<dd>
+<p>
+        When given a two-part name section.key, the value for
+        section.&lt;url&gt;.key whose &lt;url&gt; part matches the best to the
+        given URL is returned (if no such key exists, the value for
+        section.key is used as a fallback).  When given just the
+        section as name, do so for all the keys in the section and
+        list them.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1219,6 +1233,15 @@ GIT_CONFIG_NOSYSTEM
         gitproxy=proxy-command for kernel.org
         gitproxy=default-proxy ; for all the rest</code></pre>
 </div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>; HTTP
+[http]
+        sslVerify
+[http "https://weak.example.com"]
+        sslVerify = false
+        cookieFile = /tmp/cookie.txt</code></pre>
+</div></div>
 <div class="paragraph"><p>you can set the filemode to true with</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1289,6 +1312,18 @@ script:</p></div>
 WS=$(git config --get-color color.diff.whitespace "blue reverse")
 RESET=$(git config --get-color "" "reset")
 echo "${WS}your whitespace color or blue reverse${RESET}"</code></pre>
+</div></div>
+<div class="paragraph"><p>For URLs in <code>https://weak.example.com</code>, <code>http.sslVerify</code> is set to
+false, while it is set to <code>true</code> for all others:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>% git config --bool --get-urlmatch http.sslverify https://good.example.com
+true
+% git config --bool --get-urlmatch http.sslverify https://weak.example.com
+false
+% git config --get-urlmatch http https://weak.example.com
+http.cookiefile /tmp/cookie.txt
+http.sslverify false</code></pre>
 </div></div>
 </div>
 </div>
@@ -3437,6 +3472,15 @@ fetch.unpackLimit
 </p>
 </dd>
 <dt class="hdlist1">
+fetch.prune
+</dt>
+<dd>
+<p>
+        If true, fetch will automatically behave as if the <code>--prune</code>
+        option was given on the command line.  See also <code>remote.&lt;name&gt;.prune</code>.
+</p>
+</dd>
+<dt class="hdlist1">
 format.attach
 </dt>
 <dd>
@@ -4168,7 +4212,16 @@ http.cookiefile
         of the file to read cookies from should be plain HTTP headers or
         the Netscape/Mozilla cookie file format (see <a href="curl.html">curl(1)</a>).
         NOTE that the file specified with http.cookiefile is only used as
-        input. No cookies will be stored in the file.
+        input unless http.saveCookies is set.
+</p>
+</dd>
+<dt class="hdlist1">
+http.savecookies
+</dt>
+<dd>
+<p>
+        If set, store cookies received during requests to the file specified by
+        http.cookiefile. Has no effect if http.cookiefile is unset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4313,6 +4366,72 @@ http.useragent
         of common USER_AGENT strings (but not including those like git/1.7.1).
         Can be overridden by the <em>GIT_HTTP_USER_AGENT</em> environment variable.
 </p>
+</dd>
+<dt class="hdlist1">
+http.&lt;url&gt;.*
+</dt>
+<dd>
+<p>
+        Any of the http.* options above can be applied selectively to some urls.
+        For a config key to match a URL, each element of the config key is
+        compared to that of the URL, in the following order:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Scheme (e.g., <code>https</code> in <code>https://example.com/</code>). This field
+  must match exactly between the config key and the URL.
+</p>
+</li>
+<li>
+<p>
+Host/domain name (e.g., <code>example.com</code> in <code>https://example.com/</code>).
+  This field must match exactly between the config key and the URL.
+</p>
+</li>
+<li>
+<p>
+Port number (e.g., <code>8080</code> in <code>http://example.com:8080/</code>).
+  This field must match exactly between the config key and the URL.
+  Omitted port numbers are automatically converted to the correct
+  default for the scheme before matching.
+</p>
+</li>
+<li>
+<p>
+Path (e.g., <code>repo.git</code> in <code>https://example.com/repo.git</code>). The
+  path field of the config key must match the path field of the URL
+  either exactly or as a prefix of slash-delimited path elements.  This means
+  a config key with path <code>foo/</code> matches URL path <code>foo/bar</code>.  A prefix can only
+  match on a slash (<code>/</code>) boundary.  Longer matches take precedence (so a config
+  key with path <code>foo/bar</code> is a better match to URL path <code>foo/bar</code> than a config
+  key with just path <code>foo/</code>).
+</p>
+</li>
+<li>
+<p>
+User name (e.g., <code>user</code> in <code>https://user@example.com/repo.git</code>). If
+  the config key has a user name it must match the user name in the
+  URL exactly. If the config key does not have a user name, that
+  config key will match a URL with any user name (including none),
+  but at a lower precedence than a config key with a user name.
+</p>
+</li>
+</ol></div>
+</div></div>
+<div class="paragraph"><p>The list above is ordered by decreasing precedence; a URL that matches
+a config key&#8217;s path is preferred to one that matches its user name. For example,
+if the URL is <code>https://user@example.com/foo/bar</code> a config key match of
+<code>https://example.com/foo</code> will be preferred over a config key match of
+<code>https://user@example.com</code>.</p></div>
+<div class="paragraph"><p>All URLs are normalized before attempting any matching (the password part,
+if embedded in the URL, is always ignored for matching purposes) so that
+equivalent urls that are simply spelled differently will match properly.
+Environment variable settings always override any matches.  The urls that are
+matched against are those given directly to Git commands.  This means any URLs
+visited as a result of a redirection do not participate in matching.</p></div>
 </dd>
 <dt class="hdlist1">
 i18n.commitEncoding
@@ -5398,6 +5517,17 @@ remote.&lt;name&gt;.vcs
 </p>
 </dd>
 <dt class="hdlist1">
+remote.&lt;name&gt;.prune
+</dt>
+<dd>
+<p>
+        When set to true, fetching from this remote by default will also
+        remove any remote-tracking branches which no longer exist on the
+        remote (as if the <code>--prune</code> option was give on the command line).
+        Overrides <code>fetch.prune</code> settings, if any.
+</p>
+</dd>
+<dt class="hdlist1">
 remotes.&lt;group&gt;
 </dt>
 <dd>
@@ -5875,7 +6005,7 @@ web.browser
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-09-09 15:34:20 PDT
 </div>
 </div>
 </body>
