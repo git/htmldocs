@@ -746,7 +746,7 @@ git-update-ref(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git update-ref</em> [-m &lt;reason&gt;] (-d &lt;ref&gt; [&lt;oldvalue&gt;] | [--no-deref] &lt;ref&gt; &lt;newvalue&gt; [&lt;oldvalue&gt;])</pre>
+<pre class="content"><em>git update-ref</em> [-m &lt;reason&gt;] (-d &lt;ref&gt; [&lt;oldvalue&gt;] | [--no-deref] &lt;ref&gt; &lt;newvalue&gt; [&lt;oldvalue&gt;] | --stdin [-z])</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -795,6 +795,85 @@ ref symlink to some other tree, if you have copied a whole
 archive by creating a symlink tree).</p></div>
 <div class="paragraph"><p>With <code>-d</code> flag, it deletes the named &lt;ref&gt; after verifying it
 still contains &lt;oldvalue&gt;.</p></div>
+<div class="paragraph"><p>With <code>--stdin</code>, update-ref reads instructions from standard input and
+performs all modifications together.  Specify commands of the form:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>update SP &lt;ref&gt; SP &lt;newvalue&gt; [SP &lt;oldvalue&gt;] LF
+create SP &lt;ref&gt; SP &lt;newvalue&gt; LF
+delete SP &lt;ref&gt; [SP &lt;oldvalue&gt;] LF
+verify SP &lt;ref&gt; [SP &lt;oldvalue&gt;] LF
+option SP &lt;opt&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>Quote fields containing whitespace as if they were strings in C source
+code.  Alternatively, use <code>-z</code> to specify commands without quoting:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>update SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL [&lt;oldvalue&gt;] NUL
+create SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL
+delete SP &lt;ref&gt; NUL [&lt;oldvalue&gt;] NUL
+verify SP &lt;ref&gt; NUL [&lt;oldvalue&gt;] NUL
+option SP &lt;opt&gt; NUL</code></pre>
+</div></div>
+<div class="paragraph"><p>Lines of any other format or a repeated &lt;ref&gt; produce an error.
+Command meanings are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+update
+</dt>
+<dd>
+<p>
+        Set &lt;ref&gt; to &lt;newvalue&gt; after verifying &lt;oldvalue&gt;, if given.
+        Specify a zero &lt;newvalue&gt; to ensure the ref does not exist
+        after the update and/or a zero &lt;oldvalue&gt; to make sure the
+        ref does not exist before the update.
+</p>
+</dd>
+<dt class="hdlist1">
+create
+</dt>
+<dd>
+<p>
+        Create &lt;ref&gt; with &lt;newvalue&gt; after verifying it does not
+        exist.  The given &lt;newvalue&gt; may not be zero.
+</p>
+</dd>
+<dt class="hdlist1">
+delete
+</dt>
+<dd>
+<p>
+        Delete &lt;ref&gt; after verifying it exists with &lt;oldvalue&gt;, if
+        given.  If given, &lt;oldvalue&gt; may not be zero.
+</p>
+</dd>
+<dt class="hdlist1">
+verify
+</dt>
+<dd>
+<p>
+        Verify &lt;ref&gt; against &lt;oldvalue&gt; but do not change it.  If
+        &lt;oldvalue&gt; zero or missing, the ref must not exist.
+</p>
+</dd>
+<dt class="hdlist1">
+option
+</dt>
+<dd>
+<p>
+        Modify behavior of the next command naming a &lt;ref&gt;.
+        The only valid option is <code>no-deref</code> to avoid dereferencing
+        a symbolic ref.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Use 40 "0" or the empty string to specify a zero value, except that
+with <code>-z</code> an empty &lt;oldvalue&gt; is considered missing.</p></div>
+<div class="paragraph"><p>If all &lt;ref&gt;s can be locked with matching &lt;oldvalue&gt;s
+simultaneously, all modifications are performed.  Otherwise, no
+modifications are performed.  Note that while each individual
+&lt;ref&gt; is updated or deleted atomically, a concurrent reader may
+still see a subset of the modifications.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -842,7 +921,7 @@ or does not have committer information available.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-09-20 14:03:14 PDT
 </div>
 </div>
 </body>
