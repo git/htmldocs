@@ -3078,7 +3078,11 @@ diff.ignoreSubmodules
         Sets the default value of --ignore-submodules. Note that this
         affects only <em>git diff</em> Porcelain, and not lower level <em>diff</em>
         commands such as <em>git diff-files</em>. <em>git checkout</em> also honors
-        this setting when reporting uncommitted changes.
+        this setting when reporting uncommitted changes. Setting it to
+        <em>all</em> disables the submodule summary normally shown by <em>git commit</em>
+        and <em>git status</em> when <em>status.submodulesummary</em> is set unless it is
+        overridden by using the --ignore-submodules command line option.
+        The <em>git submodule</em> commands are not affected by this setting.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3281,6 +3285,11 @@ codecompare
 <li>
 <p>
 deltawalker
+</p>
+</li>
+<li>
+<p>
+diffmerge
 </p>
 </li>
 <li>
@@ -4764,6 +4773,11 @@ deltawalker
 </li>
 <li>
 <p>
+diffmerge
+</p>
+</li>
+<li>
+<p>
 diffuse
 </p>
 </li>
@@ -5807,7 +5821,14 @@ status.submodulesummary
         If this is set to a non zero number or true (identical to -1 or an
         unlimited number), the submodule summary will be enabled and a
         summary of commits for modified submodules will be shown (see
-        --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>).
+        --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>). Please note
+        that the summary output command will be suppressed for all
+        submodules when <code>diff.ignoreSubmodules</code> is set to <em>all</em> or only
+        for those submodules where <code>submodule.&lt;name&gt;.ignore=all</code>. To
+        also view the summary for ignored submodules you can either use
+        the --ignore-submodules=dirty command line option or the <em>git
+        submodule summary</em> command, which shows a similar output but does
+        not honor these settings.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5866,7 +5887,8 @@ submodule.&lt;name&gt;.ignore
         submodules that have untracked files in their work tree as changed.
         This setting overrides any setting made in .gitmodules for this submodule,
         both settings can be overridden on the command line by using the
-        "--ignore-submodules" option.
+        "--ignore-submodules" option. The <em>git submodule</em> commands are not
+        affected by this setting.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6011,11 +6033,11 @@ user.signingkey
 </dt>
 <dd>
 <p>
-        If <a href="git-tag.html">git-tag(1)</a> is not selecting the key you want it to
-        automatically when creating a signed tag, you can override the
-        default selection with this variable.  This option is passed
-        unchanged to gpg&#8217;s --local-user parameter, so you may specify a key
-        using any method that gpg supports.
+        If <a href="git-tag.html">git-tag(1)</a> or <a href="git-commit.html">git-commit(1)</a> is not selecting the
+        key you want it to automatically when creating a signed tag or
+        commit, you can override the default selection with this variable.
+        This option is passed unchanged to gpg&#8217;s --local-user parameter,
+        so you may specify a key using any method that gpg supports.
 </p>
 </dd>
 <dt class="hdlist1">

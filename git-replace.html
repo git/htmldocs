@@ -760,7 +760,11 @@ git-replace(1) Manual Page
 <div class="paragraph"><p>The name of the <em>replace</em> reference is the SHA-1 of the object that is
 replaced. The content of the <em>replace</em> reference is the SHA-1 of the
 replacement object.</p></div>
+<div class="paragraph"><p>The replaced object and the replacement object must be of the same type.
+This restriction can be bypassed using <code>-f</code>.</p></div>
 <div class="paragraph"><p>Unless <code>-f</code> is given, the <em>replace</em> reference must not yet exist.</p></div>
+<div class="paragraph"><p>There is no other restriction on the replaced and replacement objects.
+Merge commits can be replaced by non-merge commits and vice versa.</p></div>
 <div class="paragraph"><p>Replacement references will be used by default by all Git commands
 except those doing reachability traversal (prune, pack transfer and
 fsck).</p></div>
@@ -788,6 +792,9 @@ achieve the same effect as the <code>--no-replace-objects</code> option.</p></di
 <dt class="hdlist1">
 -f
 </dt>
+<dt class="hdlist1">
+--force
+</dt>
 <dd>
 <p>
         If an existing replace ref for the same object exists, it will
@@ -797,6 +804,9 @@ achieve the same effect as the <code>--no-replace-objects</code> option.</p></di
 <dt class="hdlist1">
 -d
 </dt>
+<dt class="hdlist1">
+--delete
+</dt>
 <dd>
 <p>
         Delete existing replace refs for the given objects.
@@ -804,6 +814,9 @@ achieve the same effect as the <code>--no-replace-objects</code> option.</p></di
 </dd>
 <dt class="hdlist1">
 -l &lt;pattern&gt;
+</dt>
+<dt class="hdlist1">
+--list &lt;pattern&gt;
 </dt>
 <dd>
 <p>
@@ -817,6 +830,19 @@ achieve the same effect as the <code>--no-replace-objects</code> option.</p></di
 </div>
 </div>
 <div class="sect1">
+<h2 id="_creating_replacement_objects">CREATING REPLACEMENT OBJECTS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><a href="git-filter-branch.html">git-filter-branch(1)</a>, <a href="git-hash-object.html">git-hash-object(1)</a> and
+<a href="git-rebase.html">git-rebase(1)</a>, among other git commands, can be used to create
+replacement objects from existing objects.</p></div>
+<div class="paragraph"><p>If you want to replace many blobs, trees or commits that are part of a
+string of commits, you may just want to create a replacement string of
+commits and then only replace the commit at the tip of the target
+string of commits with the commit at the tip of the replacement string
+of commits.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Comparing blobs or trees that have been replaced with those that
@@ -824,15 +850,16 @@ replace them will not work properly. And using <code>git reset --hard</code> to
 go back to a replaced commit will move the branch to the replacement
 commit instead of the replaced commit.</p></div>
 <div class="paragraph"><p>There may be other problems when using <em>git rev-list</em> related to
-pending objects. And of course things may break if an object of one
-type is replaced by an object of another type (for example a blob
-replaced by a commit).</p></div>
+pending objects.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><a href="git-tag.html">git-tag(1)</a>
+<div class="paragraph"><p><a href="git-hash-object.html">git-hash-object(1)</a>
+<a href="git-filter-branch.html">git-filter-branch(1)</a>
+<a href="git-rebase.html">git-rebase(1)</a>
+<a href="git-tag.html">git-tag(1)</a>
 <a href="git-branch.html">git-branch(1)</a>
 <a href="git.html">git(1)</a></p></div>
 </div>
@@ -847,7 +874,7 @@ replaced by a commit).</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-10-15 11:39:58 PDT
 </div>
 </div>
 </body>
