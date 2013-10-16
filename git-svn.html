@@ -886,9 +886,27 @@ Subversion updated from Git by the <em>dcommit</em> command.</p></div>
         trailing slash, so be sure you include one in the
         argument if that is what you want.  If --branches/-b is
         specified, the prefix must include a trailing slash.
-        Setting a prefix is useful if you wish to track multiple
-        projects that share a common repository.
+        Setting a prefix (with a trailing slash) is strongly
+        encouraged in any case, as your SVN-tracking refs will
+        then be located at "refs/remotes/$prefix/<strong>", which is
+        compatible with Git&#8217;s own remote-tracking ref layout
+        (refs/remotes/$remote/</strong>). Setting a prefix is also useful
+        if you wish to track multiple projects that share a common
+        repository.
 </p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">In Git v2.0, the default prefix will CHANGE from "" (no prefix)
+to "origin/". This is done to put SVN-tracking refs at
+"refs/remotes/origin/<strong>" instead of "refs/remotes/</strong>", and make them
+more compatible with how Git&#8217;s own remote-tracking refs are organized
+(i.e. refs/remotes/$remote/*). You can enjoy the same benefits today,
+by using the --prefix option.</td>
+</tr></table>
+</div>
 </dd>
 <dt class="hdlist1">
 --ignore-paths=&lt;regex&gt;
@@ -936,9 +954,11 @@ Subversion updated from Git by the <em>dcommit</em> command.</p></div>
 <p>
         Fetch unfetched revisions from the Subversion remote we are
         tracking.  The name of the [svn-remote "&#8230;"] section in the
-        .git/config file may be specified as an optional command-line
-        argument.
+        $GIT_DIR/config file may be specified as an optional
+        command-line argument.
 </p>
+<div class="paragraph"><p>This automatically updates the rev_map if needed (see
+<em>$GIT_DIR/svn/**/.rev_map.*</em> in the FILES section below for details).</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 --localtime
@@ -1087,6 +1107,8 @@ accept.  However, <em>--fetch-all</em> only fetches from the current
 [svn-remote], and not all [svn-remote] definitions.</p></div>
 <div class="paragraph"><p>Like <em>git rebase</em>; this requires that the working tree be clean
 and have no uncommitted changes.</p></div>
+<div class="paragraph"><p>This automatically updates the rev_map if needed (see
+<em>$GIT_DIR/svn/**/.rev_map.*</em> in the FILES section below for details).</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 -l
@@ -1535,8 +1557,8 @@ environment). This command has the same behaviour.</td>
 </dt>
 <dd>
 <p>
-        Compress $GIT_DIR/svn/&lt;refname&gt;/unhandled.log files in .git/svn
-        and remove $GIT_DIR/svn/&lt;refname&gt;index files in .git/svn.
+        Compress $GIT_DIR/svn/&lt;refname&gt;/unhandled.log files and remove
+        $GIT_DIR/svn/&lt;refname&gt;/index files.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1554,9 +1576,10 @@ environment). This command has the same behaviour.</td>
         file cannot be ignored forever (with --ignore-paths) the only
         way to repair the repo is to use <em>reset</em>.
 </p>
-<div class="paragraph"><p>Only the rev_map and refs/remotes/git-svn are changed.  Follow <em>reset</em>
-with a <em>fetch</em> and then <em>git reset</em> or <em>git rebase</em> to move local
-branches onto the new tree.</p></div>
+<div class="paragraph"><p>Only the rev_map and refs/remotes/git-svn are changed (see
+<em>$GIT_DIR/svn/**/.rev_map.*</em> in the FILES section below for details).
+Follow <em>reset</em> with a <em>fetch</em> and then <em>git reset</em> or <em>git rebase</em> to
+move local branches onto the new tree.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 -r &lt;n&gt;
@@ -1940,7 +1963,7 @@ svn-remote.&lt;name&gt;.noMetadata
 </p>
 <div class="paragraph"><p>This option can only be used for one-shot imports as <em>git svn</em>
 will not be able to fetch again without metadata. Additionally,
-if you lose your .git/svn/<strong>*/.rev_map.</strong> files, <em>git svn</em> will not
+if you lose your <em>$GIT_DIR/svn/**/.rev_map.*</em> files, <em>git svn</em> will not
 be able to rebuild them.</p></div>
 <div class="paragraph"><p>The <em>git svn log</em> command will not work on repositories using
 this, either.  Using this conflicts with the <em>useSvmProps</em>
@@ -2099,16 +2122,16 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code># Clone a repo with standard SVN directory layout (like git clone):
-        git svn clone http://svn.example.com/project --stdlayout
+        git svn clone http://svn.example.com/project --stdlayout --prefix svn/
 # Or, if the repo uses a non-standard directory layout:
-        git svn clone http://svn.example.com/project -T tr -b branch -t tag
+        git svn clone http://svn.example.com/project -T tr -b branch -t tag --prefix svn/
 # View all branches and tags you have cloned:
         git branch -r
 # Create a new branch in SVN
     git svn branch waldo
 # Reset your master to trunk (or any other branch, replacing 'trunk'
 # with the appropriate name):
-        git reset --hard remotes/trunk
+        git reset --hard svn/trunk
 # You may only dcommit to one branch/tag/trunk at a time.  The usage
 # of dcommit/rebase/show-ignore should be the same as above.</code></pre>
 </div></div>
@@ -2121,7 +2144,7 @@ have each person clone that repository with <em>git clone</em>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code># Do the initial import on a server
-        ssh server "cd /pub &amp;&amp; git svn clone http://svn.example.com/project
+        ssh server "cd /pub &amp;&amp; git svn clone http://svn.example.com/project [options...]"
 # Clone locally - make sure the refs/remotes/ space matches the server
         mkdir project
         cd project
@@ -2134,8 +2157,9 @@ have each person clone that repository with <em>git clone</em>:</p></div>
         git config --remove-section remote.origin
 # Create a local branch from one of the branches just fetched
         git checkout -b master FETCH_HEAD
-# Initialize 'git svn' locally (be sure to use the same URL and -T/-b/-t options as were used on server)
-        git svn init http://svn.example.com/project
+# Initialize 'git svn' locally (be sure to use the same URL and
+# --stdlayout/-T/-b/-t/--prefix options as were used on server)
+        git svn init http://svn.example.com/project [options...]
 # Pull the latest changes from Subversion
         git svn rebase</code></pre>
 </div></div>
@@ -2263,12 +2287,21 @@ required, it is easiest to only clone one directory (typically trunk),
 without giving any repository layout options.  If the full history with
 branches and tags is required, the options <em>--trunk</em> / <em>--branches</em> /
 <em>--tags</em> must be used.</p></div>
+<div class="paragraph"><p>When using the options for describing the repository layout (--trunk,
+--tags, --branches, --stdlayout), please also specify the --prefix
+option (e.g. <em>--prefix=origin/</em>) to cause your SVN-tracking refs to be
+placed at refs/remotes/origin/* rather than the default refs/remotes/<strong>.
+The former is more compatible with the layout of Git&#8217;s "regular"
+remote-tracking refs (refs/remotes/$remote/</strong>), and may potentially
+prevent similarly named SVN branches and Git remotes from clobbering
+each other. In Git v2.0 the default prefix used (i.e. when no --prefix
+is given) will change from "" (no prefix) to "origin/".</p></div>
 <div class="paragraph"><p>When using multiple --branches or --tags, <em>git svn</em> does not automatically
 handle name collisions (for example, if two branches from different paths have
 the same name, or if a branch and a tag have the same name).  In these cases,
 use <em>init</em> to set up your Git repository then, before your first <em>fetch</em>, edit
-the .git/config file so that the branches and tags are associated with
-different name spaces.  For example:</p></div>
+the $GIT_DIR/config file so that the branches and tags are associated
+with different name spaces.  For example:</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>branches = stable/*:refs/remotes/svn/stable/*
@@ -2298,7 +2331,7 @@ and imports all SVN tags as branches, prefixing the tag name with <em>tags/</em>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><em>git svn</em> stores [svn-remote] configuration information in the
-repository .git/config file.  It is similar the core Git
+repository $GIT_DIR/config file.  It is similar the core Git
 [remote] sections except <em>fetch</em> keys do not accept glob
 arguments; but they are instead handled by the <em>branches</em>
 and <em>tags</em> keys.  Since some SVN repositories are oddly
@@ -2325,8 +2358,8 @@ comma-separated list of names within braces. For example:</p></div>
 <pre><code>[svn-remote "huge-project"]
         url = http://server.org/svn
         fetch = trunk/src:refs/remotes/trunk
-        branches = branches/{red,green}/src:refs/remotes/branches/*
-        tags = tags/{1.0,2.0}/src:refs/remotes/tags/*</code></pre>
+        branches = branches/{red,green}/src:refs/remotes/project-a/branches/*
+        tags = tags/{1.0,2.0}/src:refs/remotes/project-a/tags/*</code></pre>
 </div></div>
 <div class="paragraph"><p>Multiple fetch, branches, and tags keys are supported:</p></div>
 <div class="listingblock">
@@ -2347,8 +2380,30 @@ location to use using the -d or --destination flag:</p></div>
 </div></div>
 <div class="paragraph"><p>Note that git-svn keeps track of the highest revision in which a branch
 or tag has appeared. If the subset of branches or tags is changed after
-fetching, then .git/svn/.metadata must be manually edited to remove (or
-reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
+fetching, then $GIT_DIR/svn/.metadata must be manually edited to remove
+(or reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_files">FILES</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+$GIT_DIR/svn/**/.rev_map.*
+</dt>
+<dd>
+<p>
+        Mapping between Subversion revision numbers and Git commit
+        names.  In a repository where the noMetadata option is not set,
+        this can be rebuilt from the git-svn-id: lines that are at the
+        end of every commit (see the <em>svn.noMetadata</em> section above for
+        details).
+</p>
+<div class="paragraph"><p><em>git svn fetch</em> and <em>git svn rebase</em> automatically update the rev_map
+if it is missing or not up to date.  <em>git svn reset</em> automatically
+rewinds it.</p></div>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
@@ -2367,7 +2422,7 @@ reset) branches-maxRev and/or tags-maxRev as appropriate.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-10-16 14:11:04 PDT
 </div>
 </div>
 </body>
