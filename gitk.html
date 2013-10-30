@@ -746,7 +746,7 @@ gitk(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>gitk</em> [&lt;option&gt;&#8230;] [&lt;revs&gt;] [--] [&lt;path&gt;&#8230;]</pre>
+<pre class="content"><em>gitk</em> [&lt;options&gt;] [&lt;revision range&gt;] [--] [&lt;path&gt;&#8230;]</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -757,28 +757,48 @@ gitk(1) Manual Page
 <div class="paragraph"><p>Displays changes in a repository or a selected set of commits. This includes
 visualizing the commit graph, showing information related to each commit, and
 the files in the trees of each revision.</p></div>
-<div class="paragraph"><p>Historically, gitk was the first repository browser. It&#8217;s written in tcl/tk
-and started off in a separate repository but was later merged into the main
-Git repository.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>To control which revisions to show, the command takes options applicable to
-the <em>git rev-list</em> command (see <a href="git-rev-list.html">git-rev-list(1)</a>).
-This manual page describes only the most
-frequently used options.</p></div>
+<div class="paragraph"><p>To control which revisions to show, gitk supports most options
+applicable to the <em>git rev-list</em> command.  It also supports a few
+options applicable to the <em>git diff-*</em> commands to control how the
+changes each commit introduces are shown.  Finally, it supports some
+gitk-specific options.</p></div>
+<div class="paragraph"><p>gitk generally only understands options with arguments in the
+<em>sticked</em> form (see <a href="gitcli.html">gitcli(7)</a>) due to limitations in the
+command line parser.</p></div>
+<div class="sect2">
+<h3 id="_rev_list_options_and_arguments">rev-list options and arguments</h3>
+<div class="paragraph"><p>This manual page describes only the most frequently used options.  See
+<a href="git-rev-list.html">git-rev-list(1)</a> for a complete list.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
--n &lt;number&gt;
-</dt>
-<dt class="hdlist1">
---max-count=&lt;number&gt;
+--all
 </dt>
 <dd>
 <p>
-        Limits the number of commits to show.
+        Show all refs (branches, tags, etc.).
+</p>
+</dd>
+<dt class="hdlist1">
+--branches[=&lt;pattern&gt;]
+</dt>
+<dt class="hdlist1">
+--tags[=&lt;pattern&gt;]
+</dt>
+<dt class="hdlist1">
+--remotes[=&lt;pattern&gt;]
+</dt>
+<dd>
+<p>
+        Pretend as if all the branches (tags, remote branches, resp.)
+        are listed on the command line as <em>&lt;commit&gt;</em>. If <em>&lt;pattern&gt;</em>
+        is given, limit refs to ones matching given shell glob. If
+        pattern lacks <em>?</em>, <em>&#42;</em>, or <em>[</em>, <em>/&#42;</em> at the
+        end is implied.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -798,11 +818,11 @@ frequently used options.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---all
+--date-order
 </dt>
 <dd>
 <p>
-        Show all branches.
+        Sort commits by date when possible.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -817,28 +837,53 @@ frequently used options.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---argscmd=&lt;command&gt;
+--left-right
 </dt>
 <dd>
 <p>
-        Command to be run each time gitk has to determine the list of
-        &lt;revs&gt; to show.  The command is expected to print on its standard
-        output a list of additional revs to be shown, one per line.
-        Use this instead of explicitly specifying &lt;revs&gt; if the set of
-        commits to show may vary between refreshes.
+        Mark which side of a symmetric diff a commit is reachable
+        from.  Commits from the left side are prefixed with a <code>&lt;</code>
+        symbol and those from the right with a <code>&gt;</code> symbol.
 </p>
 </dd>
 <dt class="hdlist1">
---select-commit=&lt;ref&gt;
+--full-history
 </dt>
 <dd>
 <p>
-        Automatically select the specified commit after loading the graph.
-        Default behavior is equivalent to specifying <em>--select-commit=HEAD</em>.
+        When filtering history with <em>&lt;path&gt;&#8230;</em>, does not prune some
+        history.  (See "History simplification" in <a href="git-log.html">git-log(1)</a>
+        for a more detailed explanation.)
 </p>
 </dd>
 <dt class="hdlist1">
-&lt;revs&gt;
+--simplify-merges
+</dt>
+<dd>
+<p>
+        Additional option to <em>--full-history</em> to remove some needless
+        merges from the resulting history, as there are no selected
+        commits contributing to this merge.  (See "History
+        simplification" in <a href="git-log.html">git-log(1)</a> for a more detailed
+        explanation.)
+</p>
+</dd>
+<dt class="hdlist1">
+--ancestry-path
+</dt>
+<dd>
+<p>
+        When given a range of commits to display
+        (e.g. <em>commit1..commit2</em> or <em>commit2 &#94;commit1</em>), only
+        display commits that exist directly on the ancestry chain
+        between the <em>commit1</em> and <em>commit2</em>, i.e. commits that are
+        both descendants of <em>commit1</em>, and ancestors of <em>commit2</em>.
+        (See "History simplification" in <a href="git-log.html">git-log(1)</a> for a more
+        detailed explanation.)
+</p>
+</dd>
+<dt class="hdlist1">
+&lt;revision range&gt;
 </dt>
 <dd>
 <p>
@@ -861,6 +906,34 @@ frequently used options.</p></div>
 </p>
 </dd>
 </dl></div>
+</div>
+<div class="sect2">
+<h3 id="_gitk_specific_options">gitk-specific options</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--argscmd=&lt;command&gt;
+</dt>
+<dd>
+<p>
+        Command to be run each time gitk has to determine the revision
+        range to show.  The command is expected to print on its
+        standard output a list of additional revisions to be shown,
+        one per line.  Use this instead of explicitly specifying a
+        <em>&lt;revision range&gt;</em> if the set of commits to show may vary
+        between refreshes.
+</p>
+</dd>
+<dt class="hdlist1">
+--select-commit=&lt;ref&gt;
+</dt>
+<dd>
+<p>
+        Select the specified commit after loading the graph.
+        Default behavior is equivalent to specifying <em>--select-commit=HEAD</em>.
+</p>
+</dd>
+</dl></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -906,6 +979,14 @@ such as display options, font, and colors.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_history">History</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Gitk was the first graphical repository browser. It&#8217;s written in
+tcl/tk and started off in a separate repository but was later merged
+into the main Git repository.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -948,7 +1029,7 @@ such as display options, font, and colors.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-10-30 14:54:47 PDT
 </div>
 </div>
 </body>
