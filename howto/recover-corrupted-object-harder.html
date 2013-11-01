@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.8" />
-<title>git-web&#45;&#45;browse(1)</title>
+<title>How to recover an object from scratch</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -729,238 +729,229 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="manpage">
+<body class="article">
 <div id="header">
-<h1>
-git-web&#45;&#45;browse(1) Manual Page
-</h1>
-<h2>NAME</h2>
-<div class="sectionbody">
-<p>git-web--browse -
-   Git helper script to launch a web browser
-</p>
-</div>
+<h1>How to recover an object from scratch</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_synopsis">SYNOPSIS</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="verseblock">
-<pre class="content"><em>git web&#45;&#45;browse</em> [OPTIONS] URL/FILE &#8230;</pre>
-<div class="attribution">
+<div class="paragraph"><p>I was recently presented with a repository with a corrupted packfile,
+and was asked if the data was recoverable. This post-mortem describes
+the steps I took to investigate and fix the problem. I thought others
+might find the process interesting, and it might help somebody in the
+same situation.</p></div>
+<div class="sidebarblock">
+<div class="content">
+<div class="paragraph"><p>Note: In this case, no good copy of the repository was available. For
+the much easier case where you can get the corrupted object from
+elsewhere, see <a href="recover-corrupted-blob-object.html">this howto</a>.</p></div>
 </div></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_description">DESCRIPTION</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>This script tries, as much as possible, to display the URLs and FILEs
-that are passed as arguments, as HTML pages in new tabs on an already
-opened web browser.</p></div>
-<div class="paragraph"><p>The following browsers (or commands) are currently supported:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-firefox (this is the default under X Window when not using KDE)
-</p>
-</li>
-<li>
-<p>
-iceweasel
-</p>
-</li>
-<li>
-<p>
-seamonkey
-</p>
-</li>
-<li>
-<p>
-iceape
-</p>
-</li>
-<li>
-<p>
-chromium (also supported as chromium-browser)
-</p>
-</li>
-<li>
-<p>
-google-chrome (also supported as chrome)
-</p>
-</li>
-<li>
-<p>
-konqueror (this is the default under KDE, see <em>Note about konqueror</em> below)
-</p>
-</li>
-<li>
-<p>
-opera
-</p>
-</li>
-<li>
-<p>
-w3m (this is the default outside graphical environments)
-</p>
-</li>
-<li>
-<p>
-elinks
-</p>
-</li>
-<li>
-<p>
-links
-</p>
-</li>
-<li>
-<p>
-lynx
-</p>
-</li>
-<li>
-<p>
-dillo
-</p>
-</li>
-<li>
-<p>
-open (this is the default under Mac OS X GUI)
-</p>
-</li>
-<li>
-<p>
-start (this is the default under MinGW)
-</p>
-</li>
-<li>
-<p>
-cygstart (this is the default under Cygwin)
-</p>
-</li>
-<li>
-<p>
-xdg-open
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Custom commands may also be specified.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_options">OPTIONS</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
--b &lt;browser&gt;
-</dt>
-<dt class="hdlist1">
---browser=&lt;browser&gt;
-</dt>
-<dd>
-<p>
-        Use the specified browser. It must be in the list of supported
-        browsers.
-</p>
-</dd>
-<dt class="hdlist1">
--t &lt;browser&gt;
-</dt>
-<dt class="hdlist1">
---tool=&lt;browser&gt;
-</dt>
-<dd>
-<p>
-        Same as above.
-</p>
-</dd>
-<dt class="hdlist1">
--c &lt;conf.var&gt;
-</dt>
-<dt class="hdlist1">
---config=&lt;conf.var&gt;
-</dt>
-<dd>
-<p>
-        CONF.VAR is looked up in the Git config files. If it&#8217;s set,
-        then its value specifies the browser that should be used.
-</p>
-</dd>
-</dl></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_configuration_variables">CONFIGURATION VARIABLES</h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_conf_var_from_c_option_and_web_browser">CONF.VAR (from -c option) and web.browser</h3>
-<div class="paragraph"><p>The web browser can be specified using a configuration variable passed
-with the -c (or --config) command line option, or the <em>web.browser</em>
-configuration variable if the former is not used.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_browser_lt_tool_gt_path">browser.&lt;tool&gt;.path</h3>
-<div class="paragraph"><p>You can explicitly provide a full path to your preferred browser by
-setting the configuration variable <em>browser.&lt;tool&gt;.path</em>. For example,
-you can configure the absolute path to firefox by setting
-<em>browser.firefox.path</em>. Otherwise, <em>git web&#45;&#45;browse</em> assumes the tool
-is available in PATH.</p></div>
-</div>
-<div class="sect2">
-<h3 id="_browser_lt_tool_gt_cmd">browser.&lt;tool&gt;.cmd</h3>
-<div class="paragraph"><p>When the browser, specified by options or configuration variables, is
-not among the supported ones, then the corresponding
-<em>browser.&lt;tool&gt;.cmd</em> configuration variable will be looked up. If this
-variable exists then <em>git web&#45;&#45;browse</em> will treat the specified tool
-as a custom command and will use a shell eval to run the command with
-the URLs passed as arguments.</p></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_note_about_konqueror">Note about konqueror</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>When <em>konqueror</em> is specified by a command line option or a
-configuration variable, we launch <em>kfmclient</em> to try to open the HTML
-man page on an already opened konqueror in a new tab if possible.</p></div>
-<div class="paragraph"><p>For consistency, we also try such a trick if <em>browser.konqueror.path</em> is
-set to something like <em>A_PATH_TO/konqueror</em>. That means we will try to
-launch <em>A_PATH_TO/kfmclient</em> instead.</p></div>
-<div class="paragraph"><p>If you really want to use <em>konqueror</em>, then you can use something like
-the following:</p></div>
+<div class="paragraph"><p>I started with an fsck, which found a problem with exactly one object
+(I&#8217;ve used $pack and $obj below to keep the output readable, and also
+because I&#8217;ll refer to them later):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        [web]
-                browser = konq
+<pre><code>    $ git fsck
+    error: $pack SHA1 checksum mismatch
+    error: index CRC mismatch for object $obj from $pack at offset 51653873
+    error: inflate: data stream error (incorrect data check)
+    error: cannot unpack $obj from $pack at offset 51653873</code></pre>
+</div></div>
+<div class="paragraph"><p>The pack checksum failing means a byte is munged somewhere, and it is
+presumably in the object mentioned (since both the index checksum and
+zlib were failing).</p></div>
+<div class="paragraph"><p>Reading the zlib source code, I found that "incorrect data check" means
+that the adler-32 checksum at the end of the zlib data did not match the
+inflated data. So stepping the data through zlib would not help, as it
+did not fail until the very end, when we realize the crc does not match.
+The problematic bytes could be anywhere in the object data.</p></div>
+<div class="paragraph"><p>The first thing I did was pull the broken data out of the packfile. I
+needed to know how big the object was, which I found out with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>    $ git show-index &lt;$idx | cut -d' ' -f1 | sort -n | grep -A1 51653873
+    51653873
+    51664736</code></pre>
+</div></div>
+<div class="paragraph"><p>Show-index gives us the list of objects and their offsets. We throw away
+everything but the offsets, and then sort them so that our interesting
+offset (which we got from the fsck output above) is followed immediately
+by the offset of the next object. Now we know that the object data is
+10863 bytes long, and we can grab it with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>  dd if=$pack of=object bs=1 skip=51653873 count=10863</code></pre>
+</div></div>
+<div class="paragraph"><p>I inspected a hexdump of the data, looking for any obvious bogosity
+(e.g., a 4K run of zeroes would be a good sign of filesystem
+corruption). But everything looked pretty reasonable.</p></div>
+<div class="paragraph"><p>Note that the "object" file isn&#8217;t fit for feeding straight to zlib; it
+has the git packed object header, which is variable-length. We want to
+strip that off so we can start playing with the zlib data directly. You
+can either work your way through it manually (the format is described in
+<a href="../technical/pack-format.html">Documentation/technical/pack-format.txt</a>),
+or you can walk through it in a debugger. I did the latter, creating a
+valid pack like:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>    # pack magic and version
+    printf 'PACK\0\0\0\2' &gt;tmp.pack
+    # pack has one object
+    printf '\0\0\0\1' &gt;&gt;tmp.pack
+    # now add our object data
+    cat object &gt;&gt;tmp.pack
+    # and then append the pack trailer
+    /path/to/git.git/test-sha1 -b &lt;tmp.pack &gt;trailer
+    cat trailer &gt;&gt;tmp.pack</code></pre>
+</div></div>
+<div class="paragraph"><p>and then running "git index-pack tmp.pack" in the debugger (stop at
+unpack_raw_entry). Doing this, I found that there were 3 bytes of header
+(and the header itself had a sane type and size). So I stripped those
+off with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>    dd if=object of=zlib bs=1 skip=3</code></pre>
+</div></div>
+<div class="paragraph"><p>I ran the result through zlib&#8217;s inflate using a custom C program. And
+while it did report the error, I did get the right number of output
+bytes (i.e., it matched git&#8217;s size header that we decoded above). But
+feeding the result back to "git hash-object" didn&#8217;t produce the same
+sha1. So there were some wrong bytes, but I didn&#8217;t know which. The file
+happened to be C source code, so I hoped I could notice something
+obviously wrong with it, but I didn&#8217;t. I even got it to compile!</p></div>
+<div class="paragraph"><p>I also tried comparing it to other versions of the same path in the
+repository, hoping that there would be some part of the diff that didn&#8217;t
+make sense. Unfortunately, this happened to be the only revision of this
+particular file in the repository, so I had nothing to compare against.</p></div>
+<div class="paragraph"><p>So I took a different approach. Working under the guess that the
+corruption was limited to a single byte, I wrote a program to munge each
+byte individually, and try inflating the result. Since the object was
+only 10K compressed, that worked out to about 2.5M attempts, which took
+a few minutes.</p></div>
+<div class="paragraph"><p>The program I used is here:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;string.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;zlib.h&gt;
 
-        [browser "konq"]
-                cmd = A_PATH_TO/konqueror</code></pre>
+static int try_zlib(unsigned char *buf, int len)
+{
+        /* make this absurdly large so we don't have to loop */
+        static unsigned char out[1024*1024];
+        z_stream z;
+        int ret;
+
+        memset(&amp;z, 0, sizeof(z));
+        inflateInit(&amp;z);
+
+        z.next_in = buf;
+        z.avail_in = len;
+        z.next_out = out;
+        z.avail_out = sizeof(out);
+
+        ret = inflate(&amp;z, 0);
+        inflateEnd(&amp;z);
+        return ret &gt;= 0;
+}
+
+/* eye candy */
+static int counter = 0;
+static void progress(int sig)
+{
+        fprintf(stderr, "\r%d", counter);
+        alarm(1);
+}
+
+int main(void)
+{
+        /* oversized so we can read the whole buffer in */
+        unsigned char buf[1024*1024];
+        int len;
+        unsigned i, j;
+
+        signal(SIGALRM, progress);
+        alarm(1);
+
+        len = read(0, buf, sizeof(buf));
+        for (i = 0; i &lt; len; i++) {
+                unsigned char c = buf[i];
+                for (j = 0; j &lt;= 0xff; j++) {
+                        buf[i] = j;
+
+                        counter++;
+                        if (try_zlib(buf, len))
+                                printf("i=%d, j=%x\n", i, j);
+                }
+                buf[i] = c;
+        }
+
+        alarm(0);
+        fprintf(stderr, "\n");
+        return 0;
+}</code></pre>
 </div></div>
-<div class="sect2">
-<h3 id="_note_about_git_config_global">Note about git-config --global</h3>
-<div class="paragraph"><p>Note that these configuration variables should probably be set using
-the <em>--global</em> flag, for example like this:</p></div>
+<div class="paragraph"><p>I compiled and ran with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git config --global web.browser firefox</code></pre>
+<pre><code>  gcc -Wall -Werror -O3 munge.c -o munge -lz
+  ./munge &lt;zlib</code></pre>
 </div></div>
-<div class="paragraph"><p>as they are probably more user specific than repository specific.
-See <a href="git-config.html">git-config(1)</a> for more information about this.</p></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_git">GIT</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+<div class="paragraph"><p>There were a few false positives early on (if you write "no data" in the
+zlib header, zlib thinks it&#8217;s just fine :) ). But I got a hit about
+halfway through:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>  i=5642, j=c7</code></pre>
+</div></div>
+<div class="paragraph"><p>I let it run to completion, and got a few more hits at the end (where it
+was munging the crc to match our broken data). So there was a good
+chance this middle hit was the source of the problem.</p></div>
+<div class="paragraph"><p>I confirmed by tweaking the byte in a hex editor, zlib inflating the
+result (no errors!), and then piping the output into "git hash-object",
+which reported the sha1 of the broken object. Success!</p></div>
+<div class="paragraph"><p>I fixed the packfile itself with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>  chmod +w $pack
+  printf '\xc7' | dd of=$pack bs=1 seek=51659518 conv=notrunc
+  chmod -w $pack</code></pre>
+</div></div>
+<div class="paragraph"><p>The <code>\xc7</code> comes from the replacement byte our "munge" program found.
+The offset 51659518 is derived by taking the original object offset
+(51653873), adding the replacement offset found by "munge" (5642), and
+then adding back in the 3 bytes of git header we stripped.</p></div>
+<div class="paragraph"><p>After that, "git fsck" ran clean.</p></div>
+<div class="paragraph"><p>As for the corruption itself, I was lucky that it was indeed a single
+byte. In fact, it turned out to be a single bit. The byte 0xc7 was
+corrupted to 0xc5. So presumably it was caused by faulty hardware, or a
+cosmic ray.</p></div>
+<div class="paragraph"><p>And the aborted attempt to look at the inflated output to see what was
+wrong? I could have looked forever and never found it. Here&#8217;s the diff
+between what the corrupted data inflates to, versus the real data:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>  -       cp = strtok (arg, "+");
+  +       cp = strtok (arg, ".");</code></pre>
+</div></div>
+<div class="paragraph"><p>It tweaked one byte and still ended up as valid, readable C that just
+happened to do something totally different! One takeaway is that on a
+less unlucky day, looking at the zlib output might have actually been
+helpful, as most random changes would actually break the C code.</p></div>
+<div class="paragraph"><p>But more importantly, git&#8217;s hashing and checksumming noticed a problem
+that easily could have gone undetected in another system. The result
+still compiled, but would have caused an interesting bug (that would
+have been blamed on some random commit).</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-01 09:52:04 PDT
+Last updated 2013-11-01 09:52:06 PDT
 </div>
 </div>
 </body>
