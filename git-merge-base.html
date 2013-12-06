@@ -749,7 +749,8 @@ git-merge-base(1) Manual Page
 <pre class="content"><em>git merge-base</em> [-a|--all] &lt;commit&gt; &lt;commit&gt;&#8230;
 <em>git merge-base</em> [-a|--all] --octopus &lt;commit&gt;&#8230;
 <em>git merge-base</em> --is-ancestor &lt;commit&gt; &lt;commit&gt;
-<em>git merge-base</em> --independent &lt;commit&gt;&#8230;</pre>
+<em>git merge-base</em> --independent &lt;commit&gt;&#8230;
+<em>git merge-base</em> --fork-point &lt;ref&gt; [&lt;commit&gt;]</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -766,7 +767,7 @@ merge base for a pair of commits.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_operation_mode">OPERATION MODE</h2>
+<h2 id="_operation_modes">OPERATION MODES</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>As the most common special case, specifying only two commits on the
 command line means computing the merge base between the given two commits.</p></div>
@@ -808,6 +809,20 @@ from <a href="git-show-branch.html">git-show-branch(1)</a> when used with the <c
         Check if the first &lt;commit&gt; is an ancestor of the second &lt;commit&gt;,
         and exit with status 0 if true, or with status 1 if not.
         Errors are signaled by a non-zero status that is not 1.
+</p>
+</dd>
+<dt class="hdlist1">
+--fork-point
+</dt>
+<dd>
+<p>
+        Find the point at which a branch (or any history that leads
+        to &lt;commit&gt;) forked from another branch (or any reference)
+        &lt;ref&gt;. This does not just look for the common ancestor of
+        the two commits, but also takes into account the reflog of
+        &lt;ref&gt; to see if the history leading to &lt;commit&gt; forked from
+        an earlier incarnation of the branch &lt;ref&gt; (see discussion
+        on this mode below).
 </p>
 </dd>
 </dl></div>
@@ -907,6 +922,35 @@ fi</code></pre>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_discussion_on_fork_point_mode">Discussion on fork-point mode</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>After working on the <code>topic</code> branch created with <code>git checkout -b
+topic origin/master</code>, the history of remote-tracking branch
+<code>origin/master</code> may have been rewound and rebuilt, leading to a
+history of this shape:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>                 o---B1
+                /
+---o---o---B2--o---o---o---B (origin/master)
+        \
+         B3
+          \
+           Derived (topic)</code></pre>
+</div></div>
+<div class="paragraph"><p>where <code>origin/master</code> used to point at commits B3, B2, B1 and now it
+points at B, and your <code>topic</code> branch was started on top of it back
+when <code>origin/master</code> was at B3. This mode uses the reflog of
+<code>origin/master</code> to find B3 as the fork point, so that the <code>topic</code>
+can be rebased on top of the updated <code>origin/master</code> by:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>$ fork_point=$(git merge-base --fork-point origin/master topic)
+$ git rebase --onto origin/master $fork_point topic</code></pre>
+</div></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_see_also">See also</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><a href="git-rev-list.html">git-rev-list(1)</a>,
@@ -924,7 +968,7 @@ fi</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-12-06 15:42:42 PST
 </div>
 </div>
 </body>
