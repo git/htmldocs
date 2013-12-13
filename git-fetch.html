@@ -762,13 +762,13 @@ along with the objects necessary to complete them.</p></div>
 <div class="paragraph"><p>The ref names and their object names of fetched refs are stored
 in <code>.git/FETCH_HEAD</code>.  This information is left for a later merge
 operation done by <em>git merge</em>.</p></div>
-<div class="paragraph"><p>When &lt;refspec&gt; stores the fetched result in remote-tracking branches,
-the tags that point at these branches are automatically
-followed.  This is done by first fetching from the remote using
-the given &lt;refspec&gt;s, and if the repository has objects that are
-pointed by remote tags that it does not yet have, then fetch
-those missing tags.  If the other end has tags that point at
-branches you are not interested in, you will not get them.</p></div>
+<div class="paragraph"><p>By default, tags are auto-followed.  This means that when fetching
+from a remote, any tags on the remote that point to objects that exist
+in the local repository are fetched.  The effect is to fetch tags that
+point at branches that you are interested in.  This default behavior
+can be changed by using the --tags or --no-tags options, by
+configuring remote.&lt;name&gt;.tagopt, or by using a refspec that fetches
+tags explicitly.</p></div>
 <div class="paragraph"><p><em>git fetch</em> can fetch from either a single named repository,
 or from several repositories at once if &lt;group&gt; is given and
 there is a remotes.&lt;group&gt; entry in the configuration file.
@@ -871,8 +871,14 @@ there is a remotes.&lt;group&gt; entry in the configuration file.
 </dt>
 <dd>
 <p>
-        After fetching, remove any remote-tracking branches which
-        no longer exist on the remote.
+        After fetching, remove any remote-tracking references that no
+        longer exist on the remote.  Tags are not subject to pruning
+        if they are fetched only because of the default tag
+        auto-following or due to a --tags option.  However, if tags
+        are fetched due to an explicit refspec (either on the command
+        line or in the remote configuration, for example if the remote
+        was cloned with the --mirror option), then they are also
+        subject to pruning.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -898,11 +904,12 @@ there is a remotes.&lt;group&gt; entry in the configuration file.
 </dt>
 <dd>
 <p>
-        This is a short-hand for giving <code>refs/tags/*:refs/tags/*</code>
-        refspec from the command line, to ask all tags to be fetched
-        and stored locally.  Because this acts as an explicit
-        refspec, the default refspecs (configured with the
-        remote.$name.fetch variable) are overridden and not used.
+        Fetch all tags from the remote (i.e., fetch remote tags
+        <code>refs/tags/*</code> into local tags with the same name), in addition
+        to whatever else would otherwise be fetched.  Using this
+        option alone does not subject tags to pruning, even if --prune
+        is used (though tags may be pruned anyway if they are also the
+        destination of an explicit refspec; see <em>--prune</em>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1417,7 +1424,7 @@ version.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2013-12-12 16:55:14 PST
 </div>
 </div>
 </body>
