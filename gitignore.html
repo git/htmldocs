@@ -850,8 +850,10 @@ A line starting with # serves as a comment.
 <p>
 An optional prefix "<code>!</code>" which negates the pattern; any
    matching file excluded by a previous pattern will become
-   included again.  If a negated pattern matches, this will
-   override lower precedence patterns sources.
+   included again. It is not possible to re-include a file if a parent
+   directory of that file is excluded. Git doesn&#8217;t list excluded
+   directories for performance reasons, so any patterns on contained
+   files have no effect, no matter where they are defined.
    Put a backslash ("<code>\</code>") in front of the first "<code>!</code>" for patterns
    that begin with a literal "<code>!</code>", for example, "<code>\!important!.txt</code>".
 </p>
@@ -979,6 +981,18 @@ use <em>git update-index &#45;&#45;assume-unchanged</em>.</p></div>
 </div></div>
 <div class="paragraph"><p>The second .gitignore prevents Git from ignoring
 <code>arch/foo/kernel/vmlinux.lds.S</code>.</p></div>
+<div class="paragraph"><p>Example to exclude everything except a specific directory <code>foo/bar</code>
+(note the <code>/*</code> - without the slash, the wildcard would also exclude
+everything within <code>foo/bar</code>):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>    $ cat .gitignore
+    # exclude everything except directory foo/bar
+    /*
+    !/foo
+    /foo/*
+    !/foo/bar</code></pre>
+</div></div>
 </div>
 </div>
 <div class="sect1">
@@ -1000,7 +1014,7 @@ use <em>git update-index &#45;&#45;assume-unchanged</em>.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-07 16:30:38 PST
+Last updated 2013-12-17 15:53:46 PST
 </div>
 </div>
 </body>

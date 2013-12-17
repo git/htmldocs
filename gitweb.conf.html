@@ -1823,6 +1823,45 @@ and forward compatible.</p></div>
 time zones in the form of "+/-HHMM", such as "+0200".</p></div>
 <div class="paragraph"><p>Project specific override is not supported.</p></div>
 </dd>
+<dt class="hdlist1">
+extra-branch-refs
+</dt>
+<dd>
+<p>
+        List of additional directories under "refs" which are going to
+        be used as branch refs. For example if you have a gerrit setup
+        where all branches under refs/heads/ are official,
+        push-after-review ones and branches under refs/sandbox/,
+        refs/wip and refs/other are user ones where permissions are
+        much wider, then you might want to set this variable as
+        follows:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$feature{'extra-branch-refs'}{'default'} =
+        ['sandbox', 'wip', 'other'];</code></pre>
+</div></div>
+<div class="paragraph"><p>This feature can be configured on per-repository basis after setting
+$feature{<em>extra-branch-refs</em>}{<em>override</em>} to true, via repository&#8217;s
+<code>gitweb.extraBranchRefs</code> configuration variable, which contains a
+space separated list of refs. An example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>[gitweb]
+        extraBranchRefs = sandbox wip other</code></pre>
+</div></div>
+<div class="paragraph"><p>The gitweb.extraBranchRefs is actually a multi-valued configuration
+variable, so following example is also correct and the result is the
+same as of the snippet above:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>[gitweb]
+        extraBranchRefs = sandbox
+        extraBranchRefs = wip other</code></pre>
+</div></div>
+<div class="paragraph"><p>It is an error to specify a ref that does not pass "git check-ref-format"
+scrutiny. Duplicated values are filtered.</p></div>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -1955,7 +1994,7 @@ gitweb_config.perl
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-12 15:22:25 PST
+Last updated 2013-12-17 15:53:46 PST
 </div>
 </div>
 </body>
