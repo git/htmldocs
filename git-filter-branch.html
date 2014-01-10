@@ -1167,7 +1167,7 @@ git filter-branch ... D..H --not C</code></pre>
 <div class="sect1">
 <h2 id="_checklist_for_shrinking_a_repository">Checklist for Shrinking a Repository</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>git-filter-branch is often used to get rid of a subset of files,
+<div class="paragraph"><p>git-filter-branch can be used to get rid of a subset of files,
 usually with some combination of <code>--index-filter</code> and
 <code>--subdirectory-filter</code>.  People expect the resulting repository to
 be smaller than the original, but you need a few more steps to
@@ -1227,6 +1227,49 @@ Garbage collect all unreferenced objects with <code>git gc --prune=now</code>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_notes">Notes</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>git-filter-branch allows you to make complex shell-scripted rewrites
+of your Git history, but you probably don&#8217;t need this flexibility if
+you&#8217;re simply <em>removing unwanted data</em> like large files or passwords.
+For those operations you may want to consider
+<a href="http://rtyley.github.io/bfg-repo-cleaner/">The BFG Repo-Cleaner</a>,
+a JVM-based alternative to git-filter-branch, typically at least
+10-50x faster for those use-cases, and with quite different
+characteristics:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Any particular version of a file is cleaned exactly <em>once</em>. The BFG,
+  unlike git-filter-branch, does not give you the opportunity to
+  handle a file differently based on where or when it was committed
+  within your history. This constraint gives the core performance
+  benefit of The BFG, and is well-suited to the task of cleansing bad
+  data - you don&#8217;t care <em>where</em> the bad data is, you just want it
+  <em>gone</em>.
+</p>
+</li>
+<li>
+<p>
+By default The BFG takes full advantage of multi-core machines,
+  cleansing commit file-trees in parallel. git-filter-branch cleans
+  commits sequentially (ie in a single-threaded manner), though it
+  <em>is</em> possible to write filters that include their own parallellism,
+  in the scripts executed against each commit.
+</p>
+</li>
+<li>
+<p>
+The <a href="http://rtyley.github.io/bfg-repo-cleaner/#examples">command options</a>
+  are much more restrictive than git-filter branch, and dedicated just
+  to the tasks of removing unwanted data- e.g:
+  <code>--strip-blobs-bigger-than 1M</code>.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
@@ -1236,7 +1279,7 @@ Garbage collect all unreferenced objects with <code>git gc --prune=now</code>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-01-10 12:32:20 PST
 </div>
 </div>
 </body>
