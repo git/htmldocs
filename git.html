@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -770,7 +774,7 @@ page to learn what commands Git offers.  You can learn more about
 individual Git commands with "git help command".  <a href="gitcli.html">gitcli(7)</a>
 manual page gives you an overview of the command line command syntax.</p></div>
 <div class="paragraph"><p>Formatted and hyperlinked version of the latest Git documentation
-can be viewed at <code>http://git-htmldocs.googlecode.com/git/git.html</code>.</p></div>
+can be viewed at <tt>http://git-htmldocs.googlecode.com/git/git.html</tt>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -797,8 +801,8 @@ can be viewed at <code>http://git-htmldocs.googlecode.com/git/git.html</code>.</
 </p>
 <div class="paragraph"><p>Other options are available to control how the manual page is
 displayed. See <a href="git-help.html">git-help(1)</a> for more information,
-because <code>git --help ...</code> is converted internally into <code>git
-help ...</code>.</p></div>
+because <tt>git --help ...</tt> is converted internally into <tt>git
+help ...</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 -C &lt;path&gt;
@@ -806,18 +810,18 @@ help ...</code>.</p></div>
 <dd>
 <p>
         Run as if git was started in <em>&lt;path&gt;</em> instead of the current working
-        directory.  When multiple <code>-C</code> options are given, each subsequent
-        non-absolute <code>-C &lt;path&gt;</code> is interpreted relative to the preceding <code>-C
-        &lt;path&gt;</code>.
+        directory.  When multiple <tt>-C</tt> options are given, each subsequent
+        non-absolute <tt>-C &lt;path&gt;</tt> is interpreted relative to the preceding <tt>-C
+        &lt;path&gt;</tt>.
 </p>
-<div class="paragraph"><p>This option affects options that expect path name like <code>--git-dir</code> and
-<code>--work-tree</code> in that their interpretations of the path names would be
-made relative to the working directory caused by the <code>-C</code> option. For
+<div class="paragraph"><p>This option affects options that expect path name like <tt>--git-dir</tt> and
+<tt>--work-tree</tt> in that their interpretations of the path names would be
+made relative to the working directory caused by the <tt>-C</tt> option. For
 example the following invocations are equivalent:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git --git-dir=a.git --work-tree=b -C c status
-git --git-dir=c/a.git --work-tree=c/b status</code></pre>
+<pre><tt>git --git-dir=a.git --work-tree=b -C c status
+git --git-dir=c/a.git --work-tree=c/b status</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -856,7 +860,7 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 </dt>
 <dd>
 <p>
-        Print the manpath (see <code>man(1)</code>) for the man pages for
+        Print the manpath (see <tt>man(1)</tt>) for the man pages for
         this version of Git and exit.
 </p>
 </dd>
@@ -878,7 +882,7 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 <dd>
 <p>
         Pipe all output into <em>less</em> (or if set, $PAGER) if standard
-        output is a terminal.  This overrides the <code>pager.&lt;cmd&gt;</code>
+        output is a terminal.  This overrides the <tt>pager.&lt;cmd&gt;</tt>
         configuration options (see the "Configuration Mechanism" section
         below).
 </p>
@@ -920,7 +924,7 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 <dd>
 <p>
         Set the Git namespace.  See <a href="gitnamespaces.html">gitnamespaces(7)</a> for more
-        details.  Equivalent to setting the <code>GIT_NAMESPACE</code> environment
+        details.  Equivalent to setting the <tt>GIT_NAMESPACE</tt> environment
         variable.
 </p>
 </dd>
@@ -949,8 +953,8 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 <dd>
 <p>
         Treat pathspecs literally (i.e. no globbing, no pathspec magic).
-        This is equivalent to setting the <code>GIT_LITERAL_PATHSPECS</code> environment
-        variable to <code>1</code>.
+        This is equivalent to setting the <tt>GIT_LITERAL_PATHSPECS</tt> environment
+        variable to <tt>1</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -959,7 +963,7 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 <dd>
 <p>
         Add "glob" magic to all pathspec. This is equivalent to setting
-        the <code>GIT_GLOB_PATHSPECS</code> environment variable to <code>1</code>. Disabling
+        the <tt>GIT_GLOB_PATHSPECS</tt> environment variable to <tt>1</tt>. Disabling
         globbing on individual pathspecs can be done using pathspec
         magic ":(literal)"
 </p>
@@ -970,7 +974,7 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 <dd>
 <p>
         Add "literal" magic to all pathspec. This is equivalent to setting
-        the <code>GIT_NOGLOB_PATHSPECS</code> environment variable to <code>1</code>. Enabling
+        the <tt>GIT_NOGLOB_PATHSPECS</tt> environment variable to <tt>1</tt>. Enabling
         globbing on individual pathspecs can be done using pathspec
         magic ":(glob)"
 </p>
@@ -981,7 +985,7 @@ git --git-dir=c/a.git --work-tree=c/b status</code></pre>
 <dd>
 <p>
         Add "icase" magic to all pathspec. This is equivalent to setting
-        the <code>GIT_ICASE_PATHSPECS</code> environment variable to <code>1</code>.
+        the <tt>GIT_ICASE_PATHSPECS</tt> environment variable to <tt>1</tt>.
 </p>
 </dd>
 </dl></div>
@@ -2175,7 +2179,7 @@ repository and are per user.  Such a configuration file may look
 like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>#
+<pre><tt>#
 # A '#' or ';' character indicates a comment.
 #
 
@@ -2187,7 +2191,7 @@ like this:</p></div>
 ; user identity
 [user]
         name = "Junio C Hamano"
-        email = "gitster@pobox.com"</code></pre>
+        email = "gitster@pobox.com"</tt></pre>
 </div></div>
 <div class="paragraph"><p>Various commands read from the configuration file and adjust
 their operation accordingly.  See <a href="git-config.html">git-config(1)</a> for a
@@ -2258,7 +2262,7 @@ list and more details about the configuration mechanism.</p></div>
 <dd>
 <p>
         Indicates that an object type is required.
-        Currently one of: <code>blob</code>, <code>tree</code>, <code>commit</code>, or <code>tag</code>.
+        Currently one of: <tt>blob</tt>, <tt>tree</tt>, <tt>commit</tt>, or <tt>tag</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2267,7 +2271,7 @@ list and more details about the configuration mechanism.</p></div>
 <dd>
 <p>
         Indicates a filename - almost always relative to the
-        root of the tree structure <code>GIT_INDEX_FILE</code> describes.
+        root of the tree structure <tt>GIT_INDEX_FILE</tt> describes.
 </p>
 </dd>
 </dl></div>
@@ -2293,7 +2297,7 @@ HEAD
 <dd>
 <p>
         a valid tag <em>name</em>
-        (i.e. a <code>refs/tags/&lt;tag&gt;</code> reference).
+        (i.e. a <tt>refs/tags/&lt;tag&gt;</tt> reference).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2302,7 +2306,7 @@ HEAD
 <dd>
 <p>
         a valid head <em>name</em>
-        (i.e. a <code>refs/heads/&lt;head&gt;</code> reference).
+        (i.e. a <tt>refs/heads/&lt;head&gt;</tt> reference).
 </p>
 </dd>
 </dl></div>
@@ -2316,7 +2320,7 @@ HEAD
 <div class="paragraph"><p>Please see the <a href="gitrepository-layout.html">gitrepository-layout(5)</a> document.</p></div>
 <div class="paragraph"><p>Read <a href="githooks.html">githooks(5)</a> for more details about each hook.</p></div>
 <div class="paragraph"><p>Higher level SCMs may provide and manage additional information in the
-<code>$GIT_DIR</code>.</p></div>
+<tt>$GIT_DIR</tt>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -2341,7 +2345,7 @@ Git so take care if using Cogito etc.</p></div>
 <dd>
 <p>
         This environment allows the specification of an alternate
-        index file. If not specified, the default of <code>$GIT_DIR/index</code>
+        index file. If not specified, the default of <tt>$GIT_DIR/index</tt>
         is used.
 </p>
 </dd>
@@ -2352,7 +2356,7 @@ Git so take care if using Cogito etc.</p></div>
 <p>
         If the object storage directory is specified via this
         environment variable then the sha1 directories are created
-        underneath - otherwise the default <code>$GIT_DIR/objects</code>
+        underneath - otherwise the default <tt>$GIT_DIR/objects</tt>
         directory is used.
 </p>
 </dd>
@@ -2374,7 +2378,7 @@ Git so take care if using Cogito etc.</p></div>
 <dd>
 <p>
         If the <em>GIT_DIR</em> environment variable is set then it
-        specifies a path to use instead of the default <code>.git</code>
+        specifies a path to use instead of the default <tt>.git</tt>
         for the base of the repository.
         The <em>--git-dir</em> command-line option also sets this value.
 </p>
@@ -2492,7 +2496,7 @@ Git so take care if using Cogito etc.</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>path old-file old-hex old-mode new-file new-hex new-mode</code></pre>
+<pre><tt>path old-file old-hex old-mode new-file new-hex new-mode</tt></pre>
 </div></div>
 <div class="paragraph"><p>where:</p></div>
 </dd>
@@ -2521,8 +2525,8 @@ are the 40-hexdigit SHA-1 hashes,
 are the octal representation of the file modes.
 </p>
 <div class="paragraph"><p>The file parameters can point at the user&#8217;s working file
-(e.g. <code>new-file</code> in "git-diff-files"), <code>/dev/null</code> (e.g. <code>old-file</code>
-when a new file is added), or a temporary file (e.g. <code>old-file</code> in the
+(e.g. <tt>new-file</tt> in "git-diff-files"), <tt>/dev/null</tt> (e.g. <tt>old-file</tt>
+when a new file is added), or a temporary file (e.g. <tt>old-file</tt> in the
 index).  <em>GIT_EXTERNAL_DIFF</em> should not worry about unlinking the
 temporary file --- it is removed when <em>GIT_EXTERNAL_DIFF</em> exits.</p></div>
 <div class="paragraph"><p>For a path that is unmerged, <em>GIT_EXTERNAL_DIFF</em> is called with 1
@@ -2566,9 +2570,9 @@ parameter, &lt;path&gt;.</p></div>
 </dt>
 <dd>
 <p>
-        This environment variable overrides <code>$PAGER</code>. If it is set
+        This environment variable overrides <tt>$PAGER</tt>. If it is set
         to an empty string or to the value "cat", Git will not launch
-        a pager.  See also the <code>core.pager</code> option in
+        a pager.  See also the <tt>core.pager</tt> option in
         <a href="git-config.html">git-config(1)</a>.
 </p>
 </dd>
@@ -2577,10 +2581,10 @@ parameter, &lt;path&gt;.</p></div>
 </dt>
 <dd>
 <p>
-        This environment variable overrides <code>$EDITOR</code> and <code>$VISUAL</code>.
+        This environment variable overrides <tt>$EDITOR</tt> and <tt>$VISUAL</tt>.
         It is used by several Git commands when, on interactive mode,
         an editor is to be launched. See also <a href="git-var.html">git-var(1)</a>
-        and the <code>core.editor</code> option in <a href="git-config.html">git-config(1)</a>.
+        and the <tt>core.editor</tt> option in <a href="git-config.html">git-config(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2602,7 +2606,7 @@ parameter, &lt;path&gt;.</p></div>
 you will need to wrap the program and options into a shell script,
 then set GIT_SSH to refer to the shell script.</p></div>
 <div class="paragraph"><p>Usually it is easier to configure any desired options through your
-personal <code>.ssh/config</code> file.  Please consult your ssh documentation
+personal <tt>.ssh/config</tt> file.  Please consult your ssh documentation
 for further details.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -2623,10 +2627,10 @@ for further details.</p></div>
 <dd>
 <p>
         Whether to skip reading settings from the system-wide
-        <code>$(prefix)/etc/gitconfig</code> file.  This environment variable can
-        be used along with <code>$HOME</code> and <code>$XDG_CONFIG_HOME</code> to create a
+        <tt>$(prefix)/etc/gitconfig</tt> file.  This environment variable can
+        be used along with <tt>$HOME</tt> and <tt>$XDG_CONFIG_HOME</tt> to create a
         predictable environment for a picky script, or you can set it
-        temporarily to avoid using a buggy <code>/etc/gitconfig</code> file while
+        temporarily to avoid using a buggy <tt>/etc/gitconfig</tt> file while
         waiting for someone with sufficient permissions to fix it.
 </p>
 </dd>
@@ -2652,7 +2656,7 @@ for further details.</p></div>
 <dd>
 <p>
         If this variable is set to "1", "2" or "true" (comparison
-        is case insensitive), Git will print <code>trace:</code> messages on
+        is case insensitive), Git will print <tt>trace:</tt> messages on
         stderr telling about alias expansion, built-in command
         execution and external command execution.
         If this variable is set to an integer value greater than 1
@@ -2693,13 +2697,13 @@ GIT_LITERAL_PATHSPECS
 </dt>
 <dd>
 <p>
-        Setting this variable to <code>1</code> will cause Git to treat all
+        Setting this variable to <tt>1</tt> will cause Git to treat all
         pathspecs literally, rather than as glob patterns. For example,
-        running <code>GIT_LITERAL_PATHSPECS=1 git log -- '*.c'</code> will search
-        for commits that touch the path <code>*.c</code>, not any paths that the
-        glob <code>*.c</code> matches. You might want this if you are feeding
+        running <tt>GIT_LITERAL_PATHSPECS=1 git log -- '*.c'</tt> will search
+        for commits that touch the path <tt>*.c</tt>, not any paths that the
+        glob <tt>*.c</tt> matches. You might want this if you are feeding
         literal paths to Git (e.g., paths previously given to you by
-        <code>git ls-tree</code>, <code>--raw</code> diff output, etc).
+        <tt>git ls-tree</tt>, <tt>--raw</tt> diff output, etc).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2707,7 +2711,7 @@ GIT_GLOB_PATHSPECS
 </dt>
 <dd>
 <p>
-        Setting this variable to <code>1</code> will cause Git to treat all
+        Setting this variable to <tt>1</tt> will cause Git to treat all
         pathspecs as glob patterns (aka "glob" magic).
 </p>
 </dd>
@@ -2716,7 +2720,7 @@ GIT_NOGLOB_PATHSPECS
 </dt>
 <dd>
 <p>
-        Setting this variable to <code>1</code> will cause Git to treat all
+        Setting this variable to <tt>1</tt> will cause Git to treat all
         pathspecs as literal (aka "literal" magic).
 </p>
 </dd>
@@ -2725,7 +2729,7 @@ GIT_ICASE_PATHSPECS
 </dt>
 <dd>
 <p>
-        Setting this variable to <code>1</code> will cause Git to treat all
+        Setting this variable to <tt>1</tt> will cause Git to treat all
         pathspecs as case-insensitive.
 </p>
 </dd>
@@ -2739,7 +2743,7 @@ GIT_ICASE_PATHSPECS
         typically the name of the high-level command that updated
         the ref), in addition to the old and new values of the ref.
         A scripted Porcelain command can use set_reflog_action
-        helper function in <code>git-sh-setup</code> to set its name to this
+        helper function in <tt>git-sh-setup</tt> to set its name to this
         variable when it is invoked as the top level command by the
         end user, to be recorded in the body of the reflog.
 </p>
@@ -2777,10 +2781,10 @@ purpose.</p></div>
 efficiency may later be compressed together into "pack files".</p></div>
 <div class="paragraph"><p>Named pointers called refs mark interesting points in history.  A ref
 may contain the SHA-1 name of an object or the name of another ref.  Refs
-with names beginning <code>ref/head/</code> contain the SHA-1 name of the most
+with names beginning <tt>ref/head/</tt> contain the SHA-1 name of the most
 recent commit (or "head") of a branch under development.  SHA-1 names of
-tags of interest are stored under <code>ref/tags/</code>.  A special ref named
-<code>HEAD</code> contains the name of the currently checked-out branch.</p></div>
+tags of interest are stored under <tt>ref/tags/</tt>.  A special ref named
+<tt>HEAD</tt> contains the name of the currently checked-out branch.</p></div>
 <div class="paragraph"><p>The index file is initialized with a list of all paths and, for each
 path, a blob object and a set of attributes.  The blob object represents
 the contents of the file as of the head of the current branch.  The
@@ -2852,7 +2856,7 @@ subscribed to the list to send a message there.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-12-27 16:32:55 PST
+Last updated 2014-01-13 15:35:15 PST
 </div>
 </div>
 </body>

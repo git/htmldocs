@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-rm(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -755,13 +759,13 @@ git-rm(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Remove files from the index, or from the working tree and the index.
-<code>git rm</code> will not remove a file from just your working directory.
+<tt>git rm</tt> will not remove a file from just your working directory.
 (There is no option to remove a file only from the working tree
-and yet keep it in the index; use <code>/bin/rm</code> if you want to do that.)
+and yet keep it in the index; use <tt>/bin/rm</tt> if you want to do that.)
 The files being removed have to be identical to the tip of the branch,
 and no updates to their contents can be staged in the index,
-though that default behavior can be overridden with the <code>-f</code> option.
-When <code>--cached</code> is given, the staged content has to
+though that default behavior can be overridden with the <tt>-f</tt> option.
+When <tt>--cached</tt> is given, the staged content has to
 match either the tip of the branch or the file on disk,
 allowing the file to be removed from just the index.</p></div>
 </div>
@@ -775,14 +779,14 @@ allowing the file to be removed from just the index.</p></div>
 </dt>
 <dd>
 <p>
-        Files to remove.  Fileglobs (e.g. <code>*.c</code>) can be given to
+        Files to remove.  Fileglobs (e.g. <tt>*.c</tt>) can be given to
         remove all matching files.  If you want Git to expand
         file glob characters, you may need to shell-escape them.
         A leading directory name
-        (e.g. <code>dir</code> to remove <code>dir/file1</code> and <code>dir/file2</code>) can be
+        (e.g. <tt>dir</tt> to remove <tt>dir/file1</tt> and <tt>dir/file2</tt>) can be
         given to remove all files in the directory, and recursively
         all sub-directories,
-        but this requires the <code>-r</code> option to be explicitly given.
+        but this requires the <tt>-r</tt> option to be explicitly given.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -854,7 +858,7 @@ allowing the file to be removed from just the index.</p></div>
 </dt>
 <dd>
 <p>
-        <code>git rm</code> normally outputs one line (in the form of an <code>rm</code> command)
+        <tt>git rm</tt> normally outputs one line (in the form of an <tt>rm</tt> command)
         for each file removed. This option suppresses that output.
 </p>
 </dd>
@@ -869,15 +873,15 @@ file glob patterns, or leading directory names.  The command
 removes only the paths that are known to Git.  Giving the name of
 a file that you have not told Git about does not remove that file.</p></div>
 <div class="paragraph"><p>File globbing matches across directory boundaries.  Thus, given
-two directories <code>d</code> and <code>d2</code>, there is a difference between
-using <code>git rm 'd*'</code> and <code>git rm 'd/*'</code>, as the former will
-also remove all of directory <code>d2</code>.</p></div>
+two directories <tt>d</tt> and <tt>d2</tt>, there is a difference between
+using <tt>git rm 'd*'</tt> and <tt>git rm 'd/*'</tt>, as the former will
+also remove all of directory <tt>d2</tt>.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_removing_files_that_have_disappeared_from_the_filesystem">REMOVING FILES THAT HAVE DISAPPEARED FROM THE FILESYSTEM</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>There is no option for <code>git rm</code> to remove from the index only
+<div class="paragraph"><p>There is no option for <tt>git rm</tt> to remove from the index only
 the paths that have disappeared from the filesystem. However,
 depending on the use case, there are several ways that can be
 done.</p></div>
@@ -885,10 +889,10 @@ done.</p></div>
 <h3 id="_using_8220_git_commit_a_8221">Using &#8220;git commit -a&#8221;</h3>
 <div class="paragraph"><p>If you intend that your next commit should record all modifications
 of tracked files in the working tree and record all removals of
-files that have been removed from the working tree with <code>rm</code>
-(as opposed to <code>git rm</code>), use <code>git commit -a</code>, as it will
+files that have been removed from the working tree with <tt>rm</tt>
+(as opposed to <tt>git rm</tt>), use <tt>git commit -a</tt>, as it will
 automatically notice and record all removals.  You can also have a
-similar effect without committing by using <code>git add -u</code>.</p></div>
+similar effect without committing by using <tt>git add -u</tt>.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_using_8220_git_add_a_8221">Using &#8220;git add -A&#8221;</h3>
@@ -899,7 +903,7 @@ as well as modifications of existing paths.</p></div>
 tree using this command:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git ls-files -z | xargs -0 rm -f</code></pre>
+<pre><tt>git ls-files -z | xargs -0 rm -f</tt></pre>
 </div></div>
 <div class="paragraph"><p>and then untar the new code in the working tree. Alternately
 you could <em>rsync</em> the changes into the working tree.</p></div>
@@ -907,7 +911,7 @@ you could <em>rsync</em> the changes into the working tree.</p></div>
 modifications in the working tree is:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git add -A</code></pre>
+<pre><tt>git add -A</tt></pre>
 </div></div>
 <div class="paragraph"><p>See <a href="git-add.html">git-add(1)</a>.</p></div>
 </div>
@@ -915,11 +919,11 @@ modifications in the working tree is:</p></div>
 <h3 id="_other_ways">Other ways</h3>
 <div class="paragraph"><p>If all you really want to do is to remove from the index the files
 that are no longer present in the working tree (perhaps because
-your working tree is dirty so that you cannot use <code>git commit -a</code>),
+your working tree is dirty so that you cannot use <tt>git commit -a</tt>),
 use the following command:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git diff --name-only --diff-filter=D -z | xargs -0 git rm --cached</code></pre>
+<pre><tt>git diff --name-only --diff-filter=D -z | xargs -0 git rm --cached</tt></pre>
 </div></div>
 </div>
 </div>
@@ -931,7 +935,7 @@ use the following command:</p></div>
 with a Git version 1.7.8 or newer) will be removed from the work
 tree, as their repository lives inside the .git directory of the
 superproject. If a submodule (or one of those nested inside it)
-still uses a .git directory, <code>git rm</code> will fail - no matter if forced
+still uses a .git directory, <tt>git rm</tt> will fail - no matter if forced
 or not - to protect the submodule&#8217;s history. If it exists the
 submodule.&lt;name&gt; section in the <a href="gitmodules.html">gitmodules(5)</a> file will also
 be removed and that file will be staged (unless --cached or -n are used).</p></div>
@@ -942,7 +946,7 @@ Ignored files are deemed expendable and won&#8217;t stop a submodule&#8217;s wor
 tree from being removed.</p></div>
 <div class="paragraph"><p>If you only want to remove the local checkout of a submodule from your
 work tree without committing the removal,
-use <a href="git-submodule.html">git-submodule(1)</a> <code>deinit</code> instead.</p></div>
+use <a href="git-submodule.html">git-submodule(1)</a> <tt>deinit</tt> instead.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -950,28 +954,39 @@ use <a href="git-submodule.html">git-submodule(1)</a> <code>deinit</code> instea
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>git rm Documentation/\*.txt</code>
+<tt>git rm Documentation/\*.txt</tt>
 </dt>
 <dd>
 <p>
-        Removes all <code>*.txt</code> files from the index that are under the
-        <code>Documentation</code> directory and any of its subdirectories.
+        Removes all <tt>*.txt</tt> files from the index that are under the
+        <tt>Documentation</tt> directory and any of its subdirectories.
 </p>
-<div class="paragraph"><p>Note that the asterisk <code>*</code> is quoted from the shell in this
+<div class="paragraph"><p>Note that the asterisk <tt>*</tt> is quoted from the shell in this
 example; this lets Git, and not the shell, expand the pathnames
-of files and subdirectories under the <code>Documentation/</code> directory.</p></div>
+of files and subdirectories under the <tt>Documentation/</tt> directory.</p></div>
 </dd>
 <dt class="hdlist1">
-<code>git rm -f git-*.sh</code>
+<tt>git rm -f git-*.sh</tt>
 </dt>
 <dd>
 <p>
         Because this example lets the shell expand the asterisk
         (i.e. you are listing the files explicitly), it
-        does not remove <code>subdir/git-foo.sh</code>.
+        does not remove <tt>subdir/git-foo.sh</tt>.
 </p>
 </dd>
 </dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_bugs">BUGS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Each time a superproject update removes a populated submodule
+(e.g. when switching between commits before and after the removal) a
+stale submodule checkout will remain in the old location. Removing the
+old directory is only safe when it uses a gitfile, as otherwise the
+history of the submodule will be deleted too. This step will be
+obsolete when recursive submodule update has been implemented.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -990,7 +1005,7 @@ of files and subdirectories under the <code>Documentation/</code> directory.</p>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-09-09 15:34:20 PDT
+Last updated 2014-01-13 15:35:15 PST
 </div>
 </div>
 </body>
