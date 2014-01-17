@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>run-command API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -749,17 +753,17 @@ produces in the caller in order to process it.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>start_command</code>
+<tt>start_command</tt>
 </dt>
 <dd>
 <p>
-        Start a sub-process. Takes a pointer to a <code>struct child_process</code>
+        Start a sub-process. Takes a pointer to a <tt>struct child_process</tt>
         that specifies the details and returns pipe FDs (if requested).
         See below for details.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>finish_command</code>
+<tt>finish_command</tt>
 </dt>
 <dd>
 <p>
@@ -768,27 +772,27 @@ produces in the caller in order to process it.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>run_command</code>
+<tt>run_command</tt>
 </dt>
 <dd>
 <p>
         A convenience function that encapsulates a sequence of
         start_command() followed by finish_command(). Takes a pointer
-        to a <code>struct child_process</code> that specifies the details.
+        to a <tt>struct child_process</tt> that specifies the details.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>run_command_v_opt</code>, <code>run_command_v_opt_cd_env</code>
+<tt>run_command_v_opt</tt>, <tt>run_command_v_opt_cd_env</tt>
 </dt>
 <dd>
 <p>
         Convenience functions that encapsulate a sequence of
         start_command() followed by finish_command(). The argument argv
         specifies the program and its arguments. The argument opt is zero
-        or more of the flags <code>RUN_COMMAND_NO_STDIN</code>, <code>RUN_GIT_CMD</code>,
-        <code>RUN_COMMAND_STDOUT_TO_STDERR</code>, or <code>RUN_SILENT_EXEC_FAILURE</code>
+        or more of the flags <tt>RUN_COMMAND_NO_STDIN</tt>, <tt>RUN_GIT_CMD</tt>,
+        <tt>RUN_COMMAND_STDOUT_TO_STDERR</tt>, or <tt>RUN_SILENT_EXEC_FAILURE</tt>
         that correspond to the members .no_stdin, .git_cmd,
-        .stdout_to_stderr, .silent_exec_failure of <code>struct child_process</code>.
+        .stdout_to_stderr, .silent_exec_failure of <tt>struct child_process</tt>.
         The argument dir corresponds the member .dir. The argument env
         corresponds to the member .env.
 </p>
@@ -823,17 +827,17 @@ If the program terminated due to a signal, then the return value is the
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>start_async</code>
+<tt>start_async</tt>
 </dt>
 <dd>
 <p>
-        Run a function asynchronously. Takes a pointer to a <code>struct
-        async</code> that specifies the details and returns a set of pipe FDs
+        Run a function asynchronously. Takes a pointer to a <tt>struct
+        async</tt> that specifies the details and returns a set of pipe FDs
         for communication with the function. See below for details.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>finish_async</code>
+<tt>finish_async</tt>
 </dt>
 <dd>
 <p>
@@ -842,7 +846,7 @@ If the program terminated due to a signal, then the return value is the
 </p>
 </dd>
 <dt class="hdlist1">
-<code>run_hook</code>
+<tt>run_hook</tt>
 </dt>
 <dd>
 <p>
@@ -871,7 +875,7 @@ If the program terminated due to a signal, then the return value is the
 <div class="ulist"><ul>
 <li>
 <p>
-<code>struct child_process</code>
+<tt>struct child_process</tt>
 </p>
 </li>
 </ul></div>
@@ -932,19 +936,19 @@ Specify -1 to have a pipe allocated; start_command() replaces -1
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>.in: Returns the writable pipe end into which the caller writes;
-        the readable end of the pipe becomes the child's stdin.</code></pre>
+<pre><tt>.in: Returns the writable pipe end into which the caller writes;
+        the readable end of the pipe becomes the child's stdin.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>.out, .err: Returns the readable pipe end from which the caller
+<pre><tt>.out, .err: Returns the readable pipe end from which the caller
         reads; the writable end of the pipe end becomes child's
-        stdout/stderr.</code></pre>
+        stdout/stderr.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The caller of start_command() must close the so returned FDs
-after it has completed reading from/writing to it!</code></pre>
+<pre><tt>The caller of start_command() must close the so returned FDs
+after it has completed reading from/writing to it!</tt></pre>
 </div></div>
 </li>
 <li>
@@ -953,14 +957,14 @@ Specify a file descriptor &gt; 0 to be used by the child:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>.in: The FD must be readable; it becomes child's stdin.
+<pre><tt>.in: The FD must be readable; it becomes child's stdin.
 .out: The FD must be writable; it becomes child's stdout.
-.err: The FD must be writable; it becomes child's stderr.</code></pre>
+.err: The FD must be writable; it becomes child's stderr.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The specified FD is closed by start_command(), even if it fails to
-run the sub-process!</code></pre>
+<pre><tt>The specified FD is closed by start_command(), even if it fails to
+run the sub-process!</tt></pre>
 </div></div>
 </li>
 <li>
@@ -970,15 +974,15 @@ Special forms of redirection are available by setting these members
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>.no_stdin, .no_stdout, .no_stderr: The respective channel is
-        redirected to /dev/null.</code></pre>
+<pre><tt>.no_stdin, .no_stdout, .no_stderr: The respective channel is
+        redirected to /dev/null.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>.stdout_to_stderr: stdout of the child is redirected to its
+<pre><tt>.stdout_to_stderr: stdout of the child is redirected to its
         stderr. This happens after stderr is itself redirected.
         So stdout will follow stderr to wherever it is
-        redirected.</code></pre>
+        redirected.</tt></pre>
 </div></div>
 </li>
 </ol></div>
@@ -1007,7 +1011,7 @@ special error condition.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>struct async</code>
+<tt>struct async</tt>
 </p>
 </li>
 </ul></div>
@@ -1063,20 +1067,20 @@ Specify &lt; 0 to have a pipe allocated; start_async() replaces
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>.in: Returns the writable pipe end into which the caller
+<pre><tt>.in: Returns the writable pipe end into which the caller
 writes; the readable end of the pipe becomes the function's
-in argument.</code></pre>
+in argument.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>.out: Returns the readable pipe end from which the caller
+<pre><tt>.out: Returns the readable pipe end from which the caller
 reads; the writable end of the pipe becomes the function's
-out argument.</code></pre>
+out argument.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The caller of start_async() must close the returned FDs after it
-has completed reading from/writing from them.</code></pre>
+<pre><tt>The caller of start_async() must close the returned FDs after it
+has completed reading from/writing from them.</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1085,20 +1089,20 @@ Specify a file descriptor &gt; 0 to be used by the function:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>.in: The FD must be readable; it becomes the function's in.
-.out: The FD must be writable; it becomes the function's out.</code></pre>
+<pre><tt>.in: The FD must be readable; it becomes the function's in.
+.out: The FD must be writable; it becomes the function's out.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The specified FD is closed by start_async(), even if it fails to
-run the function.</code></pre>
+<pre><tt>The specified FD is closed by start_async(), even if it fails to
+run the function.</tt></pre>
 </div></div>
 </li>
 </ol></div>
 <div class="paragraph"><p>The function pointer in .proc has the following signature:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>int proc(int in, int out, void *data);</code></pre>
+<pre><tt>int proc(int in, int out, void *data);</tt></pre>
 </div></div>
 <div class="olist arabic"><ol class="arabic">
 <li>

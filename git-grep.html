@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-grep(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -848,8 +852,8 @@ grep.extendedRegexp
 </dt>
 <dd>
 <p>
-        Also search in ignored files by not honoring the <code>.gitignore</code>
-        mechanism. Only useful with <code>--untracked</code>.
+        Also search in ignored files by not honoring the <tt>.gitignore</tt>
+        mechanism. Only useful with <tt>--untracked</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -857,9 +861,9 @@ grep.extendedRegexp
 </dt>
 <dd>
 <p>
-        Do not pay attention to ignored files specified via the <code>.gitignore</code>
+        Do not pay attention to ignored files specified via the <tt>.gitignore</tt>
         mechanism.  Only useful when searching files in the current directory
-        with <code>--no-index</code>.
+        with <tt>--no-index</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -955,9 +959,9 @@ grep.extendedRegexp
 <dd>
 <p>
         By default, the command shows the filename for each
-        match.  <code>-h</code> option is used to suppress this output.
-        <code>-H</code> is there for completeness and does not do anything
-        except it overrides <code>-h</code> given earlier on the command
+        match.  <tt>-h</tt> option is used to suppress this output.
+        <tt>-H</tt> is there for completeness and does not do anything
+        except it overrides <tt>-h</tt> given earlier on the command
         line.
 </p>
 </dd>
@@ -1044,8 +1048,8 @@ grep.extendedRegexp
 <p>
         Instead of showing every matched line, show only the
         names of files that contain (or do not contain) matches.
-        For better compatibility with <em>git diff</em>, <code>--name-only</code> is a
-        synonym for <code>--files-with-matches</code>.
+        For better compatibility with <em>git diff</em>, <tt>--name-only</tt> is a
+        synonym for <tt>--files-with-matches</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1102,7 +1106,7 @@ grep.extendedRegexp
 <p>
         Turn off match highlighting, even when the configuration file
         gives the default to color output.
-        Same as <code>--color=never</code>.
+        Same as <tt>--color=never</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1149,7 +1153,7 @@ grep.extendedRegexp
 <dd>
 <p>
         Show &lt;num&gt; leading and trailing lines, and place a line
-        containing <code>--</code> between contiguous groups of matches.
+        containing <tt>--</tt> between contiguous groups of matches.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1161,7 +1165,7 @@ grep.extendedRegexp
 <dd>
 <p>
         Show &lt;num&gt; trailing lines, and place a line containing
-        <code>--</code> between contiguous groups of matches.
+        <tt>--</tt> between contiguous groups of matches.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1173,7 +1177,7 @@ grep.extendedRegexp
 <dd>
 <p>
         Show &lt;num&gt; leading lines, and place a line containing
-        <code>--</code> between contiguous groups of matches.
+        <tt>--</tt> between contiguous groups of matches.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1204,7 +1208,7 @@ grep.extendedRegexp
 <dd>
 <p>
         The next parameter is the pattern. This option has to be
-        used for patterns starting with <code>-</code> and should be used in
+        used for patterns starting with <tt>-</tt> and should be used in
         scripts passing user input to grep.  Multiple patterns are
         combined by <em>or</em>.
 </p>
@@ -1224,8 +1228,8 @@ grep.extendedRegexp
 <dd>
 <p>
         Specify how multiple patterns are combined using Boolean
-        expressions.  <code>--or</code> is the default operator.  <code>--and</code> has
-        higher precedence than <code>--or</code>.  <code>-e</code> has to be used for all
+        expressions.  <tt>--or</tt> is the default operator.  <tt>--and</tt> has
+        higher precedence than <tt>--or</tt>.  <tt>-e</tt> has to be used for all
         patterns.
 </p>
 </dd>
@@ -1234,7 +1238,7 @@ grep.extendedRegexp
 </dt>
 <dd>
 <p>
-        When giving multiple pattern expressions combined with <code>--or</code>,
+        When giving multiple pattern expressions combined with <tt>--or</tt>,
         this flag is specified to limit the match to files that
         have lines to match all of them.
 </p>
@@ -1286,29 +1290,29 @@ grep.extendedRegexp
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>git grep 'time_t' -- '*.[ch]'</code>
+<tt>git grep 'time_t' -- '*.[ch]'</tt>
 </dt>
 <dd>
 <p>
-        Looks for <code>time_t</code> in all tracked .c and .h files in the working
+        Looks for <tt>time_t</tt> in all tracked .c and .h files in the working
         directory and its subdirectories.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>git grep -e '#define' --and \( -e MAX_PATH -e PATH_MAX \)</code>
+<tt>git grep -e '#define' --and \( -e MAX_PATH -e PATH_MAX \)</tt>
 </dt>
 <dd>
 <p>
-        Looks for a line that has <code>#define</code> and either <code>MAX_PATH</code> or
-        <code>PATH_MAX</code>.
+        Looks for a line that has <tt>#define</tt> and either <tt>MAX_PATH</tt> or
+        <tt>PATH_MAX</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>git grep --all-match -e NODE -e Unexpected</code>
+<tt>git grep --all-match -e NODE -e Unexpected</tt>
 </dt>
 <dd>
 <p>
-        Looks for a line that has <code>NODE</code> or <code>Unexpected</code> in
+        Looks for a line that has <tt>NODE</tt> or <tt>Unexpected</tt> in
         files that have lines that match both.
 </p>
 </dd>

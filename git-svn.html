@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-svn(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -967,7 +971,7 @@ by using the --prefix option.</td>
 <p>
         Store Git commit times in the local time zone instead of UTC.  This
         makes <em>git log</em> (even without --date=local) show the same times
-        that <code>svn log</code> would in the local time zone.
+        that <tt>svn log</tt> would in the local time zone.
 </p>
 <div class="paragraph"><p>This doesn&#8217;t interfere with interoperating with the Subversion
 repository you cloned from, but if you wish for your local Git
@@ -1010,7 +1014,7 @@ Skip "doc*" directory for every fetch
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>--ignore-paths="^doc"</code></pre>
+<pre><tt>--ignore-paths="^doc"</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1019,7 +1023,7 @@ Skip "branches" and "tags" of first level directories
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>--ignore-paths="^[^/]+/(?:branches|tags)"</code></pre>
+<pre><tt>--ignore-paths="^[^/]+/(?:branches|tags)"</tt></pre>
 </div></div>
 </dd>
 </dl></div>
@@ -1099,7 +1103,7 @@ Skip "branches" and "tags" of first level directories
         This fetches revisions from the SVN parent of the current HEAD
         and rebases the current (uncommitted to SVN) work against it.
 </p>
-<div class="paragraph"><p>This works similarly to <code>svn update</code> or <em>git pull</em> except that
+<div class="paragraph"><p>This works similarly to <tt>svn update</tt> or <em>git pull</em> except that
 it preserves linear history with <em>git rebase</em> instead of
 <em>git merge</em> for ease of dcommitting with <em>git svn</em>.</p></div>
 <div class="paragraph"><p>This accepts all options that <em>git svn fetch</em> and <em>git rebase</em>
@@ -1154,9 +1158,9 @@ branch, not on the current branch.</p></div>
 <p>
         Commit to this SVN URL (the full path).  This is intended to
         allow existing <em>git svn</em> repositories created with one transport
-        method (e.g. <code>svn://</code> or <code>http://</code> for anonymous read) to be
+        method (e.g. <tt>svn://</tt> or <tt>http://</tt> for anonymous read) to be
         reused if a user is later given access to an alternate transport
-        method (e.g. <code>svn+ssh://</code> or <code>https://</code>) for commit.
+        method (e.g. <tt>svn+ssh://</tt> or <tt>https://</tt>) for commit.
 </p>
 <div class="verseblock">
 <pre class="content">config key: svn-remote.&lt;name&gt;.commiturl
@@ -1172,11 +1176,11 @@ discouraged.</p></div>
 <dd>
 <p>
         Add the given merge information during the dcommit
-        (e.g. <code>--mergeinfo="/branches/foo:1-10"</code>). All svn server versions can
+        (e.g. <tt>--mergeinfo="/branches/foo:1-10"</tt>). All svn server versions can
         store this information (as a property), and svn clients starting from
         version 1.5 can make use of it. To specify merge information from multiple
         branches, use a single space character between the branches
-        (<code>--mergeinfo="/branches/foo:1-10 /branches/bar:3,5-6,8"</code>)
+        (<tt>--mergeinfo="/branches/foo:1-10 /branches/bar:3,5-6,8"</tt>)
 </p>
 <div class="verseblock">
 <pre class="content">config key: svn.pushmergeinfo</pre>
@@ -1250,8 +1254,8 @@ first have already been pushed into SVN.</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>git config --get-all svn-remote.&lt;name&gt;.branches
-git config --get-all svn-remote.&lt;name&gt;.tags</code></pre>
+<pre><tt>git config --get-all svn-remote.&lt;name&gt;.branches
+git config --get-all svn-remote.&lt;name&gt;.tags</tt></pre>
 </div></div>
 <div class="paragraph"><p>where &lt;name&gt; is the name of the SVN repository as specified by the -R option to
 <em>init</em> (or "svn" by default).</p></div>
@@ -1277,7 +1281,7 @@ git config --get-all svn-remote.&lt;name&gt;.tags</code></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>git config --get-all svn-remote.&lt;name&gt;.commiturl</code></pre>
+<pre><tt>git config --get-all svn-remote.&lt;name&gt;.commiturl</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1504,12 +1508,12 @@ environment). This command has the same behaviour.</td>
 <dd>
 <p>
         Commits the diff of two tree-ish arguments from the
-        command-line.  This command does not rely on being inside an <code>git svn
-        init</code>-ed repository.  This command takes three arguments, (a) the
+        command-line.  This command does not rely on being inside an <tt>git svn
+        init</tt>-ed repository.  This command takes three arguments, (a) the
         original tree to diff against, (b) the new tree result, (c) the
         URL of the target Subversion repository.  The final argument
         (URL) may be omitted if you are working from a <em>git svn</em>-aware
-        repository (that has been <code>init</code>-ed with <em>git svn</em>).
+        repository (that has been <tt>init</tt>-ed with <em>git svn</em>).
         The -r&lt;revision&gt; option is required for this.
 </p>
 </dd>
@@ -1614,9 +1618,9 @@ Assume you have local changes in "master", but you need to refetch "r2".
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>    r1---r2---r3 remotes/git-svn
+<pre><tt>    r1---r2---r3 remotes/git-svn
                 \
-                 A---B master</code></pre>
+                 A---B master</tt></pre>
 </div></div>
 <div class="paragraph"><p>Fix the ignore-paths or SVN permissions problem that caused "r2" to
 be incomplete in the first place.  Then:</p></div>
@@ -1627,9 +1631,9 @@ git svn fetch</pre>
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    r1---r2'--r3' remotes/git-svn
+<pre><tt>    r1---r2'--r3' remotes/git-svn
       \
-       r2---r3---A---B master</code></pre>
+       r2---r3---A---B master</tt></pre>
 </div></div>
 <div class="paragraph"><p>Then fixup "master" with <em>git rebase</em>.
 Do NOT use <em>git merge</em> or your history will not be compatible with a
@@ -1640,9 +1644,9 @@ future <em>dcommit</em>!</p></div>
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    r1---r2'--r3' remotes/git-svn
+<pre><tt>    r1---r2'--r3' remotes/git-svn
                 \
-                 A'--B' master</code></pre>
+                 A'--B' master</tt></pre>
 </div></div>
 </dd>
 </dl></div>
@@ -1762,7 +1766,7 @@ config key: svn.findcopiesharder</pre>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        loginname = Joe User &lt;user@example.com&gt;</code></pre>
+<pre><tt>        loginname = Joe User &lt;user@example.com&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>If this option is specified and <em>git svn</em> encounters an SVN
 committer name that does not exist in the authors-file, <em>git svn</em>
@@ -1869,7 +1873,7 @@ creating the branch or tag.</p></div>
 <dd>
 <p>
         When retrieving svn commits into Git (as part of <em>fetch</em>, <em>rebase</em>, or
-        <em>dcommit</em> operations), look for the first <code>From:</code> or <code>Signed-off-by:</code> line
+        <em>dcommit</em> operations), look for the first <tt>From:</tt> or <tt>Signed-off-by:</tt> line
         in the log message and use that as the author string.
 </p>
 </dd>
@@ -1880,8 +1884,8 @@ creating the branch or tag.</p></div>
 <p>
         When committing to svn from Git (as part of <em>commit-diff</em>, <em>set-tree</em> or <em>dcommit</em>
         operations), if the existing log message doesn&#8217;t already have a
-        <code>From:</code> or <code>Signed-off-by:</code> line, append a <code>From:</code> line based on the
-        Git commit&#8217;s author string.  If you use this, then <code>--use-log-author</code>
+        <tt>From:</tt> or <tt>Signed-off-by:</tt> line, append a <tt>From:</tt> line based on the
+        Git commit&#8217;s author string.  If you use this, then <tt>--use-log-author</tt>
         will retrieve a valid author string for all commits.
 </p>
 </dd>
@@ -2100,7 +2104,7 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 (ignoring tags and branches):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code># Clone a repo (like git clone):
+<pre><tt># Clone a repo (like git clone):
         git svn clone http://svn.example.com/project/trunk
 # Enter the newly cloned directory:
         cd trunk
@@ -2115,13 +2119,13 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 # as well as automatically updating your working HEAD:
         git svn dcommit
 # Append svn:ignore settings to the default Git exclude file:
-        git svn show-ignore &gt;&gt; .git/info/exclude</code></pre>
+        git svn show-ignore &gt;&gt; .git/info/exclude</tt></pre>
 </div></div>
 <div class="paragraph"><p>Tracking and contributing to an entire Subversion-managed project
 (complete with a trunk, tags and branches):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code># Clone a repo with standard SVN directory layout (like git clone):
+<pre><tt># Clone a repo with standard SVN directory layout (like git clone):
         git svn clone http://svn.example.com/project --stdlayout --prefix svn/
 # Or, if the repo uses a non-standard directory layout:
         git svn clone http://svn.example.com/project -T tr -b branch -t tag --prefix svn/
@@ -2133,7 +2137,7 @@ for rewriteRoot and rewriteUUID which can be used together.</p></div>
 # with the appropriate name):
         git reset --hard svn/trunk
 # You may only dcommit to one branch/tag/trunk at a time.  The usage
-# of dcommit/rebase/show-ignore should be the same as above.</code></pre>
+# of dcommit/rebase/show-ignore should be the same as above.</tt></pre>
 </div></div>
 <div class="paragraph"><p>The initial <em>git svn clone</em> can be quite time-consuming
 (especially for large Subversion repositories). If multiple
@@ -2143,7 +2147,7 @@ do the initial <em>git svn clone</em> to a repository on a server and
 have each person clone that repository with <em>git clone</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code># Do the initial import on a server
+<pre><tt># Do the initial import on a server
         ssh server "cd /pub &amp;&amp; git svn clone http://svn.example.com/project [options...]"
 # Clone locally - make sure the refs/remotes/ space matches the server
         mkdir project
@@ -2161,7 +2165,7 @@ have each person clone that repository with <em>git clone</em>:</p></div>
 # --stdlayout/-T/-b/-t/--prefix options as were used on server)
         git svn init http://svn.example.com/project [options...]
 # Pull the latest changes from Subversion
-        git svn rebase</code></pre>
+        git svn rebase</tt></pre>
 </div></div>
 </div>
 </div>
@@ -2175,9 +2179,9 @@ respect to the upstream SVN repository and allow the use of the preferred
 <em>git svn dcommit</em> subcommand to push unintegrated commits back into SVN.</p></div>
 <div class="paragraph"><p>Originally, <em>git svn</em> recommended that developers pulled or merged from
 the <em>git svn</em> branch.  This was because the author favored
-<code>git svn set-tree B</code> to commit a single head rather than the
-<code>git svn set-tree A..B</code> notation to commit multiple commits. Use of
-<em>git pull</em> or <em>git merge</em> with <code>git svn set-tree A..B</code> will cause non-linear
+<tt>git svn set-tree B</tt> to commit a single head rather than the
+<tt>git svn set-tree A..B</tt> notation to commit multiple commits. Use of
+<em>git pull</em> or <em>git merge</em> with <tt>git svn set-tree A..B</tt> will cause non-linear
 history to be flattened when committing into SVN and this can lead to merge
 commits unexpectedly reversing previous commits in SVN.</p></div>
 </div>
@@ -2255,7 +2259,7 @@ branch.</p></div>
 attempt to commit on top of the SVN commit named in</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git log --grep=^git-svn-id: --first-parent -1</code></pre>
+<pre><tt>git log --grep=^git-svn-id: --first-parent -1</tt></pre>
 </div></div>
 <div class="paragraph"><p>You <em>must</em> therefore ensure that the most recent commit of the branch
 you want to dcommit to is the <em>first</em> parent of the merge.  Chaos will
@@ -2304,8 +2308,8 @@ the $GIT_DIR/config file so that the branches and tags are associated
 with different name spaces.  For example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>branches = stable/*:refs/remotes/svn/stable/*
-branches = debug/*:refs/remotes/svn/debug/*</code></pre>
+<pre><tt>branches = stable/*:refs/remotes/svn/stable/*
+branches = debug/*:refs/remotes/svn/debug/*</tt></pre>
 </div></div>
 </div>
 </div>
@@ -2339,11 +2343,11 @@ configured with multiple projects glob expansions such those
 listed below are allowed:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[svn-remote "project-a"]
+<pre><tt>[svn-remote "project-a"]
         url = http://server.org/svn
         fetch = trunk/project-a:refs/remotes/project-a/trunk
         branches = branches/*/project-a:refs/remotes/project-a/branches/*
-        tags = tags/*/project-a:refs/remotes/project-a/tags/*</code></pre>
+        tags = tags/*/project-a:refs/remotes/project-a/tags/*</tt></pre>
 </div></div>
 <div class="paragraph"><p>Keep in mind that the <em>*</em> (asterisk) wildcard of the local ref
 (right of the <em>:</em>) <strong>must</strong> be the farthest right path component;
@@ -2355,28 +2359,28 @@ should be manually entered with a text-editor or using <em>git config</em>.</p><
 comma-separated list of names within braces. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[svn-remote "huge-project"]
+<pre><tt>[svn-remote "huge-project"]
         url = http://server.org/svn
         fetch = trunk/src:refs/remotes/trunk
         branches = branches/{red,green}/src:refs/remotes/project-a/branches/*
-        tags = tags/{1.0,2.0}/src:refs/remotes/project-a/tags/*</code></pre>
+        tags = tags/{1.0,2.0}/src:refs/remotes/project-a/tags/*</tt></pre>
 </div></div>
 <div class="paragraph"><p>Multiple fetch, branches, and tags keys are supported:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[svn-remote "messy-repo"]
+<pre><tt>[svn-remote "messy-repo"]
         url = http://server.org/svn
         fetch = trunk/project-a:refs/remotes/project-a/trunk
         fetch = branches/demos/june-project-a-demo:refs/remotes/project-a/demos/june-demo
         branches = branches/server/*:refs/remotes/project-a/branches/*
         branches = branches/demos/2011/*:refs/remotes/project-a/2011-demos/*
-        tags = tags/server/*:refs/remotes/project-a/tags/*</code></pre>
+        tags = tags/server/*:refs/remotes/project-a/tags/*</tt></pre>
 </div></div>
 <div class="paragraph"><p>Creating a branch in such a configuration requires disambiguating which
 location to use using the -d or --destination flag:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git svn branch -d branches/server release-2-3-0</code></pre>
+<pre><tt>$ git svn branch -d branches/server release-2-3-0</tt></pre>
 </div></div>
 <div class="paragraph"><p>Note that git-svn keeps track of the highest revision in which a branch
 or tag has appeared. If the subset of branches or tags is changed after

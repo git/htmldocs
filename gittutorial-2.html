@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gittutorial-2(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -767,7 +771,7 @@ of the Git documentation.</p></div>
 <div class="paragraph"><p>Let&#8217;s start a new project and create a small amount of history:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ mkdir test-project
+<pre><tt>$ mkdir test-project
 $ cd test-project
 $ git init
 Initialized empty Git repository in .git/
@@ -780,7 +784,7 @@ $ git commit -a -m "initial commit"
 $ echo 'hello world!' &gt;file.txt
 $ git commit -a -m "add emphasis"
 [master c4d59f3] add emphasis
- 1 file changed, 1 insertion(+), 1 deletion(-)</code></pre>
+ 1 file changed, 1 insertion(+), 1 deletion(-)</tt></pre>
 </div></div>
 <div class="paragraph"><p>What are the 7 digits of hex that Git responded to the commit with?</p></div>
 <div class="paragraph"><p>We saw in part one of the tutorial that commits have names like this.
@@ -797,20 +801,20 @@ can be used, so long as they are unambiguous.</p></div>
 following the example above generates a different SHA-1 hash than
 the one shown above because the commit object records the time when
 it was created and the name of the person performing the commit.</p></div>
-<div class="paragraph"><p>We can ask Git about this particular object with the <code>cat-file</code>
+<div class="paragraph"><p>We can ask Git about this particular object with the <tt>cat-file</tt>
 command. Don&#8217;t copy the 40 hex digits from this example but use those
 from your own version. Note that you can shorten it to only a few
 characters to save yourself typing all 40 hex digits:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git cat-file -t 54196cc2
+<pre><tt>$ git cat-file -t 54196cc2
 commit
 $ git cat-file commit 54196cc2
 tree 92b8b694ffb1675e5975148e1121810081dbdffe
 author J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
 committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
 
-initial commit</code></pre>
+initial commit</tt></pre>
 </div></div>
 <div class="paragraph"><p>A tree can refer to one or more "blob" objects, each corresponding to
 a file.  In addition, a tree can also refer to other tree objects,
@@ -819,21 +823,21 @@ any tree using ls-tree (remember that a long enough initial portion
 of the SHA-1 will also work):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-tree 92b8b694
-100644 blob 3b18e512dba79e4c8300dd08aeb37f8e728b8dad    file.txt</code></pre>
+<pre><tt>$ git ls-tree 92b8b694
+100644 blob 3b18e512dba79e4c8300dd08aeb37f8e728b8dad    file.txt</tt></pre>
 </div></div>
 <div class="paragraph"><p>Thus we see that this tree has one file in it.  The SHA-1 hash is a
 reference to that file&#8217;s data:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git cat-file -t 3b18e512
-blob</code></pre>
+<pre><tt>$ git cat-file -t 3b18e512
+blob</tt></pre>
 </div></div>
 <div class="paragraph"><p>A "blob" is just file data, which we can also examine with cat-file:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git cat-file blob 3b18e512
-hello world</code></pre>
+<pre><tt>$ git cat-file blob 3b18e512
+hello world</tt></pre>
 </div></div>
 <div class="paragraph"><p>Note that this is the old file data; so the object that Git named in
 its response to the initial tree was a tree with a snapshot of the
@@ -842,7 +846,7 @@ directory state that was recorded by the first commit.</p></div>
 directory:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ find .git/objects/
+<pre><tt>$ find .git/objects/
 .git/objects/
 .git/objects/pack
 .git/objects/info
@@ -857,7 +861,7 @@ directory:</p></div>
 .git/objects/d0
 .git/objects/d0/492b368b66bdabf2ac1fd8c92b39d3db916e59
 .git/objects/c4
-.git/objects/c4/d59f390b9cfd4318117afde11d601c1085f241</code></pre>
+.git/objects/c4/d59f390b9cfd4318117afde11d601c1085f241</tt></pre>
 </div></div>
 <div class="paragraph"><p>and the contents of these files is just the compressed data plus a
 header identifying their length and their type.  The type is either a
@@ -866,8 +870,8 @@ blob, a tree, a commit, or a tag.</p></div>
 from .git/HEAD:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cat .git/HEAD
-ref: refs/heads/master</code></pre>
+<pre><tt>$ cat .git/HEAD
+ref: refs/heads/master</tt></pre>
 </div></div>
 <div class="paragraph"><p>As you can see, this tells us which branch we&#8217;re currently on, and it
 tells us this by naming a file under the .git directory, which itself
@@ -875,7 +879,7 @@ contains a SHA-1 name referring to a commit object, which we can
 examine with cat-file:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cat .git/refs/heads/master
+<pre><tt>$ cat .git/refs/heads/master
 c4d59f390b9cfd4318117afde11d601c1085f241
 $ git cat-file -t c4d59f39
 commit
@@ -885,25 +889,25 @@ parent 54196cc2703dc165cbd373a65a4dcf22d50ae7f7
 author J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143418702 -0500
 committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143418702 -0500
 
-add emphasis</code></pre>
+add emphasis</tt></pre>
 </div></div>
 <div class="paragraph"><p>The "tree" object here refers to the new state of the tree:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-tree d0492b36
+<pre><tt>$ git ls-tree d0492b36
 100644 blob a0423896973644771497bdc03eb99d5281615b51    file.txt
 $ git cat-file blob a0423896
-hello world!</code></pre>
+hello world!</tt></pre>
 </div></div>
 <div class="paragraph"><p>and the "parent" object refers to the previous commit:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git cat-file commit 54196cc2
+<pre><tt>$ git cat-file commit 54196cc2
 tree 92b8b694ffb1675e5975148e1121810081dbdffe
 author J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
 committer J. Bruce Fields &lt;bfields@puzzle.fieldses.org&gt; 1143414668 -0500
 
-initial commit</code></pre>
+initial commit</tt></pre>
 </div></div>
 <div class="paragraph"><p>The tree object is the tree we examined first, and this commit is
 unusual in that it lacks any parent.</p></div>
@@ -961,8 +965,8 @@ designate such an argument.</p></div>
 <div class="sect1">
 <h2 id="_the_index_file">The index file</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The primary tool we&#8217;ve been using to create commits is <code>git-commit
--a</code>, which creates a commit including every change you&#8217;ve made to
+<div class="paragraph"><p>The primary tool we&#8217;ve been using to create commits is <tt>git-commit
+-a</tt>, which creates a commit including every change you&#8217;ve made to
 your working tree.  But what if you want to commit changes only to
 certain files?  Or only certain changes to certain files?</p></div>
 <div class="paragraph"><p>If we look at the way commits are created under the cover, we&#8217;ll see
@@ -970,34 +974,34 @@ that there are more flexible ways creating commits.</p></div>
 <div class="paragraph"><p>Continuing with our test-project, let&#8217;s modify file.txt again:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ echo "hello world, again" &gt;&gt;file.txt</code></pre>
+<pre><tt>$ echo "hello world, again" &gt;&gt;file.txt</tt></pre>
 </div></div>
 <div class="paragraph"><p>but this time instead of immediately making the commit, let&#8217;s take an
 intermediate step, and ask for diffs along the way to keep track of
 what&#8217;s happening:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git diff
+<pre><tt>$ git diff
 --- a/file.txt
 +++ b/file.txt
 @@ -1 +1,2 @@
  hello world!
 +hello world, again
 $ git add file.txt
-$ git diff</code></pre>
+$ git diff</tt></pre>
 </div></div>
 <div class="paragraph"><p>The last diff is empty, but no new commits have been made, and the
 head still doesn&#8217;t contain the new line:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git diff HEAD
+<pre><tt>$ git diff HEAD
 diff --git a/file.txt b/file.txt
 index a042389..513feba 100644
 --- a/file.txt
 +++ b/file.txt
 @@ -1 +1,2 @@
  hello world!
-+hello world, again</code></pre>
++hello world, again</tt></pre>
 </div></div>
 <div class="paragraph"><p>So <em>git diff</em> is comparing against something other than the head.
 The thing that it&#8217;s comparing against is actually the index file,
@@ -1005,13 +1009,13 @@ which is stored in .git/index in a binary format, but whose contents
 we can examine with ls-files:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-files --stage
+<pre><tt>$ git ls-files --stage
 100644 513feba2e53ebbd2532419ded848ba19de88ba00 0       file.txt
 $ git cat-file -t 513feba2
 blob
 $ git cat-file blob 513feba2
 hello world!
-hello world, again</code></pre>
+hello world, again</tt></pre>
 </div></div>
 <div class="paragraph"><p>So what our <em>git add</em> did was store a new blob and then put
 a reference to it in the index file.  If we modify the file again,
@@ -1019,7 +1023,7 @@ we&#8217;ll see that the new modifications are reflected in the <em>git diff</em
 output:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ echo 'again?' &gt;&gt;file.txt
+<pre><tt>$ echo 'again?' &gt;&gt;file.txt
 $ git diff
 index 513feba..ba3da7b 100644
 --- a/file.txt
@@ -1027,14 +1031,14 @@ index 513feba..ba3da7b 100644
 @@ -1,2 +1,3 @@
  hello world!
  hello world, again
-+again?</code></pre>
++again?</tt></pre>
 </div></div>
 <div class="paragraph"><p>With the right arguments, <em>git diff</em> can also show us the difference
 between the working directory and the last commit, or between the
 index and the last commit:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git diff HEAD
+<pre><tt>$ git diff HEAD
 diff --git a/file.txt b/file.txt
 index a042389..ba3da7b 100644
 --- a/file.txt
@@ -1050,7 +1054,7 @@ index a042389..513feba 100644
 +++ b/file.txt
 @@ -1 +1,2 @@
  hello world!
-+hello world, again</code></pre>
++hello world, again</tt></pre>
 </div></div>
 <div class="paragraph"><p>At any time, we can create a new commit using <em>git commit</em> (without
 the "-a" option), and verify that the state committed only includes the
@@ -1058,7 +1062,7 @@ changes stored in the index file, not the additional change that is
 still only in our working tree:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git commit -m "repeat"
+<pre><tt>$ git commit -m "repeat"
 $ git diff HEAD
 diff --git a/file.txt b/file.txt
 index 513feba..ba3da7b 100644
@@ -1067,7 +1071,7 @@ index 513feba..ba3da7b 100644
 @@ -1,2 +1,3 @@
  hello world!
  hello world, again
-+again?</code></pre>
++again?</tt></pre>
 </div></div>
 <div class="paragraph"><p>So by default <em>git commit</em> uses the index to create the commit, not
 the working tree; the "-a" option to commit tells it to first update
@@ -1076,28 +1080,28 @@ the index with all changes in the working tree.</p></div>
 file:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ echo "goodbye, world" &gt;closing.txt
-$ git add closing.txt</code></pre>
+<pre><tt>$ echo "goodbye, world" &gt;closing.txt
+$ git add closing.txt</tt></pre>
 </div></div>
 <div class="paragraph"><p>The effect of the <em>git add</em> was to add one entry to the index file:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-files --stage
+<pre><tt>$ git ls-files --stage
 100644 8b9743b20d4b15be3955fc8d5cd2b09cd2336138 0       closing.txt
-100644 513feba2e53ebbd2532419ded848ba19de88ba00 0       file.txt</code></pre>
+100644 513feba2e53ebbd2532419ded848ba19de88ba00 0       file.txt</tt></pre>
 </div></div>
 <div class="paragraph"><p>And, as you can see with cat-file, this new entry refers to the
 current contents of the file:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git cat-file blob 8b9743b2
-goodbye, world</code></pre>
+<pre><tt>$ git cat-file blob 8b9743b2
+goodbye, world</tt></pre>
 </div></div>
 <div class="paragraph"><p>The "status" command is a useful way to get a quick summary of the
 situation:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git status
+<pre><tt>$ git status
 # On branch master
 # Changes to be committed:
 #   (use "git reset HEAD &lt;file&gt;..." to unstage)
@@ -1108,7 +1112,7 @@ situation:</p></div>
 #   (use "git add &lt;file&gt;..." to update what will be committed)
 #
 #       modified: file.txt
-#</code></pre>
+#</tt></pre>
 </div></div>
 <div class="paragraph"><p>Since the current state of closing.txt is cached in the index file,
 it is listed as "Changes to be committed".  Since file.txt has
@@ -1116,7 +1120,7 @@ changes in the working directory that aren&#8217;t reflected in the index,
 it is marked "changed but not updated".  At this point, running "git
 commit" would create a commit that added closing.txt (with its new
 contents), but that didn&#8217;t modify file.txt.</p></div>
-<div class="paragraph"><p>Also, note that a bare <code>git diff</code> shows the changes to file.txt, but
+<div class="paragraph"><p>Also, note that a bare <tt>git diff</tt> shows the changes to file.txt, but
 not the addition of closing.txt, because the version of closing.txt
 in the index file is identical to the one in the working directory.</p></div>
 <div class="paragraph"><p>In addition to being the staging area for new commits, the index file

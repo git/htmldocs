@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-daemon(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -774,12 +778,12 @@ it will refuse to export any Git directory that hasn&#8217;t explicitly been mar
 for export this way (unless the <em>--export-all</em> parameter is specified). If you
 pass some directory paths as <em>git daemon</em> arguments, you can further restrict
 the offers to a whitelist comprising of those.</p></div>
-<div class="paragraph"><p>By default, only <code>upload-pack</code> service is enabled, which serves
+<div class="paragraph"><p>By default, only <tt>upload-pack</tt> service is enabled, which serves
 <em>git fetch-pack</em> and <em>git ls-remote</em> clients, which are invoked
 from <em>git fetch</em>, <em>git pull</em>, and <em>git clone</em>.</p></div>
 <div class="paragraph"><p>This is ideally suited for read-only updates, i.e., pulling from
 Git repositories.</p></div>
-<div class="paragraph"><p>An <code>upload-archive</code> also exists to serve <em>git archive</em>.</p></div>
+<div class="paragraph"><p>An <tt>upload-archive</tt> also exists to serve <em>git archive</em>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -925,10 +929,10 @@ Git repositories.</p></div>
         Allow &#126;user notation to be used in requests.  When
         specified with no parameter, requests to
         git://host/&#126;alice/foo is taken as a request to access
-        <em>foo</em> repository in the home directory of user <code>alice</code>.
-        If <code>--user-path=path</code> is specified, the same request is
-        taken as a request to access <code>path/foo</code> repository in
-        the home directory of user <code>alice</code>.
+        <em>foo</em> repository in the home directory of user <tt>alice</tt>.
+        If <tt>--user-path=path</tt> is specified, the same request is
+        taken as a request to access <tt>path/foo</tt> repository in
+        the home directory of user <tt>alice</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -963,7 +967,7 @@ Git repositories.</p></div>
 <dd>
 <p>
         Save the process id in <em>file</em>.  Ignored when the daemon
-        is run under <code>--inetd</code>.
+        is run under <tt>--inetd</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -975,20 +979,20 @@ Git repositories.</p></div>
 <dd>
 <p>
         Change daemon&#8217;s uid and gid before entering the service loop.
-        When only <code>--user</code> is given without <code>--group</code>, the
+        When only <tt>--user</tt> is given without <tt>--group</tt>, the
         primary group ID for the user is used.  The values of
-        the option are given to <code>getpwnam(3)</code> and <code>getgrnam(3)</code>
+        the option are given to <tt>getpwnam(3)</tt> and <tt>getgrnam(3)</tt>
         and numeric IDs are not supported.
 </p>
-<div class="paragraph"><p>Giving these options is an error when used with <code>--inetd</code>; use
+<div class="paragraph"><p>Giving these options is an error when used with <tt>--inetd</tt>; use
 the facility of inet daemon to achieve the same before spawning
 <em>git daemon</em> if needed.</p></div>
 <div class="paragraph"><p>Like many programs that switch user id, the daemon does not reset
-environment variables such as <code>$HOME</code> when it runs git programs,
-e.g. <code>upload-pack</code> and <code>receive-pack</code>. When using this option, you
-may also want to set and export <code>HOME</code> to point at the home
-directory of <code>&lt;user&gt;</code> before starting the daemon, and make sure any
-Git configuration files in that directory are readable by <code>&lt;user&gt;</code>.</p></div>
+environment variables such as <tt>$HOME</tt> when it runs git programs,
+e.g. <tt>upload-pack</tt> and <tt>receive-pack</tt>. When using this option, you
+may also want to set and export <tt>HOME</tt> to point at the home
+directory of <tt>&lt;user&gt;</tt> before starting the daemon, and make sure any
+Git configuration files in that directory are readable by <tt>&lt;user&gt;</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --enable=&lt;service&gt;
@@ -1081,8 +1085,8 @@ upload-pack
 <p>
         This serves <em>git fetch-pack</em> and <em>git ls-remote</em>
         clients.  It is enabled by default, but a repository can
-        disable it by setting <code>daemon.uploadpack</code> configuration
-        item to <code>false</code>.
+        disable it by setting <tt>daemon.uploadpack</tt> configuration
+        item to <tt>false</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1092,7 +1096,7 @@ upload-archive
 <p>
         This serves <em>git archive --remote</em>.  It is disabled by
         default, but a repository can enable it by setting
-        <code>daemon.uploadarch</code> configuration item to <code>true</code>.
+        <tt>daemon.uploadarch</tt> configuration item to <tt>true</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1106,8 +1110,8 @@ receive-pack
         can push anything into the repository, including removal
         of refs).  This is solely meant for a closed LAN setting
         where everybody is friendly.  This service can be
-        enabled by setting <code>daemon.receivepack</code> configuration item to
-        <code>true</code>.
+        enabled by setting <tt>daemon.receivepack</tt> configuration item to
+        <tt>true</tt>.
 </p>
 </dd>
 </dl></div>
@@ -1123,8 +1127,8 @@ We assume the following in /etc/services
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ grep 9418 /etc/services
-git             9418/tcp                # Git Version Control System</code></pre>
+<pre><tt>$ grep 9418 /etc/services
+git             9418/tcp                # Git Version Control System</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1139,9 +1143,9 @@ git             9418/tcp                # Git Version Control System</code></pre
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        git stream tcp nowait nobody  /usr/bin/git
+<pre><tt>        git stream tcp nowait nobody  /usr/bin/git
                 git daemon --inetd --verbose --export-all
-                /pub/foo /pub/bar</code></pre>
+                /pub/foo /pub/bar</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1150,24 +1154,24 @@ git             9418/tcp                # Git Version Control System</code></pre
 <dd>
 <p>
         To set up <em>git daemon</em> as an inetd service that handles
-        repositories for different virtual hosts, <code>www.example.com</code>
-        and <code>www.example.org</code>, place an entry like the following into
-        <code>/etc/inetd</code> all on one line:
+        repositories for different virtual hosts, <tt>www.example.com</tt>
+        and <tt>www.example.org</tt>, place an entry like the following into
+        <tt>/etc/inetd</tt> all on one line:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        git stream tcp nowait nobody /usr/bin/git
+<pre><tt>        git stream tcp nowait nobody /usr/bin/git
                 git daemon --inetd --verbose --export-all
                 --interpolated-path=/pub/%H%D
                 /pub/www.example.org/software
                 /pub/www.example.com/software
-                /software</code></pre>
+                /software</tt></pre>
 </div></div>
-<div class="paragraph"><p>In this example, the root-level directory <code>/pub</code> will contain
+<div class="paragraph"><p>In this example, the root-level directory <tt>/pub</tt> will contain
 a subdirectory for each virtual host name supported.
 Further, both hosts advertise repositories simply as
-<code>git://www.example.com/software/repo.git</code>.  For pre-1.4.0
-clients, a symlink from <code>/software</code> into the appropriate
+<tt>git://www.example.com/software/repo.git</tt>.  For pre-1.4.0
+clients, a symlink from <tt>/software</tt> into the appropriate
 default repository could be made as well.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1181,12 +1185,12 @@ default repository could be made as well.</p></div>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        git daemon --verbose --export-all
+<pre><tt>        git daemon --verbose --export-all
                 --interpolated-path=/pub/%IP/%D
                 /pub/192.168.1.200/software
-                /pub/10.10.220.23/software</code></pre>
+                /pub/10.10.220.23/software</tt></pre>
 </div></div>
-<div class="paragraph"><p>In this example, the root-level directory <code>/pub</code> will contain
+<div class="paragraph"><p>In this example, the root-level directory <tt>/pub</tt> will contain
 a subdirectory for each virtual host IP address supported.
 Repositories can still be accessed by hostname though, assuming
 they correspond to these IP addresses.</p></div>
@@ -1203,9 +1207,9 @@ selectively enable/disable services per repository
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        [daemon]
+<pre><tt>        [daemon]
                 uploadpack = false
-                uploadarch = true</code></pre>
+                uploadarch = true</tt></pre>
 </div></div>
 </dd>
 </dl></div>

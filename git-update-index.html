@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-update-index(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -887,7 +891,7 @@ using the various options:</p></div>
 </p>
 <div class="paragraph"><p>This option can be also used as a coarse file-level mechanism
 to ignore uncommitted changes in tracked files (akin to what
-<code>.gitignore</code> does for untracked files).
+<tt>.gitignore</tt> does for untracked files).
 Git will fail (gracefully) in case it needs to modify this file
 in the index e.g. when merging in a commit;
 thus, in case the assumed-untracked file is changed upstream,
@@ -922,7 +926,7 @@ you will need to handle the situation manually.</p></div>
 <dd>
 <p>
         Runs <em>git update-index</em> itself on the paths whose index
-        entries are different from those from the <code>HEAD</code> commit.
+        entries are different from those from the <tt>HEAD</tt> commit.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -958,9 +962,9 @@ you will need to handle the situation manually.</p></div>
 </dt>
 <dd>
 <p>
-        By default, when a file <code>path</code> exists in the index,
-        <em>git update-index</em> refuses an attempt to add <code>path/file</code>.
-        Similarly if a file <code>path/file</code> exists, a file <code>path</code>
+        By default, when a file <tt>path</tt> exists in the index,
+        <em>git update-index</em> refuses an attempt to add <tt>path/file</tt>.
+        Similarly if a file <tt>path/file</tt> exists, a file <tt>path</tt>
         cannot be added.  With --replace flag, existing entries
         that conflict with the entry being added are
         automatically removed with warning messages.
@@ -992,7 +996,7 @@ you will need to handle the situation manually.</p></div>
         Write the resulting index out in the named on-disk format version.
         Supported versions are 2, 3 and 4. The current default version is 2
         or 3, depending on whether extra features are used, such as
-        <code>git add -N</code>.
+        <tt>git add -N</tt>.
 </p>
 <div class="paragraph"><p>Version 4 performs a simple pathname compression that reduces index
 size by 30%-50% on large repositories, which results in faster load
@@ -1005,7 +1009,7 @@ may not support it yet.</p></div>
 </dt>
 <dd>
 <p>
-        Only meaningful with <code>--stdin</code> or <code>--index-info</code>; paths are
+        Only meaningful with <tt>--stdin</tt> or <tt>--index-info</tt>; paths are
         separated with NUL character instead of LF.
 </p>
 </dd>
@@ -1024,7 +1028,7 @@ may not support it yet.</p></div>
 <p>
         Files to act on.
         Note that files beginning with <em>.</em> are discarded. This includes
-        <code>./file</code> and <code>dir/./file</code>. If you don&#8217;t want this, then use
+        <tt>./file</tt> and <tt>dir/./file</tt>. If you don&#8217;t want this, then use
         cleaner names.
         The same applies to directories ending <em>/</em> and paths with <em>//</em>
 </p>
@@ -1053,7 +1057,7 @@ merging.</p></div>
 <div class="paragraph"><p>To pretend you have a file with mode and sha1 at path, say:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git update-index --cacheinfo mode sha1 path</code></pre>
+<pre><tt>$ git update-index --cacheinfo mode sha1 path</tt></pre>
 </div></div>
 <div class="paragraph"><p><em>--info-only</em> is used to register files without placing them in the object
 database.  This is useful for status-only repositories.</p></div>
@@ -1067,7 +1071,7 @@ object database.</p></div>
 <div class="sect1">
 <h2 id="_using_index_info">Using --index-info</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><code>--index-info</code> is a more powerful mechanism that lets you feed
+<div class="paragraph"><p><tt>--index-info</tt> is a more powerful mechanism that lets you feed
 multiple entry definitions from the standard input, and designed
 specifically for scripts.  It can take inputs of three formats:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1101,16 +1105,16 @@ then feeding necessary input lines in the third format.</p></div>
 <div class="paragraph"><p>For example, starting with this index:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-files -s
-100644 8a1218a1024a212bb3db30becd860315f9f3ac52 0       frotz</code></pre>
+<pre><tt>$ git ls-files -s
+100644 8a1218a1024a212bb3db30becd860315f9f3ac52 0       frotz</tt></pre>
 </div></div>
-<div class="paragraph"><p>you can feed the following input to <code>--index-info</code>:</p></div>
+<div class="paragraph"><p>you can feed the following input to <tt>--index-info</tt>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git update-index --index-info
+<pre><tt>$ git update-index --index-info
 0 0000000000000000000000000000000000000000      frotz
 100644 8a1218a1024a212bb3db30becd860315f9f3ac52 1       frotz
-100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</code></pre>
+100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</tt></pre>
 </div></div>
 <div class="paragraph"><p>The first line of the input feeds 0 as the mode to remove the
 path; the SHA-1 does not matter as long as it is well formatted.
@@ -1118,9 +1122,9 @@ Then the second and third line feeds stage 1 and stage 2 entries
 for that path.  After the above, we would end up with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-files -s
+<pre><tt>$ git ls-files -s
 100644 8a1218a1024a212bb3db30becd860315f9f3ac52 1       frotz
-100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</code></pre>
+100755 8a1218a1024a212bb3db30becd860315f9f3ac52 2       frotz</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1128,11 +1132,11 @@ for that path.  After the above, we would end up with this:</p></div>
 <h2 id="_using_8220_assume_unchanged_8221_bit">Using &#8220;assume unchanged&#8221; bit</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Many operations in Git depend on your filesystem to have an
-efficient <code>lstat(2)</code> implementation, so that <code>st_mtime</code>
+efficient <tt>lstat(2)</tt> implementation, so that <tt>st_mtime</tt>
 information for working tree files can be cheaply checked to see
 if the file contents have changed from the version recorded in
 the index file.  Unfortunately, some filesystems have
-inefficient <code>lstat(2)</code>.  If your filesystem is one of them, you
+inefficient <tt>lstat(2)</tt>.  If your filesystem is one of them, you
 can set "assume unchanged" bit to paths you have not changed to
 cause Git not to do this check.  Note that setting this bit on a
 path does not mean Git will check the contents of the file to
@@ -1140,18 +1144,18 @@ see if it has changed&#8201;&#8212;&#8201;it makes Git to omit any checking and
 assume it has <strong>not</strong> changed.  When you make changes to working
 tree files, you have to explicitly tell Git about it by dropping
 "assume unchanged" bit, either before or after you modify them.</p></div>
-<div class="paragraph"><p>In order to set "assume unchanged" bit, use <code>--assume-unchanged</code>
-option.  To unset, use <code>--no-assume-unchanged</code>. To see which files
-have the "assume unchanged" bit set, use <code>git ls-files -v</code>
+<div class="paragraph"><p>In order to set "assume unchanged" bit, use <tt>--assume-unchanged</tt>
+option.  To unset, use <tt>--no-assume-unchanged</tt>. To see which files
+have the "assume unchanged" bit set, use <tt>git ls-files -v</tt>
 (see <a href="git-ls-files.html">git-ls-files(1)</a>).</p></div>
-<div class="paragraph"><p>The command looks at <code>core.ignorestat</code> configuration variable.  When
-this is true, paths updated with <code>git update-index paths...</code> and
+<div class="paragraph"><p>The command looks at <tt>core.ignorestat</tt> configuration variable.  When
+this is true, paths updated with <tt>git update-index paths...</tt> and
 paths updated with other Git commands that update both index and
 working tree (e.g. <em>git apply --index</em>, <em>git checkout-index -u</em>,
 and <em>git read-tree -u</em>) are automatically marked as "assume
 unchanged".  Note that "assume unchanged" bit is <strong>not</strong> set if
-<code>git update-index --refresh</code> finds the working tree file matches
-the index (use <code>git update-index --really-refresh</code> if you want
+<tt>git update-index --refresh</tt> finds the working tree file matches
+the index (use <tt>git update-index --really-refresh</tt> if you want
 to mark them as "assume unchanged").</p></div>
 </div>
 </div>
@@ -1161,16 +1165,16 @@ to mark them as "assume unchanged").</p></div>
 <div class="paragraph"><p>To update and refresh only the files already checked out:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</code></pre>
+<pre><tt>$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</tt></pre>
 </div></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-On an inefficient filesystem with <code>core.ignorestat</code> set
+On an inefficient filesystem with <tt>core.ignorestat</tt> set
 </dt>
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git update-index --really-refresh              <b>&lt;1&gt;</b>
+<pre><tt>$ git update-index --really-refresh              <b>&lt;1&gt;</b>
 $ git update-index --no-assume-unchanged foo.c   <b>&lt;2&gt;</b>
 $ git diff --name-only                           <b>&lt;3&gt;</b>
 $ edit foo.c
@@ -1182,7 +1186,7 @@ $ edit foo.c
 $ git diff --name-only                           <b>&lt;7&gt;</b>
 $ git update-index --no-assume-unchanged foo.c   <b>&lt;8&gt;</b>
 $ git diff --name-only                           <b>&lt;9&gt;</b>
-M foo.c</code></pre>
+M foo.c</tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1257,20 +1261,20 @@ precedence over assume-unchanged bit when both are set.</p></div>
 <div class="sect1">
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The command honors <code>core.filemode</code> configuration variable.  If
+<div class="paragraph"><p>The command honors <tt>core.filemode</tt> configuration variable.  If
 your repository is on a filesystem whose executable bits are
 unreliable, this should be set to <em>false</em> (see <a href="git-config.html">git-config(1)</a>).
 This causes the command to ignore differences in file modes recorded
 in the index and the file mode on the filesystem if they differ only on
 executable bit.   On such an unfortunate filesystem, you may
 need to use <em>git update-index --chmod=</em>.</p></div>
-<div class="paragraph"><p>Quite similarly, if <code>core.symlinks</code> configuration variable is set
+<div class="paragraph"><p>Quite similarly, if <tt>core.symlinks</tt> configuration variable is set
 to <em>false</em> (see <a href="git-config.html">git-config(1)</a>), symbolic links are checked out
 as plain files, and this command does not modify a recorded file mode
 from symbolic link to regular file.</p></div>
-<div class="paragraph"><p>The command looks at <code>core.ignorestat</code> configuration variable.  See
+<div class="paragraph"><p>The command looks at <tt>core.ignorestat</tt> configuration variable.  See
 <em>Using "assume unchanged" bit</em> section above.</p></div>
-<div class="paragraph"><p>The command also looks at <code>core.trustctime</code> configuration variable.
+<div class="paragraph"><p>The command also looks at <tt>core.trustctime</tt> configuration variable.
 It can be useful when the inode change time is regularly modified by
 something outside Git (file system crawlers and backup systems use
 ctime for marking files processed) (see <a href="git-config.html">git-config(1)</a>).</p></div>

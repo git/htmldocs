@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-receive-pack(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -794,7 +798,7 @@ and is executable, it will be invoked once with no parameters.  The
 standard input of the hook will be one line per ref to be updated:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>sha1-old SP sha1-new SP refname LF</code></pre>
+<pre><tt>sha1-old SP sha1-new SP refname LF</tt></pre>
 </div></div>
 <div class="paragraph"><p>The refname value is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 values before
@@ -817,7 +821,7 @@ bail out if the update is not to be supported.</p></div>
 and is executable, it is invoked once per ref, with three parameters:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$GIT_DIR/hooks/update refname sha1-old sha1-new</code></pre>
+<pre><tt>$GIT_DIR/hooks/update refname sha1-old sha1-new</tt></pre>
 </div></div>
 <div class="paragraph"><p>The refname parameter is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 arguments are
@@ -843,7 +847,7 @@ parameters.  The standard input of the hook will be one line
 for each successfully updated ref:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>sha1-old SP sha1-new SP refname LF</code></pre>
+<pre><tt>sha1-old SP sha1-new SP refname LF</tt></pre>
 </div></div>
 <div class="paragraph"><p>The refname value is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 values before
@@ -857,7 +861,7 @@ to the repository.  This example script sends one mail message per
 ref listing the commits pushed to the repository:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>#!/bin/sh
+<pre><tt>#!/bin/sh
 # mail out commit update information.
 while read oval nval ref
 do
@@ -871,7 +875,7 @@ do
         fi |
         mail -s "Changes to ref $ref" commit-list@mydomain
 done
-exit 0</code></pre>
+exit 0</tt></pre>
 </div></div>
 <div class="paragraph"><p>The exit code from this hook invocation is ignored, however a
 non-zero exit code will generate an error message.</p></div>
@@ -892,12 +896,12 @@ This can be used to implement any repository wide cleanup tasks.</p></div>
 <div class="paragraph"><p>The exit code from this hook invocation is ignored; the only thing
 left for <em>git-receive-pack</em> to do at that point is to exit itself
 anyway.</p></div>
-<div class="paragraph"><p>This hook can be used, for example, to run <code>git update-server-info</code>
+<div class="paragraph"><p>This hook can be used, for example, to run <tt>git update-server-info</tt>
 if the repository is packed and is served via a dumb transport.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>#!/bin/sh
-exec git update-server-info</code></pre>
+<pre><tt>#!/bin/sh
+exec git update-server-info</tt></pre>
 </div></div>
 </div>
 </div>

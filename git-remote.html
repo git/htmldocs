@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-remote(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -781,7 +785,7 @@ git-remote(1) Manual Page
 <dd>
 <p>
         Be a little more verbose and show remote url after name.
-        NOTE: This must be placed between <code>remote</code> and <code>subcommand</code>.
+        NOTE: This must be placed between <tt>remote</tt> and <tt>subcommand</tt>.
 </p>
 </dd>
 </dl></div>
@@ -799,29 +803,29 @@ subcommands are available to perform operations on the remotes.</p></div>
 <dd>
 <p>
 Adds a remote named &lt;name&gt; for the repository at
-&lt;url&gt;.  The command <code>git fetch &lt;name&gt;</code> can then be used to create and
+&lt;url&gt;.  The command <tt>git fetch &lt;name&gt;</tt> can then be used to create and
 update remote-tracking branches &lt;name&gt;/&lt;branch&gt;.
 </p>
-<div class="paragraph"><p>With <code>-f</code> option, <code>git fetch &lt;name&gt;</code> is run immediately after
+<div class="paragraph"><p>With <tt>-f</tt> option, <tt>git fetch &lt;name&gt;</tt> is run immediately after
 the remote information is set up.</p></div>
-<div class="paragraph"><p>With <code>--tags</code> option, <code>git fetch &lt;name&gt;</code> imports every tag from the
+<div class="paragraph"><p>With <tt>--tags</tt> option, <tt>git fetch &lt;name&gt;</tt> imports every tag from the
 remote repository.</p></div>
-<div class="paragraph"><p>With <code>--no-tags</code> option, <code>git fetch &lt;name&gt;</code> does not import tags from
+<div class="paragraph"><p>With <tt>--no-tags</tt> option, <tt>git fetch &lt;name&gt;</tt> does not import tags from
 the remote repository.</p></div>
-<div class="paragraph"><p>With <code>-t &lt;branch&gt;</code> option, instead of the default glob
+<div class="paragraph"><p>With <tt>-t &lt;branch&gt;</tt> option, instead of the default glob
 refspec for the remote to track all branches under
-the <code>refs/remotes/&lt;name&gt;/</code> namespace, a refspec to track only <code>&lt;branch&gt;</code>
-is created.  You can give more than one <code>-t &lt;branch&gt;</code> to track
+the <tt>refs/remotes/&lt;name&gt;/</tt> namespace, a refspec to track only <tt>&lt;branch&gt;</tt>
+is created.  You can give more than one <tt>-t &lt;branch&gt;</tt> to track
 multiple branches without grabbing all branches.</p></div>
-<div class="paragraph"><p>With <code>-m &lt;master&gt;</code> option, a symbolic-ref <code>refs/remotes/&lt;name&gt;/HEAD</code> is set
-up to point at remote&#8217;s <code>&lt;master&gt;</code> branch. See also the set-head command.</p></div>
-<div class="paragraph"><p>When a fetch mirror is created with <code>--mirror=fetch</code>, the refs will not
+<div class="paragraph"><p>With <tt>-m &lt;master&gt;</tt> option, a symbolic-ref <tt>refs/remotes/&lt;name&gt;/HEAD</tt> is set
+up to point at remote&#8217;s <tt>&lt;master&gt;</tt> branch. See also the set-head command.</p></div>
+<div class="paragraph"><p>When a fetch mirror is created with <tt>--mirror=fetch</tt>, the refs will not
 be stored in the <em>refs/remotes/</em> namespace, but rather everything in
 <em>refs/</em> on the remote will be directly mirrored into <em>refs/</em> in the
 local repository. This option only makes sense in bare repositories,
 because a fetch would overwrite any local commits.</p></div>
-<div class="paragraph"><p>When a push mirror is created with <code>--mirror=push</code>, then <code>git push</code>
-will always behave as if <code>--mirror</code> was passed.</p></div>
+<div class="paragraph"><p>When a push mirror is created with <tt>--mirror=push</tt>, then <tt>git push</tt>
+will always behave as if <tt>--mirror</tt> was passed.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>rename</em>
@@ -832,7 +836,7 @@ Rename the remote named &lt;old&gt; to &lt;new&gt;. All remote-tracking branches
 configuration settings for the remote are updated.
 </p>
 <div class="paragraph"><p>In case &lt;old&gt; and &lt;new&gt; are the same, and &lt;old&gt; is a file under
-<code>$GIT_DIR/remotes</code> or <code>$GIT_DIR/branches</code>, the remote is converted to
+<tt>$GIT_DIR/remotes</tt> or <tt>$GIT_DIR/branches</tt>, the remote is converted to
 the configuration file format.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -853,24 +857,24 @@ configuration settings for the remote are removed.
 <dd>
 <p>
 Sets or deletes the default branch (i.e. the target of the
-symbolic-ref <code>refs/remotes/&lt;name&gt;/HEAD</code>) for
+symbolic-ref <tt>refs/remotes/&lt;name&gt;/HEAD</tt>) for
 the named remote. Having a default branch for a remote is not required,
 but allows the name of the remote to be specified in lieu of a specific
-branch. For example, if the default branch for <code>origin</code> is set to
-<code>master</code>, then <code>origin</code> may be specified wherever you would normally
-specify <code>origin/master</code>.
+branch. For example, if the default branch for <tt>origin</tt> is set to
+<tt>master</tt>, then <tt>origin</tt> may be specified wherever you would normally
+specify <tt>origin/master</tt>.
 </p>
-<div class="paragraph"><p>With <code>-d</code> or <code>--delete</code>, the symbolic ref <code>refs/remotes/&lt;name&gt;/HEAD</code> is deleted.</p></div>
-<div class="paragraph"><p>With <code>-a</code> or <code>--auto</code>, the remote is queried to determine its <code>HEAD</code>, then the
-symbolic-ref <code>refs/remotes/&lt;name&gt;/HEAD</code> is set to the same branch. e.g., if the remote
-<code>HEAD</code> is pointed at <code>next</code>, "<code>git remote set-head origin -a</code>" will set
-the symbolic-ref <code>refs/remotes/origin/HEAD</code> to <code>refs/remotes/origin/next</code>. This will
-only work if <code>refs/remotes/origin/next</code> already exists; if not it must be
+<div class="paragraph"><p>With <tt>-d</tt> or <tt>--delete</tt>, the symbolic ref <tt>refs/remotes/&lt;name&gt;/HEAD</tt> is deleted.</p></div>
+<div class="paragraph"><p>With <tt>-a</tt> or <tt>--auto</tt>, the remote is queried to determine its <tt>HEAD</tt>, then the
+symbolic-ref <tt>refs/remotes/&lt;name&gt;/HEAD</tt> is set to the same branch. e.g., if the remote
+<tt>HEAD</tt> is pointed at <tt>next</tt>, "<tt>git remote set-head origin -a</tt>" will set
+the symbolic-ref <tt>refs/remotes/origin/HEAD</tt> to <tt>refs/remotes/origin/next</tt>. This will
+only work if <tt>refs/remotes/origin/next</tt> already exists; if not it must be
 fetched first.</p></div>
-<div class="paragraph"><p>Use <code>&lt;branch&gt;</code> to set the symbolic-ref <code>refs/remotes/&lt;name&gt;/HEAD</code> explicitly. e.g., "git
-remote set-head origin master" will set the symbolic-ref <code>refs/remotes/origin/HEAD</code> to
-<code>refs/remotes/origin/master</code>. This will only work if
-<code>refs/remotes/origin/master</code> already exists; if not it must be fetched first.</p></div>
+<div class="paragraph"><p>Use <tt>&lt;branch&gt;</tt> to set the symbolic-ref <tt>refs/remotes/&lt;name&gt;/HEAD</tt> explicitly. e.g., "git
+remote set-head origin master" will set the symbolic-ref <tt>refs/remotes/origin/HEAD</tt> to
+<tt>refs/remotes/origin/master</tt>. This will only work if
+<tt>refs/remotes/origin/master</tt> already exists; if not it must be fetched first.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>set-branches</em>
@@ -882,8 +886,8 @@ This can be used to track a subset of the available remote branches
 after the initial setup for a remote.
 </p>
 <div class="paragraph"><p>The named branches will be interpreted as if specified with the
-<code>-t</code> option on the <em>git remote add</em> command line.</p></div>
-<div class="paragraph"><p>With <code>--add</code>, instead of replacing the list of currently tracked
+<tt>-t</tt> option on the <em>git remote add</em> command line.</p></div>
+<div class="paragraph"><p>With <tt>--add</tt>, instead of replacing the list of currently tracked
 branches, adds to that list.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -908,8 +912,8 @@ error.</p></div>
 <p>
 Gives some information about the remote &lt;name&gt;.
 </p>
-<div class="paragraph"><p>With <code>-n</code> option, the remote heads are not queried first with
-<code>git ls-remote &lt;name&gt;</code>; cached information is used instead.</p></div>
+<div class="paragraph"><p>With <tt>-n</tt> option, the remote heads are not queried first with
+<tt>git ls-remote &lt;name&gt;</tt>; cached information is used instead.</p></div>
 </dd>
 <dt class="hdlist1">
 <em>prune</em>
@@ -921,7 +925,7 @@ These stale branches have already been removed from the remote repository
 referenced by &lt;name&gt;, but are still locally available in
 "remotes/&lt;name&gt;".
 </p>
-<div class="paragraph"><p>With <code>--dry-run</code> option, report what branches will be pruned, but do not
+<div class="paragraph"><p>With <tt>--dry-run</tt> option, report what branches will be pruned, but do not
 actually prune them.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -936,7 +940,7 @@ remotes.default is not defined, all remotes which do not have the
 configuration parameter remote.&lt;name&gt;.skipDefaultUpdate set to true will
 be updated.  (See <a href="git-config.html">git-config(1)</a>).
 </p>
-<div class="paragraph"><p>With <code>--prune</code> option, prune all the remotes that are updated.</p></div>
+<div class="paragraph"><p>With <tt>--prune</tt> option, prune all the remotes that are updated.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -944,8 +948,8 @@ be updated.  (See <a href="git-config.html">git-config(1)</a>).
 <div class="sect1">
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The remote configuration is achieved using the <code>remote.origin.url</code> and
-<code>remote.origin.fetch</code> configuration variables.  (See
+<div class="paragraph"><p>The remote configuration is achieved using the <tt>remote.origin.url</tt> and
+<tt>remote.origin.fetch</tt> configuration variables.  (See
 <a href="git-config.html">git-config(1)</a>).</p></div>
 </div>
 </div>
@@ -959,7 +963,7 @@ Add a new remote, fetch, and check out a branch from it
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git remote
+<pre><tt>$ git remote
 origin
 $ git branch -r
   origin/HEAD -&gt; origin/master
@@ -981,7 +985,7 @@ $ git branch -r
   staging/staging-linus
   staging/staging-next
 $ git checkout -b staging staging/master
-...</code></pre>
+...</tt></pre>
 </div></div>
 </li>
 <li>
@@ -990,11 +994,11 @@ Imitate <em>git clone</em> but track only selected branches
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ mkdir project.git
+<pre><tt>$ mkdir project.git
 $ cd project.git
 $ git init
 $ git remote add -f -t master -m master origin git://example.com/git.git/
-$ git merge origin</code></pre>
+$ git merge origin</tt></pre>
 </div></div>
 </li>
 </ul></div>

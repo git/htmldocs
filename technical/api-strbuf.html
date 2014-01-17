@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>strbuf API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -747,22 +751,22 @@ strbuf API actually relies on the string being free of NULs.</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-The <code>buf</code> member is never NULL, so it can be used in any usual C
+The <tt>buf</tt> member is never NULL, so it can be used in any usual C
 string operations safely. strbuf&#8217;s <em>have</em> to be initialized either by
-<code>strbuf_init()</code> or by <code>= STRBUF_INIT</code> before the invariants, though.
+<tt>strbuf_init()</tt> or by <tt>= STRBUF_INIT</tt> before the invariants, though.
 </p>
-<div class="paragraph"><p>Do <strong>not</strong> assume anything on what <code>buf</code> really is (e.g. if it is
-allocated memory or not), use <code>strbuf_detach()</code> to unwrap a memory
+<div class="paragraph"><p>Do <strong>not</strong> assume anything on what <tt>buf</tt> really is (e.g. if it is
+allocated memory or not), use <tt>strbuf_detach()</tt> to unwrap a memory
 buffer from its strbuf shell in a safe way. That is the sole supported
-way. This will give you a malloced buffer that you can later <code>free()</code>.</p></div>
+way. This will give you a malloced buffer that you can later <tt>free()</tt>.</p></div>
 <div class="paragraph"><p>However, it is totally safe to modify anything in the string pointed by
-the <code>buf</code> member, between the indices <code>0</code> and <code>len-1</code> (inclusive).</p></div>
+the <tt>buf</tt> member, between the indices <tt>0</tt> and <tt>len-1</tt> (inclusive).</p></div>
 </li>
 <li>
 <p>
-The <code>buf</code> member is a byte array that has at least <code>len + 1</code> bytes
-  allocated. The extra byte is used to store a <code>'\0'</code>, allowing the
-  <code>buf</code> member to be a valid C-string. Every strbuf function ensure this
+The <tt>buf</tt> member is a byte array that has at least <tt>len + 1</tt> bytes
+  allocated. The extra byte is used to store a <tt>'\0'</tt>, allowing the
+  <tt>buf</tt> member to be a valid C-string. Every strbuf function ensure this
   invariant is preserved.
 </p>
 <div class="admonitionblock">
@@ -776,22 +780,22 @@ The <code>buf</code> member is a byte array that has at least <code>len + 1</cod
 </div>
 <div class="listingblock">
 <div class="content">
-<pre><code>strbuf_grow(sb, SOME_SIZE); <b>&lt;1&gt;</b>
-strbuf_setlen(sb, sb-&gt;len + SOME_OTHER_SIZE);</code></pre>
+<pre><tt>strbuf_grow(sb, SOME_SIZE); <b>&lt;1&gt;</b>
+strbuf_setlen(sb, sb-&gt;len + SOME_OTHER_SIZE);</tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
 <p>
-Here, the memory array starting at <code>sb-&gt;buf</code>, and of length
-<code>strbuf_avail(sb)</code> is all yours, and you can be sure that
-<code>strbuf_avail(sb)</code> is at least <code>SOME_SIZE</code>.
+Here, the memory array starting at <tt>sb-&gt;buf</tt>, and of length
+<tt>strbuf_avail(sb)</tt> is all yours, and you can be sure that
+<tt>strbuf_avail(sb)</tt> is at least <tt>SOME_SIZE</tt>.
 </p>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content"><code>SOME_OTHER_SIZE</code> must be smaller or equal to <code>strbuf_avail(sb)</code>.</td>
+<td class="content"><tt>SOME_OTHER_SIZE</tt> must be smaller or equal to <tt>strbuf_avail(sb)</tt>.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>Doing so is safe, though if it has to be done in many places, adding the
@@ -801,9 +805,9 @@ missing API to the strbuf module is the way to go.</p></div>
 <td class="icon">
 <div class="title">Warning</div>
 </td>
-<td class="content">Do <em>not</em> assume that the area that is yours is of size <code>alloc
-- 1</code> even if it&#8217;s true in the current implementation. Alloc is somehow a
-"private" member that should not be messed with. Use <code>strbuf_avail()</code>
+<td class="content">Do <em>not</em> assume that the area that is yours is of size <tt>alloc
+- 1</tt> even if it&#8217;s true in the current implementation. Alloc is somehow a
+"private" member that should not be messed with. Use <tt>strbuf_avail()</tt>
 instead.</td>
 </tr></table>
 </div>
@@ -819,12 +823,12 @@ instead.</td>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>struct strbuf</code>
+<tt>struct strbuf</tt>
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>This is the string buffer structure. The <code>len</code> member can be used to
-determine the current length of the string, and <code>buf</code> member provides access to
+<div class="paragraph"><p>This is the string buffer structure. The <tt>len</tt> member can be used to
+determine the current length of the string, and <tt>buf</tt> member provides access to
 the string itself.</p></div>
 </div>
 </div>
@@ -838,7 +842,7 @@ Life cycle
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>strbuf_init</code>
+<tt>strbuf_init</tt>
 </dt>
 <dd>
 <p>
@@ -847,7 +851,7 @@ Life cycle
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_release</code>
+<tt>strbuf_release</tt>
 </dt>
 <dd>
 <p>
@@ -856,17 +860,17 @@ Life cycle
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_detach</code>
+<tt>strbuf_detach</tt>
 </dt>
 <dd>
 <p>
         Detach the string from the strbuf and returns it; you now own the
         storage the string occupies and it is your responsibility from then on
-        to release it with <code>free(3)</code> when you are done with it.
+        to release it with <tt>free(3)</tt> when you are done with it.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_attach</code>
+<tt>strbuf_attach</tt>
 </dt>
 <dd>
 <p>
@@ -879,7 +883,7 @@ Life cycle
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_swap</code>
+<tt>strbuf_swap</tt>
 </dt>
 <dd>
 <p>
@@ -894,7 +898,7 @@ Related to the size of the buffer
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>strbuf_avail</code>
+<tt>strbuf_avail</tt>
 </dt>
 <dd>
 <p>
@@ -902,31 +906,31 @@ Related to the size of the buffer
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_grow</code>
+<tt>strbuf_grow</tt>
 </dt>
 <dd>
 <p>
         Ensure that at least this amount of unused memory is available after
-        <code>len</code>. This is used when you know a typical size for what you will add
+        <tt>len</tt>. This is used when you know a typical size for what you will add
         and want to avoid repetitive automatic resizing of the underlying buffer.
         This is never a needed operation, but can be critical for performance in
         some cases.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_setlen</code>
+<tt>strbuf_setlen</tt>
 </dt>
 <dd>
 <p>
         Set the length of the buffer to a given value. This function does <strong>not</strong>
-        allocate new memory, so you should not perform a <code>strbuf_setlen()</code> to a
-        length that is larger than <code>len + strbuf_avail()</code>. <code>strbuf_setlen()</code> is
+        allocate new memory, so you should not perform a <tt>strbuf_setlen()</tt> to a
+        length that is larger than <tt>len + strbuf_avail()</tt>. <tt>strbuf_setlen()</tt> is
         just meant as a <em>please fix invariants from this strbuf I just messed
         with</em>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_reset</code>
+<tt>strbuf_reset</tt>
 </dt>
 <dd>
 <p>
@@ -941,7 +945,7 @@ Related to the contents of the buffer
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>strbuf_rtrim</code>
+<tt>strbuf_rtrim</tt>
 </dt>
 <dd>
 <p>
@@ -949,7 +953,7 @@ Related to the contents of the buffer
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_cmp</code>
+<tt>strbuf_cmp</tt>
 </dt>
 <dd>
 <p>
@@ -973,13 +977,13 @@ Adding data to the buffer
 </td>
 <td class="content">All of the functions in this section will grow the buffer as necessary.
 If they fail for some reason other than memory shortage and the buffer hadn&#8217;t
-been allocated before (i.e. the <code>struct strbuf</code> was set to <code>STRBUF_INIT</code>),
+been allocated before (i.e. the <tt>struct strbuf</tt> was set to <tt>STRBUF_INIT</tt>),
 then they will free() it.</td>
 </tr></table>
 </div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>strbuf_addch</code>
+<tt>strbuf_addch</tt>
 </dt>
 <dd>
 <p>
@@ -987,7 +991,7 @@ then they will free() it.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_insert</code>
+<tt>strbuf_insert</tt>
 </dt>
 <dd>
 <p>
@@ -996,7 +1000,7 @@ then they will free() it.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_remove</code>
+<tt>strbuf_remove</tt>
 </dt>
 <dd>
 <p>
@@ -1004,16 +1008,16 @@ then they will free() it.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_splice</code>
+<tt>strbuf_splice</tt>
 </dt>
 <dd>
 <p>
-        Remove the bytes between <code>pos..pos+len</code> and replace it with the given
+        Remove the bytes between <tt>pos..pos+len</tt> and replace it with the given
         data.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_add_commented_lines</code>
+<tt>strbuf_add_commented_lines</tt>
 </dt>
 <dd>
 <p>
@@ -1022,7 +1026,7 @@ then they will free() it.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_add</code>
+<tt>strbuf_add</tt>
 </dt>
 <dd>
 <p>
@@ -1030,7 +1034,7 @@ then they will free() it.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_addstr</code>
+<tt>strbuf_addstr</tt>
 </dt>
 <dd>
 <p>
@@ -1047,16 +1051,16 @@ that expands to:</td>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre><code>strbuf_add(..., s, strlen(s));</code></pre>
+<pre><tt>strbuf_add(..., s, strlen(s));</tt></pre>
 </div></div>
 <div class="paragraph"><p>Meaning that this is efficient to write things like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>strbuf_addstr(sb, "immediate string");</code></pre>
+<pre><tt>strbuf_addstr(sb, "immediate string");</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_addbuf</code>
+<tt>strbuf_addbuf</tt>
 </dt>
 <dd>
 <p>
@@ -1064,7 +1068,7 @@ that expands to:</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_adddup</code>
+<tt>strbuf_adddup</tt>
 </dt>
 <dd>
 <p>
@@ -1073,7 +1077,7 @@ that expands to:</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_expand</code>
+<tt>strbuf_expand</tt>
 </dt>
 <dd>
 <p>
@@ -1081,35 +1085,35 @@ that expands to:</td>
         placeholders. To that end, it parses the string and calls the specified
         function for every percent sign found.
 </p>
-<div class="paragraph"><p>The callback function is given a pointer to the character after the <code>%</code>
+<div class="paragraph"><p>The callback function is given a pointer to the character after the <tt>%</tt>
 and a pointer to the struct strbuf.  It is expected to add the expanded
 version of the placeholder to the strbuf, e.g. to add a newline
-character if the letter <code>n</code> appears after a <code>%</code>.  The function returns
-the length of the placeholder recognized and <code>strbuf_expand()</code> skips
+character if the letter <tt>n</tt> appears after a <tt>%</tt>.  The function returns
+the length of the placeholder recognized and <tt>strbuf_expand()</tt> skips
 over it.</p></div>
-<div class="paragraph"><p>The format <code>%%</code> is automatically expanded to a single <code>%</code> as a quoting
-mechanism; callers do not need to handle the <code>%</code> placeholder themselves,
+<div class="paragraph"><p>The format <tt>%%</tt> is automatically expanded to a single <tt>%</tt> as a quoting
+mechanism; callers do not need to handle the <tt>%</tt> placeholder themselves,
 and the callback function will not be invoked for this placeholder.</p></div>
 <div class="paragraph"><p>All other characters (non-percent and not skipped ones) are copied
 verbatim to the strbuf.  If the callback returned zero, meaning that the
 placeholder is unknown, then the percent sign is copied, too.</p></div>
 <div class="paragraph"><p>In order to facilitate caching and to make it possible to give
-parameters to the callback, <code>strbuf_expand()</code> passes a context pointer,
+parameters to the callback, <tt>strbuf_expand()</tt> passes a context pointer,
 which can be used by the programmer of the callback as she sees fit.</p></div>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_expand_dict_cb</code>
+<tt>strbuf_expand_dict_cb</tt>
 </dt>
 <dd>
 <p>
-        Used as callback for <code>strbuf_expand()</code>, expects an array of
+        Used as callback for <tt>strbuf_expand()</tt>, expects an array of
         struct strbuf_expand_dict_entry as context, i.e. pairs of
         placeholder and replacement string.  The array needs to be
         terminated by an entry with placeholder set to NULL.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_addbuf_percentquote</code>
+<tt>strbuf_addbuf_percentquote</tt>
 </dt>
 <dd>
 <p>
@@ -1120,7 +1124,7 @@ which can be used by the programmer of the callback as she sees fit.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_humanise_bytes</code>
+<tt>strbuf_humanise_bytes</tt>
 </dt>
 <dd>
 <p>
@@ -1129,7 +1133,7 @@ which can be used by the programmer of the callback as she sees fit.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_addf</code>
+<tt>strbuf_addf</tt>
 </dt>
 <dd>
 <p>
@@ -1137,7 +1141,7 @@ which can be used by the programmer of the callback as she sees fit.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_commented_addf</code>
+<tt>strbuf_commented_addf</tt>
 </dt>
 <dd>
 <p>
@@ -1146,7 +1150,7 @@ which can be used by the programmer of the callback as she sees fit.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_fread</code>
+<tt>strbuf_fread</tt>
 </dt>
 <dd>
 <p>
@@ -1158,14 +1162,14 @@ which can be used by the programmer of the callback as she sees fit.</p></div>
 <div class="title">Note</div>
 </td>
 <td class="content">The buffer is rewound if the read fails. If -1 is returned,
-<code>errno</code> must be consulted, like you would do for <code>read(3)</code>.
-<code>strbuf_read()</code>, <code>strbuf_read_file()</code> and <code>strbuf_getline()</code> has the
+<tt>errno</tt> must be consulted, like you would do for <tt>read(3)</tt>.
+<tt>strbuf_read()</tt>, <tt>strbuf_read_file()</tt> and <tt>strbuf_getline()</tt> has the
 same behaviour as well.</td>
 </tr></table>
 </div>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_read</code>
+<tt>strbuf_read</tt>
 </dt>
 <dd>
 <p>
@@ -1174,7 +1178,7 @@ same behaviour as well.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_read_file</code>
+<tt>strbuf_read_file</tt>
 </dt>
 <dd>
 <p>
@@ -1183,7 +1187,7 @@ same behaviour as well.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_readlink</code>
+<tt>strbuf_readlink</tt>
 </dt>
 <dd>
 <p>
@@ -1192,40 +1196,40 @@ same behaviour as well.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_getline</code>
+<tt>strbuf_getline</tt>
 </dt>
 <dd>
 <p>
         Read a line from a FILE *, overwriting the existing contents
         of the strbuf. The second argument specifies the line
-        terminator character, typically <code>'\n'</code>.
+        terminator character, typically <tt>'\n'</tt>.
         Reading stops after the terminator or at EOF.  The terminator
         is removed from the buffer before returning.  Returns 0 unless
-        there was nothing left before EOF, in which case it returns <code>EOF</code>.
+        there was nothing left before EOF, in which case it returns <tt>EOF</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_getwholeline</code>
+<tt>strbuf_getwholeline</tt>
 </dt>
 <dd>
 <p>
-        Like <code>strbuf_getline</code>, but keeps the trailing terminator (if
+        Like <tt>strbuf_getline</tt>, but keeps the trailing terminator (if
         any) in the buffer.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_getwholeline_fd</code>
+<tt>strbuf_getwholeline_fd</tt>
 </dt>
 <dd>
 <p>
-        Like <code>strbuf_getwholeline</code>, but operates on a file descriptor.
+        Like <tt>strbuf_getwholeline</tt>, but operates on a file descriptor.
         It reads one character at a time, so it is very slow.  Do not
         use it unless you need the correct position in the file
         descriptor.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>stripspace</code>
+<tt>stripspace</tt>
 </dt>
 <dd>
 <p>
@@ -1234,37 +1238,37 @@ same behaviour as well.</td>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_split_buf</code>
+<tt>strbuf_split_buf</tt>
 </dt>
 <dt class="hdlist1">
-<code>strbuf_split_str</code>
+<tt>strbuf_split_str</tt>
 </dt>
 <dt class="hdlist1">
-<code>strbuf_split_max</code>
+<tt>strbuf_split_max</tt>
 </dt>
 <dt class="hdlist1">
-<code>strbuf_split</code>
+<tt>strbuf_split</tt>
 </dt>
 <dd>
 <p>
         Split a string or strbuf into a list of strbufs at a specified
         terminator character.  The returned substrings include the
-        terminator characters.  Some of these functions take a <code>max</code>
+        terminator characters.  Some of these functions take a <tt>max</tt>
         parameter, which, if positive, limits the output to that
         number of substrings.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>strbuf_list_free</code>
+<tt>strbuf_list_free</tt>
 </dt>
 <dd>
 <p>
         Free a list of strbufs (for example, the return values of the
-        <code>strbuf_split()</code> functions).
+        <tt>strbuf_split()</tt> functions).
 </p>
 </dd>
 <dt class="hdlist1">
-<code>launch_editor</code>
+<tt>launch_editor</tt>
 </dt>
 <dd>
 <p>

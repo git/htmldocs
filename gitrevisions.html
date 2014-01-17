@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitrevisions(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -787,7 +791,7 @@ blobs contained in a commit.</p></div>
 </dt>
 <dd>
 <p>
-  Output from <code>git describe</code>; i.e. a closest tag, optionally
+  Output from <tt>git describe</tt>; i.e. a closest tag, optionally
   followed by a dash and a number of commits, followed by a dash, a
   <em>g</em>, and an abbreviated object name.
 </p>
@@ -838,15 +842,15 @@ otherwise, <em>refs/remotes/&lt;refname&gt;/HEAD</em> if it exists.
 </p>
 <div class="paragraph"><p><em>HEAD</em> names the commit on which you based the changes in the working tree.
 <em>FETCH_HEAD</em> records the branch which you fetched from a remote repository
-with your last <code>git fetch</code> invocation.
+with your last <tt>git fetch</tt> invocation.
 <em>ORIG_HEAD</em> is created by commands that move your <em>HEAD</em> in a drastic
 way, to record the position of the <em>HEAD</em> before their operation, so that
 you can easily change the tip of the branch back to the state before you ran
 them.
 <em>MERGE_HEAD</em> records the commit(s) which you are merging into your branch
-when you run <code>git merge</code>.
+when you run <tt>git merge</tt>.
 <em>CHERRY_PICK_HEAD</em> records the commit which you are cherry-picking
-when you run <code>git cherry-pick</code>.</p></div>
+when you run <tt>git cherry-pick</tt>.</p></div>
 <div class="paragraph"><p>Note that any of the <em>refs/*</em> cases above may come either from
 the <em>$GIT_DIR/refs</em> directory or from the <em>$GIT_DIR/packed-refs</em> file.
 While the ref name encoding is unspecified, UTF-8 is preferred as
@@ -1046,7 +1050,7 @@ and C are parents of commit node A.  Parent commits are ordered
 left-to-right.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>G   H   I   J
+<pre><tt>G   H   I   J
  \ /     \ /
   D   E   F
    \  |  / \
@@ -1055,11 +1059,11 @@ left-to-right.</p></div>
       B     C
        \   /
         \ /
-         A</code></pre>
+         A</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>A =      = A^0
+<pre><tt>A =      = A^0
 B = A^   = A^1     = A~1
 C = A^2  = A^2
 D = A^^  = A^1^1   = A~2
@@ -1068,14 +1072,14 @@ F = B^3  = A^^3
 G = A^^^ = A^1^1^1 = A~3
 H = D^2  = B^^2    = A^^^2  = A~2^2
 I = F^   = B^3^    = A^^3^
-J = F^2  = B^3^2   = A^^3^2</code></pre>
+J = F^2  = B^3^2   = A^^3^2</tt></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_specifying_ranges">SPECIFYING RANGES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>History traversing commands such as <code>git log</code> operate on a set
+<div class="paragraph"><p>History traversing commands such as <tt>git log</tt> operate on a set
 of commits, not just a single commit.  To these commands,
 specifying a single revision with the notation described in the
 previous section means the set of commits reachable from that
@@ -1167,7 +1171,7 @@ all of its parents.</p></div>
 <div class="paragraph"><p>Here are a handful of examples:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>D                G H D
+<pre><tt>D                G H D
 D F              G H I J D F
 ^G D             H D
 ^D B             E I J F B
@@ -1177,7 +1181,7 @@ B...C            G H D E B C
 C                I J F C
 C^@              I J F
 C^!              C
-F^! D            G H D F</code></pre>
+F^! D            G H D F</tt></pre>
 </div></div>
 </div>
 </div>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-read-tree(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -761,8 +765,8 @@ git-read-tree(1) Manual Page
 but does not actually <strong>update</strong> any of the files it "caches". (see:
 <a href="git-checkout-index.html">git-checkout-index(1)</a>)</p></div>
 <div class="paragraph"><p>Optionally, it can merge a tree into the index, perform a
-fast-forward (i.e. 2-way) merge, or a 3-way merge, with the <code>-m</code>
-flag.  When used with <code>-m</code>, the <code>-u</code> flag causes it to also update
+fast-forward (i.e. 2-way) merge, or a 3-way merge, with the <tt>-m</tt>
+flag.  When used with <tt>-m</tt>, the <tt>-u</tt> flag causes it to also update
 the files in the work tree with the result of the merge.</p></div>
 <div class="paragraph"><p>Trivial merges are done by <em>git read-tree</em> itself.  Only conflicting paths
 will be in unmerged state when <em>git read-tree</em> returns.</p></div>
@@ -883,9 +887,9 @@ when both sides add a path identically.  The resolution
 <dd>
 <p>
         Keep the current index contents, and read the contents
-        of the named tree-ish under the directory at <code>&lt;prefix&gt;</code>.
+        of the named tree-ish under the directory at <tt>&lt;prefix&gt;</tt>.
         The command will refuse to overwrite entries that already
-        existed in the original index file. Note that the <code>&lt;prefix&gt;/</code>
+        existed in the original index file. Note that the <tt>&lt;prefix&gt;/</tt>
         value must end with a slash.
 </p>
 </dd>
@@ -894,7 +898,7 @@ when both sides add a path identically.  The resolution
 </dt>
 <dd>
 <p>
-        When running the command with <code>-u</code> and <code>-m</code> options, the
+        When running the command with <tt>-u</tt> and <tt>-m</tt> options, the
         merge result may need to overwrite paths that are not
         tracked in the current branch.  The command usually
         refuses to proceed with the merge to avoid losing such a
@@ -902,8 +906,8 @@ when both sides add a path identically.  The resolution
         way.  For example, it often happens that the other
         branch added a file that used to be a generated file in
         your branch, and the safety valve triggers when you try
-        to switch to that branch after you ran <code>make</code> but before
-        running <code>make clean</code> to remove the generated file.  This
+        to switch to that branch after you ran <tt>make</tt> but before
+        running <tt>make clean</tt> to remove the generated file.  This
         option tells the command to read per-directory exclude
         file (usually <em>.gitignore</em>) and allows such an untracked
         but explicitly ignored file to be overwritten.
@@ -914,7 +918,7 @@ when both sides add a path identically.  The resolution
 </dt>
 <dd>
 <p>
-        Instead of writing the results out to <code>$GIT_INDEX_FILE</code>,
+        Instead of writing the results out to <tt>$GIT_INDEX_FILE</tt>,
         write the resulting index in the named file.  While the
         command is operating, the original index file is locked
         with the same mechanism as usual.  The file must allow
@@ -931,7 +935,7 @@ when both sides add a path identically.  The resolution
 </dt>
 <dd>
 <p>
-        Disable sparse checkout support even if <code>core.sparseCheckout</code>
+        Disable sparse checkout support even if <tt>core.sparseCheckout</tt>
         is true.
 </p>
 </dd>
@@ -958,26 +962,26 @@ when both sides add a path identically.  The resolution
 <div class="sect1">
 <h2 id="_merging">Merging</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>If <code>-m</code> is specified, <em>git read-tree</em> can perform 3 kinds of
+<div class="paragraph"><p>If <tt>-m</tt> is specified, <em>git read-tree</em> can perform 3 kinds of
 merge, a single tree merge if only 1 tree is given, a
 fast-forward merge with 2 trees, or a 3-way merge if 3 trees are
 provided.</p></div>
 <div class="sect2">
 <h3 id="_single_tree_merge">Single Tree Merge</h3>
 <div class="paragraph"><p>If only 1 tree is specified, <em>git read-tree</em> operates as if the user did not
-specify <code>-m</code>, except that if the original index has an entry for a
+specify <tt>-m</tt>, except that if the original index has an entry for a
 given pathname, and the contents of the path match with the tree
 being read, the stat info from the index is used. (In other words, the
 index&#8217;s stat()s take precedence over the merged tree&#8217;s).</p></div>
-<div class="paragraph"><p>That means that if you do a <code>git read-tree -m &lt;newtree&gt;</code> followed by a
-<code>git checkout-index -f -u -a</code>, the <em>git checkout-index</em> only checks out
+<div class="paragraph"><p>That means that if you do a <tt>git read-tree -m &lt;newtree&gt;</tt> followed by a
+<tt>git checkout-index -f -u -a</tt>, the <em>git checkout-index</em> only checks out
 the stuff that really changed.</p></div>
 <div class="paragraph"><p>This is used to avoid unnecessary false hits when <em>git diff-files</em> is
 run after <em>git read-tree</em>.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_two_tree_merge">Two Tree Merge</h3>
-<div class="paragraph"><p>Typically, this is invoked as <code>git read-tree -m $H $M</code>, where $H
+<div class="paragraph"><p>Typically, this is invoked as <tt>git read-tree -m $H $M</tt>, where $H
 is the head commit of the current repository, and $M is the head
 of a foreign tree, which is simply ahead of $H (i.e. we are in a
 fast-forward situation).</p></div>
@@ -996,14 +1000,14 @@ The user wants to fast-forward to $M.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>In this case, the <code>git read-tree -m $H $M</code> command makes sure
+<div class="paragraph"><p>In this case, the <tt>git read-tree -m $H $M</tt> command makes sure
 that no local change is lost as the result of this "merge".
 Here are the "carry forward" rules, where "I" denotes the index,
 "clean" means that index and work tree coincide, and "exists"/"nothing"
 refer to the presence of a path in the specified commit:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   I                   H        M        Result
+<pre><tt>   I                   H        M        Result
   -------------------------------------------------------
 0  nothing             nothing  nothing  (does not happen)
 1  nothing             nothing  exists   use M
@@ -1011,46 +1015,46 @@ refer to the presence of a path in the specified commit:</p></div>
 3  nothing             exists   exists,  use M if "initial checkout",
                                 H == M   keep index otherwise
                                 exists,  fail
-                                H != M</code></pre>
+                                H != M</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   clean I==H  I==M
+<pre><tt>   clean I==H  I==M
   ------------------
 4  yes   N/A   N/A     nothing  nothing  keep index
-5  no    N/A   N/A     nothing  nothing  keep index</code></pre>
+5  no    N/A   N/A     nothing  nothing  keep index</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>6  yes   N/A   yes     nothing  exists   keep index
+<pre><tt>6  yes   N/A   yes     nothing  exists   keep index
 7  no    N/A   yes     nothing  exists   keep index
 8  yes   N/A   no      nothing  exists   fail
-9  no    N/A   no      nothing  exists   fail</code></pre>
+9  no    N/A   no      nothing  exists   fail</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>10 yes   yes   N/A     exists   nothing  remove path from index
+<pre><tt>10 yes   yes   N/A     exists   nothing  remove path from index
 11 no    yes   N/A     exists   nothing  fail
 12 yes   no    N/A     exists   nothing  fail
-13 no    no    N/A     exists   nothing  fail</code></pre>
+13 no    no    N/A     exists   nothing  fail</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   clean (H==M)
+<pre><tt>   clean (H==M)
   ------
 14 yes                 exists   exists   keep index
-15 no                  exists   exists   keep index</code></pre>
+15 no                  exists   exists   keep index</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   clean I==H  I==M (H!=M)
+<pre><tt>   clean I==H  I==M (H!=M)
   ------------------
 16 yes   no    no      exists   exists   fail
 17 no    no    no      exists   exists   fail
 18 yes   no    yes     exists   exists   keep index
 19 no    no    yes     exists   exists   keep index
 20 yes   yes   no      exists   exists   use M
-21 no    yes   no      exists   exists   fail</code></pre>
+21 no    yes   no      exists   exists   fail</tt></pre>
 </div></div>
 <div class="paragraph"><p>In all "keep index" cases, the index entry stays as in the
 original index file.  If the entry is not up to date,
@@ -1058,13 +1062,13 @@ original index file.  If the entry is not up to date,
 operating under the -u flag.</p></div>
 <div class="paragraph"><p>When this form of <em>git read-tree</em> returns successfully, you can
 see which of the "local changes" that you made were carried forward by running
-<code>git diff-index --cached $M</code>.  Note that this does not
-necessarily match what <code>git diff-index --cached $H</code> would have
+<tt>git diff-index --cached $M</tt>.  Note that this does not
+necessarily match what <tt>git diff-index --cached $H</tt> would have
 produced before such a two tree merge.  This is because of cases
 18 and 19 --- if you already had the changes in $M (e.g. maybe
-you picked it up via e-mail in a patch form), <code>git diff-index
---cached $H</code> would have told you about the change before this
-merge, but it would not show in <code>git diff-index --cached $M</code>
+you picked it up via e-mail in a patch form), <tt>git diff-index
+--cached $H</tt> would have told you about the change before this
+merge, but it would not show in <tt>git diff-index --cached $M</tt>
 output after the two-tree merge.</p></div>
 <div class="paragraph"><p>Case 3 is slightly tricky and needs explanation.  The result from this
 rule logically should be to remove the path if the user staged the removal
@@ -1082,7 +1086,7 @@ starts out at 1.</p></div>
 <div class="paragraph"><p>This means that you can do</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git read-tree -m &lt;tree1&gt; &lt;tree2&gt; &lt;tree3&gt;</code></pre>
+<pre><tt>$ git read-tree -m &lt;tree1&gt; &lt;tree2&gt; &lt;tree3&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>and you will end up with an index with all of the &lt;tree1&gt; entries in
 "stage1", all of the &lt;tree2&gt; entries in "stage2" and all of the
@@ -1192,16 +1196,16 @@ commit.  To illustrate, suppose you start from what has been
 committed last to your repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ JC=`git rev-parse --verify "HEAD^0"`
-$ git checkout-index -f -u -a $JC</code></pre>
+<pre><tt>$ JC=`git rev-parse --verify "HEAD^0"`
+$ git checkout-index -f -u -a $JC</tt></pre>
 </div></div>
 <div class="paragraph"><p>You do random edits, without running <em>git update-index</em>.  And then
 you notice that the tip of your "upstream" tree has advanced
 since you pulled from him:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git fetch git://.... linus
-$ LT=`git rev-parse FETCH_HEAD`</code></pre>
+<pre><tt>$ git fetch git://.... linus
+$ LT=`git rev-parse FETCH_HEAD`</tt></pre>
 </div></div>
 <div class="paragraph"><p>Your work tree is still based on your HEAD ($JC), but you have
 some edits since.  Three-way merge makes sure that you have not
@@ -1209,10 +1213,10 @@ added or modified index entries since $JC, and if you haven&#8217;t,
 then does the right thing.  So with the following sequence:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git read-tree -m -u `git merge-base $JC $LT` $JC $LT
+<pre><tt>$ git read-tree -m -u `git merge-base $JC $LT` $JC $LT
 $ git merge-index git-merge-one-file -a
 $ echo "Merge with Linus" | \
-  git commit-tree `git write-tree` -p $JC -p $LT</code></pre>
+  git commit-tree `git write-tree` -p $JC -p $LT</tt></pre>
 </div></div>
 <div class="paragraph"><p>what you would commit is a pure merge between $JC and $LT without
 your work-in-progress changes, and your work tree would be
@@ -1240,7 +1244,7 @@ It uses the skip-worktree bit (see <a href="git-update-index.html">git-update-in
 Git whether a file in the working directory is worth looking at.</p></div>
 <div class="paragraph"><p><em>git read-tree</em> and other merge-based commands (<em>git merge</em>, <em>git
 checkout</em>&#8230;) can help maintaining the skip-worktree bitmap and working
-directory update. <code>$GIT_DIR/info/sparse-checkout</code> is used to
+directory update. <tt>$GIT_DIR/info/sparse-checkout</tt> is used to
 define the skip-worktree reference bitmap. When <em>git read-tree</em> needs
 to update the working directory, it resets the skip-worktree bit in the index
 based on this file, which uses the same syntax as .gitignore files.
@@ -1249,27 +1253,27 @@ set on that entry. Otherwise, skip-worktree will be set.</p></div>
 <div class="paragraph"><p>Then it compares the new skip-worktree value with the previous one. If
 skip-worktree turns from set to unset, it will add the corresponding
 file back. If it turns from unset to set, that file will be removed.</p></div>
-<div class="paragraph"><p>While <code>$GIT_DIR/info/sparse-checkout</code> is usually used to specify what
+<div class="paragraph"><p>While <tt>$GIT_DIR/info/sparse-checkout</tt> is usually used to specify what
 files are in, you can also specify what files are <em>not</em> in, using
-negate patterns. For example, to remove the file <code>unwanted</code>:</p></div>
+negate patterns. For example, to remove the file <tt>unwanted</tt>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>/*
-!unwanted</code></pre>
+<pre><tt>/*
+!unwanted</tt></pre>
 </div></div>
 <div class="paragraph"><p>Another tricky thing is fully repopulating the working directory when you
 no longer want sparse checkout. You cannot just disable "sparse
 checkout" because skip-worktree bits are still in the index and your working
 directory is still sparsely populated. You should re-populate the working
-directory with the <code>$GIT_DIR/info/sparse-checkout</code> file content as
+directory with the <tt>$GIT_DIR/info/sparse-checkout</tt> file content as
 follows:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>/*</code></pre>
+<pre><tt>/*</tt></pre>
 </div></div>
 <div class="paragraph"><p>Then you can disable sparse checkout. Sparse checkout support in <em>git
 read-tree</em> and similar commands is disabled by default. You need to
-turn <code>core.sparseCheckout</code> on in order to have sparse checkout
+turn <tt>core.sparseCheckout</tt> on in order to have sparse checkout
 support.</p></div>
 </div>
 </div>

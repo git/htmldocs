@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-init(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -756,15 +760,15 @@ git-init(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This command creates an empty Git repository - basically a <code>.git</code>
-directory with subdirectories for <code>objects</code>, <code>refs/heads</code>,
-<code>refs/tags</code>, and template files.  An initial <code>HEAD</code> file that
+<div class="paragraph"><p>This command creates an empty Git repository - basically a <tt>.git</tt>
+directory with subdirectories for <tt>objects</tt>, <tt>refs/heads</tt>,
+<tt>refs/tags</tt>, and template files.  An initial <tt>HEAD</tt> file that
 references the HEAD of the master branch is also created.</p></div>
-<div class="paragraph"><p>If the <code>$GIT_DIR</code> environment variable is set then it specifies a path
-to use instead of <code>./.git</code> for the base of the repository.</p></div>
+<div class="paragraph"><p>If the <tt>$GIT_DIR</tt> environment variable is set then it specifies a path
+to use instead of <tt>./.git</tt> for the base of the repository.</p></div>
 <div class="paragraph"><p>If the object storage directory is specified via the
-<code>$GIT_OBJECT_DIRECTORY</code> environment variable then the sha1 directories
-are created underneath - otherwise the default <code>$GIT_DIR/objects</code>
+<tt>$GIT_OBJECT_DIRECTORY</tt> environment variable then the sha1 directories
+are created underneath - otherwise the default <tt>$GIT_DIR/objects</tt>
 directory is used.</p></div>
 <div class="paragraph"><p>Running <em>git init</em> in an existing repository is safe. It will not
 overwrite things that are already there. The primary reason for
@@ -828,7 +832,7 @@ path.
 Specify that the Git repository is to be shared amongst several users.  This
 allows users belonging to the same group to push into that
 repository.  When specified, the config variable "core.sharedRepository" is
-set so that files and directories under <code>$GIT_DIR</code> are created with the
+set so that files and directories under <tt>$GIT_DIR</tt> are created with the
 requested permissions.  When not specified, Git will use permissions reported
 by umask(2).
 </p>
@@ -840,7 +844,7 @@ is given:</p></div>
 <li>
 <p>
 <em>umask</em> (or <em>false</em>): Use permissions reported by umask(2). The default,
-   when <code>--shared</code> is not specified.
+   when <tt>--shared</tt> is not specified.
 </p>
 </li>
 <li>
@@ -883,27 +887,27 @@ line, the command is run inside the directory (possibly after creating it).</p><
 <h2 id="_template_directory">TEMPLATE DIRECTORY</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The template directory contains files and directories that will be copied to
-the <code>$GIT_DIR</code> after it is created.</p></div>
+the <tt>$GIT_DIR</tt> after it is created.</p></div>
 <div class="paragraph"><p>The template directory used will (in order):</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-The argument given with the <code>--template</code> option.
+The argument given with the <tt>--template</tt> option.
 </p>
 </li>
 <li>
 <p>
-The contents of the <code>$GIT_TEMPLATE_DIR</code> environment variable.
+The contents of the <tt>$GIT_TEMPLATE_DIR</tt> environment variable.
 </p>
 </li>
 <li>
 <p>
-The <code>init.templatedir</code> configuration variable.
+The <tt>init.templatedir</tt> configuration variable.
 </p>
 </li>
 <li>
 <p>
-The default template directory: <code>/usr/share/git-core/templates</code>.
+The default template directory: <tt>/usr/share/git-core/templates</tt>.
 </p>
 </li>
 </ul></div>
@@ -922,9 +926,9 @@ Start a new Git repository for an existing code base
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cd /path/to/my/codebase
+<pre><tt>$ cd /path/to/my/codebase
 $ git init      <b>&lt;1&gt;</b>
-$ git add .     <b>&lt;2&gt;</b></code></pre>
+$ git add .     <b>&lt;2&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitattributes API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -745,24 +749,24 @@ attributes to set of paths.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>struct git_attr</code>
+<tt>struct git_attr</tt>
 </dt>
 <dd>
 <p>
         An attribute is an opaque object that is identified by its name.
-        Pass the name to <code>git_attr()</code> function to obtain the object of
+        Pass the name to <tt>git_attr()</tt> function to obtain the object of
         this type.  The internal representation of this structure is
         of no interest to the calling programs.  The name of the
-        attribute can be retrieved by calling <code>git_attr_name()</code>.
+        attribute can be retrieved by calling <tt>git_attr_name()</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>struct git_attr_check</code>
+<tt>struct git_attr_check</tt>
 </dt>
 <dd>
 <p>
         This structure represents a set of attributes to check in a call
-        to <code>git_check_attr()</code> function, and receives the results.
+        to <tt>git_check_attr()</tt> function, and receives the results.
 </p>
 </dd>
 </dl></div>
@@ -772,11 +776,11 @@ attributes to set of paths.</p></div>
 <h2 id="_attribute_values">Attribute Values</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>An attribute for a path can be in one of four states: Set, Unset,
-Unspecified or set to a string, and <code>.value</code> member of <code>struct
-git_attr_check</code> records it.  There are three macros to check these:</p></div>
+Unspecified or set to a string, and <tt>.value</tt> member of <tt>struct
+git_attr_check</tt> records it.  There are three macros to check these:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>ATTR_TRUE()</code>
+<tt>ATTR_TRUE()</tt>
 </dt>
 <dd>
 <p>
@@ -784,7 +788,7 @@ git_attr_check</code> records it.  There are three macros to check these:</p></d
 </p>
 </dd>
 <dt class="hdlist1">
-<code>ATTR_FALSE()</code>
+<tt>ATTR_FALSE()</tt>
 </dt>
 <dd>
 <p>
@@ -792,7 +796,7 @@ git_attr_check</code> records it.  There are three macros to check these:</p></d
 </p>
 </dd>
 <dt class="hdlist1">
-<code>ATTR_UNSET()</code>
+<tt>ATTR_UNSET()</tt>
 </dt>
 <dd>
 <p>
@@ -800,7 +804,7 @@ git_attr_check</code> records it.  There are three macros to check these:</p></d
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>If none of the above returns true, <code>.value</code> member points at a string
+<div class="paragraph"><p>If none of the above returns true, <tt>.value</tt> member points at a string
 value of the attribute for the path.</p></div>
 </div>
 </div>
@@ -810,19 +814,19 @@ value of the attribute for the path.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Prepare an array of <code>struct git_attr_check</code> to define the list of
+Prepare an array of <tt>struct git_attr_check</tt> to define the list of
   attributes you would want to check.  To populate this array, you would
-  need to define necessary attributes by calling <code>git_attr()</code> function.
+  need to define necessary attributes by calling <tt>git_attr()</tt> function.
 </p>
 </li>
 <li>
 <p>
-Call <code>git_check_attr()</code> to check the attributes for the path.
+Call <tt>git_check_attr()</tt> to check the attributes for the path.
 </p>
 </li>
 <li>
 <p>
-Inspect <code>git_attr_check</code> structure to see how each of the attribute in
+Inspect <tt>git_attr_check</tt> structure to see how each of the attribute in
   the array is defined for the path.
 </p>
 </li>
@@ -836,47 +840,47 @@ Inspect <code>git_attr_check</code> structure to see how each of the attribute i
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Prepare an array of <code>struct git_attr_check</code> with two elements (because
-  we are checking two attributes).  Initialize their <code>attr</code> member with
-  pointers to <code>struct git_attr</code> obtained by calling <code>git_attr()</code>:
+Prepare an array of <tt>struct git_attr_check</tt> with two elements (because
+  we are checking two attributes).  Initialize their <tt>attr</tt> member with
+  pointers to <tt>struct git_attr</tt> obtained by calling <tt>git_attr()</tt>:
 </p>
 </li>
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>static struct git_attr_check check[2];
+<pre><tt>static struct git_attr_check check[2];
 static void setup_check(void)
 {
         if (check[0].attr)
                 return; /* already done */
         check[0].attr = git_attr("crlf");
         check[1].attr = git_attr("ident");
-}</code></pre>
+}</tt></pre>
 </div></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Call <code>git_check_attr()</code> with the prepared array of <code>struct git_attr_check</code>:
+Call <tt>git_check_attr()</tt> with the prepared array of <tt>struct git_attr_check</tt>:
 </p>
 </li>
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        const char *path;
+<pre><tt>        const char *path;
 
         setup_check();
-        git_check_attr(path, ARRAY_SIZE(check), check);</code></pre>
+        git_check_attr(path, ARRAY_SIZE(check), check);</tt></pre>
 </div></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Act on <code>.value</code> member of the result, left in <code>check[]</code>:
+Act on <tt>.value</tt> member of the result, left in <tt>check[]</tt>:
 </p>
 </li>
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        const char *value = check[0].value;
+<pre><tt>        const char *value = check[0].value;
 
         if (ATTR_TRUE(value)) {
                 The attribute is Set, by listing only the name of the
@@ -892,7 +896,7 @@ Act on <code>.value</code> member of the result, left in <code>check[]</code>:
                 file for the path by saying "attr=value".
         } else if (... other check using value as string ...) {
                 ...
-        }</code></pre>
+        }</tt></pre>
 </div></div>
 </div>
 </div>
@@ -903,23 +907,23 @@ Act on <code>.value</code> member of the result, left in <code>check[]</code>:
 <div class="ulist"><ul>
 <li>
 <p>
-Call <code>git_all_attrs()</code>, which returns an array of <code>git_attr_check</code>
+Call <tt>git_all_attrs()</tt>, which returns an array of <tt>git_attr_check</tt>
   structures.
 </p>
 </li>
 <li>
 <p>
-Iterate over the <code>git_attr_check</code> array to examine the attribute
+Iterate over the <tt>git_attr_check</tt> array to examine the attribute
   names and values.  The name of the attribute described by a
-  <code>git_attr_check</code> object can be retrieved via
-  <code>git_attr_name(check[i].attr)</code>.  (Please note that no items will be
-  returned for unset attributes, so <code>ATTR_UNSET()</code> will return false
-  for all returned <code>git_array_check</code> objects.)
+  <tt>git_attr_check</tt> object can be retrieved via
+  <tt>git_attr_name(check[i].attr)</tt>.  (Please note that no items will be
+  returned for unset attributes, so <tt>ATTR_UNSET()</tt> will return false
+  for all returned <tt>git_array_check</tt> objects.)
 </p>
 </li>
 <li>
 <p>
-Free the <code>git_array_check</code> array.
+Free the <tt>git_array_check</tt> array.
 </p>
 </li>
 </ul></div>

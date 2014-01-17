@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-status(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -758,9 +762,9 @@ git-status(1) Manual Page
 current HEAD commit, paths that have differences between the working
 tree and the index file, and paths in the working tree that are not
 tracked by Git (and are not ignored by <a href="gitignore.html">gitignore(5)</a>). The first
-are what you <em>would</em> commit by running <code>git commit</code>; the second and
+are what you <em>would</em> commit by running <tt>git commit</tt>; the second and
 third are what you <em>could</em> commit by running <em>git add</em> before running
-<code>git commit</code>.</p></div>
+<tt>git commit</tt>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -836,11 +840,11 @@ specify the handling of untracked files.</p></div>
 <p>
 <em>all</em>    - Also shows individual files in untracked directories.
 </p>
-<div class="paragraph"><p>When <code>-u</code> option is not used, untracked files and directories are
-shown (i.e. the same as specifying <code>normal</code>), to help you avoid
+<div class="paragraph"><p>When <tt>-u</tt> option is not used, untracked files and directories are
+shown (i.e. the same as specifying <tt>normal</tt>), to help you avoid
 forgetting to add newly created files.  Because it takes extra work
 to find untracked files in the filesystem, this mode may take some
-time in a large working tree.  You can use <code>no</code> to have <code>git status</code>
+time in a large working tree.  You can use <tt>no</tt> to have <tt>git status</tt>
 return more quickly without showing untracked files.</p></div>
 <div class="paragraph"><p>The default can be changed using the status.showUntrackedFiles
 configuration variable documented in <a href="git-config.html">git-config(1)</a>.</p></div>
@@ -864,7 +868,7 @@ configuration variable documented in <a href="git-config.html">git-config(1)</a>
         only changes to the commits stored in the superproject are shown (this was
         the behavior before 1.7.0). Using "all" hides all changes to submodules
         (and suppresses the output of submodule summaries when the config option
-        <code>status.submodulesummary</code> is set).
+        <tt>status.submodulesummary</tt> is set).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -881,7 +885,7 @@ configuration variable documented in <a href="git-config.html">git-config(1)</a>
 <dd>
 <p>
         Terminate entries with NUL, instead of LF.  This implies
-        the <code>--porcelain</code> output format if no other format is given.
+        the <tt>--porcelain</tt> output format if no other format is given.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -893,7 +897,7 @@ configuration variable documented in <a href="git-config.html">git-config(1)</a>
 <dd>
 <p>
         Display untracked files in columns. See configuration variable
-        column.status for option syntax.<code>--column</code> and <code>--no-column</code>
+        column.status for option syntax.<tt>--column</tt> and <tt>--no-column</tt>
         without options are equivalent to <em>always</em> and <em>never</em>
         respectively.
 </p>
@@ -918,21 +922,21 @@ the status.relativePaths config option below.</p></div>
 <div class="paragraph"><p>In the short-format, the status of each path is shown as</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>XY PATH1 -&gt; PATH2</code></pre>
+<pre><tt>XY PATH1 -&gt; PATH2</tt></pre>
 </div></div>
-<div class="paragraph"><p>where <code>PATH1</code> is the path in the <code>HEAD</code>, and the " <code>-&gt; PATH2</code>" part is
-shown only when <code>PATH1</code> corresponds to a different path in the
+<div class="paragraph"><p>where <tt>PATH1</tt> is the path in the <tt>HEAD</tt>, and the " <tt>-&gt; PATH2</tt>" part is
+shown only when <tt>PATH1</tt> corresponds to a different path in the
 index/worktree (i.e. the file is renamed). The <em>XY</em> is a two-letter
 status code.</p></div>
-<div class="paragraph"><p>The fields (including the <code>-&gt;</code>) are separated from each other by a
+<div class="paragraph"><p>The fields (including the <tt>-&gt;</tt>) are separated from each other by a
 single space. If a filename contains whitespace or other nonprintable
 characters, that field will be quoted in the manner of a C string
 literal: surrounded by ASCII double quote (34) characters, and with
 interior special characters backslash-escaped.</p></div>
-<div class="paragraph"><p>For paths with merge conflicts, <code>X</code> and <em>Y</em> show the modification
+<div class="paragraph"><p>For paths with merge conflicts, <tt>X</tt> and <em>Y</em> show the modification
 states of each side of the merge. For paths that do not have merge
-conflicts, <code>X</code> shows the status of the index, and <code>Y</code> shows the status
-of the work tree.  For untracked paths, <code>XY</code> are <code>??</code>.  Other status
+conflicts, <tt>X</tt> shows the status of the index, and <tt>Y</tt> shows the status
+of the work tree.  For untracked paths, <tt>XY</tt> are <tt>??</tt>.  Other status
 codes can be interpreted as follows:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -971,11 +975,11 @@ codes can be interpreted as follows:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Ignored files are not listed, unless <code>--ignored</code> option is in effect,
-in which case <code>XY</code> are <code>!!</code>.</p></div>
+<div class="paragraph"><p>Ignored files are not listed, unless <tt>--ignored</tt> option is in effect,
+in which case <tt>XY</tt> are <tt>!!</tt>.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>X          Y     Meaning
+<pre><tt>X          Y     Meaning
 -------------------------------------------------
           [MD]   not updated
 M        [ MD]   updated in index
@@ -997,7 +1001,7 @@ U           U    unmerged, both modified
 -------------------------------------------------
 ?           ?    untracked
 !           !    ignored
--------------------------------------------------</code></pre>
+-------------------------------------------------</tt></pre>
 </div></div>
 <div class="paragraph"><p>If -b is used the short-format status is preceded by a line</p></div>
 <div class="paragraph"><p>## branchname tracking info</p></div>
@@ -1038,20 +1042,20 @@ backslash-escaping is performed.</p></div>
 <div class="sect1">
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The command honors <code>color.status</code> (or <code>status.color</code>&#8201;&#8212;&#8201;they
+<div class="paragraph"><p>The command honors <tt>color.status</tt> (or <tt>status.color</tt>&#8201;&#8212;&#8201;they
 mean the same thing and the latter is kept for backward
-compatibility) and <code>color.status.&lt;slot&gt;</code> configuration variables
+compatibility) and <tt>color.status.&lt;slot&gt;</tt> configuration variables
 to colorize its output.</p></div>
-<div class="paragraph"><p>If the config variable <code>status.relativePaths</code> is set to false, then all
+<div class="paragraph"><p>If the config variable <tt>status.relativePaths</tt> is set to false, then all
 paths shown are relative to the repository root, not to the current
 directory.</p></div>
-<div class="paragraph"><p>If <code>status.submodulesummary</code> is set to a non zero number or true (identical
+<div class="paragraph"><p>If <tt>status.submodulesummary</tt> is set to a non zero number or true (identical
 to -1 or an unlimited number), the submodule summary will be enabled for
 the long format and a summary of commits for modified submodules will be
 shown (see --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>). Please note
 that the summary output from the status command will be suppressed for all
-submodules when <code>diff.ignoreSubmodules</code> is set to <em>all</em> or only for those
-submodules where <code>submodule.&lt;name&gt;.ignore=all</code>. To also view the summary for
+submodules when <tt>diff.ignoreSubmodules</tt> is set to <em>all</em> or only for those
+submodules where <tt>submodule.&lt;name&gt;.ignore=all</tt>. To also view the summary for
 ignored submodules you can either use the --ignore-submodules=dirty command
 line option or the <em>git submodule summary</em> command, which shows a similar
 output but does not honor these settings.</p></div>

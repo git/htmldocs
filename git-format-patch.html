@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-format-patch(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -790,26 +794,26 @@ Generic &lt;revision range&gt; expression (see "SPECIFYING
 </ol></div>
 <div class="paragraph"><p>The first rule takes precedence in the case of a single &lt;commit&gt;.  To
 apply the second rule, i.e., format everything since the beginning of
-history up until &lt;commit&gt;, use the <em>--root</em> option: <code>git format-patch
---root &lt;commit&gt;</code>.  If you want to format only &lt;commit&gt; itself, you
-can do this with <code>git format-patch -1 &lt;commit&gt;</code>.</p></div>
+history up until &lt;commit&gt;, use the <em>--root</em> option: <tt>git format-patch
+--root &lt;commit&gt;</tt>.  If you want to format only &lt;commit&gt; itself, you
+can do this with <tt>git format-patch -1 &lt;commit&gt;</tt>.</p></div>
 <div class="paragraph"><p>By default, each output file is numbered sequentially from 1, and uses the
 first line of the commit message (massaged for pathname safety) as
-the filename. With the <code>--numbered-files</code> option, the output file names
+the filename. With the <tt>--numbered-files</tt> option, the output file names
 will only be numbers, without the first line of the commit appended.
 The names of the output files are printed to standard
-output, unless the <code>--stdout</code> option is specified.</p></div>
-<div class="paragraph"><p>If <code>-o</code> is specified, output files are created in &lt;dir&gt;.  Otherwise
+output, unless the <tt>--stdout</tt> option is specified.</p></div>
+<div class="paragraph"><p>If <tt>-o</tt> is specified, output files are created in &lt;dir&gt;.  Otherwise
 they are created in the current working directory.</p></div>
 <div class="paragraph"><p>By default, the subject of a single patch is "[PATCH] " followed by
 the concatenation of lines from the commit message up to the first blank
 line (see the DISCUSSION section of <a href="git-commit.html">git-commit(1)</a>).</p></div>
 <div class="paragraph"><p>When multiple patches are output, the subject prefix will instead be
-"[PATCH n/m] ".  To force 1/1 to be added for a single patch, use <code>-n</code>.
-To omit patch numbers from the subject, use <code>-N</code>.</p></div>
-<div class="paragraph"><p>If given <code>--thread</code>, <code>git-format-patch</code> will generate <code>In-Reply-To</code> and
-<code>References</code> headers to make the second and subsequent patch mails appear
-as replies to the first mail; this also generates a <code>Message-Id</code> header to
+"[PATCH n/m] ".  To force 1/1 to be added for a single patch, use <tt>-n</tt>.
+To omit patch numbers from the subject, use <tt>-N</tt>.</p></div>
+<div class="paragraph"><p>If given <tt>--thread</tt>, <tt>git-format-patch</tt> will generate <tt>In-Reply-To</tt> and
+<tt>References</tt> headers to make the second and subsequent patch mails appear
+as replies to the first mail; this also generates a <tt>Message-Id</tt> header to
 reference.</p></div>
 </div>
 </div>
@@ -836,8 +840,8 @@ reference.</p></div>
 </dt>
 <dd>
 <p>
-        Suppress diff output. Useful for commands like <code>git show</code> that
-        show the patch by default, or to cancel the effect of <code>--patch</code>.
+        Suppress diff output. Useful for commands like <tt>git show</tt> that
+        show the patch by default, or to cancel the effect of <tt>--patch</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -888,7 +892,7 @@ reference.</p></div>
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>default</code>, <code>myers</code>
+<tt>default</tt>, <tt>myers</tt>
 </dt>
 <dd>
 <p>
@@ -896,7 +900,7 @@ reference.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>minimal</code>
+<tt>minimal</tt>
 </dt>
 <dd>
 <p>
@@ -905,7 +909,7 @@ reference.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>patience</code>
+<tt>patience</tt>
 </dt>
 <dd>
 <p>
@@ -913,7 +917,7 @@ reference.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>histogram</code>
+<tt>histogram</tt>
 </dt>
 <dd>
 <p>
@@ -925,7 +929,7 @@ reference.</p></div>
 </div></div>
 <div class="paragraph"><p>For instance, if you configured diff.algorithm variable to a
 non-default value and want to use the default one, then you
-have to use <code>--diff-algorithm=default</code> option.</p></div>
+have to use <tt>--diff-algorithm=default</tt> option.</p></div>
 </dd>
 <dt class="hdlist1">
 --stat[=&lt;width&gt;[,&lt;name-width&gt;[,&lt;count&gt;]]]
@@ -936,29 +940,29 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
         will be used for the filename part, and the rest for the graph
         part. Maximum width defaults to terminal width, or 80 columns
         if not connected to a terminal, and can be overridden by
-        <code>&lt;width&gt;</code>. The width of the filename part can be limited by
-        giving another width <code>&lt;name-width&gt;</code> after a comma. The width
+        <tt>&lt;width&gt;</tt>. The width of the filename part can be limited by
+        giving another width <tt>&lt;name-width&gt;</tt> after a comma. The width
         of the graph part can be limited by using
-        <code>--stat-graph-width=&lt;width&gt;</code> (affects all commands generating
-        a stat graph) or by setting <code>diff.statGraphWidth=&lt;width&gt;</code>
-        (does not affect <code>git format-patch</code>).
-        By giving a third parameter <code>&lt;count&gt;</code>, you can limit the
-        output to the first <code>&lt;count&gt;</code> lines, followed by <code>...</code> if
+        <tt>--stat-graph-width=&lt;width&gt;</tt> (affects all commands generating
+        a stat graph) or by setting <tt>diff.statGraphWidth=&lt;width&gt;</tt>
+        (does not affect <tt>git format-patch</tt>).
+        By giving a third parameter <tt>&lt;count&gt;</tt>, you can limit the
+        output to the first <tt>&lt;count&gt;</tt> lines, followed by <tt>...</tt> if
         there are more.
 </p>
-<div class="paragraph"><p>These parameters can also be set individually with <code>--stat-width=&lt;width&gt;</code>,
-<code>--stat-name-width=&lt;name-width&gt;</code> and <code>--stat-count=&lt;count&gt;</code>.</p></div>
+<div class="paragraph"><p>These parameters can also be set individually with <tt>--stat-width=&lt;width&gt;</tt>,
+<tt>--stat-name-width=&lt;name-width&gt;</tt> and <tt>--stat-count=&lt;count&gt;</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --numstat
 </dt>
 <dd>
 <p>
-        Similar to <code>--stat</code>, but shows number of added and
+        Similar to <tt>--stat</tt>, but shows number of added and
         deleted lines in decimal notation and pathname without
         abbreviation, to make it more machine friendly.  For
-        binary files, outputs two <code>-</code> instead of saying
-        <code>0 0</code>.
+        binary files, outputs two <tt>-</tt> instead of saying
+        <tt>0 0</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -966,7 +970,7 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 </dt>
 <dd>
 <p>
-        Output only the last line of the <code>--stat</code> format containing total
+        Output only the last line of the <tt>--stat</tt> format containing total
         number of modified files, as well as number of added and deleted
         lines.
 </p>
@@ -977,9 +981,9 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 <dd>
 <p>
         Output the distribution of relative amount of changes for each
-        sub-directory. The behavior of <code>--dirstat</code> can be customized by
+        sub-directory. The behavior of <tt>--dirstat</tt> can be customized by
         passing it a comma separated list of parameters.
-        The defaults are controlled by the <code>diff.dirstat</code> configuration
+        The defaults are controlled by the <tt>diff.dirstat</tt> configuration
         variable (see <a href="git-config.html">git-config(1)</a>).
         The following parameters are available:
 </p>
@@ -987,7 +991,7 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>changes</code>
+<tt>changes</tt>
 </dt>
 <dd>
 <p>
@@ -999,39 +1003,39 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>lines</code>
+<tt>lines</tt>
 </dt>
 <dd>
 <p>
         Compute the dirstat numbers by doing the regular line-based diff
         analysis, and summing the removed/added line counts. (For binary
         files, count 64-byte chunks instead, since binary files have no
-        natural concept of lines). This is a more expensive <code>--dirstat</code>
-        behavior than the <code>changes</code> behavior, but it does count rearranged
+        natural concept of lines). This is a more expensive <tt>--dirstat</tt>
+        behavior than the <tt>changes</tt> behavior, but it does count rearranged
         lines within a file as much as other changes. The resulting output
-        is consistent with what you get from the other <code>--*stat</code> options.
+        is consistent with what you get from the other <tt>--*stat</tt> options.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>files</code>
+<tt>files</tt>
 </dt>
 <dd>
 <p>
         Compute the dirstat numbers by counting the number of files changed.
         Each changed file counts equally in the dirstat analysis. This is
-        the computationally cheapest <code>--dirstat</code> behavior, since it does
+        the computationally cheapest <tt>--dirstat</tt> behavior, since it does
         not have to look at the file contents at all.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>cumulative</code>
+<tt>cumulative</tt>
 </dt>
 <dd>
 <p>
         Count changes in a child directory for the parent directory as well.
-        Note that when using <code>cumulative</code>, the sum of the percentages
+        Note that when using <tt>cumulative</tt>, the sum of the percentages
         reported may exceed 100%. The default (non-cumulative) behavior can
-        be specified with the <code>noncumulative</code> parameter.
+        be specified with the <tt>noncumulative</tt> parameter.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1049,7 +1053,7 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 <div class="paragraph"><p>Example: The following will count changed files, while ignoring
 directories with less than 10% of the total amount of changed files,
 and accumulating child directory counts in the parent directories:
-<code>--dirstat=files,10,cumulative</code>.</p></div>
+<tt>--dirstat=files,10,cumulative</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --summary
@@ -1084,8 +1088,8 @@ and accumulating child directory counts in the parent directories:
 </dt>
 <dd>
 <p>
-        In addition to <code>--full-index</code>, output a binary diff that
-        can be applied with <code>git-apply</code>.
+        In addition to <tt>--full-index</tt>, output a binary diff that
+        can be applied with <tt>git-apply</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1096,9 +1100,9 @@ and accumulating child directory counts in the parent directories:
         Instead of showing the full 40-byte hexadecimal object
         name in diff-raw format output and diff-tree header
         lines, show only a partial prefix.  This is
-        independent of the <code>--full-index</code> option above, which controls
+        independent of the <tt>--full-index</tt> option above, which controls
         the diff-patch output format.  Non default number of
-        digits can be specified with <code>--abbrev=&lt;n&gt;</code>.
+        digits can be specified with <tt>--abbrev=&lt;n&gt;</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1116,15 +1120,15 @@ and accumulating child directory counts in the parent directories:
 not as a series of deletion and insertion mixed together with a very
 few lines that happen to match textually as the context, but as a
 single deletion of everything old followed by a single insertion of
-everything new, and the number <code>m</code> controls this aspect of the -B
-option (defaults to 60%). <code>-B/70%</code> specifies that less than 30% of the
+everything new, and the number <tt>m</tt> controls this aspect of the -B
+option (defaults to 60%). <tt>-B/70%</tt> specifies that less than 30% of the
 original should remain in the result for Git to consider it a total
 rewrite (i.e. otherwise the resulting patch will be a series of
 deletion and insertion mixed together with context lines).</p></div>
 <div class="paragraph"><p>When used with -M, a totally-rewritten file is also considered as the
 source of a rename (usually -M only considers a file that disappeared
-as the source of a rename), and the number <code>n</code> controls this aspect of
-the -B option (defaults to 50%). <code>-B20%</code> specifies that a change with
+as the source of a rename), and the number <tt>n</tt> controls this aspect of
+the -B option (defaults to 50%). <tt>-B20%</tt> specifies that a change with
 addition and deletion compared to 20% or more of the file&#8217;s size are
 eligible for being picked up as a possible source of a rename to
 another file.</p></div>
@@ -1138,15 +1142,15 @@ another file.</p></div>
 <dd>
 <p>
         Detect renames.
-        If <code>n</code> is specified, it is a threshold on the similarity
+        If <tt>n</tt> is specified, it is a threshold on the similarity
         index (i.e. amount of addition/deletions compared to the
-        file&#8217;s size). For example, <code>-M90%</code> means Git should consider a
+        file&#8217;s size). For example, <tt>-M90%</tt> means Git should consider a
         delete/add pair to be a rename if more than 90% of the file
-        hasn&#8217;t changed.  Without a <code>%</code> sign, the number is to be read as
-        a fraction, with a decimal point before it.  I.e., <code>-M5</code> becomes
-        0.5, and is thus the same as <code>-M50%</code>.  Similarly, <code>-M05</code> is
-        the same as <code>-M5%</code>.  To limit detection to exact renames, use
-        <code>-M100%</code>.  The default similarity index is 50%.
+        hasn&#8217;t changed.  Without a <tt>%</tt> sign, the number is to be read as
+        a fraction, with a decimal point before it.  I.e., <tt>-M5</tt> becomes
+        0.5, and is thus the same as <tt>-M50%</tt>.  Similarly, <tt>-M05</tt> is
+        the same as <tt>-M5%</tt>.  To limit detection to exact renames, use
+        <tt>-M100%</tt>.  The default similarity index is 50%.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1157,8 +1161,8 @@ another file.</p></div>
 </dt>
 <dd>
 <p>
-        Detect copies as well as renames.  See also <code>--find-copies-harder</code>.
-        If <code>n</code> is specified, it has the same meaning as for <code>-M&lt;n&gt;</code>.
+        Detect copies as well as renames.  See also <tt>--find-copies-harder</tt>.
+        If <tt>n</tt> is specified, it has the same meaning as for <tt>-M&lt;n&gt;</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1166,13 +1170,13 @@ another file.</p></div>
 </dt>
 <dd>
 <p>
-        For performance reasons, by default, <code>-C</code> option finds copies only
+        For performance reasons, by default, <tt>-C</tt> option finds copies only
         if the original file of the copy was modified in the same
         changeset.  This flag makes the command
         inspect unmodified files as candidates for the source of
         copy.  This is a very expensive operation for large
         projects, so use it with caution.  Giving more than one
-        <code>-C</code> option has the same effect.
+        <tt>-C</tt> option has the same effect.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1184,14 +1188,14 @@ another file.</p></div>
 <dd>
 <p>
         Omit the preimage for deletes, i.e. print only the header but not
-        the diff between the preimage and <code>/dev/null</code>. The resulting patch
-        is not meant to be applied with <code>patch</code> nor <code>git apply</code>; this is
+        the diff between the preimage and <tt>/dev/null</tt>. The resulting patch
+        is not meant to be applied with <tt>patch</tt> nor <tt>git apply</tt>; this is
         solely for people who want to just concentrate on reviewing the
         text after the change. In addition, the output obviously lack
         enough information to apply such a patch in reverse, even manually,
         hence the name of the option.
 </p>
-<div class="paragraph"><p>When used together with <code>-B</code>, omit also the preimage in the deletion part
+<div class="paragraph"><p>When used together with <tt>-B</tt>, omit also the preimage in the deletion part
 of a delete/create pair.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1199,7 +1203,7 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        The <code>-M</code> and <code>-C</code> options require O(n^2) processing time where n
+        The <tt>-M</tt> and <tt>-C</tt> options require O(n^2) processing time where n
         is the number of potential rename/copy targets.  This
         option prevents rename/copy detection from running if
         the number of rename/copy targets exceeds the specified
@@ -1213,9 +1217,9 @@ of a delete/create pair.</p></div>
 <p>
         Output the patch in the order specified in the
         &lt;orderfile&gt;, which has one shell glob pattern per line.
-        This overrides the <code>diff.orderfile</code> configuration variable
-        (see <a href="git-config.html">git-config(1)</a>).  To cancel <code>diff.orderfile</code>,
-        use <code>-O/dev/null</code>.
+        This overrides the <tt>diff.orderfile</tt> configuration variable
+        (see <a href="git-config.html">git-config(1)</a>).  To cancel <tt>diff.orderfile</tt>,
+        use <tt>-O/dev/null</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1452,7 +1456,7 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Add <code>Signed-off-by:</code> line to the commit message, using
+        Add <tt>Signed-off-by:</tt> line to the commit message, using
         the committer identity of yourself.
 </p>
 </dd>
@@ -1472,7 +1476,7 @@ of a delete/create pair.</p></div>
 <p>
         Create multipart/mixed attachment, the first part of
         which is the commit message and the patch itself in the
-        second part, with <code>Content-Disposition: attachment</code>.
+        second part, with <tt>Content-Disposition: attachment</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1491,7 +1495,7 @@ of a delete/create pair.</p></div>
 <p>
         Create multipart/mixed attachment, the first part of
         which is the commit message and the patch itself in the
-        second part, with <code>Content-Disposition: inline</code>.
+        second part, with <tt>Content-Disposition: inline</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1502,29 +1506,29 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Controls addition of <code>In-Reply-To</code> and <code>References</code> headers to
+        Controls addition of <tt>In-Reply-To</tt> and <tt>References</tt> headers to
         make the second and subsequent mails appear as replies to the
-        first.  Also controls generation of the <code>Message-Id</code> header to
+        first.  Also controls generation of the <tt>Message-Id</tt> header to
         reference.
 </p>
-<div class="paragraph"><p>The optional &lt;style&gt; argument can be either <code>shallow</code> or <code>deep</code>.
+<div class="paragraph"><p>The optional &lt;style&gt; argument can be either <tt>shallow</tt> or <tt>deep</tt>.
 <em>shallow</em> threading makes every mail a reply to the head of the
 series, where the head is chosen from the cover letter, the
-<code>--in-reply-to</code>, and the first patch mail, in this order.  <em>deep</em>
+<tt>--in-reply-to</tt>, and the first patch mail, in this order.  <em>deep</em>
 threading makes every mail a reply to the previous one.</p></div>
-<div class="paragraph"><p>The default is <code>--no-thread</code>, unless the <em>format.thread</em> configuration
-is set.  If <code>--thread</code> is specified without a style, it defaults to the
-style specified by <em>format.thread</em> if any, or else <code>shallow</code>.</p></div>
+<div class="paragraph"><p>The default is <tt>--no-thread</tt>, unless the <em>format.thread</em> configuration
+is set.  If <tt>--thread</tt> is specified without a style, it defaults to the
+style specified by <em>format.thread</em> if any, or else <tt>shallow</tt>.</p></div>
 <div class="paragraph"><p>Beware that the default for <em>git send-email</em> is to thread emails
-itself.  If you want <code>git format-patch</code> to take care of threading, you
-will want to ensure that threading is disabled for <code>git send-email</code>.</p></div>
+itself.  If you want <tt>git format-patch</tt> to take care of threading, you
+will want to ensure that threading is disabled for <tt>git send-email</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --in-reply-to=Message-Id
 </dt>
 <dd>
 <p>
-        Make the first mail (or all the mails with <code>--no-thread</code>) appear as a
+        Make the first mail (or all the mails with <tt>--no-thread</tt>) appear as a
         reply to the given Message-Id, which avoids breaking threads to
         provide a new patch series.
 </p>
@@ -1549,7 +1553,7 @@ will want to ensure that threading is disabled for <code>git send-email</code>.<
         Instead of the standard <em>[PATCH]</em> prefix in the subject
         line, instead use <em>[&lt;Subject-Prefix&gt;]</em>. This
         allows for useful naming of a patch series, and can be
-        combined with the <code>--numbered</code> option.
+        combined with the <tt>--numbered</tt> option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1561,10 +1565,10 @@ will want to ensure that threading is disabled for <code>git send-email</code>.<
 <dd>
 <p>
         Mark the series as the &lt;n&gt;-th iteration of the topic. The
-        output filenames have <code>v&lt;n&gt;</code> pretended to them, and the
+        output filenames have <tt>v&lt;n&gt;</tt> pretended to them, and the
         subject prefix ("PATCH" by default, but configurable via the
-        <code>--subject-prefix</code> option) has ` v&lt;n&gt;` appended to it.  E.g.
-        <code>--reroll-count=4</code> may produce <code>v4-0001-add-makefile.patch</code>
+        <tt>--subject-prefix</tt> option) has ` v&lt;n&gt;` appended to it.  E.g.
+        <tt>--reroll-count=4</tt> may produce <tt>v4-0001-add-makefile.patch</tt>
         file that has "Subject: [PATCH v4 1/20] Add makefile" in it.
 </p>
 </dd>
@@ -1573,9 +1577,9 @@ will want to ensure that threading is disabled for <code>git send-email</code>.<
 </dt>
 <dd>
 <p>
-        Add a <code>To:</code> header to the email headers. This is in addition
+        Add a <tt>To:</tt> header to the email headers. This is in addition
         to any configured headers, and may be used multiple times.
-        The negated form <code>--no-to</code> discards all <code>To:</code> headers added so
+        The negated form <tt>--no-to</tt> discards all <tt>To:</tt> headers added so
         far (from config or command line).
 </p>
 </dd>
@@ -1584,9 +1588,9 @@ will want to ensure that threading is disabled for <code>git send-email</code>.<
 </dt>
 <dd>
 <p>
-        Add a <code>Cc:</code> header to the email headers. This is in addition
+        Add a <tt>Cc:</tt> header to the email headers. This is in addition
         to any configured headers, and may be used multiple times.
-        The negated form <code>--no-cc</code> discards all <code>Cc:</code> headers added so
+        The negated form <tt>--no-cc</tt> discards all <tt>Cc:</tt> headers added so
         far (from config or command line).
 </p>
 </dd>
@@ -1598,18 +1602,18 @@ will want to ensure that threading is disabled for <code>git send-email</code>.<
 </dt>
 <dd>
 <p>
-        Use <code>ident</code> in the <code>From:</code> header of each commit email. If the
+        Use <tt>ident</tt> in the <tt>From:</tt> header of each commit email. If the
         author ident of the commit is not textually identical to the
-        provided <code>ident</code>, place a <code>From:</code> header in the body of the
-        message with the original author. If no <code>ident</code> is given, use
+        provided <tt>ident</tt>, place a <tt>From:</tt> header in the body of the
+        message with the original author. If no <tt>ident</tt> is given, use
         the committer ident.
 </p>
 <div class="paragraph"><p>Note that this option is only useful if you are actually sending the
 emails and want to identify yourself as the sender, but retain the
-original author (and <code>git am</code> will correctly pick up the in-body
-header). Note also that <code>git send-email</code> already handles this
+original author (and <tt>git am</tt> will correctly pick up the in-body
+header). Note also that <tt>git send-email</tt> already handles this
 transformation for you, and this option should not be used if you are
-feeding the result to <code>git send-email</code>.</p></div>
+feeding the result to <tt>git send-email</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --add-header=&lt;header&gt;
@@ -1618,9 +1622,9 @@ feeding the result to <code>git send-email</code>.</p></div>
 <p>
         Add an arbitrary header to the email headers.  This is in addition
         to any configured headers, and may be used multiple times.
-        For example, <code>--add-header="Organization: git-foo"</code>.
-        The negated form <code>--no-add-header</code> discards <strong>all</strong> (<code>To:</code>,
-        <code>Cc:</code>, and custom) headers added so far from config or command
+        For example, <tt>--add-header="Organization: git-foo"</tt>.
+        The negated form <tt>--no-add-header</tt> discards <strong>all</strong> (<tt>To:</tt>,
+        <tt>Cc:</tt>, and custom) headers added so far from config or command
         line.
 </p>
 </dd>
@@ -1645,9 +1649,9 @@ feeding the result to <code>git send-email</code>.</p></div>
 <div class="paragraph"><p>The expected use case of this is to write supporting explanation for
 the commit that does not belong to the commit log message proper,
 and include it with the patch submission. While one can simply write
-these explanations after <code>format-patch</code> has run but before sending,
+these explanations after <tt>format-patch</tt> has run but before sending,
 keeping them as Git notes allows them to be maintained between versions
-of the patch series (but see the discussion of the <code>notes.rewrite</code>
+of the patch series (but see the discussion of the <tt>notes.rewrite</tt>
 configuration options in <a href="git-notes.html">git-notes(1)</a> to use this workflow).</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1666,13 +1670,13 @@ configuration options in <a href="git-notes.html">git-notes(1)</a> to use this w
 </dt>
 <dd>
 <p>
-        Instead of using <code>.patch</code> as the suffix for generated
+        Instead of using <tt>.patch</tt> as the suffix for generated
         filenames, use specified suffix.  A common alternative is
-        <code>--suffix=.txt</code>.  Leaving this empty will remove the <code>.patch</code>
+        <tt>--suffix=.txt</tt>.  Leaving this empty will remove the <tt>.patch</tt>
         suffix.
 </p>
 <div class="paragraph"><p>Note that the leading character does not have to be a dot; for example,
-you can use <code>--suffix=-patch</code> to get <code>0001-description-of-my-change-patch</code>.</p></div>
+you can use <tt>--suffix=-patch</tt> to get <tt>0001-description-of-my-change-patch</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 -q
@@ -1720,7 +1724,7 @@ outputting more than one patch, add "To" or "Cc:" headers, configure
 attachments, and sign off patches with configuration variables.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[format]
+<pre><tt>[format]
         headers = "Organization: git-foo\n"
         subjectprefix = CHANGE
         suffix = .txt
@@ -1729,7 +1733,7 @@ attachments, and sign off patches with configuration variables.</p></div>
         cc = &lt;email&gt;
         attach [ = mime-boundary-string ]
         signoff = true
-        coverletter = auto</code></pre>
+        coverletter = auto</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1741,7 +1745,7 @@ with a fixed "magic" time stamp to indicate that the file is output
 from format-patch rather than a real mailbox, like so:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>From 8f72bad1baf19a53459661343e21d6491c3908d3 Mon Sep 17 00:00:00 2001
+<pre><tt>From 8f72bad1baf19a53459661343e21d6491c3908d3 Mon Sep 17 00:00:00 2001
 From: Tony Luck &lt;tony.luck@intel.com&gt;
 Date: Tue, 13 Jul 2010 11:42:54 -0700
 Subject: [PATCH] =?UTF-8?q?[IA64]=20Put=20ia64=20config=20files=20on=20the=20?=
@@ -1754,7 +1758,7 @@ arch/arm config files were slimmed down using a python script
 (See commit c2330e286f68f1c408b4aa6515ba49d57f05beae comment)
 
 Do the same for ia64 so we can have sleek &amp; trim looking
-...</code></pre>
+...</tt></pre>
 </div></div>
 <div class="paragraph"><p>Typically it will be placed in a MUA&#8217;s drafts folder, edited to add
 timely commentary that should not go in the changelog after the three
@@ -1765,11 +1769,11 @@ can save interesting patches in a UNIX mailbox and apply them with
 <div class="paragraph"><p>When a patch is part of an ongoing discussion, the patch generated by
 <em>git format-patch</em> can be tweaked to take advantage of the <em>git am
 --scissors</em> feature.  After your response to the discussion comes a
-line that consists solely of "<code>-- &gt;8 --</code>" (scissors and perforation),
+line that consists solely of "<tt>-- &gt;8 --</tt>" (scissors and perforation),
 followed by the patch with unnecessary header fields removed:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>...
+<pre><tt>...
 &gt; So we should do such-and-such.
 
 Makes sense to me.  How about this patch?
@@ -1778,11 +1782,11 @@ Makes sense to me.  How about this patch?
 Subject: [IA64] Put ia64 config files on the Uwe Kleine-König diet
 
 arch/arm config files were slimmed down using a python script
-...</code></pre>
+...</tt></pre>
 </div></div>
 <div class="paragraph"><p>When sending a patch this way, most often you are sending your own
-patch, so in addition to the "<code>From $SHA1 $magic_timestamp</code>" marker you
-should omit <code>From:</code> and <code>Date:</code> lines from the patch file.  The patch
+patch, so in addition to the "<tt>From $SHA1 $magic_timestamp</tt>" marker you
+should omit <tt>From:</tt> and <tt>Date:</tt> lines from the patch file.  The patch
 title is likely to be different from the subject of the discussion the
 patch is in response to, so it is likely that you would want to keep
 the Subject: line, like the example above.</p></div>
@@ -1824,10 +1828,10 @@ Apply it:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git fetch &lt;project&gt; master:test-apply
+<pre><tt>$ git fetch &lt;project&gt; master:test-apply
 $ git checkout test-apply
 $ git reset --hard
-$ git am a.patch</code></pre>
+$ git am a.patch</tt></pre>
 </div></div>
 </li>
 </ul></div>
@@ -1918,7 +1922,7 @@ Edit..Preferences..Composition, wrap plain text messages at 0</p></div>
 <div class="paragraph"><p>In Thunderbird 3:
 Edit..Preferences..Advanced..Config Editor.  Search for
 "mail.wrap_long_lines".
-Toggle it to make sure it is set to <code>false</code>. Also, search for
+Toggle it to make sure it is set to <tt>false</tt>. Also, search for
 "mailnews.wraplength" and set the value to 0.</p></div>
 </li>
 <li>
@@ -1926,7 +1930,7 @@ Toggle it to make sure it is set to <code>false</code>. Also, search for
 Disable the use of format=flowed:
 Edit..Preferences..Advanced..Config Editor.  Search for
 "mailnews.send_plaintext_flowed".
-Toggle it to make sure it is set to <code>false</code>.
+Toggle it to make sure it is set to <tt>false</tt>.
 </p>
 </li>
 </ol></div>
@@ -1961,8 +1965,8 @@ In the main Thunderbird window, <em>before</em> you open the compose
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>        mailnews.send_plaintext_flowed  =&gt; false
-        mailnews.wraplength             =&gt; 0</code></pre>
+<pre><tt>        mailnews.send_plaintext_flowed  =&gt; false
+        mailnews.wraplength             =&gt; 0</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1981,9 +1985,9 @@ In the external editor window, read in the patch file and exit
 about:config and the following settings but no one&#8217;s tried yet.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        mail.html_compose                       =&gt; false
+<pre><tt>        mail.html_compose                       =&gt; false
         mail.identity.default.compose_html      =&gt; false
-        mail.identity.id?.compose_html          =&gt; false</code></pre>
+        mail.identity.id?.compose_html          =&gt; false</tt></pre>
 </div></div>
 <div class="paragraph"><p>There is a script in contrib/thunderbird-patch-inline which can help
 you include patches with Thunderbird in an easy way. To use it, do the
@@ -2036,7 +2040,7 @@ the current branch using <em>git am</em> to cherry-pick them:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git format-patch -k --stdout R1..R2 | git am -3 -k</code></pre>
+<pre><tt>$ git format-patch -k --stdout R1..R2 | git am -3 -k</tt></pre>
 </div></div>
 </li>
 <li>
@@ -2046,7 +2050,7 @@ origin branch:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git format-patch origin</code></pre>
+<pre><tt>$ git format-patch origin</tt></pre>
 </div></div>
 <div class="paragraph"><p>For each commit a separate file is created in the current directory.</p></div>
 </li>
@@ -2057,7 +2061,7 @@ project:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git format-patch --root origin</code></pre>
+<pre><tt>$ git format-patch --root origin</tt></pre>
 </div></div>
 </li>
 <li>
@@ -2066,7 +2070,7 @@ The same as the previous one:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git format-patch -M -B origin</code></pre>
+<pre><tt>$ git format-patch -M -B origin</tt></pre>
 </div></div>
 <div class="paragraph"><p>Additionally, it detects and handles renames and complete rewrites
 intelligently to produce a renaming patch.  A renaming patch reduces
@@ -2081,7 +2085,7 @@ as e-mailable patches:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git format-patch -3</code></pre>
+<pre><tt>$ git format-patch -3</tt></pre>
 </div></div>
 </li>
 </ul></div>

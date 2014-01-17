@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-gc(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -761,12 +765,12 @@ created from prior invocations of <em>git add</em>.</p></div>
 <div class="paragraph"><p>Users are encouraged to run this task on a regular basis within
 each repository to maintain good disk space utilization and good
 operating performance.</p></div>
-<div class="paragraph"><p>Some git commands may automatically run <em>git gc</em>; see the <code>--auto</code> flag
+<div class="paragraph"><p>Some git commands may automatically run <em>git gc</em>; see the <tt>--auto</tt> flag
 below for details. If you know what you&#8217;re doing and all you want is to
 disable this behavior permanently without further considerations, just do:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git config --global gc.auto 0</code></pre>
+<pre><tt>$ git config --global gc.auto 0</tt></pre>
 </div></div>
 </div>
 </div>
@@ -794,19 +798,19 @@ disable this behavior permanently without further considerations, just do:</p></
 <p>
         With this option, <em>git gc</em> checks whether any housekeeping is
         required; if not, it exits without performing any work.
-        Some git commands run <code>git gc --auto</code> after performing
+        Some git commands run <tt>git gc --auto</tt> after performing
         operations that could create many loose objects.
 </p>
 <div class="paragraph"><p>Housekeeping is required if there are too many loose objects or
 too many packs in the repository. If the number of loose objects
-exceeds the value of the <code>gc.auto</code> configuration variable, then
+exceeds the value of the <tt>gc.auto</tt> configuration variable, then
 all loose objects are combined into a single pack using
-<code>git repack -d -l</code>.  Setting the value of <code>gc.auto</code> to 0
+<tt>git repack -d -l</tt>.  Setting the value of <tt>gc.auto</tt> to 0
 disables automatic packing of loose objects.</p></div>
-<div class="paragraph"><p>If the number of packs exceeds the value of <code>gc.autopacklimit</code>,
-then existing packs (except those marked with a <code>.keep</code> file)
-are consolidated into a single pack by using the <code>-A</code> option of
-<em>git repack</em>. Setting <code>gc.autopacklimit</code> to 0 disables
+<div class="paragraph"><p>If the number of packs exceeds the value of <tt>gc.autopacklimit</tt>,
+then existing packs (except those marked with a <tt>.keep</tt> file)
+are consolidated into a single pack by using the <tt>-A</tt> option of
+<em>git repack</em>. Setting <tt>gc.autopacklimit</tt> to 0 disables
 automatic consolidation of packs.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -815,7 +819,7 @@ automatic consolidation of packs.</p></div>
 <dd>
 <p>
         Prune loose objects older than date (default is 2 weeks ago,
-        overridable by the config variable <code>gc.pruneExpire</code>).
+        overridable by the config variable <tt>gc.pruneExpire</tt>).
         --prune=all prunes loose objects regardless of their age.
         --prune is on by default.
 </p>
@@ -841,7 +845,7 @@ automatic consolidation of packs.</p></div>
 </dt>
 <dd>
 <p>
-        Force <code>git gc</code> to run even if there may be another <code>git gc</code>
+        Force <tt>git gc</tt> to run even if there may be another <tt>git gc</tt>
         instance running on this repository.
 </p>
 </dd>
@@ -860,7 +864,7 @@ It defaults to <em>90 days</em>.</p></div>
 can be set to indicate how long historical reflog entries which
 are not part of the current branch should remain available in
 this repository.  These types of entries are generally created as
-a result of using <code>git commit --amend</code> or <code>git rebase</code> and are the
+a result of using <tt>git commit --amend</tt> or <tt>git rebase</tt> and are the
 commits prior to the amend or rebase occurring.  Since these changes
 are not part of the current project most users will want to expire
 them sooner.  This option defaults to <em>30 days</em>.</p></div>
@@ -869,9 +873,9 @@ example, this sets non-default expiry values only to remote-tracking
 branches:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[gc "refs/remotes/*"]
+<pre><tt>[gc "refs/remotes/*"]
         reflogExpire = never
-        reflogexpireUnreachable = 3 days</code></pre>
+        reflogexpireUnreachable = 3 days</tt></pre>
 </div></div>
 <div class="paragraph"><p>The optional configuration variable <em>gc.rerereresolved</em> indicates
 how long records of conflicted merge you resolved earlier are

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-show-branch(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -763,7 +767,7 @@ git-show-branch(1) Manual Page
 with &lt;rev&gt;s or &lt;globs&gt;s (or all refs under refs/heads
 and/or refs/tags) semi-visually.</p></div>
 <div class="paragraph"><p>It cannot show more than 29 branches and commits at a time.</p></div>
-<div class="paragraph"><p>It uses <code>showbranch.default</code> multi-valued configuration items if
+<div class="paragraph"><p>It uses <tt>showbranch.default</tt> multi-valued configuration items if
 no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p></div>
 </div>
 </div>
@@ -788,7 +792,7 @@ no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p></div>
         A glob pattern that matches branch or tag names under
         refs/.  For example, if you have many topic
         branches under refs/heads/topic, giving
-        <code>topic/*</code> would show all of them.
+        <tt>topic/*</tt> would show all of them.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -872,7 +876,7 @@ no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p></div>
 </dt>
 <dd>
 <p>
-        Synonym to <code>--more=-1</code>
+        Synonym to <tt>--more=-1</tt>
 </p>
 </dd>
 <dt class="hdlist1">
@@ -940,7 +944,7 @@ no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p></div>
         ref.  If &lt;base&gt; is given, &lt;n&gt; entries going back from
         that entry.  &lt;base&gt; can be specified as count or date.
         When no explicit &lt;ref&gt; parameter is given, it defaults to the
-        current branch (or <code>HEAD</code> if it is detached).
+        current branch (or <tt>HEAD</tt> if it is detached).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -948,7 +952,7 @@ no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p></div>
 </dt>
 <dd>
 <p>
-        Color the status sign (one of these: <code>*</code> <code>!</code> <code>+</code> <code>-</code>) of each commit
+        Color the status sign (one of these: <tt>*</tt> <tt>!</tt> <tt>+</tt> <tt>-</tt>) of each commit
         corresponding to the branch it&#8217;s in.
         The value must be always (the default), never, or auto.
 </p>
@@ -960,7 +964,7 @@ no &lt;rev&gt; nor &lt;glob&gt; is given on the command line.</p></div>
 <p>
         Turn off colored output, even when the configuration file gives the
         default to color output.
-        Same as <code>--color=never</code>.
+        Same as <tt>--color=never</tt>.
 </p>
 </dd>
 </dl></div>
@@ -973,19 +977,19 @@ are mutually exclusive.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>Given N &lt;references&gt;, the first N lines are the one-line
 description from their commit message.  The branch head that is
-pointed at by $GIT_DIR/HEAD is prefixed with an asterisk <code>*</code>
-character while other heads are prefixed with a <code>!</code> character.</p></div>
+pointed at by $GIT_DIR/HEAD is prefixed with an asterisk <tt>*</tt>
+character while other heads are prefixed with a <tt>!</tt> character.</p></div>
 <div class="paragraph"><p>Following these N lines, one-line log for each commit is
 displayed, indented N places.  If a commit is on the I-th
-branch, the I-th indentation character shows a <code>+</code> sign;
+branch, the I-th indentation character shows a <tt>+</tt> sign;
 otherwise it shows a space.  Merge commits are denoted by
-a <code>-</code> sign.  Each commit shows a short name that
+a <tt>-</tt> sign.  Each commit shows a short name that
 can be used as an extended SHA-1 to name that commit.</p></div>
 <div class="paragraph"><p>The following example shows three branches, "master", "fixes"
 and "mhf":</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git show-branch master fixes mhf
+<pre><tt>$ git show-branch master fixes mhf
 * [master] Add 'git show-branch'.
  ! [fixes] Introduce "reset type" flag to "git reset"
   ! [mhf] Allow "+remote:local" refspec to cause --force when fetching.
@@ -1000,7 +1004,7 @@ and "mhf":</p></div>
   + [mhf~6] Retire git-parse-remote.
   + [mhf~7] Multi-head fetch.
   + [mhf~8] Start adding the $GIT_DIR/remotes/ support.
-*++ [master] Add 'git show-branch'.</code></pre>
+*++ [master] Add 'git show-branch'.</tt></pre>
 </div></div>
 <div class="paragraph"><p>These three branches all forked from a common commit, [master],
 whose commit message is "Add &#39;git show-branch&#39;".
@@ -1013,23 +1017,23 @@ The current branch is "master".</p></div>
 <h2 id="_example">EXAMPLE</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If you keep your primary branches immediately under
-<code>refs/heads</code>, and topic branches in subdirectories of
+<tt>refs/heads</tt>, and topic branches in subdirectories of
 it, having the following in the configuration file may help:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[showbranch]
+<pre><tt>[showbranch]
         default = --topo-order
-        default = heads/*</code></pre>
+        default = heads/*</tt></pre>
 </div></div>
-<div class="paragraph"><p>With this, <code>git show-branch</code> without extra parameters would show
+<div class="paragraph"><p>With this, <tt>git show-branch</tt> without extra parameters would show
 only the primary branches.  In addition, if you happen to be on
 your topic branch, it is shown as well.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git show-branch --reflog="10,1 hour ago" --list master</code></pre>
+<pre><tt>$ git show-branch --reflog="10,1 hour ago" --list master</tt></pre>
 </div></div>
 <div class="paragraph"><p>shows 10 reflog entries going back from the tip as of 1 hour ago.
-Without <code>--list</code>, the output also shows how these tips are
+Without <tt>--list</tt>, the output also shows how these tips are
 topologically related with each other.</p></div>
 </div>
 </div>

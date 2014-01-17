@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-clone(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -762,17 +766,17 @@ git-clone(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Clones a repository into a newly created directory, creates
 remote-tracking branches for each branch in the cloned repository
-(visible using <code>git branch -r</code>), and creates and checks out an
+(visible using <tt>git branch -r</tt>), and creates and checks out an
 initial branch that is forked from the cloned repository&#8217;s
 currently active branch.</p></div>
-<div class="paragraph"><p>After the clone, a plain <code>git fetch</code> without arguments will update
-all the remote-tracking branches, and a <code>git pull</code> without
+<div class="paragraph"><p>After the clone, a plain <tt>git fetch</tt> without arguments will update
+all the remote-tracking branches, and a <tt>git pull</tt> without
 arguments will in addition merge the remote master branch into the
 current master branch, if any (this is untrue when "--single-branch"
 is given; see below).</p></div>
 <div class="paragraph"><p>This default configuration is achieved by creating references to
-the remote branch heads under <code>refs/remotes/origin</code> and
-by initializing <code>remote.origin.url</code> and <code>remote.origin.fetch</code>
+the remote branch heads under <tt>refs/remotes/origin</tt> and
+by initializing <tt>remote.origin.url</tt> and <tt>remote.origin.fetch</tt>
 configuration variables.</p></div>
 </div>
 </div>
@@ -792,18 +796,18 @@ configuration variables.</p></div>
         this flag bypasses the normal "Git aware" transport
         mechanism and clones the repository by making a copy of
         HEAD and everything under objects and refs directories.
-        The files under <code>.git/objects/</code> directory are hardlinked
+        The files under <tt>.git/objects/</tt> directory are hardlinked
         to save space when possible.
 </p>
-<div class="paragraph"><p>If the repository is specified as a local path (e.g., <code>/path/to/repo</code>),
+<div class="paragraph"><p>If the repository is specified as a local path (e.g., <tt>/path/to/repo</tt>),
 this is the default, and --local is essentially a no-op.  If the
 repository is specified as a URL, then this flag is ignored (and we
-never use the local optimizations).  Specifying <code>--no-local</code> will
-override the default when <code>/path/to/repo</code> is given, using the regular
+never use the local optimizations).  Specifying <tt>--no-local</tt> will
+override the default when <tt>/path/to/repo</tt> is given, using the regular
 Git transport instead.</p></div>
 <div class="paragraph"><p>To force copying instead of hardlinking (which may be desirable if you
 are trying to make a back-up of your repository), but still avoid the
-usual "Git aware" transport mechanism, <code>--no-hardlinks</code> can be used.</p></div>
+usual "Git aware" transport mechanism, <tt>--no-hardlinks</tt> can be used.</p></div>
 </dd>
 <dt class="hdlist1">
 --no-hardlinks
@@ -811,7 +815,7 @@ usual "Git aware" transport mechanism, <code>--no-hardlinks</code> can be used.<
 <dd>
 <p>
         Optimize the cloning process from a repository on a
-        local filesystem by copying files under <code>.git/objects</code>
+        local filesystem by copying files under <tt>.git/objects</tt>
         directory.
 </p>
 </dd>
@@ -825,7 +829,7 @@ usual "Git aware" transport mechanism, <code>--no-hardlinks</code> can be used.<
 <p>
         When the repository to clone is on the local machine,
         instead of using hard links, automatically setup
-        <code>.git/objects/info/alternates</code> to share the objects
+        <tt>.git/objects/info/alternates</tt> to share the objects
         with the source repository.  The resulting repository
         starts out without any object of its own.
 </p>
@@ -834,17 +838,17 @@ it unless you understand what it does. If you clone your
 repository using this option and then delete branches (or use any
 other Git command that makes any existing commit unreferenced) in the
 source repository, some objects may become unreferenced (or dangling).
-These objects may be removed by normal Git operations (such as <code>git commit</code>)
-which automatically call <code>git gc --auto</code>. (See <a href="git-gc.html">git-gc(1)</a>.)
+These objects may be removed by normal Git operations (such as <tt>git commit</tt>)
+which automatically call <tt>git gc --auto</tt>. (See <a href="git-gc.html">git-gc(1)</a>.)
 If these objects are removed and were referenced by the cloned repository,
 then the cloned repository will become corrupt.</p></div>
-<div class="paragraph"><p>Note that running <code>git repack</code> without the <code>-l</code> option in a repository
-cloned with <code>-s</code> will copy objects from the source repository into a pack
-in the cloned repository, removing the disk space savings of <code>clone -s</code>.
-It is safe, however, to run <code>git gc</code>, which uses the <code>-l</code> option by
+<div class="paragraph"><p>Note that running <tt>git repack</tt> without the <tt>-l</tt> option in a repository
+cloned with <tt>-s</tt> will copy objects from the source repository into a pack
+in the cloned repository, removing the disk space savings of <tt>clone -s</tt>.
+It is safe, however, to run <tt>git gc</tt>, which uses the <tt>-l</tt> option by
 default.</p></div>
-<div class="paragraph"><p>If you want to break the dependency of a repository cloned with <code>-s</code> on
-its source repository, you can simply run <code>git repack -a</code> to copy all
+<div class="paragraph"><p>If you want to break the dependency of a repository cloned with <tt>-s</tt> on
+its source repository, you can simply run <tt>git repack -a</tt> to copy all
 objects from the source repository into a pack in the cloned repository.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -853,13 +857,13 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <dd>
 <p>
         If the reference repository is on the local machine,
-        automatically setup <code>.git/objects/info/alternates</code> to
+        automatically setup <tt>.git/objects/info/alternates</tt> to
         obtain objects from the reference repository.  Using
         an already existing repository as an alternate will
         require fewer objects to be copied from the repository
         being cloned, reducing network and local storage costs.
 </p>
-<div class="paragraph"><p><strong>NOTE</strong>: see the NOTE for the <code>--shared</code> option.</p></div>
+<div class="paragraph"><p><strong>NOTE</strong>: see the NOTE for the <tt>--shared</tt> option.</p></div>
 </dd>
 <dt class="hdlist1">
 --quiet
@@ -914,13 +918,13 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <dd>
 <p>
         Make a <em>bare</em> Git repository.  That is, instead of
-        creating <code>&lt;directory&gt;</code> and placing the administrative
-        files in <code>&lt;directory&gt;/.git</code>, make the <code>&lt;directory&gt;</code>
-        itself the <code>$GIT_DIR</code>. This obviously implies the <code>-n</code>
+        creating <tt>&lt;directory&gt;</tt> and placing the administrative
+        files in <tt>&lt;directory&gt;/.git</tt>, make the <tt>&lt;directory&gt;</tt>
+        itself the <tt>$GIT_DIR</tt>. This obviously implies the <tt>-n</tt>
         because there is nowhere to check out the working tree.
         Also the branch heads at the remote are copied directly
         to corresponding local branch heads, without mapping
-        them to <code>refs/remotes/origin/</code>.  When this option is
+        them to <tt>refs/remotes/origin/</tt>.  When this option is
         used, neither remote-tracking branches nor the related
         configuration variables are created.
 </p>
@@ -930,11 +934,11 @@ objects from the source repository into a pack in the cloned repository.</p></di
 </dt>
 <dd>
 <p>
-        Set up a mirror of the source repository.  This implies <code>--bare</code>.
-        Compared to <code>--bare</code>, <code>--mirror</code> not only maps local branches of the
+        Set up a mirror of the source repository.  This implies <tt>--bare</tt>.
+        Compared to <tt>--bare</tt>, <tt>--mirror</tt> not only maps local branches of the
         source to local branches of the target, it maps all refs (including
         remote-tracking branches, notes etc.) and sets up a refspec configuration such
-        that all these refs are overwritten by a <code>git remote update</code> in the
+        that all these refs are overwritten by a <tt>git remote update</tt> in the
         target repository.
 </p>
 </dd>
@@ -946,8 +950,8 @@ objects from the source repository into a pack in the cloned repository.</p></di
 </dt>
 <dd>
 <p>
-        Instead of using the remote name <code>origin</code> to keep track
-        of the upstream repository, use <code>&lt;name&gt;</code>.
+        Instead of using the remote name <tt>origin</tt> to keep track
+        of the upstream repository, use <tt>&lt;name&gt;</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -959,10 +963,10 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <dd>
 <p>
         Instead of pointing the newly created HEAD to the branch pointed
-        to by the cloned repository&#8217;s HEAD, point to <code>&lt;name&gt;</code> branch
+        to by the cloned repository&#8217;s HEAD, point to <tt>&lt;name&gt;</tt> branch
         instead. In a non-bare repository, this is the branch that will
         be checked out.
-        <code>--branch</code> can also take tags and detaches the HEAD at that commit
+        <tt>--branch</tt> can also take tags and detaches the HEAD at that commit
         in the resulting repository.
 </p>
 </dd>
@@ -1000,7 +1004,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
         this takes effect immediately after the repository is
         initialized, but before the remote history is fetched or any
         files checked out.  The key is in the same format as expected by
-        <a href="git-config.html">git-config(1)</a> (e.g., <code>core.eol=true</code>). If multiple
+        <a href="git-config.html">git-config(1)</a> (e.g., <tt>core.eol=true</tt>). If multiple
         values are given for the same key, each value will be written to
         the config file. This makes it safe, for example, to add
         additional fetch refspecs to the origin remote.
@@ -1012,12 +1016,7 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <dd>
 <p>
         Create a <em>shallow</em> clone with a history truncated to the
-        specified number of revisions.  A shallow repository has a
-        number of limitations (you cannot clone or fetch from
-        it, nor push from nor into it), but is adequate if you
-        are only interested in the recent history of a large project
-        with a long history, and would want to send in fixes
-        as patches.
+        specified number of revisions.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1026,15 +1025,15 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <dd>
 <p>
         Clone only the history leading to the tip of a single branch,
-        either specified by the <code>--branch</code> option or the primary
-        branch remote&#8217;s <code>HEAD</code> points at. When creating a shallow
-        clone with the <code>--depth</code> option, this is the default, unless
-        <code>--no-single-branch</code> is given to fetch the histories near the
+        either specified by the <tt>--branch</tt> option or the primary
+        branch remote&#8217;s <tt>HEAD</tt> points at. When creating a shallow
+        clone with the <tt>--depth</tt> option, this is the default, unless
+        <tt>--no-single-branch</tt> is given to fetch the histories near the
         tips of all branches.
         Further fetches into the resulting repository will only update the
         remote-tracking branch for the branch this option was used for the
         initial cloning.  If the HEAD at the remote did not point at any
-        branch when <code>--single-branch</code> clone was made, no remote-tracking
+        branch when <tt>--single-branch</tt> clone was made, no remote-tracking
         branch is created.
 </p>
 </dd>
@@ -1048,10 +1047,10 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <p>
         After the clone is created, initialize all submodules within,
         using their default settings. This is equivalent to running
-        <code>git submodule update --init --recursive</code> immediately after
+        <tt>git submodule update --init --recursive</tt> immediately after
         the clone is finished. This option is ignored if the cloned
         repository does not have a worktree/checkout (i.e. if any of
-        <code>--no-checkout</code>/<code>-n</code>, <code>--bare</code>, or <code>--mirror</code> is given)
+        <tt>--no-checkout</tt>/<tt>-n</tt>, <tt>--bare</tt>, or <tt>--mirror</tt> is given)
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1083,8 +1082,8 @@ objects from the source repository into a pack in the cloned repository.</p></di
 <p>
         The name of a new directory to clone into.  The "humanish"
         part of the source repository is used if no directory is
-        explicitly given (<code>repo</code> for <code>/path/to/repo.git</code> and <code>foo</code>
-        for <code>host.xz:foo/.git</code>).  Cloning into an existing directory
+        explicitly given (<tt>repo</tt> for <tt>/path/to/repo.git</tt> and <tt>foo</tt>
+        for <tt>host.xz:foo/.git</tt>).  Cloning into an existing directory
         is only allowed if the directory is empty.
 </p>
 </dd>
@@ -1142,8 +1141,8 @@ rsync://host.xz/path/to/repo.git/
 </ul></div>
 <div class="paragraph"><p>This syntax is only recognized if there are no slashes before the
 first colon. This helps differentiate a local path that contains a
-colon. For example the local path <code>foo:bar</code> could be specified as an
-absolute path or <code>./foo:bar</code> to avoid being misinterpreted as an ssh
+colon. For example the local path <tt>foo:bar</tt> could be specified as an
+absolute path or <tt>./foo:bar</tt> to avoid being misinterpreted as an ssh
 url.</p></div>
 <div class="paragraph"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
 <div class="ulist"><ul>
@@ -1199,15 +1198,15 @@ use will be rewritten into URLs that work), you can create a
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        [url "&lt;actual url base&gt;"]
-                insteadOf = &lt;other url base&gt;</code></pre>
+<pre><tt>        [url "&lt;actual url base&gt;"]
+                insteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        [url "git://git.host.xz/"]
+<pre><tt>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
-                insteadOf = work:</code></pre>
+                insteadOf = work:</tt></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
@@ -1215,14 +1214,14 @@ rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        [url "&lt;actual url base&gt;"]
-                pushInsteadOf = &lt;other url base&gt;</code></pre>
+<pre><tt>        [url "&lt;actual url base&gt;"]
+                pushInsteadOf = &lt;other url base&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        [url "ssh://example.org/"]
-                pushInsteadOf = git://example.org/</code></pre>
+<pre><tt>        [url "ssh://example.org/"]
+                pushInsteadOf = git://example.org/</tt></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
 "ssh://example.org/path/to/repo.git" for pushes, but pulls will still
@@ -1239,9 +1238,9 @@ Clone from upstream:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git clone git://git.kernel.org/pub/scm/.../linux.git my-linux
+<pre><tt>$ git clone git://git.kernel.org/pub/scm/.../linux.git my-linux
 $ cd my-linux
-$ make</code></pre>
+$ make</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1250,9 +1249,9 @@ Make a local clone that borrows from the current directory, without checking thi
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git clone -l -s -n . ../copy
+<pre><tt>$ git clone -l -s -n . ../copy
 $ cd ../copy
-$ git show-branch</code></pre>
+$ git show-branch</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1261,10 +1260,10 @@ Clone from upstream while borrowing from an existing local directory:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git clone --reference /git/linux.git \
+<pre><tt>$ git clone --reference /git/linux.git \
         git://git.kernel.org/pub/scm/.../linux.git \
         my-linux
-$ cd my-linux</code></pre>
+$ cd my-linux</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1273,7 +1272,7 @@ Create a bare repository to publish your changes to the public:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git clone --bare -l /home/proj/.git /pub/scm/proj.git</code></pre>
+<pre><tt>$ git clone --bare -l /home/proj/.git /pub/scm/proj.git</tt></pre>
 </div></div>
 </li>
 </ul></div>
@@ -1289,7 +1288,7 @@ Create a bare repository to publish your changes to the public:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-01-17 14:43:28 PST
 </div>
 </div>
 </body>

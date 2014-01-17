@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>Everyday Git With 20 Commands Or So</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -822,12 +826,12 @@ Use a tarball as a starting point for a new repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ tar zxf frotz.tar.gz
+<pre><tt>$ tar zxf frotz.tar.gz
 $ cd frotz
 $ git init
 $ git add . <b>&lt;1&gt;</b>
 $ git commit -m "import of frotz source tree."
-$ git tag v2.43 <b>&lt;2&gt;</b></code></pre>
+$ git tag v2.43 <b>&lt;2&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -848,7 +852,7 @@ Create a topic branch and develop.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git checkout -b alsa-audio <b>&lt;1&gt;</b>
+<pre><tt>$ git checkout -b alsa-audio <b>&lt;1&gt;</b>
 $ edit/compile/test
 $ git checkout -- curses/ux_audio_oss.c <b>&lt;2&gt;</b>
 $ git add curses/ux_audio_alsa.c <b>&lt;3&gt;</b>
@@ -863,7 +867,7 @@ $ git commit -a -c ORIG_HEAD <b>&lt;8&gt;</b>
 $ git checkout master <b>&lt;9&gt;</b>
 $ git merge alsa-audio <b>&lt;10&gt;</b>
 $ git log --since='3 days ago' <b>&lt;11&gt;</b>
-$ git log v2.43.. curses/ <b>&lt;12&gt;</b></code></pre>
+$ git log v2.43.. curses/ <b>&lt;12&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -873,13 +877,13 @@ create a new topic branch.
 </li>
 <li>
 <p>
-revert your botched changes in <code>curses/ux_audio_oss.c</code>.
+revert your botched changes in <tt>curses/ux_audio_oss.c</tt>.
 </p>
 </li>
 <li>
 <p>
 you need to tell Git if you added a new file; removal and
-modification will be caught if you do <code>git commit -a</code> later.
+modification will be caught if you do <tt>git commit -a</tt> later.
 </p>
 </li>
 <li>
@@ -921,14 +925,14 @@ merge a topic branch into your master branch.
 <li>
 <p>
 review commit logs; other forms to limit output can be
-combined and include <code>--max-count=10</code> (show 10 commits),
-<code>--until=2005-12-10</code>, etc.
+combined and include <tt>--max-count=10</tt> (show 10 commits),
+<tt>--until=2005-12-10</tt>, etc.
 </p>
 </li>
 <li>
 <p>
-view only the changes that touch what&#8217;s in <code>curses/</code>
-directory, since <code>v2.43</code> tag.
+view only the changes that touch what&#8217;s in <tt>curses/</tt>
+directory, since <tt>v2.43</tt> tag.
 </p>
 </li>
 </ol></div>
@@ -978,7 +982,7 @@ Clone the upstream and work on it.  Feed changes to upstream.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git clone git://git.kernel.org/pub/scm/.../torvalds/linux-2.6 my2.6
+<pre><tt>$ git clone git://git.kernel.org/pub/scm/.../torvalds/linux-2.6 my2.6
 $ cd my2.6
 $ edit/compile/test; git commit -a -s <b>&lt;1&gt;</b>
 $ git format-patch origin <b>&lt;2&gt;</b>
@@ -987,7 +991,7 @@ $ git log -p ORIG_HEAD.. arch/i386 include/asm-i386 <b>&lt;4&gt;</b>
 $ git pull git://git.kernel.org/pub/.../jgarzik/libata-dev.git ALL <b>&lt;5&gt;</b>
 $ git reset --hard ORIG_HEAD <b>&lt;6&gt;</b>
 $ git gc <b>&lt;7&gt;</b>
-$ git fetch --tags <b>&lt;8&gt;</b></code></pre>
+$ git fetch --tags <b>&lt;8&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1002,7 +1006,7 @@ extract patches from your branch for e-mail submission.
 </li>
 <li>
 <p>
-<code>git pull</code> fetches from <code>origin</code> by default and merges into the
+<tt>git pull</tt> fetches from <tt>origin</tt> by default and merges into the
 current branch.
 </p>
 </li>
@@ -1030,8 +1034,8 @@ garbage collect leftover objects from reverted pull.
 </li>
 <li>
 <p>
-from time to time, obtain official tags from the <code>origin</code>
-and store them under <code>.git/refs/tags/</code>.
+from time to time, obtain official tags from the <tt>origin</tt>
+and store them under <tt>.git/refs/tags/</tt>.
 </p>
 </li>
 </ol></div>
@@ -1042,7 +1046,7 @@ Push into another repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>satellite$ git clone mothership:frotz frotz <b>&lt;1&gt;</b>
+<pre><tt>satellite$ git clone mothership:frotz frotz <b>&lt;1&gt;</b>
 satellite$ cd frotz
 satellite$ git config --get-regexp '^(remote|branch)\.' <b>&lt;2&gt;</b>
 remote.origin.url mothership:frotz
@@ -1056,7 +1060,7 @@ satellite$ git push origin <b>&lt;4&gt;</b>
 
 mothership$ cd frotz
 mothership$ git checkout master
-mothership$ git merge satellite/master <b>&lt;5&gt;</b></code></pre>
+mothership$ git merge satellite/master <b>&lt;5&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1069,19 +1073,19 @@ machine.
 <li>
 <p>
 clone sets these configuration variables by default.
-It arranges <code>git pull</code> to fetch and store the branches of mothership
-machine to local <code>remotes/origin/*</code> remote-tracking branches.
+It arranges <tt>git pull</tt> to fetch and store the branches of mothership
+machine to local <tt>remotes/origin/*</tt> remote-tracking branches.
 </p>
 </li>
 <li>
 <p>
-arrange <code>git push</code> to push local <code>master</code> branch to
-<code>remotes/satellite/master</code> branch of the mothership machine.
+arrange <tt>git push</tt> to push local <tt>master</tt> branch to
+<tt>remotes/satellite/master</tt> branch of the mothership machine.
 </p>
 </li>
 <li>
 <p>
-push will stash our work away on <code>remotes/satellite/master</code>
+push will stash our work away on <tt>remotes/satellite/master</tt>
 remote-tracking branch on the mothership machine.  You could use this
 as a back-up method.
 </p>
@@ -1100,11 +1104,11 @@ Branch off of a specific tag.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git checkout -b private2.6.14 v2.6.14 <b>&lt;1&gt;</b>
+<pre><tt>$ git checkout -b private2.6.14 v2.6.14 <b>&lt;1&gt;</b>
 $ edit/compile/test; git commit -a
 $ git checkout master
 $ git format-patch -k -m --stdout v2.6.14..private2.6.14 |
-  git am -3 -k <b>&lt;2&gt;</b></code></pre>
+  git am -3 -k <b>&lt;2&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1115,7 +1119,7 @@ tag.
 </li>
 <li>
 <p>
-forward port all changes in <code>private2.6.14</code> branch to <code>master</code> branch
+forward port all changes in <tt>private2.6.14</tt> branch to <tt>master</tt> branch
 without a formal "merging".
 </p>
 </li>
@@ -1170,7 +1174,7 @@ My typical Git day.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git status <b>&lt;1&gt;</b>
+<pre><tt>$ git status <b>&lt;1&gt;</b>
 $ git show-branch <b>&lt;2&gt;</b>
 $ mailx <b>&lt;3&gt;</b>
 &amp; s 2 3 4 5 ./+to-apply
@@ -1189,7 +1193,7 @@ $ compile/test
 $ git tag -s -m "GIT 0.99.9x" v0.99.9x <b>&lt;10&gt;</b>
 $ git fetch ko &amp;&amp; git show-branch master maint 'tags/ko-*' <b>&lt;11&gt;</b>
 $ git push ko <b>&lt;12&gt;</b>
-$ git push ko v0.99.9x <b>&lt;13&gt;</b></code></pre>
+$ git push ko v0.99.9x <b>&lt;13&gt;</b></tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1228,7 +1232,7 @@ master, nor exposed as a part of a stable branch.
 </li>
 <li>
 <p>
-restart <code>pu</code> every time from the next.
+restart <tt>pu</tt> every time from the next.
 </p>
 </li>
 <li>
@@ -1249,12 +1253,12 @@ create a signed tag.
 <li>
 <p>
 make sure I did not accidentally rewind master beyond what I
-already pushed out.  <code>ko</code> shorthand points at the repository I have
+already pushed out.  <tt>ko</tt> shorthand points at the repository I have
 at kernel.org, and looks like this:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cat .git/remotes/ko
+<pre><tt>$ cat .git/remotes/ko
 URL: kernel.org:/pub/scm/git/git.git
 Pull: master:refs/tags/ko-master
 Pull: next:refs/tags/ko-next
@@ -1262,11 +1266,11 @@ Pull: maint:refs/tags/ko-maint
 Push: master
 Push: next
 Push: +pu
-Push: maint</code></pre>
+Push: maint</tt></pre>
 </div></div>
-<div class="paragraph"><p>In the output from <code>git show-branch</code>, <code>master</code> should have
-everything <code>ko-master</code> has, and <code>next</code> should have
-everything <code>ko-next</code> has.</p></div>
+<div class="paragraph"><p>In the output from <tt>git show-branch</tt>, <tt>master</tt> should have
+everything <tt>ko-master</tt> has, and <tt>next</tt> should have
+everything <tt>ko-next</tt> has.</p></div>
 </li>
 <li>
 <p>
@@ -1314,8 +1318,8 @@ We assume the following in /etc/services
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ grep 9418 /etc/services
-git             9418/tcp                # Git Version Control System</code></pre>
+<pre><tt>$ grep 9418 /etc/services
+git             9418/tcp                # Git Version Control System</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1324,9 +1328,9 @@ Run git-daemon to serve /pub/scm from inetd.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ grep git /etc/inetd.conf
+<pre><tt>$ grep git /etc/inetd.conf
 git     stream  tcp     nowait  nobody \
-  /usr/bin/git-daemon git-daemon --inetd --export-all /pub/scm</code></pre>
+  /usr/bin/git-daemon git-daemon --inetd --export-all /pub/scm</tt></pre>
 </div></div>
 <div class="paragraph"><p>The actual configuration line should be on one line.</p></div>
 </dd>
@@ -1336,7 +1340,7 @@ Run git-daemon to serve /pub/scm from xinetd.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cat /etc/xinetd.d/git-daemon
+<pre><tt>$ cat /etc/xinetd.d/git-daemon
 # default: off
 # description: The Git server offers access to Git repositories
 service git
@@ -1350,7 +1354,7 @@ service git
         server          = /usr/bin/git-daemon
         server_args     = --inetd --export-all --base-path=/pub/scm
         log_on_failure  += USERID
-}</code></pre>
+}</tt></pre>
 </div></div>
 <div class="paragraph"><p>Check your xinetd(8) documentation and setup, this is from a Fedora system.
 Others might be different.</p></div>
@@ -1361,19 +1365,19 @@ Give push/pull only access to developers.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ grep git /etc/passwd <b>&lt;1&gt;</b>
+<pre><tt>$ grep git /etc/passwd <b>&lt;1&gt;</b>
 alice:x:1000:1000::/home/alice:/usr/bin/git-shell
 bob:x:1001:1001::/home/bob:/usr/bin/git-shell
 cindy:x:1002:1002::/home/cindy:/usr/bin/git-shell
 david:x:1003:1003::/home/david:/usr/bin/git-shell
 $ grep git /etc/shells <b>&lt;2&gt;</b>
-/usr/bin/git-shell</code></pre>
+/usr/bin/git-shell</tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
 <p>
 log-in shell is set to /usr/bin/git-shell, which does not
-allow anything but <code>git push</code> and <code>git pull</code>.  The users should
+allow anything but <tt>git push</tt> and <tt>git pull</tt>.  The users should
 get an ssh access to the machine.
 </p>
 </li>
@@ -1391,7 +1395,7 @@ CVS-style shared repository.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ grep git /etc/group <b>&lt;1&gt;</b>
+<pre><tt>$ grep git /etc/group <b>&lt;1&gt;</b>
 git:x:9418:alice,bob,cindy,david
 $ cd /home/devo.git
 $ ls -l <b>&lt;2&gt;</b>
@@ -1410,7 +1414,7 @@ $ ls -l hooks/update <b>&lt;3&gt;</b>
 $ cat info/allowed-users <b>&lt;4&gt;</b>
 refs/heads/master       alice\|cindy
 refs/heads/doc-update   bob
-refs/tags/v[0-9]*       david</code></pre>
+refs/tags/v[0-9]*       david</tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1444,9 +1448,9 @@ HTTP server to support dumb protocol transfer.
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><code>dev$ git update-server-info <b>&lt;1&gt;</b>
+<pre><tt>dev$ git update-server-info <b>&lt;1&gt;</b>
 dev$ ftp user@isp.example.com <b>&lt;2&gt;</b>
-ftp&gt; cp -r .git /home/user/myproject.git</code></pre>
+ftp&gt; cp -r .git /home/user/myproject.git</tt></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>

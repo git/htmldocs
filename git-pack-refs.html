@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-pack-refs(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -756,7 +760,7 @@ git-pack-refs(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Traditionally, tips of branches and tags (collectively known as
 <em>refs</em>) were stored one file per ref in a (sub)directory
-under <code>$GIT_DIR/refs</code>
+under <tt>$GIT_DIR/refs</tt>
 directory.  While many branch tips tend to be updated often,
 most tags and some branch tips are never updated.  When a
 repository has hundreds or thousands of tags, this
@@ -764,19 +768,19 @@ one-file-per-ref format both wastes storage and hurts
 performance.</p></div>
 <div class="paragraph"><p>This command is used to solve the storage and performance
 problem by storing the refs in a single file,
-<code>$GIT_DIR/packed-refs</code>.  When a ref is missing from the
-traditional <code>$GIT_DIR/refs</code> directory hierarchy, it is looked
+<tt>$GIT_DIR/packed-refs</tt>.  When a ref is missing from the
+traditional <tt>$GIT_DIR/refs</tt> directory hierarchy, it is looked
 up in this
 file and used if found.</p></div>
 <div class="paragraph"><p>Subsequent updates to branches always create new files under
-<code>$GIT_DIR/refs</code> directory hierarchy.</p></div>
+<tt>$GIT_DIR/refs</tt> directory hierarchy.</p></div>
 <div class="paragraph"><p>A recommended practice to deal with a repository with too many
-refs is to pack its refs with <code>--all</code> once, and
-occasionally run <code>git pack-refs</code>.  Tags are by
+refs is to pack its refs with <tt>--all</tt> once, and
+occasionally run <tt>git pack-refs</tt>.  Tags are by
 definition stationary and are not expected to change.  Branch
-heads will be packed with the initial <code>pack-refs --all</code>, but
+heads will be packed with the initial <tt>pack-refs --all</tt>, but
 only the currently active branch heads will become unpacked,
-and the next <code>pack-refs</code> (without <code>--all</code>) will leave them
+and the next <tt>pack-refs</tt> (without <tt>--all</tt>) will leave them
 unpacked.</p></div>
 </div>
 </div>
@@ -802,7 +806,7 @@ a repository with many branches of historical interests.
 </dt>
 <dd>
 <p>
-The command usually removes loose refs under <code>$GIT_DIR/refs</code>
+The command usually removes loose refs under <tt>$GIT_DIR/refs</tt>
 hierarchy after packing them.  This option tells it not to.
 </p>
 </dd>

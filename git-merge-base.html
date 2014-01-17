@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-merge-base(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -777,7 +781,7 @@ the other commit is a (possibly hypothetical) commit that is a merge
 across all the remaining commits on the command line.</p></div>
 <div class="paragraph"><p>As a consequence, the <em>merge base</em> is not necessarily contained in each of the
 commit arguments if more than two commits are specified. This is different
-from <a href="git-show-branch.html">git-show-branch(1)</a> when used with the <code>--merge-base</code> option.</p></div>
+from <a href="git-show-branch.html">git-show-branch(1)</a> when used with the <tt>--merge-base</tt> option.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 --octopus
@@ -849,54 +853,54 @@ from <a href="git-show-branch.html">git-show-branch(1)</a> when used with the <c
 <div class="sect1">
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Given two commits <em>A</em> and <em>B</em>, <code>git merge-base A B</code> will output a commit
+<div class="paragraph"><p>Given two commits <em>A</em> and <em>B</em>, <tt>git merge-base A B</tt> will output a commit
 which is reachable from both <em>A</em> and <em>B</em> through the parent relationship.</p></div>
 <div class="paragraph"><p>For example, with this topology:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>         o---o---o---B
+<pre><tt>         o---o---o---B
         /
----o---1---o---o---o---A</code></pre>
+---o---1---o---o---o---A</tt></pre>
 </div></div>
 <div class="paragraph"><p>the merge base between <em>A</em> and <em>B</em> is <em>1</em>.</p></div>
-<div class="paragraph"><p>Given three commits <em>A</em>, <em>B</em> and <em>C</em>, <code>git merge-base A B C</code> will compute the
+<div class="paragraph"><p>Given three commits <em>A</em>, <em>B</em> and <em>C</em>, <tt>git merge-base A B C</tt> will compute the
 merge base between <em>A</em> and a hypothetical commit <em>M</em>, which is a merge
 between <em>B</em> and <em>C</em>.  For example, with this topology:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>       o---o---o---o---C
+<pre><tt>       o---o---o---o---C
       /
      /   o---o---o---B
     /   /
----2---1---o---o---o---A</code></pre>
+---2---1---o---o---o---A</tt></pre>
 </div></div>
-<div class="paragraph"><p>the result of <code>git merge-base A B C</code> is <em>1</em>.  This is because the
+<div class="paragraph"><p>the result of <tt>git merge-base A B C</tt> is <em>1</em>.  This is because the
 equivalent topology with a merge commit <em>M</em> between <em>B</em> and <em>C</em> is:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>       o---o---o---o---o
+<pre><tt>       o---o---o---o---o
       /                 \
      /   o---o---o---o---M
     /   /
----2---1---o---o---o---A</code></pre>
+---2---1---o---o---o---A</tt></pre>
 </div></div>
-<div class="paragraph"><p>and the result of <code>git merge-base A M</code> is <em>1</em>.  Commit <em>2</em> is also a
+<div class="paragraph"><p>and the result of <tt>git merge-base A M</tt> is <em>1</em>.  Commit <em>2</em> is also a
 common ancestor between <em>A</em> and <em>M</em>, but <em>1</em> is a better common ancestor,
 because <em>2</em> is an ancestor of <em>1</em>.  Hence, <em>2</em> is not a merge base.</p></div>
-<div class="paragraph"><p>The result of <code>git merge-base --octopus A B C</code> is <em>2</em>, because <em>2</em> is
+<div class="paragraph"><p>The result of <tt>git merge-base --octopus A B C</tt> is <em>2</em>, because <em>2</em> is
 the best common ancestor of all commits.</p></div>
 <div class="paragraph"><p>When the history involves criss-cross merges, there can be more than one
 <em>best</em> common ancestor for two commits.  For example, with this topology:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>---1---o---A
+<pre><tt>---1---o---A
     \ /
      X
     / \
----2---o---o---B</code></pre>
+---2---o---o---B</tt></pre>
 </div></div>
 <div class="paragraph"><p>both <em>1</em> and <em>2</em> are merge-bases of A and B.  Neither one is better than
-the other (both are <em>best</em> merge bases).  When the <code>--all</code> option is not given,
+the other (both are <em>best</em> merge bases).  When the <tt>--all</tt> option is not given,
 it is unspecified which best one is output.</p></div>
 <div class="paragraph"><p>A common idiom to check "fast-forward-ness" between two commits A
 and B is (or at least used to be) to compute the merge base between
@@ -904,19 +908,19 @@ A and B, and check if it is the same as A, in which case, A is an
 ancestor of B.  You will see this idiom used often in older scripts.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>A=$(git rev-parse --verify A)
+<pre><tt>A=$(git rev-parse --verify A)
 if test "$A" = "$(git merge-base A B)"
 then
         ... A is an ancestor of B ...
-fi</code></pre>
+fi</tt></pre>
 </div></div>
 <div class="paragraph"><p>In modern git, you can say this in a more direct way:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>if git merge-base --is-ancestor A B
+<pre><tt>if git merge-base --is-ancestor A B
 then
         ... A is an ancestor of B ...
-fi</code></pre>
+fi</tt></pre>
 </div></div>
 <div class="paragraph"><p>instead.</p></div>
 </div>
@@ -924,29 +928,29 @@ fi</code></pre>
 <div class="sect1">
 <h2 id="_discussion_on_fork_point_mode">Discussion on fork-point mode</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>After working on the <code>topic</code> branch created with <code>git checkout -b
-topic origin/master</code>, the history of remote-tracking branch
-<code>origin/master</code> may have been rewound and rebuilt, leading to a
+<div class="paragraph"><p>After working on the <tt>topic</tt> branch created with <tt>git checkout -b
+topic origin/master</tt>, the history of remote-tracking branch
+<tt>origin/master</tt> may have been rewound and rebuilt, leading to a
 history of this shape:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>                 o---B1
+<pre><tt>                 o---B1
                 /
 ---o---o---B2--o---o---o---B (origin/master)
         \
          B3
           \
-           Derived (topic)</code></pre>
+           Derived (topic)</tt></pre>
 </div></div>
-<div class="paragraph"><p>where <code>origin/master</code> used to point at commits B3, B2, B1 and now it
-points at B, and your <code>topic</code> branch was started on top of it back
-when <code>origin/master</code> was at B3. This mode uses the reflog of
-<code>origin/master</code> to find B3 as the fork point, so that the <code>topic</code>
-can be rebased on top of the updated <code>origin/master</code> by:</p></div>
+<div class="paragraph"><p>where <tt>origin/master</tt> used to point at commits B3, B2, B1 and now it
+points at B, and your <tt>topic</tt> branch was started on top of it back
+when <tt>origin/master</tt> was at B3. This mode uses the reflog of
+<tt>origin/master</tt> to find B3 as the fork point, so that the <tt>topic</tt>
+can be rebased on top of the updated <tt>origin/master</tt> by:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ fork_point=$(git merge-base --fork-point origin/master topic)
-$ git rebase --onto origin/master $fork_point topic</code></pre>
+<pre><tt>$ fork_point=$(git merge-base --fork-point origin/master topic)
+$ git rebase --onto origin/master $fork_point topic</tt></pre>
 </div></div>
 </div>
 </div>

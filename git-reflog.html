@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-reflog(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -766,23 +770,23 @@ depending on the subcommand:</p></div>
 <div class="paragraph"><p>Reflog is a mechanism to record when the tip of branches are
 updated.  This command is to manage the information recorded in it.</p></div>
 <div class="paragraph"><p>The subcommand "expire" is used to prune older reflog entries.
-Entries older than <code>expire</code> time, or entries older than
-<code>expire-unreachable</code> time and not reachable from the current
+Entries older than <tt>expire</tt> time, or entries older than
+<tt>expire-unreachable</tt> time and not reachable from the current
 tip, are removed from the reflog.  This is typically not used
 directly by the end users&#8201;&#8212;&#8201;instead, see <a href="git-gc.html">git-gc(1)</a>.</p></div>
 <div class="paragraph"><p>The subcommand "show" (which is also the default, in the absence of any
 subcommands) will take all the normal log options, and show the log of
-the reference provided in the command-line (or <code>HEAD</code>, by default).
+the reference provided in the command-line (or <tt>HEAD</tt>, by default).
 The reflog will cover all recent actions (HEAD reflog records branch switching
-as well).  It is an alias for <code>git log -g --abbrev-commit --pretty=oneline</code>;
+as well).  It is an alias for <tt>git log -g --abbrev-commit --pretty=oneline</tt>;
 see <a href="git-log.html">git-log(1)</a>.</p></div>
 <div class="paragraph"><p>The reflog is useful in various Git commands, to specify the old value
-of a reference. For example, <code>HEAD@{2}</code> means "where HEAD used to be
-two moves ago", <code>master@{one.week.ago}</code> means "where master used to
+of a reference. For example, <tt>HEAD@{2}</tt> means "where HEAD used to be
+two moves ago", <tt>master@{one.week.ago}</tt> means "where master used to
 point to one week ago", and so on. See <a href="gitrevisions.html">gitrevisions(7)</a> for
 more details.</p></div>
 <div class="paragraph"><p>To delete single entries from the reflog, use the subcommand "delete"
-and specify the <em>exact</em> entry (e.g. "<code>git reflog delete master@{2}</code>").</p></div>
+and specify the <em>exact</em> entry (e.g. "<tt>git reflog delete master@{2}</tt>").</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -812,7 +816,7 @@ them.</p></div>
 <dd>
 <p>
         Entries older than this time are pruned.  Without the
-        option it is taken from configuration <code>gc.reflogExpire</code>,
+        option it is taken from configuration <tt>gc.reflogExpire</tt>,
         which in turn defaults to 90 days.  --expire=all prunes
         entries regardless of their age; --expire=never turns off
         pruning of reachable entries (but see --expire-unreachable).
@@ -826,7 +830,7 @@ them.</p></div>
         Entries older than this time and not reachable from
         the current tip of the branch are pruned.  Without the
         option it is taken from configuration
-        <code>gc.reflogExpireUnreachable</code>, which in turn defaults to
+        <tt>gc.reflogExpireUnreachable</tt>, which in turn defaults to
         30 days.  --expire-unreachable=all prunes unreachable
         entries regardless of their age; --expire-unreachable=never
         turns off early pruning of unreachable entries (but see
@@ -856,7 +860,7 @@ them.</p></div>
 <dd>
 <p>
         While expiring or deleting, adjust each reflog entry to ensure
-        that the <code>old</code> sha1 field points to the <code>new</code> sha1 field of the
+        that the <tt>old</tt> sha1 field points to the <tt>new</tt> sha1 field of the
         previous entry.
 </p>
 </dd>

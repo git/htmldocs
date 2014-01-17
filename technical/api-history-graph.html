@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>history graph API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -747,48 +751,48 @@ history.  The API generates the graph in a line-by-line fashion.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>graph_init()</code> creates a new <code>struct git_graph</code>
+<tt>graph_init()</tt> creates a new <tt>struct git_graph</tt>
 </p>
 </li>
 <li>
 <p>
-<code>graph_update()</code> moves the graph to a new commit.
+<tt>graph_update()</tt> moves the graph to a new commit.
 </p>
 </li>
 <li>
 <p>
-<code>graph_next_line()</code> outputs the next line of the graph into a strbuf.  It
+<tt>graph_next_line()</tt> outputs the next line of the graph into a strbuf.  It
   does not add a terminating newline.
 </p>
 </li>
 <li>
 <p>
-<code>graph_padding_line()</code> outputs a line of vertical padding in the graph.  It
-  is similar to <code>graph_next_line()</code>, but is guaranteed to never print the line
-  containing the current commit.  Where <code>graph_next_line()</code> would print the
-  commit line next, <code>graph_padding_line()</code> prints a line that simply extends
+<tt>graph_padding_line()</tt> outputs a line of vertical padding in the graph.  It
+  is similar to <tt>graph_next_line()</tt>, but is guaranteed to never print the line
+  containing the current commit.  Where <tt>graph_next_line()</tt> would print the
+  commit line next, <tt>graph_padding_line()</tt> prints a line that simply extends
   all branch lines downwards one row, leaving their positions unchanged.
 </p>
 </li>
 <li>
 <p>
-<code>graph_is_commit_finished()</code> determines if the graph has output all lines
-  necessary for the current commit.  If <code>graph_update()</code> is called before all
+<tt>graph_is_commit_finished()</tt> determines if the graph has output all lines
+  necessary for the current commit.  If <tt>graph_update()</tt> is called before all
   lines for the current commit have been printed, the next call to
-  <code>graph_next_line()</code> will output an ellipsis, to indicate that a portion of
+  <tt>graph_next_line()</tt> will output an ellipsis, to indicate that a portion of
   the graph was omitted.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>The following utility functions are wrappers around <code>graph_next_line()</code> and
-<code>graph_is_commit_finished()</code>.  They always print the output to stdout.
+<div class="paragraph"><p>The following utility functions are wrappers around <tt>graph_next_line()</tt> and
+<tt>graph_is_commit_finished()</tt>.  They always print the output to stdout.
 They can all be called with a NULL graph argument, in which case no graph
 output will be printed.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>graph_show_commit()</code> calls <code>graph_next_line()</code> and
-  <code>graph_is_commit_finished()</code> until one of them return non-zero.  This prints
+<tt>graph_show_commit()</tt> calls <tt>graph_next_line()</tt> and
+  <tt>graph_is_commit_finished()</tt> until one of them return non-zero.  This prints
   all graph lines up to, and including, the line containing this commit.
   Output is printed to stdout.  The last line printed does not contain a
   terminating newline.
@@ -796,40 +800,40 @@ output will be printed.</p></div>
 </li>
 <li>
 <p>
-<code>graph_show_oneline()</code> calls <code>graph_next_line()</code> and prints the result to
+<tt>graph_show_oneline()</tt> calls <tt>graph_next_line()</tt> and prints the result to
   stdout.  The line printed does not contain a terminating newline.
 </p>
 </li>
 <li>
 <p>
-<code>graph_show_padding()</code> calls <code>graph_padding_line()</code> and prints the result to
+<tt>graph_show_padding()</tt> calls <tt>graph_padding_line()</tt> and prints the result to
   stdout.  The line printed does not contain a terminating newline.
 </p>
 </li>
 <li>
 <p>
-<code>graph_show_remainder()</code> calls <code>graph_next_line()</code> until
-  <code>graph_is_commit_finished()</code> returns non-zero.  Output is printed to stdout.
+<tt>graph_show_remainder()</tt> calls <tt>graph_next_line()</tt> until
+  <tt>graph_is_commit_finished()</tt> returns non-zero.  Output is printed to stdout.
   The last line printed does not contain a terminating newline.  Returns 1 if
   output was printed, and 0 if no output was necessary.
 </p>
 </li>
 <li>
 <p>
-<code>graph_show_strbuf()</code> prints the specified strbuf to stdout, prefixing all
+<tt>graph_show_strbuf()</tt> prints the specified strbuf to stdout, prefixing all
   lines but the first with a graph line.  The caller is responsible for
   ensuring graph output for the first line has already been printed to stdout.
-  (This can be done with <code>graph_show_commit()</code> or <code>graph_show_oneline()</code>.)  If
+  (This can be done with <tt>graph_show_commit()</tt> or <tt>graph_show_oneline()</tt>.)  If
   a NULL graph is supplied, the strbuf is printed as-is.
 </p>
 </li>
 <li>
 <p>
-<code>graph_show_commit_msg()</code> is similar to <code>graph_show_strbuf()</code>, but it also
+<tt>graph_show_commit_msg()</tt> is similar to <tt>graph_show_strbuf()</tt>, but it also
   prints the remainder of the graph, if more lines are needed after the strbuf
-  ends.  It is better than directly calling <code>graph_show_strbuf()</code> followed by
-  <code>graph_show_remainder()</code> since it properly handles buffers that do not end in
-  a terminating newline.  The output printed by <code>graph_show_commit_msg()</code> will
+  ends.  It is better than directly calling <tt>graph_show_strbuf()</tt> followed by
+  <tt>graph_show_remainder()</tt> since it properly handles buffers that do not end in
+  a terminating newline.  The output printed by <tt>graph_show_commit_msg()</tt> will
   end in a newline if and only if the strbuf ends in a newline.
 </p>
 </li>
@@ -839,7 +843,7 @@ output will be printed.</p></div>
 <div class="sect1">
 <h2 id="_data_structure">Data structure</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><code>struct git_graph</code> is an opaque data type used to store the current graph
+<div class="paragraph"><p><tt>struct git_graph</tt> is an opaque data type used to store the current graph
 state.</p></div>
 </div>
 </div>
@@ -849,24 +853,24 @@ state.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Create a <code>struct git_graph</code> by calling <code>graph_init()</code>.  When using the
-  revision walking API, this is done automatically by <code>setup_revisions()</code> if
+Create a <tt>struct git_graph</tt> by calling <tt>graph_init()</tt>.  When using the
+  revision walking API, this is done automatically by <tt>setup_revisions()</tt> if
   the <em>--graph</em> option is supplied.
 </p>
 </li>
 <li>
 <p>
 Use the revision walking API to walk through a group of contiguous commits.
-  The <code>get_revision()</code> function automatically calls <code>graph_update()</code> each time
+  The <tt>get_revision()</tt> function automatically calls <tt>graph_update()</tt> each time
   it is invoked.
 </p>
 </li>
 <li>
 <p>
-For each commit, call <code>graph_next_line()</code> repeatedly, until
-  <code>graph_is_commit_finished()</code> returns non-zero.  Each call go
-  <code>graph_next_line()</code> will output a single line of the graph.  The resulting
-  lines will not contain any newlines.  <code>graph_next_line()</code> returns 1 if the
+For each commit, call <tt>graph_next_line()</tt> repeatedly, until
+  <tt>graph_is_commit_finished()</tt> returns non-zero.  Each call go
+  <tt>graph_next_line()</tt> will output a single line of the graph.  The resulting
+  lines will not contain any newlines.  <tt>graph_next_line()</tt> returns 1 if the
   resulting line contains the current commit, or 0 if this is merely a line
   needed to adjust the graph before or after the current commit.  This return
   value can be used to determine where to print the commit summary information
@@ -882,19 +886,19 @@ For each commit, call <code>graph_next_line()</code> repeatedly, until
 <div class="ulist"><ul>
 <li>
 <p>
-<code>graph_update()</code> must be called with commits in topological order.  It should
+<tt>graph_update()</tt> must be called with commits in topological order.  It should
   not be called on a commit if it has already been invoked with an ancestor of
   that commit, or the graph output will be incorrect.
 </p>
 </li>
 <li>
 <p>
-<code>graph_update()</code> must be called on a contiguous group of commits.  If
-  <code>graph_update()</code> is called on a particular commit, it should later be called
+<tt>graph_update()</tt> must be called on a contiguous group of commits.  If
+  <tt>graph_update()</tt> is called on a particular commit, it should later be called
   on all parents of that commit.  Parents must not be skipped, or the graph
   output will appear incorrect.
 </p>
-<div class="paragraph"><p><code>graph_update()</code> may be used on a pruned set of commits only if the parent list
+<div class="paragraph"><p><tt>graph_update()</tt> may be used on a pruned set of commits only if the parent list
 has been rewritten so as to include only ancestors from the pruned set.</p></div>
 </li>
 <li>
@@ -912,7 +916,7 @@ The graph API does not currently support reverse commit ordering.  In
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code>struct commit *commit;
+<pre><tt>struct commit *commit;
 struct git_graph *graph = graph_init(opts);
 
 while ((commit = get_revision(opts)) != NULL) {
@@ -931,7 +935,7 @@ while ((commit = get_revision(opts)) != NULL) {
                 else
                         putchar(opts-&gt;diffopt.line_termination);
         }
-}</code></pre>
+}</tt></pre>
 </div></div>
 </div>
 </div>
@@ -943,7 +947,7 @@ not include any commit summary information&#8212;callers are responsible for
 outputting that information, if desired.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>*
+<pre><tt>*
 *
 *
 |\
@@ -972,7 +976,7 @@ outputting that information, if desired.</p></div>
 * | | | | |
 | | | | | *
 | | | | |/
-| | | | *</code></pre>
+| | | | *</tt></pre>
 </div></div>
 </div>
 </div>

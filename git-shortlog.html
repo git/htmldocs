@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-shortlog(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -809,12 +813,12 @@ reference to the current repository.</p></div>
 <p>
         Instead of the commit subject, use some other information to
         describe each commit.  <em>&lt;format&gt;</em> can be any string accepted
-        by the <code>--format</code> option of <em>git log</em>, such as <em>* [%h] %s</em>.
+        by the <tt>--format</tt> option of <em>git log</em>, such as <em>* [%h] %s</em>.
         (See the "PRETTY FORMATS" section of <a href="git-log.html">git-log(1)</a>.)
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>Each pretty-printed commit will be rewrapped before it is shown.</code></pre>
+<pre><tt>Each pretty-printed commit will be rewrapped before it is shown.</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -822,12 +826,12 @@ reference to the current repository.</p></div>
 </dt>
 <dd>
 <p>
-        Linewrap the output by wrapping each line at <code>width</code>.  The first
-        line of each entry is indented by <code>indent1</code> spaces, and the second
-        and subsequent lines are indented by <code>indent2</code> spaces. <code>width</code>,
-        <code>indent1</code>, and <code>indent2</code> default to 76, 6 and 9 respectively.
+        Linewrap the output by wrapping each line at <tt>width</tt>.  The first
+        line of each entry is indented by <tt>indent1</tt> spaces, and the second
+        and subsequent lines are indented by <tt>indent2</tt> spaces. <tt>width</tt>,
+        <tt>indent1</tt>, and <tt>indent2</tt> default to 76, 6 and 9 respectively.
 </p>
-<div class="paragraph"><p>If width is <code>0</code> (zero) then indent the lines of the output without wrapping
+<div class="paragraph"><p>If width is <tt>0</tt> (zero) then indent the lines of the output without wrapping
 them.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -836,10 +840,10 @@ them.</p></div>
 <dd>
 <p>
         Show only commits in the specified revision range.  When no
-        &lt;revision range&gt; is specified, it defaults to <code>HEAD</code> (i.e. the
-        whole history leading to the current commit).  <code>origin..HEAD</code>
+        &lt;revision range&gt; is specified, it defaults to <tt>HEAD</tt> (i.e. the
+        whole history leading to the current commit).  <tt>origin..HEAD</tt>
         specifies all the commits reachable from the current commit
-        (i.e. <code>HEAD</code>), but not from <code>origin</code>. For a complete list of
+        (i.e. <tt>HEAD</tt>), but not from <tt>origin</tt>. For a complete list of
         ways to spell &lt;revision range&gt;, see the "Specifying Ranges"
         section of <a href="gitrevisions.html">gitrevisions(7)</a>.
 </p>
@@ -861,10 +865,10 @@ options or the revision range, when confusion arises.</p></div>
 <div class="sect1">
 <h2 id="_mapping_authors">MAPPING AUTHORS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <code>.mailmap</code> feature is used to coalesce together commits by the same
+<div class="paragraph"><p>The <tt>.mailmap</tt> feature is used to coalesce together commits by the same
 person in the shortlog, where their name and/or email address was
 spelled differently.</p></div>
-<div class="paragraph"><p>If the file <code>.mailmap</code> exists at the toplevel of the repository, or at
+<div class="paragraph"><p>If the file <tt>.mailmap</tt> exists at the toplevel of the repository, or at
 the location pointed to by the mailmap.file or mailmap.blob
 configuration options, it
 is used to map author and committer names and email addresses to
@@ -876,7 +880,7 @@ commit (enclosed by <em>&lt;</em> and <em>&gt;</em>) to map to the name. For exa
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Proper Name &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>Proper Name &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>The more complex forms are:</p></div>
@@ -884,7 +888,7 @@ commit (enclosed by <em>&lt;</em> and <em>&gt;</em>) to map to the name. For exa
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>&lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>which allows mailmap to replace only the email part of a commit, and:</p></div>
@@ -892,7 +896,7 @@ commit (enclosed by <em>&lt;</em> and <em>&gt;</em>) to map to the name. For exa
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Proper Name &lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>Proper Name &lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>which allows mailmap to replace both the name and the email of a
@@ -901,7 +905,7 @@ commit matching the specified commit email address, and:</p></div>
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Proper Name &lt;proper@email.xx&gt; Commit Name &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>Proper Name &lt;proper@email.xx&gt; Commit Name &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>which allows mailmap to replace both the name and the email of a
@@ -910,41 +914,41 @@ commit matching both the specified commit name and email address.</p></div>
 and Joe, whose names appear in the repository under several forms:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Joe Developer &lt;joe@example.com&gt;
+<pre><tt>Joe Developer &lt;joe@example.com&gt;
 Joe R. Developer &lt;joe@example.com&gt;
 Jane Doe &lt;jane@example.com&gt;
 Jane Doe &lt;jane@laptop.(none)&gt;
-Jane D. &lt;jane@desktop.(none)&gt;</code></pre>
+Jane D. &lt;jane@desktop.(none)&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>Now suppose that Joe wants his middle name initial used, and Jane
-prefers her family name fully spelled out. A proper <code>.mailmap</code> file
+prefers her family name fully spelled out. A proper <tt>.mailmap</tt> file
 would look like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Jane Doe         &lt;jane@desktop.(none)&gt;
-Joe R. Developer &lt;joe@example.com&gt;</code></pre>
+<pre><tt>Jane Doe         &lt;jane@desktop.(none)&gt;
+Joe R. Developer &lt;joe@example.com&gt;</tt></pre>
 </div></div>
-<div class="paragraph"><p>Note how there is no need for an entry for <code>&lt;jane@laptop.(none)&gt;</code>, because the
+<div class="paragraph"><p>Note how there is no need for an entry for <tt>&lt;jane@laptop.(none)&gt;</tt>, because the
 real name of that author is already correct.</p></div>
 <div class="paragraph"><p>Example 2: Your repository contains commits from the following
 authors:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>nick1 &lt;bugs@company.xx&gt;
+<pre><tt>nick1 &lt;bugs@company.xx&gt;
 nick2 &lt;bugs@company.xx&gt;
 nick2 &lt;nick2@company.xx&gt;
 santa &lt;me@company.xx&gt;
 claus &lt;me@company.xx&gt;
-CTO &lt;cto@coompany.xx&gt;</code></pre>
+CTO &lt;cto@coompany.xx&gt;</tt></pre>
 </div></div>
-<div class="paragraph"><p>Then you might want a <code>.mailmap</code> file that looks like:</p></div>
+<div class="paragraph"><p>Then you might want a <tt>.mailmap</tt> file that looks like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>&lt;cto@company.xx&gt;                       &lt;cto@coompany.xx&gt;
+<pre><tt>&lt;cto@company.xx&gt;                       &lt;cto@coompany.xx&gt;
 Some Dude &lt;some@dude.xx&gt;         nick1 &lt;bugs@company.xx&gt;
 Other Author &lt;other@author.xx&gt;   nick2 &lt;bugs@company.xx&gt;
 Other Author &lt;other@author.xx&gt;         &lt;nick2@company.xx&gt;
-Santa Claus &lt;santa.claus@northpole.xx&gt; &lt;me@company.xx&gt;</code></pre>
+Santa Claus &lt;santa.claus@northpole.xx&gt; &lt;me@company.xx&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>Use hash <em>#</em> for comments that are either on their own line, or after
 the email address.</p></div>

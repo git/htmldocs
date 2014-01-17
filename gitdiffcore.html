@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitdiffcore(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -796,9 +800,9 @@ the filepairs outside the specified sets of pathnames.  E.g. If the
 input set of filepairs included:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 100644 bcd1234... 0123456... M junkfile</code></pre>
+<pre><tt>:100644 100644 bcd1234... 0123456... M junkfile</tt></pre>
 </div></div>
-<div class="paragraph"><p>but the command invocation was <code>git diff-files myfile</code>, then the
+<div class="paragraph"><p>but the command invocation was <tt>git diff-files myfile</tt>, then the
 junkfile entry would be removed from the list because only "myfile"
 is under consideration.</p></div>
 <div class="paragraph"><p>The result of comparison is passed from these commands to what is
@@ -806,10 +810,10 @@ internally called "diffcore", in a format similar to what is output
 when the -p option is not used.  E.g.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>in-place edit  :100644 100644 bcd1234... 0123456... M file0
+<pre><tt>in-place edit  :100644 100644 bcd1234... 0123456... M file0
 create         :000000 100644 0000000... 1234567... A file4
 delete         :100644 000000 1234567... 0000000... D file5
-unmerged       :000000 000000 0000000... 0000000... U file6</code></pre>
+unmerged       :000000 000000 0000000... 0000000... U file6</tt></pre>
 </div></div>
 <div class="paragraph"><p>The diffcore mechanism is fed a list of such comparison results
 (each of which is called "filepair", although at this point each
@@ -861,14 +865,14 @@ break such filepair into two filepairs that represent delete and
 create.  E.g.  If the input contained this filepair:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 100644 bcd1234... 0123456... M file0</code></pre>
+<pre><tt>:100644 100644 bcd1234... 0123456... M file0</tt></pre>
 </div></div>
 <div class="paragraph"><p>and if it detects that the file "file0" is completely rewritten,
 it changes it to:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 000000 bcd1234... 0000000... D file0
-:000000 100644 0000000... 0123456... A file0</code></pre>
+<pre><tt>:100644 000000 bcd1234... 0000000... D file0
+:000000 100644 0000000... 0123456... A file0</tt></pre>
 </div></div>
 <div class="paragraph"><p>For the purpose of breaking a filepair, diffcore-break examines
 the extent of changes between the contents of the files before
@@ -893,15 +897,15 @@ controlled by the -M option (to detect renames) and the -C option
 input contained these filepairs:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 000000 0123456... 0000000... D fileX
-:000000 100644 0000000... 0123456... A file0</code></pre>
+<pre><tt>:100644 000000 0123456... 0000000... D fileX
+:000000 100644 0000000... 0123456... A file0</tt></pre>
 </div></div>
 <div class="paragraph"><p>and the contents of the deleted file fileX is similar enough to
 the contents of the created file file0, then rename detection
 merges these filepairs and creates:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 100644 0123456... 0123456... R100 fileX file0</code></pre>
+<pre><tt>:100644 100644 0123456... 0123456... R100 fileX file0</tt></pre>
 </div></div>
 <div class="paragraph"><p>When the "-C" option is used, the original contents of modified files,
 and deleted files (and also unmodified files, if the
@@ -911,16 +915,16 @@ these filepairs, that talk about a modified file fileY and a newly
 created file file0:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 100644 0123456... 1234567... M fileY
-:000000 100644 0000000... bcd3456... A file0</code></pre>
+<pre><tt>:100644 100644 0123456... 1234567... M fileY
+:000000 100644 0000000... bcd3456... A file0</tt></pre>
 </div></div>
 <div class="paragraph"><p>the original contents of fileY and the resulting contents of
 file0 are compared, and if they are similar enough, they are
 changed to:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>:100644 100644 0123456... 1234567... M fileY
-:100644 100644 0123456... bcd3456... C100 fileY file0</code></pre>
+<pre><tt>:100644 100644 0123456... 1234567... M fileY
+:100644 100644 0123456... bcd3456... C100 fileY file0</tt></pre>
 </div></div>
 <div class="paragraph"><p>In both rename and copy detection, the same "extent of changes"
 algorithm used in diffcore-break is used to determine if two
@@ -928,11 +932,11 @@ files are "similar enough", and can be customized to use
 a similarity score different from the default of 50% by giving a
 number after the "-M" or "-C" option (e.g. "-M8" to tell it to use
 8/10 = 80%).</p></div>
-<div class="paragraph"><p>Note.  When the "-C" option is used with <code>--find-copies-harder</code>
+<div class="paragraph"><p>Note.  When the "-C" option is used with <tt>--find-copies-harder</tt>
 option, <em>git diff-&#42;</em> commands feed unmodified filepairs to
 diffcore mechanism as well as modified ones.  This lets the copy
 detector consider unmodified files as copy source candidates at
-the expense of making it slower.  Without <code>--find-copies-harder</code>,
+the expense of making it slower.  Without <tt>--find-copies-harder</tt>,
 <em>git diff-&#42;</em> commands can detect copies only if the file that was
 copied happened to have been modified in the same changeset.</p></div>
 </div>
@@ -995,9 +999,9 @@ specify different ways these strings are sought.</p></div>
 have different number of occurrences of the specified block of text.
 By definition, it will not detect in-file moves.  Also, when a
 changeset moves a file wholesale without affecting the interesting
-string, diffcore-rename kicks in as usual, and <code>-S</code> omits the filepair
+string, diffcore-rename kicks in as usual, and <tt>-S</tt> omits the filepair
 (since the number of occurrences of that string didn&#8217;t change in that
-rename-detected filepair).  When used with <code>--pickaxe-regex</code>, treat
+rename-detected filepair).  When used with <tt>--pickaxe-regex</tt>, treat
 the &lt;block of text&gt; as an extended POSIX regular expression to match,
 instead of a literal string.</p></div>
 <div class="paragraph"><p>"-G&lt;regular expression&gt;" (mnemonic: grep) detects filepairs whose
@@ -1006,9 +1010,9 @@ regular expression.  This means that it will detect in-file (or what
 rename-detection considers the same file) moves, which is noise.  The
 implementation runs diff twice and greps, and this can be quite
 expensive.</p></div>
-<div class="paragraph"><p>When <code>-S</code> or <code>-G</code> are used without <code>--pickaxe-all</code>, only filepairs
+<div class="paragraph"><p>When <tt>-S</tt> or <tt>-G</tt> are used without <tt>--pickaxe-all</tt>, only filepairs
 that match their respective criterion are kept in the output.  When
-<code>--pickaxe-all</code> is used, if even one filepair matches their respective
+<tt>--pickaxe-all</tt> is used, if even one filepair matches their respective
 criterion in a changeset, the entire changeset is kept.  This behavior
 is designed to make reviewing changes in the context of the whole
 changeset easier.</p></div>
@@ -1028,12 +1032,12 @@ filepairs that do not match any glob pattern are output last.</p></div>
 would look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>README
+<pre><tt>README
 Makefile
 Documentation
 *.h
 *.c
-t</code></pre>
+t</tt></pre>
 </div></div>
 </div>
 </div>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>How to rebase from an internal branch</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -738,7 +742,7 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code>Petr Baudis &lt;pasky@suse.cz&gt; writes:
+<pre><tt>Petr Baudis &lt;pasky@suse.cz&gt; writes:
 
 &gt; Dear diary, on Sun, Aug 14, 2005 at 09:57:13AM CEST, I got a letter
 &gt; where Junio C Hamano &lt;junkio@cox.net&gt; told me that...
@@ -747,7 +751,7 @@ asciidoc.install();
 &gt;&gt; &gt; Junio, maybe you want to talk about how you move patches from your "pu"
 &gt;&gt; &gt; branch to the real branches.
 &gt;&gt;
-&gt; Actually, wouldn't this be also precisely for what StGIT is intended to?</code></pre>
+&gt; Actually, wouldn't this be also precisely for what StGIT is intended to?</tt></pre>
 </div></div>
 <div class="paragraph"><p>Exactly my feeling.  I was sort of waiting for Catalin to speak
 up.  With its basing philosophical ancestry on quilt, this is
@@ -760,24 +764,24 @@ placing new things in pu first.  At the beginning, the commit
 ancestry graph looked like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>                         *"pu" head
-master --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
+<pre><tt>                         *"pu" head
+master --&gt; #1 --&gt; #2 --&gt; #3</tt></pre>
 </div></div>
 <div class="paragraph"><p>So I started from master, made a bunch of edits, and committed:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git checkout master
+<pre><tt>$ git checkout master
 $ cd Documentation; ed git.txt ...
 $ cd ..; git add Documentation/*.txt
-$ git commit -s</code></pre>
+$ git commit -s</tt></pre>
 </div></div>
 <div class="paragraph"><p>After the commit, the ancestry graph would look like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>                          *"pu" head
+<pre><tt>                          *"pu" head
 master^ --&gt; #1 --&gt; #2 --&gt; #3
       \
-        \---&gt; master</code></pre>
+        \---&gt; master</tt></pre>
 </div></div>
 <div class="paragraph"><p>The old master is now master^ (the first parent of the master).
 The new master commit holds my documentation updates.</p></div>
@@ -797,17 +801,17 @@ operations for <em>you</em> easier if you rebase (i.e. carry forward
 your changes) "pu" rather than merge.  So I ran "git rebase":</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git checkout pu
-$ git rebase master pu</code></pre>
+<pre><tt>$ git checkout pu
+$ git rebase master pu</tt></pre>
 </div></div>
 <div class="paragraph"><p>What this does is to pick all the commits since the current
 branch (note that I now am on "pu" branch) forked from the
 master branch, and forward port these changes.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>master^ --&gt; #1 --&gt; #2 --&gt; #3
+<pre><tt>master^ --&gt; #1 --&gt; #2 --&gt; #3
       \                                  *"pu" head
-        \---&gt; master --&gt; #1' --&gt; #2' --&gt; #3'</code></pre>
+        \---&gt; master --&gt; #1' --&gt; #2' --&gt; #3'</tt></pre>
 </div></div>
 <div class="paragraph"><p>The diff between master^ and #1 is applied to master and
 committed to create #1' commit with the commit information (log,
@@ -824,15 +828,15 @@ to do cherrypicking using only the core Git tools.</p></div>
 made a couple of commits on top of it.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>                           *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
+<pre><tt>                           *your "master" head
+upstream --&gt; #1 --&gt; #2 --&gt; #3</tt></pre>
 </div></div>
 <div class="paragraph"><p>You would want changes #2 and #3 incorporated in the upstream,
 while you feel that #1 may need further improvements.  So you
 prepare #2 and #3 for e-mail submission.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git format-patch master^^ master</code></pre>
+<pre><tt>$ git format-patch master^^ master</tt></pre>
 </div></div>
 <div class="paragraph"><p>This creates two files, 0001-XXXX.patch and 0002-XXXX.patch.  Send
 them out "To: " your project maintainer and "Cc: " your mailing
@@ -844,11 +848,11 @@ patch.</p></div>
 up your changes, along with other changes.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code> where                      *your "master" head
+<pre><tt> where                      *your "master" head
 upstream --&gt; #1 --&gt; #2 --&gt; #3
   used   \
  to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C
-                                              *upstream head</code></pre>
+                                              *upstream head</tt></pre>
 </div></div>
 <div class="paragraph"><p>The two commits #2' and #3' in the above picture record the same
 changes your e-mail submission for #2 and #3 contained, but
@@ -858,14 +862,14 @@ information, they are different objects from #2 and #3 commits.</p></div>
 <div class="paragraph"><p>You fetch from upstream, but not merge.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git fetch upstream</code></pre>
+<pre><tt>$ git fetch upstream</tt></pre>
 </div></div>
 <div class="paragraph"><p>This leaves the updated upstream head in .git/FETCH_HEAD but
 does not touch your .git/HEAD nor .git/refs/heads/master.
 You run "git rebase" now.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git rebase FETCH_HEAD master</code></pre>
+<pre><tt>$ git rebase FETCH_HEAD master</tt></pre>
 </div></div>
 <div class="paragraph"><p>Earlier, I said that rebase applies all the commits from your
 branch on top of the upstream head.  Well, I lied.  "git rebase"
@@ -874,12 +878,12 @@ be applied, so it only applies #1.  The commit ancestry graph
 becomes something like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code> where                     *your old "master" head
+<pre><tt> where                     *your old "master" head
 upstream --&gt; #1 --&gt; #2 --&gt; #3
   used   \                      your new "master" head*
  to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C --&gt; #1'
                                               *upstream
-                                              head</code></pre>
+                                              head</tt></pre>
 </div></div>
 <div class="paragraph"><p>Again, "git prune" would discard the disused commits #1-#3 and
 you continue on starting from the new "master" head, which is
@@ -891,7 +895,7 @@ the #1' commit.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-27 14:11:28 PST
+Last updated 2014-01-17 14:44:21 PST
 </div>
 </div>
 </body>

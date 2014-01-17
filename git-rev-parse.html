@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-rev-parse(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -783,7 +787,7 @@ distinguish between them.</p></div>
 <dd>
 <p>
         Use <em>git rev-parse</em> in shell quoting mode (see SQ-QUOTE
-        section below). In contrast to the <code>--sq</code> option below, this
+        section below). In contrast to the <tt>--sq</tt> option below, this
         mode does only quoting. Nothing else is done to command input.
 </p>
 </dd>
@@ -797,8 +801,8 @@ distinguish between them.</p></div>
 </dt>
 <dd>
 <p>
-        Only meaningful in <code>--parseopt</code> mode. Tells the option parser to echo
-        out the first <code>--</code> met instead of skipping it.
+        Only meaningful in <tt>--parseopt</tt> mode. Tells the option parser to echo
+        out the first <tt>--</tt> met instead of skipping it.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -806,7 +810,7 @@ distinguish between them.</p></div>
 </dt>
 <dd>
 <p>
-        Only meaningful in <code>--parseopt</code> mode.  Lets the option parser stop at
+        Only meaningful in <tt>--parseopt</tt> mode.  Lets the option parser stop at
         the first non-option argument.  This can be used to parse sub-commands
         that take options themselves.
 </p>
@@ -816,7 +820,7 @@ distinguish between them.</p></div>
 </dt>
 <dd>
 <p>
-        Only meaningful in <code>--parseopt</code> mode. Output the options in their
+        Only meaningful in <tt>--parseopt</tt> mode. Output the options in their
         long form if available, and with their arguments stuck.
 </p>
 </dd>
@@ -869,7 +873,7 @@ distinguish between them.</p></div>
 </dt>
 <dd>
 <p>
-        If there is no parameter given by the user, use <code>&lt;arg&gt;</code>
+        If there is no parameter given by the user, use <tt>&lt;arg&gt;</tt>
         instead.
 </p>
 </dd>
@@ -878,9 +882,9 @@ distinguish between them.</p></div>
 </dt>
 <dd>
 <p>
-        Behave as if <em>git rev-parse</em> was invoked from the <code>&lt;arg&gt;</code>
+        Behave as if <em>git rev-parse</em> was invoked from the <tt>&lt;arg&gt;</tt>
         subdirectory of the working tree.  Any relative filenames are
-        resolved as if they are prefixed by <code>&lt;arg&gt;</code> and will be printed
+        resolved as if they are prefixed by <tt>&lt;arg&gt;</tt> and will be printed
         in that form.
 </p>
 <div class="paragraph"><p>This can be used to convert arguments to a command run in a subdirectory
@@ -888,9 +892,9 @@ so that they can still be used after moving to the top-level of the
 repository.  For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>prefix=$(git rev-parse --show-prefix)
+<pre><tt>prefix=$(git rev-parse --show-prefix)
 cd "$(git rev-parse --show-toplevel)"
-eval "set -- $(git rev-parse --sq --prefix "$prefix" "$@")"</code></pre>
+eval "set -- $(git rev-parse --sq --prefix "$prefix" "$@")"</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -905,10 +909,10 @@ eval "set -- $(git rev-parse --sq --prefix "$prefix" "$@")"</code></pre>
 </p>
 <div class="paragraph"><p>If you want to make sure that the output actually names an object in
 your object database and/or can be used as a specific type of object
-For example, <code>git rev-parse "$VAR^{commit}"</code> will make sure <code>$VAR</code>
+For example, <tt>git rev-parse "$VAR^{commit}"</tt> will make sure <tt>$VAR</tt>
 names an existing object that is a commit-ish (i.e. a commit, or an
-annotated tag that points at a commit).  To make sure that <code>$VAR</code>
-names an existing object of any type, <code>git rev-parse "$VAR^{object}"</code>
+annotated tag that points at a commit).  To make sure that <tt>$VAR</tt>
+names an existing object of any type, <tt>git rev-parse "$VAR^{object}"</tt>
 can be used.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -919,7 +923,7 @@ can be used.</p></div>
 </dt>
 <dd>
 <p>
-        Only meaningful in <code>--verify</code> mode. Do not output an error
+        Only meaningful in <tt>--verify</tt> mode. Do not output an error
         message if the first argument is not a valid object name;
         instead exit with non-zero status silently.
 </p>
@@ -933,8 +937,8 @@ can be used.</p></div>
         parameter.  This option makes output a single line,
         properly quoted for consumption by shell.  Useful when
         you expect your parameter to contain whitespaces and
-        newlines (e.g. when using pickaxe <code>-S</code> with
-        <em>git diff-&#42;</em>). In contrast to the <code>--sq-quote</code> option,
+        newlines (e.g. when using pickaxe <tt>-S</tt> with
+        <em>git diff-&#42;</em>). In contrast to the <tt>--sq-quote</tt> option,
         the command input is still interpreted as usual.
 </p>
 </dd>
@@ -1004,7 +1008,7 @@ can be used.</p></div>
 </dt>
 <dd>
 <p>
-        Show all refs found in <code>refs/</code>.
+        Show all refs found in <tt>refs/</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1019,23 +1023,23 @@ can be used.</p></div>
 <dd>
 <p>
         Show all branches, tags, or remote-tracking branches,
-        respectively (i.e., refs found in <code>refs/heads</code>,
-        <code>refs/tags</code>, or <code>refs/remotes</code>, respectively).
+        respectively (i.e., refs found in <tt>refs/heads</tt>,
+        <tt>refs/tags</tt>, or <tt>refs/remotes</tt>, respectively).
 </p>
-<div class="paragraph"><p>If a <code>pattern</code> is given, only refs matching the given shell glob are
-shown.  If the pattern does not contain a globbing character (<code>?</code>,
-<code>*</code>, or <code>[</code>), it is turned into a prefix match by appending <code>/*</code>.</p></div>
+<div class="paragraph"><p>If a <tt>pattern</tt> is given, only refs matching the given shell glob are
+shown.  If the pattern does not contain a globbing character (<tt>?</tt>,
+<tt>*</tt>, or <tt>[</tt>), it is turned into a prefix match by appending <tt>/*</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 --glob=pattern
 </dt>
 <dd>
 <p>
-        Show all refs matching the shell glob pattern <code>pattern</code>. If
-        the pattern does not start with <code>refs/</code>, this is automatically
+        Show all refs matching the shell glob pattern <tt>pattern</tt>. If
+        the pattern does not start with <tt>refs/</tt>, this is automatically
         prepended.  If the pattern does not contain a globbing
-        character (<code>?</code>, <code>*</code>, or <code>[</code>), it is turned into a prefix
-        match by appending <code>/*</code>.
+        character (<tt>?</tt>, <tt>*</tt>, or <tt>[</tt>), it is turned into a prefix
+        match by appending <tt>/*</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1043,17 +1047,17 @@ shown.  If the pattern does not contain a globbing character (<code>?</code>,
 </dt>
 <dd>
 <p>
-        Do not include refs matching <em>&lt;glob-pattern&gt;</em> that the next <code>--all</code>,
-        <code>--branches</code>, <code>--tags</code>, <code>--remotes</code>, or <code>--glob</code> would otherwise
+        Do not include refs matching <em>&lt;glob-pattern&gt;</em> that the next <tt>--all</tt>,
+        <tt>--branches</tt>, <tt>--tags</tt>, <tt>--remotes</tt>, or <tt>--glob</tt> would otherwise
         consider. Repetitions of this option accumulate exclusion patterns
-        up to the next <code>--all</code>, <code>--branches</code>, <code>--tags</code>, <code>--remotes</code>, or
-        <code>--glob</code> option (other options or arguments do not clear
+        up to the next <tt>--all</tt>, <tt>--branches</tt>, <tt>--tags</tt>, <tt>--remotes</tt>, or
+        <tt>--glob</tt> option (other options or arguments do not clear
         accumlated patterns).
 </p>
-<div class="paragraph"><p>The patterns given should not begin with <code>refs/heads</code>, <code>refs/tags</code>, or
-<code>refs/remotes</code> when applied to <code>--branches</code>, <code>--tags</code>, or <code>--remotes</code>,
-respectively, and they must begin with <code>refs/</code> when applied to <code>--glob</code>
-or <code>--all</code>. If a trailing <em>/&#42;</em> is intended, it must be given
+<div class="paragraph"><p>The patterns given should not begin with <tt>refs/heads</tt>, <tt>refs/tags</tt>, or
+<tt>refs/remotes</tt> when applied to <tt>--branches</tt>, <tt>--tags</tt>, or <tt>--remotes</tt>,
+respectively, and they must begin with <tt>refs/</tt> when applied to <tt>--glob</tt>
+or <tt>--all</tt>. If a trailing <em>/&#42;</em> is intended, it must be given
 explicitly.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1088,11 +1092,11 @@ explicitly.</p></div>
 </dt>
 <dd>
 <p>
-        Show <code>$GIT_DIR</code> if defined. Otherwise show the path to
+        Show <tt>$GIT_DIR</tt> if defined. Otherwise show the path to
         the .git directory. The path shown, when relative, is
         relative to the current working directory.
 </p>
-<div class="paragraph"><p>If <code>$GIT_DIR</code> is not defined and the current directory
+<div class="paragraph"><p>If <tt>$GIT_DIR</tt> is not defined and the current directory
 is not detected to lie in a Git repository or work tree
 print a message to stderr and exit with nonzero status.</p></div>
 </dd>
@@ -1228,7 +1232,7 @@ blobs contained in a commit.</p></div>
 </dt>
 <dd>
 <p>
-  Output from <code>git describe</code>; i.e. a closest tag, optionally
+  Output from <tt>git describe</tt>; i.e. a closest tag, optionally
   followed by a dash and a number of commits, followed by a dash, a
   <em>g</em>, and an abbreviated object name.
 </p>
@@ -1279,15 +1283,15 @@ otherwise, <em>refs/remotes/&lt;refname&gt;/HEAD</em> if it exists.
 </p>
 <div class="paragraph"><p><em>HEAD</em> names the commit on which you based the changes in the working tree.
 <em>FETCH_HEAD</em> records the branch which you fetched from a remote repository
-with your last <code>git fetch</code> invocation.
+with your last <tt>git fetch</tt> invocation.
 <em>ORIG_HEAD</em> is created by commands that move your <em>HEAD</em> in a drastic
 way, to record the position of the <em>HEAD</em> before their operation, so that
 you can easily change the tip of the branch back to the state before you ran
 them.
 <em>MERGE_HEAD</em> records the commit(s) which you are merging into your branch
-when you run <code>git merge</code>.
+when you run <tt>git merge</tt>.
 <em>CHERRY_PICK_HEAD</em> records the commit which you are cherry-picking
-when you run <code>git cherry-pick</code>.</p></div>
+when you run <tt>git cherry-pick</tt>.</p></div>
 <div class="paragraph"><p>Note that any of the <em>refs/*</em> cases above may come either from
 the <em>$GIT_DIR/refs</em> directory or from the <em>$GIT_DIR/packed-refs</em> file.
 While the ref name encoding is unspecified, UTF-8 is preferred as
@@ -1487,7 +1491,7 @@ and C are parents of commit node A.  Parent commits are ordered
 left-to-right.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>G   H   I   J
+<pre><tt>G   H   I   J
  \ /     \ /
   D   E   F
    \  |  / \
@@ -1496,11 +1500,11 @@ left-to-right.</p></div>
       B     C
        \   /
         \ /
-         A</code></pre>
+         A</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>A =      = A^0
+<pre><tt>A =      = A^0
 B = A^   = A^1     = A~1
 C = A^2  = A^2
 D = A^^  = A^1^1   = A~2
@@ -1509,14 +1513,14 @@ F = B^3  = A^^3
 G = A^^^ = A^1^1^1 = A~3
 H = D^2  = B^^2    = A^^^2  = A~2^2
 I = F^   = B^3^    = A^^3^
-J = F^2  = B^3^2   = A^^3^2</code></pre>
+J = F^2  = B^3^2   = A^^3^2</tt></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_specifying_ranges">SPECIFYING RANGES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>History traversing commands such as <code>git log</code> operate on a set
+<div class="paragraph"><p>History traversing commands such as <tt>git log</tt> operate on a set
 of commits, not just a single commit.  To these commands,
 specifying a single revision with the notation described in the
 previous section means the set of commits reachable from that
@@ -1608,7 +1612,7 @@ all of its parents.</p></div>
 <div class="paragraph"><p>Here are a handful of examples:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>D                G H D
+<pre><tt>D                G H D
 D F              G H I J D F
 ^G D             H D
 ^D B             E I J F B
@@ -1618,75 +1622,75 @@ B...C            G H D E B C
 C                I J F C
 C^@              I J F
 C^!              C
-F^! D            G H D F</code></pre>
+F^! D            G H D F</tt></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_parseopt">PARSEOPT</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>In <code>--parseopt</code> mode, <em>git rev-parse</em> helps massaging options to bring to shell
+<div class="paragraph"><p>In <tt>--parseopt</tt> mode, <em>git rev-parse</em> helps massaging options to bring to shell
 scripts the same facilities C builtins have. It works as an option normalizer
-(e.g. splits single switches aggregate values), a bit like <code>getopt(1)</code> does.</p></div>
+(e.g. splits single switches aggregate values), a bit like <tt>getopt(1)</tt> does.</p></div>
 <div class="paragraph"><p>It takes on the standard input the specification of the options to parse and
-understand, and echoes on the standard output a string suitable for <code>sh(1)</code> <code>eval</code>
+understand, and echoes on the standard output a string suitable for <tt>sh(1)</tt> <tt>eval</tt>
 to replace the arguments with normalized ones.  In case of error, it outputs
 usage on the standard error stream, and exits with code 129.</p></div>
-<div class="paragraph"><p>Note: Make sure you quote the result when passing it to <code>eval</code>.  See
+<div class="paragraph"><p>Note: Make sure you quote the result when passing it to <tt>eval</tt>.  See
 below for an example.</p></div>
 <div class="sect2">
 <h3 id="_input_format">Input Format</h3>
 <div class="paragraph"><p><em>git rev-parse --parseopt</em> input format is fully text based. It has two parts,
-separated by a line that contains only <code>--</code>. The lines before the separator
+separated by a line that contains only <tt>--</tt>. The lines before the separator
 (should be more than one) are used for the usage.
 The lines after the separator describe the options.</p></div>
 <div class="paragraph"><p>Each line of options has this format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>&lt;opt_spec&gt;&lt;flags&gt;* SP+ help LF</code></pre>
+<pre><tt>&lt;opt_spec&gt;&lt;flags&gt;* SP+ help LF</tt></pre>
 </div></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>&lt;opt_spec&gt;</code>
+<tt>&lt;opt_spec&gt;</tt>
 </dt>
 <dd>
 <p>
         its format is the short option character, then the long option name
         separated by a comma. Both parts are not required, though at least one
-        is necessary. <code>h,help</code>, <code>dry-run</code> and <code>f</code> are all three correct
-        <code>&lt;opt_spec&gt;</code>.
+        is necessary. <tt>h,help</tt>, <tt>dry-run</tt> and <tt>f</tt> are all three correct
+        <tt>&lt;opt_spec&gt;</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>&lt;flags&gt;</code>
+<tt>&lt;flags&gt;</tt>
 </dt>
 <dd>
 <p>
-        <code>&lt;flags&gt;</code> are of <code>*</code>, <code>=</code>, <code>?</code> or <code>!</code>.
+        <tt>&lt;flags&gt;</tt> are of <tt>*</tt>, <tt>=</tt>, <tt>?</tt> or <tt>!</tt>.
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-Use <code>=</code> if the option takes an argument.
+Use <tt>=</tt> if the option takes an argument.
 </p>
 </li>
 <li>
 <p>
-Use <code>?</code> to mean that the option takes an optional argument. You
-          probably want to use the <code>--stuck-long</code> mode to be able to
+Use <tt>?</tt> to mean that the option takes an optional argument. You
+          probably want to use the <tt>--stuck-long</tt> mode to be able to
           unambiguously parse the optional argument.
 </p>
 </li>
 <li>
 <p>
-Use <code>*</code> to mean that this option should not be listed in the usage
-          generated for the <code>-h</code> argument. It&#8217;s shown for <code>--help-all</code> as
+Use <tt>*</tt> to mean that this option should not be listed in the usage
+          generated for the <tt>-h</tt> argument. It&#8217;s shown for <tt>--help-all</tt> as
           documented in <a href="gitcli.html">gitcli(7)</a>.
 </p>
 </li>
 <li>
 <p>
-Use <code>!</code> to not make the corresponding negated long option available.
+Use <tt>!</tt> to not make the corresponding negated long option available.
 </p>
 </li>
 </ul></div>
@@ -1702,7 +1706,7 @@ lines on purpose).</p></div>
 <h3 id="_example">Example</h3>
 <div class="listingblock">
 <div class="content">
-<pre><code>OPTS_SPEC="\
+<pre><tt>OPTS_SPEC="\
 some-command [options] &lt;args&gt;...
 
 some-command does foo and bar!
@@ -1715,7 +1719,7 @@ bar=      some cool option --bar with an argument
   An option group Header
 C?        option C with an optional argument"
 
-eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?)"</code></pre>
+eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?)"</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1723,18 +1727,18 @@ eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?)"</
 <div class="sect1">
 <h2 id="_sq_quote">SQ-QUOTE</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>In <code>--sq-quote</code> mode, <em>git rev-parse</em> echoes on the standard output a
-single line suitable for <code>sh(1)</code> <code>eval</code>. This line is made by
-normalizing the arguments following <code>--sq-quote</code>. Nothing other than
+<div class="paragraph"><p>In <tt>--sq-quote</tt> mode, <em>git rev-parse</em> echoes on the standard output a
+single line suitable for <tt>sh(1)</tt> <tt>eval</tt>. This line is made by
+normalizing the arguments following <tt>--sq-quote</tt>. Nothing other than
 quoting the arguments is done.</p></div>
 <div class="paragraph"><p>If you want command input to still be interpreted as usual by
-<em>git rev-parse</em> before the output is shell quoted, see the <code>--sq</code>
+<em>git rev-parse</em> before the output is shell quoted, see the <tt>--sq</tt>
 option.</p></div>
 <div class="sect2">
 <h3 id="_example_2">Example</h3>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cat &gt;your-git-script.sh &lt;&lt;\EOF
+<pre><tt>$ cat &gt;your-git-script.sh &lt;&lt;\EOF
 #!/bin/sh
 args=$(git rev-parse --sq-quote "$@")   # quote user-supplied arguments
 command="git frotz -n24 $args"          # and use it inside a handcrafted
@@ -1742,7 +1746,7 @@ command="git frotz -n24 $args"          # and use it inside a handcrafted
 eval "$command"
 EOF
 
-$ sh your-git-script.sh "a b'c"</code></pre>
+$ sh your-git-script.sh "a b'c"</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1757,7 +1761,7 @@ Print the object name of the current commit:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git rev-parse --verify HEAD</code></pre>
+<pre><tt>$ git rev-parse --verify HEAD</tt></pre>
 </div></div>
 </li>
 <li>
@@ -1766,7 +1770,7 @@ Print the commit object name from the revision in the $REV shell variable:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git rev-parse --verify $REV^{commit}</code></pre>
+<pre><tt>$ git rev-parse --verify $REV^{commit}</tt></pre>
 </div></div>
 <div class="paragraph"><p>This will error out if $REV is empty or not a valid revision.</p></div>
 </li>
@@ -1776,7 +1780,7 @@ Similar to above:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git rev-parse --default master --verify $REV</code></pre>
+<pre><tt>$ git rev-parse --default master --verify $REV</tt></pre>
 </div></div>
 <div class="paragraph"><p>but if $REV is empty, the commit object name from master will be printed.</p></div>
 </li>

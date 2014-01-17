@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitignore(5)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -751,13 +755,13 @@ gitignore(5) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>A <code>gitignore</code> file specifies intentionally untracked files that
+<div class="paragraph"><p>A <tt>gitignore</tt> file specifies intentionally untracked files that
 Git should ignore.
 Files already tracked by Git are not affected; see the NOTES
 below for details.</p></div>
-<div class="paragraph"><p>Each line in a <code>gitignore</code> file specifies a pattern.
+<div class="paragraph"><p>Each line in a <tt>gitignore</tt> file specifies a pattern.
 When deciding whether to ignore a path, Git normally checks
-<code>gitignore</code> patterns from multiple sources, with the following
+<tt>gitignore</tt> patterns from multiple sources, with the following
 order of precedence, from highest to lowest (within one level of
 precedence, the last matching pattern decides the outcome):</p></div>
 <div class="ulist"><ul>
@@ -769,19 +773,19 @@ Patterns read from the command line for those commands that support
 </li>
 <li>
 <p>
-Patterns read from a <code>.gitignore</code> file in the same directory
+Patterns read from a <tt>.gitignore</tt> file in the same directory
    as the path, or in any parent directory, with patterns in the
    higher level files (up to the toplevel of the work tree) being overridden
    by those in lower level files down to the directory containing the file.
    These patterns match relative to the location of the
-   <code>.gitignore</code> file.  A project normally includes such
-   <code>.gitignore</code> files in its repository, containing patterns for
+   <tt>.gitignore</tt> file.  A project normally includes such
+   <tt>.gitignore</tt> files in its repository, containing patterns for
    files generated as part of the project build.
 </p>
 </li>
 <li>
 <p>
-Patterns read from <code>$GIT_DIR/info/exclude</code>.
+Patterns read from <tt>$GIT_DIR/info/exclude</tt>.
 </p>
 </li>
 <li>
@@ -798,7 +802,7 @@ be used.</p></div>
 <p>
 Patterns which should be version-controlled and distributed to
    other repositories via clone (i.e., files that all developers will want
-   to ignore) should go into a <code>.gitignore</code> file.
+   to ignore) should go into a <tt>.gitignore</tt> file.
 </p>
 </li>
 <li>
@@ -807,7 +811,7 @@ Patterns which are
    specific to a particular repository but which do not need to be shared
    with other related repositories (e.g., auxiliary files that live inside
    the repository but are specific to one user&#8217;s workflow) should go into
-   the <code>$GIT_DIR/info/exclude</code> file.
+   the <tt>$GIT_DIR/info/exclude</tt> file.
 </p>
 </li>
 <li>
@@ -815,7 +819,7 @@ Patterns which are
 Patterns which a user wants Git to
    ignore in all situations (e.g., backup or temporary files generated by
    the user&#8217;s editor of choice) generally go into a file specified by
-   <code>core.excludesfile</code> in the user&#8217;s <code>~/.gitconfig</code>. Its default value is
+   <tt>core.excludesfile</tt> in the user&#8217;s <tt>~/.gitconfig</tt>. Its default value is
    $XDG_CONFIG_HOME/git/ignore. If $XDG_CONFIG_HOME is either not set or
    empty, $HOME/.config/git/ignore is used instead.
 </p>
@@ -823,7 +827,7 @@ Patterns which a user wants Git to
 </ul></div>
 <div class="paragraph"><p>The underlying Git plumbing tools, such as
 <em>git ls-files</em> and <em>git read-tree</em>, read
-<code>gitignore</code> patterns specified by command-line options, or from
+<tt>gitignore</tt> patterns specified by command-line options, or from
 files specified by command-line options.  Higher-level Git
 tools, such as <em>git status</em> and <em>git add</em>,
 use patterns from the sources specified above.</p></div>
@@ -842,29 +846,29 @@ A blank line matches no files, so it can serve as a separator
 <li>
 <p>
 A line starting with # serves as a comment.
-   Put a backslash ("<code>\</code>") in front of the first hash for patterns
+   Put a backslash ("<tt>\</tt>") in front of the first hash for patterns
    that begin with a hash.
 </p>
 </li>
 <li>
 <p>
-An optional prefix "<code>!</code>" which negates the pattern; any
+An optional prefix "<tt>!</tt>" which negates the pattern; any
    matching file excluded by a previous pattern will become
    included again. It is not possible to re-include a file if a parent
    directory of that file is excluded. Git doesn&#8217;t list excluded
    directories for performance reasons, so any patterns on contained
    files have no effect, no matter where they are defined.
-   Put a backslash ("<code>\</code>") in front of the first "<code>!</code>" for patterns
-   that begin with a literal "<code>!</code>", for example, "<code>\!important!.txt</code>".
+   Put a backslash ("<tt>\</tt>") in front of the first "<tt>!</tt>" for patterns
+   that begin with a literal "<tt>!</tt>", for example, "<tt>\!important!.txt</tt>".
 </p>
 </li>
 <li>
 <p>
 If the pattern ends with a slash, it is removed for the
    purpose of the following description, but it would only find
-   a match with a directory.  In other words, <code>foo/</code> will match a
-   directory <code>foo</code> and paths underneath it, but will not match a
-   regular file or a symbolic link <code>foo</code> (this is consistent
+   a match with a directory.  In other words, <tt>foo/</tt> will match a
+   directory <tt>foo</tt> and paths underneath it, but will not match a
+   regular file or a symbolic link <tt>foo</tt> (this is consistent
    with the way how pathspec works in general in Git).
 </p>
 </li>
@@ -872,9 +876,9 @@ If the pattern ends with a slash, it is removed for the
 <p>
 If the pattern does not contain a slash <em>/</em>, Git treats it as
    a shell glob pattern and checks for a match against the
-   pathname relative to the location of the <code>.gitignore</code> file
+   pathname relative to the location of the <tt>.gitignore</tt> file
    (relative to the toplevel of the work tree if not from a
-   <code>.gitignore</code> file).
+   <tt>.gitignore</tt> file).
 </p>
 </li>
 <li>
@@ -895,30 +899,30 @@ A leading slash matches the beginning of the pathname.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Two consecutive asterisks ("<code>**</code>") in patterns matched against
+<div class="paragraph"><p>Two consecutive asterisks ("<tt>**</tt>") in patterns matched against
 full pathname may have special meaning:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-A leading "<code>**</code>" followed by a slash means match in all
-   directories. For example, "<code>**/foo</code>" matches file or directory
-   "<code>foo</code>" anywhere, the same as pattern "<code>foo</code>". "<code>**/foo/bar</code>"
-   matches file or directory "<code>bar</code>" anywhere that is directly
-   under directory "<code>foo</code>".
+A leading "<tt>**</tt>" followed by a slash means match in all
+   directories. For example, "<tt>**/foo</tt>" matches file or directory
+   "<tt>foo</tt>" anywhere, the same as pattern "<tt>foo</tt>". "<tt>**/foo/bar</tt>"
+   matches file or directory "<tt>bar</tt>" anywhere that is directly
+   under directory "<tt>foo</tt>".
 </p>
 </li>
 <li>
 <p>
-A trailing "<code>/**</code>" matches everything inside. For example,
-   "<code>abc/**</code>" matches all files inside directory "<code>abc</code>", relative
-   to the location of the <code>.gitignore</code> file, with infinite depth.
+A trailing "<tt>/**</tt>" matches everything inside. For example,
+   "<tt>abc/**</tt>" matches all files inside directory "<tt>abc</tt>", relative
+   to the location of the <tt>.gitignore</tt> file, with infinite depth.
 </p>
 </li>
 <li>
 <p>
 A slash followed by two consecutive asterisks then a slash
-   matches zero or more directories. For example, "<code>a/**/b</code>"
-   matches "<code>a/b</code>", "<code>a/x/b</code>", "<code>a/x/y/b</code>" and so on.
+   matches zero or more directories. For example, "<tt>a/**/b</tt>"
+   matches "<tt>a/b</tt>", "<tt>a/x/b</tt>", "<tt>a/x/y/b</tt>" and so on.
 </p>
 </li>
 <li>
@@ -945,7 +949,7 @@ use <em>git update-index &#45;&#45;assume-unchanged</em>.</p></div>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code>    $ git status
+<pre><tt>    $ git status
     [...]
     # Untracked files:
     [...]
@@ -968,30 +972,30 @@ use <em>git update-index &#45;&#45;assume-unchanged</em>.</p></div>
     # Untracked files:
     [...]
     #       Documentation/foo.html
-    [...]</code></pre>
+    [...]</tt></pre>
 </div></div>
 <div class="paragraph"><p>Another example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    $ cat .gitignore
+<pre><tt>    $ cat .gitignore
     vmlinux*
     $ ls arch/foo/kernel/vm*
     arch/foo/kernel/vmlinux.lds.S
-    $ echo '!/vmlinux*' &gt;arch/foo/kernel/.gitignore</code></pre>
+    $ echo '!/vmlinux*' &gt;arch/foo/kernel/.gitignore</tt></pre>
 </div></div>
 <div class="paragraph"><p>The second .gitignore prevents Git from ignoring
-<code>arch/foo/kernel/vmlinux.lds.S</code>.</p></div>
-<div class="paragraph"><p>Example to exclude everything except a specific directory <code>foo/bar</code>
-(note the <code>/*</code> - without the slash, the wildcard would also exclude
-everything within <code>foo/bar</code>):</p></div>
+<tt>arch/foo/kernel/vmlinux.lds.S</tt>.</p></div>
+<div class="paragraph"><p>Example to exclude everything except a specific directory <tt>foo/bar</tt>
+(note the <tt>/*</tt> - without the slash, the wildcard would also exclude
+everything within <tt>foo/bar</tt>):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    $ cat .gitignore
+<pre><tt>    $ cat .gitignore
     # exclude everything except directory foo/bar
     /*
     !/foo
     /foo/*
-    !/foo/bar</code></pre>
+    !/foo/bar</tt></pre>
 </div></div>
 </div>
 </div>

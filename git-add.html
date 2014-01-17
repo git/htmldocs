@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-add(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -766,20 +770,20 @@ remove paths that do not exist in the working tree anymore.</p></div>
 <div class="paragraph"><p>The "index" holds a snapshot of the content of the working tree, and it
 is this snapshot that is taken as the contents of the next commit.  Thus
 after making any changes to the working directory, and before running
-the commit command, you must use the <code>add</code> command to add any new or
+the commit command, you must use the <tt>add</tt> command to add any new or
 modified files to the index.</p></div>
 <div class="paragraph"><p>This command can be performed multiple times before a commit.  It only
 adds the content of the specified file(s) at the time the add command is
 run; if you want subsequent changes included in the next commit, then
-you must run <code>git add</code> again to add the new content to the index.</p></div>
-<div class="paragraph"><p>The <code>git status</code> command can be used to obtain a summary of which
+you must run <tt>git add</tt> again to add the new content to the index.</p></div>
+<div class="paragraph"><p>The <tt>git status</tt> command can be used to obtain a summary of which
 files have changes that are staged for the next commit.</p></div>
-<div class="paragraph"><p>The <code>git add</code> command will not add ignored files by default.  If any
-ignored files were explicitly specified on the command line, <code>git add</code>
+<div class="paragraph"><p>The <tt>git add</tt> command will not add ignored files by default.  If any
+ignored files were explicitly specified on the command line, <tt>git add</tt>
 will fail with a list of ignored files.  Ignored files reached by
 directory recursion or filename globbing performed by Git (quote your
 globs before the shell) will be silently ignored.  The <em>git add</em> command can
-be used to add ignored files with the <code>-f</code> (force) option.</p></div>
+be used to add ignored files with the <tt>-f</tt> (force) option.</p></div>
 <div class="paragraph"><p>Please see <a href="git-commit.html">git-commit(1)</a> for alternative ways to add content to a
 commit.</p></div>
 </div>
@@ -793,10 +797,10 @@ commit.</p></div>
 </dt>
 <dd>
 <p>
-        Files to add content from.  Fileglobs (e.g. <code>*.c</code>) can
+        Files to add content from.  Fileglobs (e.g. <tt>*.c</tt>) can
         be given to add all matching files.  Also a
-        leading directory name (e.g. <code>dir</code> to add <code>dir/file1</code>
-        and <code>dir/file2</code>) can be given to add all files in the
+        leading directory name (e.g. <tt>dir</tt> to add <tt>dir/file1</tt>
+        and <tt>dir/file2</tt>) can be given to add all files in the
         directory, recursively.
 </p>
 </dd>
@@ -861,8 +865,8 @@ commit.</p></div>
         to review the difference before adding modified contents to the
         index.
 </p>
-<div class="paragraph"><p>This effectively runs <code>add --interactive</code>, but bypasses the
-initial command menu and directly jumps to the <code>patch</code> subcommand.
+<div class="paragraph"><p>This effectively runs <tt>add --interactive</tt>, but bypasses the
+initial command menu and directly jumps to the <tt>patch</tt> subcommand.
 See &#8220;Interactive mode&#8221; for details.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -948,8 +952,8 @@ today&#8217;s "git add &lt;pathspec&gt;&#8230;", ignoring removed files.</p></di
         Record only the fact that the path will be added later. An entry
         for the path is placed in the index with no content. This is
         useful for, among other things, showing the unstaged content of
-        such files with <code>git diff</code> and committing them with <code>git commit
-        -a</code>.
+        such files with <tt>git diff</tt> and committing them with <tt>git commit
+        -a</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -969,7 +973,7 @@ today&#8217;s "git add &lt;pathspec&gt;&#8230;", ignoring removed files.</p></di
         If some files could not be added because of errors indexing
         them, do not abort the operation, but continue adding the
         others. The command shall still exit with non-zero status.
-        The configuration variable <code>add.ignoreErrors</code> can be set to
+        The configuration variable <tt>add.ignoreErrors</tt> can be set to
         true to make this the default behaviour.
 </p>
 </dd>
@@ -1000,7 +1004,7 @@ today&#8217;s "git add &lt;pathspec&gt;&#8230;", ignoring removed files.</p></di
 <div class="sect1">
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The optional configuration variable <code>core.excludesfile</code> indicates a path to a
+<div class="paragraph"><p>The optional configuration variable <tt>core.excludesfile</tt> indicates a path to a
 file containing patterns of file names to exclude from git-add, similar to
 $GIT_DIR/info/exclude.  Patterns in the exclude file are used in addition to
 those in info/exclude.  See <a href="gitignore.html">gitignore(5)</a>.</p></div>
@@ -1012,16 +1016,16 @@ those in info/exclude.  See <a href="gitignore.html">gitignore(5)</a>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Adds content from all <code>*.txt</code> files under <code>Documentation</code> directory
+Adds content from all <tt>*.txt</tt> files under <tt>Documentation</tt> directory
 and its subdirectories:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git add Documentation/\*.txt</code></pre>
+<pre><tt>$ git add Documentation/\*.txt</tt></pre>
 </div></div>
-<div class="paragraph"><p>Note that the asterisk <code>*</code> is quoted from the shell in this
+<div class="paragraph"><p>Note that the asterisk <tt>*</tt> is quoted from the shell in this
 example; this lets the command include the files from
-subdirectories of <code>Documentation/</code> directory.</p></div>
+subdirectories of <tt>Documentation/</tt> directory.</p></div>
 </li>
 <li>
 <p>
@@ -1029,11 +1033,11 @@ Considers adding content from all git-*.sh scripts:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git add git-*.sh</code></pre>
+<pre><tt>$ git add git-*.sh</tt></pre>
 </div></div>
 <div class="paragraph"><p>Because this example lets the shell expand the asterisk (i.e. you are
 listing the files explicitly), it does not consider
-<code>subdir/git-foo.sh</code>.</p></div>
+<tt>subdir/git-foo.sh</tt>.</p></div>
 </li>
 </ul></div>
 </div>
@@ -1050,12 +1054,12 @@ with a single <em>&gt;</em>, you can pick only one of the choices given
 and type return, like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    *** Commands ***
+<pre><tt>    *** Commands ***
       1: status       2: update       3: revert       4: add untracked
       5: patch        6: diff         7: quit         8: help
-    What now&gt; 1</code></pre>
+    What now&gt; 1</tt></pre>
 </div></div>
-<div class="paragraph"><p>You also could say <code>s</code> or <code>sta</code> or <code>status</code> above as long as the
+<div class="paragraph"><p>You also could say <tt>s</tt> or <tt>sta</tt> or <tt>status</tt> above as long as the
 choice is unique.</p></div>
 <div class="paragraph"><p>The main command loop has 6 subcommands (plus help and quit).</p></div>
 <div class="dlist"><dl>
@@ -1065,16 +1069,16 @@ status
 <dd>
 <p>
    This shows the change between HEAD and index (i.e. what will be
-   committed if you say <code>git commit</code>), and between index and
+   committed if you say <tt>git commit</tt>), and between index and
    working tree files (i.e. what you could stage further before
-   <code>git commit</code> using <code>git add</code>) for each path.  A sample output
+   <tt>git commit</tt> using <tt>git add</tt>) for each path.  A sample output
    looks like this:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>              staged     unstaged path
+<pre><tt>              staged     unstaged path
      1:       binary      nothing foo.png
-     2:     +403/-35        +1/-1 git-add--interactive.perl</code></pre>
+     2:     +403/-35        +1/-1 git-add--interactive.perl</tt></pre>
 </div></div>
 <div class="paragraph"><p>It shows that foo.png has differences from HEAD (but that is
 binary so line count cannot be shown) and there is no
@@ -1103,15 +1107,15 @@ update
 like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>           staged     unstaged path
+<pre><tt>           staged     unstaged path
   1:       binary      nothing foo.png
-* 2:     +403/-35        +1/-1 git-add--interactive.perl</code></pre>
+* 2:     +403/-35        +1/-1 git-add--interactive.perl</tt></pre>
 </div></div>
-<div class="paragraph"><p>To remove selection, prefix the input with <code>-</code>
+<div class="paragraph"><p>To remove selection, prefix the input with <tt>-</tt>
 like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Update&gt;&gt; -2</code></pre>
+<pre><tt>Update&gt;&gt; -2</tt></pre>
 </div></div>
 <div class="paragraph"><p>After making the selection, answer with an empty line to stage the
 contents of working tree files for selected paths in the index.</p></div>
@@ -1148,7 +1152,7 @@ patch
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>y - stage this hunk
+<pre><tt>y - stage this hunk
 n - do not stage this hunk
 q - quit; do not stage this hunk nor any of the remaining ones
 a - stage this hunk and all later hunks in the file
@@ -1161,12 +1165,12 @@ k - leave this hunk undecided, see previous undecided hunk
 K - leave this hunk undecided, see previous hunk
 s - split the current hunk into smaller hunks
 e - manually edit the current hunk
-? - print help</code></pre>
+? - print help</tt></pre>
 </div></div>
 <div class="paragraph"><p>After deciding the fate for all hunks, if there is any hunk
 that was chosen, the index is updated with the selected hunks.</p></div>
 <div class="paragraph"><p>You can omit having to type return here, by setting the configuration
-variable <code>interactive.singlekey</code> to <code>true</code>.</p></div>
+variable <tt>interactive.singlekey</tt> to <tt>true</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 diff
@@ -1183,7 +1187,7 @@ diff
 <div class="sect1">
 <h2 id="_editing_patches">EDITING PATCHES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Invoking <code>git add -e</code> or selecting <code>e</code> from the interactive hunk
+<div class="paragraph"><p>Invoking <tt>git add -e</tt> or selecting <tt>e</tt> from the interactive hunk
 selector will open a patch in your editor; after the editor exits, the
 result is applied to the index. You are free to make arbitrary changes
 to the patch, but note that some changes may have confusing results, or

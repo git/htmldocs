@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-send-email(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -852,24 +856,24 @@ and In-Reply-To headers will be used unless they are removed.</p></div>
 </dt>
 <dd>
 <p>
-        Make the first mail (or all the mails with <code>--no-thread</code>) appear as a
+        Make the first mail (or all the mails with <tt>--no-thread</tt>) appear as a
         reply to the given Message-Id, which avoids breaking threads to
         provide a new patch series.
         The second and subsequent emails will be sent as replies according to
-        the <code>--[no]-chain-reply-to</code> setting.
+        the <tt>--[no]-chain-reply-to</tt> setting.
 </p>
-<div class="paragraph"><p>So for example when <code>--thread</code> and <code>--no-chain-reply-to</code> are specified, the
+<div class="paragraph"><p>So for example when <tt>--thread</tt> and <tt>--no-chain-reply-to</tt> are specified, the
 second and subsequent patches will be replies to the first one like in the
-illustration below where <code>[PATCH v2 0/3]</code> is in reply to <code>[PATCH 0/2]</code>:</p></div>
+illustration below where <tt>[PATCH v2 0/3]</tt> is in reply to <tt>[PATCH 0/2]</tt>:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>[PATCH 0/2] Here is what I did...
+<pre><tt>[PATCH 0/2] Here is what I did...
   [PATCH 1/2] Clean up and tests
   [PATCH 2/2] Implementation
   [PATCH v2 0/3] Here is a reroll
     [PATCH v2 1/3] Clean up
     [PATCH v2 2/3] New tests
-    [PATCH v2 3/3] Implementation</code></pre>
+    [PATCH v2 3/3] Implementation</tt></pre>
 </div></div>
 <div class="paragraph"><p>Only necessary if --compose is also set.  If --compose
 is not set, this will be prompted for.</p></div>
@@ -981,13 +985,13 @@ a password is obtained using <em>git-credential</em>.</p></div>
 <dd>
 <p>
         If set, specifies the outgoing SMTP server to use (e.g.
-        <code>smtp.example.com</code> or a raw IP address).  Alternatively it can
+        <tt>smtp.example.com</tt> or a raw IP address).  Alternatively it can
         specify a full pathname of a sendmail-like program instead;
-        the program must support the <code>-i</code> option.  Default value can
+        the program must support the <tt>-i</tt> option.  Default value can
         be specified by the <em>sendemail.smtpserver</em> configuration
-        option; the built-in default is <code>/usr/sbin/sendmail</code> or
-        <code>/usr/lib/sendmail</code> if such program is available, or
-        <code>localhost</code> otherwise.
+        option; the built-in default is <tt>/usr/sbin/sendmail</tt> or
+        <tt>/usr/lib/sendmail</tt> if such program is available, or
+        <tt>localhost</tt> otherwise.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1032,7 +1036,7 @@ must be used for each option.</p></div>
         Path to ca-certificates (either a directory or a single file).
         Set it to an empty string to disable certificate verification.
         Defaults to the value set to the <em>sendemail.smtpsslcertpath</em>
-        configuration variable, if set, or <code>/etc/ssl/certs</code> otherwise.
+        configuration variable, if set, or <tt>/etc/ssl/certs</tt> otherwise.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1193,8 +1197,8 @@ specified, as well as <em>body</em> if --no-signed-off-cc is specified.</p></div
 <p>
         If this is set, the In-Reply-To and References headers will be
         added to each email sent.  Whether each mail refers to the
-        previous email (<code>deep</code> threading per <em>git format-patch</em>
-        wording) or to the first email (<code>shallow</code> threading) is
+        previous email (<tt>deep</tt> threading per <em>git format-patch</em>
+        wording) or to the first email (<tt>shallow</tt> threading) is
         governed by "--[no-]chain-reply-to".
 </p>
 <div class="paragraph"><p>If disabled with "--no-thread", those headers will not be added
@@ -1371,19 +1375,19 @@ sendemail.confirm
 edit ~/.gitconfig to specify your account settings:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>[sendemail]
+<pre><tt>[sendemail]
         smtpencryption = tls
         smtpserver = smtp.gmail.com
         smtpuser = yourname@gmail.com
-        smtpserverport = 587</code></pre>
+        smtpserverport = 587</tt></pre>
 </div></div>
 <div class="paragraph"><p>Once your commits are ready to be sent to the mailing list, run the
 following commands:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git format-patch --cover-letter -M origin/master -o outgoing/
+<pre><tt>$ git format-patch --cover-letter -M origin/master -o outgoing/
 $ edit outgoing/0000-*
-$ git send-email outgoing/*</code></pre>
+$ git send-email outgoing/*</tt></pre>
 </div></div>
 <div class="paragraph"><p>Note: the following perl modules are required
       Net::SMTP::SSL, MIME::Base64 and Authen::SASL</p></div>

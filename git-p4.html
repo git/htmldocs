@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-p4(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -778,7 +782,7 @@ Clone a repository:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 clone //depot/path/project</code></pre>
+<pre><tt>$ git p4 clone //depot/path/project</tt></pre>
 </div></div>
 </li>
 <li>
@@ -787,9 +791,9 @@ Do some work in the newly created Git repository:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ cd project
+<pre><tt>$ cd project
 $ vi foo.h
-$ git commit -a -m "edited foo.h"</code></pre>
+$ git commit -a -m "edited foo.h"</tt></pre>
 </div></div>
 </li>
 <li>
@@ -799,7 +803,7 @@ Update the Git repository with recent changes from p4, rebasing your
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 rebase</code></pre>
+<pre><tt>$ git p4 rebase</tt></pre>
 </div></div>
 </li>
 <li>
@@ -808,7 +812,7 @@ Submit your commits back to p4:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 submit</code></pre>
+<pre><tt>$ git p4 submit</tt></pre>
 </div></div>
 </li>
 </ul></div>
@@ -823,7 +827,7 @@ Submit your commits back to p4:
 from an existing p4 repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 clone //depot/path/project</code></pre>
+<pre><tt>$ git p4 clone //depot/path/project</tt></pre>
 </div></div>
 <div class="paragraph"><p>This:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -848,7 +852,7 @@ Creates a local branch, <em>master</em> from this remote and checks it out.
 the depot path:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 clone //depot/path/project@all</code></pre>
+<pre><tt>$ git p4 clone //depot/path/project@all</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -857,17 +861,17 @@ the depot path:</p></div>
 be included in the Git repository using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 sync</code></pre>
+<pre><tt>$ git p4 sync</tt></pre>
 </div></div>
 <div class="paragraph"><p>This command finds new changes in p4 and imports them as Git commits.</p></div>
 <div class="paragraph"><p>P4 repositories can be added to an existing Git repository using
 <em>git p4 sync</em> too:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ mkdir repo-git
+<pre><tt>$ mkdir repo-git
 $ cd repo-git
 $ git init
-$ git p4 sync //path/in/your/perforce/depot</code></pre>
+$ git p4 sync //path/in/your/perforce/depot</tt></pre>
 </div></div>
 <div class="paragraph"><p>This imports the specified depot into
 <em>refs/remotes/p4/master</em> in an existing Git repository.  The
@@ -891,7 +895,7 @@ sense.  This command does <em>git p4 sync</em> followed by <em>git rebase</em> t
 local commits on top of updated p4 changes.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 rebase</code></pre>
+<pre><tt>$ git p4 rebase</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -905,12 +909,12 @@ will be created and populated if it does not already exist.</p></div>
 the <em>p4/master</em> branch, use:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 submit</code></pre>
+<pre><tt>$ git p4 submit</tt></pre>
 </div></div>
 <div class="paragraph"><p>To specify a branch other than the current one, use:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git p4 submit topicbranch</code></pre>
+<pre><tt>$ git p4 submit topicbranch</tt></pre>
 </div></div>
 <div class="paragraph"><p>The upstream reference is generally <em>refs/remotes/p4/master</em>, but can
 be overridden using the <em>--origin=</em> command-line option.</p></div>
@@ -968,8 +972,8 @@ behavior can be modified using the --import-local option.</p></div>
 Git repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    $ git init
-    $ git p4 sync --branch=refs/remotes/p4/proj2 //depot/proj2</code></pre>
+<pre><tt>    $ git init
+    $ git p4 sync --branch=refs/remotes/p4/proj2 //depot/proj2</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -1295,18 +1299,18 @@ subdirectories in p4, and to generate these as branches in Git.</p></div>
 <div class="paragraph"><p>For example, if the P4 repository structure is:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>//depot/main/...
-//depot/branch1/...</code></pre>
+<pre><tt>//depot/main/...
+//depot/branch1/...</tt></pre>
 </div></div>
 <div class="paragraph"><p>And "p4 branch -o branch1" shows a View line that looks like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>//depot/main/... //depot/branch1/...</code></pre>
+<pre><tt>//depot/main/... //depot/branch1/...</tt></pre>
 </div></div>
 <div class="paragraph"><p>Then this <em>git p4 clone</em> command:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git p4 clone --detect-branches //depot@all</code></pre>
+<pre><tt>git p4 clone --detect-branches //depot@all</tt></pre>
 </div></div>
 <div class="paragraph"><p>produces a separate branch in <em>refs/remotes/p4/</em> for //depot/main,
 called <em>master</em>, and one for //depot/branch1 called <em>depot/branch1</em>.</p></div>
@@ -1321,10 +1325,10 @@ presence of the p4 branch.  Without p4 branches, the same result will
 occur with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git init depot
+<pre><tt>git init depot
 cd depot
 git config git-p4.branchList main:branch1
-git p4 clone --detect-branches //depot@all .</code></pre>
+git p4 clone --detect-branches //depot@all .</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1433,8 +1437,8 @@ git-p4.branchList
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>git config       git-p4.branchList main:branchA
-git config --add git-p4.branchList main:branchB</code></pre>
+<pre><tt>git config       git-p4.branchList main:branchA
+git config --add git-p4.branchList main:branchB</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">

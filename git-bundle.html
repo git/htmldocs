@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-bundle(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -827,7 +831,7 @@ unbundle &lt;file&gt;
         A list of arguments, acceptable to <em>git rev-parse</em> and
         <em>git rev-list</em> (and containing a named ref, see SPECIFYING REFERENCES
         below), that specifies the specific objects and references
-        to transport.  For example, <code>master~10..master</code> causes the
+        to transport.  For example, <tt>master~10..master</tt> causes the
         current master reference to be packaged along with all objects
         added since its 10th ancestor commit.  There is no explicit
         limit to the number of references and objects that may be
@@ -854,12 +858,12 @@ unbundle &lt;file&gt;
 <div class="sectionbody">
 <div class="paragraph"><p><em>git bundle</em> will only package references that are shown by
 <em>git show-ref</em>: this includes heads, tags, and remote heads.  References
-such as <code>master~1</code> cannot be packaged, but are perfectly suitable for
+such as <tt>master~1</tt> cannot be packaged, but are perfectly suitable for
 defining the basis.  More than one reference may be packaged, and more
 than one basis can be specified.  The objects packaged are those not
 contained in the union of the given bases.  Each basis can be
-specified explicitly (e.g. <code>^master~10</code>), or implicitly (e.g.
-<code>master~10..master</code>, <code>--since=10.days.ago master</code>).</p></div>
+specified explicitly (e.g. <tt>^master~10</tt>), or implicitly (e.g.
+<tt>master~10..master</tt>, <tt>--since=10.days.ago master</tt>).</p></div>
 <div class="paragraph"><p>It is very important that the basis used be held by the destination.
 It is okay to err on the side of caution, causing the bundle file
 to contain objects already in the destination, as these are ignored
@@ -880,25 +884,25 @@ processed, in order to make it easy to later update the other repository
 with an incremental bundle:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>machineA$ cd R1
+<pre><tt>machineA$ cd R1
 machineA$ git bundle create file.bundle master
-machineA$ git tag -f lastR2bundle master</code></pre>
+machineA$ git tag -f lastR2bundle master</tt></pre>
 </div></div>
 <div class="paragraph"><p>Then you transfer file.bundle to the target machine B. Because this
 bundle does not require any existing object to be extracted, you can
 create a new repository on machine B by cloning from it:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>machineB$ git clone -b master /home/me/tmp/file.bundle R2</code></pre>
+<pre><tt>machineB$ git clone -b master /home/me/tmp/file.bundle R2</tt></pre>
 </div></div>
 <div class="paragraph"><p>This will define a remote called "origin" in the resulting repository that
 lets you fetch and pull from the bundle. The $GIT_DIR/config file in R2 will
 have an entry like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>[remote "origin"]
+<pre><tt>[remote "origin"]
     url = /home/me/tmp/file.bundle
-    fetch = refs/heads/*:refs/remotes/origin/*</code></pre>
+    fetch = refs/heads/*:refs/remotes/origin/*</tt></pre>
 </div></div>
 <div class="paragraph"><p>To update the resulting mine.git repository, you can fetch or pull after
 replacing the bundle stored at /home/me/tmp/file.bundle with incremental
@@ -907,16 +911,16 @@ updates.</p></div>
 incremental bundle to update the other repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>machineA$ cd R1
+<pre><tt>machineA$ cd R1
 machineA$ git bundle create file.bundle lastR2bundle..master
-machineA$ git tag -f lastR2bundle master</code></pre>
+machineA$ git tag -f lastR2bundle master</tt></pre>
 </div></div>
 <div class="paragraph"><p>You then transfer the bundle to the other machine to replace
 /home/me/tmp/file.bundle, and pull from it.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>machineB$ cd R2
-machineB$ git pull</code></pre>
+<pre><tt>machineB$ cd R2
+machineB$ git pull</tt></pre>
 </div></div>
 <div class="paragraph"><p>If you know up to what commit the intended recipient repository should
 have the necessary objects, you can use that knowledge to specify the
@@ -927,23 +931,23 @@ the <a href="git-log.html">git-log(1)</a> command. Here are more examples:</p></
 <div class="paragraph"><p>You can use a tag that is present in both:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bundle create mybundle v1.0.0..master</code></pre>
+<pre><tt>$ git bundle create mybundle v1.0.0..master</tt></pre>
 </div></div>
 <div class="paragraph"><p>You can use a basis based on time:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bundle create mybundle --since=10.days master</code></pre>
+<pre><tt>$ git bundle create mybundle --since=10.days master</tt></pre>
 </div></div>
 <div class="paragraph"><p>You can use the number of commits:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bundle create mybundle -10 master</code></pre>
+<pre><tt>$ git bundle create mybundle -10 master</tt></pre>
 </div></div>
-<div class="paragraph"><p>You can run <code>git-bundle verify</code> to see if you can extract from a bundle
+<div class="paragraph"><p>You can run <tt>git-bundle verify</tt> to see if you can extract from a bundle
 that was created with a basis:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bundle verify mybundle</code></pre>
+<pre><tt>$ git bundle verify mybundle</tt></pre>
 </div></div>
 <div class="paragraph"><p>This will list what commits you must have in order to extract from the
 bundle and will error out if you do not have them.</p></div>
@@ -952,12 +956,12 @@ regular repository which it fetches or pulls from. You can, for example, map
 references when fetching:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git fetch mybundle master:localRef</code></pre>
+<pre><tt>$ git fetch mybundle master:localRef</tt></pre>
 </div></div>
 <div class="paragraph"><p>You can also see what references it offers:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git ls-remote mybundle</code></pre>
+<pre><tt>$ git ls-remote mybundle</tt></pre>
 </div></div>
 </div>
 </div>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-shell(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -747,8 +751,8 @@ git-shell(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>chsh</em> -s $(command -v git-shell) &lt;user&gt;
-<em>git clone</em> &lt;user&gt;<code>@localhost:/path/to/repo.git</code>
-<em>ssh</em> &lt;user&gt;<code>@localhost</code></pre>
+<em>git clone</em> &lt;user&gt;<tt>@localhost:/path/to/repo.git</tt>
+<em>ssh</em> &lt;user&gt;<tt>@localhost</tt></pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -759,7 +763,7 @@ git-shell(1) Manual Page
 <div class="paragraph"><p>This is a login shell for SSH accounts to provide restricted Git access.
 It permits execution only of server-side Git commands implementing the
 pull/push functionality, plus custom commands present in a subdirectory
-named <code>git-shell-commands</code> in the user&#8217;s home directory.</p></div>
+named <tt>git-shell-commands</tt> in the user&#8217;s home directory.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -792,9 +796,9 @@ named <code>git-shell-commands</code> in the user&#8217;s home directory.</p></d
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>If a <code>~/git-shell-commands</code> directory is present, <em>git shell</em> will
+<div class="paragraph"><p>If a <tt>~/git-shell-commands</tt> directory is present, <em>git shell</em> will
 also handle other, custom commands by running
-"<code>git-shell-commands/&lt;command&gt; &lt;arguments&gt;</code>" from the user&#8217;s home
+"<tt>git-shell-commands/&lt;command&gt; &lt;arguments&gt;</tt>" from the user&#8217;s home
 directory.</p></div>
 </div>
 </div>
@@ -803,18 +807,18 @@ directory.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>By default, the commands above can be executed only with the <em>-c</em>
 option; the shell is not interactive.</p></div>
-<div class="paragraph"><p>If a <code>~/git-shell-commands</code> directory is present, <em>git shell</em>
-can also be run interactively (with no arguments).  If a <code>help</code>
-command is present in the <code>git-shell-commands</code> directory, it is
+<div class="paragraph"><p>If a <tt>~/git-shell-commands</tt> directory is present, <em>git shell</em>
+can also be run interactively (with no arguments).  If a <tt>help</tt>
+command is present in the <tt>git-shell-commands</tt> directory, it is
 run to provide the user with an overview of allowed actions.  Then a
 "git&gt; " prompt is presented at which one can enter any of the
-commands from the <code>git-shell-commands</code> directory, or <code>exit</code> to close
+commands from the <tt>git-shell-commands</tt> directory, or <tt>exit</tt> to close
 the connection.</p></div>
 <div class="paragraph"><p>Generally this mode is used as an administrative interface to allow
 users to list repositories they have access to, create, delete, or
 rename repositories, or change repository descriptions and
 permissions.</p></div>
-<div class="paragraph"><p>If a <code>no-interactive-login</code> command exists, then it is run and the
+<div class="paragraph"><p>If a <tt>no-interactive-login</tt> command exists, then it is run and the
 interactive shell is aborted.</p></div>
 </div>
 </div>
@@ -825,7 +829,7 @@ interactive shell is aborted.</p></div>
 <div class="paragraph"><p>+</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ chsh -s /usr/bin/git-shell
+<pre><tt>$ chsh -s /usr/bin/git-shell
 $ mkdir $HOME/git-shell-commands
 $ cat &gt;$HOME/git-shell-commands/no-interactive-login &lt;&lt;\EOF
 #!/bin/sh
@@ -833,7 +837,7 @@ printf '%s\n' "Hi $USER! You've successfully authenticated, but I do not"
 printf '%s\n' "provide interactive shell access."
 exit 128
 EOF
-$ chmod +x $HOME/git-shell-commands/no-interactive-login</code></pre>
+$ chmod +x $HOME/git-shell-commands/no-interactive-login</tt></pre>
 </div></div>
 </div>
 </div>

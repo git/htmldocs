@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitrepository-layout(5)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -755,24 +759,24 @@ gitrepository-layout(5) Manual Page
 <div class="ulist"><ul>
 <li>
 <p>
-a <code>.git</code> directory at the root of the working tree;
+a <tt>.git</tt> directory at the root of the working tree;
 </p>
 </li>
 <li>
 <p>
-a <code>&lt;project&gt;.git</code> directory that is a <em>bare</em> repository
+a <tt>&lt;project&gt;.git</tt> directory that is a <em>bare</em> repository
    (i.e. without its own working tree), that is typically used for
    exchanging histories with others by pushing into it and fetching
    from it.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p><strong>Note</strong>: Also you can have a plain text file <code>.git</code> at the root of
-your working tree, containing <code>gitdir: &lt;path&gt;</code> to point at the real
+<div class="paragraph"><p><strong>Note</strong>: Also you can have a plain text file <tt>.git</tt> at the root of
+your working tree, containing <tt>gitdir: &lt;path&gt;</tt> to point at the real
 directory that has the repository.  This mechanism is often used for
 a working tree of a submodule checkout, to allow you in the
-containing superproject to <code>git checkout</code> a branch that does not
-have the submodule.  The <code>checkout</code> has to remove the entire
+containing superproject to <tt>git checkout</tt> a branch that does not
+have the submodule.  The <tt>checkout</tt> has to remove the entire
 submodule working tree, without losing the submodule repository.</p></div>
 <div class="paragraph"><p>These things may exist in a Git repository.</p></div>
 <div class="dlist"><dl>
@@ -795,12 +799,12 @@ by creating a shallow clone.  See <a href="git-clone.html">git-clone(1)</a>.
 </li>
 <li>
 <p>
-You could be using the <code>objects/info/alternates</code> or
-<code>$GIT_ALTERNATE_OBJECT_DIRECTORIES</code> mechanisms to <em>borrow</em>
+You could be using the <tt>objects/info/alternates</tt> or
+<tt>$GIT_ALTERNATE_OBJECT_DIRECTORIES</tt> mechanisms to <em>borrow</em>
 objects from other object stores.  A repository with this kind
 of incomplete object store is not suitable to be published for
 use with dumb transports but otherwise is OK as long as
-<code>objects/info/alternates</code> points at the object stores it
+<tt>objects/info/alternates</tt> points at the object stores it
 borrows from.
 </p>
 </li>
@@ -814,7 +818,7 @@ objects/[0-9a-f][0-9a-f]
         A newly created object is stored in its own file.
         The objects are splayed over 256 subdirectories using
         the first two characters of the sha1 object name to
-        keep the number of directory entries in <code>objects</code>
+        keep the number of directory entries in <tt>objects</tt>
         itself to a manageable number. Objects found
         here are often called <em>unpacked</em> (or <em>loose</em>) objects.
 </p>
@@ -845,7 +849,7 @@ objects/info/packs
 <p>
         This file is to help dumb transports discover what packs
         are available in this object store.  Whenever a pack is
-        added or removed, <code>git update-server-info</code> should be run
+        added or removed, <tt>git update-server-info</tt> should be run
         to keep this file up-to-date if the repository is
         published for dumb transports.  <em>git repack</em> does this
         by default.
@@ -889,15 +893,15 @@ refs
 </p>
 </dd>
 <dt class="hdlist1">
-refs/heads/<code>name</code>
+refs/heads/<tt>name</tt>
 </dt>
 <dd>
 <p>
-        records tip-of-the-tree commit objects of branch <code>name</code>
+        records tip-of-the-tree commit objects of branch <tt>name</tt>
 </p>
 </dd>
 <dt class="hdlist1">
-refs/tags/<code>name</code>
+refs/tags/<tt>name</tt>
 </dt>
 <dd>
 <p>
@@ -906,7 +910,7 @@ refs/tags/<code>name</code>
 </p>
 </dd>
 <dt class="hdlist1">
-refs/remotes/<code>name</code>
+refs/remotes/<tt>name</tt>
 </dt>
 <dd>
 <p>
@@ -915,11 +919,11 @@ refs/remotes/<code>name</code>
 </p>
 </dd>
 <dt class="hdlist1">
-refs/replace/<code>&lt;obj-sha1&gt;</code>
+refs/replace/<tt>&lt;obj-sha1&gt;</tt>
 </dt>
 <dd>
 <p>
-        records the SHA-1 of the object that replaces <code>&lt;obj-sha1&gt;</code>.
+        records the SHA-1 of the object that replaces <tt>&lt;obj-sha1&gt;</tt>.
         This is similar to info/grafts and is internally used and
         maintained by <a href="git-replace.html">git-replace(1)</a>. Such refs can be exchanged
         between repositories while grafts are not.
@@ -940,7 +944,7 @@ HEAD
 </dt>
 <dd>
 <p>
-        A symref (see glossary) to the <code>refs/heads/</code> namespace
+        A symref (see glossary) to the <tt>refs/heads/</tt> namespace
         describing the currently active branch.  It does not mean
         much if the repository is not associated with any working tree
         (i.e. a <em>bare</em> repository), but a valid Git repository
@@ -963,7 +967,7 @@ branches
 <p>
         A slightly deprecated way to store shorthands to be used
         to specify a URL to <em>git fetch</em>, <em>git pull</em> and <em>git push</em>.
-        A file can be stored as <code>branches/&lt;name&gt;</code> and then
+        A file can be stored as <tt>branches/&lt;name&gt;</tt> and then
         <em>name</em> can be given to these commands in place of
         <em>repository</em> argument.  See the REMOTES section in
         <a href="git-fetch.html">git-fetch(1)</a> for details.  This mechanism is legacy
@@ -978,7 +982,7 @@ hooks
         Hooks are customization scripts used by various Git
         commands.  A handful of sample hooks are installed when
         <em>git init</em> is run, but all of them are disabled by
-        default.  To enable, the <code>.sample</code> suffix has to be
+        default.  To enable, the <tt>.sample</tt> suffix has to be
         removed from the filename by renaming.
         Read <a href="githooks.html">githooks(5)</a> for more details about
         each hook.
@@ -1012,7 +1016,7 @@ info/refs
         published for dumb transports, this file should be
         regenerated by <em>git update-server-info</em> every time a tag
         or branch is created or modified.  This is normally done
-        from the <code>hooks/update</code> hook, which is run by the
+        from the <tt>hooks/update</tt> hook, which is run by the
         <em>git-receive-pack</em> command when you <em>git push</em> into the
         repository.
 </p>
@@ -1036,7 +1040,7 @@ info/exclude
 <dd>
 <p>
         This file, by convention among Porcelains, stores the
-        exclude pattern list. <code>.gitignore</code> is the per-directory
+        exclude pattern list. <tt>.gitignore</tt> is the per-directory
         ignore file.  <em>git status</em>, <em>git add</em>, <em>git rm</em> and
         <em>git clean</em> look at it but the core Git commands do not look
         at it.  See also: <a href="gitignore.html">gitignore(5)</a>.
@@ -1074,19 +1078,19 @@ logs
 </p>
 </dd>
 <dt class="hdlist1">
-logs/refs/heads/<code>name</code>
+logs/refs/heads/<tt>name</tt>
 </dt>
 <dd>
 <p>
-        Records all changes made to the branch tip named <code>name</code>.
+        Records all changes made to the branch tip named <tt>name</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-logs/refs/tags/<code>name</code>
+logs/refs/tags/<tt>name</tt>
 </dt>
 <dd>
 <p>
-        Records all changes made to the tag named <code>name</code>.
+        Records all changes made to the tag named <tt>name</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1094,8 +1098,8 @@ shallow
 </dt>
 <dd>
 <p>
-        This is similar to <code>info/grafts</code> but is internally used
-        and maintained by shallow clone mechanism.  See <code>--depth</code>
+        This is similar to <tt>info/grafts</tt> but is internally used
+        and maintained by shallow clone mechanism.  See <tt>--depth</tt>
         option to <a href="git-clone.html">git-clone(1)</a> and <a href="git-fetch.html">git-fetch(1)</a>.
 </p>
 </dd>

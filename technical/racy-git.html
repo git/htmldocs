@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>Use of index and Racy Git problem</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -745,32 +749,32 @@ write out the next tree object to be committed.  The state is
 often does not, match the files in the working tree.</p></div>
 <div class="paragraph"><p>There are cases Git needs to examine the differences between the
 virtual working tree state in the index and the files in the
-working tree.  The most obvious case is when the user asks <code>git
-diff</code> (or its low level implementation, <code>git diff-files</code>) or
-<code>git-ls-files --modified</code>.  In addition, Git internally checks
+working tree.  The most obvious case is when the user asks <tt>git
+diff</tt> (or its low level implementation, <tt>git diff-files</tt>) or
+<tt>git-ls-files --modified</tt>.  In addition, Git internally checks
 if the files in the working tree are different from what are
 recorded in the index to avoid stomping on local changes in them
 during patch application, switching branches, and merging.</p></div>
 <div class="paragraph"><p>In order to speed up this comparison between the files in the
 working tree and the index entries, the index entries record the
-information obtained from the filesystem via <code>lstat(2)</code> system
+information obtained from the filesystem via <tt>lstat(2)</tt> system
 call when they were last updated.  When checking if they differ,
-Git first runs <code>lstat(2)</code> on the files and compares the result
+Git first runs <tt>lstat(2)</tt> on the files and compares the result
 with this information (this is what was originally done by the
-<code>ce_match_stat()</code> function, but the current code does it in
-<code>ce_match_stat_basic()</code> function).  If some of these "cached
+<tt>ce_match_stat()</tt> function, but the current code does it in
+<tt>ce_match_stat_basic()</tt> function).  If some of these "cached
 stat information" fields do not match, Git can tell that the
 files are modified without even looking at their contents.</p></div>
-<div class="paragraph"><p>Note: not all members in <code>struct stat</code> obtained via <code>lstat(2)</code>
-are used for this comparison.  For example, <code>st_atime</code> obviously
+<div class="paragraph"><p>Note: not all members in <tt>struct stat</tt> obtained via <tt>lstat(2)</tt>
+are used for this comparison.  For example, <tt>st_atime</tt> obviously
 is not useful.  Currently, Git compares the file type (regular
 files vs symbolic links) and executable bits (only for regular
-files) from <code>st_mode</code> member, <code>st_mtime</code> and <code>st_ctime</code>
-timestamps, <code>st_uid</code>, <code>st_gid</code>, <code>st_ino</code>, and <code>st_size</code> members.
-With a <code>USE_STDEV</code> compile-time option, <code>st_dev</code> is also
+files) from <tt>st_mode</tt> member, <tt>st_mtime</tt> and <tt>st_ctime</tt>
+timestamps, <tt>st_uid</tt>, <tt>st_gid</tt>, <tt>st_ino</tt>, and <tt>st_size</tt> members.
+With a <tt>USE_STDEV</tt> compile-time option, <tt>st_dev</tt> is also
 compared, but this is not enabled by default because this member
-is not stable on network filesystems.  With <code>USE_NSEC</code>
-compile-time option, <code>st_mtim.tv_nsec</code> and <code>st_ctim.tv_nsec</code>
+is not stable on network filesystems.  With <tt>USE_NSEC</tt>
+compile-time option, <tt>st_mtim.tv_nsec</tt> and <tt>st_ctim.tv_nsec</tt>
 members are also compared, but this is not enabled by default
 because in-core timestamps can have finer granularity than
 on-disk timestamps, resulting in meaningless changes when an
@@ -787,17 +791,17 @@ of git://git.kernel.org/pub/scm/linux/kernel/git/tglx/history.git
 cached stat information.  Consider this sequence:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>: modify 'foo'
+<pre><tt>: modify 'foo'
 $ git update-index 'foo'
-: modify 'foo' again, in-place, without changing its size</code></pre>
+: modify 'foo' again, in-place, without changing its size</tt></pre>
 </div></div>
-<div class="paragraph"><p>The first <code>update-index</code> computes the object name of the
-contents of file <code>foo</code> and updates the index entry for <code>foo</code>
-along with the <code>struct stat</code> information.  If the modification
-that follows it happens very fast so that the file&#8217;s <code>st_mtime</code>
+<div class="paragraph"><p>The first <tt>update-index</tt> computes the object name of the
+contents of file <tt>foo</tt> and updates the index entry for <tt>foo</tt>
+along with the <tt>struct stat</tt> information.  If the modification
+that follows it happens very fast so that the file&#8217;s <tt>st_mtime</tt>
 timestamp does not change, after this sequence, the cached stat
 information the index entry records still exactly match what you
-would see in the filesystem, even though the file <code>foo</code> is now
+would see in the filesystem, even though the file <tt>foo</tt> is now
 different.
 This way, Git can incorrectly think files in the working tree
 are unmodified even though they actually are.  This is called
@@ -809,9 +813,9 @@ are called "racily clean".</p></div>
 <li>
 <p>
 When the cached stat information says the file has not been
-  modified, and the <code>st_mtime</code> is the same as (or newer than)
-  the timestamp of the index file itself (which is the time <code>git
-  update-index foo</code> finished running in the above example), it
+  modified, and the <tt>st_mtime</tt> is the same as (or newer than)
+  the timestamp of the index file itself (which is the time <tt>git
+  update-index foo</tt> finished running in the above example), it
   also compares the contents with the object registered in the
   index entry to make sure they match.
 </p>
@@ -819,79 +823,79 @@ When the cached stat information says the file has not been
 <li>
 <p>
 When the index file is updated that contains racily clean
-  entries, cached <code>st_size</code> information is truncated to zero
+  entries, cached <tt>st_size</tt> information is truncated to zero
   before writing a new version of the index file.
 </p>
 </li>
 </ol></div>
 <div class="paragraph"><p>Because the index file itself is written after collecting all
-the stat information from updated paths, <code>st_mtime</code> timestamp of
+the stat information from updated paths, <tt>st_mtime</tt> timestamp of
 it is usually the same as or newer than any of the paths the
 index contains.  And no matter how quick the modification that
-follows <code>git update-index foo</code> finishes, the resulting
-<code>st_mtime</code> timestamp on <code>foo</code> cannot get a value earlier
+follows <tt>git update-index foo</tt> finishes, the resulting
+<tt>st_mtime</tt> timestamp on <tt>foo</tt> cannot get a value earlier
 than the index file.  Therefore, index entries that can be
 racily clean are limited to the ones that have the same
 timestamp as the index file itself.</p></div>
 <div class="paragraph"><p>The callers that want to check if an index entry matches the
 corresponding file in the working tree continue to call
-<code>ce_match_stat()</code>, but with this change, <code>ce_match_stat()</code> uses
-<code>ce_modified_check_fs()</code> to see if racily clean ones are
+<tt>ce_match_stat()</tt>, but with this change, <tt>ce_match_stat()</tt> uses
+<tt>ce_modified_check_fs()</tt> to see if racily clean ones are
 actually clean after comparing the cached stat information using
-<code>ce_match_stat_basic()</code>.</p></div>
+<tt>ce_match_stat_basic()</tt>.</p></div>
 <div class="paragraph"><p>The problem the latter solves is this sequence:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git update-index 'foo'
+<pre><tt>$ git update-index 'foo'
 : modify 'foo' in-place without changing its size
 : wait for enough time
-$ git update-index 'bar'</code></pre>
+$ git update-index 'bar'</tt></pre>
 </div></div>
 <div class="paragraph"><p>Without the latter, the timestamp of the index file gets a newer
-value, and falsely clean entry <code>foo</code> would not be caught by the
+value, and falsely clean entry <tt>foo</tt> would not be caught by the
 timestamp comparison check done with the former logic anymore.
-The latter makes sure that the cached stat information for <code>foo</code>
+The latter makes sure that the cached stat information for <tt>foo</tt>
 would never match with the file in the working tree, so later
-checks by <code>ce_match_stat_basic()</code> would report that the index entry
+checks by <tt>ce_match_stat_basic()</tt> would report that the index entry
 does not match the file and Git does not have to fall back on more
-expensive <code>ce_modified_check_fs()</code>.</p></div>
+expensive <tt>ce_modified_check_fs()</tt>.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_runtime_penalty">Runtime penalty</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The runtime penalty of falling back to <code>ce_modified_check_fs()</code>
-from <code>ce_match_stat()</code> can be very expensive when there are many
+<div class="paragraph"><p>The runtime penalty of falling back to <tt>ce_modified_check_fs()</tt>
+from <tt>ce_match_stat()</tt> can be very expensive when there are many
 racily clean entries.  An obvious way to artificially create
 this situation is to give the same timestamp to all the files in
-the working tree in a large project, run <code>git update-index</code> on
+the working tree in a large project, run <tt>git update-index</tt> on
 them, and give the same timestamp to the index file:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ date &gt;.datestamp
+<pre><tt>$ date &gt;.datestamp
 $ git ls-files | xargs touch -r .datestamp
 $ git ls-files | git update-index --stdin
-$ touch -r .datestamp .git/index</code></pre>
+$ touch -r .datestamp .git/index</tt></pre>
 </div></div>
 <div class="paragraph"><p>This will make all index entries racily clean.  The linux project, for
 example, there are over 20,000 files in the working tree.  On my
 Athlon 64 X2 3800+, after the above:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ /usr/bin/time git diff-files
+<pre><tt>$ /usr/bin/time git diff-files
 1.68user 0.54system 0:02.22elapsed 100%CPU (0avgtext+0avgdata 0maxresident)k
 0inputs+0outputs (0major+67111minor)pagefaults 0swaps
 $ git update-index MAINTAINERS
 $ /usr/bin/time git diff-files
 0.02user 0.12system 0:00.14elapsed 100%CPU (0avgtext+0avgdata 0maxresident)k
-0inputs+0outputs (0major+935minor)pagefaults 0swaps</code></pre>
+0inputs+0outputs (0major+935minor)pagefaults 0swaps</tt></pre>
 </div></div>
-<div class="paragraph"><p>Running <code>git update-index</code> in the middle checked the racily
-clean entries, and left the cached <code>st_mtime</code> for all the paths
+<div class="paragraph"><p>Running <tt>git update-index</tt> in the middle checked the racily
+clean entries, and left the cached <tt>st_mtime</tt> for all the paths
 intact because they were actually clean (so this step took about
-the same amount of time as the first <code>git diff-files</code>).  After
+the same amount of time as the first <tt>git diff-files</tt>).  After
 that, they are not racily clean anymore but are truly clean, so
-the second invocation of <code>git diff-files</code> fully took advantage
+the second invocation of <tt>git diff-files</tt> fully took advantage
 of the cached stat information.</p></div>
 </div>
 </div>
@@ -910,17 +914,17 @@ that can record recent timestamp for large number of paths are:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Initial <code>git add .</code> of a large project.
+Initial <tt>git add .</tt> of a large project.
 </p>
 </li>
 <li>
 <p>
-<code>git checkout</code> of a large project from an empty index into an
+<tt>git checkout</tt> of a large project from an empty index into an
   unpopulated working tree.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Note: switching branches with <code>git checkout</code> keeps the cached
+<div class="paragraph"><p>Note: switching branches with <tt>git checkout</tt> keeps the cached
 stat information of existing working tree files that are the
 same between the current branch and the new branch, which are
 all older than the resulting index file, and they will not

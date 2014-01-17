@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>directory listing API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -737,66 +741,66 @@ asciidoc.install();
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>The directory listing API is used to enumerate paths in the work tree,
-optionally taking <code>.git/info/exclude</code> and <code>.gitignore</code> files per
+optionally taking <tt>.git/info/exclude</tt> and <tt>.gitignore</tt> files per
 directory into account.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_data_structure">Data structure</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><code>struct dir_struct</code> structure is used to pass directory traversal
+<div class="paragraph"><p><tt>struct dir_struct</tt> structure is used to pass directory traversal
 options to the library and to record the paths discovered.  A single
-<code>struct dir_struct</code> is used regardless of whether or not the traversal
+<tt>struct dir_struct</tt> is used regardless of whether or not the traversal
 recursively descends into subdirectories.</p></div>
 <div class="paragraph"><p>The notable options are:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>exclude_per_dir</code>
+<tt>exclude_per_dir</tt>
 </dt>
 <dd>
 <p>
         The name of the file to be read in each directory for excluded
-        files (typically <code>.gitignore</code>).
+        files (typically <tt>.gitignore</tt>).
 </p>
 </dd>
 <dt class="hdlist1">
-<code>flags</code>
+<tt>flags</tt>
 </dt>
 <dd>
 <p>
-        A bit-field of options (the <code>*IGNORED*</code> flags are mutually exclusive):
+        A bit-field of options (the <tt>*IGNORED*</tt> flags are mutually exclusive):
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>DIR_SHOW_IGNORED</code>
+<tt>DIR_SHOW_IGNORED</tt>
 </dt>
 <dd>
 <p>
-        Return just ignored files in <code>entries[]</code>, not untracked files.
+        Return just ignored files in <tt>entries[]</tt>, not untracked files.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>DIR_SHOW_IGNORED_TOO</code>
+<tt>DIR_SHOW_IGNORED_TOO</tt>
 </dt>
 <dd>
 <p>
-        Similar to <code>DIR_SHOW_IGNORED</code>, but return ignored files in <code>ignored[]</code>
-        in addition to untracked files in <code>entries[]</code>.
+        Similar to <tt>DIR_SHOW_IGNORED</tt>, but return ignored files in <tt>ignored[]</tt>
+        in addition to untracked files in <tt>entries[]</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>DIR_COLLECT_IGNORED</code>
+<tt>DIR_COLLECT_IGNORED</tt>
 </dt>
 <dd>
 <p>
-        Special mode for git-add. Return ignored files in <code>ignored[]</code> and
-        untracked files in <code>entries[]</code>. Only returns ignored files that match
+        Special mode for git-add. Return ignored files in <tt>ignored[]</tt> and
+        untracked files in <tt>entries[]</tt>. Only returns ignored files that match
         pathspec exactly (no wildcards). Does not recurse into ignored
         directories.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>DIR_SHOW_OTHER_DIRECTORIES</code>
+<tt>DIR_SHOW_OTHER_DIRECTORIES</tt>
 </dt>
 <dd>
 <p>
@@ -804,7 +808,7 @@ recursively descends into subdirectories.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>DIR_HIDE_EMPTY_DIRECTORIES</code>
+<tt>DIR_HIDE_EMPTY_DIRECTORIES</tt>
 </dt>
 <dd>
 <p>
@@ -812,7 +816,7 @@ recursively descends into subdirectories.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>DIR_NO_GITLINKS</code>
+<tt>DIR_NO_GITLINKS</tt>
 </dt>
 <dd>
 <p>
@@ -826,45 +830,45 @@ recursively descends into subdirectories.</p></div>
 <div class="paragraph"><p>The result of the enumeration is left in these fields:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>entries[]</code>
+<tt>entries[]</tt>
 </dt>
 <dd>
 <p>
-        An array of <code>struct dir_entry</code>, each element of which describes
+        An array of <tt>struct dir_entry</tt>, each element of which describes
         a path.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>nr</code>
+<tt>nr</tt>
 </dt>
 <dd>
 <p>
-        The number of members in <code>entries[]</code> array.
+        The number of members in <tt>entries[]</tt> array.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>alloc</code>
+<tt>alloc</tt>
 </dt>
 <dd>
 <p>
-        Internal use; keeps track of allocation of <code>entries[]</code> array.
+        Internal use; keeps track of allocation of <tt>entries[]</tt> array.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>ignored[]</code>
+<tt>ignored[]</tt>
 </dt>
 <dd>
 <p>
-        An array of <code>struct dir_entry</code>, used for ignored paths with the
-        <code>DIR_SHOW_IGNORED_TOO</code> and <code>DIR_COLLECT_IGNORED</code> flags.
+        An array of <tt>struct dir_entry</tt>, used for ignored paths with the
+        <tt>DIR_SHOW_IGNORED_TOO</tt> and <tt>DIR_COLLECT_IGNORED</tt> flags.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>ignored_nr</code>
+<tt>ignored_nr</tt>
 </dt>
 <dd>
 <p>
-        The number of members in <code>ignored[]</code> array.
+        The number of members in <tt>ignored[]</tt> array.
 </p>
 </dd>
 </dl></div>
@@ -878,21 +882,21 @@ marked. If you to exclude files, make sure you have loaded index first.</p></div
 <div class="ulist"><ul>
 <li>
 <p>
-Prepare <code>struct dir_struct dir</code> and clear it with <code>memset(&amp;dir, 0,
-  sizeof(dir))</code>.
+Prepare <tt>struct dir_struct dir</tt> and clear it with <tt>memset(&amp;dir, 0,
+  sizeof(dir))</tt>.
 </p>
 </li>
 <li>
 <p>
-To add single exclude pattern, call <code>add_exclude_list()</code> and then
-  <code>add_exclude()</code>.
+To add single exclude pattern, call <tt>add_exclude_list()</tt> and then
+  <tt>add_exclude()</tt>.
 </p>
 </li>
 <li>
 <p>
-To add patterns from a file (e.g. <code>.git/info/exclude</code>), call
-  <code>add_excludes_from_file()</code> , and/or set <code>dir.exclude_per_dir</code>.  A
-  short-hand function <code>setup_standard_excludes()</code> can be used to set
+To add patterns from a file (e.g. <tt>.git/info/exclude</tt>), call
+  <tt>add_excludes_from_file()</tt> , and/or set <tt>dir.exclude_per_dir</tt>.  A
+  short-hand function <tt>setup_standard_excludes()</tt> can be used to set
   up the standard set of exclude settings.
 </p>
 </li>
@@ -903,17 +907,17 @@ Set options described in the Data Structure section above.
 </li>
 <li>
 <p>
-Call <code>read_directory()</code>.
+Call <tt>read_directory()</tt>.
 </p>
 </li>
 <li>
 <p>
-Use <code>dir.entries[]</code>.
+Use <tt>dir.entries[]</tt>.
 </p>
 </li>
 <li>
 <p>
-Call <code>clear_directory()</code> when none of the contained elements are no longer in use.
+Call <tt>clear_directory()</tt> when none of the contained elements are no longer in use.
 </p>
 </li>
 </ul></div>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>How to use the update hook</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -742,21 +746,21 @@ developer, so is hooks/update script.  Quoting from the relevant
 section of the documentation:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>Before each ref is updated, if $GIT_DIR/hooks/update file exists
-and executable, it is called with three parameters:</code></pre>
+<pre><tt>Before each ref is updated, if $GIT_DIR/hooks/update file exists
+and executable, it is called with three parameters:</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$GIT_DIR/hooks/update refname sha1-old sha1-new</code></pre>
+<pre><tt>$GIT_DIR/hooks/update refname sha1-old sha1-new</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The refname parameter is relative to $GIT_DIR; e.g. for the
+<pre><tt>The refname parameter is relative to $GIT_DIR; e.g. for the
 master head this is "refs/heads/master".  Two sha1 are the
 object names for the refname before and after the update.  Note
 that the hook is called before the refname is updated, so either
 sha1-old is 0{40} (meaning there is no such ref yet), or it
-should match what is recorded in refname.</code></pre>
+should match what is recorded in refname.</tt></pre>
 </div></div>
 <div class="paragraph"><p>So if your policy is (1) always require fast-forward push
 (i.e. never allow "git-push repo +branch:branch"), (2) you
@@ -767,7 +771,7 @@ like this as your hooks/update script.</p></div>
 since I posted the original outline]</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>#!/bin/bash
+<pre><tt>#!/bin/bash
 
 umask 002
 
@@ -901,19 +905,19 @@ then
   esac
 fi
 
-deny &gt;/dev/null "There are no more rules to check.  Denying access"</code></pre>
+deny &gt;/dev/null "There are no more rules to check.  Denying access"</tt></pre>
 </div></div>
 <div class="paragraph"><p>This uses two files, $GIT_DIR/info/allowed-users and
 allowed-groups, to describe which heads can be pushed into by
 whom.  The format of each file would look like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>refs/heads/master   junio
+<pre><tt>refs/heads/master   junio
 +refs/heads/pu      junio
 refs/heads/cogito$  pasky
 refs/heads/bw/.*    linus
 refs/heads/tmp/.*   .*
-refs/tags/v[0-9].*  junio</code></pre>
+refs/tags/v[0-9].*  junio</tt></pre>
 </div></div>
 <div class="paragraph"><p>With this, Linus can push or create "bw/penguin" or "bw/zebra"
 or "bw/panda" branches, Pasky can do only "cogito", and JC can
@@ -926,7 +930,7 @@ that JC can make non-fast-forward pushes on it.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-27 14:11:22 PST
+Last updated 2014-01-17 14:44:19 PST
 </div>
 </div>
 </body>

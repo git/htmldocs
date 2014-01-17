@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-fast-export(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -826,7 +830,7 @@ produced incorrect results if you gave these options.</p></div>
 <dd>
 <p>
         Dumps the internal marks table to &lt;file&gt; when complete.
-        Marks are written one per line as <code>:markid SHA-1</code>. Only marks
+        Marks are written one per line as <tt>:markid SHA-1</tt>. Only marks
         for revisions are dumped; marks for blobs are ignored.
         Backends can use this file to validate imports after they
         have been completed, or to save the marks table across
@@ -902,7 +906,7 @@ marks the same across runs.</p></div>
 <p>
         A list of arguments, acceptable to <em>git rev-parse</em> and
         <em>git rev-list</em>, that specifies the specific objects and references
-        to export.  For example, <code>master~10..master</code> causes the
+        to export.  For example, <tt>master~10..master</tt> causes the
         current master reference to be exported along with all objects
         added since its 10th ancestor commit.
 </p>
@@ -915,16 +919,16 @@ marks the same across runs.</p></div>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git fast-export --all | (cd /empty/repository &amp;&amp; git fast-import)</code></pre>
+<pre><tt>$ git fast-export --all | (cd /empty/repository &amp;&amp; git fast-import)</tt></pre>
 </div></div>
 <div class="paragraph"><p>This will export the whole repository and import it into the existing
 empty repository.  Except for reencoding commits that are not in
 UTF-8, it would be a one-to-one mirror.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git fast-export master~5..master |
+<pre><tt>$ git fast-export master~5..master |
         sed "s|refs/heads/master|refs/heads/other|" |
-        git fast-import</code></pre>
+        git fast-import</tt></pre>
 </div></div>
 <div class="paragraph"><p>This makes a new branch called <em>other</em> from <em>master~5..master</em>
 (i.e. if <em>master</em> has linear history, it will take the last 5 commits).</p></div>

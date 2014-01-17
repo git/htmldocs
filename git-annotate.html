@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-annotate(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -772,7 +776,7 @@ familiar command name for people coming from other SCM systems.</p></div>
 <dd>
 <p>
         Show blank SHA-1 for boundary commits.  This can also
-        be controlled via the <code>blame.blankboundary</code> config option.
+        be controlled via the <tt>blame.blankboundary</tt> config option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -781,7 +785,7 @@ familiar command name for people coming from other SCM systems.</p></div>
 <dd>
 <p>
         Do not treat root commits as boundaries.  This can also be
-        controlled via the <code>blame.showroot</code> config option.
+        controlled via the <tt>blame.showroot</tt> config option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -820,7 +824,7 @@ absolute line number (lines count from 1).</p></div>
 </p>
 <div class="paragraph"><p>This form will use the first line matching the given
 POSIX regex. If &lt;start&gt; is a regex, it will search from the end of
-the previous <code>-L</code> range, if any, otherwise from the start of file.
+the previous <tt>-L</tt> range, if any, otherwise from the start of file.
 If &lt;start&gt; is &#8220;^/regex/&#8221;, it will search from the start of file.
 If &lt;end&gt; is a regex, it will search
 starting at the line given by &lt;start&gt;.</p></div>
@@ -835,7 +839,7 @@ of lines before or after the line given by &lt;start&gt;.</p></div>
 </ul></div>
 <div class="paragraph"><p>If &#8220;:&lt;regex&gt;&#8221; is given in place of &lt;start&gt; and &lt;end&gt;, it denotes the range
 from the first funcname line that matches &lt;regex&gt;, up to the next
-funcname line. &#8220;:&lt;regex&gt;&#8221; searches from the end of the previous <code>-L</code> range,
+funcname line. &#8220;:&lt;regex&gt;&#8221; searches from the end of the previous <tt>-L</tt> range,
 if any, otherwise from the start of file.
 &#8220;^:&lt;regex&gt;&#8221; searches from the start of file.</p></div>
 </dd>
@@ -911,7 +915,7 @@ if any, otherwise from the start of file.
 <dd>
 <p>
         Specifies the encoding used to output author names
-        and commit summaries. Setting it to <code>none</code> makes blame
+        and commit summaries. Setting it to <tt>none</tt> makes blame
         output unconverted data. For more information see the
         discussion about encoding in the <a href="git-log.html">git-log(1)</a>
         manual page.
@@ -926,7 +930,7 @@ if any, otherwise from the start of file.
         changes starting backwards from the working tree copy.
         This flag makes the command pretend as if the working
         tree copy has the contents of the named file (specify
-        <code>-</code> to make the command read from the standard input).
+        <tt>-</tt> to make the command read from the standard input).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -967,7 +971,7 @@ commit. The default value is 20.</p></div>
 </dt>
 <dd>
 <p>
-        In addition to <code>-M</code>, detect lines moved or copied from other
+        In addition to <tt>-M</tt>, detect lines moved or copied from other
         files that were modified in the same commit.  This is
         useful when you reorganize your program and move code
         around across files.  When this option is given twice,
@@ -980,7 +984,7 @@ commit. The default value is 20.</p></div>
 alphanumeric characters that Git must detect as moving/copying
 between files for it to associate those lines with the parent
 commit. And the default value is 40. If there are more than one
-<code>-C</code> options given, the &lt;num&gt; argument of the last <code>-C</code> will
+<tt>-C</tt> options given, the &lt;num&gt; argument of the last <tt>-C</tt> will
 take effect.</p></div>
 </dd>
 <dt class="hdlist1">

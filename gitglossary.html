@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitglossary(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -768,12 +772,12 @@ gitglossary(7) Manual Page
 <dd>
 <p>
         A bare repository is normally an appropriately
-        named <a href="#def_directory">directory</a> with a <code>.git</code> suffix that does not
+        named <a href="#def_directory">directory</a> with a <tt>.git</tt> suffix that does not
         have a locally checked-out copy of any of the files under
         revision control. That is, all of the Git
         administrative and control files that would normally be present in the
-        hidden <code>.git</code> sub-directory are directly present in the
-        <code>repository.git</code> directory instead,
+        hidden <tt>.git</tt> sub-directory are directly present in the
+        <tt>repository.git</tt> directory instead,
         and no other files are present and checked out. Usually publishers of
         public repositories make bare repositories available.
 </p>
@@ -958,11 +962,11 @@ to point at the new commit.</p></div>
         "detached".
 </p>
 <div class="paragraph"><p>Note that commands that operate on the history of the current branch
-(e.g. <code>git commit</code> to build a new history on top of it) still work
+(e.g. <tt>git commit</tt> to build a new history on top of it) still work
 while the HEAD is detached. They update the HEAD to point at the tip
 of the updated history without affecting any branch.  Commands that
-update or inquire information <em>about</em> the current branch (e.g. <code>git
-branch --set-upstream-to</code> that sets what remote-tracking branch the
+update or inquire information <em>about</em> the current branch (e.g. <tt>git
+branch --set-upstream-to</tt> that sets what remote-tracking branch the
 current branch integrates with) obviously do not work, as there is no
 (real) current branch to ask about in this state.</p></div>
 </dd>
@@ -1043,7 +1047,7 @@ current branch integrates with) obviously do not work, as there is no
 </dt>
 <dd>
 <p>
-        A plain file <code>.git</code> at the root of a working tree that
+        A plain file <tt>.git</tt> at the root of a working tree that
         points at the directory that is the real repository.
 </p>
 </dd>
@@ -1056,7 +1060,7 @@ current branch integrates with) obviously do not work, as there is no
         together by recording fake ancestry information for commits. This way
         you can make Git pretend the set of <a href="#def_parent">parents</a> a <a href="#def_commit">commit</a> has
         is different from what was recorded when the commit was
-        created. Configured via the <code>.git/info/grafts</code> file.
+        created. Configured via the <tt>.git/info/grafts</tt> file.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1074,7 +1078,7 @@ current branch integrates with) obviously do not work, as there is no
 <p>
         A <a href="#def_ref">named reference</a> to the <a href="#def_commit">commit</a> at the tip of a
         <a href="#def_branch">branch</a>.  Heads are stored in a file in
-        <code>$GIT_DIR/refs/heads/</code> directory, except when using packed refs. (See
+        <tt>$GIT_DIR/refs/heads/</tt> directory, except when using packed refs. (See
         <a href="git-pack-refs.html">git-pack-refs(1)</a>.)
 </p>
 </dd>
@@ -1108,8 +1112,8 @@ current branch integrates with) obviously do not work, as there is no
         checking. Typically, the hooks allow for a command to be pre-verified
         and potentially aborted, and allow for a post-notification after the
         operation is done. The hook scripts are found in the
-        <code>$GIT_DIR/hooks/</code> directory, and are enabled by simply
-        removing the <code>.sample</code> suffix from the filename. In earlier versions
+        <tt>$GIT_DIR/hooks/</tt> directory, and are enabled by simply
+        removing the <tt>.sample</tt> suffix from the filename. In earlier versions
         of Git you had to make them executable.
 </p>
 </dd>
@@ -1190,7 +1194,7 @@ This commit is referred to as a "merge commit", or sometimes just a
 <p>
         Stores a set of "objects", and an individual <a href="#def_object">object</a> is
         identified by its <a href="#def_object_name">object name</a>. The objects usually
-        live in <code>$GIT_DIR/objects/</code>.
+        live in <tt>$GIT_DIR/objects/</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1240,7 +1244,7 @@ This commit is referred to as a "merge commit", or sometimes just a
         <em>origin</em> is used for that purpose. New upstream updates
         will be fetched into <a href="#def_remote_tracking_branch">remote-tracking branches</a> named
         origin/name-of-upstream-branch, which you can see using
-        <code>git branch -r</code>.
+        <tt>git branch -r</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1304,18 +1308,18 @@ the rest of the pathspec is a pattern for the remainder
 <div class="paragraph"><p>For example, Documentation/*.jpg will match all .jpg files
 in the Documentation subtree,
 including Documentation/chapter_1/figure_1.jpg.</p></div>
-<div class="paragraph"><p>A pathspec that begins with a colon <code>:</code> has special meaning.  In the
-short form, the leading colon <code>:</code> is followed by zero or more "magic
-signature" letters (which optionally is terminated by another colon <code>:</code>),
+<div class="paragraph"><p>A pathspec that begins with a colon <tt>:</tt> has special meaning.  In the
+short form, the leading colon <tt>:</tt> is followed by zero or more "magic
+signature" letters (which optionally is terminated by another colon <tt>:</tt>),
 and the remainder is the pattern to match against the path.
 The "magic signature" consists of ASCII symbols that are neither
 alphanumeric, glob, regex special charaters nor colon.
 The optional colon that terminates the "magic signature" can be
 omitted if the pattern begins with a character that does not belong to
 "magic signature" symbol set and is not a colon.</p></div>
-<div class="paragraph"><p>In the long form, the leading colon <code>:</code> is followed by a open
-parenthesis <code>(</code>, a comma-separated list of zero or more "magic words",
-and a close parentheses <code>)</code>, and the remainder is the pattern to match
+<div class="paragraph"><p>In the long form, the leading colon <tt>:</tt> is followed by a open
+parenthesis <tt>(</tt>, a comma-separated list of zero or more "magic words",
+and a close parentheses <tt>)</tt>, and the remainder is the pattern to match
 against the path.</p></div>
 <div class="paragraph"><p>A pathspec with only a colon means "there is no pathspec". This form
 should not be combined with other pathspec.</p></div>
@@ -1327,7 +1331,7 @@ top
 </dt>
 <dd>
 <p>
-        The magic word <code>top</code> (magic signature: <code>/</code>) makes the pattern
+        The magic word <tt>top</tt> (magic signature: <tt>/</tt>) makes the pattern
         match from the root of the working tree, even when you are
         running the command from inside a subdirectory.
 </p>
@@ -1337,7 +1341,7 @@ literal
 </dt>
 <dd>
 <p>
-        Wildcards in the pattern such as <code>*</code> or <code>?</code> are treated
+        Wildcards in the pattern such as <tt>*</tt> or <tt>?</tt> are treated
         as literal characters.
 </p>
 </dd>
@@ -1361,30 +1365,30 @@ glob
         "Documentation/git.html" but not "Documentation/ppc/ppc.html"
         or "tools/perf/Documentation/perf.html".
 </p>
-<div class="paragraph"><p>Two consecutive asterisks ("<code>**</code>") in patterns matched against
+<div class="paragraph"><p>Two consecutive asterisks ("<tt>**</tt>") in patterns matched against
 full pathname may have special meaning:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-A leading "<code>**</code>" followed by a slash means match in all
-   directories. For example, "<code>**/foo</code>" matches file or directory
-   "<code>foo</code>" anywhere, the same as pattern "<code>foo</code>". "<code>**/foo/bar</code>"
-   matches file or directory "<code>bar</code>" anywhere that is directly
-   under directory "<code>foo</code>".
+A leading "<tt>**</tt>" followed by a slash means match in all
+   directories. For example, "<tt>**/foo</tt>" matches file or directory
+   "<tt>foo</tt>" anywhere, the same as pattern "<tt>foo</tt>". "<tt>**/foo/bar</tt>"
+   matches file or directory "<tt>bar</tt>" anywhere that is directly
+   under directory "<tt>foo</tt>".
 </p>
 </li>
 <li>
 <p>
-A trailing "<code>/**</code>" matches everything inside. For example,
-   "<code>abc/**</code>" matches all files inside directory "abc", relative
-   to the location of the <code>.gitignore</code> file, with infinite depth.
+A trailing "<tt>/**</tt>" matches everything inside. For example,
+   "<tt>abc/**</tt>" matches all files inside directory "abc", relative
+   to the location of the <tt>.gitignore</tt> file, with infinite depth.
 </p>
 </li>
 <li>
 <p>
 A slash followed by two consecutive asterisks then a slash
-   matches zero or more directories. For example, "<code>a/**/b</code>"
-   matches "<code>a/b</code>", "<code>a/x/b</code>", "<code>a/x/y/b</code>" and so on.
+   matches zero or more directories. For example, "<tt>a/**/b</tt>"
+   matches "<tt>a/b</tt>", "<tt>a/x/b</tt>", "<tt>a/x/y/b</tt>" and so on.
 </p>
 </li>
 <li>
@@ -1401,7 +1405,7 @@ exclude
 <dd>
 <p>
         After a path matches any non-exclude pathspec, it will be run
-        through all exclude pathspec (magic signature: <code>!</code>). If it
+        through all exclude pathspec (magic signature: <tt>!</tt>). If it
         matches, the path is ignored.
 </p>
 </dd>
@@ -1425,7 +1429,7 @@ exclude
 <p>
         The term <a href="#def_pickaxe">pickaxe</a> refers to an option to the diffcore
         routines that help select changes that add or delete a given text
-        string. With the <code>--pickaxe-all</code> option, it can be used to view the full
+        string. With the <tt>--pickaxe-all</tt> option, it can be used to view the full
         <a href="#def_changeset">changeset</a> that introduced or removed, say, a
         particular line of text. See <a href="git-diff.html">git-diff(1)</a>.
 </p>
@@ -1505,7 +1509,7 @@ exclude
 </dt>
 <dd>
 <p>
-        A name that begins with <code>refs/</code> (e.g. <code>refs/heads/master</code>)
+        A name that begins with <tt>refs/</tt> (e.g. <tt>refs/heads/master</tt>)
         that points to an <a href="#def_object_name">object name</a> or another
         ref (the latter is called a <a href="#def_symref">symbolic ref</a>).
         For convenience, a ref can sometimes be abbreviated when used
@@ -1515,9 +1519,9 @@ exclude
 </p>
 <div class="paragraph"><p>The ref namespace is hierarchical.
 Different subhierarchies are used for different purposes (e.g. the
-<code>refs/heads/</code> hierarchy is used to represent local branches).</p></div>
-<div class="paragraph"><p>There are a few special-purpose refs that do not begin with <code>refs/</code>.
-The most notable example is <code>HEAD</code>.</p></div>
+<tt>refs/heads/</tt> hierarchy is used to represent local branches).</p></div>
+<div class="paragraph"><p>There are a few special-purpose refs that do not begin with <tt>refs/</tt>.
+The most notable example is <tt>HEAD</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
 <a id="def_reflog"></a>reflog
@@ -1621,7 +1625,7 @@ The most notable example is <code>HEAD</code>.</p></div>
         parents, even though they are recorded in the <a href="#def_commit_object">commit         object</a>). This is sometimes useful when you are interested only in the
         recent history of a project even though the real history recorded in the
         upstream is much larger. A shallow repository
-        is created by giving the <code>--depth</code> option to <a href="git-clone.html">git-clone(1)</a>, and
+        is created by giving the <tt>--depth</tt> option to <a href="git-clone.html">git-clone(1)</a>, and
         its history can be later deepened with <a href="git-fetch.html">git-fetch(1)</a>.
 </p>
 </dd>
@@ -1643,11 +1647,11 @@ The most notable example is <code>HEAD</code>.</p></div>
 </dt>
 <dd>
 <p>
-        A <a href="#def_ref">ref</a> under <code>refs/tags/</code> namespace that points to an
+        A <a href="#def_ref">ref</a> under <tt>refs/tags/</tt> namespace that points to an
         object of an arbitrary type (typically a tag points to either a
         <a href="#def_tag_object">tag</a> or a <a href="#def_commit_object">commit object</a>).
         In contrast to a <a href="#def_head">head</a>, a tag is not updated by
-        the <code>commit</code> command. A Git tag has nothing to do with a Lisp
+        the <tt>commit</tt> command. A Git tag has nothing to do with a Lisp
         tag (which would be called an <a href="#def_object_type">object type</a>
         in Git&#8217;s context). A tag is most typically used to mark a particular
         point in the commit ancestry <a href="#def_chain">chain</a>.

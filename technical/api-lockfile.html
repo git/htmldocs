@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>lockfile API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -741,9 +745,9 @@ asciidoc.install();
 <li>
 <p>
 Mutual exclusion.  When we write out a new index file, first
-  we create a new file <code>$GIT_DIR/index.lock</code>, write the new
+  we create a new file <tt>$GIT_DIR/index.lock</tt>, write the new
   contents into it, and rename it to the final destination
-  <code>$GIT_DIR/index</code>.  We try to create the <code>$GIT_DIR/index.lock</code>
+  <tt>$GIT_DIR/index</tt>.  We try to create the <tt>$GIT_DIR/index.lock</tt>
   file with O_EXCL so that we can notice and fail when somebody
   else is already trying to update the index file.
 </p>
@@ -751,11 +755,11 @@ Mutual exclusion.  When we write out a new index file, first
 <li>
 <p>
 Automatic cruft removal.  After we create the "lock" file, we
-  may decide to <code>die()</code>, and we would want to make sure that we
+  may decide to <tt>die()</tt>, and we would want to make sure that we
   remove the file that has not been committed to its final
   destination.  This is done by remembering the lockfiles we
   created in a linked list and cleaning them up from an
-  <code>atexit(3)</code> handler.  Outstanding lockfiles are also removed
+  <tt>atexit(3)</tt> handler.  Outstanding lockfiles are also removed
   when the program dies on a signal.
 </p>
 </li>
@@ -771,11 +775,11 @@ hold_lock_file_for_update
 </dt>
 <dd>
 <p>
-        Take a pointer to <code>struct lock_file</code>, the filename of
-        the final destination (e.g. <code>$GIT_DIR/index</code>) and a flag
-        <code>die_on_error</code>.  Attempt to create a lockfile for the
+        Take a pointer to <tt>struct lock_file</tt>, the filename of
+        the final destination (e.g. <tt>$GIT_DIR/index</tt>) and a flag
+        <tt>die_on_error</tt>.  Attempt to create a lockfile for the
         destination and return the file descriptor for writing
-        to the file.  If <code>die_on_error</code> flag is true, it dies if
+        to the file.  If <tt>die_on_error</tt> flag is true, it dies if
         a lock is already taken for the file; otherwise it
         returns a negative integer to the caller on failure.
 </p>
@@ -785,8 +789,8 @@ commit_lock_file
 </dt>
 <dd>
 <p>
-        Take a pointer to the <code>struct lock_file</code> initialized
-        with an earlier call to <code>hold_lock_file_for_update()</code>,
+        Take a pointer to the <tt>struct lock_file</tt> initialized
+        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
         close the file descriptor and rename the lockfile to its
         final destination.  Returns 0 upon success, a negative
         value on failure to close(2) or rename(2).
@@ -797,8 +801,8 @@ rollback_lock_file
 </dt>
 <dd>
 <p>
-        Take a pointer to the <code>struct lock_file</code> initialized
-        with an earlier call to <code>hold_lock_file_for_update()</code>,
+        Take a pointer to the <tt>struct lock_file</tt> initialized
+        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
         close the file descriptor and remove the lockfile.
 </p>
 </dd>
@@ -807,30 +811,30 @@ close_lock_file
 </dt>
 <dd>
 <p>
-        Take a pointer to the <code>struct lock_file</code> initialized
-        with an earlier call to <code>hold_lock_file_for_update()</code>,
+        Take a pointer to the <tt>struct lock_file</tt> initialized
+        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
         and close the file descriptor.  Returns 0 upon success,
         a negative value on failure to close(2).
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>Because the structure is used in an <code>atexit(3)</code> handler, its
+<div class="paragraph"><p>Because the structure is used in an <tt>atexit(3)</tt> handler, its
 storage has to stay throughout the life of the program.  It
 cannot be an auto variable allocated on the stack.</p></div>
-<div class="paragraph"><p>Call <code>commit_lock_file()</code> or <code>rollback_lock_file()</code> when you are
+<div class="paragraph"><p>Call <tt>commit_lock_file()</tt> or <tt>rollback_lock_file()</tt> when you are
 done writing to the file descriptor.  If you do not call either
-and simply <code>exit(3)</code> from the program, an <code>atexit(3)</code> handler
+and simply <tt>exit(3)</tt> from the program, an <tt>atexit(3)</tt> handler
 will close and remove the lockfile.</p></div>
 <div class="paragraph"><p>If you need to close the file descriptor you obtained from
-<code>hold_lock_file_for_update</code> function yourself, do so by calling
-<code>close_lock_file()</code>.  You should never call <code>close(2)</code> yourself!
-Otherwise the <code>struct
-lock_file</code> structure still remembers that the file descriptor
-needs to be closed, and a later call to <code>commit_lock_file()</code> or
-<code>rollback_lock_file()</code> will result in duplicate calls to
-<code>close(2)</code>.  Worse yet, if you <code>close(2)</code>, open another file
+<tt>hold_lock_file_for_update</tt> function yourself, do so by calling
+<tt>close_lock_file()</tt>.  You should never call <tt>close(2)</tt> yourself!
+Otherwise the <tt>struct
+lock_file</tt> structure still remembers that the file descriptor
+needs to be closed, and a later call to <tt>commit_lock_file()</tt> or
+<tt>rollback_lock_file()</tt> will result in duplicate calls to
+<tt>close(2)</tt>.  Worse yet, if you <tt>close(2)</tt>, open another file
 descriptor for completely different purpose, and then call
-<code>commit_lock_file()</code> or <code>rollback_lock_file()</code>, they may close
+<tt>commit_lock_file()</tt> or <tt>rollback_lock_file()</tt>, they may close
 that unrelated file descriptor.</p></div>
 </div>
 </div>

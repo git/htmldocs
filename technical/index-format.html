@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>Git index format</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -739,8 +743,8 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><code>All binary numbers are in network byte order. Version 2 is described
-here unless stated otherwise.</code></pre>
+<pre><tt>All binary numbers are in network byte order. Version 2 is described
+here unless stated otherwise.</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -749,17 +753,17 @@ A 12-byte header consisting of
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>4-byte signature:
-  The signature is { 'D', 'I', 'R', 'C' } (stands for "dircache")</code></pre>
+<pre><tt>4-byte signature:
+  The signature is { 'D', 'I', 'R', 'C' } (stands for "dircache")</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>4-byte version number:
-  The current supported versions are 2, 3 and 4.</code></pre>
+<pre><tt>4-byte version number:
+  The current supported versions are 2, 3 and 4.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit number of index entries.</code></pre>
+<pre><tt>32-bit number of index entries.</tt></pre>
 </div></div>
 </li>
 <li>
@@ -773,25 +777,25 @@ Extensions
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>Extensions are identified by signature. Optional extensions can
-be ignored if Git does not understand them.</code></pre>
+<pre><tt>Extensions are identified by signature. Optional extensions can
+be ignored if Git does not understand them.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>Git currently supports cached tree and resolve undo extensions.</code></pre>
+<pre><tt>Git currently supports cached tree and resolve undo extensions.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>4-byte extension signature. If the first byte is 'A'..'Z' the
-extension is optional and can be ignored.</code></pre>
+<pre><tt>4-byte extension signature. If the first byte is 'A'..'Z' the
+extension is optional and can be ignored.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit size of the extension</code></pre>
+<pre><tt>32-bit size of the extension</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>Extension data</code></pre>
+<pre><tt>Extension data</tt></pre>
 </div></div>
 </li>
 <li>
@@ -808,137 +812,137 @@ extension is optional and can be ignored.</code></pre>
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><code>Index entries are sorted in ascending order on the name field,
+<pre><tt>Index entries are sorted in ascending order on the name field,
 interpreted as a string of unsigned bytes (i.e. memcmp() order, no
 localization, no special casing of directory separator '/'). Entries
-with the same name are sorted by their stage field.</code></pre>
+with the same name are sorted by their stage field.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit ctime seconds, the last time a file's metadata changed
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit ctime seconds, the last time a file's metadata changed
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit ctime nanosecond fractions
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit ctime nanosecond fractions
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit mtime seconds, the last time a file's data changed
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit mtime seconds, the last time a file's data changed
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit mtime nanosecond fractions
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit mtime nanosecond fractions
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit dev
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit dev
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit ino
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit ino
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit mode, split into (high to low bits)</code></pre>
+<pre><tt>32-bit mode, split into (high to low bits)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>4-bit object type
+<pre><tt>4-bit object type
   valid values in binary are 1000 (regular file), 1010 (symbolic link)
-  and 1110 (gitlink)</code></pre>
+  and 1110 (gitlink)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>3-bit unused</code></pre>
+<pre><tt>3-bit unused</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>9-bit unix permission. Only 0755 and 0644 are valid for regular files.
-Symbolic links and gitlinks have value 0 in this field.</code></pre>
+<pre><tt>9-bit unix permission. Only 0755 and 0644 are valid for regular files.
+Symbolic links and gitlinks have value 0 in this field.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit uid
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit uid
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit gid
-  this is stat(2) data</code></pre>
+<pre><tt>32-bit gid
+  this is stat(2) data</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>32-bit file size
-  This is the on-disk size from stat(2), truncated to 32-bit.</code></pre>
+<pre><tt>32-bit file size
+  This is the on-disk size from stat(2), truncated to 32-bit.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>160-bit SHA-1 for the represented object</code></pre>
+<pre><tt>160-bit SHA-1 for the represented object</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>A 16-bit 'flags' field split into (high to low bits)</code></pre>
+<pre><tt>A 16-bit 'flags' field split into (high to low bits)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1-bit assume-valid flag</code></pre>
+<pre><tt>1-bit assume-valid flag</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1-bit extended flag (must be zero in version 2)</code></pre>
+<pre><tt>1-bit extended flag (must be zero in version 2)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>2-bit stage (during merge)</code></pre>
+<pre><tt>2-bit stage (during merge)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
-is stored in this field.</code></pre>
+<pre><tt>12-bit name length if the length is less than 0xFFF; otherwise 0xFFF
+is stored in this field.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>(Version 3 or later) A 16-bit field, only applicable if the
-"extended flag" above is 1, split into (high to low bits).</code></pre>
+<pre><tt>(Version 3 or later) A 16-bit field, only applicable if the
+"extended flag" above is 1, split into (high to low bits).</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1-bit reserved for future</code></pre>
+<pre><tt>1-bit reserved for future</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1-bit skip-worktree flag (used by sparse checkout)</code></pre>
+<pre><tt>1-bit skip-worktree flag (used by sparse checkout)</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1-bit intent-to-add flag (used by "git add -N")</code></pre>
+<pre><tt>1-bit intent-to-add flag (used by "git add -N")</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>13-bit unused, must be zero</code></pre>
+<pre><tt>13-bit unused, must be zero</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>Entry path name (variable length) relative to top level directory
+<pre><tt>Entry path name (variable length) relative to top level directory
   (without leading slash). '/' is used as path separator. The special
   path components ".", ".." and ".git" (without quotes) are disallowed.
-  Trailing slash is also disallowed.</code></pre>
+  Trailing slash is also disallowed.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The exact encoding is undefined, but the '.' and '/' characters
+<pre><tt>The exact encoding is undefined, but the '.' and '/' characters
 are encoded in 7-bit ASCII and the encoding cannot contain a NUL
-byte (iow, this is a UNIX pathname).</code></pre>
+byte (iow, this is a UNIX pathname).</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>(Version 4) In version 4, the entry path name is prefix-compressed
+<pre><tt>(Version 4) In version 4, the entry path name is prefix-compressed
   relative to the path name for the previous entry (the very first
   entry is encoded as if the path name for the previous entry is an
   empty string).  At the beginning of an entry, an integer N in the
@@ -946,17 +950,17 @@ byte (iow, this is a UNIX pathname).</code></pre>
   for OFS_DELTA pack entries; see pack-format.txt) is stored, followed
   by a NUL-terminated string S.  Removing N bytes from the end of the
   path name for the previous entry, and replacing it with the string S
-  yields the path name for this entry.</code></pre>
+  yields the path name for this entry.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1-8 nul bytes as necessary to pad the entry to a multiple of eight bytes
-while keeping the name NUL-terminated.</code></pre>
+<pre><tt>1-8 nul bytes as necessary to pad the entry to a multiple of eight bytes
+while keeping the name NUL-terminated.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>(Version 4) In version 4, the padding after the pathname does not
-exist.</code></pre>
+<pre><tt>(Version 4) In version 4, the padding after the pathname does not
+exist.</tt></pre>
 </div></div>
 </div>
 </div>
@@ -967,23 +971,23 @@ exist.</code></pre>
 <h3 id="_cached_tree">Cached tree</h3>
 <div class="literalblock">
 <div class="content">
-<pre><code>Cached tree extension contains pre-computed hashes for trees that can
+<pre><tt>Cached tree extension contains pre-computed hashes for trees that can
 be derived from the index. It helps speed up tree object generation
-from index for a new commit.</code></pre>
+from index for a new commit.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>When a path is updated in index, the path must be invalidated and
-removed from tree cache.</code></pre>
+<pre><tt>When a path is updated in index, the path must be invalidated and
+removed from tree cache.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The signature for this extension is { 'T', 'R', 'E', 'E' }.</code></pre>
+<pre><tt>The signature for this extension is { 'T', 'R', 'E', 'E' }.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>A series of entries fill the entire extension; each of which
-consists of:</code></pre>
+<pre><tt>A series of entries fill the entire extension; each of which
+consists of:</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -1020,18 +1024,18 @@ A newline (ASCII 10); and
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>An entry can be in an invalidated state and is represented by having
+<pre><tt>An entry can be in an invalidated state and is represented by having
 a negative number in the entry_count field. In this case, there is no
 object name and the next entry starts immediately after the newline.
-When writing an invalid entry, -1 should always be used as entry_count.</code></pre>
+When writing an invalid entry, -1 should always be used as entry_count.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The entries are written out in the top-down, depth-first order.  The
+<pre><tt>The entries are written out in the top-down, depth-first order.  The
 first entry represents the root level of the repository, followed by the
 first subtree---let's call this A---of the root level (with its name
 relative to the root level), followed by the first subtree of A (with
-its name relative to A), ...</code></pre>
+its name relative to A), ...</tt></pre>
 </div></div>
 </li>
 </ul></div>
@@ -1040,26 +1044,26 @@ its name relative to A), ...</code></pre>
 <h3 id="_resolve_undo">Resolve undo</h3>
 <div class="literalblock">
 <div class="content">
-<pre><code>A conflict is represented in the index as a set of higher stage entries.
+<pre><tt>A conflict is represented in the index as a set of higher stage entries.
 When a conflict is resolved (e.g. with "git add path"), these higher
 stage entries will be removed and a stage-0 entry with proper resolution
-is added.</code></pre>
+is added.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>When these higher stage entries are removed, they are saved in the
+<pre><tt>When these higher stage entries are removed, they are saved in the
 resolve undo extension, so that conflicts can be recreated (e.g. with
 "git checkout -m"), in case users want to redo a conflict resolution
-from scratch.</code></pre>
+from scratch.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>The signature for this extension is { 'R', 'E', 'U', 'C' }.</code></pre>
+<pre><tt>The signature for this extension is { 'R', 'E', 'U', 'C' }.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>A series of entries fill the entire extension; each of which
-consists of:</code></pre>
+<pre><tt>A series of entries fill the entire extension; each of which
+consists of:</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>

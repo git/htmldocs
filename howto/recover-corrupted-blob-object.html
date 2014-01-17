@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>How to recover a corrupted blob object</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -738,10 +742,10 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre><code>On Fri, 9 Nov 2007, Yossi Leybovich wrote:
+<pre><tt>On Fri, 9 Nov 2007, Yossi Leybovich wrote:
 &gt;
 &gt; Did not help still the repository look for this object?
-&gt; Any one know how can I track this object and understand which file is it</code></pre>
+&gt; Any one know how can I track this object and understand which file is it</tt></pre>
 </div></div>
 <div class="paragraph"><p>So exactly <strong>because</strong> the SHA-1 hash is cryptographically secure, the hash
 itself doesn&#8217;t actually tell you anything, in order to fix a corrupt
@@ -763,19 +767,19 @@ interesting for the future, in the hope that you can re-create a
 non-corrupt version.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>So:
+<pre><tt>So:
 
-&gt; ib]$ mv .git/objects/4b/9458b3786228369c63936db65827de3cc06200 ../</code></pre>
+&gt; ib]$ mv .git/objects/4b/9458b3786228369c63936db65827de3cc06200 ../</tt></pre>
 </div></div>
 <div class="paragraph"><p>This is the right thing to do, although it&#8217;s usually best to save it under
 it&#8217;s full SHA-1 name (you just dropped the "4b" from the result ;).</p></div>
 <div class="paragraph"><p>Let&#8217;s see what that tells us:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>&gt; ib]$ git-fsck --full
+<pre><tt>&gt; ib]$ git-fsck --full
 &gt; broken link from    tree 2d9263c6d23595e7cb2a21e5ebbb53655278dff8
 &gt;              to    blob 4b9458b3786228369c63936db65827de3cc06200
-&gt; missing blob 4b9458b3786228369c63936db65827de3cc06200</code></pre>
+&gt; missing blob 4b9458b3786228369c63936db65827de3cc06200</tt></pre>
 </div></div>
 <div class="paragraph"><p>Ok, I removed the "dangling commit" messages, because they are just
 messages about the fact that you probably have rebased etc, so they&#8217;re not
@@ -784,24 +788,24 @@ we now know which tree points to it!</p></div>
 <div class="paragraph"><p>Now you can do</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git ls-tree 2d9263c6d23595e7cb2a21e5ebbb53655278dff8</code></pre>
+<pre><tt>git ls-tree 2d9263c6d23595e7cb2a21e5ebbb53655278dff8</tt></pre>
 </div></div>
 <div class="paragraph"><p>which will show something like</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>100644 blob 8d14531846b95bfa3564b58ccfb7913a034323b8    .gitignore
+<pre><tt>100644 blob 8d14531846b95bfa3564b58ccfb7913a034323b8    .gitignore
 100644 blob ebf9bf84da0aab5ed944264a5db2a65fe3a3e883    .mailmap
 100644 blob ca442d313d86dc67e0a2e5d584b465bd382cbf5c    COPYING
 100644 blob ee909f2cc49e54f0799a4739d24c4cb9151ae453    CREDITS
 040000 tree 0f5f709c17ad89e72bdbbef6ea221c69807009f6    Documentation
 100644 blob 1570d248ad9237e4fa6e4d079336b9da62d9ba32    Kbuild
 100644 blob 1c7c229a092665b11cd46a25dbd40feeb31661d9    MAINTAINERS
-...</code></pre>
+...</tt></pre>
 </div></div>
 <div class="paragraph"><p>and you should now have a line that looks like</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>10064 blob 4b9458b3786228369c63936db65827de3cc06200     my-magic-file</code></pre>
+<pre><tt>10064 blob 4b9458b3786228369c63936db65827de3cc06200     my-magic-file</tt></pre>
 </div></div>
 <div class="paragraph"><p>in the output. This already tells you a <strong>lot</strong> it tells you what file the
 corrupt blob came from!</p></div>
@@ -811,7 +815,7 @@ lucky, and it may be the version that you already have checked out in your
 working tree, in which case fixing this problem is really simple, just do</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git hash-object -w my-magic-file</code></pre>
+<pre><tt>git hash-object -w my-magic-file</tt></pre>
 </div></div>
 <div class="paragraph"><p>again, and if it outputs the missing SHA-1 (4b945..) you&#8217;re now all done!</p></div>
 <div class="paragraph"><p>But that&#8217;s the really lucky case, so let&#8217;s assume that it was some older
@@ -819,7 +823,7 @@ version that was broken. How do you tell which version it was?</p></div>
 <div class="paragraph"><p>The easiest way to do it is to do</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git log --raw --all --full-history -- subdirectory/my-magic-file</code></pre>
+<pre><tt>git log --raw --all --full-history -- subdirectory/my-magic-file</tt></pre>
 </div></div>
 <div class="paragraph"><p>and that will show you the whole log for that file (please realize that
 the tree you had may not be the top-level tree, so you need to figure out
@@ -827,22 +831,22 @@ which subdirectory it was in on your own), and because you&#8217;re asking for
 raw output, you&#8217;ll now get something like</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>commit abc
+<pre><tt>commit abc
 Author:
 Date:
   ..
-:100644 100644 4b9458b... newsha... M  somedirectory/my-magic-file</code></pre>
+:100644 100644 4b9458b... newsha... M  somedirectory/my-magic-file</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>commit xyz
+<pre><tt>commit xyz
 Author:
-Date:</code></pre>
+Date:</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>  ..
-:100644 100644 oldsha... 4b9458b... M   somedirectory/my-magic-file</code></pre>
+<pre><tt>  ..
+:100644 100644 oldsha... 4b9458b... M   somedirectory/my-magic-file</tt></pre>
 </div></div>
 <div class="paragraph"><p>and this actually tells you what the <strong>previous</strong> and <strong>subsequent</strong> versions
 of that file were! So now you can look at those ("oldsha" and "newsha"
@@ -852,13 +856,13 @@ newer versions!</p></div>
 <div class="paragraph"><p>If you can do that, you can now recreate the missing object with</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git hash-object -w &lt;recreated-file&gt;</code></pre>
+<pre><tt>git hash-object -w &lt;recreated-file&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>and your repository is good again!</p></div>
 <div class="paragraph"><p>(Btw, you could have ignored the fsck, and started with doing a</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git log --raw --all</code></pre>
+<pre><tt>git log --raw --all</tt></pre>
 </div></div>
 <div class="paragraph"><p>and just looked for the sha of the missing object (4b9458b..) in that
 whole thing. It&#8217;s up to you - Git does <strong>have</strong> a lot of information, it is
@@ -868,7 +872,7 @@ were lucky that it&#8217;s a blob. It&#8217;s quite possible that you can recrea
 thing.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>Linus</code></pre>
+<pre><tt>Linus</tt></pre>
 </div></div>
 </div>
 </div>
@@ -876,7 +880,7 @@ thing.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-27 14:11:26 PST
+Last updated 2014-01-17 14:44:20 PST
 </div>
 </div>
 </body>

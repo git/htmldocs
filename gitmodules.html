@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitmodules(5)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -751,7 +755,7 @@ gitmodules(5) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <code>.gitmodules</code> file, located in the top-level directory of a Git
+<div class="paragraph"><p>The <tt>.gitmodules</tt> file, located in the top-level directory of a Git
 working tree, is a text file with a syntax matching the requirements
 of <a href="git-config.html">git-config(1)</a>.</p></div>
 <div class="paragraph"><p>The file contains one subsection per submodule, and the subsection value
@@ -767,7 +771,7 @@ submodule.&lt;name&gt;.path
 <p>
         Defines the path, relative to the top-level directory of the Git
         working tree, where the submodule is expected to be checked out.
-        The path name must not end with a <code>/</code>. All submodule paths must
+        The path name must not end with a <tt>/</tt>. All submodule paths must
         be unique within the .gitmodules file.
 </p>
 </dd>
@@ -797,13 +801,13 @@ submodule.&lt;name&gt;.update
         the commit specified in the superproject. If <em>merge</em>, the commit
         specified in the superproject will be merged into the current branch
         in the submodule.
-        If <em>none</em>, the submodule with name <code>$name</code> will not be updated
+        If <em>none</em>, the submodule with name <tt>$name</tt> will not be updated
         by default.
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>This config option is overridden if 'git submodule update' is given
-the '--merge', '--rebase' or '--checkout' options.</code></pre>
+<pre><tt>This config option is overridden if 'git submodule update' is given
+the '--merge', '--rebase' or '--checkout' options.</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -813,7 +817,7 @@ submodule.&lt;name&gt;.branch
 <p>
         A remote branch name for tracking updates in the upstream submodule.
         If the option is not specified, it defaults to <em>master</em>.  See the
-        <code>--remote</code> documentation in <a href="git-submodule.html">git-submodule(1)</a> for details.
+        <tt>--remote</tt> documentation in <a href="git-submodule.html">git-submodule(1)</a> for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -859,17 +863,17 @@ submodule.&lt;name&gt;.ignore
 <div class="paragraph"><p>Consider the following .gitmodules file:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>[submodule "libfoo"]
+<pre><tt>[submodule "libfoo"]
         path = include/foo
-        url = git://foo.com/git/lib.git</code></pre>
+        url = git://foo.com/git/lib.git</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>[submodule "libbar"]
+<pre><tt>[submodule "libbar"]
         path = include/bar
-        url = git://bar.com/git/lib.git</code></pre>
+        url = git://bar.com/git/lib.git</tt></pre>
 </div></div>
-<div class="paragraph"><p>This defines two submodules, <code>libfoo</code> and <code>libbar</code>. These are expected to
+<div class="paragraph"><p>This defines two submodules, <tt>libfoo</tt> and <tt>libbar</tt>. These are expected to
 be checked out in the paths <em>include/foo</em> and <em>include/bar</em>, and for both
 submodules a URL is specified which can be used for cloning the submodules.</p></div>
 </div>

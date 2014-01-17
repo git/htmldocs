@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>Git Protocol Capabilities</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -779,12 +783,12 @@ doesn&#8217;t and the server has commits in lower case that the client
 doesn&#8217;t, as in the following diagram:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   +---- u ---------------------- x
+<pre><tt>   +---- u ---------------------- x
   /              +----- y
  /              /
 a -- b -- c -- d -- E -- F
    \
-    +--- Q -- R -- S</code></pre>
+    +--- Q -- R -- S</tt></pre>
 </div></div>
 <div class="paragraph"><p>If the client wants x,y and starts out by saying have F,S, the server
 doesn&#8217;t know what F,S is.  Eventually the client says "have d" and
@@ -837,9 +841,9 @@ followed by a 1-byte stream code, followed by the actual data.</p></div>
 <div class="paragraph"><p>The stream code can be one of:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>1 - pack data
+<pre><tt>1 - pack data
 2 - progress messages
-3 - fatal error message just before stream aborts</code></pre>
+3 - fatal error message just before stream aborts</tt></pre>
 </div></div>
 <div class="paragraph"><p>The "side-band-64k" capability came about as a way for newer clients
 that can handle much larger packets to request packets that are
@@ -865,11 +869,11 @@ send/read OBJ_OFS_DELTA (aka type 6) in a packfile.</p></div>
 <div class="sect1">
 <h2 id="_agent">agent</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The server may optionally send a capability of the form <code>agent=X</code> to
-notify the client that the server is running version <code>X</code>. The client may
-optionally return its own agent string by responding with an <code>agent=Y</code>
+<div class="paragraph"><p>The server may optionally send a capability of the form <tt>agent=X</tt> to
+notify the client that the server is running version <tt>X</tt>. The client may
+optionally return its own agent string by responding with an <tt>agent=Y</tt>
 capability (but it MUST NOT do so if the server did not mention the
-agent capability). The <code>X</code> and <code>Y</code> strings may contain any printable
+agent capability). The <tt>X</tt> and <tt>Y</tt> strings may contain any printable
 ASCII characters except space (i.e., the byte range 32 &lt; x &lt; 127), and
 are typically of the form "package/version" (e.g., "git/1.8.3.1"). The
 agent strings are purely informative for statistics and debugging
@@ -949,7 +953,7 @@ capable of silencing human-readable progress output which otherwise may
 be shown when processing the received pack. A send-pack client should
 respond with the <em>quiet</em> capability to suppress server-side progress
 reporting if the local progress reporting is also being suppressed
-(e.g., via <code>push -q</code>, or if stderr does not go to a tty).</p></div>
+(e.g., via <tt>push -q</tt>, or if stderr does not go to a tty).</p></div>
 </div>
 </div>
 <div class="sect1">

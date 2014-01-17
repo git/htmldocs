@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitworkflows(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -755,7 +759,7 @@ gitworkflows(7) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This document attempts to write down and motivate some of the workflow
-elements used for <code>git.git</code> itself.  Many ideas apply in general,
+elements used for <tt>git.git</tt> itself.  Many ideas apply in general,
 though the full workflow is rarely required for smaller projects with
 fewer people involved.</p></div>
 <div class="paragraph"><p>We formulate a set of <em>rules</em> for quick reference, while the prose
@@ -777,8 +781,8 @@ useful for later inspection and analysis, for example with
 beginning. It is always easier to squash a few commits together than
 to split one big commit into several.  Don&#8217;t be afraid of making too
 small or imperfect steps along the way. You can always go back later
-and edit the commits with <code>git rebase --interactive</code> before you
-publish them.  You can use <code>git stash save --keep-index</code> to run the
+and edit the commits with <tt>git rebase --interactive</tt> before you
+publish them.  You can use <tt>git stash save --keep-index</tt> to run the
 test suite independent of other uncommitted changes; see the EXAMPLES
 section of <a href="git-stash.html">git-stash(1)</a>.</p></div>
 </div>
@@ -805,7 +809,7 @@ management.  The following subsections discuss the important points.</p></div>
 <h3 id="_graduation">Graduation</h3>
 <div class="paragraph"><p>As a given feature goes from experimental to stable, it also
 "graduates" between the corresponding branches of the software.
-<code>git.git</code> uses the following <em>integration branches</em>:</p></div>
+<tt>git.git</tt> uses the following <em>integration branches</em>:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -942,7 +946,7 @@ throw-away branch.  You must never base any work on such a branch!</p></div>
 <div class="paragraph"><p>If you make it (very) clear that this branch is going to be deleted
 right after the testing, you can even publish this branch, for example
 to give the testers a chance to work with it, or other developers a
-chance to see if their in-progress work will be compatible.  <code>git.git</code>
+chance to see if their in-progress work will be compatible.  <tt>git.git</tt>
 has such an official throw-away integration branch called <em>pu</em>.</p></div>
 </div>
 <div class="sect2">
@@ -960,7 +964,7 @@ will therefore not be included in your feature release.</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: Verify <em>master</em> is a superset of <em>maint</em></div>
 <div class="content">
-<div class="paragraph"><p><code>git log master..maint</code></p></div>
+<div class="paragraph"><p><tt>git log master..maint</tt></p></div>
 </div></div>
 <div class="paragraph"><p>This command should not list any commits.  Otherwise, check out
 <em>master</em> and merge <em>maint</em> into it.</p></div>
@@ -969,7 +973,7 @@ tag to the tip of <em>master</em> indicating the release version:</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: Release tagging</div>
 <div class="content">
-<div class="paragraph"><p><code>git tag -s -m "Git X.Y.Z" vX.Y.Z master</code></p></div>
+<div class="paragraph"><p><tt>git tag -s -m "Git X.Y.Z" vX.Y.Z master</tt></p></div>
 </div></div>
 <div class="paragraph"><p>You need to push the new tag to a public Git server (see
 "DISTRIBUTED WORKFLOWS" below). This makes the tag available to
@@ -992,7 +996,7 @@ where X.Y.Z is the current release).</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: Copy maint</div>
 <div class="content">
-<div class="paragraph"><p><code>git branch maint-X.Y.(Z-1) maint</code></p></div>
+<div class="paragraph"><p><tt>git branch maint-X.Y.(Z-1) maint</tt></p></div>
 </div></div>
 <div class="paragraph"><p>The <em>maint</em> branch should now be fast-forwarded to the newly released
 code so that maintenance fixes can be tracked for the current release:</p></div>
@@ -1002,12 +1006,12 @@ code so that maintenance fixes can be tracked for the current release:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>git checkout maint</code>
+<tt>git checkout maint</tt>
 </p>
 </li>
 <li>
 <p>
-<code>git merge --ff-only master</code>
+<tt>git merge --ff-only master</tt>
 </p>
 </li>
 </ul></div>
@@ -1028,22 +1032,22 @@ topics on <em>next</em>:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>git checkout next</code>
+<tt>git checkout next</tt>
 </p>
 </li>
 <li>
 <p>
-<code>git reset --hard master</code>
+<tt>git reset --hard master</tt>
 </p>
 </li>
 <li>
 <p>
-<code>git merge ai/topic_in_next1</code>
+<tt>git merge ai/topic_in_next1</tt>
 </p>
 </li>
 <li>
 <p>
-<code>git merge ai/topic_in_next2</code>
+<tt>git merge ai/topic_in_next2</tt>
 </p>
 </li>
 <li>
@@ -1078,7 +1082,7 @@ you will have to share your work.</p></div>
 <div class="paragraph"><p>Roughly speaking, there are two important workflows: merge and patch.
 The important difference is that the merge workflow can propagate full
 history, including merges, while patches cannot.  Both workflows can
-be used in parallel: in <code>git.git</code>, only subsystem maintainers use
+be used in parallel: in <tt>git.git</tt>, only subsystem maintainers use
 the merge workflow, while everyone else sends patches.</p></div>
 <div class="paragraph"><p>Note that the maintainer(s) may impose restrictions, such as
 "Signed-off-by" requirements, that all commits/patches submitted for
@@ -1115,7 +1119,7 @@ to merge the remote branch.</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: Push/pull: Publishing branches/topics</div>
 <div class="content">
-<div class="paragraph"><p><code>git push &lt;remote&gt; &lt;branch&gt;</code> and tell everyone where they can fetch
+<div class="paragraph"><p><tt>git push &lt;remote&gt; &lt;branch&gt;</tt> and tell everyone where they can fetch
 from.</p></div>
 </div></div>
 <div class="paragraph"><p>You will still have to tell people by other means, such as mail.  (Git
@@ -1126,7 +1130,7 @@ staying up to date is easy too:</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: Push/pull: Staying up to date</div>
 <div class="content">
-<div class="paragraph"><p>Use <code>git fetch &lt;remote&gt;</code> or <code>git remote update</code> to stay up to date.</p></div>
+<div class="paragraph"><p>Use <tt>git fetch &lt;remote&gt;</tt> or <tt>git remote update</tt> to stay up to date.</p></div>
 </div></div>
 <div class="paragraph"><p>Then simply fork your topic branches from the stable remotes as
 explained earlier.</p></div>
@@ -1135,15 +1139,15 @@ branches to the integration branches, they will typically send a
 request to do so by mail.  Such a request looks like</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Please pull from
-    &lt;url&gt; &lt;branch&gt;</code></pre>
+<pre><tt>Please pull from
+    &lt;url&gt; &lt;branch&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>In that case, <em>git pull</em> can do the fetch and merge in one go, as
 follows.</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: Push/pull: Merging remote topics</div>
 <div class="content">
-<div class="paragraph"><p><code>git pull &lt;url&gt; &lt;branch&gt;</code></p></div>
+<div class="paragraph"><p><tt>git pull &lt;url&gt; &lt;branch&gt;</tt></p></div>
 </div></div>
 <div class="paragraph"><p>Occasionally, the maintainer may get merge conflicts when he tries to
 pull changes from downstream.  In this case, he can ask downstream to
@@ -1164,13 +1168,13 @@ maintainer&#8217;s life easier).</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>git format-patch -M upstream..topic</code> to turn them into preformatted
+<tt>git format-patch -M upstream..topic</tt> to turn them into preformatted
   patch files
 </p>
 </li>
 <li>
 <p>
-<code>git send-email --to=&lt;recipient&gt; &lt;patches&gt;</code>
+<tt>git send-email --to=&lt;recipient&gt; &lt;patches&gt;</tt>
 </p>
 </li>
 </ul></div>
@@ -1183,7 +1187,7 @@ merge because you cannot format-patch merges):</p></div>
 <div class="exampleblock">
 <div class="title">Recipe: format-patch/am: Keeping topics up to date</div>
 <div class="content">
-<div class="paragraph"><p><code>git pull --rebase &lt;url&gt; &lt;branch&gt;</code></p></div>
+<div class="paragraph"><p><tt>git pull --rebase &lt;url&gt; &lt;branch&gt;</tt></p></div>
 </div></div>
 <div class="paragraph"><p>You can then fix the conflicts during the rebase.  Presumably you have
 not published your topic other than by mail, so rebasing it is not a
@@ -1194,10 +1198,10 @@ create a new topic branch and use <em>git am</em> to import the commits:</p></di
 <div class="exampleblock">
 <div class="title">Recipe: format-patch/am: Importing patches</div>
 <div class="content">
-<div class="paragraph"><p><code>git am &lt; patch</code></p></div>
+<div class="paragraph"><p><tt>git am &lt; patch</tt></p></div>
 </div></div>
 <div class="paragraph"><p>One feature worth pointing out is the three-way merge, which can help
-if you get conflicts: <code>git am -3</code> will use index information contained
+if you get conflicts: <tt>git am -3</tt> will use index information contained
 in patches to figure out the merge base.  See <a href="git-am.html">git-am(1)</a> for
 other options.</p></div>
 </div>

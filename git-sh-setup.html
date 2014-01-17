@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-sh-setup(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -758,14 +762,14 @@ git-sh-setup(1) Manual Page
 This documentation is meant for people who are studying the
 Porcelain-ish scripts and/or are writing new ones.</p></div>
 <div class="paragraph"><p>The <em>git sh-setup</em> scriptlet is designed to be sourced (using
-<code>.</code>) by other shell scripts to set up some variables pointing at
+<tt>.</tt>) by other shell scripts to set up some variables pointing at
 the normal Git directories and a few helper shell functions.</p></div>
 <div class="paragraph"><p>Before sourcing it, your script should set up a few variables;
-<code>USAGE</code> (and <code>LONG_USAGE</code>, if any) is used to define message
-given by <code>usage()</code> shell function.  <code>SUBDIRECTORY_OK</code> can be set
+<tt>USAGE</tt> (and <tt>LONG_USAGE</tt>, if any) is used to define message
+given by <tt>usage()</tt> shell function.  <tt>SUBDIRECTORY_OK</tt> can be set
 if the script can run from a subdirectory of the working tree
 (some commands do not).</p></div>
-<div class="paragraph"><p>The scriptlet sets <code>GIT_DIR</code> and <code>GIT_OBJECT_DIRECTORY</code> shell
+<div class="paragraph"><p>The scriptlet sets <tt>GIT_DIR</tt> and <tt>GIT_OBJECT_DIRECTORY</tt> shell
 variables, but does <strong>not</strong> export them to the environment.</p></div>
 </div>
 </div>
@@ -797,7 +801,7 @@ set_reflog_action
 <p>
         Set GIT_REFLOG_ACTION environment to a given string (typically
         the name of the program) unless it is already set.  Whenever
-        the script runs a <code>git</code> command that updates refs, a reflog
+        the script runs a <tt>git</tt> command that updates refs, a reflog
         entry is created using the value of this string to leave the
         record of what command updated the ref.
 </p>
@@ -817,7 +821,7 @@ is_bare_repository
 </dt>
 <dd>
 <p>
-        outputs <code>true</code> or <code>false</code> to the standard output stream
+        outputs <tt>true</tt> or <tt>false</tt> to the standard output stream
         to indicate if the repository is a bare repository
         (i.e. without an associated working tree).
 </p>
@@ -857,12 +861,12 @@ require_clean_work_tree &lt;action&gt; [&lt;hint&gt;]
 <p>
         checks that the working tree and index associated with the
         repository have no uncommitted changes to tracked files.
-        Otherwise it emits an error message of the form <code>Cannot
-        &lt;action&gt;: &lt;reason&gt;. &lt;hint&gt;</code>, and dies.  Example:
+        Otherwise it emits an error message of the form <tt>Cannot
+        &lt;action&gt;: &lt;reason&gt;. &lt;hint&gt;</tt>, and dies.  Example:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>require_clean_work_tree rebase "Please commit or stash them."</code></pre>
+<pre><tt>require_clean_work_tree rebase "Please commit or stash them."</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">

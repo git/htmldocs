@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>string-list API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -738,81 +742,81 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="paragraph"><p>The string_list API offers a data structure and functions to handle
 sorted and unsorted string lists.  A "sorted" list is one whose
-entries are sorted by string value in <code>strcmp()</code> order.</p></div>
+entries are sorted by string value in <tt>strcmp()</tt> order.</p></div>
 <div class="paragraph"><p>The <em>string_list</em> struct used to be called <em>path_list</em>, but was renamed
 because it is not specific to paths.</p></div>
 <div class="paragraph"><p>The caller:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Allocates and clears a <code>struct string_list</code> variable.
+Allocates and clears a <tt>struct string_list</tt> variable.
 </p>
 </li>
 <li>
 <p>
-Initializes the members. You might want to set the flag <code>strdup_strings</code>
+Initializes the members. You might want to set the flag <tt>strdup_strings</tt>
   if the strings should be strdup()ed. For example, this is necessary
   when you add something like git_path("&#8230;"), since that function returns
   a static buffer that will change with the next call to git_path().
 </p>
-<div class="paragraph"><p>If you need something advanced, you can manually malloc() the <code>items</code>
+<div class="paragraph"><p>If you need something advanced, you can manually malloc() the <tt>items</tt>
 member (you need this if you add things later) and you should set the
-<code>nr</code> and <code>alloc</code> members in that case, too.</p></div>
+<tt>nr</tt> and <tt>alloc</tt> members in that case, too.</p></div>
 </li>
 <li>
 <p>
-Adds new items to the list, using <code>string_list_append</code>,
-  <code>string_list_append_nodup</code>, <code>string_list_insert</code>,
-  <code>string_list_split</code>, and/or <code>string_list_split_in_place</code>.
+Adds new items to the list, using <tt>string_list_append</tt>,
+  <tt>string_list_append_nodup</tt>, <tt>string_list_insert</tt>,
+  <tt>string_list_split</tt>, and/or <tt>string_list_split_in_place</tt>.
 </p>
 </li>
 <li>
 <p>
-Can check if a string is in the list using <code>string_list_has_string</code> or
-  <code>unsorted_string_list_has_string</code> and get it from the list using
-  <code>string_list_lookup</code> for sorted lists.
+Can check if a string is in the list using <tt>string_list_has_string</tt> or
+  <tt>unsorted_string_list_has_string</tt> and get it from the list using
+  <tt>string_list_lookup</tt> for sorted lists.
 </p>
 </li>
 <li>
 <p>
-Can sort an unsorted list using <code>sort_string_list</code>.
+Can sort an unsorted list using <tt>sort_string_list</tt>.
 </p>
 </li>
 <li>
 <p>
 Can remove duplicate items from a sorted list using
-  <code>string_list_remove_duplicates</code>.
+  <tt>string_list_remove_duplicates</tt>.
 </p>
 </li>
 <li>
 <p>
 Can remove individual items of an unsorted list using
-  <code>unsorted_string_list_delete_item</code>.
+  <tt>unsorted_string_list_delete_item</tt>.
 </p>
 </li>
 <li>
 <p>
 Can remove items not matching a criterion from a sorted or unsorted
-  list using <code>filter_string_list</code>, or remove empty strings using
-  <code>string_list_remove_empty_items</code>.
+  list using <tt>filter_string_list</tt>, or remove empty strings using
+  <tt>string_list_remove_empty_items</tt>.
 </p>
 </li>
 <li>
 <p>
-Finally it should free the list using <code>string_list_clear</code>.
+Finally it should free the list using <tt>string_list_clear</tt>.
 </p>
 </li>
 </ol></div>
 <div class="paragraph"><p>Example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>struct string_list list = STRING_LIST_INIT_NODUP;
+<pre><tt>struct string_list list = STRING_LIST_INIT_NODUP;
 int i;
 
 string_list_append(&amp;list, "foo");
 string_list_append(&amp;list, "bar");
 for (i = 0; i &lt; list.nr; i++)
-        printf("%s\n", list.items[i].string)</code></pre>
+        printf("%s\n", list.items[i].string)</tt></pre>
 </div></div>
 <div class="admonitionblock">
 <table><tr>
@@ -820,8 +824,8 @@ for (i = 0; i &lt; list.nr; i++)
 <div class="title">Note</div>
 </td>
 <td class="content">It is more efficient to build an unsorted list and sort it
-afterwards, instead of building a sorted list (<code>O(n log n)</code> instead of
-<code>O(n^2)</code>).</td>
+afterwards, instead of building a sorted list (<tt>O(n log n)</tt> instead of
+<tt>O(n^2)</tt>).</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>+
@@ -840,7 +844,7 @@ General ones (works with sorted and unsorted lists as well)
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>filter_string_list</code>
+<tt>filter_string_list</tt>
 </dt>
 <dd>
 <p>
@@ -852,7 +856,7 @@ General ones (works with sorted and unsorted lists as well)
 </p>
 </dd>
 <dt class="hdlist1">
-<code>string_list_remove_empty_items</code>
+<tt>string_list_remove_empty_items</tt>
 </dt>
 <dd>
 <p>
@@ -862,7 +866,7 @@ General ones (works with sorted and unsorted lists as well)
 </p>
 </dd>
 <dt class="hdlist1">
-<code>print_string_list</code>
+<tt>print_string_list</tt>
 </dt>
 <dd>
 <p>
@@ -872,13 +876,13 @@ General ones (works with sorted and unsorted lists as well)
 </p>
 </dd>
 <dt class="hdlist1">
-<code>string_list_clear</code>
+<tt>string_list_clear</tt>
 </dt>
 <dd>
 <p>
-        Free a string_list. The <code>string</code> pointer of the items will be freed in
-        case the <code>strdup_strings</code> member of the string_list is set. The second
-        parameter controls if the <code>util</code> pointer of the items should be freed
+        Free a string_list. The <tt>string</tt> pointer of the items will be freed in
+        case the <tt>strdup_strings</tt> member of the string_list is set. The second
+        parameter controls if the <tt>util</tt> pointer of the items should be freed
         or not.
 </p>
 </dd>
@@ -890,7 +894,7 @@ Functions for sorted lists only
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>string_list_has_string</code>
+<tt>string_list_has_string</tt>
 </dt>
 <dd>
 <p>
@@ -898,22 +902,22 @@ Functions for sorted lists only
 </p>
 </dd>
 <dt class="hdlist1">
-<code>string_list_insert</code>
+<tt>string_list_insert</tt>
 </dt>
 <dd>
 <p>
         Insert a new element to the string_list. The returned pointer can be
-        handy if you want to write something to the <code>util</code> pointer of the
+        handy if you want to write something to the <tt>util</tt> pointer of the
         string_list_item containing the just added string. If the given
         string already exists the insertion will be skipped and the
         pointer to the existing item returned.
 </p>
 <div class="paragraph"><p>Since this function uses xrealloc() (which die()s if it fails) if the
 list needs to grow, it is safe not to check the pointer. I.e. you may
-write <code>string_list_insert(...)-&gt;util = ...;</code>.</p></div>
+write <tt>string_list_insert(...)-&gt;util = ...;</tt>.</p></div>
 </dd>
 <dt class="hdlist1">
-<code>string_list_lookup</code>
+<tt>string_list_lookup</tt>
 </dt>
 <dd>
 <p>
@@ -922,7 +926,7 @@ write <code>string_list_insert(...)-&gt;util = ...;</code>.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>string_list_remove_duplicates</code>
+<tt>string_list_remove_duplicates</tt>
 </dt>
 <dd>
 <p>
@@ -939,86 +943,86 @@ Functions for unsorted lists only
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>string_list_append</code>
+<tt>string_list_append</tt>
 </dt>
 <dd>
 <p>
         Append a new string to the end of the string_list.  If
-        <code>strdup_string</code> is set, then the string argument is copied;
-        otherwise the new <code>string_list_entry</code> refers to the input
+        <tt>strdup_string</tt> is set, then the string argument is copied;
+        otherwise the new <tt>string_list_entry</tt> refers to the input
         string.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>string_list_append_nodup</code>
+<tt>string_list_append_nodup</tt>
 </dt>
 <dd>
 <p>
         Append a new string to the end of the string_list.  The new
-        <code>string_list_entry</code> always refers to the input string, even if
-        <code>strdup_string</code> is set.  This function can be used to hand
-        ownership of a malloc()ed string to a <code>string_list</code> that has
-        <code>strdup_string</code> set.
+        <tt>string_list_entry</tt> always refers to the input string, even if
+        <tt>strdup_string</tt> is set.  This function can be used to hand
+        ownership of a malloc()ed string to a <tt>string_list</tt> that has
+        <tt>strdup_string</tt> set.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>sort_string_list</code>
+<tt>sort_string_list</tt>
 </dt>
 <dd>
 <p>
-        Sort the list&#8217;s entries by string value in <code>strcmp()</code> order.
+        Sort the list&#8217;s entries by string value in <tt>strcmp()</tt> order.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>unsorted_string_list_has_string</code>
+<tt>unsorted_string_list_has_string</tt>
 </dt>
 <dd>
 <p>
-        It&#8217;s like <code>string_list_has_string()</code> but for unsorted lists.
+        It&#8217;s like <tt>string_list_has_string()</tt> but for unsorted lists.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>unsorted_string_list_lookup</code>
+<tt>unsorted_string_list_lookup</tt>
 </dt>
 <dd>
 <p>
-        It&#8217;s like <code>string_list_lookup()</code> but for unsorted lists.
+        It&#8217;s like <tt>string_list_lookup()</tt> but for unsorted lists.
 </p>
 <div class="paragraph"><p>The above two functions need to look through all items, as opposed to their
 counterpart for sorted lists, which performs a binary search.</p></div>
 </dd>
 <dt class="hdlist1">
-<code>unsorted_string_list_delete_item</code>
+<tt>unsorted_string_list_delete_item</tt>
 </dt>
 <dd>
 <p>
-        Remove an item from a string_list. The <code>string</code> pointer of the items
-        will be freed in case the <code>strdup_strings</code> member of the string_list
-        is set. The third parameter controls if the <code>util</code> pointer of the
+        Remove an item from a string_list. The <tt>string</tt> pointer of the items
+        will be freed in case the <tt>strdup_strings</tt> member of the string_list
+        is set. The third parameter controls if the <tt>util</tt> pointer of the
         items should be freed or not.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>string_list_split</code>
+<tt>string_list_split</tt>
 </dt>
 <dt class="hdlist1">
-<code>string_list_split_in_place</code>
+<tt>string_list_split_in_place</tt>
 </dt>
 <dd>
 <p>
         Split a string into substrings on a delimiter character and
-        append the substrings to a <code>string_list</code>.  If <code>maxsplit</code> is
-        non-negative, then split at most <code>maxsplit</code> times.  Return the
+        append the substrings to a <tt>string_list</tt>.  If <tt>maxsplit</tt> is
+        non-negative, then split at most <tt>maxsplit</tt> times.  Return the
         number of substrings appended to the list.
 </p>
-<div class="paragraph"><p><code>string_list_split</code> requires a <code>string_list</code> that has <code>strdup_strings</code>
+<div class="paragraph"><p><tt>string_list_split</tt> requires a <tt>string_list</tt> that has <tt>strdup_strings</tt>
 set to true; it leaves the input string untouched and makes copies of
 the substrings in newly-allocated memory.
-<code>string_list_split_in_place</code> requires a <code>string_list</code> that has
-<code>strdup_strings</code> set to false; it splits the input string in place,
+<tt>string_list_split_in_place</tt> requires a <tt>string_list</tt> that has
+<tt>strdup_strings</tt> set to false; it splits the input string in place,
 overwriting the delimiter characters with NULs and creating new
 string_list_items that point into the original string (the original
-string must therefore not be modified or freed while the <code>string_list</code>
+string must therefore not be modified or freed while the <tt>string_list</tt>
 is in use).</p></div>
 </dd>
 </dl></div>
@@ -1032,16 +1036,16 @@ is in use).</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>struct string_list_item</code>
+<tt>struct string_list_item</tt>
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Represents an item of the list. The <code>string</code> member is a pointer to the
-string, and you may use the <code>util</code> member for any purpose, if you want.</p></div>
+<div class="paragraph"><p>Represents an item of the list. The <tt>string</tt> member is a pointer to the
+string, and you may use the <tt>util</tt> member for any purpose, if you want.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<code>struct string_list</code>
+<tt>struct string_list</tt>
 </p>
 </li>
 </ul></div>
@@ -1049,23 +1053,23 @@ string, and you may use the <code>util</code> member for any purpose, if you wan
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-The array of items are available via the <code>items</code> member.
+The array of items are available via the <tt>items</tt> member.
 </p>
 </li>
 <li>
 <p>
-The <code>nr</code> member contains the number of items stored in the list.
+The <tt>nr</tt> member contains the number of items stored in the list.
 </p>
 </li>
 <li>
 <p>
-The <code>alloc</code> member is used to avoid reallocating at every insertion.
+The <tt>alloc</tt> member is used to avoid reallocating at every insertion.
   You should not tamper with it.
 </p>
 </li>
 <li>
 <p>
-Setting the <code>strdup_strings</code> member to 1 will strdup() the strings
+Setting the <tt>strdup_strings</tt> member to 1 will strdup() the strings
   before adding them, see above.
 </p>
 </li>

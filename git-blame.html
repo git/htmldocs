@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-blame(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -758,13 +762,13 @@ git-blame(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Annotates each line in the given file with information from the revision which
 last modified the line. Optionally, start annotating from the given revision.</p></div>
-<div class="paragraph"><p>When specified one or more times, <code>-L</code> restricts annotation to the requested
+<div class="paragraph"><p>When specified one or more times, <tt>-L</tt> restricts annotation to the requested
 lines.</p></div>
 <div class="paragraph"><p>The origin of lines is automatically followed across whole-file
 renames (currently there is no option to turn the rename-following
 off). To follow lines moved from one file to another, or to follow
 lines that were copied and pasted from another file, etc., see the
-<code>-C</code> and <code>-M</code> options.</p></div>
+<tt>-C</tt> and <tt>-M</tt> options.</p></div>
 <div class="paragraph"><p>The report does not tell you anything about lines which have been deleted or
 replaced; you need to use a tool such as <em>git diff</em> or the "pickaxe"
 interface briefly mentioned in the following paragraph.</p></div>
@@ -775,9 +779,9 @@ between files, and eventually deleted or replaced. It works by searching for
 a text string in the diff. A small example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git log --pretty=oneline -S'blame_usage'
+<pre><tt>$ git log --pretty=oneline -S'blame_usage'
 5040f17eba15504bad66b14a645bddd9b015ebb7 blame -S &lt;ancestry-file&gt;
-ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</code></pre>
+ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</tt></pre>
 </div></div>
 </div>
 </div>
@@ -791,7 +795,7 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</code></pre>
 <dd>
 <p>
         Show blank SHA-1 for boundary commits.  This can also
-        be controlled via the <code>blame.blankboundary</code> config option.
+        be controlled via the <tt>blame.blankboundary</tt> config option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -800,7 +804,7 @@ ea4c7f9bf69e781dd0cd88d2bccb2bf5cc15c9a7 git-blame: Make the output</code></pre>
 <dd>
 <p>
         Do not treat root commits as boundaries.  This can also be
-        controlled via the <code>blame.showroot</code> config option.
+        controlled via the <tt>blame.showroot</tt> config option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -839,7 +843,7 @@ absolute line number (lines count from 1).</p></div>
 </p>
 <div class="paragraph"><p>This form will use the first line matching the given
 POSIX regex. If &lt;start&gt; is a regex, it will search from the end of
-the previous <code>-L</code> range, if any, otherwise from the start of file.
+the previous <tt>-L</tt> range, if any, otherwise from the start of file.
 If &lt;start&gt; is &#8220;^/regex/&#8221;, it will search from the start of file.
 If &lt;end&gt; is a regex, it will search
 starting at the line given by &lt;start&gt;.</p></div>
@@ -854,7 +858,7 @@ of lines before or after the line given by &lt;start&gt;.</p></div>
 </ul></div>
 <div class="paragraph"><p>If &#8220;:&lt;regex&gt;&#8221; is given in place of &lt;start&gt; and &lt;end&gt;, it denotes the range
 from the first funcname line that matches &lt;regex&gt;, up to the next
-funcname line. &#8220;:&lt;regex&gt;&#8221; searches from the end of the previous <code>-L</code> range,
+funcname line. &#8220;:&lt;regex&gt;&#8221; searches from the end of the previous <tt>-L</tt> range,
 if any, otherwise from the start of file.
 &#8220;^:&lt;regex&gt;&#8221; searches from the start of file.</p></div>
 </dd>
@@ -930,7 +934,7 @@ if any, otherwise from the start of file.
 <dd>
 <p>
         Specifies the encoding used to output author names
-        and commit summaries. Setting it to <code>none</code> makes blame
+        and commit summaries. Setting it to <tt>none</tt> makes blame
         output unconverted data. For more information see the
         discussion about encoding in the <a href="git-log.html">git-log(1)</a>
         manual page.
@@ -945,7 +949,7 @@ if any, otherwise from the start of file.
         changes starting backwards from the working tree copy.
         This flag makes the command pretend as if the working
         tree copy has the contents of the named file (specify
-        <code>-</code> to make the command read from the standard input).
+        <tt>-</tt> to make the command read from the standard input).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -986,7 +990,7 @@ commit. The default value is 20.</p></div>
 </dt>
 <dd>
 <p>
-        In addition to <code>-M</code>, detect lines moved or copied from other
+        In addition to <tt>-M</tt>, detect lines moved or copied from other
         files that were modified in the same commit.  This is
         useful when you reorganize your program and move code
         around across files.  When this option is given twice,
@@ -999,7 +1003,7 @@ commit. The default value is 20.</p></div>
 alphanumeric characters that Git must detect as moving/copying
 between files for it to associate those lines with the parent
 commit. And the default value is 40. If there are more than one
-<code>-C</code> options given, the &lt;num&gt; argument of the last <code>-C</code> will
+<tt>-C</tt> options given, the &lt;num&gt; argument of the last <tt>-C</tt> will
 take effect.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1024,8 +1028,8 @@ take effect.</p></div>
 <dd>
 <p>
         Include debugging information related to the movement of
-        lines between files (see <code>-C</code>) and lines moved within a
-        file (see <code>-M</code>).  The first number listed is the score.
+        lines between files (see <tt>-C</tt>) and lines moved within a
+        file (see <tt>-M</tt>).  The first number listed is the score.
         This is the number of alphanumeric characters detected
         as having been moved between or within files.  This must be above
         a certain threshold for <em>git blame</em> to consider those lines
@@ -1154,15 +1158,15 @@ header elements later.</p></div>
 already been seen. For example, two lines that are blamed to the same
 commit will both be shown, but the details for that commit will be shown
 only once. This is more efficient, but may require more state be kept by
-the reader. The <code>--line-porcelain</code> option can be used to output full
+the reader. The <tt>--line-porcelain</tt> option can be used to output full
 commit information for each line, allowing simpler (but less efficient)
 usage like:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code># count the number of lines attributed to each author
+<pre><tt># count the number of lines attributed to each author
 git blame --line-porcelain file |
 sed -n 's/^author //p' |
-sort | uniq -c | sort -rn</code></pre>
+sort | uniq -c | sort -rn</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1171,30 +1175,30 @@ sort | uniq -c | sort -rn</code></pre>
 <div class="sectionbody">
 <div class="paragraph"><p>Unlike <em>git blame</em> and <em>git annotate</em> in older versions of git, the extent
 of the annotation can be limited to both line ranges and revision
-ranges. The <code>-L</code> option, which limits annotation to a range of lines, may be
+ranges. The <tt>-L</tt> option, which limits annotation to a range of lines, may be
 specified multiple times.</p></div>
 <div class="paragraph"><p>When you are interested in finding the origin for
-lines 40-60 for file <code>foo</code>, you can use the <code>-L</code> option like so
+lines 40-60 for file <tt>foo</tt>, you can use the <tt>-L</tt> option like so
 (they mean the same thing&#8201;&#8212;&#8201;both ask for 21 lines starting at
 line 40):</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git blame -L 40,60 foo
-git blame -L 40,+21 foo</code></pre>
+<pre><tt>git blame -L 40,60 foo
+git blame -L 40,+21 foo</tt></pre>
 </div></div>
 <div class="paragraph"><p>Also you can use a regular expression to specify the line range:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git blame -L '/^sub hello {/,/^}$/' foo</code></pre>
+<pre><tt>git blame -L '/^sub hello {/,/^}$/' foo</tt></pre>
 </div></div>
-<div class="paragraph"><p>which limits the annotation to the body of the <code>hello</code> subroutine.</p></div>
+<div class="paragraph"><p>which limits the annotation to the body of the <tt>hello</tt> subroutine.</p></div>
 <div class="paragraph"><p>When you are not interested in changes older than version
 v2.6.18, or changes older than 3 weeks, you can use revision
 range specifiers  similar to <em>git rev-list</em>:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git blame v2.6.18.. -- foo
-git blame --since=3.weeks -- foo</code></pre>
+<pre><tt>git blame v2.6.18.. -- foo
+git blame --since=3.weeks -- foo</tt></pre>
 </div></div>
 <div class="paragraph"><p>When revision range specifiers are used to limit the annotation,
 lines that have not changed since the range boundary (either the
@@ -1208,20 +1212,20 @@ refactor the code properly.  You can first find the commit that
 introduced the file with:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git log --diff-filter=A --pretty=short -- foo</code></pre>
+<pre><tt>git log --diff-filter=A --pretty=short -- foo</tt></pre>
 </div></div>
 <div class="paragraph"><p>and then annotate the change between the commit and its
-parents, using <code>commit^!</code> notation:</p></div>
+parents, using <tt>commit^!</tt> notation:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git blame -C -C -f $commit^! -- foo</code></pre>
+<pre><tt>git blame -C -C -f $commit^! -- foo</tt></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_incremental_output">INCREMENTAL OUTPUT</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>When called with <code>--incremental</code> option, the command outputs the
+<div class="paragraph"><p>When called with <tt>--incremental</tt> option, the command outputs the
 result as it is built.  The output generally will talk about
 lines touched by more recent commits first (i.e. the lines will
 be annotated out of order) and is meant to be used by
@@ -1236,7 +1240,7 @@ Each blame entry always starts with a line of:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;40-byte hex sha1&gt; &lt;sourceline&gt; &lt;resultline&gt; &lt;num_lines&gt;</code></pre>
+<pre><tt>&lt;40-byte hex sha1&gt; &lt;sourceline&gt; &lt;resultline&gt; &lt;num_lines&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>Line numbers count from 1.</p></div>
 </li>
@@ -1255,7 +1259,7 @@ Unlike the Porcelain format, the filename information is always
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>"filename" &lt;whitespace-quoted-filename-goes-here&gt;</code></pre>
+<pre><tt>"filename" &lt;whitespace-quoted-filename-goes-here&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>and thus it is really quite easy to parse for some line- and word-oriented
 parser (which should be quite natural for most scripting languages).</p></div>
@@ -1279,7 +1283,7 @@ commit commentary), a blame viewer will not care.</td>
 <div class="sect1">
 <h2 id="_mapping_authors">MAPPING AUTHORS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>If the file <code>.mailmap</code> exists at the toplevel of the repository, or at
+<div class="paragraph"><p>If the file <tt>.mailmap</tt> exists at the toplevel of the repository, or at
 the location pointed to by the mailmap.file or mailmap.blob
 configuration options, it
 is used to map author and committer names and email addresses to
@@ -1291,7 +1295,7 @@ commit (enclosed by <em>&lt;</em> and <em>&gt;</em>) to map to the name. For exa
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Proper Name &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>Proper Name &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>The more complex forms are:</p></div>
@@ -1299,7 +1303,7 @@ commit (enclosed by <em>&lt;</em> and <em>&gt;</em>) to map to the name. For exa
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>&lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>which allows mailmap to replace only the email part of a commit, and:</p></div>
@@ -1307,7 +1311,7 @@ commit (enclosed by <em>&lt;</em> and <em>&gt;</em>) to map to the name. For exa
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Proper Name &lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>Proper Name &lt;proper@email.xx&gt; &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>which allows mailmap to replace both the name and the email of a
@@ -1316,7 +1320,7 @@ commit matching the specified commit email address, and:</p></div>
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>Proper Name &lt;proper@email.xx&gt; Commit Name &lt;commit@email.xx&gt;</code></pre>
+<pre><tt>Proper Name &lt;proper@email.xx&gt; Commit Name &lt;commit@email.xx&gt;</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>which allows mailmap to replace both the name and the email of a
@@ -1325,41 +1329,41 @@ commit matching both the specified commit name and email address.</p></div>
 and Joe, whose names appear in the repository under several forms:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Joe Developer &lt;joe@example.com&gt;
+<pre><tt>Joe Developer &lt;joe@example.com&gt;
 Joe R. Developer &lt;joe@example.com&gt;
 Jane Doe &lt;jane@example.com&gt;
 Jane Doe &lt;jane@laptop.(none)&gt;
-Jane D. &lt;jane@desktop.(none)&gt;</code></pre>
+Jane D. &lt;jane@desktop.(none)&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>Now suppose that Joe wants his middle name initial used, and Jane
-prefers her family name fully spelled out. A proper <code>.mailmap</code> file
+prefers her family name fully spelled out. A proper <tt>.mailmap</tt> file
 would look like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Jane Doe         &lt;jane@desktop.(none)&gt;
-Joe R. Developer &lt;joe@example.com&gt;</code></pre>
+<pre><tt>Jane Doe         &lt;jane@desktop.(none)&gt;
+Joe R. Developer &lt;joe@example.com&gt;</tt></pre>
 </div></div>
-<div class="paragraph"><p>Note how there is no need for an entry for <code>&lt;jane@laptop.(none)&gt;</code>, because the
+<div class="paragraph"><p>Note how there is no need for an entry for <tt>&lt;jane@laptop.(none)&gt;</tt>, because the
 real name of that author is already correct.</p></div>
 <div class="paragraph"><p>Example 2: Your repository contains commits from the following
 authors:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>nick1 &lt;bugs@company.xx&gt;
+<pre><tt>nick1 &lt;bugs@company.xx&gt;
 nick2 &lt;bugs@company.xx&gt;
 nick2 &lt;nick2@company.xx&gt;
 santa &lt;me@company.xx&gt;
 claus &lt;me@company.xx&gt;
-CTO &lt;cto@coompany.xx&gt;</code></pre>
+CTO &lt;cto@coompany.xx&gt;</tt></pre>
 </div></div>
-<div class="paragraph"><p>Then you might want a <code>.mailmap</code> file that looks like:</p></div>
+<div class="paragraph"><p>Then you might want a <tt>.mailmap</tt> file that looks like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>&lt;cto@company.xx&gt;                       &lt;cto@coompany.xx&gt;
+<pre><tt>&lt;cto@company.xx&gt;                       &lt;cto@coompany.xx&gt;
 Some Dude &lt;some@dude.xx&gt;         nick1 &lt;bugs@company.xx&gt;
 Other Author &lt;other@author.xx&gt;   nick2 &lt;bugs@company.xx&gt;
 Other Author &lt;other@author.xx&gt;         &lt;nick2@company.xx&gt;
-Santa Claus &lt;santa.claus@northpole.xx&gt; &lt;me@company.xx&gt;</code></pre>
+Santa Claus &lt;santa.claus@northpole.xx&gt; &lt;me@company.xx&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>Use hash <em>#</em> for comments that are either on their own line, or after
 the email address.</p></div>

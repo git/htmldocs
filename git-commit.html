@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-commit(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -802,7 +806,7 @@ by using the --interactive or --patch switches with the <em>commit</em> command
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>The <code>--dry-run</code> option can be used to obtain a
+<div class="paragraph"><p>The <tt>--dry-run</tt> option can be used to obtain a
 summary of what is included by any of the above for the next
 commit by giving the same set of parameters (options and paths).</p></div>
 <div class="paragraph"><p>If you make a commit and then find a mistake immediately after
@@ -869,7 +873,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 </dt>
 <dd>
 <p>
-        Construct a commit message for use with <code>rebase --autosquash</code>.
+        Construct a commit message for use with <tt>rebase --autosquash</tt>.
         The commit message will be the subject line from the specified
         commit with a prefix of "fixup! ".  See <a href="git-rebase.html">git-rebase(1)</a>
         for details.
@@ -880,10 +884,10 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 </dt>
 <dd>
 <p>
-        Construct a commit message for use with <code>rebase --autosquash</code>.
+        Construct a commit message for use with <tt>rebase --autosquash</tt>.
         The commit message subject line is taken from the specified
         commit with a prefix of "squash! ".  Can be used with additional
-        commit message options (<code>-m</code>/<code>-c</code>/<code>-C</code>/<code>-F</code>). See
+        commit message options (<tt>-m</tt>/<tt>-c</tt>/<tt>-C</tt>/<tt>-F</tt>). See
         <a href="git-rebase.html">git-rebase(1)</a> for details.
 </p>
 </dd>
@@ -904,7 +908,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <dd>
 <p>
         When doing a dry-run, give the output in the short-format. See
-        <a href="git-status.html">git-status(1)</a> for details. Implies <code>--dry-run</code>.
+        <a href="git-status.html">git-status(1)</a> for details. Implies <tt>--dry-run</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -922,7 +926,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <p>
         When doing a dry-run, give the output in a porcelain-ready
         format. See <a href="git-status.html">git-status(1)</a> for details. Implies
-        <code>--dry-run</code>.
+        <tt>--dry-run</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -931,7 +935,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <dd>
 <p>
         When doing a dry-run, give the output in a the long-format.
-        Implies <code>--dry-run</code>.
+        Implies <tt>--dry-run</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -942,9 +946,9 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 </dt>
 <dd>
 <p>
-        When showing <code>short</code> or <code>porcelain</code> status output, terminate
+        When showing <tt>short</tt> or <tt>porcelain</tt> status output, terminate
         entries in the status output with NUL, instead of LF. If no
-        format is given, implies the <code>--porcelain</code> output format.
+        format is given, implies the <tt>--porcelain</tt> output format.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -965,7 +969,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <dd>
 <p>
         Override the commit author. Specify an explicit author using the
-        standard <code>A U Thor &lt;author@example.com&gt;</code> format. Otherwise &lt;author&gt;
+        standard <tt>A U Thor &lt;author@example.com&gt;</tt> format. Otherwise &lt;author&gt;
         is assumed to be a pattern and is used to search for an existing
         commit by that author (i.e. rev-list --all -i --author=&lt;author&gt;);
         the commit author is then copied from the first such commit found.
@@ -988,7 +992,7 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <dd>
 <p>
         Use the given &lt;msg&gt; as the commit message.
-        If multiple <code>-m</code> options are given, their values are
+        If multiple <tt>-m</tt> options are given, their values are
         concatenated as separate paragraphs.
 </p>
 </dd>
@@ -1001,13 +1005,13 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <dd>
 <p>
         When editing the commit message, start the editor with the
-        contents in the given file.  The <code>commit.template</code> configuration
+        contents in the given file.  The <tt>commit.template</tt> configuration
         variable is often used to give this option implicitly to the
         command.  This mechanism can be used by projects that want to
         guide participants with some hints on what to write in the message
         in what order.  If the user exits the editor without editing the
         message, the commit is aborted.  This has no effect when a message
-        is given by other means, e.g. with the <code>-m</code> or <code>-F</code> options.
+        is given by other means, e.g. with the <tt>-m</tt> or <tt>-F</tt> options.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1062,8 +1066,8 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 <dd>
 <p>
         This option determines how the supplied commit message should be
-        cleaned up before committing.  The <em>&lt;mode&gt;</em> can be <code>strip</code>,
-        <code>whitespace</code>, <code>verbatim</code>, or <code>default</code>.
+        cleaned up before committing.  The <em>&lt;mode&gt;</em> can be <tt>strip</tt>,
+        <tt>whitespace</tt>, <tt>verbatim</tt>, or <tt>default</tt>.
 </p>
 <div class="openblock">
 <div class="content">
@@ -1082,7 +1086,7 @@ whitespace
 </dt>
 <dd>
 <p>
-        Same as <code>strip</code> except #commentary is not removed.
+        Same as <tt>strip</tt> except #commentary is not removed.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1098,8 +1102,8 @@ default
 </dt>
 <dd>
 <p>
-        Same as <code>strip</code> if the message is to be edited.
-        Otherwise <code>whitespace</code>.
+        Same as <tt>strip</tt> if the message is to be edited.
+        Otherwise <tt>whitespace</tt>.
 </p>
 </dd>
 </dl></div>
@@ -1115,8 +1119,8 @@ variable (see <a href="git-config.html">git-config(1)</a>).</p></div>
 </dt>
 <dd>
 <p>
-        The message taken from file with <code>-F</code>, command line with
-        <code>-m</code>, and from commit object with <code>-C</code> are usually used as
+        The message taken from file with <tt>-F</tt>, command line with
+        <tt>-m</tt>, and from commit object with <tt>-C</tt> are usually used as
         the commit log message unmodified. This option lets you
         further edit the message taken from these sources.
 </p>
@@ -1127,7 +1131,7 @@ variable (see <a href="git-config.html">git-config(1)</a>).</p></div>
 <dd>
 <p>
         Use the selected commit message without launching an editor.
-        For example, <code>git commit --amend --no-edit</code> amends a commit
+        For example, <tt>git commit --amend --no-edit</tt> amends a commit
         without changing its commit message.
 </p>
 </dd>
@@ -1138,12 +1142,12 @@ variable (see <a href="git-config.html">git-config(1)</a>).</p></div>
 <p>
         Replace the tip of the current branch by creating a new
         commit. The recorded tree is prepared as usual (including
-        the effect of the <code>-i</code> and <code>-o</code> options and explicit
+        the effect of the <tt>-i</tt> and <tt>-o</tt> options and explicit
         pathspec), and the message from the original commit is used
         as the starting point, instead of an empty message, when no
         other message is specified from the command line via options
-        such as <code>-m</code>, <code>-F</code>, <code>-c</code>, etc.  The new commit has the same
-        parents and author as the current one (the <code>--reset-author</code>
+        such as <tt>-m</tt>, <tt>-F</tt>, <tt>-c</tt>, etc.  The new commit has the same
+        parents and author as the current one (the <tt>--reset-author</tt>
         option can countermand this).
 </p>
 <div class="openblock">
@@ -1151,9 +1155,9 @@ variable (see <a href="git-config.html">git-config(1)</a>).</p></div>
 <div class="paragraph"><p>It is a rough equivalent for:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>        $ git reset --soft HEAD^
+<pre><tt>        $ git reset --soft HEAD^
         $ ... do something else to come up with the right tree ...
-        $ git commit -c ORIG_HEAD</code></pre>
+        $ git commit -c ORIG_HEAD</tt></pre>
 </div></div>
 <div class="paragraph"><p>but can be used to amend a merge commit.</p></div>
 </div></div>
@@ -1330,7 +1334,7 @@ configuration variable documented in <a href="git-config.html">git-config(1)</a>
 <h2 id="_date_formats">DATE FORMATS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The GIT_AUTHOR_DATE, GIT_COMMITTER_DATE environment variables
-and the <code>--date</code> option
+and the <tt>--date</tt> option
 support the following date formats:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1338,10 +1342,10 @@ Git internal format
 </dt>
 <dd>
 <p>
-        It is <code>&lt;unix timestamp&gt; &lt;time zone offset&gt;</code>, where <code>&lt;unix
-        timestamp&gt;</code> is the number of seconds since the UNIX epoch.
-        <code>&lt;time zone offset&gt;</code> is a positive or negative offset from UTC.
-        For example CET (which is 2 hours ahead UTC) is <code>+0200</code>.
+        It is <tt>&lt;unix timestamp&gt; &lt;time zone offset&gt;</tt>, where <tt>&lt;unix
+        timestamp&gt;</tt> is the number of seconds since the UNIX epoch.
+        <tt>&lt;time zone offset&gt;</tt> is a positive or negative offset from UTC.
+        For example CET (which is 2 hours ahead UTC) is <tt>+0200</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1350,7 +1354,7 @@ RFC 2822
 <dd>
 <p>
         The standard email format as described by RFC 2822, for example
-        <code>Thu, 07 Apr 2005 22:13:13 +0200</code>.
+        <tt>Thu, 07 Apr 2005 22:13:13 +0200</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1359,8 +1363,8 @@ ISO 8601
 <dd>
 <p>
         Time and date specified by the ISO 8601 standard, for example
-        <code>2005-04-07T22:13:13</code>. The parser accepts a space instead of the
-        <code>T</code> character as well.
+        <tt>2005-04-07T22:13:13</tt>. The parser accepts a space instead of the
+        <tt>T</tt> character as well.
 </p>
 <div class="admonitionblock">
 <table><tr>
@@ -1368,7 +1372,7 @@ ISO 8601
 <div class="title">Note</div>
 </td>
 <td class="content">In addition, the date part is accepted in the following formats:
-<code>YYYY.MM.DD</code>, <code>MM/DD/YYYY</code> and <code>DD.MM.YYYY</code>.</td>
+<tt>YYYY.MM.DD</tt>, <tt>MM/DD/YYYY</tt> and <tt>DD.MM.YYYY</tt>.</td>
 </tr></table>
 </div>
 </dd>
@@ -1382,56 +1386,56 @@ ISO 8601
 your working tree are temporarily stored to a staging area
 called the "index" with <em>git add</em>.  A file can be
 reverted back, only in the index but not in the working tree,
-to that of the last commit with <code>git reset HEAD -- &lt;file&gt;</code>,
+to that of the last commit with <tt>git reset HEAD -- &lt;file&gt;</tt>,
 which effectively reverts <em>git add</em> and prevents the changes to
 this file from participating in the next commit.  After building
 the state to be committed incrementally with these commands,
-<code>git commit</code> (without any pathname parameter) is used to record what
+<tt>git commit</tt> (without any pathname parameter) is used to record what
 has been staged so far.  This is the most basic form of the
 command.  An example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ edit hello.c
+<pre><tt>$ edit hello.c
 $ git rm goodbye.c
 $ git add hello.c
-$ git commit</code></pre>
+$ git commit</tt></pre>
 </div></div>
 <div class="paragraph"><p>Instead of staging files after each individual change, you can
-tell <code>git commit</code> to notice the changes to the files whose
+tell <tt>git commit</tt> to notice the changes to the files whose
 contents are tracked in
-your working tree and do corresponding <code>git add</code> and <code>git rm</code>
+your working tree and do corresponding <tt>git add</tt> and <tt>git rm</tt>
 for you.  That is, this example does the same as the earlier
 example if there is no other change in your working tree:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ edit hello.c
+<pre><tt>$ edit hello.c
 $ rm goodbye.c
-$ git commit -a</code></pre>
+$ git commit -a</tt></pre>
 </div></div>
-<div class="paragraph"><p>The command <code>git commit -a</code> first looks at your working tree,
+<div class="paragraph"><p>The command <tt>git commit -a</tt> first looks at your working tree,
 notices that you have modified hello.c and removed goodbye.c,
-and performs necessary <code>git add</code> and <code>git rm</code> for you.</p></div>
+and performs necessary <tt>git add</tt> and <tt>git rm</tt> for you.</p></div>
 <div class="paragraph"><p>After staging changes to many files, you can alter the order the
-changes are recorded in, by giving pathnames to <code>git commit</code>.
+changes are recorded in, by giving pathnames to <tt>git commit</tt>.
 When pathnames are given, the command makes a commit that
 only records the changes made to the named paths:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ edit hello.c hello.h
+<pre><tt>$ edit hello.c hello.h
 $ git add hello.c hello.h
 $ edit Makefile
-$ git commit Makefile</code></pre>
+$ git commit Makefile</tt></pre>
 </div></div>
-<div class="paragraph"><p>This makes a commit that records the modification to <code>Makefile</code>.
-The changes staged for <code>hello.c</code> and <code>hello.h</code> are not included
+<div class="paragraph"><p>This makes a commit that records the modification to <tt>Makefile</tt>.
+The changes staged for <tt>hello.c</tt> and <tt>hello.h</tt> are not included
 in the resulting commit.  However, their changes are not lost&#8201;&#8212;&#8201;they are still staged and merely held back.  After the above
 sequence, if you do:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git commit</code></pre>
+<pre><tt>$ git commit</tt></pre>
 </div></div>
-<div class="paragraph"><p>this second commit would record the changes to <code>hello.c</code> and
-<code>hello.h</code> as expected.</p></div>
+<div class="paragraph"><p>this second commit would record the changes to <tt>hello.c</tt> and
+<tt>hello.h</tt> as expected.</p></div>
 <div class="paragraph"><p>After a merge (initiated by <em>git merge</em> or <em>git pull</em>) stops
 because of conflicts, cleanly merged
 paths are already staged to be committed for you, and paths that
@@ -1441,24 +1445,24 @@ and after fixing them manually in your working tree, you would
 stage the result as usual with <em>git add</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git status | grep unmerged
+<pre><tt>$ git status | grep unmerged
 unmerged: hello.c
 $ edit hello.c
-$ git add hello.c</code></pre>
+$ git add hello.c</tt></pre>
 </div></div>
-<div class="paragraph"><p>After resolving conflicts and staging the result, <code>git ls-files -u</code>
+<div class="paragraph"><p>After resolving conflicts and staging the result, <tt>git ls-files -u</tt>
 would stop mentioning the conflicted path.  When you are done,
-run <code>git commit</code> to finally record the merge:</p></div>
+run <tt>git commit</tt> to finally record the merge:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git commit</code></pre>
+<pre><tt>$ git commit</tt></pre>
 </div></div>
-<div class="paragraph"><p>As with the case to record your own changes, you can use <code>-a</code>
+<div class="paragraph"><p>As with the case to record your own changes, you can use <tt>-a</tt>
 option to save typing.  One difference is that during a merge
-resolution, you cannot use <code>git commit</code> with pathnames to
+resolution, you cannot use <tt>git commit</tt> with pathnames to
 alter the order the changes are committed, because the merge
 should be recorded as a single commit.  In fact, the command
-refuses to run when given pathnames (but see <code>-i</code> option).</p></div>
+refuses to run when given pathnames (but see <tt>-i</tt> option).</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1510,33 +1514,33 @@ mind.</p></div>
   a warning if the commit log message given to it does not look
   like a valid UTF-8 string, unless you explicitly say your
   project uses a legacy encoding.  The way to say this is to
-  have i18n.commitencoding in <code>.git/config</code> file, like this:
+  have i18n.commitencoding in <tt>.git/config</tt> file, like this:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>[i18n]
-        commitencoding = ISO-8859-1</code></pre>
+<pre><tt>[i18n]
+        commitencoding = ISO-8859-1</tt></pre>
 </div></div>
 <div class="paragraph"><p>Commit objects created with the above setting record the value
-of <code>i18n.commitencoding</code> in its <code>encoding</code> header.  This is to
+of <tt>i18n.commitencoding</tt> in its <tt>encoding</tt> header.  This is to
 help other people who look at them later.  Lack of this header
 implies that the commit log message is encoded in UTF-8.</p></div>
 </li>
 <li>
 <p>
 <em>git log</em>, <em>git show</em>, <em>git blame</em> and friends look at the
-  <code>encoding</code> header of a commit object, and try to re-code the
+  <tt>encoding</tt> header of a commit object, and try to re-code the
   log message into UTF-8 unless otherwise specified.  You can
   specify the desired output encoding with
-  <code>i18n.logoutputencoding</code> in <code>.git/config</code> file, like this:
+  <tt>i18n.logoutputencoding</tt> in <tt>.git/config</tt> file, like this:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>[i18n]
-        logoutputencoding = ISO-8859-1</code></pre>
+<pre><tt>[i18n]
+        logoutputencoding = ISO-8859-1</tt></pre>
 </div></div>
 <div class="paragraph"><p>If you do not have this configuration variable, the value of
-<code>i18n.commitencoding</code> is used instead.</p></div>
+<tt>i18n.commitencoding</tt> is used instead.</p></div>
 </li>
 </ol></div>
 <div class="paragraph"><p>Note that we deliberately chose not to re-code the commit log
@@ -1557,8 +1561,8 @@ order).  See <a href="git-var.html">git-var(1)</a> for details.</p></div>
 <div class="sect1">
 <h2 id="_hooks">HOOKS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This command can run <code>commit-msg</code>, <code>prepare-commit-msg</code>, <code>pre-commit</code>,
-and <code>post-commit</code> hooks.  See <a href="githooks.html">githooks(5)</a> for more
+<div class="paragraph"><p>This command can run <tt>commit-msg</tt>, <tt>prepare-commit-msg</tt>, <tt>pre-commit</tt>,
+and <tt>post-commit</tt> hooks.  See <a href="githooks.html">githooks(5)</a> for more
 information.</p></div>
 </div>
 </div>
@@ -1567,15 +1571,15 @@ information.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>$GIT_DIR/COMMIT_EDITMSG</code>
+<tt>$GIT_DIR/COMMIT_EDITMSG</tt>
 </dt>
 <dd>
 <p>
         This file contains the commit message of a commit in progress.
-        If <code>git commit</code> exits due to an error before creating a commit,
+        If <tt>git commit</tt> exits due to an error before creating a commit,
         any commit message that has been provided by the user (e.g., in
         an editor session) will be available in this file, but will be
-        overwritten by the next invocation of <code>git commit</code>.
+        overwritten by the next invocation of <tt>git commit</tt>.
 </p>
 </dd>
 </dl></div>

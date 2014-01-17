@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-update-ref(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -755,12 +759,12 @@ git-update-ref(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Given two arguments, stores the &lt;newvalue&gt; in the &lt;ref&gt;, possibly
-dereferencing the symbolic refs.  E.g. <code>git update-ref HEAD
-&lt;newvalue&gt;</code> updates the current branch head to the new object.</p></div>
+dereferencing the symbolic refs.  E.g. <tt>git update-ref HEAD
+&lt;newvalue&gt;</tt> updates the current branch head to the new object.</p></div>
 <div class="paragraph"><p>Given three arguments, stores the &lt;newvalue&gt; in the &lt;ref&gt;,
 possibly dereferencing the symbolic refs, after verifying that
 the current value of the &lt;ref&gt; matches &lt;oldvalue&gt;.
-E.g. <code>git update-ref refs/heads/master &lt;newvalue&gt; &lt;oldvalue&gt;</code>
+E.g. <tt>git update-ref refs/heads/master &lt;newvalue&gt; &lt;oldvalue&gt;</tt>
 updates the master branch head to &lt;newvalue&gt; only if its current
 value is &lt;oldvalue&gt;.  You can specify 40 "0" or an empty string
 as &lt;oldvalue&gt; to make sure that the ref you are creating does
@@ -780,12 +784,12 @@ the result of following the symbolic pointers.</p></div>
 <div class="paragraph"><p>In general, using</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>git update-ref HEAD "$head"</code></pre>
+<pre><tt>git update-ref HEAD "$head"</tt></pre>
 </div></div>
 <div class="paragraph"><p>should be a <em>lot</em> safer than doing</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>echo "$head" &gt; "$GIT_DIR/HEAD"</code></pre>
+<pre><tt>echo "$head" &gt; "$GIT_DIR/HEAD"</tt></pre>
 </div></div>
 <div class="paragraph"><p>both from a symlink following standpoint <strong>and</strong> an error checking
 standpoint.  The "refs/" rule for symlinks means that symlinks
@@ -793,27 +797,27 @@ that point to "outside" the tree are safe: they&#8217;ll be followed
 for reading but not for writing (so we&#8217;ll never write through a
 ref symlink to some other tree, if you have copied a whole
 archive by creating a symlink tree).</p></div>
-<div class="paragraph"><p>With <code>-d</code> flag, it deletes the named &lt;ref&gt; after verifying it
+<div class="paragraph"><p>With <tt>-d</tt> flag, it deletes the named &lt;ref&gt; after verifying it
 still contains &lt;oldvalue&gt;.</p></div>
-<div class="paragraph"><p>With <code>--stdin</code>, update-ref reads instructions from standard input and
+<div class="paragraph"><p>With <tt>--stdin</tt>, update-ref reads instructions from standard input and
 performs all modifications together.  Specify commands of the form:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>update SP &lt;ref&gt; SP &lt;newvalue&gt; [SP &lt;oldvalue&gt;] LF
+<pre><tt>update SP &lt;ref&gt; SP &lt;newvalue&gt; [SP &lt;oldvalue&gt;] LF
 create SP &lt;ref&gt; SP &lt;newvalue&gt; LF
 delete SP &lt;ref&gt; [SP &lt;oldvalue&gt;] LF
 verify SP &lt;ref&gt; [SP &lt;oldvalue&gt;] LF
-option SP &lt;opt&gt; LF</code></pre>
+option SP &lt;opt&gt; LF</tt></pre>
 </div></div>
 <div class="paragraph"><p>Quote fields containing whitespace as if they were strings in C source
-code.  Alternatively, use <code>-z</code> to specify commands without quoting:</p></div>
+code.  Alternatively, use <tt>-z</tt> to specify commands without quoting:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>update SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL [&lt;oldvalue&gt;] NUL
+<pre><tt>update SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL [&lt;oldvalue&gt;] NUL
 create SP &lt;ref&gt; NUL &lt;newvalue&gt; NUL
 delete SP &lt;ref&gt; NUL [&lt;oldvalue&gt;] NUL
 verify SP &lt;ref&gt; NUL [&lt;oldvalue&gt;] NUL
-option SP &lt;opt&gt; NUL</code></pre>
+option SP &lt;opt&gt; NUL</tt></pre>
 </div></div>
 <div class="paragraph"><p>Lines of any other format or a repeated &lt;ref&gt; produce an error.
 Command meanings are:</p></div>
@@ -862,13 +866,13 @@ option
 <dd>
 <p>
         Modify behavior of the next command naming a &lt;ref&gt;.
-        The only valid option is <code>no-deref</code> to avoid dereferencing
+        The only valid option is <tt>no-deref</tt> to avoid dereferencing
         a symbolic ref.
 </p>
 </dd>
 </dl></div>
 <div class="paragraph"><p>Use 40 "0" or the empty string to specify a zero value, except that
-with <code>-z</code> an empty &lt;oldvalue&gt; is considered missing.</p></div>
+with <tt>-z</tt> an empty &lt;oldvalue&gt; is considered missing.</p></div>
 <div class="paragraph"><p>If all &lt;ref&gt;s can be locked with matching &lt;oldvalue&gt;s
 simultaneously, all modifications are performed.  Otherwise, no
 modifications are performed.  Note that while each individual
@@ -881,7 +885,7 @@ still see a subset of the modifications.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>If config parameter "core.logAllRefUpdates" is true and the ref is one under
 "refs/heads/", "refs/remotes/", "refs/notes/", or the symbolic ref HEAD; or
-the file "$GIT_DIR/logs/&lt;ref&gt;" exists then <code>git update-ref</code> will append
+the file "$GIT_DIR/logs/&lt;ref&gt;" exists then <tt>git update-ref</tt> will append
 a line to the log file "$GIT_DIR/logs/&lt;ref&gt;" (dereferencing all
 symbolic refs before creating the log name) describing the change
 in ref value.  Log lines are formatted as:</p></div>

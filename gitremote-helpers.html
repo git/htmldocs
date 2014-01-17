@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitremote-helpers(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -821,7 +825,7 @@ protocol), while in others it indicates the end of input.</p></div>
 <h3 id="_capabilities">Capabilities</h3>
 <div class="paragraph"><p>Each remote helper is expected to support only a subset of commands.
 The operations a helper supports are declared to Git in the response
-to the <code>capabilities</code> command (see COMMANDS, below).</p></div>
+to the <tt>capabilities</tt> command (see COMMANDS, below).</p></div>
 <div class="paragraph"><p>In the following, we list all defined capabilities and for
 each we list which commands a helper with that capability
 must provide.</p></div>
@@ -938,8 +942,8 @@ Other frontends may have some other order of preference.</p></div>
 </dt>
 <dd>
 <p>
-        For specifying settings like <code>verbosity</code> (how much output to
-        write to stderr) and <code>depth</code> (how much history is wanted in the
+        For specifying settings like <tt>verbosity</tt> (how much output to
+        write to stderr) and <tt>depth</tt> (how much history is wanted in the
         case of a shallow clone) that affect how other commands are
         carried out.
 </p>
@@ -956,15 +960,15 @@ Other frontends may have some other order of preference.</p></div>
         capability use this. It&#8217;s mandatory for <em>export</em>.
 </p>
 <div class="paragraph"><p>A helper advertising the capability
-<code>refspec refs/heads/*:refs/svn/origin/branches/*</code>
-is saying that, when it is asked to <code>import refs/heads/topic</code>, the
-stream it outputs will update the <code>refs/svn/origin/branches/topic</code>
+<tt>refspec refs/heads/*:refs/svn/origin/branches/*</tt>
+is saying that, when it is asked to <tt>import refs/heads/topic</tt>, the
+stream it outputs will update the <tt>refs/svn/origin/branches/topic</tt>
 ref.</p></div>
 <div class="paragraph"><p>This capability can be advertised multiple times.  The first
 applicable refspec takes precedence.  The left-hand of refspecs
 advertised with this capability must cover all refs reported by
 the list command.  If no <em>refspec</em> capability is advertised,
-there is an implied <code>refspec *:*</code>.</p></div>
+there is an implied <tt>refspec *:*</tt>.</p></div>
 <div class="paragraph"><p>When writing remote-helpers for decentralized version control
 systems, it is advised to keep a local copy of the repository to
 interact with, and to let the private namespace refs point to this
@@ -1126,11 +1130,11 @@ suitably updated.</p></div>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>push refs/heads/master:refs/heads/master
+<pre><tt>push refs/heads/master:refs/heads/master
 push HEAD:refs/heads/branch
 \n
 push +refs/heads/foo:refs/heads/bar
-\n</code></pre>
+\n</tt></pre>
 </div></div>
 <div class="paragraph"><p>Zero or more protocol options may be entered after the last <em>push</em>
 command, before the batch&#8217;s terminating blank line.</p></div>
@@ -1304,6 +1308,23 @@ set by Git if the remote helper has the <em>option</em> capability.</p></div>
         Request the helper to check connectivity of a clone.
 </p>
 </dd>
+<dt class="hdlist1">
+<em>option cloning {'true</em>|<em>false</em>}
+</dt>
+<dd>
+<p>
+        Notify the helper this is a clone request (i.e. the current
+        repository is guaranteed empty).
+</p>
+</dd>
+<dt class="hdlist1">
+<em>option update-shallow {'true</em>|<em>false</em>}
+</dt>
+<dd>
+<p>
+        Allow to extend .git/shallow if the new refs require it.
+</p>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -1324,7 +1345,7 @@ set by Git if the remote helper has the <em>option</em> capability.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-09-12 16:24:44 PDT
+Last updated 2014-01-17 14:43:28 PST
 </div>
 </div>
 </body>

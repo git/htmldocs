@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-check-attr(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -778,7 +782,7 @@ git-check-attr(1) Manual Page
 </dt>
 <dd>
 <p>
-        Consider <code>.gitattributes</code> in the index only, ignoring the working tree.
+        Consider <tt>.gitattributes</tt> in the index only, ignoring the working tree.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -795,7 +799,7 @@ git-check-attr(1) Manual Page
 <dd>
 <p>
         The output format is modified to be machine-parseable.
-        If <code>--stdin</code> is also given, input paths are separated
+        If <tt>--stdin</tt> is also given, input paths are separated
         with a NUL character instead of a linefeed character.
 </p>
 </dd>
@@ -809,7 +813,7 @@ git-check-attr(1) Manual Page
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>If none of <code>--stdin</code>, <code>--all</code>, or <code>--</code> is used, the first argument
+<div class="paragraph"><p>If none of <tt>--stdin</tt>, <tt>--all</tt>, or <tt>--</tt> is used, the first argument
 will be treated as an attribute and the rest of the arguments as
 pathnames.</p></div>
 </div>
@@ -819,7 +823,7 @@ pathnames.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>The output is of the form:
 &lt;path&gt; COLON SP &lt;attribute&gt; COLON SP &lt;info&gt; LF</p></div>
-<div class="paragraph"><p>unless <code>-z</code> is in effect, in which case NUL is used as delimiter:
+<div class="paragraph"><p>unless <tt>-z</tt> is in effect, in which case NUL is used as delimiter:
 &lt;path&gt; NUL &lt;attribute&gt; NUL &lt;info&gt; NUL</p></div>
 <div class="paragraph"><p>&lt;path&gt; is the path of a file being queried, &lt;attribute&gt; is an attribute
 being queried and &lt;info&gt; can be either:</p></div>
@@ -857,7 +861,7 @@ when a value has been assigned to the attribute.
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>Buffering happens as documented under the <code>GIT_FLUSH</code> option in
+<div class="paragraph"><p>Buffering happens as documented under the <tt>GIT_FLUSH</tt> option in
 <a href="git.html">git(1)</a>.  The caller is responsible for avoiding deadlocks
 caused by overfilling an input buffer or reading from an empty output
 buffer.</p></div>
@@ -869,9 +873,9 @@ buffer.</p></div>
 <div class="paragraph"><p>In the examples, the following <em>.gitattributes</em> file is used:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>*.java diff=java -crlf myAttr
+<pre><tt>*.java diff=java -crlf myAttr
 NoMyAttr.java !myAttr
-README caveat=unspecified</code></pre>
+README caveat=unspecified</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -882,8 +886,8 @@ Listing a single attribute:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git check-attr diff org/example/MyClass.java
-org/example/MyClass.java: diff: java</code></pre>
+<pre><tt>$ git check-attr diff org/example/MyClass.java
+org/example/MyClass.java: diff: java</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -894,10 +898,10 @@ Listing multiple attributes for a file:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git check-attr crlf diff myAttr -- org/example/MyClass.java
+<pre><tt>$ git check-attr crlf diff myAttr -- org/example/MyClass.java
 org/example/MyClass.java: crlf: unset
 org/example/MyClass.java: diff: java
-org/example/MyClass.java: myAttr: set</code></pre>
+org/example/MyClass.java: myAttr: set</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -908,9 +912,9 @@ Listing all attributes for a file:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git check-attr --all -- org/example/MyClass.java
+<pre><tt>$ git check-attr --all -- org/example/MyClass.java
 org/example/MyClass.java: diff: java
-org/example/MyClass.java: myAttr: set</code></pre>
+org/example/MyClass.java: myAttr: set</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -921,9 +925,9 @@ Listing an attribute for multiple files:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git check-attr myAttr -- org/example/MyClass.java org/example/NoMyAttr.java
+<pre><tt>$ git check-attr myAttr -- org/example/MyClass.java org/example/NoMyAttr.java
 org/example/MyClass.java: myAttr: set
-org/example/NoMyAttr.java: myAttr: unspecified</code></pre>
+org/example/NoMyAttr.java: myAttr: unspecified</tt></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -934,8 +938,8 @@ Not all values are equally unambiguous:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git check-attr caveat README
-README: caveat: unspecified</code></pre>
+<pre><tt>$ git check-attr caveat README
+README: caveat: unspecified</tt></pre>
 </div></div>
 </div>
 </div>

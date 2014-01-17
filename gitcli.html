@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>gitcli(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -759,33 +763,33 @@ arguments.  Here are the rules:</p></div>
 <li>
 <p>
 Revisions come first and then paths.
-   E.g. in <code>git diff v1.0 v2.0 arch/x86 include/asm-x86</code>,
-   <code>v1.0</code> and <code>v2.0</code> are revisions and <code>arch/x86</code> and <code>include/asm-x86</code>
+   E.g. in <tt>git diff v1.0 v2.0 arch/x86 include/asm-x86</tt>,
+   <tt>v1.0</tt> and <tt>v2.0</tt> are revisions and <tt>arch/x86</tt> and <tt>include/asm-x86</tt>
    are paths.
 </p>
 </li>
 <li>
 <p>
 When an argument can be misunderstood as either a revision or a path,
-   they can be disambiguated by placing <code>--</code> between them.
-   E.g. <code>git diff -- HEAD</code> is, "I have a file called HEAD in my work
+   they can be disambiguated by placing <tt>--</tt> between them.
+   E.g. <tt>git diff -- HEAD</tt> is, "I have a file called HEAD in my work
    tree.  Please show changes between the version I staged in the index
    and what I have in the work tree for that file". not "show difference
    between the HEAD commit and the work tree as a whole".  You can say
-   <code>git diff HEAD --</code> to ask for the latter.
+   <tt>git diff HEAD --</tt> to ask for the latter.
 </p>
 </li>
 <li>
 <p>
-Without disambiguating <code>--</code>, Git makes a reasonable guess, but errors
+Without disambiguating <tt>--</tt>, Git makes a reasonable guess, but errors
    out and asking you to disambiguate when ambiguous.  E.g. if you have a
-   file called HEAD in your work tree, <code>git diff HEAD</code> is ambiguous, and
-   you have to say either <code>git diff HEAD --</code> or <code>git diff -- HEAD</code> to
+   file called HEAD in your work tree, <tt>git diff HEAD</tt> is ambiguous, and
+   you have to say either <tt>git diff HEAD --</tt> or <tt>git diff -- HEAD</tt> to
    disambiguate.
 </p>
 <div class="paragraph"><p>When writing a script that is expected to handle random user-input, it is
 a good practice to make it explicit which arguments are which by placing
-disambiguating <code>--</code> at appropriate places.</p></div>
+disambiguating <tt>--</tt> at appropriate places.</p></div>
 </li>
 <li>
 <p>
@@ -795,15 +799,15 @@ Many commands allow wildcards in paths, but you need to protect
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git checkout -- *.c
-$ git checkout -- \*.c</code></pre>
+<pre><tt>$ git checkout -- *.c
+$ git checkout -- \*.c</tt></pre>
 </div></div>
 <div class="paragraph"><p>The former lets your shell expand the fileglob, and you are asking
 the dot-C files in your working tree to be overwritten with the version
-in the index.  The latter passes the <code>*.c</code> to Git, and you are asking
+in the index.  The latter passes the <tt>*.c</tt> to Git, and you are asking
 the paths in the index that match the pattern to be checked out to your
-working tree.  After running <code>git add hello.c; rm hello.c</code>, you will <em>not</em>
-see <code>hello.c</code> in your working tree with the former, but with the latter
+working tree.  After running <tt>git add hello.c; rm hello.c</tt>, you will <em>not</em>
+see <tt>hello.c</tt> in your working tree with the former, but with the latter
 you will.</p></div>
 </li>
 <li>
@@ -820,20 +824,20 @@ scripting Git:</p></div>
 <li>
 <p>
 it&#8217;s preferred to use the non dashed form of Git commands, which means that
-   you should prefer <code>git foo</code> to <code>git-foo</code>.
+   you should prefer <tt>git foo</tt> to <tt>git-foo</tt>.
 </p>
 </li>
 <li>
 <p>
-splitting short options to separate words (prefer <code>git foo -a -b</code>
-   to <code>git foo -ab</code>, the latter may not even work).
+splitting short options to separate words (prefer <tt>git foo -a -b</tt>
+   to <tt>git foo -ab</tt>, the latter may not even work).
 </p>
 </li>
 <li>
 <p>
 when a command line option takes an argument, use the <em>stuck</em> form.  In
-   other words, write <code>git foo -oArg</code> instead of <code>git foo -o Arg</code> for short
-   options, and <code>git foo --long-opt=Arg</code> instead of <code>git foo --long-opt Arg</code>
+   other words, write <tt>git foo -oArg</tt> instead of <tt>git foo -o Arg</tt> for short
+   options, and <tt>git foo --long-opt=Arg</tt> instead of <tt>git foo --long-opt Arg</tt>
    for long options.  An option that takes optional option-argument must be
    written in the <em>stuck</em> form.
 </p>
@@ -842,18 +846,18 @@ when a command line option takes an argument, use the <em>stuck</em> form.  In
 <p>
 when you give a revision parameter to a command, make sure the parameter is
    not ambiguous with a name of a file in the work tree.  E.g. do not write
-   <code>git log -1 HEAD</code> but write <code>git log -1 HEAD --</code>; the former will not work
-   if you happen to have a file called <code>HEAD</code> in the work tree.
+   <tt>git log -1 HEAD</tt> but write <tt>git log -1 HEAD --</tt>; the former will not work
+   if you happen to have a file called <tt>HEAD</tt> in the work tree.
 </p>
 </li>
 <li>
 <p>
-many commands allow a long option <code>--option</code> to be abbreviated
+many commands allow a long option <tt>--option</tt> to be abbreviated
    only to their unique prefix (e.g. if there is no other option
-   whose name begins with <code>opt</code>, you may be able to spell <code>--opt</code> to
-   invoke the <code>--option</code> flag), but you should fully spell them out
+   whose name begins with <tt>opt</tt>, you may be able to spell <tt>--opt</tt> to
+   invoke the <tt>--option</tt> flag), but you should fully spell them out
    when writing your scripts; later versions of Git may introduce a
-   new option whose name shares the same prefix, e.g. <code>--optimize</code>,
+   new option whose name shares the same prefix, e.g. <tt>--optimize</tt>,
    to make a short prefix that used to be unique no longer unique.
 </p>
 </li>
@@ -880,7 +884,7 @@ couple of magic command line options:</p></div>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git describe -h
+<pre><tt>$ git describe -h
 usage: git describe [options] &lt;commit-ish&gt;*
    or: git describe [options] --dirty
 
@@ -889,7 +893,7 @@ usage: git describe [options] &lt;commit-ish&gt;*
     --all                 use any ref
     --tags                use any tag, even unannotated
     --long                always use long format
-    --abbrev[=&lt;n&gt;]        use &lt;n&gt; digits to display SHA-1s</code></pre>
+    --abbrev[=&lt;n&gt;]        use &lt;n&gt; digits to display SHA-1s</tt></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -906,25 +910,25 @@ usage: git describe [options] &lt;commit-ish&gt;*
 </div>
 <div class="sect2">
 <h3 id="_negating_options">Negating options</h3>
-<div class="paragraph"><p>Options with long option names can be negated by prefixing <code>--no-</code>. For
-example, <code>git branch</code> has the option <code>--track</code> which is <em>on</em> by default. You
-can use <code>--no-track</code> to override that behaviour. The same goes for <code>--color</code>
-and <code>--no-color</code>.</p></div>
+<div class="paragraph"><p>Options with long option names can be negated by prefixing <tt>--no-</tt>. For
+example, <tt>git branch</tt> has the option <tt>--track</tt> which is <em>on</em> by default. You
+can use <tt>--no-track</tt> to override that behaviour. The same goes for <tt>--color</tt>
+and <tt>--no-color</tt>.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_aggregating_short_options">Aggregating short options</h3>
 <div class="paragraph"><p>Commands that support the enhanced option parser allow you to aggregate short
-options. This means that you can for example use <code>git rm -rf</code> or
-<code>git clean -fdx</code>.</p></div>
+options. This means that you can for example use <tt>git rm -rf</tt> or
+<tt>git clean -fdx</tt>.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_abbreviating_long_options">Abbreviating long options</h3>
 <div class="paragraph"><p>Commands that support the enhanced option parser accepts unique
 prefix of a long option as if it is fully spelled out, but use this
-with a caution.  For example, <code>git commit --amen</code> behaves as if you
-typed <code>git commit --amend</code>, but that is true only until a later version
+with a caution.  For example, <tt>git commit --amen</tt> behaves as if you
+typed <tt>git commit --amend</tt>, but that is true only until a later version
 of Git introduces another option that shares the same prefix,
-e.g. <code>git commit --amenity</code> option.</p></div>
+e.g. <tt>git commit --amenity</tt> option.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_separating_argument_from_the_option">Separating argument from the option</h3>
@@ -932,18 +936,18 @@ e.g. <code>git commit --amenity</code> option.</p></div>
 word on the command line.  That means that all the following uses work:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git foo --long-opt=Arg
+<pre><tt>$ git foo --long-opt=Arg
 $ git foo --long-opt Arg
 $ git foo -oArg
-$ git foo -o Arg</code></pre>
+$ git foo -o Arg</tt></pre>
 </div></div>
 <div class="paragraph"><p>However, this is <strong>NOT</strong> allowed for switches with an optional value, where the
 <em>stuck</em> form must be used:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git describe --abbrev HEAD     # correct
+<pre><tt>$ git describe --abbrev HEAD     # correct
 $ git describe --abbrev=10 HEAD  # correct
-$ git describe --abbrev 10 HEAD  # NOT WHAT YOU MEANT</code></pre>
+$ git describe --abbrev 10 HEAD  # NOT WHAT YOU MEANT</tt></pre>
 </div></div>
 </div>
 </div>
@@ -952,7 +956,7 @@ $ git describe --abbrev 10 HEAD  # NOT WHAT YOU MEANT</code></pre>
 <h2 id="_notes_on_frequently_confused_options">NOTES ON FREQUENTLY CONFUSED OPTIONS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Many commands that can work on files in the working tree
-and/or in the index can take <code>--cached</code> and/or <code>--index</code>
+and/or in the index can take <tt>--cached</tt> and/or <tt>--index</tt>
 options.  Sometimes people incorrectly think that, because
 the index was originally called cache, these two are
 synonyms.  They are <strong>not</strong>&#8201;&#8212;&#8201;these two options mean very
@@ -960,31 +964,31 @@ different things.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-The <code>--cached</code> option is used to ask a command that
+The <tt>--cached</tt> option is used to ask a command that
    usually works on files in the working tree to <strong>only</strong> work
-   with the index.  For example, <code>git grep</code>, when used
+   with the index.  For example, <tt>git grep</tt>, when used
    without a commit to specify from which commit to look for
    strings in, usually works on files in the working tree,
-   but with the <code>--cached</code> option, it looks for strings in
+   but with the <tt>--cached</tt> option, it looks for strings in
    the index.
 </p>
 </li>
 <li>
 <p>
-The <code>--index</code> option is used to ask a command that
+The <tt>--index</tt> option is used to ask a command that
    usually works on files in the working tree to <strong>also</strong>
-   affect the index.  For example, <code>git stash apply</code> usually
+   affect the index.  For example, <tt>git stash apply</tt> usually
    merges changes recorded in a stash to the working tree,
-   but with the <code>--index</code> option, it also merges changes to
+   but with the <tt>--index</tt> option, it also merges changes to
    the index as well.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p><code>git apply</code> command can be used with <code>--cached</code> and
-<code>--index</code> (but not at the same time).  Usually the command
+<div class="paragraph"><p><tt>git apply</tt> command can be used with <tt>--cached</tt> and
+<tt>--index</tt> (but not at the same time).  Usually the command
 only affects the files in the working tree, but with
-<code>--index</code>, it patches both the files and their index
-entries, and with <code>--cached</code>, it modifies only the index
+<tt>--index</tt>, it patches both the files and their index
+entries, and with <tt>--cached</tt>, it modifies only the index
 entries.</p></div>
 <div class="paragraph"><p>See also <a href="http://marc.info/?l=git&amp;m=116563135620359">http://marc.info/?l=git&amp;m=116563135620359</a> and
 <a href="http://marc.info/?l=git&amp;m=119150393620273">http://marc.info/?l=git&amp;m=119150393620273</a> for further

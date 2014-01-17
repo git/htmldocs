@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>Fighting regressions with git bisect</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -733,7 +737,7 @@ asciidoc.install();
 <div id="header">
 <h1>Fighting regressions with git bisect</h1>
 <span id="author">Christian Couder</span><br />
-<span id="email"><code>&lt;<a href="mailto:chriscool@tuxfamily.org">chriscool@tuxfamily.org</a>&gt;</code></span><br />
+<span id="email"><tt>&lt;<a href="mailto:chriscool@tuxfamily.org">chriscool@tuxfamily.org</a>&gt;</tt></span><br />
 <span id="revdate">2009/11/08</span>
 </div>
 <div id="content">
@@ -890,7 +894,7 @@ configuration after each commit. So if you have for each release: N
 configurations, M commits and T test cases, you should perform:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>N * M * T tests</code></pre>
+<pre><tt>N * M * T tests</tt></pre>
 </div></div>
 <div class="paragraph"><p>where N, M and T are all growing with the size your software.</p></div>
 <div class="paragraph"><p>So very soon it will not be possible to completely test everything.</p></div>
@@ -915,17 +919,17 @@ space. This is done usually by giving one "bad" and at least one
 start" like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect start [BAD [GOOD...]]</code></pre>
+<pre><tt>$ git bisect start [BAD [GOOD...]]</tt></pre>
 </div></div>
 <div class="paragraph"><p>or they can be set using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect bad [COMMIT]</code></pre>
+<pre><tt>$ git bisect bad [COMMIT]</tt></pre>
 </div></div>
 <div class="paragraph"><p>and:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect good [COMMIT...]</code></pre>
+<pre><tt>$ git bisect good [COMMIT...]</tt></pre>
 </div></div>
 <div class="paragraph"><p>where BAD, GOOD and COMMIT are all names that can be resolved to a
 commit.</p></div>
@@ -933,9 +937,9 @@ commit.</p></div>
 user to test it, like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect start v2.6.27 v2.6.25
+<pre><tt>$ git bisect start v2.6.27 v2.6.25
 Bisecting: 10928 revisions left to test after this (roughly 14 steps)
-[2ec65f8b89ea003c27ff7723525a2ee335a2b393] x86: clean up using max_low_pfn on 32-bit</code></pre>
+[2ec65f8b89ea003c27ff7723525a2ee335a2b393] x86: clean up using max_low_pfn on 32-bit</tt></pre>
 </div></div>
 <div class="paragraph"><p>Note that the example that we will use is really a toy example, we
 will be looking for the first commit that has a version like
@@ -955,15 +959,15 @@ using the "git bisect good" or "git bisect bad" commands respectively
 that have been described above. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect bad
+<pre><tt>$ git bisect bad
 Bisecting: 5480 revisions left to test after this (roughly 13 steps)
-[66c0b394f08fd89236515c1c84485ea712a157be] KVM: kill file-&gt;f_count abuse in kvm</code></pre>
+[66c0b394f08fd89236515c1c84485ea712a157be] KVM: kill file-&gt;f_count abuse in kvm</tt></pre>
 </div></div>
 <div class="paragraph"><p>And after a few more steps like that, "git bisect" will eventually
 find a first bad commit:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect bad
+<pre><tt>$ git bisect bad
 2ddcca36c8bcfa251724fe342c8327451988be0d is the first bad commit
 commit 2ddcca36c8bcfa251724fe342c8327451988be0d
 Author: Linus Torvalds &lt;torvalds@linux-foundation.org&gt;
@@ -971,13 +975,13 @@ Date:   Sat May 3 11:59:44 2008 -0700
 
     Linux 2.6.26-rc1
 
-:100644 100644 5cf82581... 4492984e... M      Makefile</code></pre>
+:100644 100644 5cf82581... 4492984e... M      Makefile</tt></pre>
 </div></div>
 <div class="paragraph"><p>At this point we can see what the commit does, check it out (if it&#8217;s
 not already checked out) or tinker with it, for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git show HEAD
+<pre><tt>$ git show HEAD
 commit 2ddcca36c8bcfa251724fe342c8327451988be0d
 Author: Linus Torvalds &lt;torvalds@linux-foundation.org&gt;
 Date:   Sat May 3 11:59:44 2008 -0700
@@ -997,16 +1001,16 @@ index 5cf8258..4492984 100644
 +EXTRAVERSION = -rc1
  NAME = Funky Weasel is Jiggy wit it
 
- # *DOCUMENTATION*</code></pre>
+ # *DOCUMENTATION*</tt></pre>
 </div></div>
 <div class="paragraph"><p>And when we are finished we can use "git bisect reset" to go back to
 the branch we were in before we started bisecting:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect reset
+<pre><tt>$ git bisect reset
 Checking out files: 100% (21549/21549), done.
 Previous HEAD position was 2ddcca3... Linux 2.6.26-rc1
-Switched to branch 'master'</code></pre>
+Switched to branch 'master'</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1017,7 +1021,7 @@ current commit is "good" or "bad". To do that, we use the "git bisect
 run" command. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect start v2.6.27 v2.6.25
+<pre><tt>$ git bisect start v2.6.27 v2.6.25
 Bisecting: 10928 revisions left to test after this (roughly 14 steps)
 [2ec65f8b89ea003c27ff7723525a2ee335a2b393] x86: clean up using max_low_pfn on 32-bit
 $
@@ -1043,7 +1047,7 @@ Date:   Sat May 3 11:59:44 2008 -0700
     Linux 2.6.26-rc1
 
 :100644 100644 5cf82581... 4492984e... M      Makefile
-bisect run success</code></pre>
+bisect run success</tt></pre>
 </div></div>
 <div class="paragraph"><p>In this example, we passed "grep <em>^SUBLEVEL = 25</em> Makefile" as
 parameter to "git bisect run". This means that at each step, the grep
@@ -1081,13 +1085,13 @@ tell for sure which commit introduced the regression.</p></div>
 special code 125) you could get a result like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>There are only 'skip'ped commits left to test.
+<pre><tt>There are only 'skip'ped commits left to test.
 The first bad commit could be any of:
 15722f2fa328eaba97022898a305ffc8172db6b1
 78e86cf3e850bd755bb71831f42e200626fbd1e0
 e15b73ad3db9b48d7d1ade32f8cd23a751fe0ace
 070eab2303024706f2924822bfec8b9847e4ac1b
-We cannot bisect more!</code></pre>
+We cannot bisect more!</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1096,12 +1100,12 @@ We cannot bisect more!</code></pre>
 log using for example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect log &gt; bisect_log.txt</code></pre>
+<pre><tt>$ git bisect log &gt; bisect_log.txt</tt></pre>
 </div></div>
 <div class="paragraph"><p>And it is possible to replay it using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect replay bisect_log.txt</code></pre>
+<pre><tt>$ git bisect replay bisect_log.txt</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1124,7 +1128,7 @@ b) are not ancestor of a "good" commit (excluding the "good" commits).</p></div>
 <div class="paragraph"><p>For example if we start with a graph like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>G-Y-G-W-W-W-X-X-X-X
+<pre><tt>G-Y-G-W-W-W-X-X-X-X
            \ /
             W-W-B
            /
@@ -1132,18 +1136,18 @@ Y---G-W---W
  \ /   \
 Y-Y     X-X-X-X
 
--&gt; time goes this way -&gt;</code></pre>
+-&gt; time goes this way -&gt;</tt></pre>
 </div></div>
 <div class="paragraph"><p>where B is the "bad" commit, "G" are "good" commits and W, X, and Y
 are other commits, we will get the following graph after this first
 step:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>W-W-W
+<pre><tt>W-W-W
      \
       W-W-B
      /
-W---W</code></pre>
+W---W</tt></pre>
 </div></div>
 <div class="paragraph"><p>So only the W and B commits will be kept. Because commits X and Y will
 have been removed by rules a) and b) respectively, and because commits
@@ -1152,16 +1156,16 @@ G are removed by rule b) too.</p></div>
 given by:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>git rev-list BAD --not GOOD1 GOOD2...</code></pre>
+<pre><tt>git rev-list BAD --not GOOD1 GOOD2...</tt></pre>
 </div></div>
 <div class="paragraph"><p>Also note that we don&#8217;t require the commits that are kept to be
 descendants of a "good" commit. So in the following example, commits W
 and Z will be kept:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>G-W-W-W-B
+<pre><tt>G-W-W-W-B
    /
-Z-Z</code></pre>
+Z-Z</tt></pre>
 </div></div>
 <div class="paragraph"><p>2) starting from the "good" ends of the graph, associate to each
 commit the number of ancestors it has plus one</p></div>
@@ -1169,21 +1173,21 @@ commit the number of ancestors it has plus one</p></div>
 and D are some parents of some "good" commits:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>A-B-C
+<pre><tt>A-B-C
      \
       F-G-H
      /
-D---E</code></pre>
+D---E</tt></pre>
 </div></div>
 <div class="paragraph"><p>this will give:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>1 2 3
+<pre><tt>1 2 3
 A-B-C
      \6 7 8
       F-G-H
 1   2/
-D---E</code></pre>
+D---E</tt></pre>
 </div></div>
 <div class="paragraph"><p>3) associate to each commit: min(X, N - X)</p></div>
 <div class="paragraph"><p>where X is the value associated to the commit in step 2) and N is the
@@ -1191,12 +1195,12 @@ total number of commits in the graph.</p></div>
 <div class="paragraph"><p>In the above example we have N = 8, so this will give:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>1 2 3
+<pre><tt>1 2 3
 A-B-C
      \2 1 0
       F-G-H
 1   2/
-D---E</code></pre>
+D---E</tt></pre>
 </div></div>
 <div class="paragraph"><p>4) the best bisection point is the commit with the highest associated
 number</p></div>
@@ -1215,19 +1219,19 @@ commit using "git rev-list --bisect-all".</p></div>
 <div class="paragraph"><p>For example, for the above graph, a command like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git rev-list --bisect-all BAD --not GOOD1 GOOD2</code></pre>
+<pre><tt>$ git rev-list --bisect-all BAD --not GOOD1 GOOD2</tt></pre>
 </div></div>
 <div class="paragraph"><p>would output something like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>e15b73ad3db9b48d7d1ade32f8cd23a751fe0ace (dist=3)
+<pre><tt>e15b73ad3db9b48d7d1ade32f8cd23a751fe0ace (dist=3)
 15722f2fa328eaba97022898a305ffc8172db6b1 (dist=2)
 78e86cf3e850bd755bb71831f42e200626fbd1e0 (dist=2)
 a1939d9a142de972094af4dde9a544e577ddef0e (dist=2)
 070eab2303024706f2924822bfec8b9847e4ac1b (dist=1)
 a3864d4f32a3bf5ed177ddef598490a08760b70d (dist=1)
 a41baa717dd74f1180abf55e9341bc7a0bb9d556 (dist=1)
-9e622a6dad403b71c40979743bb9d5be17b16bd6 (dist=0)</code></pre>
+9e622a6dad403b71c40979743bb9d5be17b16bd6 (dist=0)</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1240,7 +1244,7 @@ the state of the commit happens to be "good" or "bad".</p></div>
 following function is maximum:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>f(X) = min(information_if_good(X), information_if_bad(X))</code></pre>
+<pre><tt>f(X) = min(information_if_good(X), information_if_bad(X))</tt></pre>
 </div></div>
 <div class="paragraph"><p>where information_if_good(X) is the information we get if X is good
 and information_if_bad(X) is the information we get if X is bad.</p></div>
@@ -1261,7 +1265,7 @@ the graph..</p></div>
 "good", so we want to say that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>information_if_good(X) = number_of_ancestors(X)  (TRUE)</code></pre>
+<pre><tt>information_if_good(X) = number_of_ancestors(X)  (TRUE)</tt></pre>
 </div></div>
 <div class="paragraph"><p>And this is true because at step 1) b) we remove the ancestors of the
 "good" commits.</p></div>
@@ -1269,7 +1273,7 @@ the graph..</p></div>
 "bad", so we want to say that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>information_if_bad(X) = number_of_descendants(X)  (WRONG)</code></pre>
+<pre><tt>information_if_bad(X) = number_of_descendants(X)  (WRONG)</tt></pre>
 </div></div>
 <div class="paragraph"><p>But this is wrong because at step 1) a) we keep only the ancestors of
 the bad commit. So we get more information when a commit is marked as
@@ -1283,52 +1287,52 @@ commits in the graph except those that are ancestors of the new "bad"
 commit. This means that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>information_if_bad(X) = N - number_of_ancestors(X)  (TRUE)</code></pre>
+<pre><tt>information_if_bad(X) = N - number_of_ancestors(X)  (TRUE)</tt></pre>
 </div></div>
 <div class="paragraph"><p>where N is the number of commits in the (cleaned up) graph.</p></div>
 <div class="paragraph"><p>So in the end this means that to find the best bisection commits we
 should maximize the function:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>f(X) = min(number_of_ancestors(X), N - number_of_ancestors(X))</code></pre>
+<pre><tt>f(X) = min(number_of_ancestors(X), N - number_of_ancestors(X))</tt></pre>
 </div></div>
 <div class="paragraph"><p>And this is nice because at step 2) we compute number_of_ancestors(X)
 and so at step 3) we compute f(X).</p></div>
 <div class="paragraph"><p>Let&#8217;s take the following graph as an example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>            G-H-I-J
+<pre><tt>            G-H-I-J
            /       \
 A-B-C-D-E-F         O
            \       /
-            K-L-M-N</code></pre>
+            K-L-M-N</tt></pre>
 </div></div>
 <div class="paragraph"><p>If we compute the following non optimal function on it:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>g(X) = min(number_of_ancestors(X), number_of_descendants(X))</code></pre>
+<pre><tt>g(X) = min(number_of_ancestors(X), number_of_descendants(X))</tt></pre>
 </div></div>
 <div class="paragraph"><p>we get:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>            4 3 2 1
+<pre><tt>            4 3 2 1
             G-H-I-J
 1 2 3 4 5 6/       \0
 A-B-C-D-E-F         O
            \       /
             K-L-M-N
-            4 3 2 1</code></pre>
+            4 3 2 1</tt></pre>
 </div></div>
 <div class="paragraph"><p>but with the algorithm used by git bisect we get:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>            7 7 6 5
+<pre><tt>            7 7 6 5
             G-H-I-J
 1 2 3 4 5 6/       \0
 A-B-C-D-E-F         O
            \       /
             K-L-M-N
-            7 7 6 5</code></pre>
+            7 7 6 5</tt></pre>
 </div></div>
 <div class="paragraph"><p>So we chose G, H, K or L as the best bisection point, which is better
 than F. Because if for example L is bad, then we will know not only
@@ -1409,9 +1413,9 @@ descendants.</p></div>
 forked of the main branch at a commit named "D" like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>A-B-C-D-E-F-G  &lt;--main
+<pre><tt>A-B-C-D-E-F-G  &lt;--main
        \
-        H-I-J  &lt;--dev</code></pre>
+        H-I-J  &lt;--dev</tt></pre>
 </div></div>
 <div class="paragraph"><p>The commit "D" is called a "merge base" for branch "main" and "dev"
 because it&#8217;s the best common ancestor for these branches for a merge.</p></div>
@@ -1424,7 +1428,7 @@ too.</p></div>
 <div class="paragraph"><p>So we would be left with only:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>H-I-J</code></pre>
+<pre><tt>H-I-J</tt></pre>
 </div></div>
 <div class="paragraph"><p>But what happens if the first bad commit is "B" and if it has been
 fixed in the "main" branch by commit "F"?</p></div>
@@ -1442,7 +1446,7 @@ development branch that is not on the maintenance branch. They should
 be able to start bisecting using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect start dev main</code></pre>
+<pre><tt>$ git bisect start dev main</tt></pre>
 </div></div>
 <div class="paragraph"><p>To enable that additional nice feature, when a bisection is started
 and when some good commits are not ancestors of the bad commit, we
@@ -1453,8 +1457,8 @@ out and tested.</p></div>
 is stopped with a message like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>The merge base BBBBBB is bad.
-This means the bug has been fixed between BBBBBB and [GGGGGG,...].</code></pre>
+<pre><tt>The merge base BBBBBB is bad.
+This means the bug has been fixed between BBBBBB and [GGGGGG,...].</tt></pre>
 </div></div>
 <div class="paragraph"><p>where BBBBBB is the sha1 hash of the bad merge base and [GGGGGG,&#8230;]
 is a comma separated list of the sha1 of the good commits.</p></div>
@@ -1463,9 +1467,9 @@ continues, but the following message is printed for each skipped merge
 base:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>Warning: the merge base between BBBBBB and [GGGGGG,...] must be skipped.
+<pre><tt>Warning: the merge base between BBBBBB and [GGGGGG,...] must be skipped.
 So we cannot be sure the first bad commit is between MMMMMM and BBBBBB.
-We continue anyway.</code></pre>
+We continue anyway.</tt></pre>
 </div></div>
 <div class="paragraph"><p>where BBBBBB is the sha1 hash of the bad commit, MMMMMM is the sha1
 hash of the merge base that is skipped and [GGGGGG,&#8230;]  is a comma
@@ -1491,7 +1495,7 @@ configurations. And when some tests don&#8217;t pass you can use "git
 bisect" (or better "git bisect run"). So you should perform roughly:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>c * N * T + b * M * log2(M) tests</code></pre>
+<pre><tt>c * N * T + b * M * log2(M) tests</tt></pre>
 </div></div>
 <div class="paragraph"><p>where c is the number of rounds of test (so a small constant) and b is
 the ratio of bug per commit (hopefully a small constant too).</p></div>
@@ -1519,8 +1523,8 @@ powerful and efficient when used together.</p></div>
 like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect start BAD GOOD
-$ git bisect run make</code></pre>
+<pre><tt>$ git bisect start BAD GOOD
+$ git bisect run make</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1528,7 +1532,7 @@ $ git bisect run make</code></pre>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect run sh -c "make || exit 125; ./my_app | grep 'good output'"</code></pre>
+<pre><tt>$ git bisect run sh -c "make || exit 125; ./my_app | grep 'good output'"</tt></pre>
 </div></div>
 <div class="paragraph"><p>On the other hand if you do this often, then it can be worth having
 scripts to avoid too much typing.</p></div>
@@ -1541,7 +1545,7 @@ world script used by Junio Hamano <a href="#4">[4]</a>.</p></div>
 introduced a performance regression:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>#!/bin/sh
+<pre><tt>#!/bin/sh
 
 # Build errors are not what I am interested in.
 make my_app || exit 255
@@ -1567,7 +1571,7 @@ else
         # It has already finished (the $pid process was no more),
         # and we are happy.
         exit 0
-fi</code></pre>
+fi</tt></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1741,7 +1745,7 @@ fixing commit).</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</code></pre>
+<pre><tt>...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</tt></pre>
 </div></div>
 <div class="paragraph"><p>where we know that Y is good and BFC is bad, and where BBC and X1 to
 X6 are untestable.</p></div>
@@ -1754,16 +1758,16 @@ BFC also rebased on.</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'
+<pre><tt>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'
      /
-...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</code></pre>
+...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z-...</tt></pre>
 </div></div>
 <div class="paragraph"><p>where commits quoted with ' have been rebased.</p></div>
 <div class="paragraph"><p>You can easily create such a branch with Git using interactive rebase.</p></div>
 <div class="paragraph"><p>For example using:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git rebase -i Y Z</code></pre>
+<pre><tt>$ git rebase -i Y Z</tt></pre>
 </div></div>
 <div class="paragraph"><p>and then moving BFC after BBC and squashing it.</p></div>
 <div class="paragraph"><p>After that you can start bisecting as usual in the new branch and you
@@ -1771,7 +1775,7 @@ should eventually find the first bad commit.</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git bisect start Z' Y</code></pre>
+<pre><tt>$ git bisect start Z' Y</tt></pre>
 </div></div>
 <div class="paragraph"><p>If you are using "git bisect run", you can use the same manual fix up
 as above, and then start another "git bisect run" in the special
@@ -1803,9 +1807,9 @@ the project sharing the special branches and the replacements.</p></div>
 <div class="paragraph"><p>With the example above that would give:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'-...
+<pre><tt>      (BBC+BFC)-X1'-X2'-X3'-X4'-X5'-X6'-Z'-...
      /
-...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z</code></pre>
+...-Y-BBC-X1-X2-X3-X4-X5-X6-BFC-Z</tt></pre>
 </div></div>
 <div class="paragraph"><p>That&#8217;s why the "git replace" command was created. Technically it
 stores replacements "refs" in the "refs/replace/" hierarchy. These

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>git-am(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -788,7 +792,7 @@ current branch.</p></div>
 </dt>
 <dd>
 <p>
-        Add a <code>Signed-off-by:</code> line to the commit message, using
+        Add a <tt>Signed-off-by:</tt> line to the commit message, using
         the committer identity of yourself.
 </p>
 </dd>
@@ -800,7 +804,7 @@ current branch.</p></div>
 </dt>
 <dd>
 <p>
-        Pass <code>-k</code> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
+        Pass <tt>-k</tt> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -808,7 +812,7 @@ current branch.</p></div>
 </dt>
 <dd>
 <p>
-        Pass <code>-b</code> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
+        Pass <tt>-b</tt> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -816,10 +820,10 @@ current branch.</p></div>
 </dt>
 <dd>
 <p>
-        With <code>--keep-cr</code>, call <em>git mailsplit</em> (see <a href="git-mailsplit.html">git-mailsplit(1)</a>)
+        With <tt>--keep-cr</tt>, call <em>git mailsplit</em> (see <a href="git-mailsplit.html">git-mailsplit(1)</a>)
         with the same option, to prevent it from stripping CR at the end of
-        lines. <code>am.keepcr</code> configuration variable can be used to specify the
-        default behaviour.  <code>--no-keep-cr</code> is useful to override <code>am.keepcr</code>.
+        lines. <tt>am.keepcr</tt> configuration variable can be used to specify the
+        default behaviour.  <tt>--no-keep-cr</tt> is useful to override <tt>am.keepcr</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -861,21 +865,21 @@ current branch.</p></div>
 </dt>
 <dd>
 <p>
-        Pass <code>-u</code> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
+        Pass <tt>-u</tt> flag to <em>git mailinfo</em> (see <a href="git-mailinfo.html">git-mailinfo(1)</a>).
         The proposed commit log message taken from the e-mail
         is re-coded into UTF-8 encoding (configuration variable
-        <code>i18n.commitencoding</code> can be used to specify project&#8217;s
+        <tt>i18n.commitencoding</tt> can be used to specify project&#8217;s
         preferred encoding if it is not UTF-8).
 </p>
 <div class="paragraph"><p>This was optional in prior versions of git, but now it is the
-default.   You can use <code>--no-utf8</code> to override this.</p></div>
+default.   You can use <tt>--no-utf8</tt> to override this.</p></div>
 </dd>
 <dt class="hdlist1">
 --no-utf8
 </dt>
 <dd>
 <p>
-        Pass <code>-n</code> flag to <em>git mailinfo</em> (see
+        Pass <tt>-n</tt> flag to <em>git mailinfo</em> (see
         <a href="git-mailinfo.html">git-mailinfo(1)</a>).
 </p>
 </dd>
@@ -1000,8 +1004,8 @@ default.   You can use <code>--no-utf8</code> to override this.</p></div>
 <p>
         When a patch failure occurs, &lt;msg&gt; will be printed
         to the screen before exiting.  This overrides the
-        standard message informing you to use <code>--continue</code>
-        or <code>--skip</code> to handle the failure.  This is solely
+        standard message informing you to use <tt>--continue</tt>
+        or <tt>--skip</tt> to handle the failure.  This is solely
         for internal use between <em>git rebase</em> and <em>git am</em>.
 </p>
 </dd>
@@ -1052,7 +1056,7 @@ a line that begins with "Index: "
 </ul></div>
 <div class="paragraph"><p>is taken as the beginning of a patch, and the commit log message
 is terminated before the first occurrence of such a line.</p></div>
-<div class="paragraph"><p>When initially invoking <code>git am</code>, you give it the names of the mailboxes
+<div class="paragraph"><p>When initially invoking <tt>git am</tt>, you give it the names of the mailboxes
 to process.  Upon seeing the first patch that does not apply, it
 aborts in the middle.  You can recover from this in one of two ways:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1072,7 +1076,7 @@ hand resolve the conflict in the working directory, and update
 </ol></div>
 <div class="paragraph"><p>The command refuses to process new mailboxes until the current
 operation is finished, so if you decide to start over from scratch,
-run <code>git am --abort</code> before running the command with mailbox
+run <tt>git am --abort</tt> before running the command with mailbox
 names.</p></div>
 <div class="paragraph"><p>Before any patches are applied, ORIG_HEAD is set to the tip of the
 current branch.  This is useful if you have problems with multiple

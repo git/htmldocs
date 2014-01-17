@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>argv-array API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -738,15 +742,15 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="paragraph"><p>The argv-array API allows one to dynamically build and store
 NULL-terminated lists.  An argv-array maintains the invariant that the
-<code>argv</code> member always points to a non-NULL array, and that the array is
-always NULL-terminated at the element pointed to by <code>argv[argc]</code>. This
+<tt>argv</tt> member always points to a non-NULL array, and that the array is
+always NULL-terminated at the element pointed to by <tt>argv[argc]</tt>. This
 makes the result suitable for passing to functions expecting to receive
 argv from main(), or the <a href="api-run-command.html">run-command API</a>.</p></div>
 <div class="paragraph"><p>The <a href="api-string-list.html">string-list API</a> is similar, but cannot be
 used for these purposes; instead of storing a straight string pointer,
-it contains an item structure with a <code>util</code> field that is not compatible
+it contains an item structure with a <tt>util</tt> field that is not compatible
 with the traditional argv interface.</p></div>
-<div class="paragraph"><p>Each <code>argv_array</code> manages its own memory. Any strings pushed into the
+<div class="paragraph"><p>Each <tt>argv_array</tt> manages its own memory. Any strings pushed into the
 array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 </div>
 </div>
@@ -755,13 +759,13 @@ array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>struct argv_array</code>
+<tt>struct argv_array</tt>
 </dt>
 <dd>
 <p>
         A single array. This should be initialized by assignment from
-        <code>ARGV_ARRAY_INIT</code>, or by calling <code>argv_array_init</code>. The <code>argv</code>
-        member contains the actual array; the <code>argc</code> member contains the
+        <tt>ARGV_ARRAY_INIT</tt>, or by calling <tt>argv_array_init</tt>. The <tt>argv</tt>
+        member contains the actual array; the <tt>argc</tt> member contains the
         number of elements in the array, not including the terminating
         NULL.
 </p>
@@ -774,16 +778,16 @@ array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>argv_array_init</code>
+<tt>argv_array_init</tt>
 </dt>
 <dd>
 <p>
         Initialize an array. This is no different than assigning from
-        <code>ARGV_ARRAY_INIT</code>.
+        <tt>ARGV_ARRAY_INIT</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_push</code>
+<tt>argv_array_push</tt>
 </dt>
 <dd>
 <p>
@@ -791,26 +795,26 @@ array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_pushl</code>
+<tt>argv_array_pushl</tt>
 </dt>
 <dd>
 <p>
         Push a list of strings onto the end of the array. The arguments
-        should be a list of <code>const char *</code> strings, terminated by a NULL
+        should be a list of <tt>const char *</tt> strings, terminated by a NULL
         argument.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_pushf</code>
+<tt>argv_array_pushf</tt>
 </dt>
 <dd>
 <p>
         Format a string and push it onto the end of the array. This is a
-        convenience wrapper combining <code>strbuf_addf</code> and <code>argv_array_push</code>.
+        convenience wrapper combining <tt>strbuf_addf</tt> and <tt>argv_array_push</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_pop</code>
+<tt>argv_array_pop</tt>
 </dt>
 <dd>
 <p>
@@ -819,7 +823,7 @@ array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_clear</code>
+<tt>argv_array_clear</tt>
 </dt>
 <dd>
 <p>
@@ -828,20 +832,20 @@ array are duplicated, and all memory is freed by argv_array_clear().</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_detach</code>
+<tt>argv_array_detach</tt>
 </dt>
 <dd>
 <p>
-        Detach the argv array from the <code>struct argv_array</code>, transferring
+        Detach the argv array from the <tt>struct argv_array</tt>, transferring
         ownership of the allocated array and strings.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>argv_array_free_detached</code>
+<tt>argv_array_free_detached</tt>
 </dt>
 <dd>
 <p>
-        Free the memory allocated by a <code>struct argv_array</code> that was later
+        Free the memory allocated by a <tt>struct argv_array</tt> that was later
         detached and is now no longer needed.
 </p>
 </dd>

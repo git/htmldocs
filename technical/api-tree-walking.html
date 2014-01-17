@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>tree walking API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -744,7 +748,7 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>struct name_entry</code>
+<tt>struct name_entry</tt>
 </dt>
 <dd>
 <p>
@@ -753,7 +757,7 @@ asciidoc.install();
 </p>
 </dd>
 <dt class="hdlist1">
-<code>struct tree_desc</code>
+<tt>struct tree_desc</tt>
 </dt>
 <dd>
 <p>
@@ -763,24 +767,24 @@ asciidoc.install();
 <div class="ulist"><ul>
 <li>
 <p>
-<code>buffer</code> is a pointer into the memory representation of the tree. It always
+<tt>buffer</tt> is a pointer into the memory representation of the tree. It always
 points at the current entry being visited.
 </p>
 </li>
 <li>
 <p>
-<code>size</code> counts the number of bytes left in the <code>buffer</code>.
+<tt>size</tt> counts the number of bytes left in the <tt>buffer</tt>.
 </p>
 </li>
 <li>
 <p>
-<code>entry</code> points to the current entry being visited.
+<tt>entry</tt> points to the current entry being visited.
 </p>
 </li>
 </ul></div>
 </dd>
 <dt class="hdlist1">
-<code>struct traverse_info</code>
+<tt>struct traverse_info</tt>
 </dt>
 <dd>
 <p>
@@ -789,40 +793,40 @@ points at the current entry being visited.
 <div class="ulist"><ul>
 <li>
 <p>
-<code>prev</code> points to the traverse_info which was used to descend into the
-current tree. If this is the top-level tree <code>prev</code> will point to
+<tt>prev</tt> points to the traverse_info which was used to descend into the
+current tree. If this is the top-level tree <tt>prev</tt> will point to
 a dummy traverse_info.
 </p>
 </li>
 <li>
 <p>
-<code>name</code> is the entry for the current tree (if the tree is a subtree).
+<tt>name</tt> is the entry for the current tree (if the tree is a subtree).
 </p>
 </li>
 <li>
 <p>
-<code>pathlen</code> is the length of the full path for the current tree.
+<tt>pathlen</tt> is the length of the full path for the current tree.
 </p>
 </li>
 <li>
 <p>
-<code>conflicts</code> can be used by callbacks to maintain directory-file conflicts.
+<tt>conflicts</tt> can be used by callbacks to maintain directory-file conflicts.
 </p>
 </li>
 <li>
 <p>
-<code>fn</code> is a callback called for each entry in the tree. See Traversing for more
+<tt>fn</tt> is a callback called for each entry in the tree. See Traversing for more
 information.
 </p>
 </li>
 <li>
 <p>
-<code>data</code> can be anything the <code>fn</code> callback would want to use.
+<tt>data</tt> can be anything the <tt>fn</tt> callback would want to use.
 </p>
 </li>
 <li>
 <p>
-<code>show_all_errors</code> tells whether to stop at the first error or not.
+<tt>show_all_errors</tt> tells whether to stop at the first error or not.
 </p>
 </li>
 </ul></div>
@@ -835,33 +839,33 @@ information.
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>init_tree_desc</code>
+<tt>init_tree_desc</tt>
 </dt>
 <dd>
 <p>
-        Initialize a <code>tree_desc</code> and decode its first entry. The buffer and
+        Initialize a <tt>tree_desc</tt> and decode its first entry. The buffer and
         size parameters are assumed to be the same as the buffer and size
-        members of <code>struct tree</code>.
+        members of <tt>struct tree</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>fill_tree_descriptor</code>
+<tt>fill_tree_descriptor</tt>
 </dt>
 <dd>
 <p>
-        Initialize a <code>tree_desc</code> and decode its first entry given the sha1 of
-        a tree. Returns the <code>buffer</code> member if the sha1 is a valid tree
+        Initialize a <tt>tree_desc</tt> and decode its first entry given the sha1 of
+        a tree. Returns the <tt>buffer</tt> member if the sha1 is a valid tree
         identifier and NULL otherwise.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>setup_traverse_info</code>
+<tt>setup_traverse_info</tt>
 </dt>
 <dd>
 <p>
-        Initialize a <code>traverse_info</code> given the pathname of the tree to start
-        traversing from. The <code>base</code> argument is assumed to be the <code>path</code>
-        member of the <code>name_entry</code> being recursed into unless the tree is a
+        Initialize a <tt>traverse_info</tt> given the pathname of the tree to start
+        traversing from. The <tt>base</tt> argument is assumed to be the <tt>path</tt>
+        member of the <tt>name_entry</tt> being recursed into unless the tree is a
         top-level tree in which case the empty string ("") is used.
 </p>
 </dd>
@@ -873,7 +877,7 @@ information.
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>tree_entry</code>
+<tt>tree_entry</tt>
 </dt>
 <dd>
 <p>
@@ -883,7 +887,7 @@ information.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>tree_entry_len</code>
+<tt>tree_entry_len</tt>
 </dt>
 <dd>
 <p>
@@ -893,27 +897,27 @@ information.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>update_tree_entry</code>
+<tt>update_tree_entry</tt>
 </dt>
 <dd>
 <p>
         Walk to the next entry in a tree. This is commonly used in conjunction
-        with <code>tree_entry_extract</code> to inspect the current entry.
+        with <tt>tree_entry_extract</tt> to inspect the current entry.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>tree_entry_extract</code>
+<tt>tree_entry_extract</tt>
 </dt>
 <dd>
 <p>
         Decode the entry currently being visited (the one pointed to by
-        <code>tree_desc's</code> <code>entry</code> member) and return the sha1 of the entry. The
-        <code>pathp</code> and <code>modep</code> arguments are set to the entry&#8217;s pathname and mode
+        <tt>tree_desc's</tt> <tt>entry</tt> member) and return the sha1 of the entry. The
+        <tt>pathp</tt> and <tt>modep</tt> arguments are set to the entry&#8217;s pathname and mode
         respectively.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>get_tree_entry</code>
+<tt>get_tree_entry</tt>
 </dt>
 <dd>
 <p>
@@ -931,16 +935,16 @@ information.
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<code>traverse_trees</code>
+<tt>traverse_trees</tt>
 </dt>
 <dd>
 <p>
-        Traverse <code>n</code> number of trees in parallel. The <code>fn</code> callback member of
-        <code>traverse_info</code> is called once for each tree entry.
+        Traverse <tt>n</tt> number of trees in parallel. The <tt>fn</tt> callback member of
+        <tt>traverse_info</tt> is called once for each tree entry.
 </p>
 </dd>
 <dt class="hdlist1">
-<code>traverse_callback_t</code>
+<tt>traverse_callback_t</tt>
 </dt>
 <dd>
 <p>
@@ -949,27 +953,27 @@ information.
 <div class="ulist"><ul>
 <li>
 <p>
-<code>n</code> counts the number of trees being traversed.
+<tt>n</tt> counts the number of trees being traversed.
 </p>
 </li>
 <li>
 <p>
-<code>mask</code> has its nth bit set if something exists in the nth entry.
+<tt>mask</tt> has its nth bit set if something exists in the nth entry.
 </p>
 </li>
 <li>
 <p>
-<code>dirmask</code> has its nth bit set if the nth tree&#8217;s entry is a directory.
+<tt>dirmask</tt> has its nth bit set if the nth tree&#8217;s entry is a directory.
 </p>
 </li>
 <li>
 <p>
-<code>entry</code> is an array of size <code>n</code> where the nth entry is from the nth tree.
+<tt>entry</tt> is an array of size <tt>n</tt> where the nth entry is from the nth tree.
 </p>
 </li>
 <li>
 <p>
-<code>info</code> maintains the state of the traversal.
+<tt>info</tt> maintains the state of the traversal.
 </p>
 </li>
 </ul></div>
@@ -979,7 +983,7 @@ will be updated and if the bit is not set the nth tree entry will be the
 same in the next callback invocation.</p></div>
 </dd>
 <dt class="hdlist1">
-<code>make_traverse_path</code>
+<tt>make_traverse_path</tt>
 </dt>
 <dd>
 <p>
@@ -990,11 +994,11 @@ same in the next callback invocation.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<code>traverse_path_len</code>
+<tt>traverse_path_len</tt>
 </dt>
 <dd>
 <p>
-        Calculate the length of a pathname returned by <code>make_traverse_path</code>.
+        Calculate the length of a pathname returned by <tt>make_traverse_path</tt>.
         This utilizes the memory structure of a tree entry to avoid the
         overhead of using a generic strlen().
 </p>

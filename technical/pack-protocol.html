@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>Packfile transfer protocols</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -774,17 +778,17 @@ on the wire using the pkt-line format, followed by a NUL byte and a
 hostname parameter, terminated by a NUL byte.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>0032git-upload-pack /project.git\0host=myserver.com\0</code></pre>
+<pre><tt>0032git-upload-pack /project.git\0host=myserver.com\0</tt></pre>
 </div></div>
 <div class="openblock">
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>git-proto-request = request-command SP pathname NUL [ host-parameter NUL ]
+<pre><tt>git-proto-request = request-command SP pathname NUL [ host-parameter NUL ]
 request-command   = "git-upload-pack" / "git-receive-pack" /
                     "git-upload-archive"   ; case sensitive
 pathname          = *( %x01-ff ) ; exclude NUL
-host-parameter    = "host=" hostname [ ":" port ]</code></pre>
+host-parameter    = "host=" hostname [ ":" port ]</tt></pre>
 </div></div>
 </div></div>
 <div class="paragraph"><p>Only host-parameter is allowed in the git-proto-request. Clients
@@ -795,15 +799,15 @@ option to git daemon, with the %H/%CH format characters.</p></div>
 process on the server side over the Git protocol is this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ echo -e -n \
+<pre><tt>$ echo -e -n \
   "0039git-upload-pack /schacon/gitbook.git\0host=example.com\0" |
-  nc -v example.com 9418</code></pre>
+  nc -v example.com 9418</tt></pre>
 </div></div>
 <div class="paragraph"><p>If the server refuses the request for some reasons, it could abort
 gracefully with an error message.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  error-line     =  PKT-LINE("ERR" SP explanation-text)</code></pre>
+<pre><tt>  error-line     =  PKT-LINE("ERR" SP explanation-text)</tt></pre>
 </div></div>
 </div>
 </div>
@@ -815,7 +819,7 @@ executing the binary on the server via SSH remote execution.
 It is basically equivalent to running this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ ssh git.example.com "git-upload-pack '/project.git'"</code></pre>
+<pre><tt>$ ssh git.example.com "git-upload-pack '/project.git'"</tt></pre>
 </div></div>
 <div class="paragraph"><p>For a server to support Git pushing and pulling for a given user over
 SSH, that user needs to be able to execute one or both of those
@@ -828,28 +832,28 @@ read by the remote git-upload-pack exactly as is, so it&#8217;s effectively
 an absolute path in the remote filesystem.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   git clone ssh://user@example.com/project.git
+<pre><tt>   git clone ssh://user@example.com/project.git
                 |
                 v
-ssh user@example.com "git-upload-pack '/project.git'"</code></pre>
+ssh user@example.com "git-upload-pack '/project.git'"</tt></pre>
 </div></div>
 <div class="paragraph"><p>In a "user@host:path" format URI, its relative to the user&#8217;s home
 directory, because the Git client will run:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   git clone user@example.com:project.git
+<pre><tt>   git clone user@example.com:project.git
                   |
                   v
-ssh user@example.com "git-upload-pack 'project.git'"</code></pre>
+ssh user@example.com "git-upload-pack 'project.git'"</tt></pre>
 </div></div>
 <div class="paragraph"><p>The exception is if a <em>~</em> is used, in which case
 we execute it without the leading <em>/</em>.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>   ssh://user@example.com/~alice/project.git,
+<pre><tt>   ssh://user@example.com/~alice/project.git,
                   |
                   v
-ssh user@example.com "git-upload-pack '~alice/project.git'"</code></pre>
+ssh user@example.com "git-upload-pack '~alice/project.git'"</tt></pre>
 </div></div>
 <div class="paragraph"><p>A few things to remember here:</p></div>
 <div class="ulist"><ul>
@@ -884,7 +888,7 @@ with a listing of each reference it has (all branches and tags) along
 with the object name that each reference currently points to.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ echo -e -n "0039git-upload-pack /schacon/gitbook.git\0host=example.com\0" |
+<pre><tt>$ echo -e -n "0039git-upload-pack /schacon/gitbook.git\0host=example.com\0" |
    nc -v example.com 9418
 00887217a7c7e582c46cec22a130adf4b9d7d950fba0 HEAD\0multi_ack thin-pack
              side-band side-band-64k ofs-delta shallow no-progress include-tag
@@ -893,7 +897,7 @@ with the object name that each reference currently points to.</p></div>
 003cb88d2441cac0977faf98efc80305012112238d9d refs/tags/v0.9
 003c525128480b96c89e6418b1e40909bf6c5b2d580f refs/tags/v1.0
 003fe92df48743b7bc7d26bcaabfddde0a1e20cae47c refs/tags/v1.0^{}
-0000</code></pre>
+0000</tt></pre>
 </div></div>
 <div class="paragraph"><p>Server SHOULD terminate each non-flush line using LF ("\n") terminator;
 client MUST NOT complain if there is no terminator.</p></div>
@@ -909,7 +913,8 @@ immediately after the ref itself, if presented. A conforming server
 MUST peel the ref if it&#8217;s an annotated tag.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  advertised-refs  =  (no-refs / list-of-refs)
+<pre><tt>  advertised-refs  =  (no-refs / list-of-refs)
+                      *shallow
                       flush-pkt
 
   no-refs          =  PKT-LINE(zero-id SP "capabilities^{}"
@@ -923,9 +928,11 @@ MUST peel the ref if it&#8217;s an annotated tag.</p></div>
   other-tip        =  obj-id SP refname LF
   other-peeled     =  obj-id SP refname "^{}" LF
 
+  shallow          =  PKT-LINE("shallow" SP obj-id)
+
   capability-list  =  capability *(SP capability)
   capability       =  1*(LC_ALPHA / DIGIT / "-" / "_")
-  LC_ALPHA         =  %x61-7A</code></pre>
+  LC_ALPHA         =  %x61-7A</tt></pre>
 </div></div>
 <div class="paragraph"><p>Server and client MUST use lowercase for obj-id, both MUST treat obj-id
 as case-insensitive.</p></div>
@@ -949,7 +956,7 @@ will also send a list of the capabilities it wants to be in effect,
 out of what the server said it could do with the first <em>want</em> line.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  upload-request    =  want-list
+<pre><tt>  upload-request    =  want-list
                        *shallow-line
                        *1depth-request
                        flush-pkt
@@ -964,7 +971,7 @@ out of what the server said it could do with the first <em>want</em> line.</p></
   first-want        =  PKT-LINE("want" SP obj-id SP capability-list LF)
   additional-want   =  PKT-LINE("want" SP obj-id LF)
 
-  depth             =  1*DIGIT</code></pre>
+  depth             =  1*DIGIT</tt></pre>
 </div></div>
 <div class="paragraph"><p>Clients MUST send all the obj-ids it wants from the reference
 discovery phase as <em>want</em> lines. Clients MUST send at least one
@@ -992,13 +999,13 @@ send this information to the client. If the client did not request
 a positive depth, this step is skipped.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  shallow-update   =  *shallow-line
+<pre><tt>  shallow-update   =  *shallow-line
                       *unshallow-line
                       flush-pkt
 
   shallow-line     =  PKT-LINE("shallow" SP obj-id)
 
-  unshallow-line   =  PKT-LINE("unshallow" SP obj-id)</code></pre>
+  unshallow-line   =  PKT-LINE("unshallow" SP obj-id)</tt></pre>
 </div></div>
 <div class="paragraph"><p>If the client has requested a positive depth, the server will compute
 the set of commits which are no deeper than the desired depth. The set
@@ -1017,12 +1024,12 @@ canonical implementation will skip ahead and send the next 32 immediately,
 so that there is always a block of 32 "in-flight on the wire" at a time.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  upload-haves      =  have-list
+<pre><tt>  upload-haves      =  have-list
                        compute-end
 
   have-list         =  *have-line
   have-line         =  PKT-LINE("have" SP obj-id LF)
-  compute-end       =  flush-pkt / PKT-LINE("done")</code></pre>
+  compute-end       =  flush-pkt / PKT-LINE("done")</tt></pre>
 </div></div>
 <div class="paragraph"><p>If the server reads <em>have</em> lines, it then will respond by ACKing any
 of the obj-ids the client said it had that the server also has. The
@@ -1099,16 +1106,16 @@ if there is no common base found.</p></div>
 <div class="paragraph"><p>Then the server will start sending its packfile data.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  server-response = *ack_multi ack / nak
+<pre><tt>  server-response = *ack_multi ack / nak
   ack_multi       = PKT-LINE("ACK" SP obj-id ack_status LF)
   ack_status      = "continue" / "common" / "ready"
   ack             = PKT-LINE("ACK SP obj-id LF)
-  nak             = PKT-LINE("NAK" LF)</code></pre>
+  nak             = PKT-LINE("NAK" LF)</tt></pre>
 </div></div>
 <div class="paragraph"><p>A simple clone may look like this (with no <em>have</em> lines):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>   C: 0054want 74730d410fcb6603ace96f1dc55ea6196122532d multi_ack \
+<pre><tt>   C: 0054want 74730d410fcb6603ace96f1dc55ea6196122532d multi_ack \
      side-band-64k ofs-delta\n
    C: 0032want 7d1665144a3a975c05f1f43902ddaf084e784dbe\n
    C: 0032want 5a3f6be755bbb7deae50065988cbfa1ffa9ab68a\n
@@ -1118,12 +1125,12 @@ if there is no common base found.</p></div>
    C: 0009done\n
 
    S: 0008NAK\n
-   S: [PACKFILE]</code></pre>
+   S: [PACKFILE]</tt></pre>
 </div></div>
 <div class="paragraph"><p>An incremental update (fetch) response might look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>   C: 0054want 74730d410fcb6603ace96f1dc55ea6196122532d multi_ack \
+<pre><tt>   C: 0054want 74730d410fcb6603ace96f1dc55ea6196122532d multi_ack \
      side-band-64k ofs-delta\n
    C: 0032want 7d1665144a3a975c05f1f43902ddaf084e784dbe\n
    C: 0032want 5a3f6be755bbb7deae50065988cbfa1ffa9ab68a\n
@@ -1140,7 +1147,7 @@ if there is no common base found.</p></div>
    C: 0009done\n
 
    S: 0031ACK 74730d410fcb6603ace96f1dc55ea6196122532d\n
-   S: [PACKFILE]</code></pre>
+   S: [PACKFILE]</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1211,7 +1218,9 @@ contain all the objects that the server will need to complete the new
 references.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  update-request    =  command-list [pack-file]
+<pre><tt>  update-request    =  *shallow command-list [pack-file]
+
+  shallow           =  PKT-LINE("shallow" SP obj-id)
 
   command-list      =  PKT-LINE(command NUL capability-list LF)
                        *PKT-LINE(command LF)
@@ -1225,7 +1234,7 @@ references.</p></div>
   old-id            =  obj-id
   new-id            =  obj-id
 
-  pack-file         = "PACK" 28*(OCTET)</code></pre>
+  pack-file         = "PACK" 28*(OCTET)</tt></pre>
 </div></div>
 <div class="paragraph"><p>If the receiving end does not support delete-refs, the sending end MUST
 NOT ask for delete command.</p></div>
@@ -1254,7 +1263,7 @@ that it tried to update.  Each line is either <em>ok [refname]</em> if the
 update was successful, or <em>ng [refname] [error]</em> if the update was not.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  report-status     = unpack-status
+<pre><tt>  report-status     = unpack-status
                       1*(command-status)
                       flush-pkt
 
@@ -1265,7 +1274,7 @@ update was successful, or <em>ng [refname] [error]</em> if the update was not.</
   command-ok        = PKT-LINE("ok" SP refname LF)
   command-fail      = PKT-LINE("ng" SP refname SP error-msg LF)
 
-  error-msg         = 1*(OCTECT) ; where not "ok"</code></pre>
+  error-msg         = 1*(OCTECT) ; where not "ok"</tt></pre>
 </div></div>
 <div class="paragraph"><p>Updates can be unsuccessful for a number of reasons.  The reference can have
 changed since the reference discovery phase was originally sent, meaning
@@ -1276,7 +1285,7 @@ can be rejected.</p></div>
 <div class="paragraph"><p>An example client/server communication might look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>   S: 007c74730d410fcb6603ace96f1dc55ea6196122532d refs/heads/local\0report-status delete-refs ofs-delta\n
+<pre><tt>   S: 007c74730d410fcb6603ace96f1dc55ea6196122532d refs/heads/local\0report-status delete-refs ofs-delta\n
    S: 003e7d1665144a3a975c05f1f43902ddaf084e784dbe refs/heads/debug\n
    S: 003f74730d410fcb6603ace96f1dc55ea6196122532d refs/heads/master\n
    S: 003f74730d410fcb6603ace96f1dc55ea6196122532d refs/heads/team\n
@@ -1289,7 +1298,7 @@ can be rejected.</p></div>
 
    S: 000eunpack ok\n
    S: 0018ok refs/heads/debug\n
-   S: 002ang refs/heads/master non-fast-forward\n</code></pre>
+   S: 002ang refs/heads/master non-fast-forward\n</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1297,7 +1306,7 @@ can be rejected.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-01-17 14:43:28 PST
 </div>
 </div>
 </body>

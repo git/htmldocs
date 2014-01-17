@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
+<meta name="generator" content="AsciiDoc 8.6.6" />
 <title>How to separate topic branches</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,14 +87,10 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-.monospaced, code, pre {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
+pre {
   padding: 0;
   margin: 0;
 }
-
 
 #author {
   color: #527bbd;
@@ -353,7 +349,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -411,13 +407,17 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
-div.unbreakable { page-break-inside: avoid; }
-
 
 /*
  * xhtml11 specific
  *
  * */
+
+tt {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,6 +451,12 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
+
+.monospaced {
+  font-family: monospace;
+  font-size: inherit;
+  color: navy;
+}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -531,8 +537,6 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
-
-
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -577,7 +581,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -606,7 +610,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
+    if (entry.nodeName == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -652,7 +656,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -744,10 +748,10 @@ start doing some work without knowing exactly where it leads, and end
 up with a history like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>    "master"
+<pre><tt>    "master"
 o---o
      \                    "topic"
-      o---o---o---o---o---o</code></pre>
+      o---o---o---o---o---o</tt></pre>
 </div></div>
 <div class="paragraph"><p>At this point, "topic" contains something I know I want, but it
 contains two concepts that turned out to be completely independent.
@@ -759,18 +763,18 @@ picking pieces from it to get logically self-contained units, and
 start building on top of "master":</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git diff master..topic &gt;P.diff
+<pre><tt>$ git diff master..topic &gt;P.diff
 $ git checkout -b topicA master
 ... pick and apply pieces from P.diff to build
-... commits on topicA branch.</code></pre>
+... commits on topicA branch.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>      o---o---o
+<pre><tt>      o---o---o
      /        "topicA"
 o---o"master"
      \                    "topic"
-      o---o---o---o---o---o</code></pre>
+      o---o---o---o---o---o</tt></pre>
 </div></div>
 <div class="paragraph"><p>Before doing each commit on "topicA" HEAD, I run "diff HEAD"
 before update-index the affected paths, or "diff --cached HEAD"
@@ -784,27 +788,27 @@ comparing "master" and "topic" I used initially.  Still on
 other topic:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git diff -R topic &gt;P.diff ;# --cached also would work fine
+<pre><tt>$ git diff -R topic &gt;P.diff ;# --cached also would work fine
 $ git checkout -b topicB master
 ... pick and apply pieces from P.diff to build
-... commits on topicB branch.</code></pre>
+... commits on topicB branch.</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>                        "topicB"
+<pre><tt>                        "topicB"
        o---o---o---o---o
       /
      /o---o---o
     |/        "topicA"
 o---o"master"
      \                    "topic"
-      o---o---o---o---o---o</code></pre>
+      o---o---o---o---o---o</tt></pre>
 </div></div>
 <div class="paragraph"><p>After I am done, I&#8217;d try a pretend-merge between "topicA" and
 "topicB" in order to make sure I have not missed anything:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git pull . topicA ;# merge it into current "topicB"
+<pre><tt>$ git pull . topicA ;# merge it into current "topicB"
 $ git diff topic
                         "topicB"
        o---o---o---o---o---* (pretend merge)
@@ -813,23 +817,23 @@ $ git diff topic
     |/        "topicA"
 o---o"master"
      \                    "topic"
-      o---o---o---o---o---o</code></pre>
+      o---o---o---o---o---o</tt></pre>
 </div></div>
 <div class="paragraph"><p>The last diff better not to show anything other than cleanups
 for crufts.  Then I can finally clean things up:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ git branch -D topic
-$ git reset --hard HEAD^ ;# nuke pretend merge</code></pre>
+<pre><tt>$ git branch -D topic
+$ git reset --hard HEAD^ ;# nuke pretend merge</tt></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>                        "topicB"
+<pre><tt>                        "topicB"
        o---o---o---o---o
       /
      /o---o---o
     |/        "topicA"
-o---o"master"</code></pre>
+o---o"master"</tt></pre>
 </div></div>
 </div>
 </div>
@@ -837,7 +841,7 @@ o---o"master"</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-11-27 14:11:25 PST
+Last updated 2014-01-17 14:44:20 PST
 </div>
 </div>
 </body>
