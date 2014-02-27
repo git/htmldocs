@@ -992,6 +992,14 @@ commit.cleanup::
 	have to remove the help lines that begin with `#` in the commit log
 	template yourself, if you do this).
 
+commit.gpgsign::
+
+	A boolean to specify whether all commits should be GPG signed.
+	Use of this option when doing operations such as rebase can
+	result in a large number of commits being signed. It may be
+	convenient to use an agent to avoid typing your GPG passphrase
+	several times.
+
 commit.status::
 	A boolean to enable/disable inclusion of status information in the
 	commit message template when using an editor to prepare the commit
@@ -1862,6 +1870,31 @@ pack.packSizeLimit::
 	Common unit suffixes of 'k', 'm', or 'g' are
 	supported.
 
+pack.useBitmaps::
+	When true, git will use pack bitmaps (if available) when packing
+	to stdout (e.g., during the server side of a fetch). Defaults to
+	true. You should not generally need to turn this off unless
+	you are debugging pack bitmaps.
+
+pack.writebitmaps::
+	When true, git will write a bitmap index when packing all
+	objects to disk (e.g., when `git repack -a` is run).  This
+	index can speed up the "counting objects" phase of subsequent
+	packs created for clones and fetches, at the cost of some disk
+	space and extra time spent on the initial repack.  Defaults to
+	false.
+
+pack.writeBitmapHashCache::
+	When true, git will include a "hash cache" section in the bitmap
+	index (if one is written). This cache can be used to feed git's
+	delta heuristics, potentially leading to better deltas between
+	bitmapped and non-bitmapped objects (e.g., when serving a fetch
+	between an older, bitmapped pack and objects that have been
+	pushed since the last gc). The downside is that it consumes 4
+	bytes per object of disk space, and that JGit's bitmap
+	implementation does not understand it, causing it to complain if
+	Git and JGit are used on the same repository. Defaults to false.
+
 pager.<cmd>::
 	If the value is boolean, turns on or off pagination of the
 	output of a particular Git subcommand when writing to a tty.
@@ -1880,6 +1913,16 @@ pretty.<name>::
 	to be equivalent to running `git log "--pretty=format:* %H %s"`.
 	Note that an alias with the same name as a built-in format
 	will be silently ignored.
+
+pull.ff::
+	By default, Git does not create an extra merge commit when merging
+	a commit that is a descendant of the current commit. Instead, the
+	tip of the current branch is fast-forwarded. When set to `false`,
+	this variable tells Git to create an extra merge commit in such
+	a case (equivalent to giving the `--no-ff` option from the command
+	line). When set to `only`, only such fast-forward merges are
+	allowed (equivalent to giving the `--ff-only` option from the
+	command line).
 
 pull.rebase::
 	When true, rebase branches on top of the fetched branch, instead
