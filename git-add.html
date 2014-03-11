@@ -800,8 +800,14 @@ commit.</p></div>
         Files to add content from.  Fileglobs (e.g. <tt>*.c</tt>) can
         be given to add all matching files.  Also a
         leading directory name (e.g. <tt>dir</tt> to add <tt>dir/file1</tt>
-        and <tt>dir/file2</tt>) can be given to add all files in the
-        directory, recursively.
+        and <tt>dir/file2</tt>) can be given to update the index to
+        match the current state of the directory as a whole (e.g.
+        specifying <tt>dir</tt> will record not just a file <tt>dir/file1</tt>
+        modified in the working tree, a file <tt>dir/file2</tt> added to
+        the working tree, but also a file <tt>dir/file3</tt> removed from
+        the working tree.  Note that older versions of Git used
+        to ignore removed files; use <tt>--no-all</tt> option if you want
+        to add modified or new files but ignore removed ones.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -896,10 +902,10 @@ apply to the index. See EDITING PATCHES below.</p></div>
         &lt;pathspec&gt;.  This removes as well as modifies index entries to
         match the working tree, but adds no new files.
 </p>
-<div class="paragraph"><p>If no &lt;pathspec&gt; is given, the current version of Git defaults to
-"."; in other words, update all tracked files in the current directory
-and its subdirectories. This default will change in a future version
-of Git, hence the form without &lt;pathspec&gt; should not be used.</p></div>
+<div class="paragraph"><p>If no &lt;pathspec&gt; is given when <tt>-u</tt> option is used, all
+tracked files in the entire working tree are updated (old versions
+of Git used to limit the update to the current directory and its
+subdirectories).</p></div>
 </dd>
 <dt class="hdlist1">
 -A
@@ -917,10 +923,10 @@ of Git, hence the form without &lt;pathspec&gt; should not be used.</p></div>
         entry.  This adds, modifies, and removes index entries to
         match the working tree.
 </p>
-<div class="paragraph"><p>If no &lt;pathspec&gt; is given, the current version of Git defaults to
-"."; in other words, update all files in the current directory
-and its subdirectories. This default will change in a future version
-of Git, hence the form without &lt;pathspec&gt; should not be used.</p></div>
+<div class="paragraph"><p>If no &lt;pathspec&gt; is given when <tt>-A</tt> option is used, all
+files in the entire working tree are updated (old versions
+of Git used to limit the update to the current directory and its
+subdirectories).</p></div>
 </dd>
 <dt class="hdlist1">
 --no-all
@@ -935,11 +941,9 @@ of Git, hence the form without &lt;pathspec&gt; should not be used.</p></div>
         files that have been removed from the working tree.  This
         option is a no-op when no &lt;pathspec&gt; is used.
 </p>
-<div class="paragraph"><p>This option is primarily to help the current users of Git, whose
-"git add &lt;pathspec&gt;&#8230;" ignores removed files.  In future versions
-of Git, "git add &lt;pathspec&gt;&#8230;" will be a synonym to "git add -A
-&lt;pathspec&gt;&#8230;" and "git add --ignore-removal &lt;pathspec&gt;&#8230;" will behave like
-today&#8217;s "git add &lt;pathspec&gt;&#8230;", ignoring removed files.</p></div>
+<div class="paragraph"><p>This option is primarily to help users who are used to older
+versions of Git, whose "git add &lt;pathspec&gt;&#8230;" was a synonym
+for "git add --no-all &lt;pathspec&gt;&#8230;", i.e. ignored removed files.</p></div>
 </dd>
 <dt class="hdlist1">
 -N
@@ -1317,7 +1321,7 @@ modifying the contents of context or removal lines
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-03-11 14:35:07 PDT
 </div>
 </div>
 </body>
