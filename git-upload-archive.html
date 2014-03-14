@@ -766,6 +766,48 @@ is meant to be used to get an archive from a remote repository.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_security">SECURITY</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>In order to protect the privacy of objects that have been removed from
+history but may not yet have been pruned, <tt>git-upload-archive</tt> avoids
+serving archives for commits and trees that are not reachable from the
+repository&#8217;s refs.  However, because calculating object reachability is
+computationally expensive, <tt>git-upload-archive</tt> implements a stricter
+but easier-to-check set of rules:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Clients may request a commit or tree that is pointed to directly by
+     a ref. E.g., <tt>git archive --remote=origin v1.0</tt>.
+</p>
+</li>
+<li>
+<p>
+Clients may request a sub-tree within a commit or tree using the
+     <tt>ref:path</tt> syntax. E.g., <tt>git archive --remote=origin v1.0:Documentation</tt>.
+</p>
+</li>
+<li>
+<p>
+Clients may <em>not</em> use other sha1 expressions, even if the end
+     result is reachable. E.g., neither a relative commit like <tt>master^</tt>
+     nor a literal sha1 like <tt>abcd1234</tt> is allowed, even if the result
+     is reachable from the refs.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Note that rule 3 disallows many cases that do not have any privacy
+implications. These rules are subject to change in future versions of
+git, and the server accessed by <tt>git archive --remote</tt> may or may not
+follow these exact rules.</p></div>
+<div class="paragraph"><p>If the config option <tt>uploadArchive.allowUnreachable</tt> is true, these
+rules are ignored, and clients may use arbitrary sha1 expressions.
+This is useful if you do not care about the privacy of unreachable
+objects, or if your object database is already publicly available for
+access via non-smart-http.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -790,7 +832,7 @@ is meant to be used to get an archive from a remote repository.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-03-14 14:59:49 PDT
 </div>
 </div>
 </body>
