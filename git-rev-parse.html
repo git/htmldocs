@@ -1642,12 +1642,12 @@ below for an example.</p></div>
 <h3 id="_input_format">Input Format</h3>
 <div class="paragraph"><p><em>git rev-parse --parseopt</em> input format is fully text based. It has two parts,
 separated by a line that contains only <tt>--</tt>. The lines before the separator
-(should be more than one) are used for the usage.
+(should be one or more) are used for the usage.
 The lines after the separator describe the options.</p></div>
 <div class="paragraph"><p>Each line of options has this format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&lt;opt_spec&gt;&lt;flags&gt;* SP+ help LF</tt></pre>
+<pre><tt>&lt;opt_spec&gt;&lt;flags&gt;*&lt;arg_hint&gt;? SP+ help LF</tt></pre>
 </div></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1695,6 +1695,17 @@ Use <tt>!</tt> to not make the corresponding negated long option available.
 </li>
 </ul></div>
 </dd>
+<dt class="hdlist1">
+<tt>&lt;arg_hint&gt;</tt>
+</dt>
+<dd>
+<p>
+        <tt>&lt;arg_hint&gt;</tt>, if specified, is used as a name of the argument in the
+        help output, for options that take arguments. <tt>&lt;arg_hint&gt;</tt> is
+        terminated by the first whitespace. When you need to use space in the
+        argument hint use dash instead.
+</p>
+</dd>
 </dl></div>
 <div class="paragraph"><p>The remainder of the line, after stripping the spaces, is used
 as the help associated to the option.</p></div>
@@ -1715,11 +1726,33 @@ h,help    show the help
 
 foo       some nifty option --foo
 bar=      some cool option --bar with an argument
+baz=arg   another cool option --baz with a named argument
+qux?path  qux may take a path argument but has meaning by itself
 
   An option group Header
 C?        option C with an optional argument"
 
 eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt -- "$@" || echo exit $?)"</tt></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_usage_text">Usage text</h3>
+<div class="paragraph"><p>When <tt>"$@"</tt> is <tt>-h</tt> or <tt>--help</tt> in the above example, the following
+usage text would be shown:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>usage: some-command [options] &lt;args&gt;...
+
+    some-command does foo and bar!
+
+    -h, --help            show the help
+    --foo                 some nifty option --foo
+    --bar ...             some cool option --bar with an argument
+    --bar &lt;arg&gt;           another cool option --baz with a named argument
+    --qux[=&lt;path&gt;]        qux may take a path argument but has meaning by itself
+
+An option group Header
+    -C[...]               option C with an optional argument</tt></pre>
 </div></div>
 </div>
 </div>
@@ -1797,7 +1830,7 @@ Similar to above:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-12-06 15:42:42 PST
+Last updated 2014-03-31 17:26:22 PDT
 </div>
 </div>
 </body>
