@@ -956,7 +956,56 @@ and returns the first entry, if any).</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>Here&#8217;s a simple usage example that maps long keys to double values.</p></div>
 <div class="listingblock">
-<div class="content"></div></div>
+<div class="content">
+<pre><tt>struct hashmap map;
+
+struct long2double {
+        struct hashmap_entry ent; /* must be the first member! */
+        long key;
+        double value;
+};
+
+static int long2double_cmp(const struct long2double *e1, const struct long2double *e2, const void *unused)
+{
+        return !(e1-&gt;key == e2-&gt;key);
+}
+
+void long2double_init(void)
+{
+        hashmap_init(&amp;map, (hashmap_cmp_fn) long2double_cmp, 0);
+}
+
+void long2double_free(void)
+{
+        hashmap_free(&amp;map, 1);
+}
+
+static struct long2double *find_entry(long key)
+{
+        struct long2double k;
+        hashmap_entry_init(&amp;k, memhash(&amp;key, sizeof(long)));
+        k.key = key;
+        return hashmap_get(&amp;map, &amp;k, NULL);
+}
+
+double get_value(long key)
+{
+        struct long2double *e = find_entry(key);
+        return e ? e-&gt;value : 0;
+}
+
+void set_value(long key, double value)
+{
+        struct long2double *e = find_entry(key);
+        if (!e) {
+                e = malloc(sizeof(struct long2double));
+                hashmap_entry_init(e, memhash(&amp;key, sizeof(long)));
+                e-&gt;key = key;
+                hashmap_add(&amp;map, e);
+        }
+        e-&gt;value = value;
+}</tt></pre>
+</div></div>
 </div>
 </div>
 <div class="sect1">
@@ -978,7 +1027,7 @@ stack.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-02-27 15:06:29 PST
+Last updated 2014-05-19 18:10:57 PDT
 </div>
 </div>
 </body>
