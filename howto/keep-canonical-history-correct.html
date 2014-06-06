@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.6" />
-<title>gitk(1)</title>
+<title>Keep authoritative canonical history correct with git pull</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -733,373 +733,212 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="manpage">
+<body class="article">
 <div id="header">
-<h1>
-gitk(1) Manual Page
-</h1>
-<h2>NAME</h2>
-<div class="sectionbody">
-<p>gitk -
-   The Git repository browser
-</p>
-</div>
+<h1>Keep authoritative canonical history correct with git pull</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_synopsis">SYNOPSIS</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="verseblock">
-<pre class="content"><em>gitk</em> [&lt;options&gt;] [&lt;revision range&gt;] [--] [&lt;path&gt;&#8230;]</pre>
-<div class="attribution">
+<div class="paragraph"><p>Sometimes a new project integrator will end up with project history
+that appears to be "backwards" from what other project developers
+expect. This howto presents a suggested integration workflow for
+maintaining a central repository.</p></div>
+<div class="paragraph"><p>Suppose that that central repository has this history:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A</tt></pre>
 </div></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_description">DESCRIPTION</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Displays changes in a repository or a selected set of commits. This includes
-visualizing the commit graph, showing information related to each commit, and
-the files in the trees of each revision.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_options">OPTIONS</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>To control which revisions to show, gitk supports most options
-applicable to the <em>git rev-list</em> command.  It also supports a few
-options applicable to the <em>git diff-*</em> commands to control how the
-changes each commit introduces are shown.  Finally, it supports some
-gitk-specific options.</p></div>
-<div class="paragraph"><p>gitk generally only understands options with arguments in the
-<em>sticked</em> form (see <a href="gitcli.html">gitcli(7)</a>) due to limitations in the
-command-line parser.</p></div>
-<div class="sect2">
-<h3 id="_rev_list_options_and_arguments">rev-list options and arguments</h3>
-<div class="paragraph"><p>This manual page describes only the most frequently used options.  See
-<a href="git-rev-list.html">git-rev-list(1)</a> for a complete list.</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
---all
-</dt>
-<dd>
-<p>
-        Show all refs (branches, tags, etc.).
-</p>
-</dd>
-<dt class="hdlist1">
---branches[=&lt;pattern&gt;]
-</dt>
-<dt class="hdlist1">
---tags[=&lt;pattern&gt;]
-</dt>
-<dt class="hdlist1">
---remotes[=&lt;pattern&gt;]
-</dt>
-<dd>
-<p>
-        Pretend as if all the branches (tags, remote branches, resp.)
-        are listed on the command line as <em>&lt;commit&gt;</em>. If <em>&lt;pattern&gt;</em>
-        is given, limit refs to ones matching given shell glob. If
-        pattern lacks <em>?</em>, <em>&#42;</em>, or <em>[</em>, <em>/&#42;</em> at the
-        end is implied.
-</p>
-</dd>
-<dt class="hdlist1">
---since=&lt;date&gt;
-</dt>
-<dd>
-<p>
-        Show commits more recent than a specific date.
-</p>
-</dd>
-<dt class="hdlist1">
---until=&lt;date&gt;
-</dt>
-<dd>
-<p>
-        Show commits older than a specific date.
-</p>
-</dd>
-<dt class="hdlist1">
---date-order
-</dt>
-<dd>
-<p>
-        Sort commits by date when possible.
-</p>
-</dd>
-<dt class="hdlist1">
---merge
-</dt>
-<dd>
-<p>
-        After an attempt to merge stops with conflicts, show the commits on
-        the history between two branches (i.e. the HEAD and the MERGE_HEAD)
-        that modify the conflicted files and do not exist on all the heads
-        being merged.
-</p>
-</dd>
-<dt class="hdlist1">
---left-right
-</dt>
-<dd>
-<p>
-        Mark which side of a symmetric diff a commit is reachable
-        from.  Commits from the left side are prefixed with a <tt>&lt;</tt>
-        symbol and those from the right with a <tt>&gt;</tt> symbol.
-</p>
-</dd>
-<dt class="hdlist1">
---full-history
-</dt>
-<dd>
-<p>
-        When filtering history with <em>&lt;path&gt;&#8230;</em>, does not prune some
-        history.  (See "History simplification" in <a href="git-log.html">git-log(1)</a>
-        for a more detailed explanation.)
-</p>
-</dd>
-<dt class="hdlist1">
---simplify-merges
-</dt>
-<dd>
-<p>
-        Additional option to <em>--full-history</em> to remove some needless
-        merges from the resulting history, as there are no selected
-        commits contributing to this merge.  (See "History
-        simplification" in <a href="git-log.html">git-log(1)</a> for a more detailed
-        explanation.)
-</p>
-</dd>
-<dt class="hdlist1">
---ancestry-path
-</dt>
-<dd>
-<p>
-        When given a range of commits to display
-        (e.g. <em>commit1..commit2</em> or <em>commit2 &#94;commit1</em>), only
-        display commits that exist directly on the ancestry chain
-        between the <em>commit1</em> and <em>commit2</em>, i.e. commits that are
-        both descendants of <em>commit1</em>, and ancestors of <em>commit2</em>.
-        (See "History simplification" in <a href="git-log.html">git-log(1)</a> for a more
-        detailed explanation.)
-</p>
-</dd>
-<dt class="hdlist1">
--L&lt;start&gt;,&lt;end&gt;:&lt;file&gt;
-</dt>
-<dt class="hdlist1">
--L:&lt;regex&gt;:&lt;file&gt;
-</dt>
-<dd>
-<p>
-        Trace the evolution of the line range given by "&lt;start&gt;,&lt;end&gt;"
-        (or the funcname regex &lt;regex&gt;) within the &lt;file&gt;.  You may
-        not give any pathspec limiters.  This is currently limited to
-        a walk starting from a single revision, i.e., you may only
-        give zero or one positive revision arguments.
-        You can specify this option more than once.
-</p>
-<div class="paragraph"><p><strong>Note:</strong> gitk (unlike <a href="git-log.html">git-log(1)</a>) currently only understands
-this option if you specify it "glued together" with its argument.  Do
-<strong>not</strong> put a space after <tt>-L</tt>.</p></div>
-<div class="paragraph"><p>&lt;start&gt; and &lt;end&gt; can take one of these forms:</p></div>
-<div class="ulist"><ul>
+<div class="paragraph"><p>which ends at commit <tt>A</tt> (time flows from left to right and each node
+in the graph is a commit, lines between them indicating parent-child
+relationship).</p></div>
+<div class="paragraph"><p>Then you clone it and work on your own commits, which leads you to
+have this history in <strong>your</strong> repository:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A---B---C</tt></pre>
+</div></div>
+<div class="paragraph"><p>Imagine your coworker did the same and built on top of <tt>A</tt> in <strong>his</strong>
+repository in the meantime, and then pushed it to the
+central repository:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A---X---Y---Z</tt></pre>
+</div></div>
+<div class="paragraph"><p>Now, if you <tt>git push</tt> at this point, because your history that leads
+to <tt>C</tt> lacks <tt>X</tt>, <tt>Y</tt> and <tt>Z</tt>, it will fail.  You need to somehow make
+the tip of your history a descendant of <tt>Z</tt>.</p></div>
+<div class="paragraph"><p>One suggested way to solve the problem is "fetch and then merge", aka
+<tt>git pull</tt>. When you fetch, your repository will have a history like
+this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A---B---C
+                \
+                 X---Y---Z</tt></pre>
+</div></div>
+<div class="paragraph"><p>Once you run merge after that, while still on <strong>your</strong> branch, i.e. <tt>C</tt>,
+you will create a merge <tt>M</tt> and make the history look like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A---B---C---M
+                \         /
+                 X---Y---Z</tt></pre>
+</div></div>
+<div class="paragraph"><p><tt>M</tt> is a descendant of <tt>Z</tt>, so you can push to update the central
+repository.  Such a merge <tt>M</tt> does not lose any commit in both
+histories, so in that sense it may not be wrong, but when people want
+to talk about "the authoritative canonical history that is shared
+among the project participants", i.e. "the trunk", they often view
+it as "commits you see by following the first-parent chain", and use
+this command to view it:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git log --first-parent</tt></pre>
+</div></div>
+<div class="paragraph"><p>For all other people who observed the central repository after your
+coworker pushed <tt>Z</tt> but before you pushed <tt>M</tt>, the commit on the trunk
+used to be <tt>o-o-A-X-Y-Z</tt>.  But because you made <tt>M</tt> while you were on
+<tt>C</tt>, <tt>M</tt>'s first parent is <tt>C</tt>, so by pushing <tt>M</tt> to advance the
+central repository, you made <tt>X-Y-Z</tt> a side branch, not on the trunk.</p></div>
+<div class="paragraph"><p>You would rather want to have a history of this shape:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A---X---Y---Z---M'
+                \             /
+                 B-----------C</tt></pre>
+</div></div>
+<div class="paragraph"><p>so that in the first-parent chain, it is clear that the project first
+did <tt>X</tt> and then <tt>Y</tt> and then <tt>Z</tt> and merged a change that consists of
+two commits <tt>B</tt> and <tt>C</tt> that achieves a single goal.  You may have
+worked on fixing the bug #12345 with these two patches, and the merge
+<tt>M'</tt> with swapped parents can say in its log message "Merge
+fix-bug-12345". Having a way to tell <tt>git pull</tt> to create a merge
+but record the parents in reverse order may be a way to do so.</p></div>
+<div class="paragraph"><p>Note that I said "achieves a single goal" above, because this is
+important.  "Swapping the merge order" only covers a special case
+where the project does not care too much about having unrelated
+things done on a single merge but cares a lot about first-parent
+chain.</p></div>
+<div class="paragraph"><p>There are multiple schools of thought about the "trunk" management.</p></div>
+<div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-number
+Some projects want to keep a completely linear history without any
+    merges.  Obviously, swapping the merge order would not match their
+    taste.  You would need to flatten your history on top of the
+    updated upstream to result in a history of this shape instead:
 </p>
-<div class="paragraph"><p>If &lt;start&gt; or &lt;end&gt; is a number, it specifies an
-absolute line number (lines count from 1).</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    ---o---o---A---X---Y---Z---B---C</tt></pre>
+</div></div>
+<div class="paragraph"><p>with <tt>git pull --rebase</tt> or something.</p></div>
 </li>
 <li>
 <p>
-/regex/
-</p>
-<div class="paragraph"><p>This form will use the first line matching the given
-POSIX regex. If &lt;start&gt; is a regex, it will search from the end of
-the previous <tt>-L</tt> range, if any, otherwise from the start of file.
-If &lt;start&gt; is &#8220;^/regex/&#8221;, it will search from the start of file.
-If &lt;end&gt; is a regex, it will search
-starting at the line given by &lt;start&gt;.</p></div>
-</li>
-<li>
-<p>
-+offset or -offset
-</p>
-<div class="paragraph"><p>This is only valid for &lt;end&gt; and will specify a number
-of lines before or after the line given by &lt;start&gt;.</p></div>
-</li>
-</ul></div>
-<div class="paragraph"><p>If &#8220;:&lt;regex&gt;&#8221; is given in place of &lt;start&gt; and &lt;end&gt;, it denotes the range
-from the first funcname line that matches &lt;regex&gt;, up to the next
-funcname line. &#8220;:&lt;regex&gt;&#8221; searches from the end of the previous <tt>-L</tt> range,
-if any, otherwise from the start of file.
-&#8220;^:&lt;regex&gt;&#8221; searches from the start of file.</p></div>
-</dd>
-<dt class="hdlist1">
-&lt;revision range&gt;
-</dt>
-<dd>
-<p>
-        Limit the revisions to show. This can be either a single revision
-        meaning show from the given revision and back, or it can be a range in
-        the form "<em>&lt;from&gt;</em>..<em>&lt;to&gt;</em>" to show all revisions between <em>&lt;from&gt;</em> and
-        back to <em>&lt;to&gt;</em>. Note, more advanced revision selection can be applied.
-        For a more complete list of ways to spell object names, see
-        <a href="gitrevisions.html">gitrevisions(7)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
-&lt;path&gt;&#8230;
-</dt>
-<dd>
-<p>
-        Limit commits to the ones touching files in the given paths. Note, to
-        avoid ambiguity with respect to revision names use "--" to separate the paths
-        from any preceding options.
-</p>
-</dd>
-</dl></div>
-</div>
-<div class="sect2">
-<h3 id="_gitk_specific_options">gitk-specific options</h3>
-<div class="dlist"><dl>
-<dt class="hdlist1">
---argscmd=&lt;command&gt;
-</dt>
-<dd>
-<p>
-        Command to be run each time gitk has to determine the revision
-        range to show.  The command is expected to print on its
-        standard output a list of additional revisions to be shown,
-        one per line.  Use this instead of explicitly specifying a
-        <em>&lt;revision range&gt;</em> if the set of commits to show may vary
-        between refreshes.
-</p>
-</dd>
-<dt class="hdlist1">
---select-commit=&lt;ref&gt;
-</dt>
-<dd>
-<p>
-        Select the specified commit after loading the graph.
-        Default behavior is equivalent to specifying <em>--select-commit=HEAD</em>.
-</p>
-</dd>
-</dl></div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_examples">Examples</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
-gitk v2.6.12.. include/scsi drivers/scsi
-</dt>
-<dd>
-<p>
-        Show the changes since version <em>v2.6.12</em> that changed any
-        file in the include/scsi or drivers/scsi subdirectories
-</p>
-</dd>
-<dt class="hdlist1">
-gitk --since="2 weeks ago" -- gitk
-</dt>
-<dd>
-<p>
-        Show the changes during the last two weeks to the file <em>gitk</em>.
-        The "--" is necessary to avoid confusion with the <strong>branch</strong> named
-        <em>gitk</em>
-</p>
-</dd>
-<dt class="hdlist1">
-gitk --max-count=100 --all -- Makefile
-</dt>
-<dd>
-<p>
-        Show at most 100 changes made to the file <em>Makefile</em>. Instead of only
-        looking for changes in the current branch look in all branches.
-</p>
-</dd>
-</dl></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_files">Files</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>User configuration and preferences are stored at:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<em>$XDG_CONFIG_HOME/git/gitk</em> if it exists, otherwise
+Some projects tolerate merges in their history, but do not worry
+    too much about the first-parent order, and allow fast-forward
+    merges.  To them, swapping the merge order does not hurt, but
+    it is unnecessary.
 </p>
 </li>
 <li>
 <p>
-<em>$HOME/.gitk</em> if it exists
+Some projects want each commit on the "trunk" to do one single
+    thing.  The output of <tt>git log --first-parent</tt> in such a project
+    would show either a merge of a side branch that completes a single
+    theme, or a single commit that completes a single theme by itself.
+    If your two commits <tt>B</tt> and <tt>C</tt> (or they may even be two groups of
+    commits) were solving two independent issues, then the merge <tt>M'</tt>
+    we made in the earlier example by swapping the merge order is
+    still not up to the project standard.  It merges two unrelated
+    efforts <tt>B</tt> and <tt>C</tt> at the same time.
 </p>
 </li>
-</ul></div>
-<div class="paragraph"><p>If neither of the above exist then <em>$XDG_CONFIG_HOME/git/gitk</em> is created and
-used by default. If <em>$XDG_CONFIG_HOME</em> is not set it defaults to
-<em>$HOME/.config</em> in all cases.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_history">History</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Gitk was the first graphical repository browser. It&#8217;s written in
-tcl/tk and started off in a separate repository but was later merged
-into the main Git repository.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_see_also">SEE ALSO</h2>
-<div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<em>qgit(1)</em>
-</dt>
-<dd>
-<p>
-        A repository browser written in C++ using Qt.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>gitview(1)</em>
-</dt>
-<dd>
-<p>
-        A repository browser written in Python using Gtk. It&#8217;s based on
-        <em>bzrk(1)</em> and distributed in the contrib area of the Git repository.
-</p>
-</dd>
-<dt class="hdlist1">
-<em>tig(1)</em>
-</dt>
-<dd>
-<p>
-        A minimal repository browser and Git tool output highlighter written
-        in C using Ncurses.
-</p>
-</dd>
-</dl></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_git">GIT</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+</ol></div>
+<div class="paragraph"><p>For projects in the last category (Git itself is one of them),
+individual developers would want to prepare a history more like
+this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                 C0--C1--C2     topic-c
+                /
+    ---o---o---A                master
+                \
+                 B0--B1--B2     topic-b</tt></pre>
+</div></div>
+<div class="paragraph"><p>That is, keeping separate topics on separate branches, perhaps like
+so:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git clone $URL work &amp;&amp; cd work
+    $ git checkout -b topic-b master
+    $ ... work to create B0, B1 and B2 to complete one theme
+    $ git checkout -b topic-c master
+    $ ... same for the theme of topic-c</tt></pre>
+</div></div>
+<div class="paragraph"><p>And then</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git checkout master
+    $ git pull --ff-only</tt></pre>
+</div></div>
+<div class="paragraph"><p>would grab <tt>X</tt>, <tt>Y</tt> and <tt>Z</tt> from the upstream and advance your master
+branch:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                 C0--C1--C2     topic-c
+                /
+    ---o---o---A---X---Y---Z    master
+                \
+                 B0--B1--B2     topic-b</tt></pre>
+</div></div>
+<div class="paragraph"><p>And then you would merge these two branches separately:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git merge topic-b
+    $ git merge topic-c</tt></pre>
+</div></div>
+<div class="paragraph"><p>to result in</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                 C0--C1---------C2
+                /                 \
+    ---o---o---A---X---Y---Z---M---N
+                \             /
+                 B0--B1-----B2</tt></pre>
+</div></div>
+<div class="paragraph"><p>and push it back to the central repository.</p></div>
+<div class="paragraph"><p>It is very much possible that while you are merging topic-b and
+topic-c, somebody again advanced the history in the central repository
+to put <tt>W</tt> on top of <tt>Z</tt>, and make your <tt>git push</tt> fail.</p></div>
+<div class="paragraph"><p>In such a case, you would rewind to discard <tt>M</tt> and <tt>N</tt>, update the
+tip of your <em>master</em> again and redo the two merges:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>    $ git reset --hard origin/master
+    $ git pull --ff-only
+    $ git merge topic-b
+    $ git merge topic-c</tt></pre>
+</div></div>
+<div class="paragraph"><p>The procedure will result in a history that looks like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>                 C0--C1--------------C2
+                /                     \
+    ---o---o---A---X---Y---Z---W---M'--N'
+                \                 /
+                 B0--B1---------B2</tt></pre>
+</div></div>
+<div class="paragraph"><p>See also <a href="http://git-blame.blogspot.com/2013/09/fun-with-first-parent-history.html">http://git-blame.blogspot.com/2013/09/fun-with-first-parent-history.html</a></p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-06-06 12:15:38 PDT
+Last updated 2014-06-06 12:15:48 PDT
 </div>
 </div>
 </body>

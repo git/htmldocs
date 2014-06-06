@@ -1171,7 +1171,7 @@ values of a key from all files will be used.</p></div>
 <div class="paragraph"><p>All writing options will per default write to the repository specific
 configuration file. Note that this also affects options like <em>--replace-all</em>
 and <em>--unset</em>. <strong><em>git config</em> will only ever change one file at a time</strong>.</p></div>
-<div class="paragraph"><p>You can override these rules either by command line options or by environment
+<div class="paragraph"><p>You can override these rules either by command-line options or by environment
 variables. The <em>--global</em> and the <em>--system</em> options will limit the file used
 to the global or system-wide file respectively. The GIT_CONFIG environment
 variable has a similar effect, but you can specify any filename you want.</p></div>
@@ -1860,7 +1860,7 @@ core.worktree
 <p>
         Set the path to the root of the working tree.
         This can be overridden by the GIT_WORK_TREE environment
-        variable and the <em>--work-tree</em> command line option.
+        variable and the <em>--work-tree</em> command-line option.
         The value can be an absolute path or relative to the path to
         the .git directory, which is either specified by --git-dir
         or GIT_DIR, or automatically discovered.
@@ -2006,7 +2006,7 @@ core.deltaBaseCacheLimit
         to avoid unpacking and decompressing frequently used base
         objects multiple times.
 </p>
-<div class="paragraph"><p>Default is 16 MiB on all platforms.  This should be reasonable
+<div class="paragraph"><p>Default is 96 MiB on all platforms.  This should be reasonable
 for all users/operating systems, except on the largest projects.
 You probably do not need to adjust this value.</p></div>
 <div class="paragraph"><p>Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are supported.</p></div>
@@ -2051,7 +2051,7 @@ core.askpass
         environment variable. If not set, fall back to the value of the
         <em>SSH_ASKPASS</em> environment variable or, failing that, a simple password
         prompt. The external program shall be given a suitable prompt as
-        command line argument and write the password on its STDOUT.
+        command-line argument and write the password on its STDOUT.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2088,6 +2088,8 @@ core.commentchar
         commented, and removes them after the editor returns
         (default <em>#</em>).
 </p>
+<div class="paragraph"><p>If set to "auto", <tt>git-commit</tt> would select a character that is not
+the beginning character of any line in existing commit messages.</p></div>
 </dd>
 <dt class="hdlist1">
 sequence.editor
@@ -2111,14 +2113,19 @@ core.pager
         configuration, then <tt>$PAGER</tt>, and then the default chosen at
         compile time (usually <em>less</em>).
 </p>
-<div class="paragraph"><p>When the <tt>LESS</tt> environment variable is unset, Git sets it to <tt>FRSX</tt>
+<div class="paragraph"><p>When the <tt>LESS</tt> environment variable is unset, Git sets it to <tt>FRX</tt>
 (if <tt>LESS</tt> environment variable is set, Git does not change it at
 all).  If you want to selectively override Git&#8217;s default setting
-for <tt>LESS</tt>, you can set <tt>core.pager</tt> to e.g. <tt>less -+S</tt>.  This will
+for <tt>LESS</tt>, you can set <tt>core.pager</tt> to e.g. <tt>less -S</tt>.  This will
 be passed to the shell by Git, which will translate the final
-command to <tt>LESS=FRSX less -+S</tt>. The environment tells the command
-to set the <tt>S</tt> option to chop long lines but the command line
-resets it to the default to fold long lines.</p></div>
+command to <tt>LESS=FRX less -S</tt>. The environment does not set the
+<tt>S</tt> option but the command line does, instructing less to truncate
+long lines. Similarly, setting <tt>core.pager</tt> to <tt>less -+F</tt> will
+deactivate the <tt>F</tt> option specified by the environment from the
+command-line, deactivating the "quit if one screen" behavior of
+<tt>less</tt>.  One can specifically activate some flags for particular
+commands: for example, setting <tt>pager.blame</tt> to <tt>less -S</tt> enables
+line truncation only for <tt>git blame</tt>.</p></div>
 <div class="paragraph"><p>Likewise, when the <tt>LV</tt> environment variable is unset, Git sets it
 to <tt>-c</tt>.  You can override this setting by exporting <tt>LV</tt> with
 another value or setting <tt>core.pager</tt> to <tt>lv +c</tt>.</p></div>
@@ -3093,7 +3100,7 @@ diff.ignoreSubmodules
         this setting when reporting uncommitted changes. Setting it to
         <em>all</em> disables the submodule summary normally shown by <em>git commit</em>
         and <em>git status</em> when <em>status.submodulesummary</em> is set unless it is
-        overridden by using the --ignore-submodules command line option.
+        overridden by using the --ignore-submodules command-line option.
         The <em>git submodule</em> commands are not affected by this setting.
 </p>
 </dd>
@@ -3991,7 +3998,7 @@ gpg.program
 <p>
         Use this custom program instead of "gpg" found on $PATH when
         making or verifying a PGP signature. The program must support the
-        same command line interface as GPG, namely, to verify a detached
+        same command-line interface as GPG, namely, to verify a detached
         signature, "gpg --verify $file - &lt;$signature" is run, and the
         program is expected to signal a good signature by exiting with
         code 0, and to generate an ascii-armored detached signature, the
@@ -5981,7 +5988,7 @@ status.submodulesummary
         submodules when <tt>diff.ignoreSubmodules</tt> is set to <em>all</em> or only
         for those submodules where <tt>submodule.&lt;name&gt;.ignore=all</tt>. To
         also view the summary for ignored submodules you can either use
-        the --ignore-submodules=dirty command line option or the <em>git
+        the --ignore-submodules=dirty command-line option or the <em>git
         submodule summary</em> command, which shows a similar output but does
         not honor these settings.
 </p>
@@ -6022,7 +6029,7 @@ submodule.&lt;name&gt;.fetchRecurseSubmodules
 <p>
         This option can be used to control recursive fetching of this
         submodule. It can be overridden by using the --[no-]recurse-submodules
-        command line option to "git fetch" and "git pull".
+        command-line option to "git fetch" and "git pull".
         This setting will override that from in the <a href="gitmodules.html">gitmodules(5)</a>
         file.
 </p>
@@ -6231,7 +6238,7 @@ web.browser
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-09-09 15:34:20 PDT
+Last updated 2014-06-06 12:15:38 PDT
 </div>
 </div>
 </body>
