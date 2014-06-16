@@ -2218,9 +2218,9 @@ core.preloadindex
 </p>
 <div class="paragraph"><p>This can speed up operations like <em>git diff</em> and <em>git status</em> especially
 on filesystems like NFS that have weak caching semantics and thus
-relatively high IO latencies.  With this set to <em>true</em>, Git will do the
+relatively high IO latencies.  When enabled, Git will do the
 index comparison to the filesystem data in parallel, allowing
-overlapping IO&#8217;s.</p></div>
+overlapping IO&#8217;s.  Defaults to true.</p></div>
 </dd>
 <dt class="hdlist1">
 core.createObject
@@ -3595,6 +3595,15 @@ format.signature
         the Git version number. Use this variable to change that default.
         Set this variable to the empty string ("") to suppress
         signature generation.
+</p>
+</dd>
+<dt class="hdlist1">
+format.signaturefile
+</dt>
+<dd>
+<p>
+        Works just like format.signature except the contents of the
+        file specified by this variable will be used as the signature.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5986,7 +5995,9 @@ status.submodulesummary
         --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>). Please note
         that the summary output command will be suppressed for all
         submodules when <tt>diff.ignoreSubmodules</tt> is set to <em>all</em> or only
-        for those submodules where <tt>submodule.&lt;name&gt;.ignore=all</tt>. To
+        for those submodules where <tt>submodule.&lt;name&gt;.ignore=all</tt>. The only
+        exception to that rule is that status and commit will show staged
+        submodule changes. To
         also view the summary for ignored submodules you can either use
         the --ignore-submodules=dirty command-line option or the <em>git
         submodule summary</em> command, which shows a similar output but does
@@ -6041,7 +6052,9 @@ submodule.&lt;name&gt;.ignore
 <p>
         Defines under what circumstances "git status" and the diff family show
         a submodule as modified. When set to "all", it will never be considered
-        modified, "dirty" will ignore all changes to the submodules work tree and
+        modified (but it will nonetheless show up in the output of status and
+        commit when it has been staged), "dirty" will ignore all changes
+        to the submodules work tree and
         takes only differences between the HEAD of the submodule and the commit
         recorded in the superproject into account. "untracked" will additionally
         let submodules with modified tracked files in their work tree show up.

@@ -919,6 +919,12 @@ calls finish_command().
 terminated), of which .argv[0] is the program name to run (usually
 without a path). If the command to run is a git command, set argv[0] to
 the command name without the <em>git-</em> prefix and set .git_cmd = 1.</p></div>
+<div class="paragraph"><p>Note that the ownership of the memory pointed to by .argv stays with the
+caller, but it should survive until <tt>finish_command</tt> completes. If the
+.argv member is NULL, <tt>start_command</tt> will point it at the .args
+<tt>argv_array</tt> (so you may use one or the other, but you must use exactly
+one). The memory in .args will be cleaned up automatically during
+<tt>finish_command</tt> (or during <tt>start_command</tt> when it is unsuccessful).</p></div>
 <div class="paragraph"><p>The members .in, .out, .err are used to redirect stdin, stdout,
 stderr as follows:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1153,7 +1159,7 @@ It must not change the program&#8217;s state that the caller of the
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-06-16 14:13:22 PDT
 </div>
 </div>
 </body>
