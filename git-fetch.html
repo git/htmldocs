@@ -761,24 +761,26 @@ git-fetch(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Fetches named heads or tags from one or more other repositories,
-along with the objects necessary to complete them.</p></div>
-<div class="paragraph"><p>The ref names and their object names of fetched refs are stored
-in <tt>.git/FETCH_HEAD</tt>.  This information is left for a later merge
-operation done by <em>git merge</em>.</p></div>
-<div class="paragraph"><p>By default, tags are auto-followed.  This means that when fetching
-from a remote, any tags on the remote that point to objects that exist
-in the local repository are fetched.  The effect is to fetch tags that
+<div class="paragraph"><p>Fetch branches and/or tags (collectively, "refs") from one or more
+other repositories, along with the objects necessary to complete their
+histories.  Remote-tracking branches are updated (see the description
+of &lt;refspec&gt; below for ways to control this behavior).</p></div>
+<div class="paragraph"><p>By default, any tag that points into the histories being fetched is
+also fetched; the effect is to fetch tags that
 point at branches that you are interested in.  This default behavior
-can be changed by using the --tags or --no-tags options, by
-configuring remote.&lt;name&gt;.tagopt, or by using a refspec that fetches
-tags explicitly.</p></div>
-<div class="paragraph"><p><em>git fetch</em> can fetch from either a single named repository,
+can be changed by using the --tags or --no-tags options or by
+configuring remote.&lt;name&gt;.tagopt.  By using a refspec that fetches tags
+explicitly, you can fetch tags that do not point into branches you
+are interested in as well.</p></div>
+<div class="paragraph"><p><em>git fetch</em> can fetch from either a single named repository or URL,
 or from several repositories at once if &lt;group&gt; is given and
 there is a remotes.&lt;group&gt; entry in the configuration file.
 (See <a href="git-config.html">git-config(1)</a>).</p></div>
 <div class="paragraph"><p>When no remote is specified, by default the <tt>origin</tt> remote will be used,
 unless there&#8217;s an upstream branch configured for the current branch.</p></div>
+<div class="paragraph"><p>The names of refs that are fetched, together with the object names
+they point at, are written to <tt>.git/FETCH_HEAD</tt>.  This information
+may be used by scripts or other git commands, such as <a href="git-pull.html">git-pull(1)</a>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -914,6 +916,19 @@ the current repository has the same history as the source repository.</p></div>
         This option disables this automatic tag following. The default
         behavior for a remote may be specified with the remote.&lt;name&gt;.tagopt
         setting. See <a href="git-config.html">git-config(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+--refmap=&lt;refspec&gt;
+</dt>
+<dd>
+<p>
+        When fetching refs listed on the command line, use the
+        specified refspec (can be given more than once) to map the
+        refs to remote-tracking branches, instead of the values of
+        <tt>remote.*.fetch</tt> configuration variables for the remote
+        repository.  See section on "Configured Remote-tracking
+        Branches" for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1068,10 +1083,17 @@ the current repository has the same history as the source repository.</p></div>
 </dt>
 <dd>
 <p>
-        The format of a &lt;refspec&gt; parameter is an optional plus
-        <tt>+</tt>, followed by the source ref &lt;src&gt;, followed
-        by a colon <tt>:</tt>, followed by the destination ref &lt;dst&gt;.
+        Specifies which refs to fetch and which local refs to update.
+        When no &lt;refspec&gt;s appear on the command line, the refs to fetch
+        are read from <tt>remote.&lt;repository&gt;.fetch</tt> variables instead
+        (see <a href="#CRTB">CONFIGURED REMOTE-TRACKING BRANCHES</a> below).
 </p>
+<div class="paragraph"><p>The format of a &lt;refspec&gt; parameter is an optional plus
+<tt>+</tt>, followed by the source ref &lt;src&gt;, followed
+by a colon <tt>:</tt>, followed by the destination ref &lt;dst&gt;.
+The colon can be omitted when &lt;dst&gt; is empty.</p></div>
+<div class="paragraph"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
+it requests fetching everything up to the given tag.</p></div>
 <div class="paragraph"><p>The remote ref that matches &lt;src&gt;
 is fetched, and if &lt;dst&gt; is not empty string, the local
 ref that matches it is fast-forwarded using &lt;src&gt;.
@@ -1083,72 +1105,18 @@ update.</p></div>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">If the remote branch from which you want to pull is
-modified in non-linear ways such as being rewound and
-rebased frequently, then a pull will attempt a merge with
-an older version of itself, likely conflict, and fail.
-It is under these conditions that you would want to use
-the <tt>+</tt> sign to indicate non-fast-forward updates will
-be needed.  There is currently no easy way to determine
-or declare that a branch will be made available in a
-repository with this behavior; the pulling user simply
+<td class="content">When the remote branch you want to fetch is known to
+be rewound and rebased regularly, it is expected that
+its new tip will not be descendant of its previous tip
+(as stored in your remote-tracking branch the last time
+you fetched).  You would want
+to use the <tt>+</tt> sign to indicate non-fast-forward updates
+will be needed for such branches.  There is no way to
+determine or declare that a branch will be made available
+in a repository with this behavior; the pulling user simply
 must know this is the expected usage pattern for a branch.</td>
 </tr></table>
 </div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">You never do your own development on branches that appear
-on the right hand side of a &lt;refspec&gt; colon on <tt>Pull:</tt> lines;
-they are to be updated by <em>git fetch</em>.  If you intend to do
-development derived from a remote branch <tt>B</tt>, have a <tt>Pull:</tt>
-line to track it (i.e. <tt>Pull: B:remote-B</tt>), and have a separate
-branch <tt>my-B</tt> to do your development on top of it.  The latter
-is created by <tt>git branch my-B remote-B</tt> (or its equivalent <tt>git
-checkout -b my-B remote-B</tt>).  Run <tt>git fetch</tt> to keep track of
-the progress of the remote side, and when you see something new
-on the remote branch, merge it into your development branch with
-<tt>git pull . remote-B</tt>, while you are on <tt>my-B</tt> branch.</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">There is a difference between listing multiple &lt;refspec&gt;
-directly on <em>git pull</em> command line and having multiple
-<tt>Pull:</tt> &lt;refspec&gt; lines for a &lt;repository&gt; and running
-<em>git pull</em> command without any explicit &lt;refspec&gt; parameters.
-&lt;refspec&gt; listed explicitly on the command line are always
-merged into the current branch after fetching.  In other words,
-if you list more than one remote refs, you would be making
-an Octopus.  While <em>git pull</em> run without any explicit &lt;refspec&gt;
-parameter takes default &lt;refspec&gt;s from <tt>Pull:</tt> lines, it
-merges only the first &lt;refspec&gt; found into the current branch,
-after fetching all the remote refs.  This is because making an
-Octopus from remote refs is rarely done, while keeping track
-of multiple remote heads in one-go by fetching more than one
-is often useful.</td>
-</tr></table>
-</div>
-<div class="paragraph"><p>Some short-cut notations are also supported.</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
-  it requests fetching everything up to the given tag.
-</p>
-</li>
-<li>
-<p>
-A parameter &lt;ref&gt; without a colon fetches that ref into FETCH_HEAD,
-  and updates the remote-tracking branches (if any).
-</p>
-</li>
-</ul></div>
 </dd>
 </dl></div>
 </div>
@@ -1384,6 +1352,60 @@ refspecs, if you don&#8217;t provide one on the command line.
 </div>
 </div>
 <div class="sect1">
+<h2 id="_configured_remote_tracking_branches_a_id_crtb_a">CONFIGURED REMOTE-TRACKING BRANCHES<a id="CRTB"></a></h2>
+<div class="sectionbody">
+<div class="paragraph"><p>You often interact with the same remote repository by
+regularly and repeatedly fetching from it.  In order to keep track
+of the progress of such a remote repository, <tt>git fetch</tt> allows you
+to configure <tt>remote.&lt;repository&gt;.fetch</tt> configuration variables.</p></div>
+<div class="paragraph"><p>Typically such a variable may look like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[remote "origin"]
+        fetch = +refs/heads/*:refs/remotes/origin/*</tt></pre>
+</div></div>
+<div class="paragraph"><p>This configuration is used in two ways:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+When <tt>git fetch</tt> is run without specifying what branches
+  and/or tags to fetch on the command line, e.g. <tt>git fetch origin</tt>
+  or <tt>git fetch</tt>, <tt>remote.&lt;repository&gt;.fetch</tt> values are used as
+  the refspecs---they specify which refs to fetch and which local refs
+  to update.  The example above will fetch
+  all branches that exist in the <tt>origin</tt> (i.e. any ref that matches
+  the left-hand side of the value, <tt>refs/heads/*</tt>) and update the
+  corresponding remote-tracking branches in the <tt>refs/remotes/origin/*</tt>
+  hierarchy.
+</p>
+</li>
+<li>
+<p>
+When <tt>git fetch</tt> is run with explicit branches and/or tags
+  to fetch on the command line, e.g. <tt>git fetch origin master</tt>, the
+  &lt;refspec&gt;s given on the command line determine what are to be
+  fetched (e.g. <tt>master</tt> in the example,
+  which is a short-hand for <tt>master:</tt>, which in turn means
+  "fetch the <em>master</em> branch but I do not explicitly say what
+  remote-tracking branch to update with it from the command line"),
+  and the example command will
+  fetch <em>only</em> the <em>master</em> branch.  The <tt>remote.&lt;repository&gt;.fetch</tt>
+  values determine which
+  remote-tracking branch, if any, is updated.  When used in this
+  way, the <tt>remote.&lt;repository&gt;.fetch</tt> values do not have any
+  effect in deciding <em>what</em> gets fetched (i.e. the values are not
+  used as refspecs when the command-line lists refspecs); they are
+  only used to decide <em>where</em> the refs that are fetched are stored
+  by acting as a mapping.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The latter use of the <tt>remote.&lt;repository&gt;.fetch</tt> values can be
+overridden by giving the <tt>--refmap=&lt;refspec&gt;</tt> parameter(s) on the
+command line.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
@@ -1413,6 +1435,22 @@ the local repository by fetching from the branches (respectively)
 <tt>pu</tt> and <tt>maint</tt> from the remote repository.</p></div>
 <div class="paragraph"><p>The <tt>pu</tt> branch will be updated even if it is does not fast-forward,
 because it is prefixed with a plus sign; <tt>tmp</tt> will not be.</p></div>
+</li>
+<li>
+<p>
+Peek at a remote&#8217;s branch, without configuring the remote in your local
+repository:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ git fetch git://git.kernel.org/pub/scm/git/git.git maint
+$ git log FETCH_HEAD</tt></pre>
+</div></div>
+<div class="paragraph"><p>The first command fetches the <tt>maint</tt> branch from the repository at
+<tt>git://git.kernel.org/pub/scm/git/git.git</tt> and the second command uses
+<tt>FETCH_HEAD</tt> to examine the branch with <a href="git-log.html">git-log(1)</a>.  The fetched
+objects will eventually be removed by git&#8217;s built-in housekeeping (see
+<a href="git-gc.html">git-gc(1)</a>).</p></div>
 </li>
 </ul></div>
 </div>
@@ -1444,7 +1482,7 @@ version.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-12-17 15:53:46 PST
+Last updated 2014-06-20 15:24:28 PDT
 </div>
 </div>
 </body>
