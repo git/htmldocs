@@ -936,14 +936,58 @@ the wrapper to the regular config-reading functions. For example:</p></div>
 <div class="sect1">
 <h2 id="_writing_config_files">Writing Config Files</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>TODO</p></div>
+<div class="paragraph"><p>Git gives multiple entry points in the Config API to write config values to
+files namely <tt>git_config_set_in_file</tt> and <tt>git_config_set</tt>, which write to
+a specific config file or to <tt>.git/config</tt> respectively. They both take a
+key/value pair as parameter.
+In the end they both call <tt>git_config_set_multivar_in_file</tt> which takes four
+parameters:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+the name of the file, as a string, to which key/value pairs will be written.
+</p>
+</li>
+<li>
+<p>
+the name of key, as a string. This is in canonical "flat" form: the section,
+  subsection, and variable segments will be separated by dots, and the section
+  and variable segments will be all lowercase.
+  E.g., <tt>core.ignorecase</tt>, <tt>diff.SomeType.textconv</tt>.
+</p>
+</li>
+<li>
+<p>
+the value of the variable, as a string. If value is equal to NULL, it will
+  remove the matching key from the config file.
+</p>
+</li>
+<li>
+<p>
+the value regex, as a string. It will disregard key/value pairs where value
+  does not match.
+</p>
+</li>
+<li>
+<p>
+a multi_replace value, as an int. If value is equal to zero, nothing or only
+  one matching key/value is replaced, else all matching key/values (regardless
+  how many) are removed, before the new pair is written.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>It returns 0 on success.</p></div>
+<div class="paragraph"><p>Also, there are functions <tt>git_config_rename_section</tt> and
+<tt>git_config_rename_section_in_file</tt> with parameters <tt>old_name</tt> and <tt>new_name</tt>
+for renaming or removing sections in the config files. If NULL is passed
+through <tt>new_name</tt> parameter, the section will be removed from the config file.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-08-04 14:37:24 PDT
 </div>
 </div>
 </body>
