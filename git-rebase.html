@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-rebase(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -751,7 +749,7 @@ git-rebase(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git rebase</em> [-i | --interactive] [options] [--exec &lt;cmd&gt;] [--onto &lt;newbase&gt;]
-        [&lt;upstream&gt;] [&lt;branch&gt;]
+        [&lt;upstream&gt; [&lt;branch&gt;]]
 <em>git rebase</em> [-i | --interactive] [options] [--exec &lt;cmd&gt;] [--onto &lt;newbase&gt;]
         --root [&lt;branch&gt;]
 <em>git rebase</em> --continue | --skip | --abort | --edit-todo</pre>
@@ -763,7 +761,7 @@ git-rebase(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If &lt;branch&gt; is specified, <em>git rebase</em> will perform an automatic
-<tt>git checkout &lt;branch&gt;</tt> before doing anything else.  Otherwise
+<code>git checkout &lt;branch&gt;</code> before doing anything else.  Otherwise
 it remains on the current branch.</p></div>
 <div class="paragraph"><p>If &lt;upstream&gt; is not specified, the upstream configured in
 branch.&lt;name&gt;.remote and branch.&lt;name&gt;.merge options will be used; see
@@ -772,11 +770,11 @@ branch or if the current branch does not have a configured upstream,
 the rebase will abort.</p></div>
 <div class="paragraph"><p>All changes made by commits in the current branch but that are not
 in &lt;upstream&gt; are saved to a temporary area.  This is the same set
-of commits that would be shown by <tt>git log &lt;upstream&gt;..HEAD</tt> (or
-<tt>git log HEAD</tt>, if --root is specified).</p></div>
+of commits that would be shown by <code>git log &lt;upstream&gt;..HEAD</code> (or
+<code>git log HEAD</code>, if --root is specified).</p></div>
 <div class="paragraph"><p>The current branch is reset to &lt;upstream&gt;, or &lt;newbase&gt; if the
 --onto option was supplied.  This has the exact same effect as
-<tt>git reset --hard &lt;upstream&gt;</tt> (or &lt;newbase&gt;).  ORIG_HEAD is set
+<code>git reset --hard &lt;upstream&gt;</code> (or &lt;newbase&gt;).  ORIG_HEAD is set
 to point at the tip of the branch before the reset.</p></div>
 <div class="paragraph"><p>The commits that were previously saved into the temporary area are
 then reapplied to the current branch, one by one, in order. Note that
@@ -785,32 +783,32 @@ in HEAD..&lt;upstream&gt; are omitted (i.e., a patch already accepted upstream
 with a different commit message or timestamp will be skipped).</p></div>
 <div class="paragraph"><p>It is possible that a merge failure will prevent this process from being
 completely automatic.  You will have to resolve any such merge failure
-and run <tt>git rebase --continue</tt>.  Another option is to bypass the commit
-that caused the merge failure with <tt>git rebase --skip</tt>.  To check out the
+and run <code>git rebase --continue</code>.  Another option is to bypass the commit
+that caused the merge failure with <code>git rebase --skip</code>.  To check out the
 original &lt;branch&gt; and remove the .git/rebase-apply working files, use the
-command <tt>git rebase --abort</tt> instead.</p></div>
+command <code>git rebase --abort</code> instead.</p></div>
 <div class="paragraph"><p>Assume the following history exists and the current branch is "topic":</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>          A---B---C topic
+<pre><code>          A---B---C topic
          /
-    D---E---F---G master</tt></pre>
+    D---E---F---G master</code></pre>
 </div></div>
 <div class="paragraph"><p>From this point, the result of either of the following commands:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase master
-git rebase master topic</tt></pre>
+<pre><code>git rebase master
+git rebase master topic</code></pre>
 </div></div>
 <div class="paragraph"><p>would be:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                  A'--B'--C' topic
+<pre><code>                  A'--B'--C' topic
                  /
-    D---E---F---G master</tt></pre>
+    D---E---F---G master</code></pre>
 </div></div>
-<div class="paragraph"><p><strong>NOTE:</strong> The latter form is just a short-hand of <tt>git checkout topic</tt>
-followed by <tt>git rebase master</tt>. When rebase exits <tt>topic</tt> will
+<div class="paragraph"><p><strong>NOTE:</strong> The latter form is just a short-hand of <code>git checkout topic</code>
+followed by <code>git rebase master</code>. When rebase exits <code>topic</code> will
 remain the checked-out branch.</p></div>
 <div class="paragraph"><p>If the upstream branch already contains a change you have made (e.g.,
 because you mailed a patch which was applied upstream), then that commit
@@ -819,87 +817,87 @@ following history (in which A&#8217; and A introduce the same set of changes,
 but have different committer information):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>          A---B---C topic
+<pre><code>          A---B---C topic
          /
-    D---E---A'---F master</tt></pre>
+    D---E---A'---F master</code></pre>
 </div></div>
 <div class="paragraph"><p>will result in:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                   B'---C' topic
+<pre><code>                   B'---C' topic
                   /
-    D---E---A'---F master</tt></pre>
+    D---E---A'---F master</code></pre>
 </div></div>
 <div class="paragraph"><p>Here is how you would transplant a topic branch based on one
 branch to another, to pretend that you forked the topic branch
-from the latter branch, using <tt>rebase --onto</tt>.</p></div>
+from the latter branch, using <code>rebase --onto</code>.</p></div>
 <div class="paragraph"><p>First let&#8217;s assume your <em>topic</em> is based on branch <em>next</em>.
 For example, a feature developed in <em>topic</em> depends on some
 functionality which is found in <em>next</em>.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    o---o---o---o---o  master
+<pre><code>    o---o---o---o---o  master
          \
           o---o---o---o---o  next
                            \
-                            o---o---o  topic</tt></pre>
+                            o---o---o  topic</code></pre>
 </div></div>
 <div class="paragraph"><p>We want to make <em>topic</em> forked from branch <em>master</em>; for example,
 because the functionality on which <em>topic</em> depends was merged into the
 more stable <em>master</em> branch. We want our tree to look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    o---o---o---o---o  master
+<pre><code>    o---o---o---o---o  master
         |            \
         |             o'--o'--o'  topic
          \
-          o---o---o---o---o  next</tt></pre>
+          o---o---o---o---o  next</code></pre>
 </div></div>
 <div class="paragraph"><p>We can get this using the following command:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase --onto master next topic</tt></pre>
+<pre><code>git rebase --onto master next topic</code></pre>
 </div></div>
 <div class="paragraph"><p>Another example of --onto option is to rebase part of a
 branch.  If we have the following situation:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                            H---I---J topicB
+<pre><code>                            H---I---J topicB
                            /
                   E---F---G  topicA
                  /
-    A---B---C---D  master</tt></pre>
+    A---B---C---D  master</code></pre>
 </div></div>
 <div class="paragraph"><p>then the command</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase --onto master topicA topicB</tt></pre>
+<pre><code>git rebase --onto master topicA topicB</code></pre>
 </div></div>
 <div class="paragraph"><p>would result in:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                 H'--I'--J'  topicB
+<pre><code>                 H'--I'--J'  topicB
                 /
                 | E---F---G  topicA
                 |/
-    A---B---C---D  master</tt></pre>
+    A---B---C---D  master</code></pre>
 </div></div>
 <div class="paragraph"><p>This is useful when topicB does not depend on topicA.</p></div>
 <div class="paragraph"><p>A range of commits could also be removed with rebase.  If we have
 the following situation:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    E---F---G---H---I---J  topicA</tt></pre>
+<pre><code>    E---F---G---H---I---J  topicA</code></pre>
 </div></div>
 <div class="paragraph"><p>then the command</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase --onto topicA~5 topicA~3 topicA</tt></pre>
+<pre><code>git rebase --onto topicA~5 topicA~3 topicA</code></pre>
 </div></div>
 <div class="paragraph"><p>would result in the removal of commits F and G:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    E---H'---I'---J'  topicA</tt></pre>
+<pre><code>    E---H'---I'---J'  topicA</code></pre>
 </div></div>
 <div class="paragraph"><p>This is useful if F and G were flawed in some way, or should not be
 part of topicA.  Note that the argument to --onto and the &lt;upstream&gt;
@@ -911,18 +909,18 @@ file you edit, you need to tell Git that the conflict has been resolved,
 typically this would be done with</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git add &lt;filename&gt;</tt></pre>
+<pre><code>git add &lt;filename&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>After resolving the conflict manually and updating the index with the
 desired resolution, you can continue the rebasing process with</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase --continue</tt></pre>
+<pre><code>git rebase --continue</code></pre>
 </div></div>
 <div class="paragraph"><p>Alternatively, you can undo the <em>git rebase</em> with</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase --abort</tt></pre>
+<pre><code>git rebase --abort</code></pre>
 </div></div>
 </div>
 </div>
@@ -1066,7 +1064,7 @@ other words, the sides are swapped.</p></div>
 <dd>
 <p>
         Use the given merge strategy.
-        If there is no <tt>-s</tt> option <em>git merge-recursive</em> is used
+        If there is no <code>-s</code> option <em>git merge-recursive</em> is used
         instead.  This implies --merge.
 </p>
 <div class="paragraph"><p>Because <em>git rebase</em> replays each commit from the working branch
@@ -1083,9 +1081,9 @@ which makes little sense.</p></div>
 <dd>
 <p>
         Pass the &lt;strategy-option&gt; through to the merge strategy.
-        This implies <tt>--merge</tt> and, if no strategy has been
-        specified, <tt>-s recursive</tt>.  Note the reversal of <em>ours</em> and
-        <em>theirs</em> as noted above for the <tt>-m</tt> option.
+        This implies <code>--merge</code> and, if no strategy has been
+        specified, <code>-s recursive</code>.  Note the reversal of <em>ours</em> and
+        <em>theirs</em> as noted above for the <code>-m</code> option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1178,7 +1176,7 @@ which makes little sense.</p></div>
 <dd>
 <p>
         Force a rebase even if the current branch is up-to-date and
-        the command without <tt>--force</tt> would return without doing anything.
+        the command without <code>--force</code> would return without doing anything.
 </p>
 <div class="paragraph"><p>You may find this (or --no-ff with an interactive rebase) helpful after
 reverting a topic branch merge, as this option recreates the topic branch with
@@ -1195,12 +1193,12 @@ the reversion" (see the
 <dd>
 <p>
         Use <em>git merge-base --fork-point</em> to find a better common ancestor
-        between <tt>upstream</tt> and <tt>branch</tt> when calculating which commits have
-        have been introduced by <tt>branch</tt> (see <a href="git-merge-base.html">git-merge-base(1)</a>).
+        between <code>upstream</code> and <code>branch</code> when calculating which commits have
+        have been introduced by <code>branch</code> (see <a href="git-merge-base.html">git-merge-base(1)</a>).
 </p>
 <div class="paragraph"><p>If no non-option arguments are given on the command line, then the default is
-<tt>--fork-point @{u}</tt> otherwise the <tt>upstream</tt> argument is interpreted literally
-unless the <tt>--fork-point</tt> option is specified.</p></div>
+<code>--fork-point @{u}</code> otherwise the <code>upstream</code> argument is interpreted literally
+unless the <code>--fork-point</code> option is specified.</p></div>
 </dd>
 <dt class="hdlist1">
 --ignore-whitespace
@@ -1251,8 +1249,8 @@ unless the <tt>--fork-point</tt> option is specified.</p></div>
 <p>
         Instead of ignoring merges, try to recreate them.
 </p>
-<div class="paragraph"><p>This uses the <tt>--interactive</tt> machinery internally, but combining it
-with the <tt>--interactive</tt> option explicitly is generally not a good
+<div class="paragraph"><p>This uses the <code>--interactive</code> machinery internally, but combining it
+with the <code>--interactive</code> option explicitly is generally not a good
 idea unless you know what you are doing (see BUGS below).</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1267,20 +1265,20 @@ idea unless you know what you are doing (see BUGS below).</p></div>
         final history. &lt;cmd&gt; will be interpreted as one or more shell
         commands.
 </p>
-<div class="paragraph"><p>This option can only be used with the <tt>--interactive</tt> option
+<div class="paragraph"><p>This option can only be used with the <code>--interactive</code> option
 (see INTERACTIVE MODE below).</p></div>
-<div class="paragraph"><p>You may execute several commands by either using one instance of <tt>--exec</tt>
+<div class="paragraph"><p>You may execute several commands by either using one instance of <code>--exec</code>
 with several commands:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase -i --exec "cmd1 &amp;&amp; cmd2 &amp;&amp; ..."</tt></pre>
+<pre><code>git rebase -i --exec "cmd1 &amp;&amp; cmd2 &amp;&amp; ..."</code></pre>
 </div></div>
-<div class="paragraph"><p>or by giving more than one <tt>--exec</tt>:</p></div>
+<div class="paragraph"><p>or by giving more than one <code>--exec</code>:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase -i --exec "cmd1" --exec "cmd2" --exec ...</tt></pre>
+<pre><code>git rebase -i --exec "cmd1" --exec "cmd2" --exec ...</code></pre>
 </div></div>
-<div class="paragraph"><p>If <tt>--autosquash</tt> is used, "exec" lines will not be appended for
+<div class="paragraph"><p>If <code>--autosquash</code> is used, "exec" lines will not be appended for
 the intermediate commits, and will only appear at the end of each
 squash/fixup series.</p></div>
 </dd>
@@ -1312,13 +1310,13 @@ squash/fixup series.</p></div>
         the same &#8230;, automatically modify the todo list of rebase -i
         so that the commit marked for squashing comes right after the
         commit to be modified, and change the action of the moved
-        commit from <tt>pick</tt> to <tt>squash</tt> (or <tt>fixup</tt>).  Ignores subsequent
+        commit from <code>pick</code> to <code>squash</code> (or <code>fixup</code>).  Ignores subsequent
         "fixup! " or "squash! " after the first, in case you referred to an
-        earlier fixup/squash with <tt>git commit --fixup/--squash</tt>.
+        earlier fixup/squash with <code>git commit --fixup/--squash</code>.
 </p>
 <div class="paragraph"><p>This option is only valid when the <em>--interactive</em> option is used.</p></div>
 <div class="paragraph"><p>If the <em>--autosquash</em> option is enabled by default using the
-configuration variable <tt>rebase.autosquash</tt>, this option can be
+configuration variable <code>rebase.autosquash</code>, this option can be
 used to override and disable this setting.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1354,10 +1352,10 @@ successfully without needing to "revert the reversion" (see the
 <div class="sect1">
 <h2 id="_merge_strategies">MERGE STRATEGIES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The merge mechanism (<tt>git merge</tt> and <tt>git pull</tt> commands) allows the
-backend <em>merge strategies</em> to be chosen with <tt>-s</tt> option.  Some strategies
-can also take their own options, which can be passed by giving <tt>-X&lt;option&gt;</tt>
-arguments to <tt>git merge</tt> and/or <tt>git pull</tt>.</p></div>
+<div class="paragraph"><p>The merge mechanism (<code>git merge</code> and <code>git pull</code> commands) allows the
+backend <em>merge strategies</em> to be chosen with <code>-s</code> option.  Some strategies
+can also take their own options, which can be passed by giving <code>-X&lt;option&gt;</code>
+arguments to <code>git merge</code> and/or <code>git pull</code>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 resolve
@@ -1421,7 +1419,7 @@ patience
         to avoid mismerges that sometimes occur due to unimportant
         matching lines (e.g., braces from distinct functions).  Use
         this when the branches to be merged have diverged wildly.
-        See also <a href="git-diff.html">git-diff(1)</a> <tt>--patience</tt>.
+        See also <a href="git-diff.html">git-diff(1)</a> <code>--patience</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1432,7 +1430,7 @@ diff-algorithm=[patience|minimal|histogram|myers]
         Tells <em>merge-recursive</em> to use a different diff algorithm, which
         can help avoid mismerges that occur due to unimportant matching
         lines (such as braces from distinct functions).  See also
-        <a href="git-diff.html">git-diff(1)</a> <tt>--diff-algorithm</tt>.
+        <a href="git-diff.html">git-diff(1)</a> <code>--diff-algorithm</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1449,8 +1447,8 @@ ignore-space-at-eol
         Treats lines with the indicated type of whitespace change as
         unchanged for the sake of a three-way merge.  Whitespace
         changes mixed with other changes to a line are not ignored.
-        See also <a href="git-diff.html">git-diff(1)</a> <tt>-b</tt>, <tt>-w</tt>, and
-        <tt>--ignore-space-at-eol</tt>.
+        See also <a href="git-diff.html">git-diff(1)</a> <code>-b</code>, <code>-w</code>, and
+        <code>--ignore-space-at-eol</code>.
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1490,8 +1488,8 @@ no-renormalize
 </dt>
 <dd>
 <p>
-        Disables the <tt>renormalize</tt> option.  This overrides the
-        <tt>merge.renormalize</tt> configuration variable.
+        Disables the <code>renormalize</code> option.  This overrides the
+        <code>merge.renormalize</code> configuration variable.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1500,7 +1498,7 @@ rename-threshold=&lt;n&gt;
 <dd>
 <p>
         Controls the similarity threshold used for rename detection.
-        See also <a href="git-diff.html">git-diff(1)</a> <tt>-M</tt>.
+        See also <a href="git-diff.html">git-diff(1)</a> <code>-M</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1646,7 +1644,7 @@ commits, and squashing multiple commits into one.</p></div>
 <div class="paragraph"><p>Start it with the last commit you want to retain as-is:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git rebase -i &lt;after-this-commit&gt;</tt></pre>
+<pre><code>git rebase -i &lt;after-this-commit&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>An editor will be fired up with all the commits in your current branch
 (ignoring merge commits), which come after the given commit.  You can
@@ -1654,9 +1652,9 @@ reorder the commits in this list to your heart&#8217;s content, and you can
 remove them.  The list looks more or less like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>pick deadbee The oneline of this commit
+<pre><code>pick deadbee The oneline of this commit
 pick fa1afe1 The oneline of the next commit
-...</tt></pre>
+...</code></pre>
 </div></div>
 <div class="paragraph"><p>The oneline descriptions are purely for your pleasure; <em>git rebase</em> will
 not look at them but at the commit names ("deadbee" and "fa1afe1" in this
@@ -1676,29 +1674,29 @@ messages of the first commit and of those with the "squash" command,
 but omits the commit messages of commits with the "fixup" command.</p></div>
 <div class="paragraph"><p><em>git rebase</em> will stop when "pick" has been replaced with "edit" or
 when a command fails due to merge errors. When you are done editing
-and/or resolving conflicts you can continue with <tt>git rebase --continue</tt>.</p></div>
+and/or resolving conflicts you can continue with <code>git rebase --continue</code>.</p></div>
 <div class="paragraph"><p>For example, if you want to reorder the last 5 commits, such that what
 was HEAD~4 becomes the new HEAD. To achieve that, you would call
 <em>git rebase</em> like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git rebase -i HEAD~5</tt></pre>
+<pre><code>$ git rebase -i HEAD~5</code></pre>
 </div></div>
 <div class="paragraph"><p>And move the first patch to the end of the list.</p></div>
 <div class="paragraph"><p>You might want to preserve merges, if you have a history like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>           X
+<pre><code>           X
             \
          A---M---B
         /
----o---O---P---Q</tt></pre>
+---o---O---P---Q</code></pre>
 </div></div>
 <div class="paragraph"><p>Suppose you want to rebase the side branch starting at "A" to "Q". Make
 sure that the current HEAD is "B", and call</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git rebase -i -p --onto Q O</tt></pre>
+<pre><code>$ git rebase -i -p --onto Q O</code></pre>
 </div></div>
 <div class="paragraph"><p>Reordering and editing commits usually creates untested intermediate
 steps.  You may want to check that your history editing did not break
@@ -1707,37 +1705,37 @@ points in history by using the "exec" command (shortcut "x").  You may
 do so by creating a todo list like this one:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>pick deadbee Implement feature XXX
+<pre><code>pick deadbee Implement feature XXX
 fixup f1a5c00 Fix to feature XXX
 exec make
 pick c0ffeee The oneline of the next commit
 edit deadbab The oneline of the commit after
 exec cd subdir; make test
-...</tt></pre>
+...</code></pre>
 </div></div>
 <div class="paragraph"><p>The interactive rebase will stop when a command fails (i.e. exits with
 non-0 status) to give you an opportunity to fix the problem. You can
-continue with <tt>git rebase --continue</tt>.</p></div>
+continue with <code>git rebase --continue</code>.</p></div>
 <div class="paragraph"><p>The "exec" command launches the command in a shell (the one specified
-in <tt>$SHELL</tt>, or the default shell if <tt>$SHELL</tt> is not set), so you can
+in <code>$SHELL</code>, or the default shell if <code>$SHELL</code> is not set), so you can
 use shell features (like "cd", "&gt;", ";" &#8230;). The command is run from
 the root of the working tree.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git rebase -i --exec "make test"</tt></pre>
+<pre><code>$ git rebase -i --exec "make test"</code></pre>
 </div></div>
 <div class="paragraph"><p>This command lets you check that intermediate commits are compilable.
 The todo list becomes like that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>pick 5928aea one
+<pre><code>pick 5928aea one
 exec make test
 pick 04d0fda two
 exec make test
 pick ba46169 three
 exec make test
 pick f4593f9 four
-exec make test</tt></pre>
+exec make test</code></pre>
 </div></div>
 </div>
 </div>
@@ -1751,7 +1749,7 @@ add other commits.  This can be used to split a commit into two:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Start an interactive rebase with <tt>git rebase -i &lt;commit&gt;^</tt>, where
+Start an interactive rebase with <code>git rebase -i &lt;commit&gt;^</code>, where
   &lt;commit&gt; is the commit you want to split.  In fact, any commit range
   will do, as long as it contains that commit.
 </p>
@@ -1763,7 +1761,7 @@ Mark the commit you want to split with the action "edit".
 </li>
 <li>
 <p>
-When it comes to editing that commit, execute <tt>git reset HEAD^</tt>.  The
+When it comes to editing that commit, execute <code>git reset HEAD^</code>.  The
   effect is that the HEAD is rewound by one, and the index follows suit.
   However, the working tree stays the same.
 </p>
@@ -1771,7 +1769,7 @@ When it comes to editing that commit, execute <tt>git reset HEAD^</tt>.  The
 <li>
 <p>
 Now add the changes to the index that you want to have in the first
-  commit.  You can use <tt>git add</tt> (possibly interactively) or
+  commit.  You can use <code>git add</code> (possibly interactively) or
   <em>git gui</em> (or both) to do that.
 </p>
 </li>
@@ -1788,7 +1786,7 @@ Repeat the last two steps until your working tree is clean.
 </li>
 <li>
 <p>
-Continue the rebase with <tt>git rebase --continue</tt>.
+Continue the rebase with <code>git rebase --continue</code>.
 </p>
 </li>
 </ul></div>
@@ -1812,30 +1810,30 @@ on this <em>subsystem</em>.  You might end up with a history like the
 following:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    o---o---o---o---o---o---o---o---o  master
+<pre><code>    o---o---o---o---o---o---o---o---o  master
          \
           o---o---o---o---o  subsystem
                            \
-                            *---*---*  topic</tt></pre>
+                            *---*---*  topic</code></pre>
 </div></div>
 <div class="paragraph"><p>If <em>subsystem</em> is rebased against <em>master</em>, the following happens:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    o---o---o---o---o---o---o---o  master
+<pre><code>    o---o---o---o---o---o---o---o  master
          \                       \
           o---o---o---o---o       o'--o'--o'--o'--o'  subsystem
                            \
-                            *---*---*  topic</tt></pre>
+                            *---*---*  topic</code></pre>
 </div></div>
 <div class="paragraph"><p>If you now continue development as usual, and eventually merge <em>topic</em>
 to <em>subsystem</em>, the commits from <em>subsystem</em> will remain duplicated forever:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    o---o---o---o---o---o---o---o  master
+<pre><code>    o---o---o---o---o---o---o---o  master
          \                       \
           o---o---o---o---o       o'--o'--o'--o'--o'--M  subsystem
                            \                         /
-                            *---*---*-..........-*--*  topic</tt></pre>
+                            *---*---*-..........-*--*  topic</code></pre>
 </div></div>
 <div class="paragraph"><p>Such duplicates are generally frowned upon because they clutter up
 history, making it harder to follow.  To clean things up, you need to
@@ -1859,9 +1857,9 @@ Hard case: The changes are not the same.
 <dd>
 <p>
         This happens if the <em>subsystem</em> rebase had conflicts, or used
-        <tt>--interactive</tt> to omit, edit, squash, or fixup commits; or
-        if the upstream used one of <tt>commit --amend</tt>, <tt>reset</tt>, or
-        <tt>filter-branch</tt>.
+        <code>--interactive</code> to omit, edit, squash, or fixup commits; or
+        if the upstream used one of <code>commit --amend</code>, <code>reset</code>, or
+        <code>filter-branch</code>.
 </p>
 </dd>
 </dl></div>
@@ -1875,16 +1873,16 @@ changes that are already present in the new upstream.  So if you say
 (assuming you&#8217;re on <em>topic</em>)</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git rebase subsystem</tt></pre>
+<pre><code>    $ git rebase subsystem</code></pre>
 </div></div>
 <div class="paragraph"><p>you will end up with the fixed history</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    o---o---o---o---o---o---o---o  master
+<pre><code>    o---o---o---o---o---o---o---o  master
                                  \
                                   o'--o'--o'--o'--o'  subsystem
                                                    \
-                                                    *---*---*  topic</tt></pre>
+                                                    *---*---*  topic</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1898,8 +1896,8 @@ correspond to the ones before the rebase.</p></div>
 </td>
 <td class="content">While an "easy case recovery" sometimes appears to be successful
       even in the hard case, it may have unintended consequences.  For
-      example, a commit that was removed via <tt>git rebase
-      --interactive</tt> will be <strong>resurrected</strong>!</td>
+      example, a commit that was removed via <code>git rebase
+      --interactive</code> will be <strong>resurrected</strong>!</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>The idea is to manually tell <em>git rebase</em> "where the old <em>subsystem</em>
@@ -1910,22 +1908,22 @@ of the old <em>subsystem</em>, for example:</p></div>
 <li>
 <p>
 With the <em>subsystem</em> reflog: after <em>git fetch</em>, the old tip of
-  <em>subsystem</em> is at <tt>subsystem@{1}</tt>.  Subsequent fetches will
+  <em>subsystem</em> is at <code>subsystem@{1}</code>.  Subsequent fetches will
   increase the number.  (See <a href="git-reflog.html">git-reflog(1)</a>.)
 </p>
 </li>
 <li>
 <p>
 Relative to the tip of <em>topic</em>: knowing that your <em>topic</em> has three
-  commits, the old tip of <em>subsystem</em> must be <tt>topic~3</tt>.
+  commits, the old tip of <em>subsystem</em> must be <code>topic~3</code>.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>You can then transplant the old <tt>subsystem..topic</tt> to the new tip by
+<div class="paragraph"><p>You can then transplant the old <code>subsystem..topic</code> to the new tip by
 saying (for the reflog case, and assuming you are on <em>topic</em> already):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git rebase --onto subsystem subsystem@{1}</tt></pre>
+<pre><code>    $ git rebase --onto subsystem subsystem@{1}</code></pre>
 </div></div>
 <div class="paragraph"><p>The ripple effect of a "hard case" recovery is especially bad:
 <em>everyone</em> downstream from <em>topic</em> will now have to perform a "hard
@@ -1936,26 +1934,26 @@ case" recovery too!</p></div>
 <div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The todo list presented by <tt>--preserve-merges --interactive</tt> does not
+<div class="paragraph"><p>The todo list presented by <code>--preserve-merges --interactive</code> does not
 represent the topology of the revision graph.  Editing commits and
 rewording their commit messages should work fine, but attempts to
 reorder commits tend to produce counterintuitive results.</p></div>
 <div class="paragraph"><p>For example, an attempt to rearrange</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>1 --- 2 --- 3 --- 4 --- 5</tt></pre>
+<pre><code>1 --- 2 --- 3 --- 4 --- 5</code></pre>
 </div></div>
 <div class="paragraph"><p>to</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>1 --- 2 --- 4 --- 3 --- 5</tt></pre>
+<pre><code>1 --- 2 --- 4 --- 3 --- 5</code></pre>
 </div></div>
 <div class="paragraph"><p>by moving the "pick 4" line will result in the following history:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        3
+<pre><code>        3
        /
-1 --- 2 --- 4 --- 5</tt></pre>
+1 --- 2 --- 4 --- 5</code></pre>
 </div></div>
 </div>
 </div>
@@ -1969,7 +1967,7 @@ reorder commits tend to produce counterintuitive results.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-09-09 14:15:21 PDT
+Last updated 2014-09-19 15:32:09 PDT
 </div>
 </div>
 </body>
