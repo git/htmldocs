@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-tag(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -764,30 +762,30 @@ git-tag(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Add a tag reference in <tt>refs/tags/</tt>, unless <tt>-d/-l/-v</tt> is given
+<div class="paragraph"><p>Add a tag reference in <code>refs/tags/</code>, unless <code>-d/-l/-v</code> is given
 to delete, list or verify tags.</p></div>
-<div class="paragraph"><p>Unless <tt>-f</tt> is given, the named tag must not yet exist.</p></div>
-<div class="paragraph"><p>If one of <tt>-a</tt>, <tt>-s</tt>, or <tt>-u &lt;key-id&gt;</tt> is passed, the command
+<div class="paragraph"><p>Unless <code>-f</code> is given, the named tag must not yet exist.</p></div>
+<div class="paragraph"><p>If one of <code>-a</code>, <code>-s</code>, or <code>-u &lt;key-id&gt;</code> is passed, the command
 creates a <em>tag</em> object, and requires a tag message.  Unless
-<tt>-m &lt;msg&gt;</tt> or <tt>-F &lt;file&gt;</tt> is given, an editor is started for the user to type
+<code>-m &lt;msg&gt;</code> or <code>-F &lt;file&gt;</code> is given, an editor is started for the user to type
 in the tag message.</p></div>
-<div class="paragraph"><p>If <tt>-m &lt;msg&gt;</tt> or <tt>-F &lt;file&gt;</tt> is given and <tt>-a</tt>, <tt>-s</tt>, and <tt>-u &lt;key-id&gt;</tt>
-are absent, <tt>-a</tt> is implied.</p></div>
+<div class="paragraph"><p>If <code>-m &lt;msg&gt;</code> or <code>-F &lt;file&gt;</code> is given and <code>-a</code>, <code>-s</code>, and <code>-u &lt;key-id&gt;</code>
+are absent, <code>-a</code> is implied.</p></div>
 <div class="paragraph"><p>Otherwise just a tag reference for the SHA-1 object name of the commit object is
 created (i.e. a lightweight tag).</p></div>
-<div class="paragraph"><p>A GnuPG signed tag object will be created when <tt>-s</tt> or <tt>-u
-&lt;key-id&gt;</tt> is used.  When <tt>-u &lt;key-id&gt;</tt> is not used, the
+<div class="paragraph"><p>A GnuPG signed tag object will be created when <code>-s</code> or <code>-u
+&lt;key-id&gt;</code> is used.  When <code>-u &lt;key-id&gt;</code> is not used, the
 committer identity for the current user is used to find the
-GnuPG key for signing.  The configuration variable <tt>gpg.program</tt>
+GnuPG key for signing.  The configuration variable <code>gpg.program</code>
 is used to specify custom GnuPG binary.</p></div>
-<div class="paragraph"><p>Tag objects (created with <tt>-a</tt>, <tt>s</tt>, or <tt>-u</tt>) are called "annotated"
+<div class="paragraph"><p>Tag objects (created with <code>-a</code>, <code>-s</code>, or <code>-u</code>) are called "annotated"
 tags; they contain a creation date, the tagger name and e-mail, a
 tagging message, and an optional GnuPG signature. Whereas a
 "lightweight" tag is simply a name for an object (usually a commit
 object).</p></div>
 <div class="paragraph"><p>Annotated tags are meant for release while lightweight tags are meant
 for private or temporary object labels. For this reason, some git
-commands for naming objects (like <tt>git describe</tt>) will ignore
+commands for naming objects (like <code>git describe</code>) will ignore
 lightweight tags by default.</p></div>
 </div>
 </div>
@@ -869,7 +867,7 @@ lightweight tags by default.</p></div>
         &lt;num&gt; specifies how many lines from the annotation, if any,
         are printed when using -l.
         The default is not to print any annotation lines.
-        If no number is given to <tt>-n</tt>, only the first line is printed.
+        If no number is given to <code>-n</code>, only the first line is printed.
         If the tag is not annotated, the commit message is displayed instead.
 </p>
 </dd>
@@ -910,7 +908,7 @@ lightweight tags by default.</p></div>
 <dd>
 <p>
         Display tag listing in columns. See configuration variable
-        column.tag for option syntax.<tt>--column</tt> and <tt>--no-column</tt>
+        column.tag for option syntax.<code>--column</code> and <code>--no-column</code>
         without options are equivalent to <em>always</em> and <em>never</em> respectively.
 </p>
 <div class="paragraph"><p>This option is only applicable when listing tags without annotation lines.</p></div>
@@ -941,9 +939,9 @@ lightweight tags by default.</p></div>
 <dd>
 <p>
         Use the given tag message (instead of prompting).
-        If multiple <tt>-m</tt> options are given, their values are
+        If multiple <code>-m</code> options are given, their values are
         concatenated as separate paragraphs.
-        Implies <tt>-a</tt> if none of <tt>-a</tt>, <tt>-s</tt>, or <tt>-u &lt;key-id&gt;</tt>
+        Implies <code>-a</code> if none of <code>-a</code>, <code>-s</code>, or <code>-u &lt;key-id&gt;</code>
         is given.
 </p>
 </dd>
@@ -957,7 +955,7 @@ lightweight tags by default.</p></div>
 <p>
         Take the tag message from the given file.  Use <em>-</em> to
         read the message from the standard input.
-        Implies <tt>-a</tt> if none of <tt>-a</tt>, <tt>-s</tt>, or <tt>-u &lt;key-id&gt;</tt>
+        Implies <code>-a</code> if none of <code>-a</code>, <code>-s</code>, or <code>-u &lt;key-id&gt;</code>
         is given.
 </p>
 </dd>
@@ -1008,8 +1006,8 @@ find a key.  If you want to use a different default key, you can specify
 it in the repository configuration as follows:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>[user]
-    signingkey = &lt;gpg-key-id&gt;</tt></pre>
+<pre><code>[user]
+    signingkey = &lt;gpg-key-id&gt;</code></pre>
 </div></div>
 </div>
 </div>
@@ -1057,7 +1055,7 @@ to just fess up to it, and tell people that you messed up. You
 can do that by making a very public announcement saying:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>Ok, I messed up, and I pushed out an earlier version tagged as X. I
+<pre><code>Ok, I messed up, and I pushed out an earlier version tagged as X. I
 then fixed something, and retagged the *fixed* tree as X again.
 
 If you got the wrong tag, and want the new one, please delete
@@ -1074,7 +1072,7 @@ You can test which tag you have by doing
 
 which should return 0123456789abcdef.. if you have the new version.
 
-Sorry for the inconvenience.</tt></pre>
+Sorry for the inconvenience.</code></pre>
 </div></div>
 <div class="paragraph"><p>Does this seem a bit complicated?  It <strong>should</strong> be. There is no
 way that it would be correct to just "fix" it automatically.
@@ -1083,8 +1081,8 @@ People need to know that their tags might have been changed.</p></div>
 <div class="sect2">
 <h3 id="_on_automatic_following">On Automatic following</h3>
 <div class="paragraph"><p>If you are following somebody else&#8217;s tree, you are most likely
-using remote-tracking branches (<tt>refs/heads/origin</tt> in traditional
-layout, or <tt>refs/remotes/origin/master</tt> in the separate-remote
+using remote-tracking branches (<code>refs/heads/origin</code> in traditional
+layout, or <code>refs/remotes/origin/master</code> in the separate-remote
 layout).  You usually want the tags from the other end.</p></div>
 <div class="paragraph"><p>On the other hand, if you are fetching because you would want a
 one-shot merge from somebody else, you typically do not want to
@@ -1098,16 +1096,16 @@ is designed to be easily cut&amp;pasted at the end of a <em>git fetch</em>
 command line:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>Linus, please pull from
+<pre><code>Linus, please pull from
 
         git://git..../proj.git master
 
-to get the following updates...</tt></pre>
+to get the following updates...</code></pre>
 </div></div>
 <div class="paragraph"><p>becomes:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull git://git..../proj.git master</tt></pre>
+<pre><code>$ git pull git://git..../proj.git master</code></pre>
 </div></div>
 <div class="paragraph"><p>In such a case, you do not want to automatically follow the other
 person&#8217;s tags.</p></div>
@@ -1148,7 +1146,7 @@ values; the most common form is "YYYY-MM-DD HH:MM").</p></div>
 <div class="paragraph"><p>For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ GIT_COMMITTER_DATE="2006-10-02 10:31" git tag -s v1.0.1</tt></pre>
+<pre><code>$ GIT_COMMITTER_DATE="2006-10-02 10:31" git tag -s v1.0.1</code></pre>
 </div></div>
 </div>
 </div>
@@ -1164,10 +1162,10 @@ Git internal format
 </dt>
 <dd>
 <p>
-        It is <tt>&lt;unix timestamp&gt; &lt;time zone offset&gt;</tt>, where <tt>&lt;unix
-        timestamp&gt;</tt> is the number of seconds since the UNIX epoch.
-        <tt>&lt;time zone offset&gt;</tt> is a positive or negative offset from UTC.
-        For example CET (which is 2 hours ahead UTC) is <tt>+0200</tt>.
+        It is <code>&lt;unix timestamp&gt; &lt;time zone offset&gt;</code>, where <code>&lt;unix
+        timestamp&gt;</code> is the number of seconds since the UNIX epoch.
+        <code>&lt;time zone offset&gt;</code> is a positive or negative offset from UTC.
+        For example CET (which is 2 hours ahead UTC) is <code>+0200</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1176,7 +1174,7 @@ RFC 2822
 <dd>
 <p>
         The standard email format as described by RFC 2822, for example
-        <tt>Thu, 07 Apr 2005 22:13:13 +0200</tt>.
+        <code>Thu, 07 Apr 2005 22:13:13 +0200</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1185,8 +1183,8 @@ ISO 8601
 <dd>
 <p>
         Time and date specified by the ISO 8601 standard, for example
-        <tt>2005-04-07T22:13:13</tt>. The parser accepts a space instead of the
-        <tt>T</tt> character as well.
+        <code>2005-04-07T22:13:13</code>. The parser accepts a space instead of the
+        <code>T</code> character as well.
 </p>
 <div class="admonitionblock">
 <table><tr>
@@ -1194,7 +1192,7 @@ ISO 8601
 <div class="title">Note</div>
 </td>
 <td class="content">In addition, the date part is accepted in the following formats:
-<tt>YYYY.MM.DD</tt>, <tt>MM/DD/YYYY</tt> and <tt>DD.MM.YYYY</tt>.</td>
+<code>YYYY.MM.DD</code>, <code>MM/DD/YYYY</code> and <code>DD.MM.YYYY</code>.</td>
 </tr></table>
 </div>
 </dd>
@@ -1218,7 +1216,7 @@ ISO 8601
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-07-23 16:09:11 PDT
+Last updated 2014-10-07 15:21:30 PDT
 </div>
 </div>
 </body>
