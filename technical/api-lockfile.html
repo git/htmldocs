@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>lockfile API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -744,26 +742,184 @@ asciidoc.install();
 <div class="ulist"><ul>
 <li>
 <p>
-Mutual exclusion.  When we write out a new index file, first
-  we create a new file <tt>$GIT_DIR/index.lock</tt>, write the new
-  contents into it, and rename it to the final destination
-  <tt>$GIT_DIR/index</tt>.  We try to create the <tt>$GIT_DIR/index.lock</tt>
-  file with O_EXCL so that we can notice and fail when somebody
-  else is already trying to update the index file.
+Mutual exclusion and atomic file updates. When we want to change a
+  file, we create a lockfile <code>&lt;filename&gt;.lock</code>, write the new file
+  contents into it, and then rename the lockfile to its final
+  destination <code>&lt;filename&gt;</code>. We create the <code>&lt;filename&gt;.lock</code> file with
+  <code>O_CREAT|O_EXCL</code> so that we can notice and fail if somebody else has
+  already locked the file, then atomically rename the lockfile to its
+  final destination to commit the changes and unlock the file.
 </p>
 </li>
 <li>
 <p>
-Automatic cruft removal.  After we create the "lock" file, we
-  may decide to <tt>die()</tt>, and we would want to make sure that we
-  remove the file that has not been committed to its final
-  destination.  This is done by remembering the lockfiles we
-  created in a linked list and cleaning them up from an
-  <tt>atexit(3)</tt> handler.  Outstanding lockfiles are also removed
-  when the program dies on a signal.
+Automatic cruft removal. If the program exits after we lock a file
+  but before the changes have been committed, we want to make sure
+  that we remove the lockfile. This is done by remembering the
+  lockfiles we have created in a linked list and setting up an
+  <code>atexit(3)</code> handler and a signal handler that clean up the
+  lockfiles. This mechanism ensures that outstanding lockfiles are
+  cleaned up if the program exits (including when <code>die()</code> is called)
+  or if the program dies on a signal.
 </p>
 </li>
 </ul></div>
+<div class="paragraph"><p>Please note that lockfiles only block other writers. Readers do not
+block, but they are guaranteed to see either the old contents of the
+file or the new contents of the file (assuming that the filesystem
+implements <code>rename(2)</code> atomically).</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_calling_sequence">Calling sequence</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The caller:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Allocates a <code>struct lock_file</code> either as a static variable or on the
+  heap, initialized to zeros. Once you use the structure to call the
+  <code>hold_lock_file_*</code> family of functions, it belongs to the lockfile
+  subsystem and its storage must remain valid throughout the life of
+  the program (i.e. you cannot use an on-stack variable to hold this
+  structure).
+</p>
+</li>
+<li>
+<p>
+Attempts to create a lockfile by passing that variable and the path
+  of the final destination (e.g. <code>$GIT_DIR/index</code>) to
+  <code>hold_lock_file_for_update</code> or <code>hold_lock_file_for_append</code>.
+</p>
+</li>
+<li>
+<p>
+Writes new content for the destination file by either:
+</p>
+</li>
+<li>
+<p>
+writing to the file descriptor returned by the <code>hold_lock_file_*</code>
+    functions (also available via <code>lock-&gt;fd</code>).
+</p>
+</li>
+<li>
+<p>
+calling <code>fdopen_lock_file</code> to get a <code>FILE</code> pointer for the open
+    file and writing to the file using stdio.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>When finished writing, the caller can:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Close the file descriptor and rename the lockfile to its final
+  destination by calling <code>commit_lock_file</code> or <code>commit_lock_file_to</code>.
+</p>
+</li>
+<li>
+<p>
+Close the file descriptor and remove the lockfile by calling
+  <code>rollback_lock_file</code>.
+</p>
+</li>
+<li>
+<p>
+Close the file descriptor without removing or renaming the lockfile
+  by calling <code>close_lock_file</code>, and later call <code>commit_lock_file</code>,
+  <code>commit_lock_file_to</code>, <code>rollback_lock_file</code>, or <code>reopen_lock_file</code>.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Even after the lockfile is committed or rolled back, the <code>lock_file</code>
+object must not be freed or altered by the caller. However, it may be
+reused; just pass it to another call of <code>hold_lock_file_for_update</code> or
+<code>hold_lock_file_for_append</code>.</p></div>
+<div class="paragraph"><p>If the program exits before you have called one of <code>commit_lock_file</code>,
+<code>commit_lock_file_to</code>, <code>rollback_lock_file</code>, or <code>close_lock_file</code>, an
+<code>atexit(3)</code> handler will close and remove the lockfile, rolling back
+any uncommitted changes.</p></div>
+<div class="paragraph"><p>If you need to close the file descriptor you obtained from a
+<code>hold_lock_file_*</code> function yourself, do so by calling
+<code>close_lock_file</code>. You should never call <code>close(2)</code> or <code>fclose(3)</code>
+yourself! Otherwise the <code>struct lock_file</code> structure would still think
+that the file descriptor needs to be closed, and a commit or rollback
+would result in duplicate calls to <code>close(2)</code>. Worse yet, if you close
+and then later open another file descriptor for a completely different
+purpose, then a commit or rollback might close that unrelated file
+descriptor.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_error_handling">Error handling</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The <code>hold_lock_file_*</code> functions return a file descriptor on success
+or -1 on failure (unless <code>LOCK_DIE_ON_ERROR</code> is used; see below). On
+errors, <code>errno</code> describes the reason for failure. Errors can be
+reported by passing <code>errno</code> to one of the following helper functions:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+unable_to_lock_message
+</dt>
+<dd>
+<p>
+        Append an appropriate error message to a <code>strbuf</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+unable_to_lock_error
+</dt>
+<dd>
+<p>
+        Emit an appropriate error message using <code>error()</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+unable_to_lock_die
+</dt>
+<dd>
+<p>
+        Emit an appropriate error message and <code>die()</code>.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Similarly, <code>commit_lock_file</code>, <code>commit_lock_file_to</code>, and
+<code>close_lock_file</code> return 0 on success. On failure they set <code>errno</code>
+appropriately, do their best to roll back the lockfile, and return -1.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_flags">Flags</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The following flags can be passed to <code>hold_lock_file_for_update</code> or
+<code>hold_lock_file_for_append</code>:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+LOCK_NO_DEREF
+</dt>
+<dd>
+<p>
+        Usually symbolic links in the destination path are resolved
+        and the lockfile is created by adding ".lock" to the resolved
+        path. If <code>LOCK_NO_DEREF</code> is set, then the lockfile is created
+        by adding ".lock" to the path argument itself. This option is
+        used, for example, when locking a symbolic reference, which
+        for backwards-compatibility reasons can be a symbolic link
+        containing the name of the referred-to-reference.
+</p>
+</dd>
+<dt class="hdlist1">
+LOCK_DIE_ON_ERROR
+</dt>
+<dd>
+<p>
+        If a lock is already taken for the file, <code>die()</code> with an error
+        message. If this option is not specified, trying to lock a
+        file that is already locked returns -1 to the caller.
+</p>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
@@ -775,13 +931,40 @@ hold_lock_file_for_update
 </dt>
 <dd>
 <p>
-        Take a pointer to <tt>struct lock_file</tt>, the filename of
-        the final destination (e.g. <tt>$GIT_DIR/index</tt>) and a flag
-        <tt>die_on_error</tt>.  Attempt to create a lockfile for the
-        destination and return the file descriptor for writing
-        to the file.  If <tt>die_on_error</tt> flag is true, it dies if
-        a lock is already taken for the file; otherwise it
-        returns a negative integer to the caller on failure.
+        Take a pointer to <code>struct lock_file</code>, the path of the file to
+        be locked (e.g. <code>$GIT_DIR/index</code>) and a flags argument (see
+        above). Attempt to create a lockfile for the destination and
+        return the file descriptor for writing to the file.
+</p>
+</dd>
+<dt class="hdlist1">
+hold_lock_file_for_append
+</dt>
+<dd>
+<p>
+        Like <code>hold_lock_file_for_update</code>, but before returning copy
+        the existing contents of the file (if any) to the lockfile and
+        position its write pointer at the end of the file.
+</p>
+</dd>
+<dt class="hdlist1">
+fdopen_lock_file
+</dt>
+<dd>
+<p>
+        Associate a stdio stream with the lockfile. Return NULL
+        (<strong>without</strong> rolling back the lockfile) on error. The stream is
+        closed automatically when <code>close_lock_file</code> is called or when
+        the file is committed or rolled back.
+</p>
+</dd>
+<dt class="hdlist1">
+get_locked_file_path
+</dt>
+<dd>
+<p>
+        Return the path of the file that is locked by the specified
+        lock_file object. The caller must free the memory.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -789,11 +972,25 @@ commit_lock_file
 </dt>
 <dd>
 <p>
-        Take a pointer to the <tt>struct lock_file</tt> initialized
-        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
-        close the file descriptor and rename the lockfile to its
-        final destination.  Returns 0 upon success, a negative
-        value on failure to close(2) or rename(2).
+        Take a pointer to the <code>struct lock_file</code> initialized with an
+        earlier call to <code>hold_lock_file_for_update</code> or
+        <code>hold_lock_file_for_append</code>, close the file descriptor, and
+        rename the lockfile to its final destination. Return 0 upon
+        success. On failure, roll back the lock file and return -1,
+        with <code>errno</code> set to the value from the failing call to
+        <code>close(2)</code> or <code>rename(2)</code>. It is a bug to call
+        <code>commit_lock_file</code> for a <code>lock_file</code> object that is not
+        currently locked.
+</p>
+</dd>
+<dt class="hdlist1">
+commit_lock_file_to
+</dt>
+<dd>
+<p>
+        Like <code>commit_lock_file()</code>, except that it takes an explicit
+        <code>path</code> argument to which the lockfile should be renamed. The
+        <code>path</code> must be on the same filesystem as the lock file.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -801,9 +998,12 @@ rollback_lock_file
 </dt>
 <dd>
 <p>
-        Take a pointer to the <tt>struct lock_file</tt> initialized
-        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
-        close the file descriptor and remove the lockfile.
+        Take a pointer to the <code>struct lock_file</code> initialized with an
+        earlier call to <code>hold_lock_file_for_update</code> or
+        <code>hold_lock_file_for_append</code>, close the file descriptor and
+        remove the lockfile. It is a NOOP to call
+        <code>rollback_lock_file()</code> for a <code>lock_file</code> object that has
+        already been committed or rolled back.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -811,38 +1011,67 @@ close_lock_file
 </dt>
 <dd>
 <p>
-        Take a pointer to the <tt>struct lock_file</tt> initialized
-        with an earlier call to <tt>hold_lock_file_for_update()</tt>,
-        and close the file descriptor.  Returns 0 upon success,
-        a negative value on failure to close(2).
+        Take a pointer to the <code>struct lock_file</code> initialized with an
+        earlier call to <code>hold_lock_file_for_update</code> or
+        <code>hold_lock_file_for_append</code>. Close the file descriptor (and
+        the file pointer if it has been opened using
+        <code>fdopen_lock_file</code>). Return 0 upon success. On failure to
+        <code>close(2)</code>, return a negative value and roll back the lock
+        file. Usually <code>commit_lock_file</code>, <code>commit_lock_file_to</code>, or
+        <code>rollback_lock_file</code> should eventually be called if
+        <code>close_lock_file</code> succeeds.
 </p>
 </dd>
+<dt class="hdlist1">
+reopen_lock_file
+</dt>
+<dd>
+<p>
+        Re-open a lockfile that has been closed (using
+        <code>close_lock_file</code>) but not yet committed or rolled back. This
+        can be used to implement a sequence of operations like the
+        following:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Lock file.
+</p>
+</li>
+<li>
+<p>
+Write new contents to lockfile, then <code>close_lock_file</code> to
+          cause the contents to be written to disk.
+</p>
+</li>
+<li>
+<p>
+Pass the name of the lockfile to another program to allow it
+          (and nobody else) to inspect the contents you wrote, while
+          still holding the lock yourself.
+</p>
+</li>
+<li>
+<p>
+<code>reopen_lock_file</code> to reopen the lockfile. Make further
+          updates to the contents.
+</p>
+</li>
+<li>
+<p>
+<code>commit_lock_file</code> to make the final version permanent.
+</p>
+</li>
+</ul></div>
+</dd>
 </dl></div>
-<div class="paragraph"><p>Because the structure is used in an <tt>atexit(3)</tt> handler, its
-storage has to stay throughout the life of the program.  It
-cannot be an auto variable allocated on the stack.</p></div>
-<div class="paragraph"><p>Call <tt>commit_lock_file()</tt> or <tt>rollback_lock_file()</tt> when you are
-done writing to the file descriptor.  If you do not call either
-and simply <tt>exit(3)</tt> from the program, an <tt>atexit(3)</tt> handler
-will close and remove the lockfile.</p></div>
-<div class="paragraph"><p>If you need to close the file descriptor you obtained from
-<tt>hold_lock_file_for_update</tt> function yourself, do so by calling
-<tt>close_lock_file()</tt>.  You should never call <tt>close(2)</tt> yourself!
-Otherwise the <tt>struct
-lock_file</tt> structure still remembers that the file descriptor
-needs to be closed, and a later call to <tt>commit_lock_file()</tt> or
-<tt>rollback_lock_file()</tt> will result in duplicate calls to
-<tt>close(2)</tt>.  Worse yet, if you <tt>close(2)</tt>, open another file
-descriptor for completely different purpose, and then call
-<tt>commit_lock_file()</tt> or <tt>rollback_lock_file()</tt>, they may close
-that unrelated file descriptor.</p></div>
 </div>
 </div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-10-14 15:27:06 PDT
 </div>
 </div>
 </body>

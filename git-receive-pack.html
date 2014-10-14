@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-receive-pack(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -798,7 +796,7 @@ and is executable, it will be invoked once with no parameters.  The
 standard input of the hook will be one line per ref to be updated:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>sha1-old SP sha1-new SP refname LF</tt></pre>
+<pre><code>sha1-old SP sha1-new SP refname LF</code></pre>
 </div></div>
 <div class="paragraph"><p>The refname value is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 values before
@@ -806,6 +804,117 @@ each refname are the object names for the refname before and after
 the update.  Refs to be created will have sha1-old equal to 0{40},
 while refs to be deleted will have sha1-new equal to 0{40}, otherwise
 sha1-old and sha1-new should be valid objects in the repository.</p></div>
+<div class="paragraph"><p>When accepting a signed push (see <a href="git-push.html">git-push(1)</a>), the signed
+push certificate is stored in a blob and an environment variable
+<code>GIT_PUSH_CERT</code> can be consulted for its object name.  See the
+description of <code>post-receive</code> hook for an example.  In addition, the
+certificate is verified using GPG and the result is exported with
+the following environment variables:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>GIT_PUSH_CERT_SIGNER</code>
+</dt>
+<dd>
+<p>
+        The name and the e-mail address of the owner of the key that
+        signed the push certificate.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>GIT_PUSH_CERT_KEY</code>
+</dt>
+<dd>
+<p>
+        The GPG key ID of the key that signed the push certificate.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>GIT_PUSH_CERT_STATUS</code>
+</dt>
+<dd>
+<p>
+        The status of GPG verification of the push certificate,
+        using the same mnemonic as used in <code>%G?</code> format of <code>git log</code>
+        family of commands (see <a href="git-log.html">git-log(1)</a>).
+</p>
+</dd>
+<dt class="hdlist1">
+<code>GIT_PUSH_CERT_NONCE</code>
+</dt>
+<dd>
+<p>
+        The nonce string the process asked the signer to include
+        in the push certificate.  If this does not match the value
+        recorded on the "nonce" header in the push certificate, it
+        may indicate that the certificate is a valid one that is
+        being replayed from a separate "git push" session.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>GIT_PUSH_CERT_NONCE_STATUS</code>
+</dt>
+<dd>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>UNSOLICITED</code>
+</dt>
+<dd>
+<p>
+        "git push --signed" sent a nonce when we did not ask it to
+        send one.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>MISSING</code>
+</dt>
+<dd>
+<p>
+        "git push --signed" did not send any nonce header.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>BAD</code>
+</dt>
+<dd>
+<p>
+        "git push --signed" sent a bogus nonce.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>OK</code>
+</dt>
+<dd>
+<p>
+        "git push --signed" sent the nonce we asked it to send.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>SLOP</code>
+</dt>
+<dd>
+<p>
+        "git push --signed" sent a nonce different from what we
+        asked it to send now, but in a previous session.  See
+        <code>GIT_PUSH_CERT_NONCE_SLOP</code> environment variable.
+</p>
+</dd>
+</dl></div>
+</dd>
+<dt class="hdlist1">
+<code>GIT_PUSH_CERT_NONCE_SLOP</code>
+</dt>
+<dd>
+<p>
+        "git push --signed" sent a nonce different from what we
+        asked it to send now, but in a different session whose
+        starting time is different by this many seconds from the
+        current session.  Only meaningful when
+        <code>GIT_PUSH_CERT_NONCE_STATUS</code> says <code>SLOP</code>.
+        Also read about <code>receive.certnonceslop</code> variable in
+        <a href="git-config.html">git-config(1)</a>.
+</p>
+</dd>
+</dl></div>
 <div class="paragraph"><p>This hook is called before any refname is updated and before any
 fast-forward checks are performed.</p></div>
 <div class="paragraph"><p>If the pre-receive hook exits with a non-zero exit status no updates
@@ -821,7 +930,7 @@ bail out if the update is not to be supported.</p></div>
 and is executable, it is invoked once per ref, with three parameters:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$GIT_DIR/hooks/update refname sha1-old sha1-new</tt></pre>
+<pre><code>$GIT_DIR/hooks/update refname sha1-old sha1-new</code></pre>
 </div></div>
 <div class="paragraph"><p>The refname parameter is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 arguments are
@@ -847,7 +956,7 @@ parameters.  The standard input of the hook will be one line
 for each successfully updated ref:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>sha1-old SP sha1-new SP refname LF</tt></pre>
+<pre><code>sha1-old SP sha1-new SP refname LF</code></pre>
 </div></div>
 <div class="paragraph"><p>The refname value is relative to $GIT_DIR; e.g. for the master
 head this is "refs/heads/master".  The two sha1 values before
@@ -856,12 +965,16 @@ the update.  Refs that were created will have sha1-old equal to
 0{40}, while refs that were deleted will have sha1-new equal to
 0{40}, otherwise sha1-old and sha1-new should be valid objects in
 the repository.</p></div>
+<div class="paragraph"><p>The <code>GIT_PUSH_CERT*</code> environment variables can be inspected, just as
+in <code>pre-receive</code> hook, after accepting a signed push.</p></div>
 <div class="paragraph"><p>Using this hook, it is easy to generate mails describing the updates
 to the repository.  This example script sends one mail message per
-ref listing the commits pushed to the repository:</p></div>
+ref listing the commits pushed to the repository, and logs the push
+certificates of signed pushes with good signatures to a logger
+service:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>#!/bin/sh
+<pre><code>#!/bin/sh
 # mail out commit update information.
 while read oval nval ref
 do
@@ -875,7 +988,15 @@ do
         fi |
         mail -s "Changes to ref $ref" commit-list@mydomain
 done
-exit 0</tt></pre>
+# log signed push certificate, if any
+if test -n "${GIT_PUSH_CERT-}" &amp;&amp; test ${GIT_PUSH_CERT_STATUS} = G
+then
+        (
+                echo expected nonce is ${GIT_PUSH_NONCE}
+                git cat-file blob ${GIT_PUSH_CERT}
+        ) | mail -s "push certificate from $GIT_PUSH_CERT_SIGNER" push-log@mydomain
+fi
+exit 0</code></pre>
 </div></div>
 <div class="paragraph"><p>The exit code from this hook invocation is ignored, however a
 non-zero exit code will generate an error message.</p></div>
@@ -896,12 +1017,12 @@ This can be used to implement any repository wide cleanup tasks.</p></div>
 <div class="paragraph"><p>The exit code from this hook invocation is ignored; the only thing
 left for <em>git-receive-pack</em> to do at that point is to exit itself
 anyway.</p></div>
-<div class="paragraph"><p>This hook can be used, for example, to run <tt>git update-server-info</tt>
+<div class="paragraph"><p>This hook can be used, for example, to run <code>git update-server-info</code>
 if the repository is packed and is served via a dumb transport.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>#!/bin/sh
-exec git update-server-info</tt></pre>
+<pre><code>#!/bin/sh
+exec git update-server-info</code></pre>
 </div></div>
 </div>
 </div>
@@ -921,7 +1042,7 @@ exec git update-server-info</tt></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-08-20 08:40:27 PDT
+Last updated 2014-10-14 15:27:06 PDT
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-config(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -777,7 +775,7 @@ actually the section and the key separated by a dot, and the value will be
 escaped.</p></div>
 <div class="paragraph"><p>Multiple lines can be added to an option by using the <em>--add</em> option.
 If you want to update or unset an option which can occur on multiple
-lines, a POSIX regexp <tt>value_regex</tt> needs to be given.  Only the
+lines, a POSIX regexp <code>value_regex</code> needs to be given.  Only the
 existing values that match the regexp are updated or unset.  If
 you want to handle the lines that do <strong>not</strong> match the regex, just
 prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPLES]</a>).</p></div>
@@ -857,7 +855,7 @@ you try to use an invalid regexp (ret=6).
 <p>
         Adds a new line to the option without altering any existing
         values.  This is the same as providing <em>^$</em> as the value_regex
-        in <tt>--replace-all</tt>.
+        in <code>--replace-all</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -909,13 +907,13 @@ you try to use an invalid regexp (ret=6).
 </dt>
 <dd>
 <p>
-        For writing options: write to global <tt>~/.gitconfig</tt> file
-        rather than the repository <tt>.git/config</tt>, write to
-        <tt>$XDG_CONFIG_HOME/git/config</tt> file if this file exists and the
-        <tt>~/.gitconfig</tt> file doesn&#8217;t.
+        For writing options: write to global <code>~/.gitconfig</code> file
+        rather than the repository <code>.git/config</code>, write to
+        <code>$XDG_CONFIG_HOME/git/config</code> file if this file exists and the
+        <code>~/.gitconfig</code> file doesn&#8217;t.
 </p>
-<div class="paragraph"><p>For reading options: read only from global <tt>~/.gitconfig</tt> and from
-<tt>$XDG_CONFIG_HOME/git/config</tt> rather than from all available files.</p></div>
+<div class="paragraph"><p>For reading options: read only from global <code>~/.gitconfig</code> and from
+<code>$XDG_CONFIG_HOME/git/config</code> rather than from all available files.</p></div>
 <div class="paragraph"><p>See also <a href="#FILES">[FILES]</a>.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -924,10 +922,10 @@ you try to use an invalid regexp (ret=6).
 <dd>
 <p>
         For writing options: write to system-wide
-        <tt>$(prefix)/etc/gitconfig</tt> rather than the repository
-        <tt>.git/config</tt>.
+        <code>$(prefix)/etc/gitconfig</code> rather than the repository
+        <code>.git/config</code>.
 </p>
-<div class="paragraph"><p>For reading options: read only from system-wide <tt>$(prefix)/etc/gitconfig</tt>
+<div class="paragraph"><p>For reading options: read only from system-wide <code>$(prefix)/etc/gitconfig</code>
 rather than from all available files.</p></div>
 <div class="paragraph"><p>See also <a href="#FILES">[FILES]</a>.</p></div>
 </dd>
@@ -936,10 +934,10 @@ rather than from all available files.</p></div>
 </dt>
 <dd>
 <p>
-        For writing options: write to the repository <tt>.git/config</tt> file.
+        For writing options: write to the repository <code>.git/config</code> file.
         This is the default behavior.
 </p>
-<div class="paragraph"><p>For reading options: read only from the repository <tt>.git/config</tt> rather than
+<div class="paragraph"><p>For reading options: read only from the repository <code>.git/config</code> rather than
 from all available files.</p></div>
 <div class="paragraph"><p>See also <a href="#FILES">[FILES]</a>.</p></div>
 </dd>
@@ -1070,14 +1068,14 @@ from all available files.</p></div>
 </dt>
 <dd>
 <p>
-        Find the color setting for <tt>name</tt> (e.g. <tt>color.diff</tt>) and output
-        "true" or "false".  <tt>stdout-is-tty</tt> should be either "true" or
+        Find the color setting for <code>name</code> (e.g. <code>color.diff</code>) and output
+        "true" or "false".  <code>stdout-is-tty</code> should be either "true" or
         "false", and is taken into account when configuration says
-        "auto".  If <tt>stdout-is-tty</tt> is missing, then checks the standard
+        "auto".  If <code>stdout-is-tty</code> is missing, then checks the standard
         output of the command itself, and exits with status 0 if color
         is to be used, or exits with status 1 otherwise.
-        When the color setting for <tt>name</tt> is undefined, the command uses
-        <tt>color.ui</tt> as fallback.
+        When the color setting for <code>name</code> is undefined, the command uses
+        <code>color.ui</code> as fallback.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1085,10 +1083,10 @@ from all available files.</p></div>
 </dt>
 <dd>
 <p>
-        Find the color configured for <tt>name</tt> (e.g. <tt>color.diff.new</tt>) and
+        Find the color configured for <code>name</code> (e.g. <code>color.diff.new</code>) and
         output it as the ANSI color escape sequence to the standard
-        output.  The optional <tt>default</tt> parameter is used instead, if
-        there is no color configured for <tt>name</tt>.
+        output.  The optional <code>default</code> parameter is used instead, if
+        there is no color configured for <code>name</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1108,7 +1106,7 @@ from all available files.</p></div>
 </dt>
 <dd>
 <p>
-        Respect <tt>include.*</tt> directives in config files when looking up
+        Respect <code>include.*</code> directives in config files when looking up
         values. Defaults to on.
 </p>
 </dd>
@@ -1135,9 +1133,9 @@ $XDG_CONFIG_HOME/git/config
 <dd>
 <p>
         Second user-specific configuration file. If $XDG_CONFIG_HOME is not set
-        or empty, <tt>$HOME/.config/git/config</tt> will be used. Any single-valued
+        or empty, <code>$HOME/.config/git/config</code> will be used. Any single-valued
         variable set in this file will be overwritten by whatever is in
-        <tt>~/.gitconfig</tt>.  It is a good idea not to create this file if
+        <code>~/.gitconfig</code>.  It is a good idea not to create this file if
         you sometimes use older versions of Git, as support for this
         file was added fairly recently.
 </p>
@@ -1210,124 +1208,124 @@ GIT_CONFIG_NOSYSTEM
 <div class="paragraph"><p>Given a .git/config like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>#
+<pre><code>#
 # This is the config file, and
 # a '#' or ';' character indicates
 # a comment
-#</tt></pre>
+#</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>; core variables
+<pre><code>; core variables
 [core]
         ; Don't trust file modes
-        filemode = false</tt></pre>
+        filemode = false</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>; Our diff algorithm
+<pre><code>; Our diff algorithm
 [diff]
         external = /usr/local/bin/diff-wrapper
-        renames = true</tt></pre>
+        renames = true</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>; Proxy settings
+<pre><code>; Proxy settings
 [core]
         gitproxy=proxy-command for kernel.org
-        gitproxy=default-proxy ; for all the rest</tt></pre>
+        gitproxy=default-proxy ; for all the rest</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>; HTTP
+<pre><code>; HTTP
 [http]
         sslVerify
 [http "https://weak.example.com"]
         sslVerify = false
-        cookieFile = /tmp/cookie.txt</tt></pre>
+        cookieFile = /tmp/cookie.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>you can set the filemode to true with</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config core.filemode true</tt></pre>
+<pre><code>% git config core.filemode true</code></pre>
 </div></div>
 <div class="paragraph"><p>The hypothetical proxy command entries actually have a postfix to discern
 what URL they apply to. Here is how to change the entry for kernel.org
 to "ssh".</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config core.gitproxy '"ssh" for kernel.org' 'for kernel.org$'</tt></pre>
+<pre><code>% git config core.gitproxy '"ssh" for kernel.org' 'for kernel.org$'</code></pre>
 </div></div>
 <div class="paragraph"><p>This makes sure that only the key/value pair for kernel.org is replaced.</p></div>
 <div class="paragraph"><p>To delete the entry for renames, do</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --unset diff.renames</tt></pre>
+<pre><code>% git config --unset diff.renames</code></pre>
 </div></div>
 <div class="paragraph"><p>If you want to delete an entry for a multivar (like core.gitproxy above),
 you have to provide a regex matching the value of exactly one line.</p></div>
 <div class="paragraph"><p>To query the value for a given key, do</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --get core.filemode</tt></pre>
+<pre><code>% git config --get core.filemode</code></pre>
 </div></div>
 <div class="paragraph"><p>or</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config core.filemode</tt></pre>
+<pre><code>% git config core.filemode</code></pre>
 </div></div>
 <div class="paragraph"><p>or, to query a multivar:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --get core.gitproxy "for kernel.org$"</tt></pre>
+<pre><code>% git config --get core.gitproxy "for kernel.org$"</code></pre>
 </div></div>
 <div class="paragraph"><p>If you want to know all the values for a multivar, do:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --get-all core.gitproxy</tt></pre>
+<pre><code>% git config --get-all core.gitproxy</code></pre>
 </div></div>
 <div class="paragraph"><p>If you like to live dangerously, you can replace <strong>all</strong> core.gitproxy by a
 new one with</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --replace-all core.gitproxy ssh</tt></pre>
+<pre><code>% git config --replace-all core.gitproxy ssh</code></pre>
 </div></div>
 <div class="paragraph"><p>However, if you really only want to replace the line for the default proxy,
 i.e. the one without a "for &#8230;" postfix, do something like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config core.gitproxy ssh '! for '</tt></pre>
+<pre><code>% git config core.gitproxy ssh '! for '</code></pre>
 </div></div>
 <div class="paragraph"><p>To actually match only values with an exclamation mark, you have to</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config section.key value '[!]'</tt></pre>
+<pre><code>% git config section.key value '[!]'</code></pre>
 </div></div>
 <div class="paragraph"><p>To add a new proxy, without altering any of the existing ones, use</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --add core.gitproxy '"proxy-command" for example.com'</tt></pre>
+<pre><code>% git config --add core.gitproxy '"proxy-command" for example.com'</code></pre>
 </div></div>
 <div class="paragraph"><p>An example to use customized color from the configuration in your
 script:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>#!/bin/sh
+<pre><code>#!/bin/sh
 WS=$(git config --get-color color.diff.whitespace "blue reverse")
 RESET=$(git config --get-color "" "reset")
-echo "${WS}your whitespace color or blue reverse${RESET}"</tt></pre>
+echo "${WS}your whitespace color or blue reverse${RESET}"</code></pre>
 </div></div>
-<div class="paragraph"><p>For URLs in <tt>https://weak.example.com</tt>, <tt>http.sslVerify</tt> is set to
-false, while it is set to <tt>true</tt> for all others:</p></div>
+<div class="paragraph"><p>For URLs in <code>https://weak.example.com</code>, <code>http.sslVerify</code> is set to
+false, while it is set to <code>true</code> for all others:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>% git config --bool --get-urlmatch http.sslverify https://good.example.com
+<pre><code>% git config --bool --get-urlmatch http.sslverify https://good.example.com
 true
 % git config --bool --get-urlmatch http.sslverify https://weak.example.com
 false
 % git config --get-urlmatch http https://weak.example.com
 http.cookiefile /tmp/cookie.txt
-http.sslverify false</tt></pre>
+http.sslverify false</code></pre>
 </div></div>
 </div>
 </div>
@@ -1335,17 +1333,17 @@ http.sslverify false</tt></pre>
 <h2 id="_configuration_file">CONFIGURATION FILE</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The Git configuration file contains a number of variables that affect
-the Git commands' behavior. The <tt>.git/config</tt> file in each repository
+the Git commands' behavior. The <code>.git/config</code> file in each repository
 is used to store the configuration for that repository, and
-<tt>$HOME/.gitconfig</tt> is used to store a per-user configuration as
-fallback values for the <tt>.git/config</tt> file. The file <tt>/etc/gitconfig</tt>
+<code>$HOME/.gitconfig</code> is used to store a per-user configuration as
+fallback values for the <code>.git/config</code> file. The file <code>/etc/gitconfig</code>
 can be used to store a system-wide default configuration.</p></div>
 <div class="paragraph"><p>The configuration variables are used by both the Git plumbing
 and the porcelains. The variables are divided into sections, wherein
 the fully qualified variable name of the variable itself is the last
 dot-separated segment and the section name is everything before the last
 dot. The variable names are case-insensitive, allow only alphanumeric
-characters and <tt>-</tt>, and must start with an alphabetic character.  Some
+characters and <code>-</code>, and must start with an alphabetic character.  Some
 variables may appear multiple times.</p></div>
 <div class="sect2">
 <h3 id="_syntax">Syntax</h3>
@@ -1355,7 +1353,7 @@ blank lines are ignored.</p></div>
 <div class="paragraph"><p>The file consists of sections and variables.  A section begins with
 the name of the section in square brackets and continues until the next
 section begins.  Section names are not case sensitive.  Only alphanumeric
-characters, <tt>-</tt> and <tt>.</tt> are allowed in section names.  Each variable
+characters, <code>-</code> and <code>.</code> are allowed in section names.  Each variable
 must belong to some section, which means that there must be a section
 header before the first setting of a variable.</p></div>
 <div class="paragraph"><p>Sections can be further divided into subsections.  To begin a subsection
@@ -1363,15 +1361,15 @@ put its name in double quotes, separated by space from the section name,
 in the section header, like in the example below:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [section "subsection"]</tt></pre>
+<pre><code>        [section "subsection"]</code></pre>
 </div></div>
 <div class="paragraph"><p>Subsection names are case sensitive and can contain any characters except
-newline (doublequote <tt>"</tt> and backslash have to be escaped as <tt>\"</tt> and <tt>\\</tt>,
+newline (doublequote <code>"</code> and backslash have to be escaped as <code>\"</code> and <code>\\</code>,
 respectively).  Section headers cannot span multiple
 lines.  Variables may belong directly to a section or to a given subsection.
-You can have <tt>[section]</tt> if you have <tt>[section "subsection"]</tt>, but you
+You can have <code>[section]</code> if you have <code>[section "subsection"]</code>, but you
 don&#8217;t need to.</p></div>
-<div class="paragraph"><p>There is also a deprecated <tt>[section.subsection]</tt> syntax. With this
+<div class="paragraph"><p>There is also a deprecated <code>[section.subsection]</code> syntax. With this
 syntax, the subsection name is converted to lower-case and is also
 compared case sensitively. These subsection names follow the same
 restrictions as section names.</p></div>
@@ -1380,7 +1378,7 @@ header) are recognized as setting variables, in the form
 <em>name = value</em>.  If there is no equal sign on the line, the entire line
 is taken as <em>name</em> and the variable is recognized as boolean "true".
 The variable names are case-insensitive, allow only alphanumeric characters
-and <tt>-</tt>, and must start with an alphabetic character.  There can be more
+and <code>-</code>, and must start with an alphabetic character.  There can be more
 than one value for a given variable; we say then that the variable is
 multivalued.</p></div>
 <div class="paragraph"><p>Leading and trailing whitespace in a variable value is discarded.
@@ -1394,63 +1392,63 @@ converting value to the canonical form using <em>--bool</em> type specifier;
 You need to enclose variable values in double quotes if you want to
 preserve leading or trailing whitespace, or if the variable value contains
 comment characters (i.e. it contains <em>#</em> or <em>;</em>).
-Double quote <tt>"</tt> and backslash <tt>\</tt> characters in variable values must
-be escaped: use <tt>\"</tt> for <tt>"</tt> and <tt>\\</tt> for <tt>\</tt>.</p></div>
-<div class="paragraph"><p>The following escape sequences (beside <tt>\"</tt> and <tt>\\</tt>) are recognized:
-<tt>\n</tt> for newline character (NL), <tt>\t</tt> for horizontal tabulation (HT, TAB)
-and <tt>\b</tt> for backspace (BS).  Other char escape sequences (including octal
+Double quote <code>"</code> and backslash <code>\</code> characters in variable values must
+be escaped: use <code>\"</code> for <code>"</code> and <code>\\</code> for <code>\</code>.</p></div>
+<div class="paragraph"><p>The following escape sequences (beside <code>\"</code> and <code>\\</code>) are recognized:
+<code>\n</code> for newline character (NL), <code>\t</code> for horizontal tabulation (HT, TAB)
+and <code>\b</code> for backspace (BS).  Other char escape sequences (including octal
 escape sequences) are invalid.</p></div>
-<div class="paragraph"><p>Variable values ending in a <tt>\</tt> are continued on the next line in the
+<div class="paragraph"><p>Variable values ending in a <code>\</code> are continued on the next line in the
 customary UNIX fashion.</p></div>
 <div class="paragraph"><p>Some variables may require a special value format.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_includes">Includes</h3>
 <div class="paragraph"><p>You can include one config file from another by setting the special
-<tt>include.path</tt> variable to the name of the file to be included. The
+<code>include.path</code> variable to the name of the file to be included. The
 included file is expanded immediately, as if its contents had been
 found at the location of the include directive. If the value of the
-<tt>include.path</tt> variable is a relative path, the path is considered to be
+<code>include.path</code> variable is a relative path, the path is considered to be
 relative to the configuration file in which the include directive was
-found. The value of <tt>include.path</tt> is subject to tilde expansion: <tt>~/</tt>
-is expanded to the value of <tt>$HOME</tt>, and <tt>~user/</tt> to the specified
+found. The value of <code>include.path</code> is subject to tilde expansion: <code>~/</code>
+is expanded to the value of <code>$HOME</code>, and <code>~user/</code> to the specified
 user&#8217;s home directory. See below for examples.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_example">Example</h3>
 <div class="literalblock">
 <div class="content">
-<pre><tt># Core variables
+<pre><code># Core variables
 [core]
         ; Don't trust file modes
-        filemode = false</tt></pre>
+        filemode = false</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt># Our diff algorithm
+<pre><code># Our diff algorithm
 [diff]
         external = /usr/local/bin/diff-wrapper
-        renames = true</tt></pre>
+        renames = true</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[branch "devel"]
+<pre><code>[branch "devel"]
         remote = origin
-        merge = refs/heads/devel</tt></pre>
+        merge = refs/heads/devel</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt># Proxy settings
+<pre><code># Proxy settings
 [core]
         gitProxy="ssh" for "kernel.org"
-        gitProxy=default-proxy ; for the rest</tt></pre>
+        gitProxy=default-proxy ; for the rest</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[include]
+<pre><code>[include]
         path = /path/to/foo.inc ; include by absolute path
         path = foo ; expand "foo" relative to the current file
-        path = ~/foo ; expand "foo" in your $HOME directory</tt></pre>
+        path = ~/foo ; expand "foo" in your $HOME directory</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1554,7 +1552,7 @@ statusUoption
 </dt>
 <dd>
 <p>
-                Advise to consider using the <tt>-u</tt> option to <a href="git-status.html">git-status(1)</a>
+                Advise to consider using the <code>-u</code> option to <a href="git-status.html">git-status(1)</a>
                 when the command takes more than 2 seconds to enumerate untracked
                 files.
 </p>
@@ -1690,14 +1688,14 @@ core.quotepath
 <dd>
 <p>
         The commands that output paths (e.g. <em>ls-files</em>,
-        <em>diff</em>), when not given the <tt>-z</tt> option, will quote
+        <em>diff</em>), when not given the <code>-z</code> option, will quote
         "unusual" characters in the pathname by enclosing the
         pathname in a double-quote pair and with backslashes the
         same way strings in C source code are quoted.  If this
         variable is set to false, the bytes higher than 0x80 are
         not quoted but output as verbatim.  Note that double
         quote, backslash and control characters are always
-        quoted without <tt>-z</tt> regardless of the setting of this
+        quoted without <code>-z</code> regardless of the setting of this
         variable.
 </p>
 </dd>
@@ -1707,9 +1705,9 @@ core.eol
 <dd>
 <p>
         Sets the line ending type to use in the working directory for
-        files that have the <tt>text</tt> property set.  Alternatives are
+        files that have the <code>text</code> property set.  Alternatives are
         <em>lf</em>, <em>crlf</em> and <em>native</em>, which uses the platform&#8217;s native
-        line ending.  The default value is <tt>native</tt>.  See
+        line ending.  The default value is <code>native</code>.  See
         <a href="gitattributes.html">gitattributes(5)</a> for more information on end-of-line
         conversion.
 </p>
@@ -1719,13 +1717,13 @@ core.safecrlf
 </dt>
 <dd>
 <p>
-        If true, makes Git check if converting <tt>CRLF</tt> is reversible when
+        If true, makes Git check if converting <code>CRLF</code> is reversible when
         end-of-line conversion is active.  Git will verify if a command
         modifies a file in the work tree either directly or indirectly.
         For example, committing a file followed by checking out the
         same file should yield the original file in the work tree.  If
         this is not the case for the current setting of
-        <tt>core.autocrlf</tt>, Git will reject the file.  The variable can
+        <code>core.autocrlf</code>, Git will reject the file.  The variable can
         be set to "warn", in which case Git will only warn about an
         irreversible conversion but continue the operation.
 </p>
@@ -1751,13 +1749,13 @@ to do because CRLFs are line endings, while for binary files
 converting CRLFs corrupts data.</p></div>
 <div class="paragraph"><p>Note, this safety check does not mean that a checkout will generate a
 file identical to the original file for a different setting of
-<tt>core.eol</tt> and <tt>core.autocrlf</tt>, but only for the current one.  For
-example, a text file with <tt>LF</tt> would be accepted with <tt>core.eol=lf</tt>
-and could later be checked out with <tt>core.eol=crlf</tt>, in which case the
-resulting file would contain <tt>CRLF</tt>, although the original file
-contained <tt>LF</tt>.  However, in both work trees the line endings would be
-consistent, that is either all <tt>LF</tt> or all <tt>CRLF</tt>, but never mixed.  A
-file with mixed line endings would be reported by the <tt>core.safecrlf</tt>
+<code>core.eol</code> and <code>core.autocrlf</code>, but only for the current one.  For
+example, a text file with <code>LF</code> would be accepted with <code>core.eol=lf</code>
+and could later be checked out with <code>core.eol=crlf</code>, in which case the
+resulting file would contain <code>CRLF</code>, although the original file
+contained <code>LF</code>.  However, in both work trees the line endings would be
+consistent, that is either all <code>LF</code> or all <code>CRLF</code>, but never mixed.  A
+file with mixed line endings would be reported by the <code>core.safecrlf</code>
 mechanism.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1766,10 +1764,10 @@ core.autocrlf
 <dd>
 <p>
         Setting this variable to "true" is almost the same as setting
-        the <tt>text</tt> attribute to "auto" on all files except that text
+        the <code>text</code> attribute to "auto" on all files except that text
         files are not guaranteed to be normalized: files that contain
-        <tt>CRLF</tt> in the repository will not be touched.  Use this
-        setting if you want to have <tt>CRLF</tt> line endings in your
+        <code>CRLF</code> in the repository will not be touched.  Use this
+        setting if you want to have <code>CRLF</code> line endings in your
         working directory even though the repository does not have
         normalized line endings.  This variable can be set to <em>input</em>,
         in which case no output conversion is performed.
@@ -1806,7 +1804,7 @@ core.gitProxy
 <div class="paragraph"><p>Can be overridden by the <em>GIT_PROXY_COMMAND</em> environment variable
 (which always applies universally, without the special "for"
 handling).</p></div>
-<div class="paragraph"><p>The special string <tt>none</tt> can be used as the proxy command to
+<div class="paragraph"><p>The special string <code>none</code> can be used as the proxy command to
 specify that no proxy be used for a given domain pattern.
 This is useful for excluding servers inside a firewall from
 proxy use, while defaulting to a common proxy for external domains.</p></div>
@@ -2034,8 +2032,8 @@ core.excludesfile
 <p>
         In addition to <em>.gitignore</em> (per-directory) and
         <em>.git/info/exclude</em>, Git looks into this file for patterns
-        of files which are not meant to be tracked.  "<tt>~/</tt>" is expanded
-        to the value of <tt>$HOME</tt> and "<tt>~user/</tt>" to the specified user&#8217;s
+        of files which are not meant to be tracked.  "<code>~/</code>" is expanded
+        to the value of <code>$HOME</code> and "<code>~user/</code>" to the specified user&#8217;s
         home directory. Its default value is $XDG_CONFIG_HOME/git/ignore.
         If $XDG_CONFIG_HOME is either not set or empty, $HOME/.config/git/ignore
         is used instead. See <a href="gitignore.html">gitignore(5)</a>.
@@ -2063,7 +2061,7 @@ core.attributesfile
         In addition to <em>.gitattributes</em> (per-directory) and
         <em>.git/info/attributes</em>, Git looks into this file for attributes
         (see <a href="gitattributes.html">gitattributes(5)</a>). Path expansions are made the same
-        way as for <tt>core.excludesfile</tt>. Its default value is
+        way as for <code>core.excludesfile</code>. Its default value is
         $XDG_CONFIG_HOME/git/attributes. If $XDG_CONFIG_HOME is either not
         set or empty, $HOME/.config/git/attributes is used instead.
 </p>
@@ -2073,10 +2071,10 @@ core.editor
 </dt>
 <dd>
 <p>
-        Commands such as <tt>commit</tt> and <tt>tag</tt> that lets you edit
+        Commands such as <code>commit</code> and <code>tag</code> that lets you edit
         messages by launching an editor uses the value of this
         variable when it is set, and the environment variable
-        <tt>GIT_EDITOR</tt> is not set.  See <a href="git-var.html">git-var(1)</a>.
+        <code>GIT_EDITOR</code> is not set.  See <a href="git-var.html">git-var(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2084,12 +2082,12 @@ core.commentchar
 </dt>
 <dd>
 <p>
-        Commands such as <tt>commit</tt> and <tt>tag</tt> that lets you edit
+        Commands such as <code>commit</code> and <code>tag</code> that lets you edit
         messages consider a line that begins with this character
         commented, and removes them after the editor returns
         (default <em>#</em>).
 </p>
-<div class="paragraph"><p>If set to "auto", <tt>git-commit</tt> would select a character that is not
+<div class="paragraph"><p>If set to "auto", <code>git-commit</code> would select a character that is not
 the beginning character of any line in existing commit messages.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -2097,9 +2095,9 @@ sequence.editor
 </dt>
 <dd>
 <p>
-        Text editor used by <tt>git rebase -i</tt> for editing the rebase instruction file.
+        Text editor used by <code>git rebase -i</code> for editing the rebase instruction file.
         The value is meant to be interpreted by the shell when it is used.
-        It can be overridden by the <tt>GIT_SEQUENCE_EDITOR</tt> environment variable.
+        It can be overridden by the <code>GIT_SEQUENCE_EDITOR</code> environment variable.
         When not configured the default commit message editor is used instead.
 </p>
 </dd>
@@ -2110,26 +2108,26 @@ core.pager
 <p>
         Text viewer for use by Git commands (e.g., <em>less</em>).  The value
         is meant to be interpreted by the shell.  The order of preference
-        is the <tt>$GIT_PAGER</tt> environment variable, then <tt>core.pager</tt>
-        configuration, then <tt>$PAGER</tt>, and then the default chosen at
+        is the <code>$GIT_PAGER</code> environment variable, then <code>core.pager</code>
+        configuration, then <code>$PAGER</code>, and then the default chosen at
         compile time (usually <em>less</em>).
 </p>
-<div class="paragraph"><p>When the <tt>LESS</tt> environment variable is unset, Git sets it to <tt>FRX</tt>
-(if <tt>LESS</tt> environment variable is set, Git does not change it at
+<div class="paragraph"><p>When the <code>LESS</code> environment variable is unset, Git sets it to <code>FRX</code>
+(if <code>LESS</code> environment variable is set, Git does not change it at
 all).  If you want to selectively override Git&#8217;s default setting
-for <tt>LESS</tt>, you can set <tt>core.pager</tt> to e.g. <tt>less -S</tt>.  This will
+for <code>LESS</code>, you can set <code>core.pager</code> to e.g. <code>less -S</code>.  This will
 be passed to the shell by Git, which will translate the final
-command to <tt>LESS=FRX less -S</tt>. The environment does not set the
-<tt>S</tt> option but the command line does, instructing less to truncate
-long lines. Similarly, setting <tt>core.pager</tt> to <tt>less -+F</tt> will
-deactivate the <tt>F</tt> option specified by the environment from the
+command to <code>LESS=FRX less -S</code>. The environment does not set the
+<code>S</code> option but the command line does, instructing less to truncate
+long lines. Similarly, setting <code>core.pager</code> to <code>less -+F</code> will
+deactivate the <code>F</code> option specified by the environment from the
 command-line, deactivating the "quit if one screen" behavior of
-<tt>less</tt>.  One can specifically activate some flags for particular
-commands: for example, setting <tt>pager.blame</tt> to <tt>less -S</tt> enables
-line truncation only for <tt>git blame</tt>.</p></div>
-<div class="paragraph"><p>Likewise, when the <tt>LV</tt> environment variable is unset, Git sets it
-to <tt>-c</tt>.  You can override this setting by exporting <tt>LV</tt> with
-another value or setting <tt>core.pager</tt> to <tt>lv +c</tt>.</p></div>
+<code>less</code>.  One can specifically activate some flags for particular
+commands: for example, setting <code>pager.blame</code> to <code>less -S</code> enables
+line truncation only for <code>git blame</code>.</p></div>
+<div class="paragraph"><p>Likewise, when the <code>LV</code> environment variable is unset, Git sets it
+to <code>-c</code>.  You can override this setting by exporting <code>LV</code> with
+another value or setting <code>core.pager</code> to <code>lv +c</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 core.whitespace
@@ -2137,62 +2135,62 @@ core.whitespace
 <dd>
 <p>
         A comma separated list of common whitespace problems to
-        notice.  <em>git diff</em> will use <tt>color.diff.whitespace</tt> to
+        notice.  <em>git diff</em> will use <code>color.diff.whitespace</code> to
         highlight them, and <em>git apply --whitespace=error</em> will
-        consider them as errors.  You can prefix <tt>-</tt> to disable
-        any of them (e.g. <tt>-trailing-space</tt>):
+        consider them as errors.  You can prefix <code>-</code> to disable
+        any of them (e.g. <code>-trailing-space</code>):
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>blank-at-eol</tt> treats trailing whitespaces at the end of the line
+<code>blank-at-eol</code> treats trailing whitespaces at the end of the line
   as an error (enabled by default).
 </p>
 </li>
 <li>
 <p>
-<tt>space-before-tab</tt> treats a space character that appears immediately
+<code>space-before-tab</code> treats a space character that appears immediately
   before a tab character in the initial indent part of the line as an
   error (enabled by default).
 </p>
 </li>
 <li>
 <p>
-<tt>indent-with-non-tab</tt> treats a line that is indented with space
+<code>indent-with-non-tab</code> treats a line that is indented with space
   characters instead of the equivalent tabs as an error (not enabled by
   default).
 </p>
 </li>
 <li>
 <p>
-<tt>tab-in-indent</tt> treats a tab character in the initial indent part of
+<code>tab-in-indent</code> treats a tab character in the initial indent part of
   the line as an error (not enabled by default).
 </p>
 </li>
 <li>
 <p>
-<tt>blank-at-eof</tt> treats blank lines added at the end of file as an error
+<code>blank-at-eof</code> treats blank lines added at the end of file as an error
   (enabled by default).
 </p>
 </li>
 <li>
 <p>
-<tt>trailing-space</tt> is a short-hand to cover both <tt>blank-at-eol</tt> and
-  <tt>blank-at-eof</tt>.
+<code>trailing-space</code> is a short-hand to cover both <code>blank-at-eol</code> and
+  <code>blank-at-eof</code>.
 </p>
 </li>
 <li>
 <p>
-<tt>cr-at-eol</tt> treats a carriage-return at the end of line as
-  part of the line terminator, i.e. with it, <tt>trailing-space</tt>
+<code>cr-at-eol</code> treats a carriage-return at the end of line as
+  part of the line terminator, i.e. with it, <code>trailing-space</code>
   does not trigger if the character before such a carriage-return
   is not a whitespace (not enabled by default).
 </p>
 </li>
 <li>
 <p>
-<tt>tabwidth=&lt;n&gt;</tt> tells how many character positions a tab occupies; this
-  is relevant for <tt>indent-with-non-tab</tt> and when Git fixes <tt>tab-in-indent</tt>
+<code>tabwidth=&lt;n&gt;</code> tells how many character positions a tab occupies; this
+  is relevant for <code>indent-with-non-tab</code> and when Git fixes <code>tab-in-indent</code>
   errors. The default tab width is 8. Allowed values are 1 to 63.
 </p>
 </li>
@@ -2280,9 +2278,9 @@ add.ignoreErrors
         Tells <em>git add</em> to continue adding files when some files cannot be
         added due to indexing errors. Equivalent to the <em>--ignore-errors</em>
         option of <a href="git-add.html">git-add(1)</a>.  Older versions of Git accept only
-        <tt>add.ignore-errors</tt>, which does not follow the usual naming
+        <code>add.ignore-errors</code>, which does not follow the usual naming
         convention for configuration variables.  Newer versions of Git
-        honor <tt>add.ignoreErrors</tt> as well.
+        honor <code>add.ignoreErrors</code> as well.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2315,7 +2313,7 @@ am.keepcr
 <p>
         If true, git-am will call git-mailsplit for patches in mbox format
         with parameter <em>--keep-cr</em>. In this case git-mailsplit will
-        not remove <tt>\r</tt> from lines ending with <tt>\r\n</tt>. Can be overridden
+        not remove <code>\r</code> from lines ending with <code>\r\n</code>. Can be overridden
         by giving <em>--no-keep-cr</em> from the command line.
         See <a href="git-am.html">git-am(1)</a>, <a href="git-mailsplit.html">git-mailsplit(1)</a>.
 </p>
@@ -2350,10 +2348,10 @@ branch.autosetupmerge
         Tells <em>git branch</em> and <em>git checkout</em> to set up new branches
         so that <a href="git-pull.html">git-pull(1)</a> will appropriately merge from the
         starting point branch. Note that even if this option is not set,
-        this behavior can be chosen per-branch using the <tt>--track</tt>
-        and <tt>--no-track</tt> options. The valid settings are: <tt>false</tt>&#8201;&#8212;&#8201;no
-        automatic setup is done; <tt>true</tt>&#8201;&#8212;&#8201;automatic setup is done when the
-        starting point is a remote-tracking branch; <tt>always</tt>&#8201;&#8212;&#8201;        automatic setup is done when the starting point is either a
+        this behavior can be chosen per-branch using the <code>--track</code>
+        and <code>--no-track</code> options. The valid settings are: <code>false</code>&#8201;&#8212;&#8201;no
+        automatic setup is done; <code>true</code>&#8201;&#8212;&#8201;automatic setup is done when the
+        starting point is a remote-tracking branch; <code>always</code>&#8201;&#8212;&#8201;        automatic setup is done when the starting point is either a
         local branch or remote-tracking
         branch. This option defaults to true.
 </p>
@@ -2366,12 +2364,12 @@ branch.autosetuprebase
         When a new branch is created with <em>git branch</em> or <em>git checkout</em>
         that tracks another branch, this variable tells Git to set
         up pull to rebase instead of merge (see "branch.&lt;name&gt;.rebase").
-        When <tt>never</tt>, rebase is never automatically set to true.
-        When <tt>local</tt>, rebase is set to true for tracked branches of
+        When <code>never</code>, rebase is never automatically set to true.
+        When <code>local</code>, rebase is set to true for tracked branches of
         other local branches.
-        When <tt>remote</tt>, rebase is set to true for tracked branches of
+        When <code>remote</code>, rebase is set to true for tracked branches of
         remote-tracking branches.
-        When <tt>always</tt>, rebase will be set to true for all tracking
+        When <code>always</code>, rebase will be set to true for all tracking
         branches.
         See "branch.autosetupmerge" for details on how to set up a
         branch to track another branch.
@@ -2385,13 +2383,13 @@ branch.&lt;name&gt;.remote
 <p>
         When on branch &lt;name&gt;, it tells <em>git fetch</em> and <em>git push</em>
         which remote to fetch from/push to.  The remote to push to
-        may be overridden with <tt>remote.pushdefault</tt> (for all branches).
+        may be overridden with <code>remote.pushdefault</code> (for all branches).
         The remote to push to, for the current branch, may be further
-        overridden by <tt>branch.&lt;name&gt;.pushremote</tt>.  If no remote is
+        overridden by <code>branch.&lt;name&gt;.pushremote</code>.  If no remote is
         configured, or if you are not on any branch, it defaults to
-        <tt>origin</tt> for fetching and <tt>remote.pushdefault</tt> for pushing.
-        Additionally, <tt>.</tt> (a period) is the current local repository
-        (a dot-repository), see <tt>branch.&lt;name&gt;.merge</tt>'s final note below.
+        <code>origin</code> for fetching and <code>remote.pushdefault</code> for pushing.
+        Additionally, <code>.</code> (a period) is the current local repository
+        (a dot-repository), see <code>branch.&lt;name&gt;.merge</code>'s final note below.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2399,11 +2397,11 @@ branch.&lt;name&gt;.pushremote
 </dt>
 <dd>
 <p>
-        When on branch &lt;name&gt;, it overrides <tt>branch.&lt;name&gt;.remote</tt> for
-        pushing.  It also overrides <tt>remote.pushdefault</tt> for pushing
+        When on branch &lt;name&gt;, it overrides <code>branch.&lt;name&gt;.remote</code> for
+        pushing.  It also overrides <code>remote.pushdefault</code> for pushing
         from branch &lt;name&gt;.  When you pull from one place (e.g. your
         upstream) and push to another place (e.g. your own publishing
-        repository), you would want to set <tt>remote.pushdefault</tt> to
+        repository), you would want to set <code>remote.pushdefault</code> to
         specify the remote to push to for all branches, and use this
         option to override it for a specific branch.
 </p>
@@ -2428,7 +2426,7 @@ branch.&lt;name&gt;.merge
         If you wish to setup <em>git pull</em> so that it merges into &lt;name&gt; from
         another branch in the local repository, you can point
         branch.&lt;name&gt;.merge to the desired branch, and use the relative path
-        setting <tt>.</tt> (a period) for branch.&lt;name&gt;.remote.
+        setting <code>.</code> (a period) for branch.&lt;name&gt;.remote.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2454,9 +2452,9 @@ branch.&lt;name&gt;.rebase
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>When preserve, also pass `--preserve-merges` along to 'git rebase'
+<pre><code>When preserve, also pass `--preserve-merges` along to 'git rebase'
 so that locally committed merge commits will not be flattened
-by running 'git pull'.</tt></pre>
+by running 'git pull'.</code></pre>
 </div></div>
 <div class="paragraph"><p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
 it unless you understand the implications (see <a href="git-rebase.html">git-rebase(1)</a>
@@ -2468,7 +2466,7 @@ branch.&lt;name&gt;.description
 <dd>
 <p>
         Branch description, can be edited with
-        <tt>git branch --edit-description</tt>. Branch description is
+        <code>git branch --edit-description</code>. Branch description is
         automatically added in the format-patch cover letter or
         request-pull summary.
 </p>
@@ -2508,8 +2506,8 @@ color.branch
 <dd>
 <p>
         A boolean to enable/disable color in the output of
-        <a href="git-branch.html">git-branch(1)</a>. May be set to <tt>always</tt>,
-        <tt>false</tt> (or <tt>never</tt>) or <tt>auto</tt> (or <tt>true</tt>), in which case colors are used
+        <a href="git-branch.html">git-branch(1)</a>. May be set to <code>always</code>,
+        <code>false</code> (or <code>never</code>) or <code>auto</code> (or <code>true</code>), in which case colors are used
         only when the output is to a terminal. Defaults to false.
 </p>
 </dd>
@@ -2518,17 +2516,17 @@ color.branch.&lt;slot&gt;
 </dt>
 <dd>
 <p>
-        Use customized color for branch coloration. <tt>&lt;slot&gt;</tt> is one of
-        <tt>current</tt> (the current branch), <tt>local</tt> (a local branch),
-        <tt>remote</tt> (a remote-tracking branch in refs/remotes/),
-        <tt>upstream</tt> (upstream tracking branch), <tt>plain</tt> (other
+        Use customized color for branch coloration. <code>&lt;slot&gt;</code> is one of
+        <code>current</code> (the current branch), <code>local</code> (a local branch),
+        <code>remote</code> (a remote-tracking branch in refs/remotes/),
+        <code>upstream</code> (upstream tracking branch), <code>plain</code> (other
         refs).
 </p>
 <div class="paragraph"><p>The value for these configuration variables is a list of colors (at most
 two) and attributes (at most one), separated by spaces.  The colors
-accepted are <tt>normal</tt>, <tt>black</tt>, <tt>red</tt>, <tt>green</tt>, <tt>yellow</tt>, <tt>blue</tt>,
-<tt>magenta</tt>, <tt>cyan</tt> and <tt>white</tt>; the attributes are <tt>bold</tt>, <tt>dim</tt>, <tt>ul</tt>,
-<tt>blink</tt> and <tt>reverse</tt>.  The first color given is the foreground; the
+accepted are <code>normal</code>, <code>black</code>, <code>red</code>, <code>green</code>, <code>yellow</code>, <code>blue</code>,
+<code>magenta</code>, <code>cyan</code> and <code>white</code>; the attributes are <code>bold</code>, <code>dim</code>, <code>ul</code>,
+<code>blink</code> and <code>reverse</code>.  The first color given is the foreground; the
 second is the background.  The position of the attribute, if any,
 doesn&#8217;t matter.</p></div>
 </dd>
@@ -2538,26 +2536,26 @@ color.diff
 <dd>
 <p>
         Whether to use ANSI escape sequences to add color to patches.
-        If this is set to <tt>always</tt>, <a href="git-diff.html">git-diff(1)</a>,
+        If this is set to <code>always</code>, <a href="git-diff.html">git-diff(1)</a>,
         <a href="git-log.html">git-log(1)</a>, and <a href="git-show.html">git-show(1)</a> will use color
-        for all patches.  If it is set to <tt>true</tt> or <tt>auto</tt>, those
+        for all patches.  If it is set to <code>true</code> or <code>auto</code>, those
         commands will only use color when output is to the terminal.
         Defaults to false.
 </p>
 <div class="paragraph"><p>This does not affect <a href="git-format-patch.html">git-format-patch(1)</a> or the
 <em>git-diff-&#42;</em> plumbing commands.  Can be overridden on the
-command line with the <tt>--color[=&lt;when&gt;]</tt> option.</p></div>
+command line with the <code>--color[=&lt;when&gt;]</code> option.</p></div>
 </dd>
 <dt class="hdlist1">
 color.diff.&lt;slot&gt;
 </dt>
 <dd>
 <p>
-        Use customized color for diff colorization.  <tt>&lt;slot&gt;</tt> specifies
+        Use customized color for diff colorization.  <code>&lt;slot&gt;</code> specifies
         which part of the patch to use the specified color, and is one
-        of <tt>plain</tt> (context text), <tt>meta</tt> (metainformation), <tt>frag</tt>
-        (hunk header), <em>func</em> (function in hunk header), <tt>old</tt> (removed lines),
-        <tt>new</tt> (added lines), <tt>commit</tt> (commit headers), or <tt>whitespace</tt>
+        of <code>plain</code> (context text), <code>meta</code> (metainformation), <code>frag</code>
+        (hunk header), <em>func</em> (function in hunk header), <code>old</code> (removed lines),
+        <code>new</code> (added lines), <code>commit</code> (commit headers), or <code>whitespace</code>
         (highlighting whitespace errors). The values of these variables may be
         specified as in color.branch.&lt;slot&gt;.
 </p>
@@ -2567,8 +2565,8 @@ color.decorate.&lt;slot&gt;
 </dt>
 <dd>
 <p>
-        Use customized color for <em>git log --decorate</em> output.  <tt>&lt;slot&gt;</tt> is one
-        of <tt>branch</tt>, <tt>remoteBranch</tt>, <tt>tag</tt>, <tt>stash</tt> or <tt>HEAD</tt> for local
+        Use customized color for <em>git log --decorate</em> output.  <code>&lt;slot&gt;</code> is one
+        of <code>branch</code>, <code>remoteBranch</code>, <code>tag</code>, <code>stash</code> or <code>HEAD</code> for local
         branches, remote-tracking branches, tags, stash and HEAD, respectively.
 </p>
 </dd>
@@ -2577,9 +2575,9 @@ color.grep
 </dt>
 <dd>
 <p>
-        When set to <tt>always</tt>, always highlight matches.  When <tt>false</tt> (or
-        <tt>never</tt>), never.  When set to <tt>true</tt> or <tt>auto</tt>, use color only
-        when the output is written to the terminal.  Defaults to <tt>false</tt>.
+        When set to <code>always</code>, always highlight matches.  When <code>false</code> (or
+        <code>never</code>), never.  When set to <code>true</code> or <code>auto</code>, use color only
+        when the output is written to the terminal.  Defaults to <code>false</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2587,46 +2585,46 @@ color.grep.&lt;slot&gt;
 </dt>
 <dd>
 <p>
-        Use customized color for grep colorization.  <tt>&lt;slot&gt;</tt> specifies which
+        Use customized color for grep colorization.  <code>&lt;slot&gt;</code> specifies which
         part of the line to use the specified color, and is one of
 </p>
 <div class="openblock">
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>context</tt>
+<code>context</code>
 </dt>
 <dd>
 <p>
-        non-matching text in context lines (when using <tt>-A</tt>, <tt>-B</tt>, or <tt>-C</tt>)
+        non-matching text in context lines (when using <code>-A</code>, <code>-B</code>, or <code>-C</code>)
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>filename</tt>
+<code>filename</code>
 </dt>
 <dd>
 <p>
-        filename prefix (when not using <tt>-h</tt>)
+        filename prefix (when not using <code>-h</code>)
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>function</tt>
+<code>function</code>
 </dt>
 <dd>
 <p>
-        function name lines (when using <tt>-p</tt>)
+        function name lines (when using <code>-p</code>)
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>linenumber</tt>
+<code>linenumber</code>
 </dt>
 <dd>
 <p>
-        line number prefix (when using <tt>-n</tt>)
+        line number prefix (when using <code>-n</code>)
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>match</tt>
+<code>match</code>
 </dt>
 <dd>
 <p>
@@ -2634,7 +2632,7 @@ color.grep.&lt;slot&gt;
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>selected</tt>
+<code>selected</code>
 </dt>
 <dd>
 <p>
@@ -2642,12 +2640,12 @@ color.grep.&lt;slot&gt;
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>separator</tt>
+<code>separator</code>
 </dt>
 <dd>
 <p>
-        separators between fields on a line (<tt>:</tt>, <tt>-</tt>, and <tt>=</tt>)
-        and between hunks (<tt>--</tt>)
+        separators between fields on a line (<code>:</code>, <code>-</code>, and <code>=</code>)
+        and between hunks (<code>--</code>)
 </p>
 </dd>
 </dl></div>
@@ -2659,10 +2657,10 @@ color.interactive
 </dt>
 <dd>
 <p>
-        When set to <tt>always</tt>, always use colors for interactive prompts
+        When set to <code>always</code>, always use colors for interactive prompts
         and displays (such as those used by "git-add --interactive" and
-        "git-clean --interactive"). When false (or <tt>never</tt>), never.
-        When set to <tt>true</tt> or <tt>auto</tt>, use colors only when the output is
+        "git-clean --interactive"). When false (or <code>never</code>), never.
+        When set to <code>true</code> or <code>auto</code>, use colors only when the output is
         to the terminal. Defaults to false.
 </p>
 </dd>
@@ -2672,8 +2670,8 @@ color.interactive.&lt;slot&gt;
 <dd>
 <p>
         Use customized color for <em>git add --interactive</em> and <em>git clean
-        --interactive</em> output. <tt>&lt;slot&gt;</tt> may be <tt>prompt</tt>, <tt>header</tt>, <tt>help</tt>
-        or <tt>error</tt>, for four distinct types of normal output from
+        --interactive</em> output. <code>&lt;slot&gt;</code> may be <code>prompt</code>, <code>header</code>, <code>help</code>
+        or <code>error</code>, for four distinct types of normal output from
         interactive commands.  The values of these variables may be
         specified as in color.branch.&lt;slot&gt;.
 </p>
@@ -2693,8 +2691,8 @@ color.showbranch
 <dd>
 <p>
         A boolean to enable/disable color in the output of
-        <a href="git-show-branch.html">git-show-branch(1)</a>. May be set to <tt>always</tt>,
-        <tt>false</tt> (or <tt>never</tt>) or <tt>auto</tt> (or <tt>true</tt>), in which case colors are used
+        <a href="git-show-branch.html">git-show-branch(1)</a>. May be set to <code>always</code>,
+        <code>false</code> (or <code>never</code>) or <code>auto</code> (or <code>true</code>), in which case colors are used
         only when the output is to a terminal. Defaults to false.
 </p>
 </dd>
@@ -2704,8 +2702,8 @@ color.status
 <dd>
 <p>
         A boolean to enable/disable color in the output of
-        <a href="git-status.html">git-status(1)</a>. May be set to <tt>always</tt>,
-        <tt>false</tt> (or <tt>never</tt>) or <tt>auto</tt> (or <tt>true</tt>), in which case colors are used
+        <a href="git-status.html">git-status(1)</a>. May be set to <code>always</code>,
+        <code>false</code> (or <code>never</code>) or <code>auto</code> (or <code>true</code>), in which case colors are used
         only when the output is to a terminal. Defaults to false.
 </p>
 </dd>
@@ -2714,13 +2712,13 @@ color.status.&lt;slot&gt;
 </dt>
 <dd>
 <p>
-        Use customized color for status colorization. <tt>&lt;slot&gt;</tt> is
-        one of <tt>header</tt> (the header text of the status message),
-        <tt>added</tt> or <tt>updated</tt> (files which are added but not committed),
-        <tt>changed</tt> (files which are changed but not added in the index),
-        <tt>untracked</tt> (files which are not tracked by Git),
-        <tt>branch</tt> (the current branch), or
-        <tt>nobranch</tt> (the color the <em>no branch</em> warning is shown in, defaulting
+        Use customized color for status colorization. <code>&lt;slot&gt;</code> is
+        one of <code>header</code> (the header text of the status message),
+        <code>added</code> or <code>updated</code> (files which are added but not committed),
+        <code>changed</code> (files which are changed but not added in the index),
+        <code>untracked</code> (files which are not tracked by Git),
+        <code>branch</code> (the current branch), or
+        <code>nobranch</code> (the color the <em>no branch</em> warning is shown in, defaulting
         to red). The values of these variables may be specified as in
         color.branch.&lt;slot&gt;.
 </p>
@@ -2731,14 +2729,14 @@ color.ui
 <dd>
 <p>
         This variable determines the default value for variables such
-        as <tt>color.diff</tt> and <tt>color.grep</tt> that control the use of color
+        as <code>color.diff</code> and <code>color.grep</code> that control the use of color
         per command family. Its scope will expand as more commands learn
-        configuration to set a default for the <tt>--color</tt> option.  Set it
-        to <tt>false</tt> or <tt>never</tt> if you prefer Git commands not to use
+        configuration to set a default for the <code>--color</code> option.  Set it
+        to <code>false</code> or <code>never</code> if you prefer Git commands not to use
         color unless enabled explicitly with some other configuration
-        or the <tt>--color</tt> option. Set it to <tt>always</tt> if you want all
+        or the <code>--color</code> option. Set it to <code>always</code> if you want all
         output not intended for machine consumption to use color, to
-        <tt>true</tt> or <tt>auto</tt> (this is the default since Git 1.8.4) if you
+        <code>true</code> or <code>auto</code> (this is the default since Git 1.8.4) if you
         want such output to use color when written to the terminal.
 </p>
 </dd>
@@ -2757,7 +2755,7 @@ column.ui
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>always</tt>
+<code>always</code>
 </dt>
 <dd>
 <p>
@@ -2765,7 +2763,7 @@ column.ui
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>never</tt>
+<code>never</code>
 </dt>
 <dd>
 <p>
@@ -2773,7 +2771,7 @@ column.ui
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>auto</tt>
+<code>auto</code>
 </dt>
 <dd>
 <p>
@@ -2789,7 +2787,7 @@ specified.</p></div>
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>column</tt>
+<code>column</code>
 </dt>
 <dd>
 <p>
@@ -2797,7 +2795,7 @@ specified.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>row</tt>
+<code>row</code>
 </dt>
 <dd>
 <p>
@@ -2805,7 +2803,7 @@ specified.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>plain</tt>
+<code>plain</code>
 </dt>
 <dd>
 <p>
@@ -2820,7 +2818,7 @@ to <em>nodense</em>):</p></div>
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>dense</tt>
+<code>dense</code>
 </dt>
 <dd>
 <p>
@@ -2828,7 +2826,7 @@ to <em>nodense</em>):</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>nodense</tt>
+<code>nodense</code>
 </dt>
 <dd>
 <p>
@@ -2843,8 +2841,8 @@ column.branch
 </dt>
 <dd>
 <p>
-        Specify whether to output branch listing in <tt>git branch</tt> in columns.
-        See <tt>column.ui</tt> for details.
+        Specify whether to output branch listing in <code>git branch</code> in columns.
+        See <code>column.ui</code> for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2852,8 +2850,8 @@ column.clean
 </dt>
 <dd>
 <p>
-        Specify the layout when list items in <tt>git clean -i</tt>, which always
-        shows files and directories in columns. See <tt>column.ui</tt> for details.
+        Specify the layout when list items in <code>git clean -i</code>, which always
+        shows files and directories in columns. See <code>column.ui</code> for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2861,8 +2859,8 @@ column.status
 </dt>
 <dd>
 <p>
-        Specify whether to output untracked files in <tt>git status</tt> in columns.
-        See <tt>column.ui</tt> for details.
+        Specify whether to output untracked files in <code>git status</code> in columns.
+        See <code>column.ui</code> for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2870,8 +2868,8 @@ column.tag
 </dt>
 <dd>
 <p>
-        Specify whether to output tag listing in <tt>git tag</tt> in columns.
-        See <tt>column.ui</tt> for details.
+        Specify whether to output tag listing in <code>git tag</code> in columns.
+        See <code>column.ui</code> for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2879,12 +2877,12 @@ commit.cleanup
 </dt>
 <dd>
 <p>
-        This setting overrides the default of the <tt>--cleanup</tt> option in
-        <tt>git commit</tt>. See <a href="git-commit.html">git-commit(1)</a> for details. Changing the
+        This setting overrides the default of the <code>--cleanup</code> option in
+        <code>git commit</code>. See <a href="git-commit.html">git-commit(1)</a> for details. Changing the
         default can be useful when you always want to keep lines that begin
-        with comment character <tt>#</tt> in your log message, in which case you
-        would do <tt>git config commit.cleanup whitespace</tt> (note that you will
-        have to remove the help lines that begin with <tt>#</tt> in the commit log
+        with comment character <code>#</code> in your log message, in which case you
+        would do <code>git config commit.cleanup whitespace</code> (note that you will
+        have to remove the help lines that begin with <code>#</code> in the commit log
         template yourself, if you do this).
 </p>
 </dd>
@@ -2916,7 +2914,7 @@ commit.template
 <dd>
 <p>
         Specify a file to use as the template for new commit messages.
-        "<tt>~/</tt>" is expanded to the value of <tt>$HOME</tt> and "<tt>~user/</tt>" to the
+        "<code>~/</code>" is expanded to the value of <code>$HOME</code> and "<code>~user/</code>" to the
         specified user&#8217;s home directory.
 </p>
 </dd>
@@ -2970,7 +2968,7 @@ diff.autorefreshindex
 <p>
         When using <em>git diff</em> to compare with work tree
         files, do not consider stat-only change as changed.
-        Instead, silently run <tt>git update-index --refresh</tt> to
+        Instead, silently run <code>git update-index --refresh</code> to
         update the cached stat information for paths whose
         contents in the work tree match the contents in the
         index.  This option defaults to true.  Note that this
@@ -2983,18 +2981,18 @@ diff.dirstat
 </dt>
 <dd>
 <p>
-        A comma separated list of <tt>--dirstat</tt> parameters specifying the
-        default behavior of the <tt>--dirstat</tt> option to <a href="git-diff.html">git-diff(1)</a>`
+        A comma separated list of <code>--dirstat</code> parameters specifying the
+        default behavior of the <code>--dirstat</code> option to <a href="git-diff.html">git-diff(1)</a>`
         and friends. The defaults can be overridden on the command line
-        (using <tt>--dirstat=&lt;param1,param2,...&gt;</tt>). The fallback defaults
-        (when not changed by <tt>diff.dirstat</tt>) are <tt>changes,noncumulative,3</tt>.
+        (using <code>--dirstat=&lt;param1,param2,...&gt;</code>). The fallback defaults
+        (when not changed by <code>diff.dirstat</code>) are <code>changes,noncumulative,3</code>.
         The following parameters are available:
 </p>
 <div class="openblock">
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>changes</tt>
+<code>changes</code>
 </dt>
 <dd>
 <p>
@@ -3006,39 +3004,39 @@ diff.dirstat
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>lines</tt>
+<code>lines</code>
 </dt>
 <dd>
 <p>
         Compute the dirstat numbers by doing the regular line-based diff
         analysis, and summing the removed/added line counts. (For binary
         files, count 64-byte chunks instead, since binary files have no
-        natural concept of lines). This is a more expensive <tt>--dirstat</tt>
-        behavior than the <tt>changes</tt> behavior, but it does count rearranged
+        natural concept of lines). This is a more expensive <code>--dirstat</code>
+        behavior than the <code>changes</code> behavior, but it does count rearranged
         lines within a file as much as other changes. The resulting output
-        is consistent with what you get from the other <tt>--*stat</tt> options.
+        is consistent with what you get from the other <code>--*stat</code> options.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>files</tt>
+<code>files</code>
 </dt>
 <dd>
 <p>
         Compute the dirstat numbers by counting the number of files changed.
         Each changed file counts equally in the dirstat analysis. This is
-        the computationally cheapest <tt>--dirstat</tt> behavior, since it does
+        the computationally cheapest <code>--dirstat</code> behavior, since it does
         not have to look at the file contents at all.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>cumulative</tt>
+<code>cumulative</code>
 </dt>
 <dd>
 <p>
         Count changes in a child directory for the parent directory as well.
-        Note that when using <tt>cumulative</tt>, the sum of the percentages
+        Note that when using <code>cumulative</code>, the sum of the percentages
         reported may exceed 100%. The default (non-cumulative) behavior can
-        be specified with the <tt>noncumulative</tt> parameter.
+        be specified with the <code>noncumulative</code> parameter.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3056,7 +3054,7 @@ diff.dirstat
 <div class="paragraph"><p>Example: The following will count changed files, while ignoring
 directories with less than 10% of the total amount of changed files,
 and accumulating child directory counts in the parent directories:
-<tt>files,10,cumulative</tt>.</p></div>
+<code>files,10,cumulative</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 diff.statGraphWidth
@@ -3117,7 +3115,7 @@ diff.mnemonicprefix
 </p>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>git diff</tt>
+<code>git diff</code>
 </dt>
 <dd>
 <p>
@@ -3125,7 +3123,7 @@ diff.mnemonicprefix
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git diff HEAD</tt>
+<code>git diff HEAD</code>
 </dt>
 <dd>
 <p>
@@ -3133,7 +3131,7 @@ diff.mnemonicprefix
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git diff --cached</tt>
+<code>git diff --cached</code>
 </dt>
 <dd>
 <p>
@@ -3141,7 +3139,7 @@ diff.mnemonicprefix
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git diff HEAD:file1 file2</tt>
+<code>git diff HEAD:file1 file2</code>
 </dt>
 <dd>
 <p>
@@ -3149,7 +3147,7 @@ diff.mnemonicprefix
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git diff --no-index a b</tt>
+<code>git diff --no-index a b</code>
 </dt>
 <dd>
 <p>
@@ -3211,7 +3209,7 @@ diff.submodule
 <p>
         Specify the format in which differences in submodules are
         shown.  The "log" format lists the commits in the range like
-        <a href="git-submodule.html">git-submodule(1)</a> <tt>summary</tt> does.  The "short" format
+        <a href="git-submodule.html">git-submodule(1)</a> <code>summary</code> does.  The "short" format
         format just shows the names of the commits at the beginning
         and end of the range.  Defaults to short.
 </p>
@@ -3291,7 +3289,7 @@ diff.tool
 <dd>
 <p>
         Controls which diff tool is used by <a href="git-difftool.html">git-difftool(1)</a>.
-        This variable overrides the value configured in <tt>merge.tool</tt>.
+        This variable overrides the value configured in <code>merge.tool</code>.
         The list below shows the valid built-in values.
         Any other value is treated as a custom diff tool and requires
         that a corresponding difftool.&lt;tool&gt;.cmd variable is defined.
@@ -3415,7 +3413,7 @@ diff.algorithm
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>default</tt>, <tt>myers</tt>
+<code>default</code>, <code>myers</code>
 </dt>
 <dd>
 <p>
@@ -3423,7 +3421,7 @@ diff.algorithm
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>minimal</tt>
+<code>minimal</code>
 </dt>
 <dd>
 <p>
@@ -3432,7 +3430,7 @@ diff.algorithm
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>patience</tt>
+<code>patience</code>
 </dt>
 <dd>
 <p>
@@ -3440,7 +3438,7 @@ diff.algorithm
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>histogram</tt>
+<code>histogram</code>
 </dt>
 <dd>
 <p>
@@ -3503,7 +3501,7 @@ fetch.fsckObjects
         If it is set to true, git-fetch-pack will check all fetched
         objects. It will abort in the case of a malformed object or a
         broken link. The result of an abort are only dangling objects.
-        Defaults to false. If not set, the value of <tt>transfer.fsckObjects</tt>
+        Defaults to false. If not set, the value of <code>transfer.fsckObjects</code>
         is used instead.
 </p>
 </dd>
@@ -3520,7 +3518,7 @@ fetch.unpackLimit
         a pack, after adding any missing delta bases.  Storing the
         pack from a push can make the push operation complete faster,
         especially on slow filesystems.  If not set, the value of
-        <tt>transfer.unpackLimit</tt> is used instead.
+        <code>transfer.unpackLimit</code> is used instead.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3528,8 +3526,8 @@ fetch.prune
 </dt>
 <dd>
 <p>
-        If true, fetch will automatically behave as if the <tt>--prune</tt>
-        option was given on the command line.  See also <tt>remote.&lt;name&gt;.prune</tt>.
+        If true, fetch will automatically behave as if the <code>--prune</code>
+        option was given on the command line.  See also <code>remote.&lt;name&gt;.prune</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3613,7 +3611,7 @@ format.suffix
 <dd>
 <p>
         The default for format-patch is to output files with the suffix
-        <tt>.patch</tt>. Use this variable to change that suffix (make sure to
+        <code>.patch</code>. Use this variable to change that suffix (make sure to
         include the dot if you want it).
 </p>
 </dd>
@@ -3633,12 +3631,12 @@ format.thread
 <dd>
 <p>
         The default threading style for <em>git format-patch</em>.  Can be
-        a boolean value, or <tt>shallow</tt> or <tt>deep</tt>.  <tt>shallow</tt> threading
+        a boolean value, or <code>shallow</code> or <code>deep</code>.  <code>shallow</code> threading
         makes every mail a reply to the head of the series,
         where the head is chosen from the cover letter, the
-        <tt>--in-reply-to</tt>, and the first patch mail, in this order.
-        <tt>deep</tt> threading makes every mail a reply to the previous one.
-        A true boolean value is the same as <tt>shallow</tt>, and a false
+        <code>--in-reply-to</code>, and the first patch mail, in this order.
+        <code>deep</code> threading makes every mail a reply to the previous one.
+        A true boolean value is the same as <code>shallow</code>, and a false
         value disables threading.
 </p>
 </dd>
@@ -3647,7 +3645,7 @@ format.signoff
 </dt>
 <dd>
 <p>
-        A boolean value which lets you enable the <tt>-s/--signoff</tt> option of
+        A boolean value which lets you enable the <code>-s/--signoff</code> option of
         format-patch by default. <strong>Note:</strong> Adding the Signed-off-by: line to a
         patch should be a conscious act and means that you certify you have
         the rights to submit this work under the same open source license.
@@ -3710,7 +3708,7 @@ gc.auto
 <dd>
 <p>
         When there are approximately more than this many loose
-        objects in the repository, <tt>git gc --auto</tt> will pack them.
+        objects in the repository, <code>git gc --auto</code> will pack them.
         Some Porcelain commands use this command to perform a
         light-weight garbage collection from time to time.  The
         default value is 6700.  Setting this to 0 disables it.
@@ -3722,8 +3720,8 @@ gc.autopacklimit
 <dd>
 <p>
         When there are more than this many packs that are not
-        marked with <tt>*.keep</tt> file in the repository, <tt>git gc
-        --auto</tt> consolidates them into one larger pack.  The
+        marked with <code>*.keep</code> file in the repository, <code>git gc
+        --auto</code> consolidates them into one larger pack.  The
         default value is 50.  Setting this to 0 disables it.
 </p>
 </dd>
@@ -3732,7 +3730,7 @@ gc.autodetach
 </dt>
 <dd>
 <p>
-        Make <tt>git gc --auto</tt> return immediately andrun in background
+        Make <code>git gc --auto</code> return immediately andrun in background
         if the system supports it. Default is true.
 </p>
 </dd>
@@ -3741,12 +3739,12 @@ gc.packrefs
 </dt>
 <dd>
 <p>
-        Running <tt>git pack-refs</tt> in a repository renders it
+        Running <code>git pack-refs</code> in a repository renders it
         unclonable by Git versions prior to 1.5.1.2 over dumb
         transports such as HTTP.  This variable determines whether
-        <em>git gc</em> runs <tt>git pack-refs</tt>. This can be set to <tt>notbare</tt>
+        <em>git gc</em> runs <code>git pack-refs</code>. This can be set to <code>notbare</code>
         to enable it within all non-bare repos or it can be set to a
-        boolean value.  The default is <tt>true</tt>.
+        boolean value.  The default is <code>true</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3876,7 +3874,7 @@ gitcvs.dbname
         derived from the Git repository. The exact meaning depends on the
         used database driver, for SQLite (which is the default driver) this
         is a filename. Supports variable substitution (see
-        <a href="git-cvsserver.html">git-cvsserver(1)</a> for details). May not contain semicolons (<tt>;</tt>).
+        <a href="git-cvsserver.html">git-cvsserver(1)</a> for details). May not contain semicolons (<code>;</code>).
         Default: <em>%Ggitcvs.%m.sqlite</em>
 </p>
 </dd>
@@ -3889,7 +3887,7 @@ gitcvs.dbdriver
         for this here, but it might not work. git-cvsserver is tested
         with <em>DBD::SQLite</em>, reported to work with <em>DBD::Pg</em>, and
         reported <strong>not</strong> to work with <em>DBD::mysql</em>. Experimental feature.
-        May not contain double colons (<tt>:</tt>). Default: <em>SQLite</em>.
+        May not contain double colons (<code>:</code>). Default: <em>SQLite</em>.
         See <a href="git-cvsserver.html">git-cvsserver(1)</a>.
 </p>
 </dd>
@@ -4109,7 +4107,7 @@ gui.fastcopyblame
 </dt>
 <dd>
 <p>
-        If true, <em>git gui blame</em> uses <tt>-C</tt> instead of <tt>-C -C</tt> for original
+        If true, <em>git gui blame</em> uses <code>-C</code> instead of <code>-C -C</code> for original
         location detection. It makes blame significantly faster on huge
         repositories at the expense of less thorough copy detection.
 </p>
@@ -4130,8 +4128,8 @@ gui.blamehistoryctx
 <dd>
 <p>
         Specifies the radius of history context in days to show in
-        <a href="gitk.html">gitk(1)</a> for the selected commit, when the <tt>Show History
-        Context</tt> menu item is invoked from <em>git gui blame</em>. If this
+        <a href="gitk.html">gitk(1)</a> for the selected commit, when the <code>Show History
+        Context</code> menu item is invoked from <em>git gui blame</em>. If this
         variable is set to zero, the whole history is shown.
 </p>
 </dd>
@@ -4141,7 +4139,7 @@ guitool.&lt;name&gt;.cmd
 <dd>
 <p>
         Specifies the shell command line to execute when the corresponding item
-        of the <a href="git-gui.html">git-gui(1)</a> <tt>Tools</tt> menu is invoked. This option is
+        of the <a href="git-gui.html">git-gui(1)</a> <code>Tools</code> menu is invoked. This option is
         mandatory for every tool. The command is executed from the root of
         the working directory, and in the environment it receives the name of
         the tool as <em>GIT_GUITOOL</em>, the name of the currently selected file as
@@ -4287,7 +4285,7 @@ http.proxy
 <p>
         Override the HTTP proxy, normally configured using the <em>http_proxy</em>,
         <em>https_proxy</em>, and <em>all_proxy</em> environment variables (see
-        <tt>curl(1)</tt>).  This can be overridden on a per-remote basis; see
+        <code>curl(1)</code>).  This can be overridden on a per-remote basis; see
         remote.&lt;name&gt;.proxy
 </p>
 </dd>
@@ -4470,19 +4468,19 @@ http.&lt;url&gt;.*
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Scheme (e.g., <tt>https</tt> in <tt>https://example.com/</tt>). This field
+Scheme (e.g., <code>https</code> in <code>https://example.com/</code>). This field
   must match exactly between the config key and the URL.
 </p>
 </li>
 <li>
 <p>
-Host/domain name (e.g., <tt>example.com</tt> in <tt>https://example.com/</tt>).
+Host/domain name (e.g., <code>example.com</code> in <code>https://example.com/</code>).
   This field must match exactly between the config key and the URL.
 </p>
 </li>
 <li>
 <p>
-Port number (e.g., <tt>8080</tt> in <tt>http://example.com:8080/</tt>).
+Port number (e.g., <code>8080</code> in <code>http://example.com:8080/</code>).
   This field must match exactly between the config key and the URL.
   Omitted port numbers are automatically converted to the correct
   default for the scheme before matching.
@@ -4490,18 +4488,18 @@ Port number (e.g., <tt>8080</tt> in <tt>http://example.com:8080/</tt>).
 </li>
 <li>
 <p>
-Path (e.g., <tt>repo.git</tt> in <tt>https://example.com/repo.git</tt>). The
+Path (e.g., <code>repo.git</code> in <code>https://example.com/repo.git</code>). The
   path field of the config key must match the path field of the URL
   either exactly or as a prefix of slash-delimited path elements.  This means
-  a config key with path <tt>foo/</tt> matches URL path <tt>foo/bar</tt>.  A prefix can only
-  match on a slash (<tt>/</tt>) boundary.  Longer matches take precedence (so a config
-  key with path <tt>foo/bar</tt> is a better match to URL path <tt>foo/bar</tt> than a config
-  key with just path <tt>foo/</tt>).
+  a config key with path <code>foo/</code> matches URL path <code>foo/bar</code>.  A prefix can only
+  match on a slash (<code>/</code>) boundary.  Longer matches take precedence (so a config
+  key with path <code>foo/bar</code> is a better match to URL path <code>foo/bar</code> than a config
+  key with just path <code>foo/</code>).
 </p>
 </li>
 <li>
 <p>
-User name (e.g., <tt>user</tt> in <tt>https://user@example.com/repo.git</tt>). If
+User name (e.g., <code>user</code> in <code>https://user@example.com/repo.git</code>). If
   the config key has a user name it must match the user name in the
   URL exactly. If the config key does not have a user name, that
   config key will match a URL with any user name (including none),
@@ -4512,9 +4510,9 @@ User name (e.g., <tt>user</tt> in <tt>https://user@example.com/repo.git</tt>). I
 </div></div>
 <div class="paragraph"><p>The list above is ordered by decreasing precedence; a URL that matches
 a config key&#8217;s path is preferred to one that matches its user name. For example,
-if the URL is <tt>https://user@example.com/foo/bar</tt> a config key match of
-<tt>https://example.com/foo</tt> will be preferred over a config key match of
-<tt>https://user@example.com</tt>.</p></div>
+if the URL is <code>https://user@example.com/foo/bar</code> a config key match of
+<code>https://example.com/foo</code> will be preferred over a config key match of
+<code>https://user@example.com</code>.</p></div>
 <div class="paragraph"><p>All URLs are normalized before attempting any matching (the password part,
 if embedded in the URL, is always ignored for matching purposes) so that
 equivalent urls that are simply spelled differently will match properly.
@@ -4623,7 +4621,7 @@ interactive.singlekey
 <p>
         In interactive commands, allow the user to provide one-letter
         input with a single key (i.e., without hitting enter).
-        Currently this is used by the <tt>--patch</tt> mode of
+        Currently this is used by the <code>--patch</code> mode of
         <a href="git-add.html">git-add(1)</a>, <a href="git-checkout.html">git-checkout(1)</a>, <a href="git-commit.html">git-commit(1)</a>,
         <a href="git-reset.html">git-reset(1)</a>, and <a href="git-stash.html">git-stash(1)</a>. Note that this
         setting is silently ignored if portable keystroke input
@@ -4636,8 +4634,8 @@ log.abbrevCommit
 <dd>
 <p>
         If true, makes <a href="git-log.html">git-log(1)</a>, <a href="git-show.html">git-show(1)</a>, and
-        <a href="git-whatchanged.html">git-whatchanged(1)</a> assume <tt>--abbrev-commit</tt>. You may
-        override this option with <tt>--no-abbrev-commit</tt>.
+        <a href="git-whatchanged.html">git-whatchanged(1)</a> assume <code>--abbrev-commit</code>. You may
+        override this option with <code>--no-abbrev-commit</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4647,8 +4645,8 @@ log.date
 <p>
         Set the default date-time mode for the <em>log</em> command.
         Setting a value for log.date is similar to using <em>git log</em>'s
-        <tt>--date</tt> option.  Possible values are <tt>relative</tt>, <tt>local</tt>,
-        <tt>default</tt>, <tt>iso</tt>, <tt>rfc</tt>, and <tt>short</tt>; see <a href="git-log.html">git-log(1)</a>
+        <code>--date</code> option.  Possible values are <code>relative</code>, <code>local</code>,
+        <code>default</code>, <code>iso</code>, <code>rfc</code>, and <code>short</code>; see <a href="git-log.html">git-log(1)</a>
         for details.
 </p>
 </dd>
@@ -4681,7 +4679,7 @@ log.mailmap
 <dd>
 <p>
         If true, makes <a href="git-log.html">git-log(1)</a>, <a href="git-show.html">git-show(1)</a>, and
-        <a href="git-whatchanged.html">git-whatchanged(1)</a> assume <tt>--use-mailmap</tt>.
+        <a href="git-whatchanged.html">git-whatchanged(1)</a> assume <code>--use-mailmap</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4702,11 +4700,11 @@ mailmap.blob
 </dt>
 <dd>
 <p>
-        Like <tt>mailmap.file</tt>, but consider the value as a reference to a
-        blob in the repository. If both <tt>mailmap.file</tt> and
-        <tt>mailmap.blob</tt> are given, both are parsed, with entries from
-        <tt>mailmap.file</tt> taking precedence. In a bare repository, this
-        defaults to <tt>HEAD:.mailmap</tt>. In a non-bare repository, it
+        Like <code>mailmap.file</code>, but consider the value as a reference to a
+        blob in the repository. If both <code>mailmap.file</code> and
+        <code>mailmap.blob</code> are given, both are parsed, with entries from
+        <code>mailmap.file</code> taking precedence. In a bare repository, this
+        defaults to <code>HEAD:.mailmap</code>. In a non-bare repository, it
         defaults to empty.
 </p>
 </dd>
@@ -4745,10 +4743,10 @@ merge.conflictstyle
 <p>
         Specify the style in which conflicted hunks are written out to
         working tree files upon merge.  The default is "merge", which
-        shows a <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt> conflict marker, changes made by one side,
-        a <tt>=======</tt> marker, changes made by the other side, and then
-        a <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt> marker.  An alternate style, "diff3", adds a <tt>|||||||</tt>
-        marker and the original text before the <tt>=======</tt> marker.
+        shows a <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> conflict marker, changes made by one side,
+        a <code>=======</code> marker, changes made by the other side, and then
+        a <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code> marker.  An alternate style, "diff3", adds a <code>|||||||</code>
+        marker and the original text before the <code>=======</code> marker.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4759,9 +4757,9 @@ merge.defaultToUpstream
         If merge is called without any commit argument, merge the upstream
         branches configured for the current branch by using their last
         observed values stored in their remote-tracking branches.
-        The values of the <tt>branch.&lt;current branch&gt;.merge</tt> that name the
-        branches at the remote named by <tt>branch.&lt;current branch&gt;.remote</tt>
-        are consulted, and then they are mapped via <tt>remote.&lt;remote&gt;.fetch</tt>
+        The values of the <code>branch.&lt;current branch&gt;.merge</code> that name the
+        branches at the remote named by <code>branch.&lt;current branch&gt;.remote</code>
+        are consulted, and then they are mapped via <code>remote.&lt;remote&gt;.fetch</code>
         to their corresponding remote-tracking branches, and the tips of
         these tracking branches are merged.
 </p>
@@ -4773,11 +4771,11 @@ merge.ff
 <p>
         By default, Git does not create an extra merge commit when merging
         a commit that is a descendant of the current commit. Instead, the
-        tip of the current branch is fast-forwarded. When set to <tt>false</tt>,
+        tip of the current branch is fast-forwarded. When set to <code>false</code>,
         this variable tells Git to create an extra merge commit in such
-        a case (equivalent to giving the <tt>--no-ff</tt> option from the command
-        line). When set to <tt>only</tt>, only such fast-forward merges are
-        allowed (equivalent to giving the <tt>--ff-only</tt> option from the
+        a case (equivalent to giving the <code>--no-ff</code> option from the command
+        line). When set to <code>only</code>, only such fast-forward merges are
+        allowed (equivalent to giving the <code>--ff-only</code> option from the
         command line).
 </p>
 </dd>
@@ -5029,9 +5027,9 @@ mergetool.keepBackup
 <dd>
 <p>
         After performing a merge, the original file with conflict markers
-        can be saved as a file with a <tt>.orig</tt> extension.  If this variable
-        is set to <tt>false</tt> then this file is not preserved.  Defaults to
-        <tt>true</tt> (i.e. keep the backup files).
+        can be saved as a file with a <code>.orig</code> extension.  If this variable
+        is set to <code>false</code> then this file is not preserved.  Defaults to
+        <code>true</code> (i.e. keep the backup files).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5041,9 +5039,9 @@ mergetool.keepTemporaries
 <p>
         When invoking a custom merge tool, Git uses a set of temporary
         files to pass to the tool. If the tool returns an error and this
-        variable is set to <tt>true</tt>, then these temporary files will be
+        variable is set to <code>true</code>, then these temporary files will be
         preserved, otherwise they will be removed after the tool has
-        exited. Defaults to <tt>false</tt>.
+        exited. Defaults to <code>false</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5067,7 +5065,7 @@ notes.displayRef
         exist, but a glob that does not match any refs is silently
         ignored.
 </p>
-<div class="paragraph"><p>This setting can be overridden with the <tt>GIT_NOTES_DISPLAY_REF</tt>
+<div class="paragraph"><p>This setting can be overridden with the <code>GIT_NOTES_DISPLAY_REF</code>
 environment variable, which must be a colon separated list of refs or
 globs.</p></div>
 <div class="paragraph"><p>The effective value of "core.notesRef" (possibly overridden by
@@ -5079,10 +5077,10 @@ notes.rewrite.&lt;command&gt;
 </dt>
 <dd>
 <p>
-        When rewriting commits with &lt;command&gt; (currently <tt>amend</tt> or
-        <tt>rebase</tt>) and this variable is set to <tt>true</tt>, Git
+        When rewriting commits with &lt;command&gt; (currently <code>amend</code> or
+        <code>rebase</code>) and this variable is set to <code>true</code>, Git
         automatically copies your notes from the original to the
-        rewritten commit.  Defaults to <tt>true</tt>, but see
+        rewritten commit.  Defaults to <code>true</code>, but see
         "notes.rewriteRef" below.
 </p>
 </dd>
@@ -5094,10 +5092,10 @@ notes.rewriteMode
         When copying notes during a rewrite (see the
         "notes.rewrite.&lt;command&gt;" option), determines what to do if
         the target commit already has a note.  Must be one of
-        <tt>overwrite</tt>, <tt>concatenate</tt>, or <tt>ignore</tt>.  Defaults to
-        <tt>concatenate</tt>.
+        <code>overwrite</code>, <code>concatenate</code>, or <code>ignore</code>.  Defaults to
+        <code>concatenate</code>.
 </p>
-<div class="paragraph"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_MODE</tt>
+<div class="paragraph"><p>This setting can be overridden with the <code>GIT_NOTES_REWRITE_MODE</code>
 environment variable.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -5111,9 +5109,9 @@ notes.rewriteRef
         You may also specify this configuration several times.
 </p>
 <div class="paragraph"><p>Does not have a default value; you must configure this variable to
-enable note rewriting.  Set it to <tt>refs/notes/commits</tt> to enable
+enable note rewriting.  Set it to <code>refs/notes/commits</code> to enable
 rewriting for the default commit notes.</p></div>
-<div class="paragraph"><p>This setting can be overridden with the <tt>GIT_NOTES_REWRITE_REF</tt>
+<div class="paragraph"><p>This setting can be overridden with the <code>GIT_NOTES_REWRITE_REF</code>
 environment variable, which must be a colon separated list of refs or
 globs.</p></div>
 </dd>
@@ -5218,13 +5216,13 @@ pack.indexVersion
         and this config option ignored whenever the corresponding pack is
         larger than 2 GB.
 </p>
-<div class="paragraph"><p>If you have an old Git that does not understand the version 2 <tt>*.idx</tt> file,
+<div class="paragraph"><p>If you have an old Git that does not understand the version 2 <code>*.idx</code> file,
 cloning or fetching over a non native protocol (e.g. "http" and "rsync")
-that will copy both <tt>*.pack</tt> file and corresponding <tt>*.idx</tt> file from the
+that will copy both <code>*.pack</code> file and corresponding <code>*.idx</code> file from the
 other side may give you a repository that cannot be accessed with your
-older version of Git. If the <tt>*.pack</tt> file is smaller than 2 GB, however,
+older version of Git. If the <code>*.pack</code> file is smaller than 2 GB, however,
 you can use <a href="git-index-pack.html">git-index-pack(1)</a> on the *.pack file to regenerate
-the <tt>*.idx</tt> file.</p></div>
+the <code>*.idx</code> file.</p></div>
 </dd>
 <dt class="hdlist1">
 pack.packSizeLimit
@@ -5233,7 +5231,7 @@ pack.packSizeLimit
 <p>
         The maximum size of a pack.  This setting only affects
         packing to a file when repacking, i.e. the git:// protocol
-        is unaffected.  It can be overridden by the <tt>--max-pack-size</tt>
+        is unaffected.  It can be overridden by the <code>--max-pack-size</code>
         option of <a href="git-repack.html">git-repack(1)</a>. The minimum size allowed is
         limited to 1 MiB. The default is unlimited.
         Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are
@@ -5256,7 +5254,7 @@ pack.writebitmaps
 </dt>
 <dd>
 <p>
-        This is a deprecated synonym for <tt>repack.writeBitmaps</tt>.
+        This is a deprecated synonym for <code>repack.writeBitmaps</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5283,10 +5281,10 @@ pager.&lt;cmd&gt;
         If the value is boolean, turns on or off pagination of the
         output of a particular Git subcommand when writing to a tty.
         Otherwise, turns on pagination for the subcommand using the
-        pager specified by the value of <tt>pager.&lt;cmd&gt;</tt>.  If <tt>--paginate</tt>
-        or <tt>--no-pager</tt> is specified on the command line, it takes
+        pager specified by the value of <code>pager.&lt;cmd&gt;</code>.  If <code>--paginate</code>
+        or <code>--no-pager</code> is specified on the command line, it takes
         precedence over this option.  To disable pagination for all
-        commands, set <tt>core.pager</tt> or <tt>GIT_PAGER</tt> to <tt>cat</tt>.
+        commands, set <code>core.pager</code> or <code>GIT_PAGER</code> to <code>cat</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5297,9 +5295,9 @@ pretty.&lt;name&gt;
         Alias for a --pretty= format string, as specified in
         <a href="git-log.html">git-log(1)</a>. Any aliases defined here can be used just
         as the built-in pretty formats could. For example,
-        running <tt>git config pretty.changelog "format:* %H %s"</tt>
-        would cause the invocation <tt>git log --pretty=changelog</tt>
-        to be equivalent to running <tt>git log "--pretty=format:* %H %s"</tt>.
+        running <code>git config pretty.changelog "format:* %H %s"</code>
+        would cause the invocation <code>git log --pretty=changelog</code>
+        to be equivalent to running <code>git log "--pretty=format:* %H %s"</code>.
         Note that an alias with the same name as a built-in format
         will be silently ignored.
 </p>
@@ -5311,11 +5309,11 @@ pull.ff
 <p>
         By default, Git does not create an extra merge commit when merging
         a commit that is a descendant of the current commit. Instead, the
-        tip of the current branch is fast-forwarded. When set to <tt>false</tt>,
+        tip of the current branch is fast-forwarded. When set to <code>false</code>,
         this variable tells Git to create an extra merge commit in such
-        a case (equivalent to giving the <tt>--no-ff</tt> option from the command
-        line). When set to <tt>only</tt>, only such fast-forward merges are
-        allowed (equivalent to giving the <tt>--ff-only</tt> option from the
+        a case (equivalent to giving the <code>--no-ff</code> option from the command
+        line). When set to <code>only</code>, only such fast-forward merges are
+        allowed (equivalent to giving the <code>--ff-only</code> option from the
         command line).
 </p>
 </dd>
@@ -5331,9 +5329,9 @@ pull.rebase
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>When preserve, also pass `--preserve-merges` along to 'git rebase'
+<pre><code>When preserve, also pass `--preserve-merges` along to 'git rebase'
 so that locally committed merge commits will not be flattened
-by running 'git pull'.</tt></pre>
+by running 'git pull'.</code></pre>
 </div></div>
 <div class="paragraph"><p><strong>NOTE</strong>: this is a possibly dangerous operation; do <strong>not</strong> use
 it unless you understand the implications (see <a href="git-rebase.html">git-rebase(1)</a>
@@ -5361,52 +5359,52 @@ push.default
 </dt>
 <dd>
 <p>
-        Defines the action <tt>git push</tt> should take if no refspec is
+        Defines the action <code>git push</code> should take if no refspec is
         explicitly given.  Different values are well-suited for
         specific workflows; for instance, in a purely central workflow
         (i.e. the fetch source is equal to the push destination),
-        <tt>upstream</tt> is probably what you want.  Possible values are:
+        <code>upstream</code> is probably what you want.  Possible values are:
 </p>
 <div class="openblock">
 <div class="content">
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>nothing</tt> - do not push anything (error out) unless a refspec is
+<code>nothing</code> - do not push anything (error out) unless a refspec is
   explicitly given. This is primarily meant for people who want to
   avoid mistakes by always being explicit.
 </p>
 </li>
 <li>
 <p>
-<tt>current</tt> - push the current branch to update a branch with the same
+<code>current</code> - push the current branch to update a branch with the same
   name on the receiving end.  Works in both central and non-central
   workflows.
 </p>
 </li>
 <li>
 <p>
-<tt>upstream</tt> - push the current branch back to the branch whose
+<code>upstream</code> - push the current branch back to the branch whose
   changes are usually integrated into the current branch (which is
-  called <tt>@{upstream}</tt>).  This mode only makes sense if you are
+  called <code>@{upstream}</code>).  This mode only makes sense if you are
   pushing to the same repository you would normally pull from
   (i.e. central workflow).
 </p>
 </li>
 <li>
 <p>
-<tt>simple</tt> - in centralized workflow, work like <tt>upstream</tt> with an
+<code>simple</code> - in centralized workflow, work like <code>upstream</code> with an
   added safety to refuse to push if the upstream branch&#8217;s name is
   different from the local one.
 </p>
 <div class="paragraph"><p>When pushing to a remote that is different from the remote you normally
-pull from, work as <tt>current</tt>.  This is the safest option and is suited
+pull from, work as <code>current</code>.  This is the safest option and is suited
 for beginners.</p></div>
 <div class="paragraph"><p>This mode has become the default in Git 2.0.</p></div>
 </li>
 <li>
 <p>
-<tt>matching</tt> - push all branches having the same name on both ends.
+<code>matching</code> - push all branches having the same name on both ends.
   This makes the repository you are pushing to remember the set of
   branches that will be pushed out (e.g. if you always push <em>maint</em>
   and <em>master</em> there and no other branches, the repository you push
@@ -5422,7 +5420,7 @@ unfinished, this mode is not for you.  Also this mode is not
 suitable for pushing into a shared central repository, as other
 people may add new branches there, or update the tip of existing
 branches outside your control.</p></div>
-<div class="paragraph"><p>This used to be the default, but not since Git 2.0 (<tt>simple</tt> is the
+<div class="paragraph"><p>This used to be the default, but not since Git 2.0 (<code>simple</code> is the
 new default).</p></div>
 </li>
 </ul></div>
@@ -5469,6 +5467,35 @@ receive.autogc
 </p>
 </dd>
 <dt class="hdlist1">
+receive.certnonceseed
+</dt>
+<dd>
+<p>
+        By setting this variable to a string, <code>git receive-pack</code>
+        will accept a <code>git push --signed</code> and verifies it by using
+        a "nonce" protected by HMAC using this string as a secret
+        key.
+</p>
+</dd>
+<dt class="hdlist1">
+receive.certnonceslop
+</dt>
+<dd>
+<p>
+        When a <code>git push --signed</code> sent a push certificate with a
+        "nonce" that was issued by a receive-pack serving the same
+        repository within this many seconds, export the "nonce"
+        found in the certificate to <code>GIT_PUSH_CERT_NONCE</code> to the
+        hooks (instead of what the receive-pack asked the sending
+        side to include).  This may allow writing checks in
+        <code>pre-receive</code> and <code>post-receive</code> a bit easier.  Instead of
+        checking <code>GIT_PUSH_CERT_NONCE_SLOP</code> environment variable
+        that records by how many seconds the nonce is stale to
+        decide if they want to accept the certificate, they only
+        can check <code>GIT_PUSH_CERT_NONCE_STATUS</code> is <code>OK</code>.
+</p>
+</dd>
+<dt class="hdlist1">
 receive.fsckObjects
 </dt>
 <dd>
@@ -5476,7 +5503,7 @@ receive.fsckObjects
         If it is set to true, git-receive-pack will check all received
         objects. It will abort in the case of a malformed object or a
         broken link. The result of an abort are only dangling objects.
-        Defaults to false. If not set, the value of <tt>transfer.fsckObjects</tt>
+        Defaults to false. If not set, the value of <code>transfer.fsckObjects</code>
         is used instead.
 </p>
 </dd>
@@ -5492,7 +5519,7 @@ receive.unpackLimit
         a pack, after adding any missing delta bases.  Storing the
         pack from a push can make the push operation complete faster,
         especially on slow filesystems.  If not set, the value of
-        <tt>transfer.unpackLimit</tt> is used instead.
+        <code>transfer.unpackLimit</code> is used instead.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5543,13 +5570,13 @@ receive.hiderefs
 </dt>
 <dd>
 <p>
-        String(s) <tt>receive-pack</tt> uses to decide which refs to omit
+        String(s) <code>receive-pack</code> uses to decide which refs to omit
         from its initial advertisement.  Use more than one
         definitions to specify multiple prefix strings. A ref that
         are under the hierarchies listed on the value of this
-        variable is excluded, and is hidden when responding to <tt>git
-        push</tt>, and an attempt to update or delete a hidden ref by
-        <tt>git push</tt> is rejected.
+        variable is excluded, and is hidden when responding to <code>git
+        push</code>, and an attempt to update or delete a hidden ref by
+        <code>git push</code> is rejected.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5576,8 +5603,8 @@ remote.pushdefault
 <dd>
 <p>
         The remote to push to by default.  Overrides
-        <tt>branch.&lt;name&gt;.remote</tt> for all branches, and is overridden by
-        <tt>branch.&lt;name&gt;.pushremote</tt> for specific branches.
+        <code>branch.&lt;name&gt;.remote</code> for all branches, and is overridden by
+        <code>branch.&lt;name&gt;.pushremote</code> for specific branches.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5631,7 +5658,7 @@ remote.&lt;name&gt;.mirror
 <dd>
 <p>
         If true, pushing to this remote will automatically behave
-        as if the <tt>--mirror</tt> option was given on the command line.
+        as if the <code>--mirror</code> option was given on the command line.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5640,7 +5667,7 @@ remote.&lt;name&gt;.skipDefaultUpdate
 <dd>
 <p>
         If true, this remote will be skipped by default when updating
-        using <a href="git-fetch.html">git-fetch(1)</a> or the <tt>update</tt> subcommand of
+        using <a href="git-fetch.html">git-fetch(1)</a> or the <code>update</code> subcommand of
         <a href="git-remote.html">git-remote(1)</a>.
 </p>
 </dd>
@@ -5650,7 +5677,7 @@ remote.&lt;name&gt;.skipFetchAll
 <dd>
 <p>
         If true, this remote will be skipped by default when updating
-        using <a href="git-fetch.html">git-fetch(1)</a> or the <tt>update</tt> subcommand of
+        using <a href="git-fetch.html">git-fetch(1)</a> or the <code>update</code> subcommand of
         <a href="git-remote.html">git-remote(1)</a>.
 </p>
 </dd>
@@ -5701,8 +5728,8 @@ remote.&lt;name&gt;.prune
 <p>
         When set to true, fetching from this remote by default will also
         remove any remote-tracking references that no longer exist on the
-        remote (as if the <tt>--prune</tt> option was given on the command line).
-        Overrides <tt>fetch.prune</tt> settings, if any.
+        remote (as if the <code>--prune</code> option was given on the command line).
+        Overrides <code>fetch.prune</code> settings, if any.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5732,11 +5759,11 @@ repack.packKeptObjects
 </dt>
 <dd>
 <p>
-        If set to true, makes <tt>git repack</tt> act as if
-        <tt>--pack-kept-objects</tt> was passed. See <a href="git-repack.html">git-repack(1)</a> for
-        details. Defaults to <tt>false</tt> normally, but <tt>true</tt> if a bitmap
-        index is being written (either via <tt>--write-bitmap-index</tt> or
-        <tt>repack.writeBitmaps</tt>).
+        If set to true, makes <code>git repack</code> act as if
+        <code>--pack-kept-objects</code> was passed. See <a href="git-repack.html">git-repack(1)</a> for
+        details. Defaults to <code>false</code> normally, but <code>true</code> if a bitmap
+        index is being written (either via <code>--write-bitmap-index</code> or
+        <code>repack.writeBitmaps</code>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5745,7 +5772,7 @@ repack.writeBitmaps
 <dd>
 <p>
         When true, git will write a bitmap index when packing all
-        objects to disk (e.g., when <tt>git repack -a</tt> is run).  This
+        objects to disk (e.g., when <code>git repack -a</code> is run).  This
         index can speed up the "counting objects" phase of subsequent
         packs created for clones and fetches, at the cost of some disk
         space and extra time spent on the initial repack.  Defaults to
@@ -5757,7 +5784,7 @@ rerere.autoupdate
 </dt>
 <dd>
 <p>
-        When set to true, <tt>git-rerere</tt> updates the index with the
+        When set to true, <code>git-rerere</code> updates the index with the
         resulting contents after it cleanly resolves conflicts using
         previously recorded resolution.  Defaults to false.
 </p>
@@ -5770,8 +5797,8 @@ rerere.enabled
         Activate recording of resolved conflicts, so that identical
         conflict hunks can be resolved automatically, should they be
         encountered again.  By default, <a href="git-rerere.html">git-rerere(1)</a> is
-        enabled if there is an <tt>rr-cache</tt> directory under the
-        <tt>$GIT_DIR</tt>, e.g. if "rerere" was previously used in the
+        enabled if there is an <code>rr-cache</code> directory under the
+        <code>$GIT_DIR</code>, e.g. if "rerere" was previously used in the
         repository.
 </p>
 </dd>
@@ -5920,7 +5947,7 @@ status.relativePaths
 <dd>
 <p>
         By default, <a href="git-status.html">git-status(1)</a> shows paths relative to the
-        current directory. Setting this variable to <tt>false</tt> shows paths
+        current directory. Setting this variable to <code>false</code> shows paths
         relative to the repository root (this was the default for Git
         prior to v1.5.4).
 </p>
@@ -5950,7 +5977,7 @@ status.displayCommentPrefix
 <p>
         If set to true, <a href="git-status.html">git-status(1)</a> will insert a comment
         prefix before each output line (starting with
-        <tt>core.commentChar</tt>, i.e. <tt>#</tt> by default). This was the
+        <code>core.commentChar</code>, i.e. <code>#</code> by default). This was the
         behavior of <a href="git-status.html">git-status(1)</a> in Git 1.8.4 and previous.
         Defaults to false.
 </p>
@@ -5973,17 +6000,17 @@ status.showUntrackedFiles
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>no</tt> - Show no untracked files.
+<code>no</code> - Show no untracked files.
 </p>
 </li>
 <li>
 <p>
-<tt>normal</tt> - Show untracked files and directories.
+<code>normal</code> - Show untracked files and directories.
 </p>
 </li>
 <li>
 <p>
-<tt>all</tt> - Show also individual files in untracked directories.
+<code>all</code> - Show also individual files in untracked directories.
 </p>
 </li>
 </ul></div>
@@ -6003,8 +6030,8 @@ status.submodulesummary
         summary of commits for modified submodules will be shown (see
         --summary-limit option of <a href="git-submodule.html">git-submodule(1)</a>). Please note
         that the summary output command will be suppressed for all
-        submodules when <tt>diff.ignoreSubmodules</tt> is set to <em>all</em> or only
-        for those submodules where <tt>submodule.&lt;name&gt;.ignore=all</tt>. The only
+        submodules when <code>diff.ignoreSubmodules</code> is set to <em>all</em> or only
+        for those submodules where <code>submodule.&lt;name&gt;.ignore=all</code>. The only
         exception to that rule is that status and commit will show staged
         submodule changes. To
         also view the summary for ignored submodules you can either use
@@ -6027,7 +6054,7 @@ submodule.&lt;name&gt;.update
         The path within this project, URL, and the updating strategy
         for a submodule.  These variables are initially populated
         by <em>git submodule init</em>; edit them to override the
-        URL and other values found in the <tt>.gitmodules</tt> file.  See
+        URL and other values found in the <code>.gitmodules</code> file.  See
         <a href="git-submodule.html">git-submodule(1)</a> and <a href="gitmodules.html">gitmodules(5)</a> for details.
 </p>
 </dd>
@@ -6036,9 +6063,9 @@ submodule.&lt;name&gt;.branch
 </dt>
 <dd>
 <p>
-        The remote branch name for a submodule, used by <tt>git submodule
-        update --remote</tt>.  Set this option to override the value found in
-        the <tt>.gitmodules</tt> file.  See <a href="git-submodule.html">git-submodule(1)</a> and
+        The remote branch name for a submodule, used by <code>git submodule
+        update --remote</code>.  Set this option to override the value found in
+        the <code>.gitmodules</code> file.  See <a href="git-submodule.html">git-submodule(1)</a> and
         <a href="gitmodules.html">gitmodules(5)</a> for details.
 </p>
 </dd>
@@ -6102,7 +6129,7 @@ transfer.fsckObjects
 </dt>
 <dd>
 <p>
-        When <tt>fetch.fsckObjects</tt> or <tt>receive.fsckObjects</tt> are
+        When <code>fetch.fsckObjects</code> or <code>receive.fsckObjects</code> are
         not set, the value of this variable is used instead.
         Defaults to false.
 </p>
@@ -6112,8 +6139,8 @@ transfer.hiderefs
 </dt>
 <dd>
 <p>
-        This variable can be used to set both <tt>receive.hiderefs</tt>
-        and <tt>uploadpack.hiderefs</tt> at the same time to the same
+        This variable can be used to set both <code>receive.hiderefs</code>
+        and <code>uploadpack.hiderefs</code> at the same time to the same
         values.  See entries for these other variables.
 </p>
 </dd>
@@ -6122,7 +6149,7 @@ transfer.unpackLimit
 </dt>
 <dd>
 <p>
-        When <tt>fetch.unpackLimit</tt> or <tt>receive.unpackLimit</tt> are
+        When <code>fetch.unpackLimit</code> or <code>receive.unpackLimit</code> are
         not set, the value of this variable is used instead.
         The default value is 100.
 </p>
@@ -6132,11 +6159,11 @@ uploadarchive.allowUnreachable
 </dt>
 <dd>
 <p>
-        If true, allow clients to use <tt>git archive --remote</tt> to request
+        If true, allow clients to use <code>git archive --remote</code> to request
         any tree, whether reachable from the ref tips or not. See the
-        discussion in the <tt>SECURITY</tt> section of
+        discussion in the <code>SECURITY</code> section of
         <a href="git-upload-archive.html">git-upload-archive(1)</a> for more details. Defaults to
-        <tt>false</tt>.
+        <code>false</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6144,13 +6171,13 @@ uploadpack.hiderefs
 </dt>
 <dd>
 <p>
-        String(s) <tt>upload-pack</tt> uses to decide which refs to omit
+        String(s) <code>upload-pack</code> uses to decide which refs to omit
         from its initial advertisement.  Use more than one
         definitions to specify multiple prefix strings. A ref that
         are under the hierarchies listed on the value of this
-        variable is excluded, and is hidden from <tt>git ls-remote</tt>,
-        <tt>git fetch</tt>, etc.  An attempt to fetch a hidden ref by <tt>git
-        fetch</tt> will fail.  See also <tt>uploadpack.allowtipsha1inwant</tt>.
+        variable is excluded, and is hidden from <code>git ls-remote</code>,
+        <code>git fetch</code>, etc.  An attempt to fetch a hidden ref by <code>git
+        fetch</code> will fail.  See also <code>uploadpack.allowtipsha1inwant</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6158,10 +6185,10 @@ uploadpack.allowtipsha1inwant
 </dt>
 <dd>
 <p>
-        When <tt>uploadpack.hiderefs</tt> is in effect, allow <tt>upload-pack</tt>
+        When <code>uploadpack.hiderefs</code> is in effect, allow <code>upload-pack</code>
         to accept a fetch request that asks for an object at the tip
         of a hidden ref (by default, such a request is rejected).
-        see also <tt>uploadpack.hiderefs</tt>.
+        see also <code>uploadpack.hiderefs</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6169,14 +6196,14 @@ uploadpack.keepalive
 </dt>
 <dd>
 <p>
-        When <tt>upload-pack</tt> has started <tt>pack-objects</tt>, there may be a
-        quiet period while <tt>pack-objects</tt> prepares the pack. Normally
-        it would output progress information, but if <tt>--quiet</tt> was used
-        for the fetch, <tt>pack-objects</tt> will output nothing at all until
+        When <code>upload-pack</code> has started <code>pack-objects</code>, there may be a
+        quiet period while <code>pack-objects</code> prepares the pack. Normally
+        it would output progress information, but if <code>--quiet</code> was used
+        for the fetch, <code>pack-objects</code> will output nothing at all until
         the pack data begins. Some clients and networks may consider
         the server to be hung and give up. Setting this option instructs
-        <tt>upload-pack</tt> to send an empty keepalive packet every
-        <tt>uploadpack.keepalive</tt> seconds. Setting this option to 0
+        <code>upload-pack</code> to send an empty keepalive packet every
+        <code>uploadpack.keepalive</code> seconds. Setting this option to 0
         disables keepalive packets entirely. The default is 5 seconds.
 </p>
 </dd>

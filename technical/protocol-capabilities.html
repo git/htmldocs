@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Git Protocol Capabilities</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -753,8 +751,8 @@ did not say it supports.</p></div>
 was sent.  Server MUST NOT ignore capabilities that client requested
 and server advertised.  As a consequence of these rules, server MUST
 NOT advertise capabilities it does not understand.</p></div>
-<div class="paragraph"><p>The <em>report-status</em>, <em>delete-refs</em>, and <em>quiet</em> capabilities are sent and
-recognized by the receive-pack (push to server) process.</p></div>
+<div class="paragraph"><p>The <em>report-status</em>, <em>delete-refs</em>, <em>quiet</em>, and <em>push-cert</em> capabilities
+are sent and recognized by the receive-pack (push to server) process.</p></div>
 <div class="paragraph"><p>The <em>ofs-delta</em> and <em>side-band-64k</em> capabilities are sent and recognized
 by both upload-pack and receive-pack protocols.  The <em>agent</em> capability
 may optionally be sent in both protocols.</p></div>
@@ -783,12 +781,12 @@ doesn&#8217;t and the server has commits in lower case that the client
 doesn&#8217;t, as in the following diagram:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>   +---- u ---------------------- x
+<pre><code>   +---- u ---------------------- x
   /              +----- y
  /              /
 a -- b -- c -- d -- E -- F
    \
-    +--- Q -- R -- S</tt></pre>
+    +--- Q -- R -- S</code></pre>
 </div></div>
 <div class="paragraph"><p>If the client wants x,y and starts out by saying have F,S, the server
 doesn&#8217;t know what F,S is.  Eventually the client says "have d" and
@@ -862,9 +860,9 @@ followed by a 1-byte stream code, followed by the actual data.</p></div>
 <div class="paragraph"><p>The stream code can be one of:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>1 - pack data
+<pre><code>1 - pack data
 2 - progress messages
-3 - fatal error message just before stream aborts</tt></pre>
+3 - fatal error message just before stream aborts</code></pre>
 </div></div>
 <div class="paragraph"><p>The "side-band-64k" capability came about as a way for newer clients
 that can handle much larger packets to request packets that are
@@ -890,11 +888,11 @@ send/read OBJ_OFS_DELTA (aka type 6) in a packfile.</p></div>
 <div class="sect1">
 <h2 id="_agent">agent</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The server may optionally send a capability of the form <tt>agent=X</tt> to
-notify the client that the server is running version <tt>X</tt>. The client may
-optionally return its own agent string by responding with an <tt>agent=Y</tt>
+<div class="paragraph"><p>The server may optionally send a capability of the form <code>agent=X</code> to
+notify the client that the server is running version <code>X</code>. The client may
+optionally return its own agent string by responding with an <code>agent=Y</code>
 capability (but it MUST NOT do so if the server did not mention the
-agent capability). The <tt>X</tt> and <tt>Y</tt> strings may contain any printable
+agent capability). The <code>X</code> and <code>Y</code> strings may contain any printable
 ASCII characters except space (i.e., the byte range 32 &lt; x &lt; 127), and
 are typically of the form "package/version" (e.g., "git/1.8.3.1"). The
 agent strings are purely informative for statistics and debugging
@@ -974,7 +972,7 @@ capable of silencing human-readable progress output which otherwise may
 be shown when processing the received pack. A send-pack client should
 respond with the <em>quiet</em> capability to suppress server-side progress
 reporting if the local progress reporting is also being suppressed
-(e.g., via <tt>push -q</tt>, or if stderr does not go to a tty).</p></div>
+(e.g., via <code>push -q</code>, or if stderr does not go to a tty).</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -985,11 +983,21 @@ send "want" lines with SHA-1s that exist at the server but are not
 advertised by upload-pack.</p></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_push_cert_lt_nonce_gt">push-cert=&lt;nonce&gt;</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The receive-pack server that advertises this capability is willing
+to accept a signed push certificate, and asks the &lt;nonce&gt; to be
+included in the push certificate.  A send-pack client MUST NOT
+send a push-cert packet unless the receive-pack server advertises
+this capability.</p></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-02-27 15:06:29 PST
+Last updated 2014-10-14 15:27:06 PDT
 </div>
 </div>
 </body>

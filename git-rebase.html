@@ -764,14 +764,16 @@ git-rebase(1) Manual Page
 <code>git checkout &lt;branch&gt;</code> before doing anything else.  Otherwise
 it remains on the current branch.</p></div>
 <div class="paragraph"><p>If &lt;upstream&gt; is not specified, the upstream configured in
-branch.&lt;name&gt;.remote and branch.&lt;name&gt;.merge options will be used; see
-<a href="git-config.html">git-config(1)</a> for details.  If you are currently not on any
-branch or if the current branch does not have a configured upstream,
-the rebase will abort.</p></div>
+branch.&lt;name&gt;.remote and branch.&lt;name&gt;.merge options will be used (see
+<a href="git-config.html">git-config(1)</a> for details) and the <code>--fork-point</code> option is
+assumed.  If you are currently not on any branch or if the current
+branch does not have a configured upstream, the rebase will abort.</p></div>
 <div class="paragraph"><p>All changes made by commits in the current branch but that are not
 in &lt;upstream&gt; are saved to a temporary area.  This is the same set
-of commits that would be shown by <code>git log &lt;upstream&gt;..HEAD</code> (or
-<code>git log HEAD</code>, if --root is specified).</p></div>
+of commits that would be shown by <code>git log &lt;upstream&gt;..HEAD</code>; or by
+<code>git log 'fork_point'..HEAD</code>, if <code>--fork-point</code> is active (see the
+description on <code>--fork-point</code> below); or by <code>git log HEAD</code>, if the
+<code>--root</code> option is specified.</p></div>
 <div class="paragraph"><p>The current branch is reset to &lt;upstream&gt;, or &lt;newbase&gt; if the
 --onto option was supplied.  This has the exact same effect as
 <code>git reset --hard &lt;upstream&gt;</code> (or &lt;newbase&gt;).  ORIG_HEAD is set
@@ -1192,13 +1194,17 @@ the reversion" (see the
 </dt>
 <dd>
 <p>
-        Use <em>git merge-base --fork-point</em> to find a better common ancestor
-        between <code>upstream</code> and <code>branch</code> when calculating which commits have
-        have been introduced by <code>branch</code> (see <a href="git-merge-base.html">git-merge-base(1)</a>).
+        Use reflog to find a better common ancestor between &lt;upstream&gt;
+        and &lt;branch&gt; when calculating which commits have been
+        introduced by &lt;branch&gt;.
 </p>
-<div class="paragraph"><p>If no non-option arguments are given on the command line, then the default is
-<code>--fork-point @{u}</code> otherwise the <code>upstream</code> argument is interpreted literally
-unless the <code>--fork-point</code> option is specified.</p></div>
+<div class="paragraph"><p>When --fork-point is active, <em>fork_point</em> will be used instead of
+&lt;upstream&gt; to calculate the set of commits to rebase, where
+<em>fork_point</em> is the result of <code>git merge-base --fork-point &lt;upstream&gt;
+&lt;branch&gt;</code> command (see <a href="git-merge-base.html">git-merge-base(1)</a>).  If <em>fork_point</em>
+ends up being empty, the &lt;upstream&gt; will be used as a fallback.</p></div>
+<div class="paragraph"><p>If either &lt;upstream&gt; or --root is given on the command line, then the
+default is <code>--no-fork-point</code>, otherwise the default is <code>--fork-point</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 --ignore-whitespace
@@ -1967,7 +1973,7 @@ reorder commits tend to produce counterintuitive results.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-09-19 15:32:09 PDT
+Last updated 2014-10-14 15:27:06 PDT
 </div>
 </div>
 </body>
