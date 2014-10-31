@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>How to rebuild from update hook</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -749,16 +747,16 @@ when I took over Git maintainership from Linus.</p></div>
 <div class="paragraph"><p>The directories relevant to this how-to are these two:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>/pub/scm/git/git.git/       The public Git repository.
-/pub/software/scm/git/docs/ The HTML documentation page.</tt></pre>
+<pre><code>/pub/scm/git/git.git/       The public Git repository.
+/pub/software/scm/git/docs/ The HTML documentation page.</code></pre>
 </div></div>
 <div class="paragraph"><p>So I made a repository to generate the documentation under my
 home directory over there.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ cd
+<pre><code>$ cd
 $ mkdir doc-git &amp;&amp; cd doc-git
-$ git clone /pub/scm/git/git.git/ docgen</tt></pre>
+$ git clone /pub/scm/git/git.git/ docgen</code></pre>
 </div></div>
 <div class="paragraph"><p>What needs to happen is to update the $HOME/doc-git/docgen/
 working tree, build HTML docs there and install the result in
@@ -766,20 +764,20 @@ working tree, build HTML docs there and install the result in
 script:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ cat &gt;dododoc.sh &lt;&lt;\EOF
+<pre><code>$ cat &gt;dododoc.sh &lt;&lt;\EOF
 #!/bin/sh
-cd $HOME/doc-git/docgen || exit</tt></pre>
+cd $HOME/doc-git/docgen || exit</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>unset GIT_DIR</tt></pre>
+<pre><code>unset GIT_DIR</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>git pull /pub/scm/git/git.git/ master &amp;&amp;
+<pre><code>git pull /pub/scm/git/git.git/ master &amp;&amp;
 cd Documentation &amp;&amp;
 make install-webdoc
-EOF</tt></pre>
+EOF</code></pre>
 </div></div>
 <div class="paragraph"><p>Initially I used to run this by hand whenever I push into the
 public Git repository.  Then I did a cron job that ran twice a
@@ -787,24 +785,24 @@ day.  The current round uses the post-update hook mechanism,
 like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ cat &gt;/pub/scm/git/git.git/hooks/post-update &lt;&lt;\EOF
+<pre><code>$ cat &gt;/pub/scm/git/git.git/hooks/post-update &lt;&lt;\EOF
 #!/bin/sh
 #
 # An example hook script to prepare a packed repository for use over
 # dumb transports.
 #
-# To enable this hook, make this file executable by "chmod +x post-update".</tt></pre>
+# To enable this hook, make this file executable by "chmod +x post-update".</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>case " $* " in
+<pre><code>case " $* " in
 *' refs/heads/master '*)
         echo $HOME/doc-git/dododoc.sh | at now
         ;;
 esac
 exec git-update-server-info
 EOF
-$ chmod +x /pub/scm/git/git.git/hooks/post-update</tt></pre>
+$ chmod +x /pub/scm/git/git.git/hooks/post-update</code></pre>
 </div></div>
 <div class="paragraph"><p>There are four things worth mentioning:</p></div>
 <div class="ulist"><ul>
@@ -847,7 +845,7 @@ This is still crude and does not protect against simultaneous
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-17 11:15:02 PDT
+Last updated 2014-10-31 13:22:33 PDT
 </div>
 </div>
 </body>

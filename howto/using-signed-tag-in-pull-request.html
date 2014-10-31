@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>How to use a signed tag in pull requests</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -744,20 +742,20 @@ asciidoc.install();
 project, build on it, publish the result to her public repository, and ask
 the "upstream" person (often the owner of the project where she forked
 from) to pull from her public repository. Requesting such a "pull" is made
-easy by the <tt>git request-pull</tt> command.</p></div>
+easy by the <code>git request-pull</code> command.</p></div>
 <div class="paragraph"><p>Earlier, a typical pull request may have started like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> The following changes since commit 406da78032179...:
+<pre><code> The following changes since commit 406da78032179...:
 
    Froboz 3.2 (2011-09-30 14:20:57 -0700)
 
  are available in the Git repository at:
 
-   example.com:/git/froboz.git for-xyzzy</tt></pre>
+   example.com:/git/froboz.git for-xyzzy</code></pre>
 </div></div>
 <div class="paragraph"><p>followed by a shortlog of the changes and a diffstat.</p></div>
-<div class="paragraph"><p>The request was for a branch name (e.g. <tt>for-xyzzy</tt>) in the public
+<div class="paragraph"><p>The request was for a branch name (e.g. <code>for-xyzzy</code>) in the public
 repository of the contributor, and even though it stated where the
 contributor forked her work from, the message did not say anything about
 the commit to expect at the tip of the for-xyzzy branch. If the site that
@@ -768,7 +766,7 @@ was no easy way for third-party auditors to later verify the resulting
 history.</p></div>
 <div class="paragraph"><p>Starting from Git release v1.7.9, a contributor can add a signed tag to
 the commit at the tip of the history and ask the integrator to pull that
-signed tag. When the integrator runs <tt>git pull</tt>, the signed tag is
+signed tag. When the integrator runs <code>git pull</code>, the signed tag is
 automatically verified to assure that the history is not tampered with.
 In addition, the resulting merge commit records the content of the signed
 tag, so that other people can verify that the branch merged by the
@@ -782,15 +780,15 @@ integrator, using Git v1.7.9 or later.</p></div>
 <div class="sect1">
 <h2 id="_a_contributor_or_a_lieutenant">A contributor or a lieutenant</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>After preparing her work to be pulled, the contributor uses <tt>git tag -s</tt>
+<div class="paragraph"><p>After preparing her work to be pulled, the contributor uses <code>git tag -s</code>
 to create a signed tag:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> $ git checkout work
+<pre><code> $ git checkout work
  $ ... "git pull" from sublieutenants, "git commit" your own work ...
- $ git tag -s -m "Completed frotz feature" frotz-for-xyzzy work</tt></pre>
+ $ git tag -s -m "Completed frotz feature" frotz-for-xyzzy work</code></pre>
 </div></div>
-<div class="paragraph"><p>Note that this example uses the <tt>-m</tt> option to create a signed tag with
+<div class="paragraph"><p>Note that this example uses the <code>-m</code> option to create a signed tag with
 just a one-liner message, but this is for illustration purposes only. It
 is advisable to compose a well-written explanation of what the topic does
 to justify why it is worthwhile for the integrator to pull it, as this
@@ -799,17 +797,17 @@ integrator responds to the pull request (as we will see later).</p></div>
 <div class="paragraph"><p>Then she pushes the tag out to her public repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> $ git push example.com:/git/froboz.git/ +frotz-for-xyzzy</tt></pre>
+<pre><code> $ git push example.com:/git/froboz.git/ +frotz-for-xyzzy</code></pre>
 </div></div>
-<div class="paragraph"><p>There is no need to push the <tt>work</tt> branch or anything else.</p></div>
+<div class="paragraph"><p>There is no need to push the <code>work</code> branch or anything else.</p></div>
 <div class="paragraph"><p>Note that the above command line used a plus sign at the beginning of
-<tt>+frotz-for-xyzzy</tt> to allow forcing the update of a tag, as the same
+<code>+frotz-for-xyzzy</code> to allow forcing the update of a tag, as the same
 contributor may want to reuse a signed tag with the same name after the
 previous pull request has already been responded to.</p></div>
 <div class="paragraph"><p>The contributor then prepares a message to request a "pull":</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> $ git request-pull v3.2 example.com:/git/froboz.git/ frotz-for-xyzzy &gt;msg.txt</tt></pre>
+<pre><code> $ git request-pull v3.2 example.com:/git/froboz.git/ frotz-for-xyzzy &gt;msg.txt</code></pre>
 </div></div>
 <div class="paragraph"><p>The arguments are:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -834,7 +832,7 @@ the name of the tag the contributor wants to get pulled (earlier, she could
 <div class="paragraph"><p>The resulting msg.txt file begins like so:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> The following changes since commit 406da78032179...:
+<pre><code> The following changes since commit 406da78032179...:
 
    Froboz 3.2 (2011-09-30 14:20:57 -0700)
 
@@ -848,10 +846,10 @@ the name of the tag the contributor wants to get pulled (earlier, she could
 
  -----------------------------------------------
  Completed frotz feature
- -----------------------------------------------</tt></pre>
+ -----------------------------------------------</code></pre>
 </div></div>
 <div class="paragraph"><p>followed by a shortlog of the changes and a diffstat.  Comparing this with
-the earlier illustration of the output from the traditional <tt>git request-pull</tt>
+the earlier illustration of the output from the traditional <code>git request-pull</code>
 command, the reader should notice that:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -879,7 +877,7 @@ integrator.</p></div>
 integrates the tag named in the request, with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> $ git pull example.com:/git/froboz.git/ tags/frotz-for-xyzzy</tt></pre>
+<pre><code> $ git pull example.com:/git/froboz.git/ tags/frotz-for-xyzzy</code></pre>
 </div></div>
 <div class="paragraph"><p>This operation will always open an editor to allow the integrator to fine
 tune the commit log message when merging a signed tag.  Also, pulling a
@@ -890,20 +888,20 @@ about and why it was made.</p></div>
 <div class="paragraph"><p>In the editor, the integrator will see something like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> Merge tag 'frotz-for-xyzzy' of example.com:/git/froboz.git/
+<pre><code> Merge tag 'frotz-for-xyzzy' of example.com:/git/froboz.git/
 
  Completed frotz feature
  # gpg: Signature made Fri 02 Dec 2011 10:03:01 AM PST using RSA key ID 96AFE6CB
- # gpg: Good signature from "Con Tributor &lt;nitfol@example.com&gt;"</tt></pre>
+ # gpg: Good signature from "Con Tributor &lt;nitfol@example.com&gt;"</code></pre>
 </div></div>
 <div class="paragraph"><p>Notice that the message recorded in the signed tag "Completed frotz
 feature" appears here, and again that is why it is important for the
 contributor to explain her work well when creating the signed tag.</p></div>
-<div class="paragraph"><p>As usual, the lines commented with <tt>#</tt> are stripped out. The resulting
+<div class="paragraph"><p>As usual, the lines commented with <code>#</code> are stripped out. The resulting
 commit records the signed tag used for this validation in a hidden field
 so that it can later be used by others to audit the history. There is no
 need for the integrator to keep a separate copy of the tag in his
-repository (i.e. <tt>git tag -l</tt> won&#8217;t list the <tt>frotz-for-xyzzy</tt> tag in the
+repository (i.e. <code>git tag -l</code> won&#8217;t list the <code>frotz-for-xyzzy</code> tag in the
 above example), and there is no need to publish the tag to his public
 repository, either.</p></div>
 <div class="paragraph"><p>After the integrator responds to the pull request and her work becomes
@@ -912,20 +910,20 @@ her public repository, if she chooses, in order to keep the tag namespace
 of her public repository clean, with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> $ git push example.com:/git/froboz.git :frotz-for-xyzzy</tt></pre>
+<pre><code> $ git push example.com:/git/froboz.git :frotz-for-xyzzy</code></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_auditors">Auditors</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <tt>--show-signature</tt> option can be given to <tt>git log</tt> or <tt>git show</tt> and
+<div class="paragraph"><p>The <code>--show-signature</code> option can be given to <code>git log</code> or <code>git show</code> and
 shows the verification status of the embedded signed tag in merge commits
 created when the integrator responded to a pull request of a signed tag.</p></div>
-<div class="paragraph"><p>A typical output from <tt>git show --show-signature</tt> may look like this:</p></div>
+<div class="paragraph"><p>A typical output from <code>git show --show-signature</code> may look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt> $ git show --show-signature
+<pre><code> $ git show --show-signature
  commit 02306ef6a3498a39118aef9df7975bdb50091585
  merged tag 'frotz-for-xyzzy'
  gpg: Signature made Fri 06 Jan 2012 12:41:49 PM PST using RSA key ID 96AFE6CB
@@ -940,7 +938,7 @@ created when the integrator responded to a pull request of a signed tag.</p></di
 
      * tag 'frotz-for-xyzzy' (100 commits)
        Add tests and documentation for frotz
-       ...</tt></pre>
+       ...</code></pre>
 </div></div>
 <div class="paragraph"><p>There is no need for the auditor to explicitly fetch the contributor&#8217;s
 signature, or to even be aware of what tag(s) the contributor and integrator
@@ -952,7 +950,7 @@ as part of the merge commit.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-17 11:15:00 PDT
+Last updated 2014-10-31 13:22:28 PDT
 </div>
 </div>
 </body>

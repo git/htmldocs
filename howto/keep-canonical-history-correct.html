@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Keep authoritative canonical history correct with git pull</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -747,46 +745,46 @@ maintaining a central repository.</p></div>
 <div class="paragraph"><p>Suppose that that central repository has this history:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A</tt></pre>
+<pre><code>    ---o---o---A</code></pre>
 </div></div>
-<div class="paragraph"><p>which ends at commit <tt>A</tt> (time flows from left to right and each node
+<div class="paragraph"><p>which ends at commit <code>A</code> (time flows from left to right and each node
 in the graph is a commit, lines between them indicating parent-child
 relationship).</p></div>
 <div class="paragraph"><p>Then you clone it and work on your own commits, which leads you to
 have this history in <strong>your</strong> repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A---B---C</tt></pre>
+<pre><code>    ---o---o---A---B---C</code></pre>
 </div></div>
-<div class="paragraph"><p>Imagine your coworker did the same and built on top of <tt>A</tt> in <strong>his</strong>
+<div class="paragraph"><p>Imagine your coworker did the same and built on top of <code>A</code> in <strong>his</strong>
 repository in the meantime, and then pushed it to the
 central repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A---X---Y---Z</tt></pre>
+<pre><code>    ---o---o---A---X---Y---Z</code></pre>
 </div></div>
-<div class="paragraph"><p>Now, if you <tt>git push</tt> at this point, because your history that leads
-to <tt>C</tt> lacks <tt>X</tt>, <tt>Y</tt> and <tt>Z</tt>, it will fail.  You need to somehow make
-the tip of your history a descendant of <tt>Z</tt>.</p></div>
+<div class="paragraph"><p>Now, if you <code>git push</code> at this point, because your history that leads
+to <code>C</code> lacks <code>X</code>, <code>Y</code> and <code>Z</code>, it will fail.  You need to somehow make
+the tip of your history a descendant of <code>Z</code>.</p></div>
 <div class="paragraph"><p>One suggested way to solve the problem is "fetch and then merge", aka
-<tt>git pull</tt>. When you fetch, your repository will have a history like
+<code>git pull</code>. When you fetch, your repository will have a history like
 this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A---B---C
+<pre><code>    ---o---o---A---B---C
                 \
-                 X---Y---Z</tt></pre>
+                 X---Y---Z</code></pre>
 </div></div>
-<div class="paragraph"><p>Once you run merge after that, while still on <strong>your</strong> branch, i.e. <tt>C</tt>,
-you will create a merge <tt>M</tt> and make the history look like this:</p></div>
+<div class="paragraph"><p>Once you run merge after that, while still on <strong>your</strong> branch, i.e. <code>C</code>,
+you will create a merge <code>M</code> and make the history look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A---B---C---M
+<pre><code>    ---o---o---A---B---C---M
                 \         /
-                 X---Y---Z</tt></pre>
+                 X---Y---Z</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>M</tt> is a descendant of <tt>Z</tt>, so you can push to update the central
-repository.  Such a merge <tt>M</tt> does not lose any commit in both
+<div class="paragraph"><p><code>M</code> is a descendant of <code>Z</code>, so you can push to update the central
+repository.  Such a merge <code>M</code> does not lose any commit in both
 histories, so in that sense it may not be wrong, but when people want
 to talk about "the authoritative canonical history that is shared
 among the project participants", i.e. "the trunk", they often view
@@ -794,26 +792,26 @@ it as "commits you see by following the first-parent chain", and use
 this command to view it:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git log --first-parent</tt></pre>
+<pre><code>    $ git log --first-parent</code></pre>
 </div></div>
 <div class="paragraph"><p>For all other people who observed the central repository after your
-coworker pushed <tt>Z</tt> but before you pushed <tt>M</tt>, the commit on the trunk
-used to be <tt>o-o-A-X-Y-Z</tt>.  But because you made <tt>M</tt> while you were on
-<tt>C</tt>, <tt>M</tt>'s first parent is <tt>C</tt>, so by pushing <tt>M</tt> to advance the
-central repository, you made <tt>X-Y-Z</tt> a side branch, not on the trunk.</p></div>
+coworker pushed <code>Z</code> but before you pushed <code>M</code>, the commit on the trunk
+used to be <code>o-o-A-X-Y-Z</code>.  But because you made <code>M</code> while you were on
+<code>C</code>, <code>M</code>'s first parent is <code>C</code>, so by pushing <code>M</code> to advance the
+central repository, you made <code>X-Y-Z</code> a side branch, not on the trunk.</p></div>
 <div class="paragraph"><p>You would rather want to have a history of this shape:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A---X---Y---Z---M'
+<pre><code>    ---o---o---A---X---Y---Z---M'
                 \             /
-                 B-----------C</tt></pre>
+                 B-----------C</code></pre>
 </div></div>
 <div class="paragraph"><p>so that in the first-parent chain, it is clear that the project first
-did <tt>X</tt> and then <tt>Y</tt> and then <tt>Z</tt> and merged a change that consists of
-two commits <tt>B</tt> and <tt>C</tt> that achieves a single goal.  You may have
+did <code>X</code> and then <code>Y</code> and then <code>Z</code> and merged a change that consists of
+two commits <code>B</code> and <code>C</code> that achieves a single goal.  You may have
 worked on fixing the bug #12345 with these two patches, and the merge
-<tt>M'</tt> with swapped parents can say in its log message "Merge
-fix-bug-12345". Having a way to tell <tt>git pull</tt> to create a merge
+<code>M'</code> with swapped parents can say in its log message "Merge
+fix-bug-12345". Having a way to tell <code>git pull</code> to create a merge
 but record the parents in reverse order may be a way to do so.</p></div>
 <div class="paragraph"><p>Note that I said "achieves a single goal" above, because this is
 important.  "Swapping the merge order" only covers a special case
@@ -831,9 +829,9 @@ Some projects want to keep a completely linear history without any
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    ---o---o---A---X---Y---Z---B---C</tt></pre>
+<pre><code>    ---o---o---A---X---Y---Z---B---C</code></pre>
 </div></div>
-<div class="paragraph"><p>with <tt>git pull --rebase</tt> or something.</p></div>
+<div class="paragraph"><p>with <code>git pull --rebase</code> or something.</p></div>
 </li>
 <li>
 <p>
@@ -846,14 +844,14 @@ Some projects tolerate merges in their history, but do not worry
 <li>
 <p>
 Some projects want each commit on the "trunk" to do one single
-    thing.  The output of <tt>git log --first-parent</tt> in such a project
+    thing.  The output of <code>git log --first-parent</code> in such a project
     would show either a merge of a side branch that completes a single
     theme, or a single commit that completes a single theme by itself.
-    If your two commits <tt>B</tt> and <tt>C</tt> (or they may even be two groups of
-    commits) were solving two independent issues, then the merge <tt>M'</tt>
+    If your two commits <code>B</code> and <code>C</code> (or they may even be two groups of
+    commits) were solving two independent issues, then the merge <code>M'</code>
     we made in the earlier example by swapping the merge order is
     still not up to the project standard.  It merges two unrelated
-    efforts <tt>B</tt> and <tt>C</tt> at the same time.
+    efforts <code>B</code> and <code>C</code> at the same time.
 </p>
 </li>
 </ol></div>
@@ -862,74 +860,74 @@ individual developers would want to prepare a history more like
 this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                 C0--C1--C2     topic-c
+<pre><code>                 C0--C1--C2     topic-c
                 /
     ---o---o---A                master
                 \
-                 B0--B1--B2     topic-b</tt></pre>
+                 B0--B1--B2     topic-b</code></pre>
 </div></div>
 <div class="paragraph"><p>That is, keeping separate topics on separate branches, perhaps like
 so:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git clone $URL work &amp;&amp; cd work
+<pre><code>    $ git clone $URL work &amp;&amp; cd work
     $ git checkout -b topic-b master
     $ ... work to create B0, B1 and B2 to complete one theme
     $ git checkout -b topic-c master
-    $ ... same for the theme of topic-c</tt></pre>
+    $ ... same for the theme of topic-c</code></pre>
 </div></div>
 <div class="paragraph"><p>And then</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git checkout master
-    $ git pull --ff-only</tt></pre>
+<pre><code>    $ git checkout master
+    $ git pull --ff-only</code></pre>
 </div></div>
-<div class="paragraph"><p>would grab <tt>X</tt>, <tt>Y</tt> and <tt>Z</tt> from the upstream and advance your master
+<div class="paragraph"><p>would grab <code>X</code>, <code>Y</code> and <code>Z</code> from the upstream and advance your master
 branch:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                 C0--C1--C2     topic-c
+<pre><code>                 C0--C1--C2     topic-c
                 /
     ---o---o---A---X---Y---Z    master
                 \
-                 B0--B1--B2     topic-b</tt></pre>
+                 B0--B1--B2     topic-b</code></pre>
 </div></div>
 <div class="paragraph"><p>And then you would merge these two branches separately:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git merge topic-b
-    $ git merge topic-c</tt></pre>
+<pre><code>    $ git merge topic-b
+    $ git merge topic-c</code></pre>
 </div></div>
 <div class="paragraph"><p>to result in</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                 C0--C1---------C2
+<pre><code>                 C0--C1---------C2
                 /                 \
     ---o---o---A---X---Y---Z---M---N
                 \             /
-                 B0--B1-----B2</tt></pre>
+                 B0--B1-----B2</code></pre>
 </div></div>
 <div class="paragraph"><p>and push it back to the central repository.</p></div>
 <div class="paragraph"><p>It is very much possible that while you are merging topic-b and
 topic-c, somebody again advanced the history in the central repository
-to put <tt>W</tt> on top of <tt>Z</tt>, and make your <tt>git push</tt> fail.</p></div>
-<div class="paragraph"><p>In such a case, you would rewind to discard <tt>M</tt> and <tt>N</tt>, update the
+to put <code>W</code> on top of <code>Z</code>, and make your <code>git push</code> fail.</p></div>
+<div class="paragraph"><p>In such a case, you would rewind to discard <code>M</code> and <code>N</code>, update the
 tip of your <em>master</em> again and redo the two merges:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git reset --hard origin/master
+<pre><code>    $ git reset --hard origin/master
     $ git pull --ff-only
     $ git merge topic-b
-    $ git merge topic-c</tt></pre>
+    $ git merge topic-c</code></pre>
 </div></div>
 <div class="paragraph"><p>The procedure will result in a history that looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                 C0--C1--------------C2
+<pre><code>                 C0--C1--------------C2
                 /                     \
     ---o---o---A---X---Y---Z---W---M'--N'
                 \                 /
-                 B0--B1---------B2</tt></pre>
+                 B0--B1---------B2</code></pre>
 </div></div>
 <div class="paragraph"><p>See also <a href="http://git-blame.blogspot.com/2013/09/fun-with-first-parent-history.html">http://git-blame.blogspot.com/2013/09/fun-with-first-parent-history.html</a></p></div>
 </div>
@@ -938,7 +936,7 @@ tip of your <em>master</em> again and redo the two merges:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-17 11:15:03 PDT
+Last updated 2014-10-31 13:22:33 PDT
 </div>
 </div>
 </body>

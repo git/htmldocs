@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>diff API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -749,8 +747,8 @@ called diffcore, and is responsible for two things.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-finding total rewrites (<tt>-B</tt>), renames (<tt>-M</tt>) and copies (<tt>-C</tt>), and
-  changes that touch a string (<tt>-S</tt>), as specified by the caller.
+finding total rewrites (<code>-B</code>), renames (<code>-M</code>) and copies (<code>-C</code>), and
+  changes that touch a string (<code>-S</code>), as specified by the caller.
 </p>
 </li>
 <li>
@@ -768,22 +766,22 @@ outputting the differences in various formats, as specified by the
 <div class="ulist"><ul>
 <li>
 <p>
-Prepare <tt>struct diff_options</tt> to record the set of diff options, and
-  then call <tt>diff_setup()</tt> to initialize this structure.  This sets up
+Prepare <code>struct diff_options</code> to record the set of diff options, and
+  then call <code>diff_setup()</code> to initialize this structure.  This sets up
   the vanilla default.
 </p>
 </li>
 <li>
 <p>
 Fill in the options structure to specify desired output format, rename
-  detection, etc.  <tt>diff_opt_parse()</tt> can be used to parse options given
+  detection, etc.  <code>diff_opt_parse()</code> can be used to parse options given
   from the command line in a way consistent with existing git-diff
   family of programs.
 </p>
 </li>
 <li>
 <p>
-Call <tt>diff_setup_done()</tt>; this inspects the options set up so far for
+Call <code>diff_setup_done()</code>; this inspects the options set up so far for
   internal consistency and make necessary tweaking to it (e.g. if
   textual patch output was asked, recursive behaviour is turned on);
   the callback set_default in diff_options can be used to tweak this more.
@@ -791,22 +789,22 @@ Call <tt>diff_setup_done()</tt>; this inspects the options set up so far for
 </li>
 <li>
 <p>
-As you find different pairs of files, call <tt>diff_change()</tt> to feed
-  modified files, <tt>diff_addremove()</tt> to feed created or deleted files,
-  or <tt>diff_unmerge()</tt> to feed a file whose state is <em>unmerged</em> to the
-  API.  These are thin wrappers to a lower-level <tt>diff_queue()</tt> function
+As you find different pairs of files, call <code>diff_change()</code> to feed
+  modified files, <code>diff_addremove()</code> to feed created or deleted files,
+  or <code>diff_unmerge()</code> to feed a file whose state is <em>unmerged</em> to the
+  API.  These are thin wrappers to a lower-level <code>diff_queue()</code> function
   that is flexible enough to record any of these kinds of changes.
 </p>
 </li>
 <li>
 <p>
-Once you finish feeding the pairs of files, call <tt>diffcore_std()</tt>.
+Once you finish feeding the pairs of files, call <code>diffcore_std()</code>.
   This will tell the diffcore library to go ahead and do its work.
 </p>
 </li>
 <li>
 <p>
-Calling <tt>diff_flush()</tt> will produce the output.
+Calling <code>diff_flush()</code> will produce the output.
 </p>
 </li>
 </ul></div>
@@ -818,68 +816,68 @@ Calling <tt>diff_flush()</tt> will produce the output.
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>struct diff_filespec</tt>
+<code>struct diff_filespec</code>
 </p>
 </li>
 </ul></div>
 <div class="paragraph"><p>This is the internal representation for a single file (blob).  It
 records the blob object name (if known&#8201;&#8212;&#8201;for a work tree file it
 typically is a NUL SHA-1), filemode and pathname.  This is what the
-<tt>diff_addremove()</tt>, <tt>diff_change()</tt> and <tt>diff_unmerge()</tt> synthesize and
-feed <tt>diff_queue()</tt> function with.</p></div>
+<code>diff_addremove()</code>, <code>diff_change()</code> and <code>diff_unmerge()</code> synthesize and
+feed <code>diff_queue()</code> function with.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>struct diff_filepair</tt>
+<code>struct diff_filepair</code>
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>This records a pair of <tt>struct diff_filespec</tt>; the filespec for a file
-in the "old" set (i.e. preimage) is called <tt>one</tt>, and the filespec for a
-file in the "new" set (i.e. postimage) is called <tt>two</tt>.  A change that
-represents file creation has NULL in <tt>one</tt>, and file deletion has NULL
-in <tt>two</tt>.</p></div>
-<div class="paragraph"><p>A <tt>filepair</tt> starts pointing at <tt>one</tt> and <tt>two</tt> that are from the same
-filename, but <tt>diffcore_std()</tt> can break pairs and match component
+<div class="paragraph"><p>This records a pair of <code>struct diff_filespec</code>; the filespec for a file
+in the "old" set (i.e. preimage) is called <code>one</code>, and the filespec for a
+file in the "new" set (i.e. postimage) is called <code>two</code>.  A change that
+represents file creation has NULL in <code>one</code>, and file deletion has NULL
+in <code>two</code>.</p></div>
+<div class="paragraph"><p>A <code>filepair</code> starts pointing at <code>one</code> and <code>two</code> that are from the same
+filename, but <code>diffcore_std()</code> can break pairs and match component
 filespecs with other filespecs from a different filepair to form new
 filepair.  This is called <em>rename detection</em>.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>struct diff_queue</tt>
+<code>struct diff_queue</code>
 </p>
 </li>
 </ul></div>
 <div class="paragraph"><p>This is a collection of filepairs.  Notable members are:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>queue</tt>
+<code>queue</code>
 </dt>
 <dd>
 <p>
-        An array of pointers to <tt>struct diff_filepair</tt>.  This
+        An array of pointers to <code>struct diff_filepair</code>.  This
         dynamically grows as you add filepairs;
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>alloc</tt>
+<code>alloc</code>
 </dt>
 <dd>
 <p>
-        The allocated size of the <tt>queue</tt> array;
+        The allocated size of the <code>queue</code> array;
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>nr</tt>
+<code>nr</code>
 </dt>
 <dd>
 <p>
-        The number of elements in the <tt>queue</tt> array.
+        The number of elements in the <code>queue</code> array.
 </p>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>struct diff_options</tt>
+<code>struct diff_options</code>
 </p>
 </li>
 </ul></div>
@@ -890,15 +888,15 @@ the operation of diffcore library with.</p></div>
 <div class="paragraph"><p>Notable members are:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>output_format</tt>
+<code>output_format</code>
 </dt>
 <dd>
 <p>
-        The output format used when <tt>diff_flush()</tt> is run.
+        The output format used when <code>diff_flush()</code> is run.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>context</tt>
+<code>context</code>
 </dt>
 <dd>
 <p>
@@ -906,7 +904,7 @@ the operation of diffcore library with.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>break_opt</tt>, <tt>detect_rename</tt>, <tt>rename-score</tt>, <tt>rename_limit</tt>
+<code>break_opt</code>, <code>detect_rename</code>, <code>rename-score</code>, <code>rename_limit</code>
 </dt>
 <dd>
 <p>
@@ -915,7 +913,7 @@ the operation of diffcore library with.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>abbrev</tt>
+<code>abbrev</code>
 </dt>
 <dd>
 <p>
@@ -923,7 +921,7 @@ the operation of diffcore library with.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>pickaxe</tt>
+<code>pickaxe</code>
 </dt>
 <dd>
 <p>
@@ -934,7 +932,7 @@ the operation of diffcore library with.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>flags</tt>
+<code>flags</code>
 </dt>
 <dd>
 <p>
@@ -944,7 +942,7 @@ the operation of diffcore library with.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>touched_flags</tt>
+<code>touched_flags</code>
 </dt>
 <dd>
 <p>
@@ -953,7 +951,7 @@ the operation of diffcore library with.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>set_default</tt>
+<code>set_default</code>
 </dt>
 <dd>
 <p>
@@ -1034,7 +1032,7 @@ REVERSE_DIFF
 <dd>
 <p>
         Tells the library that the calling program is feeding the
-        filepairs reversed; <tt>one</tt> is two, and <tt>two</tt> is one.
+        filepairs reversed; <code>one</code> is two, and <code>two</code> is one.
 </p>
 </dd>
 <dt class="hdlist1">

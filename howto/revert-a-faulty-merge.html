@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>How to revert a faulty merge</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -743,44 +741,44 @@ asciidoc.install();
 <div class="paragraph"><p>Alan &lt;<a href="mailto:alan@clueserver.org">alan@clueserver.org</a>&gt; said:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>I have a master branch.  We have a branch off of that that some
+<pre><code>I have a master branch.  We have a branch off of that that some
 developers are doing work on.  They claim it is ready. We merge it
 into the master branch.  It breaks something so we revert the merge.
 They make changes to the code.  they get it to a point where they say
-it is ok and we merge again.</tt></pre>
+it is ok and we merge again.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>When examined, we find that code changes made before the revert are
+<pre><code>When examined, we find that code changes made before the revert are
 not in the master branch, but code changes after are in the master
-branch.</tt></pre>
+branch.</code></pre>
 </div></div>
 <div class="paragraph"><p>and asked for help recovering from this situation.</p></div>
 <div class="paragraph"><p>The history immediately after the "revert of the merge" would look like
 this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x---W
+<pre><code>---o---o---o---M---x---x---W
               /
-      ---A---B</tt></pre>
+      ---A---B</code></pre>
 </div></div>
 <div class="paragraph"><p>where A and B are on the side development that was not so good, M is the
 merge that brings these premature changes into the mainline, x are changes
 unrelated to what the side branch did and already made on the mainline,
 and W is the "revert of the merge M" (doesn&#8217;t W look M upside down?).
-IOW, <tt>"diff W^..W"</tt> is similar to <tt>"diff -R M^..M"</tt>.</p></div>
+IOW, <code>"diff W^..W"</code> is similar to <code>"diff -R M^..M"</code>.</p></div>
 <div class="paragraph"><p>Such a "revert" of a merge can be made with:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ git revert -m 1 M</tt></pre>
+<pre><code>$ git revert -m 1 M</code></pre>
 </div></div>
 <div class="paragraph"><p>After the developers of the side branch fix their mistakes, the history
 may look like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x---W---x
+<pre><code>---o---o---o---M---x---x---W---x
               /
-      ---A---B-------------------C---D</tt></pre>
+      ---A---B-------------------C---D</code></pre>
 </div></div>
 <div class="paragraph"><p>where C and D are to fix what was broken in A and B, and you may already
 have some other changes on the mainline after W.</p></div>
@@ -790,59 +788,59 @@ by W.  That is what Alan saw.</p></div>
 <div class="paragraph"><p>Linus explains the situation:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Reverting a regular commit just effectively undoes what that commit
+<pre><code>Reverting a regular commit just effectively undoes what that commit
 did, and is fairly straightforward. But reverting a merge commit also
 undoes the _data_ that the commit changed, but it does absolutely
-nothing to the effects on _history_ that the merge had.</tt></pre>
+nothing to the effects on _history_ that the merge had.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>So the merge will still exist, and it will still be seen as joining
+<pre><code>So the merge will still exist, and it will still be seen as joining
 the two branches together, and future merges will see that merge as
 the last shared state - and the revert that reverted the merge brought
-in will not affect that at all.</tt></pre>
+in will not affect that at all.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>So a "revert" undoes the data changes, but it's very much _not_ an
+<pre><code>So a "revert" undoes the data changes, but it's very much _not_ an
 "undo" in the sense that it doesn't undo the effects of a commit on
-the repository history.</tt></pre>
+the repository history.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>So if you think of "revert" as "undo", then you're going to always
+<pre><code>So if you think of "revert" as "undo", then you're going to always
 miss this part of reverts. Yes, it undoes the data, but no, it doesn't
-undo history.</tt></pre>
+undo history.</code></pre>
 </div></div>
 <div class="paragraph"><p>In such a situation, you would want to first revert the previous revert,
 which would make the history look like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x---W---x---Y
+<pre><code>---o---o---o---M---x---x---W---x---Y
               /
-      ---A---B-------------------C---D</tt></pre>
+      ---A---B-------------------C---D</code></pre>
 </div></div>
 <div class="paragraph"><p>where Y is the revert of W.  Such a "revert of the revert" can be done
 with:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ git revert W</tt></pre>
+<pre><code>$ git revert W</code></pre>
 </div></div>
 <div class="paragraph"><p>This history would (ignoring possible conflicts between what W and W..Y
 changed) be equivalent to not having W or Y at all in the history:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x-------x----
+<pre><code>---o---o---o---M---x---x-------x----
               /
-      ---A---B-------------------C---D</tt></pre>
+      ---A---B-------------------C---D</code></pre>
 </div></div>
 <div class="paragraph"><p>and merging the side branch again will not have conflict arising from an
 earlier revert and revert of the revert.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x-------x-------*
+<pre><code>---o---o---o---M---x---x-------x-------*
               /                       /
-      ---A---B-------------------C---D</tt></pre>
+      ---A---B-------------------C---D</code></pre>
 </div></div>
 <div class="paragraph"><p>Of course the changes made in C and D still can conflict with what was
 done by any of the x, but that is just a normal merge conflict.</p></div>
@@ -851,29 +849,29 @@ faulty A and B, and redone the changes on top of the updated mainline
 after the revert, the history would have looked like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x---W---x---x
+<pre><code>---o---o---o---M---x---x---W---x---x
               /                 \
-      ---A---B                   A'--B'--C'</tt></pre>
+      ---A---B                   A'--B'--C'</code></pre>
 </div></div>
 <div class="paragraph"><p>If you reverted the revert in such a case as in the previous example:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x---W---x---x---Y---*
+<pre><code>---o---o---o---M---x---x---W---x---x---Y---*
               /                 \         /
-      ---A---B                   A'--B'--C'</tt></pre>
+      ---A---B                   A'--B'--C'</code></pre>
 </div></div>
 <div class="paragraph"><p>where Y is the revert of W, A' and B' are rerolled A and B, and there may
-also be a further fix-up C' on the side branch.  <tt>"diff Y^..Y"</tt> is similar
-to <tt>"diff -R W^..W"</tt> (which in turn means it is similar to <tt>"diff M^..M"</tt>),
-and <tt>"diff A'^..C'"</tt> by definition would be similar but different from that,
+also be a further fix-up C' on the side branch.  <code>"diff Y^..Y"</code> is similar
+to <code>"diff -R W^..W"</code> (which in turn means it is similar to <code>"diff M^..M"</code>),
+and <code>"diff A'^..C'"</code> by definition would be similar but different from that,
 because it is a rerolled series of the earlier change.  There will be a
 lot of overlapping changes that result in conflicts.  So do not do "revert
 of revert" blindly without thinking..</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>---o---o---o---M---x---x---W---x---x
+<pre><code>---o---o---o---M---x---x---W---x---x
               /                 \
-      ---A---B                   A'--B'--C'</tt></pre>
+      ---A---B                   A'--B'--C'</code></pre>
 </div></div>
 <div class="paragraph"><p>In the history with rebased side branch, W (and M) are behind the merge
 base of the updated branch and the tip of the mainline, and they should
@@ -931,9 +929,9 @@ now need to do it by reverting the revert.</p></div>
 change the topic&#8217;s branching-off point.  Consider the following situation:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>P---o---o---M---x---x---W---x
+<pre><code>P---o---o---M---x---x---W---x
  \         /
-  A---B---C</tt></pre>
+  A---B---C</code></pre>
 </div></div>
 <div class="paragraph"><p>where commit W reverted commit M because it turned out that commit B was wrong
 and needs to be rewritten, but you need the rewritten topic to still branch
@@ -945,11 +943,11 @@ because "rebase -i" by default fast-forwards over any initial commits selected
 with the "pick" command.  So you end up with this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>P---o---o---M---x---x---W---x
+<pre><code>P---o---o---M---x---x---W---x
  \         /
   A---B---C   &lt;-- old branch
    \
-    B'---C'   &lt;-- naively rewritten branch</tt></pre>
+    B'---C'   &lt;-- naively rewritten branch</code></pre>
 </div></div>
 <div class="paragraph"><p>To merge A-B'-C' into the mainline branch you would still have to first revert
 commit W in order to pick up the changes in A, but then it&#8217;s likely that the
@@ -959,28 +957,28 @@ reversion of W.</p></div>
 including commit A:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>  A'---B'---C'  &lt;-- completely rewritten branch
+<pre><code>  A'---B'---C'  &lt;-- completely rewritten branch
  /
 P---o---o---M---x---x---W---x
  \         /
-  A---B---C</tt></pre>
+  A---B---C</code></pre>
 </div></div>
 <div class="paragraph"><p>You can merge A'-B'-C' into the mainline branch without worrying about first
 reverting W.  Mainline&#8217;s history would look like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>  A'---B'---C'------------------
+<pre><code>  A'---B'---C'------------------
  /                              \
 P---o---o---M---x---x---W---x---M2
  \         /
-  A---B---C</tt></pre>
+  A---B---C</code></pre>
 </div></div>
 <div class="paragraph"><p>But if you don&#8217;t actually need to change commit A, then you need some way to
 recreate it as a new commit with the same changes in it.  The rebase command&#8217;s
 --no-ff option provides a way to do this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ git rebase [-i] --no-ff P</tt></pre>
+<pre><code>$ git rebase [-i] --no-ff P</code></pre>
 </div></div>
 <div class="paragraph"><p>The --no-ff option creates a new branch A'-B'-C' with all-new commits (all the
 SHA IDs will be different) even if in the interactive case you only actually
@@ -990,34 +988,34 @@ branch and be sure you&#8217;ll get all of the branch&#8217;s changes.</p></div>
 to fix it up.  Let&#8217;s revisit the situation discussed at the start of this howto:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>P---o---o---M---x---x---W---x
+<pre><code>P---o---o---M---x---x---W---x
  \         /
-  A---B---C----------------D---E   &lt;-- fixed-up topic branch</tt></pre>
+  A---B---C----------------D---E   &lt;-- fixed-up topic branch</code></pre>
 </div></div>
 <div class="paragraph"><p>At this point, you can use --no-ff to recreate the topic branch:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$ git checkout E
-$ git rebase --no-ff P</tt></pre>
+<pre><code>$ git checkout E
+$ git rebase --no-ff P</code></pre>
 </div></div>
 <div class="paragraph"><p>yielding</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>  A'---B'---C'------------D'---E'  &lt;-- recreated topic branch
+<pre><code>  A'---B'---C'------------D'---E'  &lt;-- recreated topic branch
  /
 P---o---o---M---x---x---W---x
  \         /
-  A---B---C----------------D---E</tt></pre>
+  A---B---C----------------D---E</code></pre>
 </div></div>
 <div class="paragraph"><p>You can merge the recreated branch into the mainline without reverting commit W,
 and mainline&#8217;s history will look like this:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>  A'---B'---C'------------D'---E'
+<pre><code>  A'---B'---C'------------D'---E'
  /                              \
 P---o---o---M---x---x---W---x---M2
  \         /
-  A---B---C</tt></pre>
+  A---B---C</code></pre>
 </div></div>
 </div>
 </div>
@@ -1025,7 +1023,7 @@ P---o---o---M---x---x---W---x---M2
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-17 11:15:02 PDT
+Last updated 2014-10-31 13:22:31 PDT
 </div>
 </div>
 </body>

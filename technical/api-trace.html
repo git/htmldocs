@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>trace API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -741,14 +739,14 @@ asciidoc.install();
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph"><p>The trace API can be used to print debug messages to stderr or a file. Trace
-code is inactive unless explicitly enabled by setting <tt>GIT_TRACE*</tt> environment
+code is inactive unless explicitly enabled by setting <code>GIT_TRACE*</code> environment
 variables.</p></div>
-<div class="paragraph"><p>The trace implementation automatically adds <tt>timestamp file:line ... \n</tt> to
+<div class="paragraph"><p>The trace implementation automatically adds <code>timestamp file:line ... \n</code> to
 all trace messages. E.g.:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>23:59:59.123456 git.c:312               trace: built-in: git 'foo'
-00:00:00.000001 builtin/foo.c:99        foo: some message</tt></pre>
+<pre><code>23:59:59.123456 git.c:312               trace: built-in: git 'foo'
+00:00:00.000001 builtin/foo.c:99        foo: some message</code></pre>
 </div></div>
 </div>
 </div>
@@ -757,25 +755,25 @@ all trace messages. E.g.:</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>struct trace_key</tt>
+<code>struct trace_key</code>
 </dt>
 <dd>
 <p>
         Defines a trace key (or category). The default (for API functions that
-        don&#8217;t take a key) is <tt>GIT_TRACE</tt>.
+        don&#8217;t take a key) is <code>GIT_TRACE</code>.
 </p>
-<div class="paragraph"><p>E.g. to define a trace key controlled by environment variable <tt>GIT_TRACE_FOO</tt>:</p></div>
+<div class="paragraph"><p>E.g. to define a trace key controlled by environment variable <code>GIT_TRACE_FOO</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>static struct trace_key trace_foo = TRACE_KEY_INIT(FOO);
+<pre><code>static struct trace_key trace_foo = TRACE_KEY_INIT(FOO);
 
 static void trace_print_foo(const char *message)
 {
         trace_print_key(&amp;trace_foo, message);
-}</tt></pre>
+}</code></pre>
 </div></div>
-<div class="paragraph"><p>Note: don&#8217;t use <tt>const</tt> as the trace implementation stores internal state in
-the <tt>trace_key</tt> structure.</p></div>
+<div class="paragraph"><p>Note: don&#8217;t use <code>const</code> as the trace implementation stores internal state in
+the <code>trace_key</code> structure.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -785,7 +783,7 @@ the <tt>trace_key</tt> structure.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>int trace_want(struct trace_key *key)</tt>
+<code>int trace_want(struct trace_key *key)</code>
 </dt>
 <dd>
 <p>
@@ -794,7 +792,7 @@ the <tt>trace_key</tt> structure.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void trace_disable(struct trace_key *key)</tt>
+<code>void trace_disable(struct trace_key *key)</code>
 </dt>
 <dd>
 <p>
@@ -803,10 +801,10 @@ the <tt>trace_key</tt> structure.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void trace_printf(const char *format, ...)</tt>
+<code>void trace_printf(const char *format, ...)</code>
 </dt>
 <dt class="hdlist1">
-<tt>void trace_printf_key(struct trace_key *key, const char *format, ...)</tt>
+<code>void trace_printf_key(struct trace_key *key, const char *format, ...)</code>
 </dt>
 <dd>
 <p>
@@ -814,7 +812,7 @@ the <tt>trace_key</tt> structure.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void trace_argv_printf(const char **argv, const char *format, ...)`</tt>
+<code>void trace_argv_printf(const char **argv, const char *format, ...)`</code>
 </dt>
 <dd>
 <p>
@@ -822,16 +820,16 @@ the <tt>trace_key</tt> structure.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void trace_strbuf(struct trace_key *key, const struct strbuf *data)</tt>
+<code>void trace_strbuf(struct trace_key *key, const struct strbuf *data)</code>
 </dt>
 <dd>
 <p>
         Prints the strbuf, without additional formatting (i.e. doesn&#8217;t
-        choke on <tt>%</tt> or even <tt>\0</tt>).
+        choke on <code>%</code> or even <code>\0</code>).
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>uint64_t getnanotime(void)</tt>
+<code>uint64_t getnanotime(void)</code>
 </dt>
 <dd>
 <p>
@@ -839,30 +837,30 @@ the <tt>trace_key</tt> structure.</p></div>
         for performance measurements.
 </p>
 <div class="paragraph"><p>Currently there are high precision timer implementations for Linux (using
-<tt>clock_gettime(CLOCK_MONOTONIC)</tt>) and Windows (<tt>QueryPerformanceCounter</tt>).
-Other platforms use <tt>gettimeofday</tt> as time source.</p></div>
+<code>clock_gettime(CLOCK_MONOTONIC)</code>) and Windows (<code>QueryPerformanceCounter</code>).
+Other platforms use <code>gettimeofday</code> as time source.</p></div>
 </dd>
 <dt class="hdlist1">
-<tt>void trace_performance(uint64_t nanos, const char *format, ...)</tt>
+<code>void trace_performance(uint64_t nanos, const char *format, ...)</code>
 </dt>
 <dt class="hdlist1">
-<tt>void trace_performance_since(uint64_t start, const char *format, ...)</tt>
+<code>void trace_performance_since(uint64_t start, const char *format, ...)</code>
 </dt>
 <dd>
 <p>
         Prints the elapsed time (in nanoseconds), or elapsed time since
-        <tt>start</tt>, followed by a formatted message. Enabled via environment
-        variable <tt>GIT_TRACE_PERFORMANCE</tt>. Used for manual profiling, e.g.:
+        <code>start</code>, followed by a formatted message. Enabled via environment
+        variable <code>GIT_TRACE_PERFORMANCE</code>. Used for manual profiling, e.g.:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>uint64_t start = getnanotime();
+<pre><code>uint64_t start = getnanotime();
 /* code section to measure */
-trace_performance_since(start, "foobar");</tt></pre>
+trace_performance_since(start, "foobar");</code></pre>
 </div></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>uint64_t t = 0;
+<pre><code>uint64_t t = 0;
 for (;;) {
         /* ignore */
         t -= getnanotime();
@@ -870,7 +868,7 @@ for (;;) {
         t += getnanotime();
         /* ignore */
 }
-trace_performance(t, "frotz");</tt></pre>
+trace_performance(t, "frotz");</code></pre>
 </div></div>
 </dd>
 </dl></div>

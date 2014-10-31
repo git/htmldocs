@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>gitremote-helpers(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -825,7 +823,7 @@ protocol), while in others it indicates the end of input.</p></div>
 <h3 id="_capabilities">Capabilities</h3>
 <div class="paragraph"><p>Each remote helper is expected to support only a subset of commands.
 The operations a helper supports are declared to Git in the response
-to the <tt>capabilities</tt> command (see COMMANDS, below).</p></div>
+to the <code>capabilities</code> command (see COMMANDS, below).</p></div>
 <div class="paragraph"><p>In the following, we list all defined capabilities and for
 each we list which commands a helper with that capability
 must provide.</p></div>
@@ -942,8 +940,8 @@ Other frontends may have some other order of preference.</p></div>
 </dt>
 <dd>
 <p>
-        For specifying settings like <tt>verbosity</tt> (how much output to
-        write to stderr) and <tt>depth</tt> (how much history is wanted in the
+        For specifying settings like <code>verbosity</code> (how much output to
+        write to stderr) and <code>depth</code> (how much history is wanted in the
         case of a shallow clone) that affect how other commands are
         carried out.
 </p>
@@ -960,15 +958,15 @@ Other frontends may have some other order of preference.</p></div>
         capability use this. It&#8217;s mandatory for <em>export</em>.
 </p>
 <div class="paragraph"><p>A helper advertising the capability
-<tt>refspec refs/heads/*:refs/svn/origin/branches/*</tt>
-is saying that, when it is asked to <tt>import refs/heads/topic</tt>, the
-stream it outputs will update the <tt>refs/svn/origin/branches/topic</tt>
+<code>refspec refs/heads/*:refs/svn/origin/branches/*</code>
+is saying that, when it is asked to <code>import refs/heads/topic</code>, the
+stream it outputs will update the <code>refs/svn/origin/branches/topic</code>
 ref.</p></div>
 <div class="paragraph"><p>This capability can be advertised multiple times.  The first
 applicable refspec takes precedence.  The left-hand of refspecs
 advertised with this capability must cover all refs reported by
 the list command.  If no <em>refspec</em> capability is advertised,
-there is an implied <tt>refspec *:*</tt>.</p></div>
+there is an implied <code>refspec *:*</code>.</p></div>
 <div class="paragraph"><p>When writing remote-helpers for decentralized version control
 systems, it is advised to keep a local copy of the repository to
 interact with, and to let the private namespace refs point to this
@@ -1130,11 +1128,11 @@ suitably updated.</p></div>
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>push refs/heads/master:refs/heads/master
+<pre><code>push refs/heads/master:refs/heads/master
 push HEAD:refs/heads/branch
 \n
 push +refs/heads/foo:refs/heads/bar
-\n</tt></pre>
+\n</code></pre>
 </div></div>
 <div class="paragraph"><p>Zero or more protocol options may be entered after the last <em>push</em>
 command, before the batch&#8217;s terminating blank line.</p></div>

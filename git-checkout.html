@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-checkout(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -765,7 +763,7 @@ git-checkout(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Updates files in the working tree to match the version in the index
 or the specified tree.  If no paths are given, <em>git checkout</em> will
-also update <tt>HEAD</tt> to set the specified branch as the current
+also update <code>HEAD</code> to set the specified branch as the current
 branch.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -784,7 +782,7 @@ exactly one remote (call it &lt;remote&gt;) with a matching name, treat as
 equivalent to</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</tt></pre>
+<pre><code>$ git checkout -b &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>You could omit &lt;branch&gt;, in which case the command degenerates to
 "check out the current branch", which is a glorified no-op with a
@@ -796,19 +794,19 @@ if exists, for the current branch.</p></div>
 </dt>
 <dd>
 <p>
-        Specifying <tt>-b</tt> causes a new branch to be created as if
+        Specifying <code>-b</code> causes a new branch to be created as if
         <a href="git-branch.html">git-branch(1)</a> were called and then checked out.  In
-        this case you can use the <tt>--track</tt> or <tt>--no-track</tt> options,
+        this case you can use the <code>--track</code> or <code>--no-track</code> options,
         which will be passed to <em>git branch</em>.  As a convenience,
-        <tt>--track</tt> without <tt>-b</tt> implies branch creation; see the
-        description of <tt>--track</tt> below.
+        <code>--track</code> without <code>-b</code> implies branch creation; see the
+        description of <code>--track</code> below.
 </p>
-<div class="paragraph"><p>If <tt>-B</tt> is given, &lt;new_branch&gt; is created if it doesn&#8217;t exist; otherwise, it
+<div class="paragraph"><p>If <code>-B</code> is given, &lt;new_branch&gt; is created if it doesn&#8217;t exist; otherwise, it
 is reset. This is the transactional equivalent of</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git branch -f &lt;branch&gt; [&lt;start point&gt;]
-$ git checkout &lt;branch&gt;</tt></pre>
+<pre><code>$ git branch -f &lt;branch&gt; [&lt;start point&gt;]
+$ git checkout &lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>that is to say, the branch is not reset/created unless "git checkout" is
 successful.</p></div>
@@ -828,9 +826,9 @@ successful.</p></div>
         tree will be the state recorded in the commit plus the local
         modifications.
 </p>
-<div class="paragraph"><p>When the &lt;commit&gt; argument is a branch name, the <tt>--detach</tt> option can
-be used to detach HEAD at the tip of the branch (<tt>git checkout
-&lt;branch&gt;</tt> would check out that branch without detaching HEAD).</p></div>
+<div class="paragraph"><p>When the &lt;commit&gt; argument is a branch name, the <code>--detach</code> option can
+be used to detach HEAD at the tip of the branch (<code>git checkout
+&lt;branch&gt;</code> would check out that branch without detaching HEAD).</p></div>
 <div class="paragraph"><p>Omitting &lt;branch&gt; detaches HEAD at the tip of the current branch.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -838,10 +836,10 @@ be used to detach HEAD at the tip of the branch (<tt>git checkout
 </dt>
 <dd>
 <p>
-        When &lt;paths&gt; or <tt>--patch</tt> are given, <em>git checkout</em> does <strong>not</strong>
+        When &lt;paths&gt; or <code>--patch</code> are given, <em>git checkout</em> does <strong>not</strong>
         switch branches.  It updates the named paths in the working tree
         from the index file or from a named &lt;tree-ish&gt; (most often a
-        commit).  In this case, the <tt>-b</tt> and <tt>--track</tt> options are
+        commit).  In this case, the <code>-b</code> and <code>--track</code> options are
         meaningless and giving either of them results in an error.  The
         &lt;tree-ish&gt; argument can be used to specify a specific tree-ish
         (i.e.  commit, tag or tree) to update the index for the given
@@ -850,9 +848,9 @@ be used to detach HEAD at the tip of the branch (<tt>git checkout
 <div class="paragraph"><p>The index may contain unmerged entries because of a previous failed merge.
 By default, if you try to check out such an entry from the index, the
 checkout operation will fail and nothing will be checked out.
-Using <tt>-f</tt> will ignore these unmerged entries.  The contents from a
+Using <code>-f</code> will ignore these unmerged entries.  The contents from a
 specific side of the merge can be checked out of the index by
-using <tt>--ours</tt> or <tt>--theirs</tt>.  With <tt>-m</tt>, changes made to the working tree
+using <code>--ours</code> or <code>--theirs</code>.  With <code>-m</code>, changes made to the working tree
 file can be discarded to re-create the original conflicted merge result.</p></div>
 </dd>
 </dl></div>
@@ -1003,7 +1001,7 @@ working tree, by copying them from elsewhere, extracting a tarball, etc.</p></di
 </dt>
 <dd>
 <p>
-        In sparse checkout mode, <tt>git checkout -- &lt;paths&gt;</tt> would
+        In sparse checkout mode, <code>git checkout -- &lt;paths&gt;</code> would
         update only entries matched by &lt;paths&gt; and sparse patterns
         in $GIT_DIR/info/sparse-checkout. This option ignores
         the sparse patterns and adds back any files in &lt;paths&gt;.
@@ -1028,7 +1026,7 @@ working tree, by copying them from elsewhere, extracting a tarball, etc.</p></di
 </p>
 <div class="paragraph"><p>When a merge conflict happens, the index entries for conflicting
 paths are left unmerged, and you need to resolve the conflicts
-and mark the resolved paths with <tt>git add</tt> (or <tt>git rm</tt> if the merge
+and mark the resolved paths with <code>git add</code> (or <code>git rm</code> if the merge
 should result in deletion of the path).</p></div>
 <div class="paragraph"><p>When checking out paths from the index, this option lets you recreate
 the conflicted merge in the specified paths.</p></div>
@@ -1058,9 +1056,9 @@ the conflicted merge in the specified paths.</p></div>
         tree.  The chosen hunks are then applied in reverse to the
         working tree (and if a &lt;tree-ish&gt; was specified, the index).
 </p>
-<div class="paragraph"><p>This means that you can use <tt>git checkout -p</tt> to selectively discard
+<div class="paragraph"><p>This means that you can use <code>git checkout -p</code> to selectively discard
 edits from your current working tree. See the &#8220;Interactive Mode&#8221;
-section of <a href="git-add.html">git-add(1)</a> to learn how to operate the <tt>--patch</tt> mode.</p></div>
+section of <a href="git-add.html">git-add(1)</a> to learn how to operate the <code>--patch</code> mode.</p></div>
 </dd>
 <dt class="hdlist1">
 &lt;branch&gt;
@@ -1073,12 +1071,12 @@ section of <a href="git-add.html">git-add(1)</a> to learn how to operate the <tt
         commit, your HEAD becomes "detached" and you are no longer on
         any branch (see below for details).
 </p>
-<div class="paragraph"><p>As a special case, the <tt>"@{-N}"</tt> syntax for the N-th last branch/commit
+<div class="paragraph"><p>As a special case, the <code>"@{-N}"</code> syntax for the N-th last branch/commit
 checks out branches (instead of detaching).  You may also specify
-<tt>-</tt> which is synonymous with <tt>"@{-1}"</tt>.</p></div>
-<div class="paragraph"><p>As a further special case, you may use <tt>"A...B"</tt> as a shortcut for the
-merge base of <tt>A</tt> and <tt>B</tt> if there is exactly one merge base. You can
-leave out at most one of <tt>A</tt> and <tt>B</tt>, in which case it defaults to <tt>HEAD</tt>.</p></div>
+<code>-</code> which is synonymous with <code>"@{-1}"</code>.</p></div>
+<div class="paragraph"><p>As a further special case, you may use <code>"A...B"</code> as a shortcut for the
+merge base of <code>A</code> and <code>B</code> if there is exactly one merge base. You can
+leave out at most one of <code>A</code> and <code>B</code>, in which case it defaults to <code>HEAD</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 &lt;new_branch&gt;
@@ -1117,13 +1115,13 @@ branch refers to a specific commit. Let&#8217;s look at a repo with three
 commits, one of them tagged, and with branch <em>master</em> checked out:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>           HEAD (refers to branch 'master')
+<pre><code>           HEAD (refers to branch 'master')
             |
             v
 a---b---c  branch 'master' (refers to commit 'c')
     ^
     |
-  tag 'v2.0' (refers to commit 'b')</tt></pre>
+  tag 'v2.0' (refers to commit 'b')</code></pre>
 </div></div>
 <div class="paragraph"><p>When a commit is created in this state, the branch is updated to refer to
 the new commit. Specifically, <em>git commit</em> creates a new commit <em>d</em>, whose
@@ -1132,7 +1130,7 @@ commit <em>d</em>. HEAD still refers to branch <em>master</em> and so indirectly
 to commit <em>d</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ edit; git add; git commit
+<pre><code>$ edit; git add; git commit
 
                HEAD (refers to branch 'master')
                 |
@@ -1140,7 +1138,7 @@ to commit <em>d</em>:</p></div>
 a---b---c---d  branch 'master' (refers to commit 'd')
     ^
     |
-  tag 'v2.0' (refers to commit 'b')</tt></pre>
+  tag 'v2.0' (refers to commit 'b')</code></pre>
 </div></div>
 <div class="paragraph"><p>It is sometimes useful to be able to checkout a commit that is not at
 the tip of any named branch, or even to create a new commit that is not
@@ -1148,7 +1146,7 @@ referenced by a named branch. Let&#8217;s look at what happens when we
 checkout commit <em>b</em> (here we show two ways this may be done):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout v2.0  # or
+<pre><code>$ git checkout v2.0  # or
 $ git checkout master^^
 
    HEAD (refers to commit 'b')
@@ -1157,7 +1155,7 @@ $ git checkout master^^
 a---b---c---d  branch 'master' (refers to commit 'd')
     ^
     |
-  tag 'v2.0' (refers to commit 'b')</tt></pre>
+  tag 'v2.0' (refers to commit 'b')</code></pre>
 </div></div>
 <div class="paragraph"><p>Notice that regardless of which checkout command we use, HEAD now refers
 directly to commit <em>b</em>. This is known as being in detached HEAD state.
@@ -1165,7 +1163,7 @@ It means simply that HEAD refers to a specific commit, as opposed to
 referring to a named branch. Let&#8217;s see what happens when we create a commit:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ edit; git add; git commit
+<pre><code>$ edit; git add; git commit
 
      HEAD (refers to commit 'e')
       |
@@ -1175,13 +1173,13 @@ referring to a named branch. Let&#8217;s see what happens when we create a commi
 a---b---c---d  branch 'master' (refers to commit 'd')
     ^
     |
-  tag 'v2.0' (refers to commit 'b')</tt></pre>
+  tag 'v2.0' (refers to commit 'b')</code></pre>
 </div></div>
 <div class="paragraph"><p>There is now a new commit <em>e</em>, but it is referenced only by HEAD. We can
 of course add yet another commit in this state:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ edit; git add; git commit
+<pre><code>$ edit; git add; git commit
 
          HEAD (refers to commit 'f')
           |
@@ -1191,13 +1189,13 @@ of course add yet another commit in this state:</p></div>
 a---b---c---d  branch 'master' (refers to commit 'd')
     ^
     |
-  tag 'v2.0' (refers to commit 'b')</tt></pre>
+  tag 'v2.0' (refers to commit 'b')</code></pre>
 </div></div>
 <div class="paragraph"><p>In fact, we can perform all the normal Git operations. But, let&#8217;s look
 at what happens when we then checkout master:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout master
+<pre><code>$ git checkout master
 
                HEAD (refers to branch 'master')
       e---f     |
@@ -1205,7 +1203,7 @@ at what happens when we then checkout master:</p></div>
 a---b---c---d  branch 'master' (refers to commit 'd')
     ^
     |
-  tag 'v2.0' (refers to commit 'b')</tt></pre>
+  tag 'v2.0' (refers to commit 'b')</code></pre>
 </div></div>
 <div class="paragraph"><p>It is important to realize that at this point nothing refers to commit
 <em>f</em>. Eventually commit <em>f</em> (and by extension commit <em>e</em>) will be deleted
@@ -1214,9 +1212,9 @@ before that happens. If we have not yet moved away from commit <em>f</em>,
 any of these will create a reference to it:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b foo   <b>&lt;1&gt;</b>
+<pre><code>$ git checkout -b foo   <b>&lt;1&gt;</b>
 $ git branch foo        <b>&lt;2&gt;</b>
-$ git tag foo           <b>&lt;3&gt;</b></tt></pre>
+$ git tag foo           <b>&lt;3&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1245,8 +1243,8 @@ it. For example, to see the last two commits to which HEAD referred, we
 can use either of these commands:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git reflog -2 HEAD # or
-$ git log -g -2 HEAD</tt></pre>
+<pre><code>$ git reflog -2 HEAD # or
+$ git log -g -2 HEAD</code></pre>
 </div></div>
 </div>
 </div>
@@ -1256,16 +1254,16 @@ $ git log -g -2 HEAD</tt></pre>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-The following sequence checks out the <tt>master</tt> branch, reverts
-the <tt>Makefile</tt> to two revisions back, deletes hello.c by
+The following sequence checks out the <code>master</code> branch, reverts
+the <code>Makefile</code> to two revisions back, deletes hello.c by
 mistake, and gets it back from the index.
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout master             <b>&lt;1&gt;</b>
+<pre><code>$ git checkout master             <b>&lt;1&gt;</b>
 $ git checkout master~2 Makefile  <b>&lt;2&gt;</b>
 $ rm -f hello.c
-$ git checkout hello.c            <b>&lt;3&gt;</b></tt></pre>
+$ git checkout hello.c            <b>&lt;3&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1286,18 +1284,18 @@ restore hello.c from the index
 you can say</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -- '*.c'</tt></pre>
+<pre><code>$ git checkout -- '*.c'</code></pre>
 </div></div>
-<div class="paragraph"><p>Note the quotes around <tt>*.c</tt>.  The file <tt>hello.c</tt> will also be
+<div class="paragraph"><p>Note the quotes around <code>*.c</code>.  The file <code>hello.c</code> will also be
 checked out, even though it is no longer in the working tree,
 because the file globbing is used to match entries in the index
 (not in the working tree by the shell).</p></div>
-<div class="paragraph"><p>If you have an unfortunate branch that is named <tt>hello.c</tt>, this
+<div class="paragraph"><p>If you have an unfortunate branch that is named <code>hello.c</code>, this
 step would be confused as an instruction to switch to that branch.
 You should instead write:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -- hello.c</tt></pre>
+<pre><code>$ git checkout -- hello.c</code></pre>
 </div></div>
 </li>
 </ol></div>
@@ -1309,47 +1307,47 @@ branch would be done using:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout mytopic</tt></pre>
+<pre><code>$ git checkout mytopic</code></pre>
 </div></div>
 <div class="paragraph"><p>However, your "wrong" branch and correct "mytopic" branch may
 differ in files that you have modified locally, in which case
 the above checkout would fail like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout mytopic
-error: You have local changes to 'frotz'; not switching branches.</tt></pre>
+<pre><code>$ git checkout mytopic
+error: You have local changes to 'frotz'; not switching branches.</code></pre>
 </div></div>
-<div class="paragraph"><p>You can give the <tt>-m</tt> flag to the command, which would try a
+<div class="paragraph"><p>You can give the <code>-m</code> flag to the command, which would try a
 three-way merge:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -m mytopic
-Auto-merging frotz</tt></pre>
+<pre><code>$ git checkout -m mytopic
+Auto-merging frotz</code></pre>
 </div></div>
 <div class="paragraph"><p>After this three-way merge, the local modifications are <em>not</em>
-registered in your index file, so <tt>git diff</tt> would show you what
+registered in your index file, so <code>git diff</code> would show you what
 changes you made since the tip of the new branch.</p></div>
 </li>
 <li>
 <p>
 When a merge conflict happens during switching branches with
-the <tt>-m</tt> option, you would see something like this:
+the <code>-m</code> option, you would see something like this:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -m mytopic
+<pre><code>$ git checkout -m mytopic
 Auto-merging frotz
 ERROR: Merge conflict in frotz
-fatal: merge program failed</tt></pre>
+fatal: merge program failed</code></pre>
 </div></div>
-<div class="paragraph"><p>At this point, <tt>git diff</tt> shows the changes cleanly merged as in
+<div class="paragraph"><p>At this point, <code>git diff</code> shows the changes cleanly merged as in
 the previous example, as well as the changes in the conflicted
 files.  Edit and resolve the conflict and mark it resolved with
-<tt>git add</tt> as usual:</p></div>
+<code>git add</code> as usual:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ edit frotz
-$ git add frotz</tt></pre>
+<pre><code>$ edit frotz
+$ git add frotz</code></pre>
 </div></div>
 </li>
 </ol></div>

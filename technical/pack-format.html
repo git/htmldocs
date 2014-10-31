@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Git pack format</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -748,23 +746,23 @@ A header appears at the beginning and consists of the following:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>4-byte signature:
-    The signature is: {'P', 'A', 'C', 'K'}</tt></pre>
+<pre><code>4-byte signature:
+    The signature is: {'P', 'A', 'C', 'K'}</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>4-byte version number (network byte order):
+<pre><code>4-byte version number (network byte order):
     Git currently accepts version number 2 or 3 but
-    generates version 2 only.</tt></pre>
+    generates version 2 only.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>4-byte number of objects contained in the pack (network byte order)</tt></pre>
+<pre><code>4-byte number of objects contained in the pack (network byte order)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Observation: we cannot have more than 4G versions ;-) and
-more than 4G objects in a pack.</tt></pre>
+<pre><code>Observation: we cannot have more than 4G versions ;-) and
+more than 4G objects in a pack.</code></pre>
 </div></div>
 </li>
 <li>
@@ -774,23 +772,23 @@ The header is followed by number of object entries, each of
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>(undeltified representation)
+<pre><code>(undeltified representation)
 n-byte type and length (3-bit type, (n-1)*7+4-bit length)
-compressed data</tt></pre>
+compressed data</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>(deltified representation)
+<pre><code>(deltified representation)
 n-byte type and length (3-bit type, (n-1)*7+4-bit length)
 20-byte base object name if OBJ_REF_DELTA or a negative relative
     offset from the delta object's position in the pack if this
     is an OBJ_OFS_DELTA object
-compressed delta data</tt></pre>
+compressed delta data</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>Observation: length of each object is encoded in a variable
-length format and is not constrained to 32-bit or anything.</tt></pre>
+<pre><code>Observation: length of each object is encoded in a variable
+length format and is not constrained to 32-bit or anything.</code></pre>
 </div></div>
 </li>
 <li>
@@ -821,13 +819,13 @@ The header is followed by sorted 24-byte entries, one entry
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>4-byte network byte order integer, recording where the
+<pre><code>4-byte network byte order integer, recording where the
 object is stored in the packfile as the offset from the
-beginning.</tt></pre>
+beginning.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>20-byte object name.</tt></pre>
+<pre><code>20-byte object name.</code></pre>
 </div></div>
 </li>
 <li>
@@ -836,19 +834,19 @@ The file is concluded with a trailer:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>A copy of the 20-byte SHA-1 checksum at the end of
-corresponding packfile.</tt></pre>
+<pre><code>A copy of the 20-byte SHA-1 checksum at the end of
+corresponding packfile.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>20-byte SHA-1-checksum of all of the above.</tt></pre>
+<pre><code>20-byte SHA-1-checksum of all of the above.</code></pre>
 </div></div>
 </li>
 </ul></div>
 <div class="paragraph"><p>Pack Idx file:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>        --  +--------------------------------+
+<pre><code>        --  +--------------------------------+
 fanout      | fanout[0] = 2 (for example)    |-.
 table       +--------------------------------+ |
             | fanout[1]                      | |
@@ -878,11 +876,11 @@ trailer   | | packfile checksum              |
           | +--------------------------------+
           .-------.
                   |
-Pack file entry: &lt;+</tt></pre>
+Pack file entry: &lt;+</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>packed object header:
+<pre><code>packed object header:
    1-byte size extension bit (MSB)
           type (next 3 bit)
           size0 (lower 4-bit)
@@ -902,16 +900,16 @@ packed object data:
            offset from the type-byte of the header of the
            ofs-delta entry (the size above is the size of
            the delta data that follows).
-     delta data, deflated.</tt></pre>
+     delta data, deflated.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>offset encoding:
+<pre><code>offset encoding:
      n bytes with MSB set in all but the last one.
      The offset is then the number constructed by
      concatenating the lower 7 bit of each byte, and
      for n &gt;= 2 adding 2^7 + 2^14 + ... + 2^(7*(n-1))
-     to the result.</tt></pre>
+     to the result.</code></pre>
 </div></div>
 </div>
 </div>
@@ -920,7 +918,7 @@ packed object data:
 <div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><tt>have some other reorganizations.  They have the format:</tt></pre>
+<pre><code>have some other reorganizations.  They have the format:</code></pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -976,12 +974,12 @@ The same trailer as a v1 pack file:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>A copy of the 20-byte SHA-1 checksum at the end of
-corresponding packfile.</tt></pre>
+<pre><code>A copy of the 20-byte SHA-1 checksum at the end of
+corresponding packfile.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>20-byte SHA-1-checksum of all of the above.</tt></pre>
+<pre><code>20-byte SHA-1-checksum of all of the above.</code></pre>
 </div></div>
 </li>
 </ul></div>

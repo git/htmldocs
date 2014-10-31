@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-checkout-index(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -872,7 +870,7 @@ git-checkout-index(1) Manual Page
 </dt>
 <dd>
 <p>
-        Only meaningful with <tt>--stdin</tt>; paths are separated with
+        Only meaningful with <code>--stdin</code>; paths are separated with
         NUL character instead of LF.
 </p>
 </dd>
@@ -886,33 +884,33 @@ git-checkout-index(1) Manual Page
 </dd>
 </dl></div>
 <div class="paragraph"><p>The order of the flags used to matter, but not anymore.</p></div>
-<div class="paragraph"><p>Just doing <tt>git checkout-index</tt> does nothing. You probably meant
-<tt>git checkout-index -a</tt>. And if you want to force it, you want
-<tt>git checkout-index -f -a</tt>.</p></div>
+<div class="paragraph"><p>Just doing <code>git checkout-index</code> does nothing. You probably meant
+<code>git checkout-index -a</code>. And if you want to force it, you want
+<code>git checkout-index -f -a</code>.</p></div>
 <div class="paragraph"><p>Intuitiveness is not the goal here. Repeatability is. The reason for
 the "no arguments means no work" behavior is that from scripts you are
 supposed to be able to do:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ find . -name '*.h' -print0 | xargs -0 git checkout-index -f --</tt></pre>
+<pre><code>$ find . -name '*.h' -print0 | xargs -0 git checkout-index -f --</code></pre>
 </div></div>
-<div class="paragraph"><p>which will force all existing <tt>*.h</tt> files to be replaced with their
+<div class="paragraph"><p>which will force all existing <code>*.h</code> files to be replaced with their
 cached copies. If an empty command line implied "all", then this would
 force-refresh everything in the index, which was not the point.  But
 since <em>git checkout-index</em> accepts --stdin it would be faster to use:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ find . -name '*.h' -print0 | git checkout-index -f -z --stdin</tt></pre>
+<pre><code>$ find . -name '*.h' -print0 | git checkout-index -f -z --stdin</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>--</tt> is just a good idea when you know the rest will be filenames;
-it will prevent problems with a filename of, for example,  <tt>-a</tt>.
-Using <tt>--</tt> is probably a good policy in scripts.</p></div>
+<div class="paragraph"><p>The <code>--</code> is just a good idea when you know the rest will be filenames;
+it will prevent problems with a filename of, for example,  <code>-a</code>.
+Using <code>--</code> is probably a good policy in scripts.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_using_temp_or_stage_all">Using --temp or --stage=all</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>When <tt>--temp</tt> is used (or implied by <tt>--stage=all</tt>)
+<div class="paragraph"><p>When <code>--temp</code> is used (or implied by <code>--stage=all</code>)
 <em>git checkout-index</em> will create a temporary file for each index
 entry being checked out.  The index will not be updated with stat
 information.  These options can be useful if the caller needs all
@@ -926,8 +924,8 @@ has two variations:</p></div>
 <p>
 tempname TAB path RS
 </p>
-<div class="paragraph"><p>The first format is what gets used when <tt>--stage</tt> is omitted or
-is not <tt>--stage=all</tt>. The field tempname is the temporary file
+<div class="paragraph"><p>The first format is what gets used when <code>--stage</code> is omitted or
+is not <code>--stage=all</code>. The field tempname is the temporary file
 name holding the file content and path is the tracked path name in
 the index.  Only the requested entries are output.</p></div>
 </li>
@@ -935,10 +933,10 @@ the index.  Only the requested entries are output.</p></div>
 <p>
 stage1temp SP stage2temp SP stage3tmp TAB path RS
 </p>
-<div class="paragraph"><p>The second format is what gets used when <tt>--stage=all</tt>.  The three
+<div class="paragraph"><p>The second format is what gets used when <code>--stage=all</code>.  The three
 stage temporary fields (stage1temp, stage2temp, stage3temp) list the
 name of the temporary file if there is a stage entry in the index
-or <tt>.</tt> if there is no stage entry.  Paths which only have a stage 0
+or <code>.</code> if there is no stage entry.  Paths which only have a stage 0
 entry will always be omitted from the output.</p></div>
 </li>
 </ol></div>
@@ -963,7 +961,7 @@ To update and refresh only the files already checked out
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</tt></pre>
+<pre><code>$ git checkout-index -n -f -a &amp;&amp; git update-index --ignore-missing --refresh</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -977,9 +975,9 @@ Using <em>git checkout-index</em> to "export an entire tree"
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout-index --prefix=git-export-dir/ -a</tt></pre>
+<pre><code>$ git checkout-index --prefix=git-export-dir/ -a</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>git checkout-index</tt> will "export" the index into the specified
+<div class="paragraph"><p><code>git checkout-index</code> will "export" the index into the specified
 directory.</p></div>
 <div class="paragraph"><p>The final "/" is important. The exported name is literally just
 prefixed with the specified string.  Contrast this with the
@@ -991,10 +989,10 @@ Export files with a prefix
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout-index --prefix=.merged- Makefile</tt></pre>
+<pre><code>$ git checkout-index --prefix=.merged- Makefile</code></pre>
 </div></div>
-<div class="paragraph"><p>This will check out the currently cached copy of <tt>Makefile</tt>
-into the file <tt>.merged-Makefile</tt>.</p></div>
+<div class="paragraph"><p>This will check out the currently cached copy of <code>Makefile</code>
+into the file <code>.merged-Makefile</code>.</p></div>
 </dd>
 </dl></div>
 </div>

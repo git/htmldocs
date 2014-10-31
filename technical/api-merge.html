@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>merge API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -761,7 +759,7 @@ lining up corresponding files in the trees to be merged (rename
 <li>
 <p>
 performing a three-way merge of corresponding files, taking
-   path-specific merge drivers (specified in <tt>.gitattributes</tt>)
+   path-specific merge drivers (specified in <code>.gitattributes</code>)
    into account.
 </p>
 </li>
@@ -774,17 +772,17 @@ performing a three-way merge of corresponding files, taking
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>mmbuffer_t</tt>, <tt>mmfile_t</tt>
+<code>mmbuffer_t</code>, <code>mmfile_t</code>
 </p>
 </li>
 </ul></div>
 <div class="paragraph"><p>These store data usable for use by the xdiff backend, for writing and
-for reading, respectively.  See <tt>xdiff/xdiff.h</tt> for the definitions
-and <tt>diff.c</tt> for examples.</p></div>
+for reading, respectively.  See <code>xdiff/xdiff.h</code> for the definitions
+and <code>diff.c</code> for examples.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>struct ll_merge_options</tt>
+<code>struct ll_merge_options</code>
 </p>
 </li>
 </ul></div>
@@ -792,31 +790,31 @@ and <tt>diff.c</tt> for examples.</p></div>
 the operation of a low-level (single file) merge.  Some options:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>virtual_ancestor</tt>
+<code>virtual_ancestor</code>
 </dt>
 <dd>
 <p>
         Behave as though this were part of a merge between common
         ancestors in a recursive merge.
         If a helper program is specified by the
-        <tt>[merge "&lt;driver&gt;"] recursive</tt> configuration, it will
+        <code>[merge "&lt;driver&gt;"] recursive</code> configuration, it will
         be used (see <a href="../gitattributes.html">gitattributes(5)</a>).
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>variant</tt>
+<code>variant</code>
 </dt>
 <dd>
 <p>
         Resolve local conflicts automatically in favor
         of one side or the other (as in <em>git merge-file</em>
-        <tt>--ours</tt>/<tt>--theirs</tt>/<tt>--union</tt>).  Can be <tt>0</tt>,
-        <tt>XDL_MERGE_FAVOR_OURS</tt>, <tt>XDL_MERGE_FAVOR_THEIRS</tt>, or
-        <tt>XDL_MERGE_FAVOR_UNION</tt>.
+        <code>--ours</code>/<code>--theirs</code>/<code>--union</code>).  Can be <code>0</code>,
+        <code>XDL_MERGE_FAVOR_OURS</code>, <code>XDL_MERGE_FAVOR_THEIRS</code>, or
+        <code>XDL_MERGE_FAVOR_UNION</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>renormalize</tt>
+<code>renormalize</code>
 </dt>
 <dd>
 <p>
@@ -834,14 +832,14 @@ the operation of a low-level (single file) merge.  Some options:</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>ll_merge</tt>
+<code>ll_merge</code>
 </dt>
 <dd>
 <p>
         Perform a three-way single-file merge in core.  This is
-        a thin wrapper around <tt>xdl_merge</tt> that takes the path and
-        any merge backend specified in <tt>.gitattributes</tt> or
-        <tt>.git/info/attributes</tt> into account.  Returns 0 for a
+        a thin wrapper around <code>xdl_merge</code> that takes the path and
+        any merge backend specified in <code>.gitattributes</code> or
+        <code>.git/info/attributes</code> into account.  Returns 0 for a
         clean merge.
 </p>
 </dd>
@@ -850,9 +848,9 @@ the operation of a low-level (single file) merge.  Some options:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Prepare a <tt>struct ll_merge_options</tt> to record options.
-  If you have no special requests, skip this and pass <tt>NULL</tt>
-  as the <tt>opts</tt> parameter to use the default options.
+Prepare a <code>struct ll_merge_options</code> to record options.
+  If you have no special requests, skip this and pass <code>NULL</code>
+  as the <code>opts</code> parameter to use the default options.
 </p>
 </li>
 <li>
@@ -863,32 +861,32 @@ Allocate an mmbuffer_t variable for the result.
 <li>
 <p>
 Allocate and fill variables with the file&#8217;s original content
-  and two modified versions (using <tt>read_mmfile</tt>, for example).
+  and two modified versions (using <code>read_mmfile</code>, for example).
 </p>
 </li>
 <li>
 <p>
-Call <tt>ll_merge()</tt>.
+Call <code>ll_merge()</code>.
 </p>
 </li>
 <li>
 <p>
-Read the merged content from <tt>result_buf.ptr</tt> and <tt>result_buf.size</tt>.
+Read the merged content from <code>result_buf.ptr</code> and <code>result_buf.size</code>.
 </p>
 </li>
 <li>
 <p>
 Release buffers when finished.  A simple
-  <tt>free(ancestor.ptr); free(ours.ptr); free(theirs.ptr);
-  free(result_buf.ptr);</tt> will do.
+  <code>free(ancestor.ptr); free(ours.ptr); free(theirs.ptr);
+  free(result_buf.ptr);</code> will do.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>If the modifications do not merge cleanly, <tt>ll_merge</tt> will return a
-nonzero value and <tt>result_buf</tt> will generally include a description of
-the conflict bracketed by markers such as the traditional <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt>
-and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>.</p></div>
-<div class="paragraph"><p>The <tt>ancestor_label</tt>, <tt>our_label</tt>, and <tt>their_label</tt> parameters are
+<div class="paragraph"><p>If the modifications do not merge cleanly, <code>ll_merge</code> will return a
+nonzero value and <code>result_buf</code> will generally include a description of
+the conflict bracketed by markers such as the traditional <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>
+and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.</p></div>
+<div class="paragraph"><p>The <code>ancestor_label</code>, <code>our_label</code>, and <code>their_label</code> parameters are
 used to label the different sides of a conflict if the merge driver
 supports this.</p></div>
 </div>

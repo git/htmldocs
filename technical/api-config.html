@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>config API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -761,7 +759,7 @@ picking out different variables useful to themselves.</p></div>
 the name of the parsed variable. This is in canonical "flat" form: the
   section, subsection, and variable segments will be separated by dots,
   and the section and variable segments will be all lowercase. E.g.,
-  <tt>core.ignorecase</tt>, <tt>diff.SomeType.textconv</tt>.
+  <code>core.ignorecase</code>, <code>diff.SomeType.textconv</code>.
 </p>
 </li>
 <li>
@@ -787,44 +785,44 @@ could not be parsed properly.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>Most programs will simply want to look up variables in all config files
 that Git knows about, using the normal precedence rules. To do this,
-call <tt>git_config</tt> with a callback function and void data pointer.</p></div>
-<div class="paragraph"><p><tt>git_config</tt> will read all config sources in order of increasing
+call <code>git_config</code> with a callback function and void data pointer.</p></div>
+<div class="paragraph"><p><code>git_config</code> will read all config sources in order of increasing
 priority. Thus a callback should typically overwrite previously-seen
-entries with new ones (e.g., if both the user-wide <tt>~/.gitconfig</tt> and
-repo-specific <tt>.git/config</tt> contain <tt>color.ui</tt>, the config machinery
+entries with new ones (e.g., if both the user-wide <code>~/.gitconfig</code> and
+repo-specific <code>.git/config</code> contain <code>color.ui</code>, the config machinery
 will first feed the user-wide one to the callback, and then the
 repo-specific one; by overwriting, the higher-priority repo-specific
 value is left at the end).</p></div>
-<div class="paragraph"><p>The <tt>git_config_with_options</tt> function lets the caller examine config
-while adjusting some of the default behavior of <tt>git_config</tt>. It should
+<div class="paragraph"><p>The <code>git_config_with_options</code> function lets the caller examine config
+while adjusting some of the default behavior of <code>git_config</code>. It should
 almost never be used by "regular" Git code that is looking up
 configuration variables. It is intended for advanced callers like
-<tt>git-config</tt>, which are intentionally tweaking the normal config-lookup
+<code>git-config</code>, which are intentionally tweaking the normal config-lookup
 process. It takes two extra parameters:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>filename</tt>
+<code>filename</code>
 </dt>
 <dd>
 <p>
 If this parameter is non-NULL, it specifies the name of a file to
 parse for configuration, rather than looking in the usual files. Regular
-<tt>git_config</tt> defaults to <tt>NULL</tt>.
+<code>git_config</code> defaults to <code>NULL</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>respect_includes</tt>
+<code>respect_includes</code>
 </dt>
 <dd>
 <p>
 Specify whether include directives should be followed in parsed files.
-Regular <tt>git_config</tt> defaults to <tt>1</tt>.
+Regular <code>git_config</code> defaults to <code>1</code>.
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>There is a special version of <tt>git_config</tt> called <tt>git_config_early</tt>.
+<div class="paragraph"><p>There is a special version of <code>git_config</code> called <code>git_config_early</code>.
 This version takes an additional parameter to specify the repository
-config, instead of having it looked up via <tt>git_path</tt>. This is useful
+config, instead of having it looked up via <code>git_path</code>. This is useful
 early in a Git program before the repository has been found. Unless
 you&#8217;re working with early setup code, you probably don&#8217;t want to use
 this.</p></div>
@@ -834,43 +832,43 @@ this.</p></div>
 <h2 id="_reading_specific_files">Reading Specific Files</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>To read a specific file in git-config format, use
-<tt>git_config_from_file</tt>. This takes the same callback and data parameters
-as <tt>git_config</tt>.</p></div>
+<code>git_config_from_file</code>. This takes the same callback and data parameters
+as <code>git_config</code>.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_querying_for_specific_variables">Querying For Specific Variables</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>For programs wanting to query for specific variables in a non-callback
-manner, the config API provides two functions <tt>git_config_get_value</tt>
-and <tt>git_config_get_value_multi</tt>. They both read values from an internal
+manner, the config API provides two functions <code>git_config_get_value</code>
+and <code>git_config_get_value_multi</code>. They both read values from an internal
 cache generated previously from reading the config files.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>int git_config_get_value(const char *key, const char **value)</tt>
+<code>int git_config_get_value(const char *key, const char **value)</code>
 </dt>
 <dd>
 <p>
-        Finds the highest-priority value for the configuration variable <tt>key</tt>,
-        stores the pointer to it in <tt>value</tt> and returns 0. When the
-        configuration variable <tt>key</tt> is not found, returns 1 without touching
-        <tt>value</tt>. The caller should not free or modify <tt>value</tt>, as it is owned
+        Finds the highest-priority value for the configuration variable <code>key</code>,
+        stores the pointer to it in <code>value</code> and returns 0. When the
+        configuration variable <code>key</code> is not found, returns 1 without touching
+        <code>value</code>. The caller should not free or modify <code>value</code>, as it is owned
         by the cache.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>const struct string_list *git_config_get_value_multi(const char *key)</tt>
+<code>const struct string_list *git_config_get_value_multi(const char *key)</code>
 </dt>
 <dd>
 <p>
         Finds and returns the value list, sorted in order of increasing priority
-        for the configuration variable <tt>key</tt>. When the configuration variable
-        <tt>key</tt> is not found, returns NULL. The caller should not free or modify
+        for the configuration variable <code>key</code>. When the configuration variable
+        <code>key</code> is not found, returns NULL. The caller should not free or modify
         the returned pointer, as it is owned by the cache.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void git_config_clear(void)</tt>
+<code>void git_config_clear(void)</code>
 </dt>
 <dd>
 <p>
@@ -882,103 +880,103 @@ cache generated previously from reading the config files.</p></div>
 as well as retrieval for the queried variable, including:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>int git_config_get_int(const char *key, int *dest)</tt>
+<code>int git_config_get_int(const char *key, int *dest)</code>
 </dt>
 <dd>
 <p>
         Finds and parses the value to an integer for the configuration variable
-        <tt>key</tt>. Dies on error; otherwise, stores the value of the parsed integer in
-        <tt>dest</tt> and returns 0. When the configuration variable <tt>key</tt> is not found,
-        returns 1 without touching <tt>dest</tt>.
+        <code>key</code>. Dies on error; otherwise, stores the value of the parsed integer in
+        <code>dest</code> and returns 0. When the configuration variable <code>key</code> is not found,
+        returns 1 without touching <code>dest</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_ulong(const char *key, unsigned long *dest)</tt>
+<code>int git_config_get_ulong(const char *key, unsigned long *dest)</code>
 </dt>
 <dd>
 <p>
-        Similar to <tt>git_config_get_int</tt> but for unsigned longs.
+        Similar to <code>git_config_get_int</code> but for unsigned longs.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_bool(const char *key, int *dest)</tt>
+<code>int git_config_get_bool(const char *key, int *dest)</code>
 </dt>
 <dd>
 <p>
         Finds and parses the value into a boolean value, for the configuration
-        variable <tt>key</tt> respecting keywords like "true" and "false". Integer
+        variable <code>key</code> respecting keywords like "true" and "false". Integer
         values are converted into true/false values (when they are non-zero or
         zero, respectively). Other values cause a die(). If parsing is successful,
-        stores the value of the parsed result in <tt>dest</tt> and returns 0. When the
-        configuration variable <tt>key</tt> is not found, returns 1 without touching
-        <tt>dest</tt>.
+        stores the value of the parsed result in <code>dest</code> and returns 0. When the
+        configuration variable <code>key</code> is not found, returns 1 without touching
+        <code>dest</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_bool_or_int(const char *key, int *is_bool, int *dest)</tt>
+<code>int git_config_get_bool_or_int(const char *key, int *is_bool, int *dest)</code>
 </dt>
 <dd>
 <p>
-        Similar to <tt>git_config_get_bool</tt>, except that integers are copied as-is,
-        and <tt>is_bool</tt> flag is unset.
+        Similar to <code>git_config_get_bool</code>, except that integers are copied as-is,
+        and <code>is_bool</code> flag is unset.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_maybe_bool(const char *key, int *dest)</tt>
+<code>int git_config_get_maybe_bool(const char *key, int *dest)</code>
 </dt>
 <dd>
 <p>
-        Similar to <tt>git_config_get_bool</tt>, except that it returns -1 on error
+        Similar to <code>git_config_get_bool</code>, except that it returns -1 on error
         rather than dying.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_string_const(const char *key, const char **dest)</tt>
+<code>int git_config_get_string_const(const char *key, const char **dest)</code>
 </dt>
 <dd>
 <p>
-        Allocates and copies the retrieved string into the <tt>dest</tt> parameter for
-        the configuration variable <tt>key</tt>; if NULL string is given, prints an
-        error message and returns -1. When the configuration variable <tt>key</tt> is
-        not found, returns 1 without touching <tt>dest</tt>.
+        Allocates and copies the retrieved string into the <code>dest</code> parameter for
+        the configuration variable <code>key</code>; if NULL string is given, prints an
+        error message and returns -1. When the configuration variable <code>key</code> is
+        not found, returns 1 without touching <code>dest</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_string(const char *key, char **dest)</tt>
+<code>int git_config_get_string(const char *key, char **dest)</code>
 </dt>
 <dd>
 <p>
-        Similar to <tt>git_config_get_string_const</tt>, except that retrieved value
-        copied into the <tt>dest</tt> parameter is a mutable string.
+        Similar to <code>git_config_get_string_const</code>, except that retrieved value
+        copied into the <code>dest</code> parameter is a mutable string.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_config_get_pathname(const char *key, const char **dest)</tt>
+<code>int git_config_get_pathname(const char *key, const char **dest)</code>
 </dt>
 <dd>
 <p>
-        Similar to <tt>git_config_get_string</tt>, but expands <tt>~</tt> or <tt>~user</tt> into
+        Similar to <code>git_config_get_string</code>, but expands <code>~</code> or <code>~user</code> into
         the user&#8217;s home directory when found at the beginning of the path.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_die_config(const char *key, const char *err, ...)</tt>
+<code>git_die_config(const char *key, const char *err, ...)</code>
 </dt>
 <dd>
 <p>
-        First prints the error message specified by the caller in <tt>err</tt> and then
+        First prints the error message specified by the caller in <code>err</code> and then
         dies printing the line number and the file name of the highest priority
-        value for the configuration variable <tt>key</tt>.
+        value for the configuration variable <code>key</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void git_die_config_linenr(const char *key, const char *filename, int linenr)</tt>
+<code>void git_die_config_linenr(const char *key, const char *filename, int linenr)</code>
 </dt>
 <dd>
 <p>
         Helper function which formats the die error message according to the
-        parameters entered. Used by <tt>git_die_config()</tt>. It can be used by callers
-        handling <tt>git_config_get_value_multi()</tt> to print the correct error message
+        parameters entered. Used by <code>git_die_config()</code>. It can be used by callers
+        handling <code>git_config_get_value_multi()</code> to print the correct error message
         for the desired value.
 </p>
 </dd>
@@ -993,7 +991,7 @@ as well as retrieval for the queried variable, including:</p></div>
 a number of helper functions, including:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>git_config_int</tt>
+<code>git_config_int</code>
 </dt>
 <dd>
 <p>
@@ -1002,15 +1000,15 @@ otherwise, returns the parsed result.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_config_ulong</tt>
+<code>git_config_ulong</code>
 </dt>
 <dd>
 <p>
-Identical to <tt>git_config_int</tt>, but for unsigned longs.
+Identical to <code>git_config_int</code>, but for unsigned longs.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_config_bool</tt>
+<code>git_config_bool</code>
 </dt>
 <dd>
 <p>
@@ -1021,38 +1019,38 @@ parsing is successful, the return value is the result.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_config_bool_or_int</tt>
+<code>git_config_bool_or_int</code>
 </dt>
 <dd>
 <p>
-Same as <tt>git_config_bool</tt>, except that integers are returned as-is, and
-an <tt>is_bool</tt> flag is unset.
+Same as <code>git_config_bool</code>, except that integers are returned as-is, and
+an <code>is_bool</code> flag is unset.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_config_maybe_bool</tt>
+<code>git_config_maybe_bool</code>
 </dt>
 <dd>
 <p>
-Same as <tt>git_config_bool</tt>, except that it returns -1 on error rather
+Same as <code>git_config_bool</code>, except that it returns -1 on error rather
 than dying.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_config_string</tt>
+<code>git_config_string</code>
 </dt>
 <dd>
 <p>
-Allocates and copies the value string into the <tt>dest</tt> parameter; if no
+Allocates and copies the value string into the <code>dest</code> parameter; if no
 string is given, prints an error message and returns -1.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git_config_pathname</tt>
+<code>git_config_pathname</code>
 </dt>
 <dd>
 <p>
-Similar to <tt>git_config_string</tt>, but expands <tt>~</tt> or <tt>~user</tt> into the
+Similar to <code>git_config_string</code>, but expands <code>~</code> or <code>~user</code> into the
 user&#8217;s home directory when found at the beginning of the path.
 </p>
 </dd>
@@ -1063,33 +1061,33 @@ user&#8217;s home directory when found at the beginning of the path.
 <h2 id="_include_directives">Include Directives</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>By default, the config parser does not respect include directives.
-However, a caller can use the special <tt>git_config_include</tt> wrapper
+However, a caller can use the special <code>git_config_include</code> wrapper
 callback to support them. To do so, you simply wrap your "real" callback
-function and data pointer in a <tt>struct config_include_data</tt>, and pass
+function and data pointer in a <code>struct config_include_data</code>, and pass
 the wrapper to the regular config-reading functions. For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>int read_file_with_include(const char *file, config_fn_t fn, void *data)
+<pre><code>int read_file_with_include(const char *file, config_fn_t fn, void *data)
 {
         struct config_include_data inc = CONFIG_INCLUDE_INIT;
         inc.fn = fn;
         inc.data = data;
         return git_config_from_file(git_config_include, file, &amp;inc);
-}</tt></pre>
+}</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>git_config</tt> respects includes automatically. The lower-level
-<tt>git_config_from_file</tt> does not.</p></div>
+<div class="paragraph"><p><code>git_config</code> respects includes automatically. The lower-level
+<code>git_config_from_file</code> does not.</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_custom_configsets">Custom Configsets</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>A <tt>config_set</tt> can be used to construct an in-memory cache for
-config-like files that the caller specifies (i.e., files like <tt>.gitmodules</tt>,
-<tt>~/.gitconfig</tt> etc.). For example,</p></div>
+<div class="paragraph"><p>A <code>config_set</code> can be used to construct an in-memory cache for
+config-like files that the caller specifies (i.e., files like <code>.gitmodules</code>,
+<code>~/.gitconfig</code> etc.). For example,</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>struct config_set gm_config;
+<pre><code>struct config_set gm_config;
 git_configset_init(&amp;gm_config);
 int b;
 /* we add config files to the config_set */
@@ -1101,24 +1099,24 @@ if (!git_configset_get_bool(gm_config, "submodule.frotz.ignore", &amp;b)) {
 }
 
 /* when we are done with the configset */
-git_configset_clear(&amp;gm_config);</tt></pre>
+git_configset_clear(&amp;gm_config);</code></pre>
 </div></div>
 <div class="paragraph"><p>Configset API provides functions for the above mentioned work flow, including:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>void git_configset_init(struct config_set *cs)</tt>
+<code>void git_configset_init(struct config_set *cs)</code>
 </dt>
 <dd>
 <p>
-        Initializes the config_set <tt>cs</tt>.
+        Initializes the config_set <code>cs</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_configset_add_file(struct config_set *cs, const char *filename)</tt>
+<code>int git_configset_add_file(struct config_set *cs, const char *filename)</code>
 </dt>
 <dd>
 <p>
-        Parses the file and adds the variable-value pairs to the <tt>config_set</tt>,
+        Parses the file and adds the variable-value pairs to the <code>config_set</code>,
         dies if there is an error in parsing the file. Returns 0 on success, or
         -1 if the file does not exist or is inaccessible. The user has to decide
         if he wants to free the incomplete configset or continue using it when
@@ -1126,41 +1124,41 @@ git_configset_clear(&amp;gm_config);</tt></pre>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>int git_configset_get_value(struct config_set *cs, const char *key, const char **value)</tt>
+<code>int git_configset_get_value(struct config_set *cs, const char *key, const char **value)</code>
 </dt>
 <dd>
 <p>
-        Finds the highest-priority value for the configuration variable <tt>key</tt>
-        and config set <tt>cs</tt>, stores the pointer to it in <tt>value</tt> and returns 0.
-        When the configuration variable <tt>key</tt> is not found, returns 1 without
-        touching <tt>value</tt>. The caller should not free or modify <tt>value</tt>, as it
+        Finds the highest-priority value for the configuration variable <code>key</code>
+        and config set <code>cs</code>, stores the pointer to it in <code>value</code> and returns 0.
+        When the configuration variable <code>key</code> is not found, returns 1 without
+        touching <code>value</code>. The caller should not free or modify <code>value</code>, as it
         is owned by the cache.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>const struct string_list *git_configset_get_value_multi(struct config_set *cs, const char *key)</tt>
+<code>const struct string_list *git_configset_get_value_multi(struct config_set *cs, const char *key)</code>
 </dt>
 <dd>
 <p>
         Finds and returns the value list, sorted in order of increasing priority
-        for the configuration variable <tt>key</tt> and config set <tt>cs</tt>. When the
-        configuration variable <tt>key</tt> is not found, returns NULL. The caller
+        for the configuration variable <code>key</code> and config set <code>cs</code>. When the
+        configuration variable <code>key</code> is not found, returns NULL. The caller
         should not free or modify the returned pointer, as it is owned by the cache.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>void git_configset_clear(struct config_set *cs)</tt>
+<code>void git_configset_clear(struct config_set *cs)</code>
 </dt>
 <dd>
 <p>
-        Clears <tt>config_set</tt> structure, removes all saved variable-value pairs.
+        Clears <code>config_set</code> structure, removes all saved variable-value pairs.
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>In addition to above functions, the <tt>config_set</tt> API provides type specific
-functions in the vein of <tt>git_config_get_int</tt> and family but with an extra
-parameter, pointer to struct <tt>config_set</tt>.
-They all behave similarly to the <tt>git_config_get*()</tt> family described in
+<div class="paragraph"><p>In addition to above functions, the <code>config_set</code> API provides type specific
+functions in the vein of <code>git_config_get_int</code> and family but with an extra
+parameter, pointer to struct <code>config_set</code>.
+They all behave similarly to the <code>git_config_get*()</code> family described in
 "Querying For Specific Variables" above.</p></div>
 </div>
 </div>
@@ -1168,10 +1166,10 @@ They all behave similarly to the <tt>git_config_get*()</tt> family described in
 <h2 id="_writing_config_files">Writing Config Files</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Git gives multiple entry points in the Config API to write config values to
-files namely <tt>git_config_set_in_file</tt> and <tt>git_config_set</tt>, which write to
-a specific config file or to <tt>.git/config</tt> respectively. They both take a
+files namely <code>git_config_set_in_file</code> and <code>git_config_set</code>, which write to
+a specific config file or to <code>.git/config</code> respectively. They both take a
 key/value pair as parameter.
-In the end they both call <tt>git_config_set_multivar_in_file</tt> which takes four
+In the end they both call <code>git_config_set_multivar_in_file</code> which takes four
 parameters:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1184,7 +1182,7 @@ the name of the file, as a string, to which key/value pairs will be written.
 the name of key, as a string. This is in canonical "flat" form: the section,
   subsection, and variable segments will be separated by dots, and the section
   and variable segments will be all lowercase.
-  E.g., <tt>core.ignorecase</tt>, <tt>diff.SomeType.textconv</tt>.
+  E.g., <code>core.ignorecase</code>, <code>diff.SomeType.textconv</code>.
 </p>
 </li>
 <li>
@@ -1208,10 +1206,10 @@ a multi_replace value, as an int. If value is equal to zero, nothing or only
 </li>
 </ul></div>
 <div class="paragraph"><p>It returns 0 on success.</p></div>
-<div class="paragraph"><p>Also, there are functions <tt>git_config_rename_section</tt> and
-<tt>git_config_rename_section_in_file</tt> with parameters <tt>old_name</tt> and <tt>new_name</tt>
+<div class="paragraph"><p>Also, there are functions <code>git_config_rename_section</code> and
+<code>git_config_rename_section_in_file</code> with parameters <code>old_name</code> and <code>new_name</code>
 for renaming or removing sections in the config files. If NULL is passed
-through <tt>new_name</tt> parameter, the section will be removed from the config file.</p></div>
+through <code>new_name</code> parameter, the section will be removed from the config file.</p></div>
 </div>
 </div>
 </div>

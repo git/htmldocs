@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>How to revert an existing commit</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -749,7 +747,7 @@ barebone Porcelain.</p></div>
 <div class="paragraph"><p>First, prepare a throw-away branch in case I screw things up.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b revert-c99 master</tt></pre>
+<pre><code>$ git checkout -b revert-c99 master</code></pre>
 </div></div>
 <div class="paragraph"><p>Now I am on the <em>revert-c99</em> branch.  Let&#8217;s figure out which commit to
 revert.  I happen to know that the top of the <em>master</em> branch is a
@@ -758,7 +756,7 @@ the change I would want to undo.  Further I happen to know that that
 merge introduced 5 commits or so:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git show-branch --more=4 master master^2 | head
+<pre><code>$ git show-branch --more=4 master master^2 | head
 * [master] Merge refs/heads/portable from http://www.cs.berkeley....
  ! [master^2] Replace C99 array initializers with code.
 --
@@ -768,7 +766,7 @@ merge introduced 5 commits or so:</p></div>
 *+ [master^2~2] Include sys/time.h in daemon.c.
 *+ [master^2~3] Fix ?: statements.
 *+ [master^2~4] Replace zero-length array decls with [].
-*  [master~1] tutorial note about git branch</tt></pre>
+*  [master~1] tutorial note about git branch</code></pre>
 </div></div>
 <div class="paragraph"><p>The <em>--more=4</em> above means "after we reach the merge base of refs,
 show until we display four more common commits".  That last commit
@@ -784,22 +782,22 @@ prevents it from actually making a commit, and instead <em>git revert</em>
 leaves the commit log message it wanted to use in <em>.msg</em> file:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git revert -n master^2~4
+<pre><code>$ git revert -n master^2~4
 $ cat .msg
 Revert "Replace zero-length array decls with []."
 
 This reverts 6c5f9baa3bc0d63e141e0afc23110205379905a4 commit.
 $ git diff HEAD ;# to make sure what we are reverting makes sense.
 $ make CC=gcc-2.95 clean test ;# make sure it fixed the breakage.
-$ make clean test ;# make sure it did not cause other breakage.</tt></pre>
+$ make clean test ;# make sure it did not cause other breakage.</code></pre>
 </div></div>
 <div class="paragraph"><p>The reverted change makes sense (from reading the <em>diff</em> output), does
 fix the problem (from <em>make CC=gcc-2.95</em> test), and does not cause new
 breakage (from the last <em>make test</em>).  I&#8217;m ready to commit:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git commit -a -s ;# read .msg into the log,
-                    # and explain why I am reverting.</tt></pre>
+<pre><code>$ git commit -a -s ;# read .msg into the log,
+                    # and explain why I am reverting.</code></pre>
 </div></div>
 <div class="paragraph"><p>I could have screwed up in any of the above steps, but in the worst
 case I could just have done <em>git checkout master</em> to start over.
@@ -807,7 +805,7 @@ Fortunately I did not have to; what I have in the current branch
 <em>revert-c99</em> is what I want.  So merge that back into <em>master</em>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout master
+<pre><code>$ git checkout master
 $ git merge revert-c99 ;# this should be a fast-forward
 Updating from 10d781b9caa4f71495c7b34963bef137216f86a8 to e3a693c...
  cache.h        |    8 ++++----
@@ -815,19 +813,19 @@ Updating from 10d781b9caa4f71495c7b34963bef137216f86a8 to e3a693c...
  ls-files.c     |    2 +-
  receive-pack.c |    2 +-
  server-info.c  |    2 +-
- 5 files changed, 8 insertions(+), 8 deletions(-)</tt></pre>
+ 5 files changed, 8 insertions(+), 8 deletions(-)</code></pre>
 </div></div>
 <div class="paragraph"><p>There is no need to redo the test at this point.  We fast-forwarded
 and we know <em>master</em> matches <em>revert-c99</em> exactly.  In fact:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git diff master..revert-c99</tt></pre>
+<pre><code>$ git diff master..revert-c99</code></pre>
 </div></div>
 <div class="paragraph"><p>says nothing.</p></div>
 <div class="paragraph"><p>Then we rebase the <em>pu</em> branch as usual.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout pu
+<pre><code>$ git checkout pu
 $ git tag pu-anchor pu
 $ git rebase master
 * Applying: Redo "revert" using three-way merge machinery.
@@ -844,29 +842,29 @@ First trying simple merge strategy to cherry-pick.
 * Applying: Show commits in topo order and name all commits.
 First trying simple merge strategy to cherry-pick.
 * Applying: More documentation updates.
-First trying simple merge strategy to cherry-pick.</tt></pre>
+First trying simple merge strategy to cherry-pick.</code></pre>
 </div></div>
 <div class="paragraph"><p>The temporary tag <em>pu-anchor</em> is me just being careful, in case <em>git
 rebase</em> screws up.  After this, I can do these for sanity check:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git diff pu-anchor..pu ;# make sure we got the master fix.
+<pre><code>$ git diff pu-anchor..pu ;# make sure we got the master fix.
 $ make CC=gcc-2.95 clean test ;# make sure it fixed the breakage.
-$ make clean test ;# make sure it did not cause other breakage.</tt></pre>
+$ make clean test ;# make sure it did not cause other breakage.</code></pre>
 </div></div>
 <div class="paragraph"><p>Everything is in the good order.  I do not need the temporary branch
 or tag anymore, so remove them:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ rm -f .git/refs/tags/pu-anchor
-$ git branch -d revert-c99</tt></pre>
+<pre><code>$ rm -f .git/refs/tags/pu-anchor
+$ git branch -d revert-c99</code></pre>
 </div></div>
 <div class="paragraph"><p>It was an emergency fix, so we might as well merge it into the
 <em>release candidate</em> branch, although I expect the next release would
 be some days off:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout rc
+<pre><code>$ git checkout rc
 $ git pull . master
 Packing 0 objects
 Unpacking 0 objects
@@ -879,12 +877,12 @@ Committed merge 7fb9b7262a1d1e0a47bbfdcbbcf50ce0635d3f8f
  ls-files.c     |    2 +-
  receive-pack.c |    2 +-
  server-info.c  |    2 +-
- 5 files changed, 8 insertions(+), 8 deletions(-)</tt></pre>
+ 5 files changed, 8 insertions(+), 8 deletions(-)</code></pre>
 </div></div>
 <div class="paragraph"><p>And the final repository status looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git show-branch --more=1 master pu rc
+<pre><code>$ git show-branch --more=1 master pu rc
 ! [master] Revert "Replace zero-length array decls with []."
  ! [pu] git-repack: Add option to repack all objects.
   * [rc] Merge refs/heads/master from .
@@ -899,7 +897,7 @@ Committed merge 7fb9b7262a1d1e0a47bbfdcbbcf50ce0635d3f8f
   - [rc] Merge refs/heads/master from .
 ++* [master] Revert "Replace zero-length array decls with []."
   - [rc~1] Merge refs/heads/master from .
-... [master~1] Merge refs/heads/portable from http://www.cs.berkeley....</tt></pre>
+... [master~1] Merge refs/heads/portable from http://www.cs.berkeley....</code></pre>
 </div></div>
 </div>
 </div>
@@ -907,7 +905,7 @@ Committed merge 7fb9b7262a1d1e0a47bbfdcbbcf50ce0635d3f8f
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-17 11:14:59 PDT
+Last updated 2014-10-31 13:22:27 PDT
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-clean(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -763,7 +761,7 @@ under version control, starting from the current directory.</p></div>
 <div class="paragraph"><p>Normally, only files unknown to Git are removed, but if the <em>-x</em>
 option is specified, ignored files are also removed. This can, for
 example, be useful to remove all build products.</p></div>
-<div class="paragraph"><p>If any optional <tt>&lt;path&gt;...</tt> arguments are given, only those paths
+<div class="paragraph"><p>If any optional <code>&lt;path&gt;...</code> arguments are given, only those paths
 are affected.</p></div>
 </div>
 </div>
@@ -850,7 +848,7 @@ are affected.</p></div>
 <p>
         Don&#8217;t use the standard ignore rules read from .gitignore (per
         directory) and $GIT_DIR/info/exclude, but do still use the ignore
-        rules given with <tt>-e</tt> options.  This allows removing all untracked
+        rules given with <code>-e</code> options.  This allows removing all untracked
         files, including build products.  This can be used (possibly in
         conjunction with <em>git reset</em>) to create a pristine
         working directory to test a clean build.
@@ -880,12 +878,12 @@ with a single <em>&gt;</em>, you can pick only one of the choices given
 and type return, like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    *** Commands ***
+<pre><code>    *** Commands ***
         1: clean                2: filter by pattern    3: select by numbers
         4: ask each             5: quit                 6: help
-    What now&gt; 1</tt></pre>
+    What now&gt; 1</code></pre>
 </div></div>
-<div class="paragraph"><p>You also could say <tt>c</tt> or <tt>clean</tt> above as long as the choice is unique.</p></div>
+<div class="paragraph"><p>You also could say <code>c</code> or <code>clean</code> above as long as the choice is unique.</p></div>
 <div class="paragraph"><p>The main command loop has 6 subcommands.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">

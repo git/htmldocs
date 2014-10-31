@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-pull(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -759,12 +757,12 @@ git-pull(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Incorporates changes from a remote repository into the current
-branch.  In its default mode, <tt>git pull</tt> is shorthand for
-<tt>git fetch</tt> followed by <tt>git merge FETCH_HEAD</tt>.</p></div>
+branch.  In its default mode, <code>git pull</code> is shorthand for
+<code>git fetch</code> followed by <code>git merge FETCH_HEAD</code>.</p></div>
 <div class="paragraph"><p>More precisely, <em>git pull</em> runs <em>git fetch</em> with the given
 parameters and calls <em>git merge</em> to merge the retrieved branch
 heads into the current branch.
-With <tt>--rebase</tt>, it runs <em>git rebase</em> instead of <em>git merge</em>.</p></div>
+With <code>--rebase</code>, it runs <em>git rebase</em> instead of <em>git merge</em>.</p></div>
 <div class="paragraph"><p>&lt;repository&gt; should be the name of a remote repository as
 passed to <a href="git-fetch.html">git-fetch(1)</a>.  &lt;refspec&gt; can name an
 arbitrary remote ref (for example, the name of a tag) or even
@@ -773,32 +771,32 @@ a collection of refs with corresponding remote-tracking branches
 but usually it is the name of a branch in the remote repository.</p></div>
 <div class="paragraph"><p>Default values for &lt;repository&gt; and &lt;branch&gt; are read from the
 "remote" and "merge" configuration for the current branch
-as set by <a href="git-branch.html">git-branch(1)</a> <tt>--track</tt>.</p></div>
+as set by <a href="git-branch.html">git-branch(1)</a> <code>--track</code>.</p></div>
 <div class="paragraph"><p>Assume the following history exists and the current branch is
-"<tt>master</tt>":</p></div>
+"<code>master</code>":</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>          A---B---C master on origin
+<pre><code>          A---B---C master on origin
          /
     D---E---F---G master
         ^
-        origin/master in your repository</tt></pre>
+        origin/master in your repository</code></pre>
 </div></div>
-<div class="paragraph"><p>Then "<tt>git pull</tt>" will fetch and replay the changes from the remote
-<tt>master</tt> branch since it diverged from the local <tt>master</tt> (i.e., <tt>E</tt>)
-until its current commit (<tt>C</tt>) on top of <tt>master</tt> and record the
+<div class="paragraph"><p>Then "<code>git pull</code>" will fetch and replay the changes from the remote
+<code>master</code> branch since it diverged from the local <code>master</code> (i.e., <code>E</code>)
+until its current commit (<code>C</code>) on top of <code>master</code> and record the
 result in a new commit along with the names of the two parent commits
 and a log message from the user describing the changes.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>          A---B---C origin/master
+<pre><code>          A---B---C origin/master
          /         \
-    D---E---F---G---H master</tt></pre>
+    D---E---F---G---H master</code></pre>
 </div></div>
 <div class="paragraph"><p>See <a href="git-merge.html">git-merge(1)</a> for details, including how conflicts
 are presented and handled.</p></div>
 <div class="paragraph"><p>In Git 1.7.0 or later, to cancel a conflicting merge, use
-<tt>git reset --merge</tt>.  <strong>Warning</strong>: In older versions of Git, running <em>git pull</em>
+<code>git reset --merge</code>.  <strong>Warning</strong>: In older versions of Git, running <em>git pull</em>
 with uncommitted changes is discouraged: while possible, it leaves you
 in a state that may be hard to back out of in the case of a conflict.</p></div>
 <div class="paragraph"><p>If any of the remote changes overlap with local uncommitted changes,
@@ -883,15 +881,15 @@ inspect and further tweak the merge result before committing.</p></div>
 <p>
         Invoke an editor before committing successful mechanical merge to
         further edit the auto-generated merge message, so that the user
-        can explain and justify the merge. The <tt>--no-edit</tt> option can be
+        can explain and justify the merge. The <code>--no-edit</code> option can be
         used to accept the auto-generated message (this is generally
         discouraged).
 </p>
 <div class="paragraph"><p>Older scripts may depend on the historical behaviour of not allowing the
 user to edit the merge log message. They will see an editor opened when
-they run <tt>git merge</tt>. To make it easier to adjust such scripts to the
-updated behaviour, the environment variable <tt>GIT_MERGE_AUTOEDIT</tt> can be
-set to <tt>no</tt> at the beginning of them.</p></div>
+they run <code>git merge</code>. To make it easier to adjust such scripts to the
+updated behaviour, the environment variable <code>GIT_MERGE_AUTOEDIT</code> can be
+set to <code>no</code> at the beginning of them.</p></div>
 </dd>
 <dt class="hdlist1">
 --ff
@@ -919,7 +917,7 @@ set to <tt>no</tt> at the beginning of them.</p></div>
 <dd>
 <p>
         Refuse to merge and exit with a non-zero status unless the
-        current <tt>HEAD</tt> is already up-to-date or the merge can be
+        current <code>HEAD</code> is already up-to-date or the merge can be
         resolved as a fast-forward.
 </p>
 </dd>
@@ -965,8 +963,8 @@ merge.</p></div>
 <p>
         Produce the working tree and index state as if a real merge
         happened (except for the merge information), but do not actually
-        make a commit, move the <tt>HEAD</tt>, or record <tt>$GIT_DIR/MERGE_HEAD</tt>
-        (to cause the next <tt>git commit</tt> command to create a merge
+        make a commit, move the <code>HEAD</code>, or record <code>$GIT_DIR/MERGE_HEAD</code>
+        (to cause the next <code>git commit</code> command to create a merge
         commit).  This allows you to create a single commit on top of
         the current branch whose effect is the same as merging another
         branch (or more in case of an octopus).
@@ -984,7 +982,7 @@ option can be used to override --squash.</p></div>
 <p>
         Use the given merge strategy; can be supplied more than
         once to specify them in the order they should be tried.
-        If there is no <tt>-s</tt> option, a built-in list of strategies
+        If there is no <code>-s</code> option, a built-in list of strategies
         is used instead (<em>git merge-recursive</em> when merging a single
         head, <em>git merge-octopus</em> otherwise).
 </p>
@@ -1040,12 +1038,12 @@ option can be used to override --squash.</p></div>
         to avoid rebasing non-local changes.
 </p>
 <div class="paragraph"><p>When preserve, also rebase the current branch on top of the upstream
-branch, but pass <tt>--preserve-merges</tt> along to <tt>git rebase</tt> so that
+branch, but pass <code>--preserve-merges</code> along to <code>git rebase</code> so that
 locally created merge commits will not be flattened.</p></div>
 <div class="paragraph"><p>When false, merge the current branch into the upstream branch.</p></div>
-<div class="paragraph"><p>See <tt>pull.rebase</tt>, <tt>branch.&lt;name&gt;.rebase</tt> and <tt>branch.autosetuprebase</tt> in
-<a href="git-config.html">git-config(1)</a> if you want to make <tt>git pull</tt> always use
-<tt>--rebase</tt> instead of merging.</p></div>
+<div class="paragraph"><p>See <code>pull.rebase</code>, <code>branch.&lt;name&gt;.rebase</code> and <code>branch.autosetuprebase</code> in
+<a href="git-config.html">git-config(1)</a> if you want to make <code>git pull</code> always use
+<code>--rebase</code> instead of merging.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -1088,8 +1086,8 @@ unless you have read <a href="git-rebase.html">git-rebase(1)</a> carefully.</td>
 <dd>
 <p>
         Append ref names and object names of fetched refs to the
-        existing contents of <tt>.git/FETCH_HEAD</tt>.  Without this
-        option old data in <tt>.git/FETCH_HEAD</tt> will be overwritten.
+        existing contents of <code>.git/FETCH_HEAD</code>.  Without this
+        option old data in <code>.git/FETCH_HEAD</code> will be overwritten.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1098,7 +1096,7 @@ unless you have read <a href="git-rebase.html">git-rebase(1)</a> carefully.</td>
 <dd>
 <p>
         Deepen or shorten the history of a <em>shallow</em> repository created by
-        <tt>git clone</tt> with <tt>--depth=&lt;depth&gt;</tt> option (see <a href="git-clone.html">git-clone(1)</a>)
+        <code>git clone</code> with <code>--depth=&lt;depth&gt;</code> option (see <a href="git-clone.html">git-clone(1)</a>)
         to the specified number of commits from the tip of each remote
         branch history. Tags for the deepened commits are not fetched.
 </p>
@@ -1121,7 +1119,7 @@ the current repository has the same history as the source repository.</p></div>
 <dd>
 <p>
         By default when fetching from a shallow repository,
-        <tt>git fetch</tt> refuses refs that require updating
+        <code>git fetch</code> refuses refs that require updating
         .git/shallow. This option updates .git/shallow and accept such
         refs.
 </p>
@@ -1134,10 +1132,10 @@ the current repository has the same history as the source repository.</p></div>
 </dt>
 <dd>
 <p>
-        When <em>git fetch</em> is used with <tt>&lt;rbranch&gt;:&lt;lbranch&gt;</tt>
+        When <em>git fetch</em> is used with <code>&lt;rbranch&gt;:&lt;lbranch&gt;</code>
         refspec, it refuses to update the local branch
-        <tt>&lt;lbranch&gt;</tt> unless the remote branch <tt>&lt;rbranch&gt;</tt> it
-        fetches is a descendant of <tt>&lt;lbranch&gt;</tt>.  This option
+        <code>&lt;lbranch&gt;</code> unless the remote branch <code>&lt;rbranch&gt;</code> it
+        fetches is a descendant of <code>&lt;lbranch&gt;</code>.  This option
         overrides that check.
 </p>
 </dd>
@@ -1220,19 +1218,19 @@ the current repository has the same history as the source repository.</p></div>
 <p>
         Specifies which refs to fetch and which local refs to update.
         When no &lt;refspec&gt;s appear on the command line, the refs to fetch
-        are read from <tt>remote.&lt;repository&gt;.fetch</tt> variables instead
+        are read from <code>remote.&lt;repository&gt;.fetch</code> variables instead
         (see <a href="git-fetch.html">git-fetch(1)</a>).
 </p>
 <div class="paragraph"><p>The format of a &lt;refspec&gt; parameter is an optional plus
-<tt>+</tt>, followed by the source ref &lt;src&gt;, followed
-by a colon <tt>:</tt>, followed by the destination ref &lt;dst&gt;.
+<code>+</code>, followed by the source ref &lt;src&gt;, followed
+by a colon <code>:</code>, followed by the destination ref &lt;dst&gt;.
 The colon can be omitted when &lt;dst&gt; is empty.</p></div>
-<div class="paragraph"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
+<div class="paragraph"><p><code>tag &lt;tag&gt;</code> means the same as <code>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</code>;
 it requests fetching everything up to the given tag.</p></div>
 <div class="paragraph"><p>The remote ref that matches &lt;src&gt;
 is fetched, and if &lt;dst&gt; is not empty string, the local
 ref that matches it is fast-forwarded using &lt;src&gt;.
-If the optional plus <tt>+</tt> is used, the local ref
+If the optional plus <code>+</code> is used, the local ref
 is updated even if it does not result in a fast-forward
 update.</p></div>
 <div class="admonitionblock">
@@ -1245,7 +1243,7 @@ be rewound and rebased regularly, it is expected that
 its new tip will not be descendant of its previous tip
 (as stored in your remote-tracking branch the last time
 you fetched).  You would want
-to use the <tt>+</tt> sign to indicate non-fast-forward updates
+to use the <code>+</code> sign to indicate non-fast-forward updates
 will be needed for such branches.  There is no way to
 determine or declare that a branch will be made available
 in a repository with this behavior; the pulling user simply
@@ -1259,7 +1257,7 @@ must know this is the expected usage pattern for a branch.</td>
 </td>
 <td class="content">There is a difference between listing multiple &lt;refspec&gt;
 directly on <em>git pull</em> command line and having multiple
-<tt>remote.&lt;repository&gt;.fetch</tt> entries in your configuration
+<code>remote.&lt;repository&gt;.fetch</code> entries in your configuration
 for a &lt;repository&gt; and running a
 <em>git pull</em> command without any explicit &lt;refspec&gt; parameters.
 &lt;refspec&gt;s listed explicitly on the command line are always
@@ -1268,7 +1266,7 @@ if you list more than one remote ref, <em>git pull</em> will create
 an Octopus merge.  On the other hand, if you do not list any
 explicit &lt;refspec&gt; parameter on the command line, <em>git pull</em>
 will fetch all the &lt;refspec&gt;s it finds in the
-<tt>remote.&lt;repository&gt;.fetch</tt> configuration and merge
+<code>remote.&lt;repository&gt;.fetch</code> configuration and merge
 only the first &lt;refspec&gt; found into the current branch.
 This is because making an
 Octopus from remote refs is rarely done, while keeping track
@@ -1332,8 +1330,8 @@ rsync://host.xz/path/to/repo.git/
 </ul></div>
 <div class="paragraph"><p>This syntax is only recognized if there are no slashes before the
 first colon. This helps differentiate a local path that contains a
-colon. For example the local path <tt>foo:bar</tt> could be specified as an
-absolute path or <tt>./foo:bar</tt> to avoid being misinterpreted as an ssh
+colon. For example the local path <code>foo:bar</code> could be specified as an
+absolute path or <code>./foo:bar</code> to avoid being misinterpreted as an ssh
 url.</p></div>
 <div class="paragraph"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
 <div class="ulist"><ul>
@@ -1390,15 +1388,15 @@ use will be rewritten into URLs that work), you can create a
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "&lt;actual url base&gt;"]
-                insteadOf = &lt;other url base&gt;</tt></pre>
+<pre><code>        [url "&lt;actual url base&gt;"]
+                insteadOf = &lt;other url base&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "git://git.host.xz/"]
+<pre><code>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
-                insteadOf = work:</tt></pre>
+                insteadOf = work:</code></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
@@ -1406,14 +1404,14 @@ rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "&lt;actual url base&gt;"]
-                pushInsteadOf = &lt;other url base&gt;</tt></pre>
+<pre><code>        [url "&lt;actual url base&gt;"]
+                pushInsteadOf = &lt;other url base&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "ssh://example.org/"]
-                pushInsteadOf = git://example.org/</tt></pre>
+<pre><code>        [url "ssh://example.org/"]
+                pushInsteadOf = git://example.org/</code></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
 "ssh://example.org/path/to/repo.git" for pushes, but pulls will still
@@ -1424,21 +1422,21 @@ use the original URL.</p></div>
 <h2 id="_remotes_a_id_remotes_a">REMOTES<a id="REMOTES"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The name of one of the following can be used instead
-of a URL as <tt>&lt;repository&gt;</tt> argument:</p></div>
+of a URL as <code>&lt;repository&gt;</code> argument:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-a remote in the Git configuration file: <tt>$GIT_DIR/config</tt>,
+a remote in the Git configuration file: <code>$GIT_DIR/config</code>,
 </p>
 </li>
 <li>
 <p>
-a file in the <tt>$GIT_DIR/remotes</tt> directory, or
+a file in the <code>$GIT_DIR/remotes</code> directory, or
 </p>
 </li>
 <li>
 <p>
-a file in the <tt>$GIT_DIR/branches</tt> directory.
+a file in the <code>$GIT_DIR/branches</code> directory.
 </p>
 </li>
 </ul></div>
@@ -1448,65 +1446,65 @@ because they each contain a refspec which git will use by default.</p></div>
 <h3 id="_named_remote_in_configuration_file">Named remote in configuration file</h3>
 <div class="paragraph"><p>You can choose to provide the name of a remote which you had previously
 configured using <a href="git-remote.html">git-remote(1)</a>, <a href="git-config.html">git-config(1)</a>
-or even by a manual edit to the <tt>$GIT_DIR/config</tt> file.  The URL of
+or even by a manual edit to the <code>$GIT_DIR/config</code> file.  The URL of
 this remote will be used to access the repository.  The refspec
 of this remote will be used by default when you do
 not provide a refspec on the command line.  The entry in the
 config file would appear like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [remote "&lt;name&gt;"]
+<pre><code>        [remote "&lt;name&gt;"]
                 url = &lt;url&gt;
                 pushurl = &lt;pushurl&gt;
                 push = &lt;refspec&gt;
-                fetch = &lt;refspec&gt;</tt></pre>
+                fetch = &lt;refspec&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>&lt;pushurl&gt;</tt> is used for pushes only. It is optional and defaults
-to <tt>&lt;url&gt;</tt>.</p></div>
+<div class="paragraph"><p>The <code>&lt;pushurl&gt;</code> is used for pushes only. It is optional and defaults
+to <code>&lt;url&gt;</code>.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_named_file_in_tt_git_dir_remotes_tt">Named file in <tt>$GIT_DIR/remotes</tt></h3>
+<h3 id="_named_file_in_code_git_dir_remotes_code">Named file in <code>$GIT_DIR/remotes</code></h3>
 <div class="paragraph"><p>You can choose to provide the name of a
-file in <tt>$GIT_DIR/remotes</tt>.  The URL
+file in <code>$GIT_DIR/remotes</code>.  The URL
 in this file will be used to access the repository.  The refspec
 in this file will be used as default when you do not
 provide a refspec on the command line.  This file should have the
 following format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        URL: one of the above URL format
+<pre><code>        URL: one of the above URL format
         Push: &lt;refspec&gt;
-        Pull: &lt;refspec&gt;</tt></pre>
+        Pull: &lt;refspec&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>Push:</tt> lines are used by <em>git push</em> and
-<tt>Pull:</tt> lines are used by <em>git pull</em> and <em>git fetch</em>.
-Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
+<div class="paragraph"><p><code>Push:</code> lines are used by <em>git push</em> and
+<code>Pull:</code> lines are used by <em>git pull</em> and <em>git fetch</em>.
+Multiple <code>Push:</code> and <code>Pull:</code> lines may
 be specified for additional branch mappings.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_named_file_in_tt_git_dir_branches_tt">Named file in <tt>$GIT_DIR/branches</tt></h3>
+<h3 id="_named_file_in_code_git_dir_branches_code">Named file in <code>$GIT_DIR/branches</code></h3>
 <div class="paragraph"><p>You can choose to provide the name of a
-file in <tt>$GIT_DIR/branches</tt>.
+file in <code>$GIT_DIR/branches</code>.
 The URL in this file will be used to access the repository.
 This file should have the following format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        &lt;url&gt;#&lt;head&gt;</tt></pre>
+<pre><code>        &lt;url&gt;#&lt;head&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>&lt;url&gt;</tt> is required; <tt>#&lt;head&gt;</tt> is optional.</p></div>
+<div class="paragraph"><p><code>&lt;url&gt;</code> is required; <code>#&lt;head&gt;</code> is optional.</p></div>
 <div class="paragraph"><p>Depending on the operation, git will use one of the following
 refspecs, if you don&#8217;t provide one on the command line.
-<tt>&lt;branch&gt;</tt> is the name of this file in <tt>$GIT_DIR/branches</tt> and
-<tt>&lt;head&gt;</tt> defaults to <tt>master</tt>.</p></div>
+<code>&lt;branch&gt;</code> is the name of this file in <code>$GIT_DIR/branches</code> and
+<code>&lt;head&gt;</code> defaults to <code>master</code>.</p></div>
 <div class="paragraph"><p>git fetch uses:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</tt></pre>
+<pre><code>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>git push uses:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        HEAD:refs/heads/&lt;head&gt;</tt></pre>
+<pre><code>        HEAD:refs/heads/&lt;head&gt;</code></pre>
 </div></div>
 </div>
 </div>
@@ -1514,10 +1512,10 @@ refspecs, if you don&#8217;t provide one on the command line.
 <div class="sect1">
 <h2 id="_merge_strategies">MERGE STRATEGIES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The merge mechanism (<tt>git merge</tt> and <tt>git pull</tt> commands) allows the
-backend <em>merge strategies</em> to be chosen with <tt>-s</tt> option.  Some strategies
-can also take their own options, which can be passed by giving <tt>-X&lt;option&gt;</tt>
-arguments to <tt>git merge</tt> and/or <tt>git pull</tt>.</p></div>
+<div class="paragraph"><p>The merge mechanism (<code>git merge</code> and <code>git pull</code> commands) allows the
+backend <em>merge strategies</em> to be chosen with <code>-s</code> option.  Some strategies
+can also take their own options, which can be passed by giving <code>-X&lt;option&gt;</code>
+arguments to <code>git merge</code> and/or <code>git pull</code>.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 resolve
@@ -1581,7 +1579,7 @@ patience
         to avoid mismerges that sometimes occur due to unimportant
         matching lines (e.g., braces from distinct functions).  Use
         this when the branches to be merged have diverged wildly.
-        See also <a href="git-diff.html">git-diff(1)</a> <tt>--patience</tt>.
+        See also <a href="git-diff.html">git-diff(1)</a> <code>--patience</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1592,7 +1590,7 @@ diff-algorithm=[patience|minimal|histogram|myers]
         Tells <em>merge-recursive</em> to use a different diff algorithm, which
         can help avoid mismerges that occur due to unimportant matching
         lines (such as braces from distinct functions).  See also
-        <a href="git-diff.html">git-diff(1)</a> <tt>--diff-algorithm</tt>.
+        <a href="git-diff.html">git-diff(1)</a> <code>--diff-algorithm</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1609,8 +1607,8 @@ ignore-space-at-eol
         Treats lines with the indicated type of whitespace change as
         unchanged for the sake of a three-way merge.  Whitespace
         changes mixed with other changes to a line are not ignored.
-        See also <a href="git-diff.html">git-diff(1)</a> <tt>-b</tt>, <tt>-w</tt>, and
-        <tt>--ignore-space-at-eol</tt>.
+        See also <a href="git-diff.html">git-diff(1)</a> <code>-b</code>, <code>-w</code>, and
+        <code>--ignore-space-at-eol</code>.
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1650,8 +1648,8 @@ no-renormalize
 </dt>
 <dd>
 <p>
-        Disables the <tt>renormalize</tt> option.  This overrides the
-        <tt>merge.renormalize</tt> configuration variable.
+        Disables the <code>renormalize</code> option.  This overrides the
+        <code>merge.renormalize</code> configuration variable.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1660,7 +1658,7 @@ rename-threshold=&lt;n&gt;
 <dd>
 <p>
         Controls the similarity threshold used for rename detection.
-        See also <a href="git-diff.html">git-diff(1)</a> <tt>-M</tt>.
+        See also <a href="git-diff.html">git-diff(1)</a> <code>-M</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1727,46 +1725,46 @@ substitutes the changed version instead.</p></div>
 <div class="sect1">
 <h2 id="_default_behaviour">DEFAULT BEHAVIOUR</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Often people use <tt>git pull</tt> without giving any parameter.
-Traditionally, this has been equivalent to saying <tt>git pull
-origin</tt>.  However, when configuration <tt>branch.&lt;name&gt;.remote</tt> is
-present while on branch <tt>&lt;name&gt;</tt>, that value is used instead of
-<tt>origin</tt>.</p></div>
+<div class="paragraph"><p>Often people use <code>git pull</code> without giving any parameter.
+Traditionally, this has been equivalent to saying <code>git pull
+origin</code>.  However, when configuration <code>branch.&lt;name&gt;.remote</code> is
+present while on branch <code>&lt;name&gt;</code>, that value is used instead of
+<code>origin</code>.</p></div>
 <div class="paragraph"><p>In order to determine what URL to use to fetch from, the value
-of the configuration <tt>remote.&lt;origin&gt;.url</tt> is consulted
-and if there is not any such variable, the value on <tt>URL: ` line
-in `$GIT_DIR/remotes/&lt;origin&gt;</tt> file is used.</p></div>
+of the configuration <code>remote.&lt;origin&gt;.url</code> is consulted
+and if there is not any such variable, the value on <code>URL: ` line
+in `$GIT_DIR/remotes/&lt;origin&gt;</code> file is used.</p></div>
 <div class="paragraph"><p>In order to determine what remote branches to fetch (and
 optionally store in the remote-tracking branches) when the command is
 run without any refspec parameters on the command line, values
-of the configuration variable <tt>remote.&lt;origin&gt;.fetch</tt> are
-consulted, and if there aren&#8217;t any, <tt>$GIT_DIR/remotes/&lt;origin&gt;</tt>
+of the configuration variable <code>remote.&lt;origin&gt;.fetch</code> are
+consulted, and if there aren&#8217;t any, <code>$GIT_DIR/remotes/&lt;origin&gt;</code>
 file is consulted and its `Pull: ` lines are used.
 In addition to the refspec formats described in the OPTIONS
 section, you can have a globbing refspec that looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>refs/heads/*:refs/remotes/origin/*</tt></pre>
+<pre><code>refs/heads/*:refs/remotes/origin/*</code></pre>
 </div></div>
 <div class="paragraph"><p>A globbing refspec must have a non-empty RHS (i.e. must store
 what were fetched in remote-tracking branches), and its LHS and RHS
-must end with <tt>/*</tt>.  The above specifies that all remote
+must end with <code>/*</code>.  The above specifies that all remote
 branches are tracked using remote-tracking branches in
-<tt>refs/remotes/origin/</tt> hierarchy under the same name.</p></div>
+<code>refs/remotes/origin/</code> hierarchy under the same name.</p></div>
 <div class="paragraph"><p>The rule to determine which remote branch to merge after
 fetching is a bit involved, in order not to break backward
 compatibility.</p></div>
 <div class="paragraph"><p>If explicit refspecs were given on the command
-line of <tt>git pull</tt>, they are all merged.</p></div>
-<div class="paragraph"><p>When no refspec was given on the command line, then <tt>git pull</tt>
+line of <code>git pull</code>, they are all merged.</p></div>
+<div class="paragraph"><p>When no refspec was given on the command line, then <code>git pull</code>
 uses the refspec from the configuration or
-<tt>$GIT_DIR/remotes/&lt;origin&gt;</tt>.  In such cases, the following
+<code>$GIT_DIR/remotes/&lt;origin&gt;</code>.  In such cases, the following
 rules apply:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-If <tt>branch.&lt;name&gt;.merge</tt> configuration for the current
-  branch <tt>&lt;name&gt;</tt> exists, that is the name of the branch at the
+If <code>branch.&lt;name&gt;.merge</code> configuration for the current
+  branch <code>&lt;name&gt;</code> exists, that is the name of the branch at the
   remote site that is merged.
 </p>
 </li>
@@ -1795,7 +1793,7 @@ Update the remote-tracking branches for the repository
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull, git pull origin</tt></pre>
+<pre><code>$ git pull, git pull origin</code></pre>
 </div></div>
 <div class="paragraph"><p>Normally the branch merged in is the HEAD of the remote repository,
 but the choice is determined by the branch.&lt;name&gt;.remote and
@@ -1803,19 +1801,19 @@ branch.&lt;name&gt;.merge options; see <a href="git-config.html">git-config(1)</
 </li>
 <li>
 <p>
-Merge into the current branch the remote branch <tt>next</tt>:
+Merge into the current branch the remote branch <code>next</code>:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git pull origin next</tt></pre>
+<pre><code>$ git pull origin next</code></pre>
 </div></div>
-<div class="paragraph"><p>This leaves a copy of <tt>next</tt> temporarily in FETCH_HEAD, but
+<div class="paragraph"><p>This leaves a copy of <code>next</code> temporarily in FETCH_HEAD, but
 does not update any remote-tracking branches. Using remote-tracking
 branches, the same can be done by invoking fetch and merge:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch origin
-$ git merge origin/next</tt></pre>
+<pre><code>$ git fetch origin
+$ git merge origin/next</code></pre>
 </div></div>
 </li>
 </ul></div>

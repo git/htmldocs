@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-branch(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -767,20 +765,20 @@ git-branch(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>If <tt>--list</tt> is given, or if there are no non-option arguments, existing
+<div class="paragraph"><p>If <code>--list</code> is given, or if there are no non-option arguments, existing
 branches are listed; the current branch will be highlighted with an
-asterisk.  Option <tt>-r</tt> causes the remote-tracking branches to be listed,
-and option <tt>-a</tt> shows both local and remote branches. If a <tt>&lt;pattern&gt;</tt>
+asterisk.  Option <code>-r</code> causes the remote-tracking branches to be listed,
+and option <code>-a</code> shows both local and remote branches. If a <code>&lt;pattern&gt;</code>
 is given, it is used as a shell wildcard to restrict the output to
 matching branches. If multiple patterns are given, a branch is shown if
 it matches any of the patterns.  Note that when providing a
-<tt>&lt;pattern&gt;</tt>, you must use <tt>--list</tt>; otherwise the command is interpreted
+<code>&lt;pattern&gt;</code>, you must use <code>--list</code>; otherwise the command is interpreted
 as branch creation.</p></div>
-<div class="paragraph"><p>With <tt>--contains</tt>, shows only the branches that contain the named commit
+<div class="paragraph"><p>With <code>--contains</code>, shows only the branches that contain the named commit
 (in other words, the branches whose tip commits are descendants of the
-named commit).  With <tt>--merged</tt>, only branches merged into the named
+named commit).  With <code>--merged</code>, only branches merged into the named
 commit (i.e. the branches whose tip commits are reachable from the named
-commit) will be listed.  With <tt>--no-merged</tt> only branches not merged into
+commit) will be listed.  With <code>--no-merged</code> only branches not merged into
 the named commit will be listed.  If the &lt;commit&gt; argument is missing it
 defaults to <em>HEAD</em> (i.e. the tip of the current branch).</p></div>
 <div class="paragraph"><p>The command&#8217;s second form creates a new branch head named &lt;branchname&gt;
@@ -789,21 +787,21 @@ which points to the current <em>HEAD</em>, or &lt;start-point&gt; if given.</p><
 working tree to it; use "git checkout &lt;newbranch&gt;" to switch to the
 new branch.</p></div>
 <div class="paragraph"><p>When a local branch is started off a remote-tracking branch, Git sets up the
-branch (specifically the <tt>branch.&lt;name&gt;.remote</tt> and <tt>branch.&lt;name&gt;.merge</tt>
+branch (specifically the <code>branch.&lt;name&gt;.remote</code> and <code>branch.&lt;name&gt;.merge</code>
 configuration entries) so that <em>git pull</em> will appropriately merge from
 the remote-tracking branch. This behavior may be changed via the global
-<tt>branch.autosetupmerge</tt> configuration flag. That setting can be
-overridden by using the <tt>--track</tt> and <tt>--no-track</tt> options, and
-changed later using <tt>git branch --set-upstream-to</tt>.</p></div>
-<div class="paragraph"><p>With a <tt>-m</tt> or <tt>-M</tt> option, &lt;oldbranch&gt; will be renamed to &lt;newbranch&gt;.
+<code>branch.autosetupmerge</code> configuration flag. That setting can be
+overridden by using the <code>--track</code> and <code>--no-track</code> options, and
+changed later using <code>git branch --set-upstream-to</code>.</p></div>
+<div class="paragraph"><p>With a <code>-m</code> or <code>-M</code> option, &lt;oldbranch&gt; will be renamed to &lt;newbranch&gt;.
 If &lt;oldbranch&gt; had a corresponding reflog, it is renamed to match
 &lt;newbranch&gt;, and a reflog entry is created to remember the branch
 renaming. If &lt;newbranch&gt; exists, -M must be used to force the rename
 to happen.</p></div>
-<div class="paragraph"><p>With a <tt>-d</tt> or <tt>-D</tt> option, <tt>&lt;branchname&gt;</tt> will be deleted.  You may
+<div class="paragraph"><p>With a <code>-d</code> or <code>-D</code> option, <code>&lt;branchname&gt;</code> will be deleted.  You may
 specify more than one branch for deletion.  If the branch currently
 has a reflog then the reflog will also be deleted.</p></div>
-<div class="paragraph"><p>Use <tt>-r</tt> together with <tt>-d</tt> to delete remote-tracking branches. Note, that it
+<div class="paragraph"><p>Use <code>-r</code> together with <code>-d</code> to delete remote-tracking branches. Note, that it
 only makes sense to delete remote-tracking branches if they no longer exist
 in the remote repository or if <em>git fetch</em> was configured not to fetch
 them again. See also the <em>prune</em> subcommand of <a href="git-remote.html">git-remote(1)</a> for a
@@ -823,8 +821,8 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 <dd>
 <p>
         Delete a branch. The branch must be fully merged in its
-        upstream branch, or in <tt>HEAD</tt> if no upstream was set with
-        <tt>--track</tt> or <tt>--set-upstream</tt>.
+        upstream branch, or in <code>HEAD</code> if no upstream was set with
+        <code>--track</code> or <code>--set-upstream</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -847,7 +845,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         all changes made to the branch ref, enabling use of date
         based sha1 expressions such as "&lt;branchname&gt;@{yesterday}".
         Note that in non-bare repositories, reflogs are usually
-        enabled by default by the <tt>core.logallrefupdates</tt> config option.
+        enabled by default by the <code>core.logallrefupdates</code> config option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -859,7 +857,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 <dd>
 <p>
         Reset &lt;branchname&gt; to &lt;startpoint&gt; if &lt;branchname&gt; exists
-        already. Without <tt>-f</tt> <em>git branch</em> refuses to change an existing branch.
+        already. Without <code>-f</code> <em>git branch</em> refuses to change an existing branch.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -898,7 +896,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 <p>
         Turn off branch colors, even when the configuration file gives the
         default to color output.
-        Same as <tt>--color=never</tt>.
+        Same as <code>--color=never</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -910,7 +908,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 <dd>
 <p>
         Display branch listing in columns. See configuration variable
-        column.branch for option syntax.<tt>--column</tt> and <tt>--no-column</tt>
+        column.branch for option syntax.<code>--column</code> and <code>--no-column</code>
         without options are equivalent to <em>always</em> and <em>never</em> respectively.
 </p>
 <div class="paragraph"><p>This option is only applicable in non-verbose mode.</p></div>
@@ -942,8 +940,8 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 </dt>
 <dd>
 <p>
-        Activate the list mode. <tt>git branch &lt;pattern&gt;</tt> would try to create a branch,
-        use <tt>git branch --list &lt;pattern&gt;</tt> to list matching branches.
+        Activate the list mode. <code>git branch &lt;pattern&gt;</code> would try to create a branch,
+        use <code>git branch --list &lt;pattern&gt;</code> to list matching branches.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -960,8 +958,8 @@ way to clean up all obsolete remote-tracking branches.</p></div>
         When in list mode,
         show sha1 and commit subject line for each head, along with
         relationship to upstream branch (if any). If given twice, print
-        the name of the upstream branch, as well (see also <tt>git remote
-        show &lt;remote&gt;</tt>).
+        the name of the upstream branch, as well (see also <code>git remote
+        show &lt;remote&gt;</code>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -982,7 +980,7 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 <dd>
 <p>
         Alter the sha1&#8217;s minimum display length in the output listing.
-        The default value is 7 and can be overridden by the <tt>core.abbrev</tt>
+        The default value is 7 and can be overridden by the <code>core.abbrev</code>
         config option.
 </p>
 </dd>
@@ -1002,18 +1000,18 @@ way to clean up all obsolete remote-tracking branches.</p></div>
 </dt>
 <dd>
 <p>
-        When creating a new branch, set up <tt>branch.&lt;name&gt;.remote</tt> and
-        <tt>branch.&lt;name&gt;.merge</tt> configuration entries to mark the
+        When creating a new branch, set up <code>branch.&lt;name&gt;.remote</code> and
+        <code>branch.&lt;name&gt;.merge</code> configuration entries to mark the
         start-point branch as "upstream" from the new branch. This
         configuration will tell git to show the relationship between the
-        two branches in <tt>git status</tt> and <tt>git branch -v</tt>. Furthermore,
-        it directs <tt>git pull</tt> without arguments to pull from the
+        two branches in <code>git status</code> and <code>git branch -v</code>. Furthermore,
+        it directs <code>git pull</code> without arguments to pull from the
         upstream when the new branch is checked out.
 </p>
 <div class="paragraph"><p>This behavior is the default when the start point is a remote-tracking branch.
-Set the branch.autosetupmerge configuration variable to <tt>false</tt> if you
-want <tt>git checkout</tt> and <tt>git branch</tt> to always behave as if <em>--no-track</em>
-were given. Set it to <tt>always</tt> if you want this behavior when the
+Set the branch.autosetupmerge configuration variable to <code>false</code> if you
+want <code>git checkout</code> and <code>git branch</code> to always behave as if <em>--no-track</em>
+were given. Set it to <code>always</code> if you want this behavior when the
 start-point is either a local or remote-tracking branch.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1030,9 +1028,9 @@ start-point is either a local or remote-tracking branch.</p></div>
 </dt>
 <dd>
 <p>
-        If specified branch does not exist yet or if <tt>--force</tt> has been
-        given, acts exactly like <tt>--track</tt>. Otherwise sets up configuration
-        like <tt>--track</tt> would when creating the branch, except that where
+        If specified branch does not exist yet or if <code>--force</code> has been
+        given, acts exactly like <code>--track</code>. Otherwise sets up configuration
+        like <code>--track</code> would when creating the branch, except that where
         branch points to is not changed.
 </p>
 </dd>
@@ -1064,7 +1062,7 @@ start-point is either a local or remote-tracking branch.</p></div>
 <dd>
 <p>
         Open an editor and edit the text to explain what the branch is
-        for, to be used by various other commands (e.g. <tt>request-pull</tt>).
+        for, to be used by various other commands (e.g. <code>request-pull</code>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1073,7 +1071,7 @@ start-point is either a local or remote-tracking branch.</p></div>
 <dd>
 <p>
         Only list branches which contain the specified commit (HEAD
-        if not specified). Implies <tt>--list</tt>.
+        if not specified). Implies <code>--list</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1082,7 +1080,7 @@ start-point is either a local or remote-tracking branch.</p></div>
 <dd>
 <p>
         Only list branches whose tips are reachable from the
-        specified commit (HEAD if not specified). Implies <tt>--list</tt>.
+        specified commit (HEAD if not specified). Implies <code>--list</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1091,7 +1089,7 @@ start-point is either a local or remote-tracking branch.</p></div>
 <dd>
 <p>
         Only list branches whose tips are not reachable from the
-        specified commit (HEAD if not specified). Implies <tt>--list</tt>.
+        specified commit (HEAD if not specified). Implies <code>--list</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1145,10 +1143,10 @@ Start development from a known tag
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git clone git://git.kernel.org/pub/scm/.../linux-2.6 my2.6
+<pre><code>$ git clone git://git.kernel.org/pub/scm/.../linux-2.6 my2.6
 $ cd my2.6
 $ git branch my2.6.14 v2.6.14   <b>&lt;1&gt;</b>
-$ git checkout my2.6.14</tt></pre>
+$ git checkout my2.6.14</code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1165,10 +1163,10 @@ Delete an unneeded branch
 <dd>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git clone git://git.kernel.org/.../git.git my.git
+<pre><code>$ git clone git://git.kernel.org/.../git.git my.git
 $ cd my.git
 $ git branch -d -r origin/todo origin/html origin/man   <b>&lt;1&gt;</b>
-$ git branch -D test                                    <b>&lt;2&gt;</b></tt></pre>
+$ git branch -D test                                    <b>&lt;2&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
@@ -1193,27 +1191,27 @@ is currently checked out) does not have all commits from the test branch.
 <h2 id="_notes">Notes</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>If you are creating a branch that you want to checkout immediately, it is
-easier to use the git checkout command with its <tt>-b</tt> option to create
+easier to use the git checkout command with its <code>-b</code> option to create
 a branch and check it out with a single command.</p></div>
-<div class="paragraph"><p>The options <tt>--contains</tt>, <tt>--merged</tt> and <tt>--no-merged</tt> serve three related
+<div class="paragraph"><p>The options <code>--contains</code>, <code>--merged</code> and <code>--no-merged</code> serve three related
 but different purposes:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>--contains &lt;commit&gt;</tt> is used to find all branches which will need
+<code>--contains &lt;commit&gt;</code> is used to find all branches which will need
   special attention if &lt;commit&gt; were to be rebased or amended, since those
   branches contain the specified &lt;commit&gt;.
 </p>
 </li>
 <li>
 <p>
-<tt>--merged</tt> is used to find all branches which can be safely deleted,
+<code>--merged</code> is used to find all branches which can be safely deleted,
   since those branches are fully contained by HEAD.
 </p>
 </li>
 <li>
 <p>
-<tt>--no-merged</tt> is used to find branches which are candidates for merging
+<code>--no-merged</code> is used to find branches which are candidates for merging
   into HEAD, since those branches are not fully contained by HEAD.
 </p>
 </li>

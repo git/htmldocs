@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-for-each-ref(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -759,10 +757,10 @@ git-for-each-ref(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Iterate over all refs that match <tt>&lt;pattern&gt;</tt> and show them
-according to the given <tt>&lt;format&gt;</tt>, after sorting them according
-to the given set of <tt>&lt;key&gt;</tt>.  If <tt>&lt;count&gt;</tt> is given, stop after
-showing that many refs.  The interpolated values in <tt>&lt;format&gt;</tt>
+<div class="paragraph"><p>Iterate over all refs that match <code>&lt;pattern&gt;</code> and show them
+according to the given <code>&lt;format&gt;</code>, after sorting them according
+to the given set of <code>&lt;key&gt;</code>.  If <code>&lt;count&gt;</code> is given, stop after
+showing that many refs.  The interpolated values in <code>&lt;format&gt;</code>
 can optionally be quoted as string literals in the specified
 host language allowing their direct evaluation in that language.</p></div>
 </div>
@@ -777,7 +775,7 @@ host language allowing their direct evaluation in that language.</p></div>
 <dd>
 <p>
         By default the command shows all refs that match
-        <tt>&lt;pattern&gt;</tt>.  This option makes it stop after showing
+        <code>&lt;pattern&gt;</code>.  This option makes it stop after showing
         that many refs.
 </p>
 </dd>
@@ -786,9 +784,9 @@ host language allowing their direct evaluation in that language.</p></div>
 </dt>
 <dd>
 <p>
-        A field name to sort on.  Prefix <tt>-</tt> to sort in
+        A field name to sort on.  Prefix <code>-</code> to sort in
         descending order of the value.  When unspecified,
-        <tt>refname</tt> is used.  You may use the --sort=&lt;key&gt; option
+        <code>refname</code> is used.  You may use the --sort=&lt;key&gt; option
         multiple times, in which case the last key becomes the primary
         key.
 </p>
@@ -798,16 +796,16 @@ host language allowing their direct evaluation in that language.</p></div>
 </dt>
 <dd>
 <p>
-        A string that interpolates <tt>%(fieldname)</tt> from the
-        object pointed at by a ref being shown.  If <tt>fieldname</tt>
-        is prefixed with an asterisk (<tt>*</tt>) and the ref points
+        A string that interpolates <code>%(fieldname)</code> from the
+        object pointed at by a ref being shown.  If <code>fieldname</code>
+        is prefixed with an asterisk (<code>*</code>) and the ref points
         at a tag object, the value for the field in the object
         tag refers is used.  When unspecified, defaults to
-        <tt>%(objectname) SPC %(objecttype) TAB %(refname)</tt>.
-        It also interpolates <tt>%%</tt> to <tt>%</tt>, and <tt>%xx</tt> where <tt>xx</tt>
+        <code>%(objectname) SPC %(objecttype) TAB %(refname)</code>.
+        It also interpolates <code>%%</code> to <code>%</code>, and <code>%xx</code> where <code>xx</code>
         are hex digits interpolates to character with hex code
-        <tt>xx</tt>; for example <tt>%00</tt> interpolates to <tt>\0</tt> (NUL),
-        <tt>%09</tt> to <tt>\t</tt> (TAB) and <tt>%0a</tt> to <tt>\n</tt> (LF).
+        <code>xx</code>; for example <code>%00</code> interpolates to <code>\0</code> (NUL),
+        <code>%09</code> to <code>\t</code> (TAB) and <code>%0a</code> to <code>\n</code> (LF).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -835,7 +833,7 @@ host language allowing their direct evaluation in that language.</p></div>
 </dt>
 <dd>
 <p>
-        If given, strings that substitute <tt>%(fieldname)</tt>
+        If given, strings that substitute <code>%(fieldname)</code>
         placeholders are quoted as string literals suitable for
         the specified host language.  This is meant to produce
         a scriptlet that can directly be `eval`ed.
@@ -858,7 +856,7 @@ refname
 <dd>
 <p>
         The name of the ref (the part after $GIT_DIR/).
-        For a non-ambiguous short name of the ref append <tt>:short</tt>.
+        For a non-ambiguous short name of the ref append <code>:short</code>.
         The option core.warnAmbiguousRefs is used to select the strict
         abbreviation mode.
 </p>
@@ -868,7 +866,7 @@ objecttype
 </dt>
 <dd>
 <p>
-        The type of the object (<tt>blob</tt>, <tt>tree</tt>, <tt>commit</tt>, <tt>tag</tt>).
+        The type of the object (<code>blob</code>, <code>tree</code>, <code>commit</code>, <code>tag</code>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -885,7 +883,7 @@ objectname
 <dd>
 <p>
         The object name (aka SHA-1).
-        For a non-ambiguous abbreviation of the object name append <tt>:short</tt>.
+        For a non-ambiguous abbreviation of the object name append <code>:short</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -894,9 +892,9 @@ upstream
 <dd>
 <p>
         The name of a local ref which can be considered &#8220;upstream&#8221;
-        from the displayed ref. Respects <tt>:short</tt> in the same way as
-        <tt>refname</tt> above.  Additionally respects <tt>:track</tt> to show
-        "[ahead N, behind M]" and <tt>:trackshort</tt> to show the terse
+        from the displayed ref. Respects <code>:short</code> in the same way as
+        <code>refname</code> above.  Additionally respects <code>:track</code> to show
+        "[ahead N, behind M]" and <code>:trackshort</code> to show the terse
         version: "&gt;" (ahead), "&lt;" (behind), "&lt;&gt;" (ahead and behind),
         or "=" (in sync).  Has no effect if the ref does not have
         tracking information associated with it.
@@ -916,32 +914,32 @@ color
 </dt>
 <dd>
 <p>
-        Change output color.  Followed by <tt>:&lt;colorname&gt;</tt>, where names
-        are described in <tt>color.branch.*</tt>.
+        Change output color.  Followed by <code>:&lt;colorname&gt;</code>, where names
+        are described in <code>color.branch.*</code>.
 </p>
 </dd>
 </dl></div>
 <div class="paragraph"><p>In addition to the above, for commit and tag objects, the header
-field names (<tt>tree</tt>, <tt>parent</tt>, <tt>object</tt>, <tt>type</tt>, and <tt>tag</tt>) can
+field names (<code>tree</code>, <code>parent</code>, <code>object</code>, <code>type</code>, and <code>tag</code>) can
 be used to specify the value in the header field.</p></div>
-<div class="paragraph"><p>Fields that have name-email-date tuple as its value (<tt>author</tt>,
-<tt>committer</tt>, and <tt>tagger</tt>) can be suffixed with <tt>name</tt>, <tt>email</tt>,
-and <tt>date</tt> to extract the named component.</p></div>
-<div class="paragraph"><p>The complete message in a commit and tag object is <tt>contents</tt>.
-Its first line is <tt>contents:subject</tt>, where subject is the concatenation
+<div class="paragraph"><p>Fields that have name-email-date tuple as its value (<code>author</code>,
+<code>committer</code>, and <code>tagger</code>) can be suffixed with <code>name</code>, <code>email</code>,
+and <code>date</code> to extract the named component.</p></div>
+<div class="paragraph"><p>The complete message in a commit and tag object is <code>contents</code>.
+Its first line is <code>contents:subject</code>, where subject is the concatenation
 of all lines of the commit message up to the first blank line.  The next
 line is <em>contents:body</em>, where body is all of the lines after the first
-blank line.  Finally, the optional GPG signature is <tt>contents:signature</tt>.</p></div>
+blank line.  Finally, the optional GPG signature is <code>contents:signature</code>.</p></div>
 <div class="paragraph"><p>For sorting purposes, fields with numeric values sort in numeric
-order (<tt>objectsize</tt>, <tt>authordate</tt>, <tt>committerdate</tt>, <tt>taggerdate</tt>).
+order (<code>objectsize</code>, <code>authordate</code>, <code>committerdate</code>, <code>taggerdate</code>).
 All other fields are used to sort in their byte-value order.</p></div>
 <div class="paragraph"><p>In any case, a field name that refers to a field inapplicable to
 the object referred by the ref does not cause an error.  It
 returns an empty string instead.</p></div>
 <div class="paragraph"><p>As a special case for the date-type fields, you may specify a format for
-the date by adding one of <tt>:default</tt>, <tt>:relative</tt>, <tt>:short</tt>, <tt>:local</tt>,
-<tt>:iso8601</tt>, <tt>:rfc2822</tt> or <tt>:raw</tt> to the end of the fieldname; e.g.
-<tt>%(taggerdate:relative)</tt>.</p></div>
+the date by adding one of <code>:default</code>, <code>:relative</code>, <code>:short</code>, <code>:local</code>,
+<code>:iso8601</code>, <code>:rfc2822</code> or <code>:raw</code> to the end of the fieldname; e.g.
+<code>%(taggerdate:relative)</code>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -951,7 +949,7 @@ the date by adding one of <tt>:default</tt>, <tt>:relative</tt>, <tt>:short</tt>
 3 tagged commits:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>#!/bin/sh
+<pre><code>#!/bin/sh
 
 git for-each-ref --count=3 --sort='-*authordate' \
 --format='From: %(*authorname) %(*authoremail)
@@ -960,26 +958,26 @@ Date: %(*authordate)
 Ref: %(*refname)
 
 %(*body)
-' 'refs/tags'</tt></pre>
+' 'refs/tags'</code></pre>
 </div></div>
 <div class="paragraph"><p>A simple example showing the use of shell eval on the output,
 demonstrating the use of --shell.  List the prefixes of all heads:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>#!/bin/sh
+<pre><code>#!/bin/sh
 
 git for-each-ref --shell --format="ref=%(refname)" refs/heads | \
 while read entry
 do
         eval "$entry"
         echo `dirname $ref`
-done</tt></pre>
+done</code></pre>
 </div></div>
 <div class="paragraph"><p>A bit more elaborate report on tags, demonstrating that the format
 may be an entire script:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>#!/bin/sh
+<pre><code>#!/bin/sh
 
 fmt='
         r=%(refname)
@@ -1025,7 +1023,7 @@ eval=`git for-each-ref --shell --format="$fmt" \
         --sort='*objecttype' \
         --sort=-taggerdate \
         refs/tags`
-eval "$eval"</tt></pre>
+eval "$eval"</code></pre>
 </div></div>
 </div>
 </div>

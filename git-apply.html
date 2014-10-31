@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-apply(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -766,8 +764,8 @@ git-apply(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Reads the supplied diff output (i.e. "a patch") and applies it to files.
-With the <tt>--index</tt> option the patch is also applied to the index, and
-with the <tt>--cached</tt> option the patch is only applied to the index.
+With the <code>--index</code> option the patch is also applied to the index, and
+with the <code>--cached</code> option the patch is only applied to the index.
 Without these options, the command applies the patch only to files,
 and does not require them to be in a Git repository.</p></div>
 <div class="paragraph"><p>This command applies the patch but does not create a commit.  Use
@@ -802,11 +800,11 @@ and does not require them to be in a Git repository.</p></div>
 </dt>
 <dd>
 <p>
-        Similar to <tt>--stat</tt>, but shows the number of added and
+        Similar to <code>--stat</code>, but shows the number of added and
         deleted lines in decimal notation and the pathname without
         abbreviation, to make it more machine friendly.  For
-        binary files, outputs two <tt>-</tt> instead of saying
-        <tt>0 0</tt>.  Turns off "apply".
+        binary files, outputs two <code>-</code> instead of saying
+        <code>0 0</code>.  Turns off "apply".
 </p>
 </dd>
 <dt class="hdlist1">
@@ -835,7 +833,7 @@ and does not require them to be in a Git repository.</p></div>
 </dt>
 <dd>
 <p>
-        When <tt>--check</tt> is in effect, or when applying the patch
+        When <code>--check</code> is in effect, or when applying the patch
         (which is the default when none of the options that
         disables it is in effect), make sure the patch is
         applicable to what the current index file records.  If
@@ -851,7 +849,7 @@ and does not require them to be in a Git repository.</p></div>
 <p>
         Apply a patch without touching the working tree. Instead take the
         cached data, apply the patch, and store the result in the index
-        without using the working tree. This implies <tt>--index</tt>.
+        without using the working tree. This implies <code>--index</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -866,8 +864,8 @@ and does not require them to be in a Git repository.</p></div>
         the patch records the identity of blobs it is supposed to apply to,
         and we have those blobs available locally, possibly leaving the
         conflict markers in the files in the working tree for the user to
-        resolve.  This option implies the <tt>--index</tt> option, and is incompatible
-        with the <tt>--reject</tt> and the <tt>--cached</tt> options.
+        resolve.  This option implies the <code>--index</code> option, and is incompatible
+        with the <code>--reject</code> and the <code>--cached</code> options.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -912,11 +910,11 @@ the information is read from the current index instead.</p></div>
 </dt>
 <dd>
 <p>
-        When <tt>--numstat</tt> has been given, do not munge pathnames,
+        When <code>--numstat</code> has been given, do not munge pathnames,
         but use a NUL-terminated machine-readable format.
 </p>
 <div class="paragraph"><p>Without this option, each pathname output will have TAB, LF, double quotes,
-and backslash characters replaced with <tt>\t</tt>, <tt>\n</tt>, <tt>\"</tt>, and <tt>\\</tt>,
+and backslash characters replaced with <code>\t</code>, <code>\n</code>, <code>\"</code>, and <code>\\</code>,
 respectively, and the pathname will be enclosed in double quotes if
 any of those replacements occurred.</p></div>
 </dd>
@@ -948,8 +946,8 @@ any of those replacements occurred.</p></div>
         By default, <em>git apply</em> expects that the patch being
         applied is a unified diff with at least one line of context.
         This provides good safety measures, but breaks down when
-        applying a diff generated with <tt>--unified=0</tt>. To bypass these
-        checks use <tt>--unidiff-zero</tt>.
+        applying a diff generated with <code>--unified=0</code>. To bypass these
+        checks use <code>--unidiff-zero</code>.
 </p>
 <div class="paragraph"><p>Note, for the reasons stated above usage of context-free patches is
 discouraged.</p></div>
@@ -1011,7 +1009,7 @@ discouraged.</p></div>
         be useful when importing patchsets, where you want to include certain
         files or directories.
 </p>
-<div class="paragraph"><p>When <tt>--exclude</tt> and <tt>--include</tt> patterns are used, they are examined in the
+<div class="paragraph"><p>When <code>--exclude</code> and <code>--include</code> patterns are used, they are examined in the
 order they appear on the command line, and the first match determines if a
 patch to each path is used.  A patch to a path that does not match any
 include/exclude pattern is used by default if there is no include pattern
@@ -1029,7 +1027,7 @@ on the command line, and ignored if there is any include pattern.</p></div>
         lines if necessary.
         Context lines will preserve their whitespace, and they will not
         undergo whitespace fixing regardless of the value of the
-        <tt>--whitespace</tt> option. New lines will still be fixed, though.
+        <code>--whitespace</code> option. New lines will still be fixed, though.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1039,46 +1037,46 @@ on the command line, and ignored if there is any include pattern.</p></div>
 <p>
         When applying a patch, detect a new or modified line that has
         whitespace errors.  What are considered whitespace errors is
-        controlled by <tt>core.whitespace</tt> configuration.  By default,
+        controlled by <code>core.whitespace</code> configuration.  By default,
         trailing whitespaces (including lines that solely consist of
         whitespaces) and a space character that is immediately followed
         by a tab character inside the initial indent of the line are
         considered whitespace errors.
 </p>
 <div class="paragraph"><p>By default, the command outputs warning messages but applies the patch.
-When <tt>git-apply</tt> is used for statistics and not applying a
-patch, it defaults to <tt>nowarn</tt>.</p></div>
-<div class="paragraph"><p>You can use different <tt>&lt;action&gt;</tt> values to control this
+When <code>git-apply</code> is used for statistics and not applying a
+patch, it defaults to <code>nowarn</code>.</p></div>
+<div class="paragraph"><p>You can use different <code>&lt;action&gt;</code> values to control this
 behavior:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>nowarn</tt> turns off the trailing whitespace warning.
+<code>nowarn</code> turns off the trailing whitespace warning.
 </p>
 </li>
 <li>
 <p>
-<tt>warn</tt> outputs warnings for a few such errors, but applies the
+<code>warn</code> outputs warnings for a few such errors, but applies the
   patch as-is (default).
 </p>
 </li>
 <li>
 <p>
-<tt>fix</tt> outputs warnings for a few such errors, and applies the
-  patch after fixing them (<tt>strip</tt> is a synonym --- the tool
+<code>fix</code> outputs warnings for a few such errors, and applies the
+  patch after fixing them (<code>strip</code> is a synonym --- the tool
   used to consider only trailing whitespace characters as errors, and the
   fix involved <em>stripping</em> them, but modern Gits do more).
 </p>
 </li>
 <li>
 <p>
-<tt>error</tt> outputs warnings for a few such errors, and refuses
+<code>error</code> outputs warnings for a few such errors, and refuses
   to apply the patch.
 </p>
 </li>
 <li>
 <p>
-<tt>error-all</tt> is similar to <tt>error</tt> but shows all errors.
+<code>error-all</code> is similar to <code>error</code> but shows all errors.
 </p>
 </li>
 </ul></div>
@@ -1126,9 +1124,9 @@ behavior:</p></div>
         Prepend &lt;root&gt; to all filenames.  If a "-p" argument was also passed,
         it is applied before prepending the new root.
 </p>
-<div class="paragraph"><p>For example, a patch that talks about updating <tt>a/git-gui.sh</tt> to <tt>b/git-gui.sh</tt>
-can be applied to the file in the working tree <tt>modules/git-gui/git-gui.sh</tt> by
-running <tt>git apply --directory=modules/git-gui</tt>.</p></div>
+<div class="paragraph"><p>For example, a patch that talks about updating <code>a/git-gui.sh</code> to <code>b/git-gui.sh</code>
+can be applied to the file in the working tree <code>modules/git-gui/git-gui.sh</code> by
+running <code>git apply --directory=modules/git-gui</code>.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -1152,7 +1150,7 @@ apply.whitespace
 </dt>
 <dd>
 <p>
-        When no <tt>--whitespace</tt> flag is given from the command
+        When no <code>--whitespace</code> flag is given from the command
         line, this configuration item is used as the default.
 </p>
 </dd>
@@ -1164,12 +1162,12 @@ apply.whitespace
 <div class="sectionbody">
 <div class="paragraph"><p>If the patch contains any changes to submodules then <em>git apply</em>
 treats these changes as follows.</p></div>
-<div class="paragraph"><p>If <tt>--index</tt> is specified (explicitly or implicitly), then the submodule
+<div class="paragraph"><p>If <code>--index</code> is specified (explicitly or implicitly), then the submodule
 commits must match the index exactly for the patch to apply.  If any
 of the submodules are checked-out, then these check-outs are completely
 ignored, i.e., they are not required to be up-to-date or clean and they
 are not updated.</p></div>
-<div class="paragraph"><p>If <tt>--index</tt> is not specified, then the submodule commits in the patch
+<div class="paragraph"><p>If <code>--index</code> is not specified, then the submodule commits in the patch
 are ignored and only the absence or presence of the corresponding
 subdirectory is checked and (if possible) updated.</p></div>
 </div>

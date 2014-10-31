@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>builtin API</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -746,32 +744,32 @@ Git:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Define the implementation of the built-in command <tt>foo</tt> with
+Define the implementation of the built-in command <code>foo</code> with
   signature:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>int cmd_foo(int argc, const char **argv, const char *prefix);</tt></pre>
+<pre><code>int cmd_foo(int argc, const char **argv, const char *prefix);</code></pre>
 </div></div>
 </li>
 <li>
 <p>
-Add the external declaration for the function to <tt>builtin.h</tt>.
+Add the external declaration for the function to <code>builtin.h</code>.
 </p>
 </li>
 <li>
 <p>
-Add the command to the <tt>commands[]</tt> table defined in <tt>git.c</tt>.
+Add the command to the <code>commands[]</code> table defined in <code>git.c</code>.
   The entry should look like:
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><tt>{ "foo", cmd_foo, &lt;options&gt; },</tt></pre>
+<pre><code>{ "foo", cmd_foo, &lt;options&gt; },</code></pre>
 </div></div>
 <div class="paragraph"><p>where options is the bitwise-or of:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>RUN_SETUP</tt>
+<code>RUN_SETUP</code>
 </dt>
 <dd>
 <p>
@@ -782,7 +780,7 @@ Add the command to the <tt>commands[]</tt> table defined in <tt>git.c</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>RUN_SETUP_GENTLY</tt>
+<code>RUN_SETUP_GENTLY</code>
 </dt>
 <dd>
 <p>
@@ -791,7 +789,7 @@ Add the command to the <tt>commands[]</tt> table defined in <tt>git.c</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>USE_PAGER</tt>
+<code>USE_PAGER</code>
 </dt>
 <dd>
 <p>
@@ -800,43 +798,43 @@ Add the command to the <tt>commands[]</tt> table defined in <tt>git.c</tt>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>NEED_WORK_TREE</tt>
+<code>NEED_WORK_TREE</code>
 </dt>
 <dd>
 <p>
         Make sure there is a work tree, i.e. the command cannot act
         on bare repositories.
-        This only makes sense when <tt>RUN_SETUP</tt> is also set.
+        This only makes sense when <code>RUN_SETUP</code> is also set.
 </p>
 </dd>
 </dl></div>
 </li>
 <li>
 <p>
-Add <tt>builtin/foo.o</tt> to <tt>BUILTIN_OBJS</tt> in <tt>Makefile</tt>.
+Add <code>builtin/foo.o</code> to <code>BUILTIN_OBJS</code> in <code>Makefile</code>.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Additionally, if <tt>foo</tt> is a new command, there are 3 more things to do:</p></div>
+<div class="paragraph"><p>Additionally, if <code>foo</code> is a new command, there are 3 more things to do:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Add tests to <tt>t/</tt> directory.
+Add tests to <code>t/</code> directory.
 </p>
 </li>
 <li>
 <p>
-Write documentation in <tt>Documentation/git-foo.txt</tt>.
+Write documentation in <code>Documentation/git-foo.txt</code>.
 </p>
 </li>
 <li>
 <p>
-Add an entry for <tt>git-foo</tt> to <tt>command-list.txt</tt>.
+Add an entry for <code>git-foo</code> to <code>command-list.txt</code>.
 </p>
 </li>
 <li>
 <p>
-Add an entry for <tt>/git-foo</tt> to <tt>.gitignore</tt>.
+Add an entry for <code>/git-foo</code> to <code>.gitignore</code>.
 </p>
 </li>
 </ol></div>
@@ -845,16 +843,16 @@ Add an entry for <tt>/git-foo</tt> to <tt>.gitignore</tt>.
 <div class="sect1">
 <h2 id="_how_a_built_in_is_called">How a built-in is called</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The implementation <tt>cmd_foo()</tt> takes three parameters, <tt>argc</tt>, <tt>argv,
-and `prefix</tt>.  The first two are similar to what <tt>main()</tt> of a
+<div class="paragraph"><p>The implementation <code>cmd_foo()</code> takes three parameters, <code>argc</code>, <code>argv,
+and `prefix</code>.  The first two are similar to what <code>main()</code> of a
 standalone command would be called with.</p></div>
-<div class="paragraph"><p>When <tt>RUN_SETUP</tt> is specified in the <tt>commands[]</tt> table, and when you
-were started from a subdirectory of the work tree, <tt>cmd_foo()</tt> is called
-after chdir(2) to the top of the work tree, and <tt>prefix</tt> gets the path
+<div class="paragraph"><p>When <code>RUN_SETUP</code> is specified in the <code>commands[]</code> table, and when you
+were started from a subdirectory of the work tree, <code>cmd_foo()</code> is called
+after chdir(2) to the top of the work tree, and <code>prefix</code> gets the path
 to the subdirectory the command started from.  This allows you to
 convert a user-supplied pathname (typically relative to that directory)
 to a pathname relative to the top of the work tree.</p></div>
-<div class="paragraph"><p>The return value from <tt>cmd_foo()</tt> becomes the exit status of the
+<div class="paragraph"><p>The return value from <code>cmd_foo()</code> becomes the exit status of the
 command.</p></div>
 </div>
 </div>

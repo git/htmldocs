@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-http-backend(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -767,10 +765,10 @@ pushing using the smart HTTP protocol.</p></div>
 "git-daemon-export-ok", and it will refuse to export any Git directory
 that hasn&#8217;t explicitly been marked for export this way (unless the
 GIT_HTTP_EXPORT_ALL environmental variable is set).</p></div>
-<div class="paragraph"><p>By default, only the <tt>upload-pack</tt> service is enabled, which serves
+<div class="paragraph"><p>By default, only the <code>upload-pack</code> service is enabled, which serves
 <em>git fetch-pack</em> and <em>git ls-remote</em> clients, which are invoked from
 <em>git fetch</em>, <em>git pull</em>, and <em>git clone</em>.  If the client is authenticated,
-the <tt>receive-pack</tt> service is enabled, which serves <em>git send-pack</em>
+the <code>receive-pack</code> service is enabled, which serves <em>git send-pack</em>
 clients, which is invoked from <em>git push</em>.</p></div>
 </div>
 </div>
@@ -790,7 +788,7 @@ http.getanyfile
         any file within the repository, including objects that are
         no longer reachable from a branch but are still present.
         It is enabled by default, but a repository can disable it
-        by setting this configuration item to <tt>false</tt>.
+        by setting this configuration item to <code>false</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -800,7 +798,7 @@ http.uploadpack
 <p>
         This serves <em>git fetch-pack</em> and <em>git ls-remote</em> clients.
         It is enabled by default, but a repository can disable it
-        by setting this configuration item to <tt>false</tt>.
+        by setting this configuration item to <code>false</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -811,8 +809,8 @@ http.receivepack
         This serves <em>git send-pack</em> clients, allowing push.  It is
         disabled by default for anonymous users, and enabled by
         default for users authenticated by the web server.  It can be
-        disabled by setting this item to <tt>false</tt>, or enabled for all
-        users, including anonymous users, by setting it to <tt>true</tt>.
+        disabled by setting this item to <code>false</code>, or enabled for all
+        users, including anonymous users, by setting it to <code>true</code>.
 </p>
 </dd>
 </dl></div>
@@ -846,9 +844,9 @@ Apache 2.x
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>SetEnv GIT_PROJECT_ROOT /var/www/git
+<pre><code>SetEnv GIT_PROJECT_ROOT /var/www/git
 SetEnv GIT_HTTP_EXPORT_ALL
-ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/</tt></pre>
+ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/</code></pre>
 </div></div>
 <div class="paragraph"><p>To enable anonymous read access but authenticated write access,
 require authorization for both the initial ref advertisement (which we
@@ -856,7 +854,7 @@ detect as a push via the service parameter in the query string), and the
 receive-pack invocation itself:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>RewriteCond %{QUERY_STRING} service=git-receive-pack [OR]
+<pre><code>RewriteCond %{QUERY_STRING} service=git-receive-pack [OR]
 RewriteCond %{REQUEST_URI} /git-receive-pack$
 RewriteRule ^/git/ - [E=AUTHREQUIRED:yes]
 
@@ -869,45 +867,45 @@ RewriteRule ^/git/ - [E=AUTHREQUIRED:yes]
         Require group committers
         Satisfy Any
         ...
-&lt;/LocationMatch&gt;</tt></pre>
+&lt;/LocationMatch&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>If you do not have <tt>mod_rewrite</tt> available to match against the query
-string, it is sufficient to just protect <tt>git-receive-pack</tt> itself,
+<div class="paragraph"><p>If you do not have <code>mod_rewrite</code> available to match against the query
+string, it is sufficient to just protect <code>git-receive-pack</code> itself,
 like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&lt;LocationMatch "^/git/.*/git-receive-pack$"&gt;
+<pre><code>&lt;LocationMatch "^/git/.*/git-receive-pack$"&gt;
         AuthType Basic
         AuthName "Git Access"
         Require group committers
         ...
-&lt;/LocationMatch&gt;</tt></pre>
+&lt;/LocationMatch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>In this mode, the server will not request authentication until the
 client actually starts the object negotiation phase of the push, rather
 than during the initial contact.  For this reason, you must also enable
-the <tt>http.receivepack</tt> config option in any repositories that should
-accept a push. The default behavior, if <tt>http.receivepack</tt> is not set,
+the <code>http.receivepack</code> config option in any repositories that should
+accept a push. The default behavior, if <code>http.receivepack</code> is not set,
 is to reject any pushes by unauthenticated users; the initial request
-will therefore report <tt>403 Forbidden</tt> to the client, without even giving
+will therefore report <code>403 Forbidden</code> to the client, without even giving
 an opportunity for authentication.</p></div>
 <div class="paragraph"><p>To require authentication for both reads and writes, use a Location
 directive around the repository, or one of its parent directories:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&lt;Location /git/private&gt;
+<pre><code>&lt;Location /git/private&gt;
         AuthType Basic
         AuthName "Private Git Access"
         Require group committers
         ...
-&lt;/Location&gt;</tt></pre>
+&lt;/Location&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>To serve gitweb at the same url, use a ScriptAliasMatch to only
 those URLs that <em>git http-backend</em> can handle, and forward the
 rest to gitweb:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>ScriptAliasMatch \
+<pre><code>ScriptAliasMatch \
         "(?x)^/git/(.*/(HEAD | \
                         info/refs | \
                         objects/(info/[^/]+ | \
@@ -916,14 +914,14 @@ rest to gitweb:</p></div>
                         git-(upload|receive)-pack))$" \
         /usr/libexec/git-core/git-http-backend/$1
 
-ScriptAlias /git/ /var/www/cgi-bin/gitweb.cgi/</tt></pre>
+ScriptAlias /git/ /var/www/cgi-bin/gitweb.cgi/</code></pre>
 </div></div>
 <div class="paragraph"><p>To serve multiple repositories from different <a href="gitnamespaces.html">gitnamespaces(7)</a> in a
 single repository:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>SetEnvIf Request_URI "^/git/([^/]*)" GIT_NAMESPACE=$1
-ScriptAliasMatch ^/git/[^/]*(.*) /usr/libexec/git-core/git-http-backend/storage.git$1</tt></pre>
+<pre><code>SetEnvIf Request_URI "^/git/([^/]*)" GIT_NAMESPACE=$1
+ScriptAliasMatch ^/git/[^/]*(.*) /usr/libexec/git-core/git-http-backend/storage.git$1</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -938,16 +936,16 @@ Accelerated static Apache 2.x
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>SetEnv GIT_PROJECT_ROOT /var/www/git
+<pre><code>SetEnv GIT_PROJECT_ROOT /var/www/git
 
 AliasMatch ^/git/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$          /var/www/git/$1
 AliasMatch ^/git/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/www/git/$1
-ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/</tt></pre>
+ScriptAlias /git/ /usr/libexec/git-core/git-http-backend/</code></pre>
 </div></div>
 <div class="paragraph"><p>This can be combined with the gitweb configuration:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>SetEnv GIT_PROJECT_ROOT /var/www/git
+<pre><code>SetEnv GIT_PROJECT_ROOT /var/www/git
 
 AliasMatch ^/git/(.*/objects/[0-9a-f]{2}/[0-9a-f]{38})$          /var/www/git/$1
 AliasMatch ^/git/(.*/objects/pack/pack-[0-9a-f]{40}.(pack|idx))$ /var/www/git/$1
@@ -957,7 +955,7 @@ ScriptAliasMatch \
                         objects/info/[^/]+ | \
                         git-(upload|receive)-pack))$" \
         /usr/libexec/git-core/git-http-backend/$1
-ScriptAlias /git/ /var/www/cgi-bin/gitweb.cgi/</tt></pre>
+ScriptAlias /git/ /var/www/cgi-bin/gitweb.cgi/</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
@@ -965,49 +963,49 @@ Lighttpd
 </dt>
 <dd>
 <p>
-        Ensure that <tt>mod_cgi</tt>, <tt>mod_alias</tt>, <tt>mod_auth</tt>, <tt>mod_setenv</tt> are
-        loaded, then set <tt>GIT_PROJECT_ROOT</tt> appropriately and redirect
+        Ensure that <code>mod_cgi</code>, <code>mod_alias</code>, <code>mod_auth</code>, <code>mod_setenv</code> are
+        loaded, then set <code>GIT_PROJECT_ROOT</code> appropriately and redirect
         all requests to the CGI:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>alias.url += ( "/git" =&gt; "/usr/lib/git-core/git-http-backend" )
+<pre><code>alias.url += ( "/git" =&gt; "/usr/lib/git-core/git-http-backend" )
 $HTTP["url"] =~ "^/git" {
         cgi.assign = ("" =&gt; "")
         setenv.add-environment = (
                 "GIT_PROJECT_ROOT" =&gt; "/var/www/git",
                 "GIT_HTTP_EXPORT_ALL" =&gt; ""
         )
-}</tt></pre>
+}</code></pre>
 </div></div>
 <div class="paragraph"><p>To enable anonymous read access but authenticated write access:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$HTTP["querystring"] =~ "service=git-receive-pack" {
+<pre><code>$HTTP["querystring"] =~ "service=git-receive-pack" {
         include "git-auth.conf"
 }
 $HTTP["url"] =~ "^/git/.*/git-receive-pack$" {
         include "git-auth.conf"
-}</tt></pre>
+}</code></pre>
 </div></div>
-<div class="paragraph"><p>where <tt>git-auth.conf</tt> looks something like:</p></div>
+<div class="paragraph"><p>where <code>git-auth.conf</code> looks something like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>auth.require = (
+<pre><code>auth.require = (
         "/" =&gt; (
                 "method" =&gt; "basic",
                 "realm" =&gt; "Git Access",
                 "require" =&gt; "valid-user"
                )
 )
-# ...and set up auth.backend here</tt></pre>
+# ...and set up auth.backend here</code></pre>
 </div></div>
 <div class="paragraph"><p>To require authentication for both reads and writes:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$HTTP["url"] =~ "^/git/private" {
+<pre><code>$HTTP["url"] =~ "^/git/private" {
         include "git-auth.conf"
-}</tt></pre>
+}</code></pre>
 </div></div>
 </dd>
 </dl></div>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-check-ignore(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -760,7 +758,7 @@ git-check-ignore(1) Manual Page
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>For each pathname given via the command-line or from a file via
-<tt>--stdin</tt>, show the pattern from .gitignore (or other input files to
+<code>--stdin</code>, show the pattern from .gitignore (or other input files to
 the exclude mechanism) that decides if the pathname is excluded or
 included.  Later patterns within a file take precedence over earlier
 ones.</p></div>
@@ -802,7 +800,7 @@ ones.</p></div>
 <dd>
 <p>
         The output format is modified to be machine-parseable (see
-        below).  If <tt>--stdin</tt> is also given, input paths are separated
+        below).  If <code>--stdin</code> is also given, input paths are separated
         with a NUL character instead of a linefeed character.
 </p>
 </dd>
@@ -812,7 +810,7 @@ ones.</p></div>
 <dd>
 <p>
         Show given paths which don&#8217;t match any pattern.  This only
-        makes sense when <tt>--verbose</tt> is enabled, otherwise it would
+        makes sense when <code>--verbose</code> is enabled, otherwise it would
         not be possible to distinguish between paths which match a
         pattern and those which don&#8217;t.
 </p>
@@ -823,10 +821,10 @@ ones.</p></div>
 <dd>
 <p>
         Don&#8217;t look in the index when undertaking the checks. This can
-        be used to debug why a path became tracked by e.g. <tt>git add .</tt>
+        be used to debug why a path became tracked by e.g. <code>git add .</code>
         and was not ignored by the rules as expected by the user or when
         developing patterns including negation to match a path previously
-        added with <tt>git add -f</tt>.
+        added with <code>git add -f</code>.
 </p>
 </dd>
 </dl></div>
@@ -839,20 +837,20 @@ ones.</p></div>
 will be output, one per line.  If no pattern matches a given path,
 nothing will be output for that path; this means that path will not be
 ignored.</p></div>
-<div class="paragraph"><p>If <tt>--verbose</tt> is specified, the output is a series of lines of the form:</p></div>
+<div class="paragraph"><p>If <code>--verbose</code> is specified, the output is a series of lines of the form:</p></div>
 <div class="paragraph"><p>&lt;source&gt; &lt;COLON&gt; &lt;linenum&gt; &lt;COLON&gt; &lt;pattern&gt; &lt;HT&gt; &lt;pathname&gt;</p></div>
 <div class="paragraph"><p>&lt;pathname&gt; is the path of a file being queried, &lt;pattern&gt; is the
 matching pattern, &lt;source&gt; is the pattern&#8217;s source file, and &lt;linenum&gt;
 is the line number of the pattern within that source.  If the pattern
-contained a <tt>!</tt> prefix or <tt>/</tt> suffix, it will be preserved in the
+contained a <code>!</code> prefix or <code>/</code> suffix, it will be preserved in the
 output.  &lt;source&gt; will be an absolute path when referring to the file
-configured by <tt>core.excludesfile</tt>, or relative to the repository root
-when referring to <tt>.git/info/exclude</tt> or a per-directory exclude file.</p></div>
-<div class="paragraph"><p>If <tt>-z</tt> is specified, the pathnames in the output are delimited by the
-null character; if <tt>--verbose</tt> is also specified then null characters
+configured by <code>core.excludesfile</code>, or relative to the repository root
+when referring to <code>.git/info/exclude</code> or a per-directory exclude file.</p></div>
+<div class="paragraph"><p>If <code>-z</code> is specified, the pathnames in the output are delimited by the
+null character; if <code>--verbose</code> is also specified then null characters
 are also used instead of colons and hard tabs:</p></div>
 <div class="paragraph"><p>&lt;source&gt; &lt;NULL&gt; &lt;linenum&gt; &lt;NULL&gt; &lt;pattern&gt; &lt;NULL&gt; &lt;pathname&gt; &lt;NULL&gt;</p></div>
-<div class="paragraph"><p>If <tt>-n</tt> or <tt>--non-matching</tt> are specified, non-matching pathnames will
+<div class="paragraph"><p>If <code>-n</code> or <code>--non-matching</code> are specified, non-matching pathnames will
 also be output, in which case all fields in each output record except
 for &lt;pathname&gt; will be empty.  This can be useful when running
 non-interactively, so that files can be incrementally streamed to
@@ -861,7 +859,7 @@ files, STDOUT will indicate whether that file matched a pattern or
 not.  (Without this option, it would be impossible to tell whether the
 absence of output for a given file meant that it didn&#8217;t match any
 pattern, or that the output hadn&#8217;t been generated yet.)</p></div>
-<div class="paragraph"><p>Buffering happens as documented under the <tt>GIT_FLUSH</tt> option in
+<div class="paragraph"><p>Buffering happens as documented under the <code>GIT_FLUSH</code> option in
 <a href="git.html">git(1)</a>.  The caller is responsible for avoiding deadlocks
 caused by overfilling an input buffer or reading from an empty output
 buffer.</p></div>

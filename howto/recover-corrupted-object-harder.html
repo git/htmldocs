@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>How to recover an object from scratch</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -756,11 +754,11 @@ elsewhere, see <a href="recover-corrupted-blob-object.html">this howto</a>.</p><
 because I&#8217;ll refer to them later):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git fsck
+<pre><code>    $ git fsck
     error: $pack SHA1 checksum mismatch
     error: index CRC mismatch for object $obj from $pack at offset 51653873
     error: inflate: data stream error (incorrect data check)
-    error: cannot unpack $obj from $pack at offset 51653873</tt></pre>
+    error: cannot unpack $obj from $pack at offset 51653873</code></pre>
 </div></div>
 <div class="paragraph"><p>The pack checksum failing means a byte is munged somewhere, and it is
 presumably in the object mentioned (since both the index checksum and
@@ -774,9 +772,9 @@ The problematic bytes could be anywhere in the object data.</p></div>
 needed to know how big the object was, which I found out with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    $ git show-index &lt;$idx | cut -d' ' -f1 | sort -n | grep -A1 51653873
+<pre><code>    $ git show-index &lt;$idx | cut -d' ' -f1 | sort -n | grep -A1 51653873
     51653873
-    51664736</tt></pre>
+    51664736</code></pre>
 </div></div>
 <div class="paragraph"><p>Show-index gives us the list of objects and their offsets. We throw away
 everything but the offsets, and then sort them so that our interesting
@@ -785,7 +783,7 @@ by the offset of the next object. Now we know that the object data is
 10863 bytes long, and we can grab it with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>  dd if=$pack of=object bs=1 skip=51653873 count=10863</tt></pre>
+<pre><code>  dd if=$pack of=object bs=1 skip=51653873 count=10863</code></pre>
 </div></div>
 <div class="paragraph"><p>I inspected a hexdump of the data, looking for any obvious bogosity
 (e.g., a 4K run of zeroes would be a good sign of filesystem
@@ -799,7 +797,7 @@ or you can walk through it in a debugger. I did the latter, creating a
 valid pack like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    # pack magic and version
+<pre><code>    # pack magic and version
     printf 'PACK\0\0\0\2' &gt;tmp.pack
     # pack has one object
     printf '\0\0\0\1' &gt;&gt;tmp.pack
@@ -807,7 +805,7 @@ valid pack like:</p></div>
     cat object &gt;&gt;tmp.pack
     # and then append the pack trailer
     /path/to/git.git/test-sha1 -b &lt;tmp.pack &gt;trailer
-    cat trailer &gt;&gt;tmp.pack</tt></pre>
+    cat trailer &gt;&gt;tmp.pack</code></pre>
 </div></div>
 <div class="paragraph"><p>and then running "git index-pack tmp.pack" in the debugger (stop at
 unpack_raw_entry). Doing this, I found that there were 3 bytes of header
@@ -815,7 +813,7 @@ unpack_raw_entry). Doing this, I found that there were 3 bytes of header
 off with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>    dd if=object of=zlib bs=1 skip=3</tt></pre>
+<pre><code>    dd if=object of=zlib bs=1 skip=3</code></pre>
 </div></div>
 <div class="paragraph"><p>I ran the result through zlib&#8217;s inflate using a custom C program. And
 while it did report the error, I did get the right number of output
@@ -836,7 +834,7 @@ a few minutes.</p></div>
 <div class="paragraph"><p>The program I used is here:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>#include &lt;stdio.h&gt;
+<pre><code>#include &lt;stdio.h&gt;
 #include &lt;unistd.h&gt;
 #include &lt;string.h&gt;
 #include &lt;signal.h&gt;
@@ -896,20 +894,20 @@ int main(void)
         alarm(0);
         fprintf(stderr, "\n");
         return 0;
-}</tt></pre>
+}</code></pre>
 </div></div>
 <div class="paragraph"><p>I compiled and ran with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>  gcc -Wall -Werror -O3 munge.c -o munge -lz
-  ./munge &lt;zlib</tt></pre>
+<pre><code>  gcc -Wall -Werror -O3 munge.c -o munge -lz
+  ./munge &lt;zlib</code></pre>
 </div></div>
 <div class="paragraph"><p>There were a few false positives early on (if you write "no data" in the
 zlib header, zlib thinks it&#8217;s just fine :) ). But I got a hit about
 halfway through:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>  i=5642, j=c7</tt></pre>
+<pre><code>  i=5642, j=c7</code></pre>
 </div></div>
 <div class="paragraph"><p>I let it run to completion, and got a few more hits at the end (where it
 was munging the crc to match our broken data). So there was a good
@@ -920,11 +918,11 @@ which reported the sha1 of the broken object. Success!</p></div>
 <div class="paragraph"><p>I fixed the packfile itself with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>  chmod +w $pack
+<pre><code>  chmod +w $pack
   printf '\xc7' | dd of=$pack bs=1 seek=51659518 conv=notrunc
-  chmod -w $pack</tt></pre>
+  chmod -w $pack</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>\xc7</tt> comes from the replacement byte our "munge" program found.
+<div class="paragraph"><p>The <code>\xc7</code> comes from the replacement byte our "munge" program found.
 The offset 51659518 is derived by taking the original object offset
 (51653873), adding the replacement offset found by "munge" (5642), and
 then adding back in the 3 bytes of git header we stripped.</p></div>
@@ -938,8 +936,8 @@ wrong? I could have looked forever and never found it. Here&#8217;s the diff
 between what the corrupted data inflates to, versus the real data:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>  -       cp = strtok (arg, "+");
-  +       cp = strtok (arg, ".");</tt></pre>
+<pre><code>  -       cp = strtok (arg, "+");
+  +       cp = strtok (arg, ".");</code></pre>
 </div></div>
 <div class="paragraph"><p>It tweaked one byte and still ended up as valid, readable C that just
 happened to do something totally different! One takeaway is that on a
@@ -955,7 +953,7 @@ have been blamed on some random commit).</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-08-17 11:15:02 PDT
+Last updated 2014-10-31 13:22:32 PDT
 </div>
 </div>
 </body>

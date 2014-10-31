@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-cherry-pick(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -770,13 +768,13 @@ happens:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-The current branch and <tt>HEAD</tt> pointer stay at the last commit
+The current branch and <code>HEAD</code> pointer stay at the last commit
    successfully made.
 </p>
 </li>
 <li>
 <p>
-The <tt>CHERRY_PICK_HEAD</tt> ref is set to point at the commit that
+The <code>CHERRY_PICK_HEAD</code> ref is set to point at the commit that
    introduced the change that is difficult to apply.
 </p>
 </li>
@@ -792,7 +790,7 @@ For conflicting paths, the index file records up to three
    versions, as described in the "TRUE MERGE" section of
    <a href="git-merge.html">git-merge(1)</a>.  The working tree files will include
    a description of the conflict bracketed by the usual
-   conflict markers <tt>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</tt> and <tt>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</tt>.
+   conflict markers <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.
 </p>
 </li>
 <li>
@@ -860,9 +858,9 @@ conflicts.</p></div>
 </dt>
 <dd>
 <p>
-        It used to be that the command defaulted to do <tt>-x</tt>
-        described above, and <tt>-r</tt> was to disable it.  Now the
-        default is not to do <tt>-x</tt> so this option is a no-op.
+        It used to be that the command defaulted to do <code>-x</code>
+        described above, and <code>-r</code> was to disable it.  Now the
+        default is not to do <code>-x</code> so this option is a no-op.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -937,8 +935,8 @@ effect to your index in a row.</p></div>
 <dd>
 <p>
         By default, cherry-picking an empty commit will fail,
-        indicating that an explicit invocation of <tt>git commit
-        --allow-empty</tt> is required. This option overrides that
+        indicating that an explicit invocation of <code>git commit
+        --allow-empty</code> is required. This option overrides that
         behavior, allowing empty commits to be preserved automatically
         in a cherry-pick. Note that when "--ff" is in effect, empty
         commits that meet the "fast-forward" requirement will be kept
@@ -946,7 +944,7 @@ effect to your index in a row.</p></div>
         keeps commits that were initially empty (i.e. the commit recorded the
         same tree as its parent).  Commits which are made empty due to a
         previous commit are dropped.  To force the inclusion of those commits
-        use <tt>--keep-redundant-commits</tt>.
+        use <code>--keep-redundant-commits</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -967,7 +965,7 @@ effect to your index in a row.</p></div>
         If a commit being cherry picked duplicates a commit already in the
         current history, it will become empty.  By default these
         redundant commits are ignored.  This option overrides that behavior and
-        creates an empty commit object.  Implies <tt>--allow-empty</tt>.
+        creates an empty commit object.  Implies <code>--allow-empty</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1035,7 +1033,7 @@ effect to your index in a row.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-<tt>git cherry-pick master</tt>
+<code>git cherry-pick master</code>
 </dt>
 <dd>
 <p>
@@ -1044,10 +1042,10 @@ effect to your index in a row.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git cherry-pick ..master</tt>
+<code>git cherry-pick ..master</code>
 </dt>
 <dt class="hdlist1">
-<tt>git cherry-pick ^HEAD master</tt>
+<code>git cherry-pick ^HEAD master</code>
 </dt>
 <dd>
 <p>
@@ -1056,22 +1054,22 @@ effect to your index in a row.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git cherry-pick maint next ^master</tt>
+<code>git cherry-pick maint next ^master</code>
 </dt>
 <dt class="hdlist1">
-<tt>git cherry-pick maint master..next</tt>
+<code>git cherry-pick maint master..next</code>
 </dt>
 <dd>
 <p>
         Apply the changes introduced by all commits that are
         ancestors of maint or next, but not master or any of its
-        ancestors.  Note that the latter does not mean <tt>maint</tt> and
-        everything between <tt>master</tt> and <tt>next</tt>; specifically,
-        <tt>maint</tt> will not be used if it is included in <tt>master</tt>.
+        ancestors.  Note that the latter does not mean <code>maint</code> and
+        everything between <code>master</code> and <code>next</code>; specifically,
+        <code>maint</code> will not be used if it is included in <code>master</code>.
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git cherry-pick master~4 master~2</tt>
+<code>git cherry-pick master~4 master~2</code>
 </dt>
 <dd>
 <p>
@@ -1081,7 +1079,7 @@ effect to your index in a row.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git cherry-pick -n master~1 next</tt>
+<code>git cherry-pick -n master~1 next</code>
 </dt>
 <dd>
 <p>
@@ -1092,7 +1090,7 @@ effect to your index in a row.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git cherry-pick --ff ..next</tt>
+<code>git cherry-pick --ff ..next</code>
 </dt>
 <dd>
 <p>
@@ -1104,7 +1102,7 @@ effect to your index in a row.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<tt>git rev-list --reverse master -- README | git cherry-pick -n --stdin</tt>
+<code>git rev-list --reverse master -- README | git cherry-pick -n --stdin</code>
 </dt>
 <dd>
 <p>
@@ -1120,15 +1118,15 @@ the code the patch applies to has changed too much, and then tries
 again, this time exercising more care about matching up context lines.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git cherry-pick topic^             <b>&lt;1&gt;</b>
+<pre><code>$ git cherry-pick topic^             <b>&lt;1&gt;</b>
 $ git diff                           <b>&lt;2&gt;</b>
 $ git reset --merge ORIG_HEAD        <b>&lt;3&gt;</b>
-$ git cherry-pick -Xpatience topic^  <b>&lt;4&gt;</b></tt></pre>
+$ git cherry-pick -Xpatience topic^  <b>&lt;4&gt;</b></code></pre>
 </div></div>
 <div class="colist arabic"><ol>
 <li>
 <p>
-apply the change that would be shown by <tt>git show topic^</tt>.
+apply the change that would be shown by <code>git show topic^</code>.
 In this example, the patch does not apply cleanly, so
 information about the conflict is written to the index and
 working tree and no new commit results.
@@ -1148,7 +1146,7 @@ the working tree.
 </li>
 <li>
 <p>
-try to apply the change introduced by <tt>topic^</tt> again,
+try to apply the change introduced by <code>topic^</code> again,
 spending extra time to avoid mistakes based on incorrectly matching
 context lines.
 </p>

@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-repack(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -781,8 +779,8 @@ engines, disk storage, etc.</p></div>
         pack everything referenced into a single pack.
         Especially useful when packing a repository that is used
         for private development. Use
-        with <em>-d</em>.  This will clean up the objects that <tt>git prune</tt>
-        leaves behind, but <tt>git fsck --full --dangling</tt> shows as
+        with <em>-d</em>.  This will clean up the objects that <code>git prune</code>
+        leaves behind, but <code>git fsck --full --dangling</code> shows as
         dangling.
 </p>
 <div class="paragraph"><p>Note that users fetching over dumb protocols will have to fetch the
@@ -794,7 +792,7 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        Same as <tt>-a</tt>, unless <em>-d</em> is used.  Then any unreachable
+        Same as <code>-a</code>, unless <em>-d</em> is used.  Then any unreachable
         objects in a previous pack become loose, unpacked objects,
         instead of being left in the old pack.  Unreachable objects
         are never intentionally added to a pack, even when repacking.
@@ -821,7 +819,7 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        Pass the <tt>--local</tt> option to <em>git pack-objects</em>. See
+        Pass the <code>--local</code> option to <em>git pack-objects</em>. See
         <a href="git-pack-objects.html">git-pack-objects(1)</a>.
 </p>
 </dd>
@@ -830,7 +828,7 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        Pass the <tt>--no-reuse-delta</tt> option to <tt>git-pack-objects</tt>, see
+        Pass the <code>--no-reuse-delta</code> option to <code>git-pack-objects</code>, see
         <a href="git-pack-objects.html">git-pack-objects(1)</a>.
 </p>
 </dd>
@@ -839,7 +837,7 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        Pass the <tt>--no-reuse-object</tt> option to <tt>git-pack-objects</tt>, see
+        Pass the <code>--no-reuse-object</code> option to <code>git-pack-objects</code>, see
         <a href="git-pack-objects.html">git-pack-objects(1)</a>.
 </p>
 </dd>
@@ -848,7 +846,7 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        Pass the <tt>-q</tt> option to <em>git pack-objects</em>. See
+        Pass the <code>-q</code> option to <em>git pack-objects</em>. See
         <a href="git-pack-objects.html">git-pack-objects(1)</a>.
 </p>
 </dd>
@@ -875,8 +873,8 @@ other objects in that pack they already have locally.</p></div>
         These two options affect how the objects contained in the pack are
         stored using delta compression. The objects are first internally
         sorted by type, size and optionally names and compared against the
-        other objects within <tt>--window</tt> to see if using delta compression saves
-        space. <tt>--depth</tt> limits the maximum delta depth; making it too deep
+        other objects within <code>--window</code> to see if using delta compression saves
+        space. <code>--depth</code> limits the maximum delta depth; making it too deep
         affects the performance on the unpacker side, because delta data needs
         to be applied that many times to get to the necessary object.
         The default value for --window is 10 and --depth is 50.
@@ -887,14 +885,14 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        This option provides an additional limit on top of <tt>--window</tt>;
+        This option provides an additional limit on top of <code>--window</code>;
         the window size will dynamically scale down so as to not take
         up more than <em>&lt;n&gt;</em> bytes in memory.  This is useful in
         repositories with a mix of large and small objects to not run
         out of memory with a large window, but still be able to take
         advantage of the large window for the smaller objects.  The
         size can be suffixed with "k", "m", or "g".
-        <tt>--window-memory=0</tt> makes memory usage unlimited, which is the
+        <code>--window-memory=0</code> makes memory usage unlimited, which is the
         default.
 </p>
 </dd>
@@ -907,7 +905,7 @@ other objects in that pack they already have locally.</p></div>
         "k", "m", or "g". The minimum size allowed is limited to 1 MiB.
         If specified,  multiple packfiles may be created.
         The default is unlimited, unless the config variable
-        <tt>pack.packSizeLimit</tt> is set.
+        <code>pack.packSizeLimit</code> is set.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -919,9 +917,9 @@ other objects in that pack they already have locally.</p></div>
 <dd>
 <p>
         Write a reachability bitmap index as part of the repack. This
-        only makes sense when used with <tt>-a</tt> or <tt>-A</tt>, as the bitmaps
+        only makes sense when used with <code>-a</code> or <code>-A</code>, as the bitmaps
         must be able to refer to all reachable objects. This option
-        overrides the setting of <tt>pack.writebitmaps</tt>.
+        overrides the setting of <code>pack.writebitmaps</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -929,12 +927,12 @@ other objects in that pack they already have locally.</p></div>
 </dt>
 <dd>
 <p>
-        Include objects in <tt>.keep</tt> files when repacking.  Note that we
-        still do not delete <tt>.keep</tt> packs after <tt>pack-objects</tt> finishes.
+        Include objects in <code>.keep</code> files when repacking.  Note that we
+        still do not delete <code>.keep</code> packs after <code>pack-objects</code> finishes.
         This means that we may duplicate objects, but this makes the
         option safe to use when there are concurrent pushes or fetches.
         This option is generally only useful if you are writing bitmaps
-        with <tt>-b</tt> or <tt>pack.writebitmaps</tt>, as it ensures that the
+        with <code>-b</code> or <code>pack.writebitmaps</code>, as it ensures that the
         bitmapped packfile has the necessary objects.
 </p>
 </dd>
@@ -944,12 +942,12 @@ other objects in that pack they already have locally.</p></div>
 <div class="sect1">
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>By default, the command passes <tt>--delta-base-offset</tt> option to
+<div class="paragraph"><p>By default, the command passes <code>--delta-base-offset</code> option to
 <em>git pack-objects</em>; this typically results in slightly smaller packs,
 but the generated packs are incompatible with versions of Git older than
 version 1.4.4. If you need to share your repository with such ancient Git
 versions, either directly or via the dumb http or rsync protocol, then you
-need to set the configuration variable <tt>repack.UseDeltaBaseOffset</tt> to
+need to set the configuration variable <code>repack.UseDeltaBaseOffset</code> to
 "false" and repack. Access from old Git versions over the native protocol
 is unaffected by this option as the conversion is performed on the fly
 as needed in that case.</p></div>

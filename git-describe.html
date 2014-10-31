@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-describe(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -764,7 +762,7 @@ commit.  If the tag points to the commit, then only the tag is
 shown.  Otherwise, it suffixes the tag name with the number of
 additional commits on top of the tagged object and the
 abbreviated object name of the most recent commit.</p></div>
-<div class="paragraph"><p>By default (without --all or --tags) <tt>git describe</tt> only shows
+<div class="paragraph"><p>By default (without --all or --tags) <code>git describe</code> only shows
 annotated tags.  For more information about creating annotated tags
 see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 </div>
@@ -787,7 +785,7 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 <dd>
 <p>
         Describe the working tree.
-        It means describe HEAD and appends &lt;mark&gt; (<tt>-dirty</tt> by
+        It means describe HEAD and appends &lt;mark&gt; (<code>-dirty</code> by
         default) if the working tree is dirty.
 </p>
 </dd>
@@ -797,7 +795,7 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 <dd>
 <p>
         Instead of using only the annotated tags, use any ref
-        found in <tt>refs/</tt> namespace.  This option enables matching
+        found in <code>refs/</code> namespace.  This option enables matching
         any known branch, remote-tracking branch, or lightweight tag.
 </p>
 </dd>
@@ -807,7 +805,7 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 <dd>
 <p>
         Instead of using only the annotated tags, use any tag
-        found in <tt>refs/tags</tt> namespace.  This option enables matching
+        found in <code>refs/tags</code> namespace.  This option enables matching
         a lightweight (non-annotated) tag.
 </p>
 </dd>
@@ -882,7 +880,7 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 </dt>
 <dd>
 <p>
-        Only consider tags matching the given <tt>glob(7)</tt> pattern,
+        Only consider tags matching the given <code>glob(7)</code> pattern,
         excluding the "refs/tags/" prefix.  This can be used to avoid
         leaking private tags from the repository.
 </p>
@@ -914,8 +912,8 @@ see the -a and -s options to <a href="git-tag.html">git-tag(1)</a>.</p></div>
 <div class="paragraph"><p>With something like git.git current tree, I get:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[torvalds@g5 git]$ git describe parent
-v1.0.4-14-g2414721</tt></pre>
+<pre><code>[torvalds@g5 git]$ git describe parent
+v1.0.4-14-g2414721</code></pre>
 </div></div>
 <div class="paragraph"><p>i.e. the current head of my "parent" branch is based on v1.0.4,
 but since it has a few commits on top of that,
@@ -925,34 +923,34 @@ at the end.</p></div>
 <div class="paragraph"><p>The number of additional commits is the number
 of commits which would be displayed by "git log v1.0.4..parent".
 The hash suffix is "-g" + 7-char abbreviation for the tip commit
-of parent (which was <tt>2414721b194453f058079d897d13c4e377f92dc6</tt>).
+of parent (which was <code>2414721b194453f058079d897d13c4e377f92dc6</code>).
 The "g" prefix stands for "git" and is used to allow describing the version of
 a software depending on the SCM the software is managed with. This is useful
 in an environment where people may use different SCMs.</p></div>
 <div class="paragraph"><p>Doing a <em>git describe</em> on a tag-name will just show the tag name:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[torvalds@g5 git]$ git describe v1.0.4
-v1.0.4</tt></pre>
+<pre><code>[torvalds@g5 git]$ git describe v1.0.4
+v1.0.4</code></pre>
 </div></div>
 <div class="paragraph"><p>With --all, the command can use branch heads as references, so
 the output shows the reference path as well:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[torvalds@g5 git]$ git describe --all --abbrev=4 v1.0.5^2
-tags/v1.0.0-21-g975b</tt></pre>
+<pre><code>[torvalds@g5 git]$ git describe --all --abbrev=4 v1.0.5^2
+tags/v1.0.0-21-g975b</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[torvalds@g5 git]$ git describe --all --abbrev=4 HEAD^
-heads/lt/describe-7-g975b</tt></pre>
+<pre><code>[torvalds@g5 git]$ git describe --all --abbrev=4 HEAD^
+heads/lt/describe-7-g975b</code></pre>
 </div></div>
 <div class="paragraph"><p>With --abbrev set to 0, the command can be used to find the
 closest tagname without any suffix:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[torvalds@g5 git]$ git describe --abbrev=0 v1.0.5^2
-tags/v1.0.0</tt></pre>
+<pre><code>[torvalds@g5 git]$ git describe --abbrev=0 v1.0.5^2
+tags/v1.0.0</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that the suffix you get if you type these commands today may be
 longer than what Linus saw above when he ran these commands, as your
@@ -978,7 +976,7 @@ commit.</p></div>
 <div class="paragraph"><p>If multiple tags were found during the walk then the tag which
 has the fewest commits different from the input commit-ish will be
 selected and output.  Here fewest commits different is defined as
-the number of commits which would be shown by <tt>git log tag..input</tt>
+the number of commits which would be shown by <code>git log tag..input</code>
 will be the smallest number of commits possible.</p></div>
 </div>
 </div>

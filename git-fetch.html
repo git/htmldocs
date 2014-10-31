@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-fetch(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -776,10 +774,10 @@ are interested in as well.</p></div>
 or from several repositories at once if &lt;group&gt; is given and
 there is a remotes.&lt;group&gt; entry in the configuration file.
 (See <a href="git-config.html">git-config(1)</a>).</p></div>
-<div class="paragraph"><p>When no remote is specified, by default the <tt>origin</tt> remote will be used,
+<div class="paragraph"><p>When no remote is specified, by default the <code>origin</code> remote will be used,
 unless there&#8217;s an upstream branch configured for the current branch.</p></div>
 <div class="paragraph"><p>The names of refs that are fetched, together with the object names
-they point at, are written to <tt>.git/FETCH_HEAD</tt>.  This information
+they point at, are written to <code>.git/FETCH_HEAD</code>.  This information
 may be used by scripts or other git commands, such as <a href="git-pull.html">git-pull(1)</a>.</p></div>
 </div>
 </div>
@@ -804,8 +802,8 @@ may be used by scripts or other git commands, such as <a href="git-pull.html">gi
 <dd>
 <p>
         Append ref names and object names of fetched refs to the
-        existing contents of <tt>.git/FETCH_HEAD</tt>.  Without this
-        option old data in <tt>.git/FETCH_HEAD</tt> will be overwritten.
+        existing contents of <code>.git/FETCH_HEAD</code>.  Without this
+        option old data in <code>.git/FETCH_HEAD</code> will be overwritten.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -814,7 +812,7 @@ may be used by scripts or other git commands, such as <a href="git-pull.html">gi
 <dd>
 <p>
         Deepen or shorten the history of a <em>shallow</em> repository created by
-        <tt>git clone</tt> with <tt>--depth=&lt;depth&gt;</tt> option (see <a href="git-clone.html">git-clone(1)</a>)
+        <code>git clone</code> with <code>--depth=&lt;depth&gt;</code> option (see <a href="git-clone.html">git-clone(1)</a>)
         to the specified number of commits from the tip of each remote
         branch history. Tags for the deepened commits are not fetched.
 </p>
@@ -837,7 +835,7 @@ the current repository has the same history as the source repository.</p></div>
 <dd>
 <p>
         By default when fetching from a shallow repository,
-        <tt>git fetch</tt> refuses refs that require updating
+        <code>git fetch</code> refuses refs that require updating
         .git/shallow. This option updates .git/shallow and accept such
         refs.
 </p>
@@ -858,10 +856,10 @@ the current repository has the same history as the source repository.</p></div>
 </dt>
 <dd>
 <p>
-        When <em>git fetch</em> is used with <tt>&lt;rbranch&gt;:&lt;lbranch&gt;</tt>
+        When <em>git fetch</em> is used with <code>&lt;rbranch&gt;:&lt;lbranch&gt;</code>
         refspec, it refuses to update the local branch
-        <tt>&lt;lbranch&gt;</tt> unless the remote branch <tt>&lt;rbranch&gt;</tt> it
-        fetches is a descendant of <tt>&lt;lbranch&gt;</tt>.  This option
+        <code>&lt;lbranch&gt;</code> unless the remote branch <code>&lt;rbranch&gt;</code> it
+        fetches is a descendant of <code>&lt;lbranch&gt;</code>.  This option
         overrides that check.
 </p>
 </dd>
@@ -926,7 +924,7 @@ the current repository has the same history as the source repository.</p></div>
         When fetching refs listed on the command line, use the
         specified refspec (can be given more than once) to map the
         refs to remote-tracking branches, instead of the values of
-        <tt>remote.*.fetch</tt> configuration variables for the remote
+        <code>remote.*.fetch</code> configuration variables for the remote
         repository.  See section on "Configured Remote-tracking
         Branches" for details.
 </p>
@@ -940,7 +938,7 @@ the current repository has the same history as the source repository.</p></div>
 <dd>
 <p>
         Fetch all tags from the remote (i.e., fetch remote tags
-        <tt>refs/tags/*</tt> into local tags with the same name), in addition
+        <code>refs/tags/*</code> into local tags with the same name), in addition
         to whatever else would otherwise be fetched.  Using this
         option alone does not subject tags to pruning, even if --prune
         is used (though tags may be pruned anyway if they are also the
@@ -1085,19 +1083,19 @@ the current repository has the same history as the source repository.</p></div>
 <p>
         Specifies which refs to fetch and which local refs to update.
         When no &lt;refspec&gt;s appear on the command line, the refs to fetch
-        are read from <tt>remote.&lt;repository&gt;.fetch</tt> variables instead
+        are read from <code>remote.&lt;repository&gt;.fetch</code> variables instead
         (see <a href="#CRTB">CONFIGURED REMOTE-TRACKING BRANCHES</a> below).
 </p>
 <div class="paragraph"><p>The format of a &lt;refspec&gt; parameter is an optional plus
-<tt>+</tt>, followed by the source ref &lt;src&gt;, followed
-by a colon <tt>:</tt>, followed by the destination ref &lt;dst&gt;.
+<code>+</code>, followed by the source ref &lt;src&gt;, followed
+by a colon <code>:</code>, followed by the destination ref &lt;dst&gt;.
 The colon can be omitted when &lt;dst&gt; is empty.</p></div>
-<div class="paragraph"><p><tt>tag &lt;tag&gt;</tt> means the same as <tt>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</tt>;
+<div class="paragraph"><p><code>tag &lt;tag&gt;</code> means the same as <code>refs/tags/&lt;tag&gt;:refs/tags/&lt;tag&gt;</code>;
 it requests fetching everything up to the given tag.</p></div>
 <div class="paragraph"><p>The remote ref that matches &lt;src&gt;
 is fetched, and if &lt;dst&gt; is not empty string, the local
 ref that matches it is fast-forwarded using &lt;src&gt;.
-If the optional plus <tt>+</tt> is used, the local ref
+If the optional plus <code>+</code> is used, the local ref
 is updated even if it does not result in a fast-forward
 update.</p></div>
 <div class="admonitionblock">
@@ -1110,7 +1108,7 @@ be rewound and rebased regularly, it is expected that
 its new tip will not be descendant of its previous tip
 (as stored in your remote-tracking branch the last time
 you fetched).  You would want
-to use the <tt>+</tt> sign to indicate non-fast-forward updates
+to use the <code>+</code> sign to indicate non-fast-forward updates
 will be needed for such branches.  There is no way to
 determine or declare that a branch will be made available
 in a repository with this behavior; the pulling user simply
@@ -1172,8 +1170,8 @@ rsync://host.xz/path/to/repo.git/
 </ul></div>
 <div class="paragraph"><p>This syntax is only recognized if there are no slashes before the
 first colon. This helps differentiate a local path that contains a
-colon. For example the local path <tt>foo:bar</tt> could be specified as an
-absolute path or <tt>./foo:bar</tt> to avoid being misinterpreted as an ssh
+colon. For example the local path <code>foo:bar</code> could be specified as an
+absolute path or <code>./foo:bar</code> to avoid being misinterpreted as an ssh
 url.</p></div>
 <div class="paragraph"><p>The ssh and git protocols additionally support ~username expansion:</p></div>
 <div class="ulist"><ul>
@@ -1230,15 +1228,15 @@ use will be rewritten into URLs that work), you can create a
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "&lt;actual url base&gt;"]
-                insteadOf = &lt;other url base&gt;</tt></pre>
+<pre><code>        [url "&lt;actual url base&gt;"]
+                insteadOf = &lt;other url base&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "git://git.host.xz/"]
+<pre><code>        [url "git://git.host.xz/"]
                 insteadOf = host.xz:/path/to/
-                insteadOf = work:</tt></pre>
+                insteadOf = work:</code></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "work:repo.git" or like "host.xz:/path/to/repo.git" will be
 rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p></div>
@@ -1246,14 +1244,14 @@ rewritten in any context that takes a URL to be "git://git.host.xz/repo.git".</p
 configuration section of the form:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "&lt;actual url base&gt;"]
-                pushInsteadOf = &lt;other url base&gt;</tt></pre>
+<pre><code>        [url "&lt;actual url base&gt;"]
+                pushInsteadOf = &lt;other url base&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>For example, with this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [url "ssh://example.org/"]
-                pushInsteadOf = git://example.org/</tt></pre>
+<pre><code>        [url "ssh://example.org/"]
+                pushInsteadOf = git://example.org/</code></pre>
 </div></div>
 <div class="paragraph"><p>a URL like "git://example.org/path/to/repo.git" will be rewritten to
 "ssh://example.org/path/to/repo.git" for pushes, but pulls will still
@@ -1264,21 +1262,21 @@ use the original URL.</p></div>
 <h2 id="_remotes_a_id_remotes_a">REMOTES<a id="REMOTES"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The name of one of the following can be used instead
-of a URL as <tt>&lt;repository&gt;</tt> argument:</p></div>
+of a URL as <code>&lt;repository&gt;</code> argument:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-a remote in the Git configuration file: <tt>$GIT_DIR/config</tt>,
+a remote in the Git configuration file: <code>$GIT_DIR/config</code>,
 </p>
 </li>
 <li>
 <p>
-a file in the <tt>$GIT_DIR/remotes</tt> directory, or
+a file in the <code>$GIT_DIR/remotes</code> directory, or
 </p>
 </li>
 <li>
 <p>
-a file in the <tt>$GIT_DIR/branches</tt> directory.
+a file in the <code>$GIT_DIR/branches</code> directory.
 </p>
 </li>
 </ul></div>
@@ -1288,65 +1286,65 @@ because they each contain a refspec which git will use by default.</p></div>
 <h3 id="_named_remote_in_configuration_file">Named remote in configuration file</h3>
 <div class="paragraph"><p>You can choose to provide the name of a remote which you had previously
 configured using <a href="git-remote.html">git-remote(1)</a>, <a href="git-config.html">git-config(1)</a>
-or even by a manual edit to the <tt>$GIT_DIR/config</tt> file.  The URL of
+or even by a manual edit to the <code>$GIT_DIR/config</code> file.  The URL of
 this remote will be used to access the repository.  The refspec
 of this remote will be used by default when you do
 not provide a refspec on the command line.  The entry in the
 config file would appear like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        [remote "&lt;name&gt;"]
+<pre><code>        [remote "&lt;name&gt;"]
                 url = &lt;url&gt;
                 pushurl = &lt;pushurl&gt;
                 push = &lt;refspec&gt;
-                fetch = &lt;refspec&gt;</tt></pre>
+                fetch = &lt;refspec&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>&lt;pushurl&gt;</tt> is used for pushes only. It is optional and defaults
-to <tt>&lt;url&gt;</tt>.</p></div>
+<div class="paragraph"><p>The <code>&lt;pushurl&gt;</code> is used for pushes only. It is optional and defaults
+to <code>&lt;url&gt;</code>.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_named_file_in_tt_git_dir_remotes_tt">Named file in <tt>$GIT_DIR/remotes</tt></h3>
+<h3 id="_named_file_in_code_git_dir_remotes_code">Named file in <code>$GIT_DIR/remotes</code></h3>
 <div class="paragraph"><p>You can choose to provide the name of a
-file in <tt>$GIT_DIR/remotes</tt>.  The URL
+file in <code>$GIT_DIR/remotes</code>.  The URL
 in this file will be used to access the repository.  The refspec
 in this file will be used as default when you do not
 provide a refspec on the command line.  This file should have the
 following format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        URL: one of the above URL format
+<pre><code>        URL: one of the above URL format
         Push: &lt;refspec&gt;
-        Pull: &lt;refspec&gt;</tt></pre>
+        Pull: &lt;refspec&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>Push:</tt> lines are used by <em>git push</em> and
-<tt>Pull:</tt> lines are used by <em>git pull</em> and <em>git fetch</em>.
-Multiple <tt>Push:</tt> and <tt>Pull:</tt> lines may
+<div class="paragraph"><p><code>Push:</code> lines are used by <em>git push</em> and
+<code>Pull:</code> lines are used by <em>git pull</em> and <em>git fetch</em>.
+Multiple <code>Push:</code> and <code>Pull:</code> lines may
 be specified for additional branch mappings.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_named_file_in_tt_git_dir_branches_tt">Named file in <tt>$GIT_DIR/branches</tt></h3>
+<h3 id="_named_file_in_code_git_dir_branches_code">Named file in <code>$GIT_DIR/branches</code></h3>
 <div class="paragraph"><p>You can choose to provide the name of a
-file in <tt>$GIT_DIR/branches</tt>.
+file in <code>$GIT_DIR/branches</code>.
 The URL in this file will be used to access the repository.
 This file should have the following format:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        &lt;url&gt;#&lt;head&gt;</tt></pre>
+<pre><code>        &lt;url&gt;#&lt;head&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p><tt>&lt;url&gt;</tt> is required; <tt>#&lt;head&gt;</tt> is optional.</p></div>
+<div class="paragraph"><p><code>&lt;url&gt;</code> is required; <code>#&lt;head&gt;</code> is optional.</p></div>
 <div class="paragraph"><p>Depending on the operation, git will use one of the following
 refspecs, if you don&#8217;t provide one on the command line.
-<tt>&lt;branch&gt;</tt> is the name of this file in <tt>$GIT_DIR/branches</tt> and
-<tt>&lt;head&gt;</tt> defaults to <tt>master</tt>.</p></div>
+<code>&lt;branch&gt;</code> is the name of this file in <code>$GIT_DIR/branches</code> and
+<code>&lt;head&gt;</code> defaults to <code>master</code>.</p></div>
 <div class="paragraph"><p>git fetch uses:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</tt></pre>
+<pre><code>        refs/heads/&lt;head&gt;:refs/heads/&lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>git push uses:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>        HEAD:refs/heads/&lt;head&gt;</tt></pre>
+<pre><code>        HEAD:refs/heads/&lt;head&gt;</code></pre>
 </div></div>
 </div>
 </div>
@@ -1356,43 +1354,43 @@ refspecs, if you don&#8217;t provide one on the command line.
 <div class="sectionbody">
 <div class="paragraph"><p>You often interact with the same remote repository by
 regularly and repeatedly fetching from it.  In order to keep track
-of the progress of such a remote repository, <tt>git fetch</tt> allows you
-to configure <tt>remote.&lt;repository&gt;.fetch</tt> configuration variables.</p></div>
+of the progress of such a remote repository, <code>git fetch</code> allows you
+to configure <code>remote.&lt;repository&gt;.fetch</code> configuration variables.</p></div>
 <div class="paragraph"><p>Typically such a variable may look like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>[remote "origin"]
-        fetch = +refs/heads/*:refs/remotes/origin/*</tt></pre>
+<pre><code>[remote "origin"]
+        fetch = +refs/heads/*:refs/remotes/origin/*</code></pre>
 </div></div>
 <div class="paragraph"><p>This configuration is used in two ways:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-When <tt>git fetch</tt> is run without specifying what branches
-  and/or tags to fetch on the command line, e.g. <tt>git fetch origin</tt>
-  or <tt>git fetch</tt>, <tt>remote.&lt;repository&gt;.fetch</tt> values are used as
+When <code>git fetch</code> is run without specifying what branches
+  and/or tags to fetch on the command line, e.g. <code>git fetch origin</code>
+  or <code>git fetch</code>, <code>remote.&lt;repository&gt;.fetch</code> values are used as
   the refspecs---they specify which refs to fetch and which local refs
   to update.  The example above will fetch
-  all branches that exist in the <tt>origin</tt> (i.e. any ref that matches
-  the left-hand side of the value, <tt>refs/heads/*</tt>) and update the
-  corresponding remote-tracking branches in the <tt>refs/remotes/origin/*</tt>
+  all branches that exist in the <code>origin</code> (i.e. any ref that matches
+  the left-hand side of the value, <code>refs/heads/*</code>) and update the
+  corresponding remote-tracking branches in the <code>refs/remotes/origin/*</code>
   hierarchy.
 </p>
 </li>
 <li>
 <p>
-When <tt>git fetch</tt> is run with explicit branches and/or tags
-  to fetch on the command line, e.g. <tt>git fetch origin master</tt>, the
+When <code>git fetch</code> is run with explicit branches and/or tags
+  to fetch on the command line, e.g. <code>git fetch origin master</code>, the
   &lt;refspec&gt;s given on the command line determine what are to be
-  fetched (e.g. <tt>master</tt> in the example,
-  which is a short-hand for <tt>master:</tt>, which in turn means
+  fetched (e.g. <code>master</code> in the example,
+  which is a short-hand for <code>master:</code>, which in turn means
   "fetch the <em>master</em> branch but I do not explicitly say what
   remote-tracking branch to update with it from the command line"),
   and the example command will
-  fetch <em>only</em> the <em>master</em> branch.  The <tt>remote.&lt;repository&gt;.fetch</tt>
+  fetch <em>only</em> the <em>master</em> branch.  The <code>remote.&lt;repository&gt;.fetch</code>
   values determine which
   remote-tracking branch, if any, is updated.  When used in this
-  way, the <tt>remote.&lt;repository&gt;.fetch</tt> values do not have any
+  way, the <code>remote.&lt;repository&gt;.fetch</code> values do not have any
   effect in deciding <em>what</em> gets fetched (i.e. the values are not
   used as refspecs when the command-line lists refspecs); they are
   only used to decide <em>where</em> the refs that are fetched are stored
@@ -1400,8 +1398,8 @@ When <tt>git fetch</tt> is run with explicit branches and/or tags
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>The latter use of the <tt>remote.&lt;repository&gt;.fetch</tt> values can be
-overridden by giving the <tt>--refmap=&lt;refspec&gt;</tt> parameter(s) on the
+<div class="paragraph"><p>The latter use of the <code>remote.&lt;repository&gt;.fetch</code> values can be
+overridden by giving the <code>--refmap=&lt;refspec&gt;</code> parameter(s) on the
 command line.</p></div>
 </div>
 </div>
@@ -1415,7 +1413,7 @@ Update the remote-tracking branches:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch origin</tt></pre>
+<pre><code>$ git fetch origin</code></pre>
 </div></div>
 <div class="paragraph"><p>The above command copies all branches from the remote refs/heads/
 namespace and stores them to the local refs/remotes/origin/ namespace,
@@ -1428,13 +1426,13 @@ Using refspecs explicitly:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch origin +pu:pu maint:tmp</tt></pre>
+<pre><code>$ git fetch origin +pu:pu maint:tmp</code></pre>
 </div></div>
-<div class="paragraph"><p>This updates (or creates, as necessary) branches <tt>pu</tt> and <tt>tmp</tt> in
+<div class="paragraph"><p>This updates (or creates, as necessary) branches <code>pu</code> and <code>tmp</code> in
 the local repository by fetching from the branches (respectively)
-<tt>pu</tt> and <tt>maint</tt> from the remote repository.</p></div>
-<div class="paragraph"><p>The <tt>pu</tt> branch will be updated even if it is does not fast-forward,
-because it is prefixed with a plus sign; <tt>tmp</tt> will not be.</p></div>
+<code>pu</code> and <code>maint</code> from the remote repository.</p></div>
+<div class="paragraph"><p>The <code>pu</code> branch will be updated even if it is does not fast-forward,
+because it is prefixed with a plus sign; <code>tmp</code> will not be.</p></div>
 </li>
 <li>
 <p>
@@ -1443,12 +1441,12 @@ repository:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch git://git.kernel.org/pub/scm/git/git.git maint
-$ git log FETCH_HEAD</tt></pre>
+<pre><code>$ git fetch git://git.kernel.org/pub/scm/git/git.git maint
+$ git log FETCH_HEAD</code></pre>
 </div></div>
-<div class="paragraph"><p>The first command fetches the <tt>maint</tt> branch from the repository at
-<tt>git://git.kernel.org/pub/scm/git/git.git</tt> and the second command uses
-<tt>FETCH_HEAD</tt> to examine the branch with <a href="git-log.html">git-log(1)</a>.  The fetched
+<div class="paragraph"><p>The first command fetches the <code>maint</code> branch from the repository at
+<code>git://git.kernel.org/pub/scm/git/git.git</code> and the second command uses
+<code>FETCH_HEAD</code> to examine the branch with <a href="git-log.html">git-log(1)</a>.  The fetched
 objects will eventually be removed by git&#8217;s built-in housekeeping (see
 <a href="git-gc.html">git-gc(1)</a>).</p></div>
 </li>

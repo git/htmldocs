@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-check-ref-format(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -764,72 +762,72 @@ git-check-ref-format(1) Manual Page
 <div class="paragraph"><p>Checks if a given <em>refname</em> is acceptable, and exits with a non-zero
 status if it is not.</p></div>
 <div class="paragraph"><p>A reference is used in Git to specify branches and tags.  A
-branch head is stored in the <tt>refs/heads</tt> hierarchy, while
-a tag is stored in the <tt>refs/tags</tt> hierarchy of the ref namespace
-(typically in <tt>$GIT_DIR/refs/heads</tt> and <tt>$GIT_DIR/refs/tags</tt>
-directories or, as entries in file <tt>$GIT_DIR/packed-refs</tt>
-if refs are packed by <tt>git gc</tt>).</p></div>
+branch head is stored in the <code>refs/heads</code> hierarchy, while
+a tag is stored in the <code>refs/tags</code> hierarchy of the ref namespace
+(typically in <code>$GIT_DIR/refs/heads</code> and <code>$GIT_DIR/refs/tags</code>
+directories or, as entries in file <code>$GIT_DIR/packed-refs</code>
+if refs are packed by <code>git gc</code>).</p></div>
 <div class="paragraph"><p>Git imposes the following rules on how references are named:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-They can include slash <tt>/</tt> for hierarchical (directory)
+They can include slash <code>/</code> for hierarchical (directory)
   grouping, but no slash-separated component can begin with a
-  dot <tt>.</tt> or end with the sequence <tt>.lock</tt>.
+  dot <code>.</code> or end with the sequence <code>.lock</code>.
 </p>
 </li>
 <li>
 <p>
-They must contain at least one <tt>/</tt>. This enforces the presence of a
-  category like <tt>heads/</tt>, <tt>tags/</tt> etc. but the actual names are not
-  restricted.  If the <tt>--allow-onelevel</tt> option is used, this rule
+They must contain at least one <code>/</code>. This enforces the presence of a
+  category like <code>heads/</code>, <code>tags/</code> etc. but the actual names are not
+  restricted.  If the <code>--allow-onelevel</code> option is used, this rule
   is waived.
 </p>
 </li>
 <li>
 <p>
-They cannot have two consecutive dots <tt>..</tt> anywhere.
+They cannot have two consecutive dots <code>..</code> anywhere.
 </p>
 </li>
 <li>
 <p>
 They cannot have ASCII control characters (i.e. bytes whose
-  values are lower than \040, or \177 <tt>DEL</tt>), space, tilde <tt>~</tt>,
-  caret <tt>^</tt>, or colon <tt>:</tt> anywhere.
+  values are lower than \040, or \177 <code>DEL</code>), space, tilde <code>~</code>,
+  caret <code>^</code>, or colon <code>:</code> anywhere.
 </p>
 </li>
 <li>
 <p>
-They cannot have question-mark <tt>?</tt>, asterisk <tt>*</tt>, or open
-  bracket <tt>[</tt> anywhere.  See the <tt>--refspec-pattern</tt> option below for
+They cannot have question-mark <code>?</code>, asterisk <code>*</code>, or open
+  bracket <code>[</code> anywhere.  See the <code>--refspec-pattern</code> option below for
   an exception to this rule.
 </p>
 </li>
 <li>
 <p>
-They cannot begin or end with a slash <tt>/</tt> or contain multiple
-  consecutive slashes (see the <tt>--normalize</tt> option below for an
+They cannot begin or end with a slash <code>/</code> or contain multiple
+  consecutive slashes (see the <code>--normalize</code> option below for an
   exception to this rule)
 </p>
 </li>
 <li>
 <p>
-They cannot end with a dot <tt>.</tt>.
+They cannot end with a dot <code>.</code>.
 </p>
 </li>
 <li>
 <p>
-They cannot contain a sequence <tt>@{</tt>.
+They cannot contain a sequence <code>@{</code>.
 </p>
 </li>
 <li>
 <p>
-They cannot be the single character <tt>@</tt>.
+They cannot be the single character <code>@</code>.
 </p>
 </li>
 <li>
 <p>
-They cannot contain a <tt>\</tt>.
+They cannot contain a <code>\</code>.
 </p>
 </li>
 </ol></div>
@@ -840,20 +838,20 @@ reference name expressions (see <a href="gitrevisions.html">gitrevisions(7)</a>)
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-A double-dot <tt>..</tt> is often used as in <tt>ref1..ref2</tt>, and in some
-  contexts this notation means <tt>^ref1 ref2</tt> (i.e. not in
-  <tt>ref1</tt> and in <tt>ref2</tt>).
+A double-dot <code>..</code> is often used as in <code>ref1..ref2</code>, and in some
+  contexts this notation means <code>^ref1 ref2</code> (i.e. not in
+  <code>ref1</code> and in <code>ref2</code>).
 </p>
 </li>
 <li>
 <p>
-A tilde <tt>~</tt> and caret <tt>^</tt> are used to introduce the postfix
+A tilde <code>~</code> and caret <code>^</code> are used to introduce the postfix
   <em>nth parent</em> and <em>peel onion</em> operation.
 </p>
 </li>
 <li>
 <p>
-A colon <tt>:</tt> is used as in <tt>srcref:dstref</tt> to mean "use srcref&#8217;s
+A colon <code>:</code> is used as in <code>srcref:dstref</code> to mean "use srcref&#8217;s
   value and store it in dstref" in fetch and push operations.
   It may also be used to select a specific object such as with
   <em>git cat-file</em>: "git cat-file blob v1.3.3:refs.c".
@@ -861,12 +859,12 @@ A colon <tt>:</tt> is used as in <tt>srcref:dstref</tt> to mean "use srcref&#821
 </li>
 <li>
 <p>
-at-open-brace <tt>@{</tt> is used as a notation to access a reflog entry.
+at-open-brace <code>@{</code> is used as a notation to access a reflog entry.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>With the <tt>--branch</tt> option, it expands the &#8220;previous branch syntax&#8221;
-<tt>@{-n}</tt>.  For example, <tt>@{-1}</tt> is a way to refer the last branch you
+<div class="paragraph"><p>With the <code>--branch</code> option, it expands the &#8220;previous branch syntax&#8221;
+<code>@{-n}</code>.  For example, <code>@{-1}</code> is a way to refer the last branch you
 were on.  This option should be used by porcelains to accept this
 syntax anywhere a branch name is expected, so they can act as if you
 typed the branch name.</p></div>
@@ -882,8 +880,8 @@ typed the branch name.</p></div>
 <dd>
 <p>
         Controls whether one-level refnames are accepted (i.e.,
-        refnames that do not contain multiple <tt>/</tt>-separated
-        components).  The default is <tt>--no-allow-onelevel</tt>.
+        refnames that do not contain multiple <code>/</code>-separated
+        components).  The default is <code>--no-allow-onelevel</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -893,9 +891,9 @@ typed the branch name.</p></div>
 <p>
         Interpret &lt;refname&gt; as a reference name pattern for a refspec
         (as used with remote repositories).  If this option is
-        enabled, &lt;refname&gt; is allowed to contain a single <tt>*</tt>
+        enabled, &lt;refname&gt; is allowed to contain a single <code>*</code>
         in place of a one full pathname component (e.g.,
-        <tt>foo/*/bar</tt> but not <tt>foo/bar*</tt>).
+        <code>foo/*/bar</code> but not <code>foo/bar*</code>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -903,12 +901,12 @@ typed the branch name.</p></div>
 </dt>
 <dd>
 <p>
-        Normalize <em>refname</em> by removing any leading slash (<tt>/</tt>)
+        Normalize <em>refname</em> by removing any leading slash (<code>/</code>)
         characters and collapsing runs of adjacent slashes between
         name components into a single slash.  Iff the normalized
         refname is valid then print it to standard output and exit
-        with a status of 0.  (<tt>--print</tt> is a deprecated way to spell
-        <tt>--normalize</tt>.)
+        with a status of 0.  (<code>--print</code> is a deprecated way to spell
+        <code>--normalize</code>.)
 </p>
 </dd>
 </dl></div>
@@ -924,7 +922,7 @@ Print the name of the previous branch:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git check-ref-format --branch @{-1}</tt></pre>
+<pre><code>$ git check-ref-format --branch @{-1}</code></pre>
 </div></div>
 </li>
 <li>
@@ -933,8 +931,8 @@ Determine the reference name to use for a new branch:
 </p>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ ref=$(git check-ref-format --normalize "refs/heads/$newbranch") ||
-die "we do not like '$newbranch' as a branch name."</tt></pre>
+<pre><code>$ ref=$(git check-ref-format --normalize "refs/heads/$newbranch") ||
+die "we do not like '$newbranch' as a branch name."</code></pre>
 </div></div>
 </li>
 </ul></div>

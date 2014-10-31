@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>HTTP transfer protocols</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -757,36 +755,36 @@ efficient transport available to them.</p></div>
 URL syntax documented by RFC 1738, so they are of the form:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>http://&lt;host&gt;:&lt;port&gt;/&lt;path&gt;?&lt;searchpart&gt;</tt></pre>
+<pre><code>http://&lt;host&gt;:&lt;port&gt;/&lt;path&gt;?&lt;searchpart&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>Within this documentation the placeholder <tt>$GIT_URL</tt> will stand for
+<div class="paragraph"><p>Within this documentation the placeholder <code>$GIT_URL</code> will stand for
 the http:// repository URL entered by the end-user.</p></div>
-<div class="paragraph"><p>Servers SHOULD handle all requests to locations matching <tt>$GIT_URL</tt>, as
+<div class="paragraph"><p>Servers SHOULD handle all requests to locations matching <code>$GIT_URL</code>, as
 both the "smart" and "dumb" HTTP protocols used by Git operate
 by appending additional path components onto the end of the user
-supplied <tt>$GIT_URL</tt> string.</p></div>
+supplied <code>$GIT_URL</code> string.</p></div>
 <div class="paragraph"><p>An example of a dumb client requesting for a loose object:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$GIT_URL:     http://example.com:8080/git/repo.git
-URL request:  http://example.com:8080/git/repo.git/objects/d0/49f6c27a2244e12041955e262a404c7faba355</tt></pre>
+<pre><code>$GIT_URL:     http://example.com:8080/git/repo.git
+URL request:  http://example.com:8080/git/repo.git/objects/d0/49f6c27a2244e12041955e262a404c7faba355</code></pre>
 </div></div>
 <div class="paragraph"><p>An example of a smart request to a catch-all gateway:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$GIT_URL:     http://example.com/daemon.cgi?svc=git&amp;q=
-URL request:  http://example.com/daemon.cgi?svc=git&amp;q=/info/refs&amp;service=git-receive-pack</tt></pre>
+<pre><code>$GIT_URL:     http://example.com/daemon.cgi?svc=git&amp;q=
+URL request:  http://example.com/daemon.cgi?svc=git&amp;q=/info/refs&amp;service=git-receive-pack</code></pre>
 </div></div>
 <div class="paragraph"><p>An example of a request to a submodule:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>$GIT_URL:     http://example.com/git/repo.git/path/submodule.git
-URL request:  http://example.com/git/repo.git/path/submodule.git/info/refs</tt></pre>
+<pre><code>$GIT_URL:     http://example.com/git/repo.git/path/submodule.git
+URL request:  http://example.com/git/repo.git/path/submodule.git/info/refs</code></pre>
 </div></div>
-<div class="paragraph"><p>Clients MUST strip a trailing <tt>/</tt>, if present, from the user supplied
-<tt>$GIT_URL</tt> string to prevent empty path tokens (<tt>//</tt>) from appearing
+<div class="paragraph"><p>Clients MUST strip a trailing <code>/</code>, if present, from the user supplied
+<code>$GIT_URL</code> string to prevent empty path tokens (<code>//</code>) from appearing
 in any URL sent to a server.  Compatible clients MUST expand
-<tt>$GIT_URL/info/refs</tt> as <tt>foo/info/refs</tt> and not <tt>foo//info/refs</tt>.</p></div>
+<code>$GIT_URL/info/refs</code> as <code>foo/info/refs</code> and not <code>foo//info/refs</code>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -836,13 +834,13 @@ cookies sent by a client.</p></div>
 <div class="paragraph"><p>Except where noted, all standard HTTP behavior SHOULD be assumed
 by both client and server.  This includes (but is not necessarily
 limited to):</p></div>
-<div class="paragraph"><p>If there is no repository at <tt>$GIT_URL</tt>, or the resource pointed to by a
-location matching <tt>$GIT_URL</tt> does not exist, the server MUST NOT respond
-with <tt>200 OK</tt> response.  A server SHOULD respond with
-<tt>404 Not Found</tt>, <tt>410 Gone</tt>, or any other suitable HTTP status code
+<div class="paragraph"><p>If there is no repository at <code>$GIT_URL</code>, or the resource pointed to by a
+location matching <code>$GIT_URL</code> does not exist, the server MUST NOT respond
+with <code>200 OK</code> response.  A server SHOULD respond with
+<code>404 Not Found</code>, <code>410 Gone</code>, or any other suitable HTTP status code
 which does not imply the resource exists as requested.</p></div>
-<div class="paragraph"><p>If there is a repository at <tt>$GIT_URL</tt>, but access is not currently
-permitted, the server MUST respond with the <tt>403 Forbidden</tt> HTTP
+<div class="paragraph"><p>If there is a repository at <code>$GIT_URL</code>, but access is not currently
+permitted, the server MUST respond with the <code>403 Forbidden</code> HTTP
 status code.</p></div>
 <div class="paragraph"><p>Servers SHOULD support both HTTP 1.0 and HTTP 1.1.
 Servers SHOULD support chunked encoding for both request and response
@@ -853,9 +851,9 @@ bodies.</p></div>
 <div class="paragraph"><p>Servers MAY return ETag and/or Last-Modified headers.</p></div>
 <div class="paragraph"><p>Clients MAY revalidate cached entities by including If-Modified-Since
 and/or If-None-Match request headers.</p></div>
-<div class="paragraph"><p>Servers MAY return <tt>304 Not Modified</tt> if the relevant headers appear
+<div class="paragraph"><p>Servers MAY return <code>304 Not Modified</code> if the relevant headers appear
 in the request and the entity has not changed.  Clients MUST treat
-<tt>304 Not Modified</tt> identical to <tt>200 OK</tt> by reusing the cached entity.</p></div>
+<code>304 Not Modified</code> identical to <code>200 OK</code> by reusing the cached entity.</p></div>
 <div class="paragraph"><p>Clients MAY reuse a cached entity without revalidation if the
 Cache-Control and/or Expires header permits caching.  Clients and
 servers MUST follow RFC 2616 for cache controls.</p></div>
@@ -871,44 +869,44 @@ discovering the references available on the remote repository.</p></div>
 <div class="paragraph"><p>HTTP clients that only support the "dumb" protocol MUST discover
 references by making a request for the special info/refs file of
 the repository.</p></div>
-<div class="paragraph"><p>Dumb HTTP clients MUST make a <tt>GET</tt> request to <tt>$GIT_URL/info/refs</tt>,
+<div class="paragraph"><p>Dumb HTTP clients MUST make a <code>GET</code> request to <code>$GIT_URL/info/refs</code>,
 without any search/query parameters.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>C: GET $GIT_URL/info/refs HTTP/1.0</tt></pre>
+<pre><code>C: GET $GIT_URL/info/refs HTTP/1.0</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>S: 200 OK
+<pre><code>S: 200 OK
 S:
 S: 95dcfa3633004da0049d3d0fa03f80589cbcaf31  refs/heads/maint
 S: d049f6c27a2244e12041955e262a404c7faba355  refs/heads/master
 S: 2cb58b79488a98d2721cea644875a8dd0026b115  refs/tags/v1.0
-S: a3c2e2402b99163d1d59756e5f207ae21cccba4c  refs/tags/v1.0^{}</tt></pre>
+S: a3c2e2402b99163d1d59756e5f207ae21cccba4c  refs/tags/v1.0^{}</code></pre>
 </div></div>
 <div class="paragraph"><p>The Content-Type of the returned info/refs entity SHOULD be
-<tt>text/plain; charset=utf-8</tt>, but MAY be any content type.
+<code>text/plain; charset=utf-8</code>, but MAY be any content type.
 Clients MUST NOT attempt to validate the returned Content-Type.
 Dumb servers MUST NOT return a return type starting with
-<tt>application/x-git-</tt>.</p></div>
+<code>application/x-git-</code>.</p></div>
 <div class="paragraph"><p>Cache-Control headers MAY be returned to disable caching of the
 returned entity.</p></div>
 <div class="paragraph"><p>When examining the response clients SHOULD only examine the HTTP
-status code.  Valid responses are <tt>200 OK</tt>, or <tt>304 Not Modified</tt>.</p></div>
+status code.  Valid responses are <code>200 OK</code>, or <code>304 Not Modified</code>.</p></div>
 <div class="paragraph"><p>The returned content is a UNIX formatted text file describing
 each ref and its known value.  The file SHOULD be sorted by name
 according to the C locale ordering.  The file SHOULD NOT include
-the default ref named <tt>HEAD</tt>.</p></div>
+the default ref named <code>HEAD</code>.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>info_refs   =  *( ref_record )
-ref_record  =  any_ref / peeled_ref</tt></pre>
+<pre><code>info_refs   =  *( ref_record )
+ref_record  =  any_ref / peeled_ref</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>any_ref     =  obj-id HTAB refname LF
+<pre><code>any_ref     =  obj-id HTAB refname LF
 peeled_ref  =  obj-id HTAB refname LF
-               obj-id HTAB refname "^{}" LF</tt></pre>
+               obj-id HTAB refname "^{}" LF</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -917,27 +915,27 @@ peeled_ref  =  obj-id HTAB refname LF
 "smart" and "dumb" protocols) MUST discover references by making
 a parameterized request for the info/refs file of the repository.</p></div>
 <div class="paragraph"><p>The request MUST contain exactly one query parameter,
-<tt>service=$servicename</tt>, where <tt>$servicename</tt> MUST be the service
+<code>service=$servicename</code>, where <code>$servicename</code> MUST be the service
 name the client wishes to contact to complete the operation.
 The request MUST NOT contain additional query parameters.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>C: GET $GIT_URL/info/refs?service=git-upload-pack HTTP/1.0</tt></pre>
+<pre><code>C: GET $GIT_URL/info/refs?service=git-upload-pack HTTP/1.0</code></pre>
 </div></div>
 <div class="paragraph"><p>dumb server reply:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>S: 200 OK
+<pre><code>S: 200 OK
 S:
 S: 95dcfa3633004da0049d3d0fa03f80589cbcaf31  refs/heads/maint
 S: d049f6c27a2244e12041955e262a404c7faba355  refs/heads/master
 S: 2cb58b79488a98d2721cea644875a8dd0026b115  refs/tags/v1.0
-S: a3c2e2402b99163d1d59756e5f207ae21cccba4c  refs/tags/v1.0^{}</tt></pre>
+S: a3c2e2402b99163d1d59756e5f207ae21cccba4c  refs/tags/v1.0^{}</code></pre>
 </div></div>
 <div class="paragraph"><p>smart server reply:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>S: 200 OK
+<pre><code>S: 200 OK
 S: Content-Type: application/x-git-upload-pack-advertisement
 S: Cache-Control: no-cache
 S:
@@ -945,7 +943,7 @@ S: 001e# service=git-upload-pack\n
 S: 004895dcfa3633004da0049d3d0fa03f80589cbcaf31 refs/heads/maint\0multi_ack\n
 S: 0042d049f6c27a2244e12041955e262a404c7faba355 refs/heads/master\n
 S: 003c2cb58b79488a98d2721cea644875a8dd0026b115 refs/tags/v1.0\n
-S: 003fa3c2e2402b99163d1d59756e5f207ae21cccba4c refs/tags/v1.0^{}\n</tt></pre>
+S: 003fa3c2e2402b99163d1d59756e5f207ae21cccba4c refs/tags/v1.0^{}\n</code></pre>
 </div></div>
 <div class="sect3">
 <h4 id="_dumb_server_response">Dumb Server Response</h4>
@@ -957,63 +955,63 @@ description of the dumb server response.</p></div>
 <h4 id="_smart_server_response">Smart Server Response</h4>
 <div class="paragraph"><p>If the server does not recognize the requested service name, or the
 requested service name has been disabled by the server administrator,
-the server MUST respond with the <tt>403 Forbidden</tt> HTTP status code.</p></div>
+the server MUST respond with the <code>403 Forbidden</code> HTTP status code.</p></div>
 <div class="paragraph"><p>Otherwise, smart servers MUST respond with the smart server reply
 format for the requested service name.</p></div>
 <div class="paragraph"><p>Cache-Control headers SHOULD be used to disable caching of the
 returned entity.</p></div>
-<div class="paragraph"><p>The Content-Type MUST be <tt>application/x-$servicename-advertisement</tt>.
+<div class="paragraph"><p>The Content-Type MUST be <code>application/x-$servicename-advertisement</code>.
 Clients SHOULD fall back to the dumb protocol if another content
 type is returned.  When falling back to the dumb protocol clients
-SHOULD NOT make an additional request to <tt>$GIT_URL/info/refs</tt>, but
+SHOULD NOT make an additional request to <code>$GIT_URL/info/refs</code>, but
 instead SHOULD use the response already in hand.  Clients MUST NOT
 continue if they do not support the dumb protocol.</p></div>
-<div class="paragraph"><p>Clients MUST validate the status code is either <tt>200 OK</tt> or
-<tt>304 Not Modified</tt>.</p></div>
+<div class="paragraph"><p>Clients MUST validate the status code is either <code>200 OK</code> or
+<code>304 Not Modified</code>.</p></div>
 <div class="paragraph"><p>Clients MUST validate the first five bytes of the response entity
-matches the regex <tt>^[0-9a-f]{4}#</tt>.  If this test fails, clients
+matches the regex <code>^[0-9a-f]{4}#</code>.  If this test fails, clients
 MUST NOT continue.</p></div>
 <div class="paragraph"><p>Clients MUST parse the entire response as a sequence of pkt-line
 records.</p></div>
-<div class="paragraph"><p>Clients MUST verify the first pkt-line is <tt># service=$servicename</tt>.
+<div class="paragraph"><p>Clients MUST verify the first pkt-line is <code># service=$servicename</code>.
 Servers MUST set $servicename to be the request parameter value.
 Servers SHOULD include an LF at the end of this line.
 Clients MUST ignore an LF at the end of the line.</p></div>
-<div class="paragraph"><p>Servers MUST terminate the response with the magic <tt>0000</tt> end
+<div class="paragraph"><p>Servers MUST terminate the response with the magic <code>0000</code> end
 pkt-line marker.</p></div>
 <div class="paragraph"><p>The returned response is a pkt-line stream describing each ref and
 its known value.  The stream SHOULD be sorted by name according to
 the C locale ordering.  The stream SHOULD include the default ref
-named <tt>HEAD</tt> as the first ref.  The stream MUST include capability
+named <code>HEAD</code> as the first ref.  The stream MUST include capability
 declarations behind a NUL on the first ref.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>smart_reply     =  PKT-LINE("# service=$servicename" LF)
+<pre><code>smart_reply     =  PKT-LINE("# service=$servicename" LF)
                    ref_list
                    "0000"
-ref_list        =  empty_list / non_empty_list</tt></pre>
+ref_list        =  empty_list / non_empty_list</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>empty_list      =  PKT-LINE(zero-id SP "capabilities^{}" NUL cap-list LF)</tt></pre>
+<pre><code>empty_list      =  PKT-LINE(zero-id SP "capabilities^{}" NUL cap-list LF)</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>non_empty_list  =  PKT-LINE(obj-id SP name NUL cap_list LF)
-                   *ref_record</tt></pre>
+<pre><code>non_empty_list  =  PKT-LINE(obj-id SP name NUL cap_list LF)
+                   *ref_record</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>cap-list        =  capability *(SP capability)
+<pre><code>cap-list        =  capability *(SP capability)
 capability      =  1*(LC_ALPHA / DIGIT / "-" / "_")
-LC_ALPHA        =  %x61-7A</tt></pre>
+LC_ALPHA        =  %x61-7A</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>ref_record      =  any_ref / peeled_ref
+<pre><code>ref_record      =  any_ref / peeled_ref
 any_ref         =  PKT-LINE(obj-id SP name LF)
 peeled_ref      =  PKT-LINE(obj-id SP name LF)
-                   PKT-LINE(obj-id SP name "^{}" LF</tt></pre>
+                   PKT-LINE(obj-id SP name "^{}" LF</code></pre>
 </div></div>
 </div>
 </div>
@@ -1022,26 +1020,26 @@ peeled_ref      =  PKT-LINE(obj-id SP name LF)
 <div class="sect1">
 <h2 id="_smart_service_git_upload_pack">Smart Service git-upload-pack</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This service reads from the repository pointed to by <tt>$GIT_URL</tt>.</p></div>
+<div class="paragraph"><p>This service reads from the repository pointed to by <code>$GIT_URL</code>.</p></div>
 <div class="paragraph"><p>Clients MUST first perform ref discovery with
-<tt>$GIT_URL/info/refs?service=git-upload-pack</tt>.</p></div>
+<code>$GIT_URL/info/refs?service=git-upload-pack</code>.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>C: POST $GIT_URL/git-upload-pack HTTP/1.0
+<pre><code>C: POST $GIT_URL/git-upload-pack HTTP/1.0
 C: Content-Type: application/x-git-upload-pack-request
 C:
 C: 0032want 0a53e9ddeaddad63ad106860237bbf53411d11a7\n
 C: 0032have 441b40d833fdfa93eb2908e52742248faf0ee993\n
-C: 0000</tt></pre>
+C: 0000</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>S: 200 OK
+<pre><code>S: 200 OK
 S: Content-Type: application/x-git-upload-pack-result
 S: Cache-Control: no-cache
 S:
 S: ....ACK %s, continue
-S: ....NAK</tt></pre>
+S: ....NAK</code></pre>
 </div></div>
 <div class="paragraph"><p>Clients MUST NOT reuse or revalidate a cached response.
 Servers MUST include sufficient Cache-Control headers
@@ -1050,25 +1048,25 @@ to prevent caching of the response.</p></div>
 <div class="paragraph"><p>Clients MUST send at least one "want" command in the request body.
 Clients MUST NOT reference an id in a "want" command which did not
 appear in the response obtained through ref discovery unless the
-server advertises capability <tt>allow-tip-sha1-in-want</tt>.</p></div>
+server advertises capability <code>allow-tip-sha1-in-want</code>.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>compute_request   =  want_list
+<pre><code>compute_request   =  want_list
                      have_list
                      request_end
-request_end       =  "0000" / "done"</tt></pre>
+request_end       =  "0000" / "done"</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>want_list         =  PKT-LINE(want NUL cap_list LF)
+<pre><code>want_list         =  PKT-LINE(want NUL cap_list LF)
                      *(want_pkt)
 want_pkt          =  PKT-LINE(want LF)
 want              =  "want" SP id
-cap_list          =  *(SP capability) SP</tt></pre>
+cap_list          =  *(SP capability) SP</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>have_list         =  *PKT-LINE("have" SP id LF)</tt></pre>
+<pre><code>have_list         =  *PKT-LINE("have" SP id LF)</code></pre>
 </div></div>
 <div class="paragraph"><p>TODO: Document this further.</p></div>
 <div class="sect2">
@@ -1077,20 +1075,20 @@ cap_list          =  *(SP capability) SP</tt></pre>
 (C = client, S = server):</p></div>
 <div class="paragraph"><p><em>init step:</em></p></div>
 <div class="paragraph"><p>C: Use ref discovery to obtain the advertised refs.</p></div>
-<div class="paragraph"><p>C: Place any object seen into set <tt>advertised</tt>.</p></div>
-<div class="paragraph"><p>C: Build an empty set, <tt>common</tt>, to hold the objects that are later
+<div class="paragraph"><p>C: Place any object seen into set <code>advertised</code>.</p></div>
+<div class="paragraph"><p>C: Build an empty set, <code>common</code>, to hold the objects that are later
    determined to be on both ends.</p></div>
-<div class="paragraph"><p>C: Build a set, <tt>want</tt>, of the objects from <tt>advertised</tt> the client
+<div class="paragraph"><p>C: Build a set, <code>want</code>, of the objects from <code>advertised</code> the client
    wants to fetch, based on what it saw during ref discovery.</p></div>
-<div class="paragraph"><p>C: Start a queue, <tt>c_pending</tt>, ordered by commit time (popping newest
+<div class="paragraph"><p>C: Start a queue, <code>c_pending</code>, ordered by commit time (popping newest
    first).  Add all client refs.  When a commit is popped from
    the queue its parents SHOULD be automatically inserted back.
    Commits MUST only enter the queue once.</p></div>
 <div class="paragraph"><p><em>one compute step:</em></p></div>
-<div class="paragraph"><p>C: Send one <tt>$GIT_URL/git-upload-pack</tt> request:</p></div>
+<div class="paragraph"><p>C: Send one <code>$GIT_URL/git-upload-pack</code> request:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>C: 0032want &lt;want #1&gt;...............................
+<pre><code>C: 0032want &lt;want #1&gt;...............................
 C: 0032want &lt;want #2&gt;...............................
 ....
 C: 0032have &lt;common #1&gt;.............................
@@ -1099,7 +1097,7 @@ C: 0032have &lt;common #2&gt;.............................
 C: 0032have &lt;have #1&gt;...............................
 C: 0032have &lt;have #2&gt;...............................
 ....
-C: 0000</tt></pre>
+C: 0000</code></pre>
 </div></div>
 <div class="paragraph"><p>The stream is organized into "commands", with each command
 appearing by itself in a pkt-line.  Within a command line,
@@ -1121,41 +1119,41 @@ at all in the request stream:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>The stream is terminated by a pkt-line flush (<tt>0000</tt>).</p></div>
+<div class="paragraph"><p>The stream is terminated by a pkt-line flush (<code>0000</code>).</p></div>
 <div class="paragraph"><p>A single "want" or "have" command MUST have one hex formatted
 SHA-1 as its value.  Multiple SHA-1s MUST be sent by sending
 multiple commands.</p></div>
-<div class="paragraph"><p>The <tt>have</tt> list is created by popping the first 32 commits
-from <tt>c_pending</tt>.  Less can be supplied if <tt>c_pending</tt> empties.</p></div>
+<div class="paragraph"><p>The <code>have</code> list is created by popping the first 32 commits
+from <code>c_pending</code>.  Less can be supplied if <code>c_pending</code> empties.</p></div>
 <div class="paragraph"><p>If the client has sent 256 "have" commits and has not yet
-received one of those back from <tt>s_common</tt>, or the client has
-emptied <tt>c_pending</tt> it SHOULD include a "done" command to let
+received one of those back from <code>s_common</code>, or the client has
+emptied <code>c_pending</code> it SHOULD include a "done" command to let
 the server know it won&#8217;t proceed:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>C: 0009done</tt></pre>
+<pre><code>C: 0009done</code></pre>
 </div></div>
 <div class="paragraph"><p>S: Parse the git-upload-pack request:</p></div>
-<div class="paragraph"><p>Verify all objects in <tt>want</tt> are directly reachable from refs.</p></div>
+<div class="paragraph"><p>Verify all objects in <code>want</code> are directly reachable from refs.</p></div>
 <div class="paragraph"><p>The server MAY walk backwards through history or through
 the reflog to permit slightly stale requests.</p></div>
 <div class="paragraph"><p>If no "want" objects are received, send an error:
 TODO: Define error if no "want" lines are requested.</p></div>
 <div class="paragraph"><p>If any "want" object is not reachable, send an error:
 TODO: Define error if an invalid "want" is requested.</p></div>
-<div class="paragraph"><p>Create an empty list, <tt>s_common</tt>.</p></div>
+<div class="paragraph"><p>Create an empty list, <code>s_common</code>.</p></div>
 <div class="paragraph"><p>If "have" was sent:</p></div>
 <div class="paragraph"><p>Loop through the objects in the order supplied by the client.</p></div>
 <div class="paragraph"><p>For each object, if the server has the object reachable from
-a ref, add it to <tt>s_common</tt>.  If a commit is added to <tt>s_common</tt>,
-do not add any ancestors, even if they also appear in <tt>have</tt>.</p></div>
+a ref, add it to <code>s_common</code>.  If a commit is added to <code>s_common</code>,
+do not add any ancestors, even if they also appear in <code>have</code>.</p></div>
 <div class="paragraph"><p>S: Send the git-upload-pack response:</p></div>
 <div class="paragraph"><p>If the server has found a closed set of objects to pack or the
 request ends with "done", it replies with the pack.
 TODO: Document the pack based response</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>S: PACK...</tt></pre>
+<pre><code>S: PACK...</code></pre>
 </div></div>
 <div class="paragraph"><p>The returned stream is the side-band-64k protocol supported
 by the git-upload-pack service, and the pack is embedded into
@@ -1175,25 +1173,25 @@ TODO: Document the non-pack response</p></div>
 <div class="sect1">
 <h2 id="_smart_service_git_receive_pack">Smart Service git-receive-pack</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This service reads from the repository pointed to by <tt>$GIT_URL</tt>.</p></div>
+<div class="paragraph"><p>This service reads from the repository pointed to by <code>$GIT_URL</code>.</p></div>
 <div class="paragraph"><p>Clients MUST first perform ref discovery with
-<tt>$GIT_URL/info/refs?service=git-receive-pack</tt>.</p></div>
+<code>$GIT_URL/info/refs?service=git-receive-pack</code>.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>C: POST $GIT_URL/git-receive-pack HTTP/1.0
+<pre><code>C: POST $GIT_URL/git-receive-pack HTTP/1.0
 C: Content-Type: application/x-git-receive-pack-request
 C:
 C: ....0a53e9ddeaddad63ad106860237bbf53411d11a7 441b40d833fdfa93eb2908e52742248faf0ee993 refs/heads/maint\0 report-status
 C: 0000
-C: PACK....</tt></pre>
+C: PACK....</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>S: 200 OK
+<pre><code>S: 200 OK
 S: Content-Type: application/x-git-receive-pack-result
 S: Cache-Control: no-cache
 S:
-S: ....</tt></pre>
+S: ....</code></pre>
 </div></div>
 <div class="paragraph"><p>Clients MUST NOT reuse or revalidate a cached response.
 Servers MUST include sufficient Cache-Control headers
@@ -1204,22 +1202,22 @@ Within the command portion of the request body clients SHOULD send
 the id obtained through ref discovery as old_id.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>update_request  =  command_list
-                   "PACK" &lt;binary data&gt;</tt></pre>
+<pre><code>update_request  =  command_list
+                   "PACK" &lt;binary data&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>command_list    =  PKT-LINE(command NUL cap_list LF)
+<pre><code>command_list    =  PKT-LINE(command NUL cap_list LF)
                    *(command_pkt)
 command_pkt     =  PKT-LINE(command LF)
-cap_list        =  *(SP capability) SP</tt></pre>
+cap_list        =  *(SP capability) SP</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>command         =  create / delete / update
+<pre><code>command         =  create / delete / update
 create          =  zero-id SP new_id SP name
 delete          =  old_id SP zero-id SP name
-update          =  old_id SP new_id SP name</tt></pre>
+update          =  old_id SP new_id SP name</code></pre>
 </div></div>
 <div class="paragraph"><p>TODO: Document this further.</p></div>
 </div>

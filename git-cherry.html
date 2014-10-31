@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>git-cherry(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -758,14 +756,14 @@ git-cherry(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Determine whether there are commits in <tt>&lt;head&gt;..&lt;upstream&gt;</tt> that are
-equivalent to those in the range <tt>&lt;limit&gt;..&lt;head&gt;</tt>.</p></div>
+<div class="paragraph"><p>Determine whether there are commits in <code>&lt;head&gt;..&lt;upstream&gt;</code> that are
+equivalent to those in the range <code>&lt;limit&gt;..&lt;head&gt;</code>.</p></div>
 <div class="paragraph"><p>The equivalence test is based on the diff, after removing whitespace
 and line numbers.  git-cherry therefore detects when commits have been
 "copied" by means of <a href="git-cherry-pick.html">git-cherry-pick(1)</a>, <a href="git-am.html">git-am(1)</a> or
 <a href="git-rebase.html">git-rebase(1)</a>.</p></div>
-<div class="paragraph"><p>Outputs the SHA1 of every commit in <tt>&lt;limit&gt;..&lt;head&gt;</tt>, prefixed with
-<tt>-</tt> for commits that have an equivalent in &lt;upstream&gt;, and <tt>+</tt> for
+<div class="paragraph"><p>Outputs the SHA1 of every commit in <code>&lt;limit&gt;..&lt;head&gt;</code>, prefixed with
+<code>-</code> for commits that have an equivalent in &lt;upstream&gt;, and <code>+</code> for
 commits that do not.</p></div>
 </div>
 </div>
@@ -820,17 +818,17 @@ applied by the upstream maintainer.  In such a workflow you might
 create and send a topic branch like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git checkout -b topic origin/master
+<pre><code>$ git checkout -b topic origin/master
 # work and create some commits
 $ git format-patch origin/master
-$ git send-email ... 00*</tt></pre>
+$ git send-email ... 00*</code></pre>
 </div></div>
 <div class="paragraph"><p>Later, you can see whether your changes have been applied by saying
-(still on <tt>topic</tt>):</p></div>
+(still on <code>topic</code>):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git fetch  # update your notion of origin/master
-$ git cherry -v</tt></pre>
+<pre><code>$ git fetch  # update your notion of origin/master
+$ git cherry -v</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -839,7 +837,7 @@ $ git cherry -v</tt></pre>
 maintainer applied two of them, the situation might look like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log --graph --oneline --decorate --boundary origin/master...topic
+<pre><code>$ git log --graph --oneline --decorate --boundary origin/master...topic
 * 7654321 (origin/master) upstream tip commit
 [... snip some other commits ...]
 * cccc111 cherry-pick of C
@@ -849,21 +847,21 @@ maintainer applied two of them, the situation might look like:</p></div>
 | * bbbb000 commit B
 | * aaaa000 commit A
 |/
-o 1234567 branch point</tt></pre>
+o 1234567 branch point</code></pre>
 </div></div>
 <div class="paragraph"><p>In such cases, git-cherry shows a concise summary of what has yet to
 be applied:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git cherry origin/master topic
+<pre><code>$ git cherry origin/master topic
 - cccc000... commit C
 + bbbb000... commit B
-- aaaa000... commit A</tt></pre>
+- aaaa000... commit A</code></pre>
 </div></div>
-<div class="paragraph"><p>Here, we see that the commits A and C (marked with <tt>-</tt>) can be
-dropped from your <tt>topic</tt> branch when you rebase it on top of
-<tt>origin/master</tt>, while the commit B (marked with <tt>+</tt>) still needs to
-be kept so that it will be sent to be applied to <tt>origin/master</tt>.</p></div>
+<div class="paragraph"><p>Here, we see that the commits A and C (marked with <code>-</code>) can be
+dropped from your <code>topic</code> branch when you rebase it on top of
+<code>origin/master</code>, while the commit B (marked with <code>+</code>) still needs to
+be kept so that it will be sent to be applied to <code>origin/master</code>.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_using_a_limit">Using a limit</h3>
@@ -872,7 +870,7 @@ other work that is not in upstream.  Expanding on the previous
 example, this might look like:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git log --graph --oneline --decorate --boundary origin/master...topic
+<pre><code>$ git log --graph --oneline --decorate --boundary origin/master...topic
 * 7654321 (origin/master) upstream tip commit
 [... snip some other commits ...]
 * cccc111 cherry-pick of C
@@ -885,16 +883,16 @@ example, this might look like:</p></div>
 [... snip ...]
 | * 0000aaa unpublished stuff A
 |/
-o 1234567 merge-base between upstream and topic</tt></pre>
+o 1234567 merge-base between upstream and topic</code></pre>
 </div></div>
-<div class="paragraph"><p>By specifying <tt>base</tt> as the limit, you can avoid listing commits
-between <tt>base</tt> and <tt>topic</tt>:</p></div>
+<div class="paragraph"><p>By specifying <code>base</code> as the limit, you can avoid listing commits
+between <code>base</code> and <code>topic</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ git cherry origin/master topic base
+<pre><code>$ git cherry origin/master topic base
 - cccc000... commit C
 + bbbb000... commit B
-- aaaa000... commit A</tt></pre>
+- aaaa000... commit A</code></pre>
 </div></div>
 </div>
 </div>

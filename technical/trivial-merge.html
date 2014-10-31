@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.6" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>Trivial merge rules</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -349,7 +355,7 @@ div.colist td img {
   margin-bottom: 0.1em;
 }
 
-div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -407,17 +413,13 @@ span.underline { text-decoration: underline; }
 span.overline { text-decoration: overline; }
 span.line-through { text-decoration: line-through; }
 
+div.unbreakable { page-break-inside: avoid; }
+
 
 /*
  * xhtml11 specific
  *
  * */
-
-tt {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 div.tableblock {
   margin-top: 1.0em;
@@ -451,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -537,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -581,7 +579,7 @@ toc: function (toclevels) {
 
   function tocEntries(el, toclevels) {
     var result = new Array;
-    var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
     // Function that scans the DOM tree for header elements (the DOM2
     // nodeIterator API would be a better technique but not supported by all
     // browsers).
@@ -610,7 +608,7 @@ toc: function (toclevels) {
   var i;
   for (i = 0; i < toc.childNodes.length; i++) {
     var entry = toc.childNodes[i];
-    if (entry.nodeName == 'div'
+    if (entry.nodeName.toLowerCase() == 'div'
      && entry.getAttribute("class")
      && entry.getAttribute("class").match(/^toclevel/))
       tocEntriesToRemove.push(entry);
@@ -656,7 +654,7 @@ footnotes: function () {
   var entriesToRemove = [];
   for (i = 0; i < noteholder.childNodes.length; i++) {
     var entry = noteholder.childNodes[i];
-    if (entry.nodeName == 'div' && entry.getAttribute("class") == "footnote")
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
       entriesToRemove.push(entry);
   }
   for (i = 0; i < entriesToRemove.length; i++) {
@@ -753,12 +751,12 @@ required changes to the working tree to have it match.</p></div>
 affect the result.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>index   tree    result
+<pre><code>index   tree    result
 -----------------------
 *       (empty) (empty)
 (empty) tree    tree
 index+  tree    tree
-index+  index   index+</tt></pre>
+index+  index   index+</code></pre>
 </div></div>
 </div>
 </div>
@@ -776,7 +774,7 @@ and not up-to-date.</p></div>
 affect the result.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>case  index   old     new     result
+<pre><code>case  index   old     new     result
 -------------------------------------
 0/2   (empty) *       (empty) (empty)
 1/3   (empty) *       new     new
@@ -785,7 +783,7 @@ affect the result.</p></div>
 10    index+  index   (empty) (empty)
 14/15 index+  old     old     index+
 18/19 index+  old     index   index+
-20    index+  index   new     new</tt></pre>
+20    index+  index   new     new</code></pre>
 </div></div>
 </div>
 </div>
@@ -810,7 +808,7 @@ only one ancestor or remote fits; a <em>^</em> means all of the ancestors
 must be the same.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>case  ancest    head    remote    result
+<pre><code>case  ancest    head    remote    result
 ----------------------------------------
 1     (empty)+  (empty) (empty)   (empty)
 2ALT  (empty)+  *empty* remote    remote
@@ -827,7 +825,7 @@ must be the same.</p></div>
 16    anc1/anc2 anc1    anc2      no merge
 13    ancest+   head    ancest    head
 14    ancest+   ancest  remote    remote
-11    ancest+   head    remote    no merge</tt></pre>
+11    ancest+   head    remote    no merge</code></pre>
 </div></div>
 <div class="paragraph"><p>Only #2ALT and #3ALT use <strong>empty</strong>, because these are the only cases
 where there can be conflicts that didn&#8217;t exist before. Note that we
