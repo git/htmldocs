@@ -748,7 +748,7 @@ git-push(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git push</em> [--all | --mirror | --tags] [--follow-tags] [-n | --dry-run] [--receive-pack=&lt;git-receive-pack&gt;]
+<pre class="content"><em>git push</em> [--all | --mirror | --tags] [--follow-tags] [--atomic] [-n | --dry-run] [--receive-pack=&lt;git-receive-pack&gt;]
            [--repo=&lt;repository&gt;] [-f | --force] [--prune] [-v | --verbose]
            [-u | --set-upstream] [--signed]
            [--force-with-lease[=&lt;refname&gt;[:&lt;expect&gt;]]]
@@ -929,6 +929,16 @@ already exists on the remote side.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--[no-]atomic
+</dt>
+<dd>
+<p>
+        Use an atomic transaction on the remote side if available.
+        Either all refs are updated, or on error, no refs are updated.
+        If the server does not support atomic pushes the push will fail.
+</p>
+</dd>
+<dt class="hdlist1">
 --receive-pack=&lt;git-receive-pack&gt;
 </dt>
 <dt class="hdlist1">
@@ -1023,22 +1033,9 @@ origin +master</code> to force a push to the <code>master</code> branch). See th
 </dt>
 <dd>
 <p>
-        This option is only relevant if no &lt;repository&gt; argument is
-        passed in the invocation. In this case, <em>git push</em> derives the
-        remote name from the current branch: If it tracks a remote
-        branch, then that remote repository is pushed to. Otherwise,
-        the name "origin" is used. For this latter case, this option
-        can be used to override the name "origin". In other words,
-        the difference between these two commands
+        This option is equivalent to the &lt;repository&gt; argument. If both
+        are specified, the command-line argument takes precedence.
 </p>
-<div class="listingblock">
-<div class="content">
-<pre><code>git push public         #1
-git push --repo=public  #2</code></pre>
-</div></div>
-<div class="paragraph"><p>is that #1 always pushes to "public" whereas #2 pushes to "public"
-only if the current branch does not track a remote branch. This is
-useful if you write an alias or script around <em>git push</em>.</p></div>
 </dd>
 <dt class="hdlist1">
 -u
@@ -1743,7 +1740,7 @@ a <code>git gc</code> command on the origin repository.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-12-12 15:33:36 PST
+Last updated 2015-02-17 14:10:17 PST
 </div>
 </div>
 </body>
