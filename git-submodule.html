@@ -911,25 +911,73 @@ it contains local modifications.</p></div>
 update
 </dt>
 <dd>
+<div class="openblock">
+<div class="content">
+<div class="paragraph"><p>Update the registered submodules to match what the superproject
+expects by cloning missing submodules and updating the working tree of
+the submodules. The "updating" can be done in several ways depending
+on command line options and the value of <code>submodule.&lt;name&gt;.update</code>
+configuration variable. Supported update procedures are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+checkout
+</dt>
+<dd>
 <p>
-        Update the registered submodules, i.e. clone missing submodules and
-        checkout the commit specified in the index of the containing repository.
-        This will make the submodules HEAD be detached unless <code>--rebase</code> or
-        <code>--merge</code> is specified or the key <code>submodule.$name.update</code> is set to
-        <code>rebase</code>, <code>merge</code> or <code>none</code>. <code>none</code> can be overridden by specifying
-        <code>--checkout</code>. Setting the key <code>submodule.$name.update</code> to <code>!command</code>
-        will cause <code>command</code> to be run. <code>command</code> can be any arbitrary shell
-        command that takes a single argument, namely the sha1 to update to.
+the commit recorded in the superproject will be
+            checked out in the submodule on a detached HEAD. This is
+            done when <code>--checkout</code> option is given, or no option is
+            given, and <code>submodule.&lt;name&gt;.update</code> is unset, or if it is
+            set to <em>checkout</em>.
 </p>
+<div class="paragraph"><p>If <code>--force</code> is specified, the submodule will be checked out (using
+<code>git checkout --force</code> if appropriate), even if the commit specified
+in the index of the containing repository already matches the commit
+checked out in the submodule.</p></div>
+</dd>
+<dt class="hdlist1">
+rebase
+</dt>
+<dd>
+<p>
+the current branch of the submodule will be rebased
+            onto the commit recorded in the superproject. This is done
+            when <code>--rebase</code> option is given, or no option is given, and
+            <code>submodule.&lt;name&gt;.update</code> is set to <em>rebase</em>.
+</p>
+</dd>
+<dt class="hdlist1">
+merge
+</dt>
+<dd>
+<p>
+the commit recorded in the superproject will be merged
+            into the current branch in the submodule. This is done
+            when <code>--merge</code> option is given, or no option is given, and
+            <code>submodule.&lt;name&gt;.update</code> is set to <em>merge</em>.
+</p>
+</dd>
+<dt class="hdlist1">
+custom command
+</dt>
+<dd>
+<p>
+arbitrary shell command that takes a single
+            argument (the sha1 of the commit recorded in the
+            superproject) is executed. This is done when no option is
+            given, and <code>submodule.&lt;name&gt;.update</code> has the form of
+            <em>!command</em>.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>When no option is given and <code>submodule.&lt;name&gt;.update</code> is set to <em>none</em>,
+the submodule is not updated.</p></div>
 <div class="paragraph"><p>If the submodule is not yet initialized, and you just want to use the
 setting as stored in .gitmodules, you can automatically initialize the
 submodule with the <code>--init</code> option.</p></div>
 <div class="paragraph"><p>If <code>--recursive</code> is specified, this command will recurse into the
 registered submodules, and update any nested submodules within.</p></div>
-<div class="paragraph"><p>If <code>--force</code> is specified, the submodule will be checked out (using
-<code>git checkout --force</code> if appropriate), even if the commit specified in the
-index of the containing repository already matches the commit checked out in
-the submodule.</p></div>
+</div></div>
 </dd>
 <dt class="hdlist1">
 summary
@@ -1031,10 +1079,12 @@ sync
         When running add, allow adding an otherwise ignored submodule path.
         When running deinit the submodule work trees will be removed even if
         they contain local changes.
-        When running update, throw away local changes in submodules when
-        switching to a different commit; and always run a checkout operation
-        in the submodule, even if the commit listed in the index of the
-        containing repository matches the commit checked out in the submodule.
+        When running update (only effective with the checkout procedure),
+        throw away local changes in submodules when switching to a
+        different commit; and always run a checkout operation in the
+        submodule, even if the commit listed in the index of the
+        containing repository matches the commit checked out in the
+        submodule.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1126,7 +1176,7 @@ the submodule itself.</p></div>
         Checkout the commit recorded in the superproject on a detached HEAD
         in the submodule. This is the default behavior, the main use of
         this option is to override <code>submodule.$name.update</code> when set to
-        <code>merge</code>, <code>rebase</code> or <code>none</code>.
+        a value other than <code>checkout</code>.
         If the key <code>submodule.$name.update</code> is either not explicitly set or
         set to <code>checkout</code>, this option is implicit.
 </p>
@@ -1246,7 +1296,7 @@ for details.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-06-26 14:48:22 PDT
+Last updated 2015-03-06 15:45:51 PST
 </div>
 </div>
 </body>
