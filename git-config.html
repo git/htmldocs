@@ -1344,7 +1344,8 @@ the fully qualified variable name of the variable itself is the last
 dot-separated segment and the section name is everything before the last
 dot. The variable names are case-insensitive, allow only alphanumeric
 characters and <code>-</code>, and must start with an alphabetic character.  Some
-variables may appear multiple times.</p></div>
+variables may appear multiple times; we say then that the variable is
+multivalued.</p></div>
 <div class="sect2">
 <h3 id="_syntax">Syntax</h3>
 <div class="paragraph"><p>The syntax is fairly flexible and permissive; whitespaces are mostly
@@ -1352,7 +1353,7 @@ ignored.  The <em>#</em> and <em>;</em> characters begin comments to the end of 
 blank lines are ignored.</p></div>
 <div class="paragraph"><p>The file consists of sections and variables.  A section begins with
 the name of the section in square brackets and continues until the next
-section begins.  Section names are not case sensitive.  Only alphanumeric
+section begins.  Section names are case-insensitive.  Only alphanumeric
 characters, <code>-</code> and <code>.</code> are allowed in section names.  Each variable
 must belong to some section, which means that there must be a section
 header before the first setting of a variable.</p></div>
@@ -1364,8 +1365,8 @@ in the section header, like in the example below:</p></div>
 <pre><code>        [section "subsection"]</code></pre>
 </div></div>
 <div class="paragraph"><p>Subsection names are case sensitive and can contain any characters except
-newline (doublequote <code>"</code> and backslash have to be escaped as <code>\"</code> and <code>\\</code>,
-respectively).  Section headers cannot span multiple
+newline (doublequote <code>"</code> and backslash can be included by escaping them
+as <code>\"</code> and <code>\\</code>, respectively).  Section headers cannot span multiple
 lines.  Variables may belong directly to a section or to a given subsection.
 You can have <code>[section]</code> if you have <code>[section "subsection"]</code>, but you
 don&#8217;t need to.</p></div>
@@ -1375,32 +1376,23 @@ compared case sensitively. These subsection names follow the same
 restrictions as section names.</p></div>
 <div class="paragraph"><p>All the other lines (and the remainder of the line after the section
 header) are recognized as setting variables, in the form
-<em>name = value</em>.  If there is no equal sign on the line, the entire line
-is taken as <em>name</em> and the variable is recognized as boolean "true".
+<em>name = value</em> (or just <em>name</em>, which is a short-hand to say that
+the variable is the boolean "true").
 The variable names are case-insensitive, allow only alphanumeric characters
-and <code>-</code>, and must start with an alphabetic character.  There can be more
-than one value for a given variable; we say then that the variable is
-multivalued.</p></div>
-<div class="paragraph"><p>Leading and trailing whitespace in a variable value is discarded.
-Internal whitespace within a variable value is retained verbatim.</p></div>
-<div class="paragraph"><p>The values following the equals sign in variable assign are all either
-a string, an integer, or a boolean.  Boolean values may be given as yes/no,
-1/0, true/false or on/off.  Case is not significant in boolean values, when
-converting value to the canonical form using <em>--bool</em> type specifier;
-<em>git config</em> will ensure that the output is "true" or "false".</p></div>
-<div class="paragraph"><p>String values may be entirely or partially enclosed in double quotes.
-You need to enclose variable values in double quotes if you want to
-preserve leading or trailing whitespace, or if the variable value contains
-comment characters (i.e. it contains <em>#</em> or <em>;</em>).
-Double quote <code>"</code> and backslash <code>\</code> characters in variable values must
-be escaped: use <code>\"</code> for <code>"</code> and <code>\\</code> for <code>\</code>.</p></div>
+and <code>-</code>, and must start with an alphabetic character.</p></div>
+<div class="paragraph"><p>A line that defines a value can be continued to the next line by
+ending it with a <code>\</code>; the backquote and the end-of-line are
+stripped.  Leading whitespaces after <em>name =</em>, the remainder of the
+line after the first comment character <em>#</em> or <em>;</em>, and trailing
+whitespaces of the line are discarded unless they are enclosed in
+double quotes.  Internal whitespaces within the value are retained
+verbatim.</p></div>
+<div class="paragraph"><p>Inside double quotes, double quote <code>"</code> and backslash <code>\</code> characters
+must be escaped: use <code>\"</code> for <code>"</code> and <code>\\</code> for <code>\</code>.</p></div>
 <div class="paragraph"><p>The following escape sequences (beside <code>\"</code> and <code>\\</code>) are recognized:
 <code>\n</code> for newline character (NL), <code>\t</code> for horizontal tabulation (HT, TAB)
 and <code>\b</code> for backspace (BS).  Other char escape sequences (including octal
 escape sequences) are invalid.</p></div>
-<div class="paragraph"><p>Variable values ending in a <code>\</code> are continued on the next line in the
-customary UNIX fashion.</p></div>
-<div class="paragraph"><p>Some variables may require a special value format.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_includes">Includes</h3>
@@ -1450,6 +1442,84 @@ user&#8217;s home directory. See below for examples.</p></div>
         path = foo ; expand "foo" relative to the current file
         path = ~/foo ; expand "foo" in your $HOME directory</code></pre>
 </div></div>
+</div>
+<div class="sect2">
+<h3 id="_values">Values</h3>
+<div class="paragraph"><p>Values of many variables are treated as a simple string, but there
+are variables that take values of specific types and there are rules
+as to how to spell them.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+boolean
+</dt>
+<dd>
+<p>
+       When a variable is said to take a boolean value, many
+       synonyms are accepted for <em>true</em> and <em>false</em>; these are all
+       case-insensitive.
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+true
+</dt>
+<dd>
+<p>
+Boolean true can be spelled as <code>yes</code>, <code>on</code>, <code>true</code>,
+                or <code>1</code>.  Also, a variable defined without <code>= &lt;value&gt;</code>
+                is taken as true.
+</p>
+</dd>
+<dt class="hdlist1">
+false
+</dt>
+<dd>
+<p>
+Boolean false can be spelled as <code>no</code>, <code>off</code>,
+                <code>false</code>, or <code>0</code>.
+</p>
+<div class="paragraph"><p>When converting value to the canonical form using <em>--bool</em> type
+specifier; <em>git config</em> will ensure that the output is "true" or
+"false" (spelled in lowercase).</p></div>
+</dd>
+</dl></div>
+</dd>
+<dt class="hdlist1">
+integer
+</dt>
+<dd>
+<p>
+       The value for many variables that specify various sizes can
+       be suffixed with <code>k</code>, <code>M</code>,&#8230; to mean "scale the number by
+       1024", "by 1024x1024", etc.
+</p>
+</dd>
+<dt class="hdlist1">
+color
+</dt>
+<dd>
+<p>
+       The value for a variables that takes a color is a list of
+       colors (at most two) and attributes (at most one), separated
+       by spaces.  The colors accepted are <code>normal</code>, <code>black</code>,
+       <code>red</code>, <code>green</code>, <code>yellow</code>, <code>blue</code>, <code>magenta</code>, <code>cyan</code> and
+       <code>white</code>; the attributes are <code>bold</code>, <code>dim</code>, <code>ul</code>, <code>blink</code> and
+       <code>reverse</code>.  The first color given is the foreground; the
+       second is the background.  The position of the attribute, if
+       any, doesn&#8217;t matter. Attributes may be turned off specifically
+       by prefixing them with <code>no</code> (e.g., <code>noreverse</code>, <code>noul</code>, etc).
+</p>
+<div class="paragraph"><p>Colors (foreground and background) may also be given as numbers between
+0 and 255; these use ANSI 256-color mode (but note that not all
+terminals may support this).  If your terminal supports it, you may also
+specify 24-bit RGB values as hex, like <code>#ff0ab3</code>.</p></div>
+<div class="paragraph"><p>The attributes are meant to be reset at the beginning of each item
+in the colored output, so setting color.decorate.branch to <code>black</code>
+will paint that branch name in a plain <code>black</code>, even if the previous
+thing on the same output line (e.g. opening parenthesis before the
+list of branch names in <code>log --decorate</code> output) is set to be
+painted with <code>bold</code> or some other attribute.</p></div>
+</dd>
+</dl></div>
 </div>
 <div class="sect2">
 <h3 id="_variables">Variables</h3>
@@ -2555,18 +2625,6 @@ color.branch.&lt;slot&gt;
         <code>upstream</code> (upstream tracking branch), <code>plain</code> (other
         refs).
 </p>
-<div class="paragraph"><p>The value for these configuration variables is a list of colors (at most
-two) and attributes (at most one), separated by spaces.  The colors
-accepted are <code>normal</code>, <code>black</code>, <code>red</code>, <code>green</code>, <code>yellow</code>, <code>blue</code>,
-<code>magenta</code>, <code>cyan</code> and <code>white</code>; the attributes are <code>bold</code>, <code>dim</code>, <code>ul</code>,
-<code>blink</code> and <code>reverse</code>.  The first color given is the foreground; the
-second is the background.  The position of the attribute, if any,
-doesn&#8217;t matter. Attributes may be turned off specifically by prefixing
-them with <code>no</code> (e.g., <code>noreverse</code>, <code>noul</code>, etc).</p></div>
-<div class="paragraph"><p>Colors (foreground and background) may also be given as numbers between
-0 and 255; these use ANSI 256-color mode (but note that not all
-terminals may support this).  If your terminal supports it, you may also
-specify 24-bit RGB values as hex, like <code>#ff0ab3</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 color.diff
@@ -2594,8 +2652,7 @@ color.diff.&lt;slot&gt;
         of <code>plain</code> (context text), <code>meta</code> (metainformation), <code>frag</code>
         (hunk header), <em>func</em> (function in hunk header), <code>old</code> (removed lines),
         <code>new</code> (added lines), <code>commit</code> (commit headers), or <code>whitespace</code>
-        (highlighting whitespace errors). The values of these variables may be
-        specified as in color.branch.&lt;slot&gt;.
+        (highlighting whitespace errors).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2704,7 +2761,6 @@ color.grep.&lt;slot&gt;
 </dd>
 </dl></div>
 </div></div>
-<div class="paragraph"><p>The values of these variables may be specified as in color.branch.&lt;slot&gt;.</p></div>
 </dd>
 <dt class="hdlist1">
 color.interactive
@@ -2726,8 +2782,7 @@ color.interactive.&lt;slot&gt;
         Use customized color for <em>git add --interactive</em> and <em>git clean
         --interactive</em> output. <code>&lt;slot&gt;</code> may be <code>prompt</code>, <code>header</code>, <code>help</code>
         or <code>error</code>, for four distinct types of normal output from
-        interactive commands.  The values of these variables may be
-        specified as in color.branch.&lt;slot&gt;.
+        interactive commands.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2775,8 +2830,6 @@ color.status.&lt;slot&gt;
         <code>nobranch</code> (the color the <em>no branch</em> warning is shown in, defaulting
         to red), or
         <code>unmerged</code> (files which have unmerged changes).
-        The values of these variables may be specified as in
-        color.branch.&lt;slot&gt;.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6408,6 +6461,22 @@ user.signingkey
         This option is passed unchanged to gpg&#8217;s --local-user parameter,
         so you may specify a key using any method that gpg supports.
 </p>
+</dd>
+<dt class="hdlist1">
+versionsort.prereleaseSuffix
+</dt>
+<dd>
+<p>
+        When version sort is used in <a href="git-tag.html">git-tag(1)</a>, prerelease
+        tags (e.g. "1.0-rc1") may appear after the main release
+        "1.0". By specifying the suffix "-rc" in this variable,
+        "1.0-rc1" will appear before "1.0".
+</p>
+<div class="paragraph"><p>This variable can be specified multiple times, once per suffix. The
+order of suffixes in the config file determines the sorting order
+(e.g. if "-pre" appears before "-rc" in the config file then 1.0-preXX
+is sorted before 1.0-rcXX). The sorting order between different
+suffixes is undefined if they are in multiple config files.</p></div>
 </dd>
 <dt class="hdlist1">
 web.browser
