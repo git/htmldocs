@@ -1061,6 +1061,29 @@ edits from your current working tree. See the &#8220;Interactive Mode&#8221;
 section of <a href="git-add.html">git-add(1)</a> to learn how to operate the <code>--patch</code> mode.</p></div>
 </dd>
 <dt class="hdlist1">
+--to=&lt;path&gt;
+</dt>
+<dd>
+<p>
+        Check out a branch in a separate working directory at
+        <code>&lt;path&gt;</code>. A new working directory is linked to the current
+        repository, sharing everything except working directory
+        specific files such as HEAD, index&#8230; See "MULTIPLE WORKING
+        TREES" section for more information.
+</p>
+</dd>
+<dt class="hdlist1">
+--ignore-other-worktrees
+</dt>
+<dd>
+<p>
+        <code>git checkout</code> refuses when the wanted ref is already checked
+        out by another worktree. This option makes it check the ref
+        out anyway. In other words, the ref can be held by more than one
+        worktree.
+</p>
+</dd>
+<dt class="hdlist1">
 &lt;branch&gt;
 </dt>
 <dd>
@@ -1249,6 +1272,64 @@ $ git log -g -2 HEAD</code></pre>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_multiple_working_trees">MULTIPLE WORKING TREES</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A git repository can support multiple working trees, allowing you to check
+out more than one branch at a time.  With <code>git checkout --to</code> a new working
+tree is associated with the repository.  This new working tree is called a
+"linked working tree" as opposed to the "main working tree" prepared by "git
+init" or "git clone".  A repository has one main working tree (if it&#8217;s not a
+bare repository) and zero or more linked working trees.</p></div>
+<div class="paragraph"><p>Each linked working tree has a private sub-directory in the repository&#8217;s
+$GIT_DIR/worktrees directory.  The private sub-directory&#8217;s name is usually
+the base name of the linked working tree&#8217;s path, possibly appended with a
+number to make it unique.  For example, when <code>$GIT_DIR=/path/main/.git</code> the
+command <code>git checkout --to /path/other/test-next next</code> creates the linked
+working tree in <code>/path/other/test-next</code> and also creates a
+<code>$GIT_DIR/worktrees/test-next</code> directory (or <code>$GIT_DIR/worktrees/test-next1</code>
+if <code>test-next</code> is already taken).</p></div>
+<div class="paragraph"><p>Within a linked working tree, $GIT_DIR is set to point to this private
+directory (e.g. <code>/path/main/.git/worktrees/test-next</code> in the example) and
+$GIT_COMMON_DIR is set to point back to the main working tree&#8217;s $GIT_DIR
+(e.g. <code>/path/main/.git</code>). These settings are made in a <code>.git</code> file located at
+the top directory of the linked working tree.</p></div>
+<div class="paragraph"><p>Path resolution via <code>git rev-parse --git-path</code> uses either
+$GIT_DIR or $GIT_COMMON_DIR depending on the path. For example, in the
+linked working tree <code>git rev-parse --git-path HEAD</code> returns
+<code>/path/main/.git/worktrees/test-next/HEAD</code> (not
+<code>/path/other/test-next/.git/HEAD</code> or <code>/path/main/.git/HEAD</code>) while <code>git
+rev-parse --git-path refs/heads/master</code> uses
+$GIT_COMMON_DIR and returns <code>/path/main/.git/refs/heads/master</code>,
+since refs are shared across all working trees.</p></div>
+<div class="paragraph"><p>See <a href="gitrepository-layout.html">gitrepository-layout(5)</a> for more information. The rule of
+thumb is do not make any assumption about whether a path belongs to
+$GIT_DIR or $GIT_COMMON_DIR when you need to directly access something
+inside $GIT_DIR. Use <code>git rev-parse --git-path</code> to get the final path.</p></div>
+<div class="paragraph"><p>When you are done with a linked working tree you can simply delete it.
+The working tree&#8217;s entry in the repository&#8217;s $GIT_DIR/worktrees
+directory will eventually be removed automatically (see
+<code>gc.pruneworktreesexpire</code> in <a href=":git-config.html">:git-config(1)</a>), or you can run
+<code>git prune --worktrees</code> in the main or any linked working tree to
+clean up any stale entries in $GIT_DIR/worktrees.</p></div>
+<div class="paragraph"><p>If you move a linked working directory to another file system, or
+within a file system that does not support hard links, you need to run
+at least one git command inside the linked working directory
+(e.g. <code>git status</code>) in order to update its entry in $GIT_DIR/worktrees
+so that it does not get automatically removed.</p></div>
+<div class="paragraph"><p>To prevent a $GIT_DIR/worktrees entry from from being pruned (which
+can be useful in some situations, such as when the
+entry&#8217;s working tree is stored on a portable device), add a file named
+<em>locked</em> to the entry&#8217;s directory. The file contains the reason in
+plain text. For example, if a linked working tree&#8217;s <code>.git</code> file points
+to <code>/path/main/.git/worktrees/test-next</code> then a file named
+<code>/path/main/.git/worktrees/test-next/locked</code> will prevent the
+<code>test-next</code> entry from being pruned.  See
+<a href="gitrepository-layout.html">gitrepository-layout(5)</a> for details.</p></div>
+<div class="paragraph"><p>Multiple checkout support for submodules is incomplete. It is NOT
+recommended to make multiple checkouts of a superproject.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="olist arabic"><ol class="arabic">
@@ -1363,7 +1444,7 @@ $ git add frotz</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-03-23 14:31:16 PDT
+Last updated 2015-05-11 15:40:21 PDT
 </div>
 </div>
 </body>
