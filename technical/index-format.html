@@ -1145,11 +1145,140 @@ stage.</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_untracked_cache">Untracked cache</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><code>Untracked cache saves the untracked file list and necessary data to
+verify the cache. The signature for this extension is { 'U', 'N',
+'T', 'R' }.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>The extension starts with</code></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+A sequence of NUL-terminated strings, preceded by the size of the
+    sequence in variable width encoding. Each string describes the
+    environment where the cache can be used.
+</p>
+</li>
+<li>
+<p>
+Stat data of $GIT_DIR/info/exclude. See "Index entry" section from
+    ctime field until "file size".
+</p>
+</li>
+<li>
+<p>
+Stat data of core.excludesfile
+</p>
+</li>
+<li>
+<p>
+32-bit dir_flags (see struct dir_struct)
+</p>
+</li>
+<li>
+<p>
+160-bit SHA-1 of $GIT_DIR/info/exclude. Null SHA-1 means the file
+    does not exist.
+</p>
+</li>
+<li>
+<p>
+160-bit SHA-1 of core.excludesfile. Null SHA-1 means the file does
+    not exist.
+</p>
+</li>
+<li>
+<p>
+NUL-terminated string of per-dir exclude file name. This usually
+    is ".gitignore".
+</p>
+</li>
+<li>
+<p>
+The number of following directory blocks, variable width
+    encoding. If this number is zero, the extension ends here with a
+    following NUL.
+</p>
+</li>
+<li>
+<p>
+A number of directory blocks in depth-first-search order, each
+    consists of
+</p>
+</li>
+<li>
+<p>
+The number of untracked entries, variable width encoding.
+</p>
+</li>
+<li>
+<p>
+The number of sub-directory blocks, variable width encoding.
+</p>
+</li>
+<li>
+<p>
+The directory name terminated by NUL.
+</p>
+</li>
+<li>
+<p>
+A number of untrached file/dir names terminated by NUL.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The remaining data of each directory block is grouped by type:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+An ewah bitmap, the n-th bit marks whether the n-th directory has
+    valid untracked cache entries.
+</p>
+</li>
+<li>
+<p>
+An ewah bitmap, the n-th bit records "check-only" bit of
+    read_directory_recursive() for the n-th directory.
+</p>
+</li>
+<li>
+<p>
+An ewah bitmap, the n-th bit indicates whether SHA-1 and stat data
+    is valid for the n-th directory and exists in the next data.
+</p>
+</li>
+<li>
+<p>
+An array of stat data. The n-th data corresponds with the n-th
+    "one" bit in the previous ewah bitmap.
+</p>
+</li>
+<li>
+<p>
+An array of SHA-1. The n-th SHA-1 corresponds with the n-th "one" bit
+    in the previous ewah bitmap.
+</p>
+</li>
+<li>
+<p>
+One NUL.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-12-22 14:47:31 PST
+Last updated 2015-05-26 14:38:11 PDT
 </div>
 </div>
 </body>
