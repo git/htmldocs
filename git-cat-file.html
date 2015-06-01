@@ -749,7 +749,7 @@ git-cat-file(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git cat-file</em> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv ) &lt;object&gt;
-<em>git cat-file</em> (--batch | --batch-check) &lt; &lt;list-of-objects&gt;</pre>
+<em>git cat-file</em> (--batch | --batch-check) [--follow-symlinks] &lt; &lt;list-of-objects&gt;</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -871,6 +871,73 @@ stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></d
         Allow -s or -t to query broken/corrupt objects of unknown type.
 </p>
 </dd>
+<dt class="hdlist1">
+--follow-symlinks
+</dt>
+<dd>
+<p>
+        With --batch or --batch-check, follow symlinks inside the
+        repository when requesting objects with extended SHA-1
+        expressions of the form tree-ish:path-in-tree.  Instead of
+        providing output about the link itself, provide output about
+        the linked-to object.  If a symlink points outside the
+        tree-ish (e.g. a link to /foo or a root-level link to ../foo),
+        the portion of the link which is outside the tree will be
+        printed.
+</p>
+<div class="paragraph"><p>This option does not (currently) work correctly when an object in the
+index is specified (e.g. <code>:link</code> instead of <code>HEAD:link</code>) rather than
+one in the tree.</p></div>
+<div class="paragraph"><p>This option cannot (currently) be used unless <code>--batch</code> or
+<code>--batch-check</code> is used.</p></div>
+<div class="paragraph"><p>For example, consider a git repository containing:</p></div>
+<div class="openblock">
+<div class="content">
+<div class="literalblock">
+<div class="content">
+<pre><code>f: a file containing "hello\n"
+link: a symlink to f
+dir/link: a symlink to ../f
+plink: a symlink to ../f
+alink: a symlink to /etc/passwd</code></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>For a regular file <code>f</code>, <code>echo HEAD:f | git cat-file --batch</code> would print</p></div>
+<div class="openblock">
+<div class="content">
+<div class="literalblock">
+<div class="content">
+<pre><code>ce013625030ba8dba906f756967f9e9ca394464a blob 6</code></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>And <code>echo HEAD:link | git cat-file --batch --follow-symlinks</code> would
+print the same thing, as would <code>HEAD:dir/link</code>, as they both point at
+<code>HEAD:f</code>.</p></div>
+<div class="paragraph"><p>Without <code>--follow-symlinks</code>, these would print data about the symlink
+itself.  In the case of <code>HEAD:link</code>, you would see</p></div>
+<div class="openblock">
+<div class="content">
+<div class="literalblock">
+<div class="content">
+<pre><code>4d1ae35ba2c8ec712fa2a379db44ad639ca277bd blob 1</code></pre>
+</div></div>
+</div></div>
+<div class="paragraph"><p>Both <code>plink</code> and <code>alink</code> point outside the tree, so they would
+respectively print:</p></div>
+<div class="openblock">
+<div class="content">
+<div class="literalblock">
+<div class="content">
+<pre><code>symlink 4
+../f</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>symlink 11
+/etc/passwd</code></pre>
+</div></div>
+</div></div>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -976,6 +1043,45 @@ the repository, then <code>cat-file</code> will ignore any custom format and pri
 <div class="content">
 <pre><code>&lt;object&gt; SP missing LF</code></pre>
 </div></div>
+<div class="paragraph"><p>If --follow-symlinks is used, and a symlink in the repository points
+outside the repository, then <code>cat-file</code> will ignore any custom format
+and print:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>symlink SP &lt;size&gt; LF
+&lt;symlink&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>The symlink will either be absolute (beginning with a /), or relative
+to the tree root.  For instance, if dir/link points to ../../foo, then
+&lt;symlink&gt; will be ../foo.  &lt;size&gt; is the size of the symlink in bytes.</p></div>
+<div class="paragraph"><p>If --follow-symlinks is used, the following error messages will be
+displayed:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>&lt;object&gt; SP missing LF</code></pre>
+</div></div>
+<div class="paragraph"><p>is printed when the initial symlink requested does not exist.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>dangling SP &lt;size&gt; LF
+&lt;object&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>is printed when the initial symlink exists, but something that
+it (transitive-of) points to does not.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>loop SP &lt;size&gt; LF
+&lt;object&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>is printed for symlink loops (or any symlinks that
+require more than 40 link resolutions to resolve).</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>notdir SP &lt;size&gt; LF
+&lt;object&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>is printed when, during symlink resolution, a file is used as a
+directory name.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1002,7 +1108,7 @@ will be reported.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-19 14:25:29 PDT
+Last updated 2015-06-01 13:36:36 PDT
 </div>
 </div>
 </body>
