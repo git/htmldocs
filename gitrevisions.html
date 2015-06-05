@@ -927,6 +927,34 @@ some output processing may assume ref names in UTF-8.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+<em>&lt;branchname&gt;@{push}</em>, e.g. <em>master@{push}</em>, <em>@{push}</em>
+</dt>
+<dd>
+<p>
+  The suffix <em>@{push}</em> reports the branch "where we would push to" if
+  <code>git push</code> were run while <code>branchname</code> was checked out (or the current
+  <em>HEAD</em> if no branchname is specified). Since our push destination is
+  in a remote repository, of course, we report the local tracking branch
+  that corresponds to that branch (i.e., something in <em>refs/remotes/</em>).
+</p>
+<div class="paragraph"><p>Here&#8217;s an example to make it more clear:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git config push.default current
+$ git config remote.pushdefault myfork
+$ git checkout -b mybranch origin/master
+
+$ git rev-parse --symbolic-full-name @{upstream}
+refs/remotes/origin/master
+
+$ git rev-parse --symbolic-full-name @{push}
+refs/remotes/myfork/mybranch</code></pre>
+</div></div>
+<div class="paragraph"><p>Note in the example that we set up a triangular workflow, where we pull
+from one location and push to another. In a non-triangular workflow,
+<em>@{push}</em> is the same as <em>@{upstream}</em>, and there is no need for it.</p></div>
+</dd>
+<dt class="hdlist1">
 <em>&lt;rev&gt;&#94;</em>, e.g. <em>HEAD&#94;, v1.5.1&#94;0</em>
 </dt>
 <dd>
