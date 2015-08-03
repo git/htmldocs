@@ -3816,6 +3816,33 @@ filter.&lt;driver&gt;.smudge
 </p>
 </dd>
 <dt class="hdlist1">
+fsck.&lt;msg-id&gt;
+</dt>
+<dd>
+<p>
+        Allows overriding the message type (error, warn or ignore) of a
+        specific message ID such as <code>missingEmail</code>.
+</p>
+<div class="paragraph"><p>For convenience, fsck prefixes the error/warning with the message ID,
+e.g.  "missingEmail: invalid author/committer line - missing email" means
+that setting <code>fsck.missingEmail = ignore</code> will hide that issue.</p></div>
+<div class="paragraph"><p>This feature is intended to support working with legacy repositories
+which cannot be repaired without disruptive changes.</p></div>
+</dd>
+<dt class="hdlist1">
+fsck.skipList
+</dt>
+<dd>
+<p>
+        The path to a sorted list of object names (i.e. one SHA-1 per
+        line) that are known to be broken in a non-fatal way and should
+        be ignored. This feature is useful when an established project
+        should be accepted despite early commits containing errors that
+        can be safely ignored such as invalid committer email addresses.
+        Note: corrupt objects cannot be skipped with this setting.
+</p>
+</dd>
+<dt class="hdlist1">
 gc.aggressiveDepth
 </dt>
 <dd>
@@ -5687,6 +5714,28 @@ rebase.autoStash
 </p>
 </dd>
 <dt class="hdlist1">
+rebase.missingCommitsCheck
+</dt>
+<dd>
+<p>
+        If set to "warn", git rebase -i will print a warning if some
+        commits are removed (e.g. a line was deleted), however the
+        rebase will still proceed. If set to "error", it will print
+        the previous warning and stop the rebase, <em>git rebase
+        --edit-todo</em> can then be used to correct the error. If set to
+        "ignore", no checking is done.
+        To drop a commit without warning or error, use the <code>drop</code>
+        command in the todo-list.
+        Defaults to "ignore".
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>rebase.instructionFormat
+        A format string, as specified in <a href="git-log.html">git-log(1)</a>, to be used for
+        the instruction list during an interactive rebase.  The format will automatically
+        have the long commit hash prepended to the format.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
 receive.advertiseAtomic
 </dt>
 <dd>
@@ -5745,6 +5794,37 @@ receive.fsckObjects
         broken link. The result of an abort are only dangling objects.
         Defaults to false. If not set, the value of <code>transfer.fsckObjects</code>
         is used instead.
+</p>
+</dd>
+<dt class="hdlist1">
+receive.fsck.&lt;msg-id&gt;
+</dt>
+<dd>
+<p>
+        When <code>receive.fsckObjects</code> is set to true, errors can be switched
+        to warnings and vice versa by configuring the <code>receive.fsck.&lt;msg-id&gt;</code>
+        setting where the <code>&lt;msg-id&gt;</code> is the fsck message ID and the value
+        is one of <code>error</code>, <code>warn</code> or <code>ignore</code>. For convenience, fsck prefixes
+        the error/warning with the message ID, e.g. "missingEmail: invalid
+        author/committer line - missing email" means that setting
+        <code>receive.fsck.missingEmail = ignore</code> will hide that issue.
+</p>
+<div class="paragraph"><p>This feature is intended to support working with legacy repositories
+which would not pass pushing when <code>receive.fsckObjects = true</code>, allowing
+the host to accept repositories with certain known issues but still catch
+other issues.</p></div>
+</dd>
+<dt class="hdlist1">
+receive.fsck.skipList
+</dt>
+<dd>
+<p>
+        The path to a sorted list of object names (i.e. one SHA-1 per
+        line) that are known to be broken in a non-fatal way and should
+        be ignored. This feature is useful when an established project
+        should be accepted despite early commits containing errors that
+        can be safely ignored such as invalid committer email addresses.
+        Note: corrupt objects cannot be skipped with this setting.
 </p>
 </dd>
 <dt class="hdlist1">

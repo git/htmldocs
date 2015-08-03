@@ -1242,6 +1242,25 @@ filter.<driver>.smudge::
 	object to a worktree file upon checkout.  See
 	linkgit:gitattributes[5] for details.
 
+fsck.<msg-id>::
+	Allows overriding the message type (error, warn or ignore) of a
+	specific message ID such as `missingEmail`.
++
+For convenience, fsck prefixes the error/warning with the message ID,
+e.g.  "missingEmail: invalid author/committer line - missing email" means
+that setting `fsck.missingEmail = ignore` will hide that issue.
++
+This feature is intended to support working with legacy repositories
+which cannot be repaired without disruptive changes.
+
+fsck.skipList::
+	The path to a sorted list of object names (i.e. one SHA-1 per
+	line) that are known to be broken in a non-fatal way and should
+	be ignored. This feature is useful when an established project
+	should be accepted despite early commits containing errors that
+	can be safely ignored such as invalid committer email addresses.
+	Note: corrupt objects cannot be skipped with this setting.
+
 gc.aggressiveDepth::
 	The depth parameter used in the delta compression
 	algorithm used by 'git gc --aggressive'.  This defaults
@@ -2161,6 +2180,22 @@ rebase.autoStash::
 	successful rebase might result in non-trivial conflicts.
 	Defaults to false.
 
+rebase.missingCommitsCheck::
+	If set to "warn", git rebase -i will print a warning if some
+	commits are removed (e.g. a line was deleted), however the
+	rebase will still proceed. If set to "error", it will print
+	the previous warning and stop the rebase, 'git rebase
+	--edit-todo' can then be used to correct the error. If set to
+	"ignore", no checking is done.
+	To drop a commit without warning or error, use the `drop`
+	command in the todo-list.
+	Defaults to "ignore".
+
+rebase.instructionFormat
+	A format string, as specified in linkgit:git-log[1], to be used for
+	the instruction list during an interactive rebase.  The format will automatically
+	have the long commit hash prepended to the format.
+
 receive.advertiseAtomic::
 	By default, git-receive-pack will advertise the atomic push
 	capability to its clients. If you don't want to this capability
@@ -2196,6 +2231,28 @@ receive.fsckObjects::
 	broken link. The result of an abort are only dangling objects.
 	Defaults to false. If not set, the value of `transfer.fsckObjects`
 	is used instead.
+
+receive.fsck.<msg-id>::
+	When `receive.fsckObjects` is set to true, errors can be switched
+	to warnings and vice versa by configuring the `receive.fsck.<msg-id>`
+	setting where the `<msg-id>` is the fsck message ID and the value
+	is one of `error`, `warn` or `ignore`. For convenience, fsck prefixes
+	the error/warning with the message ID, e.g. "missingEmail: invalid
+	author/committer line - missing email" means that setting
+	`receive.fsck.missingEmail = ignore` will hide that issue.
++
+This feature is intended to support working with legacy repositories
+which would not pass pushing when `receive.fsckObjects = true`, allowing
+the host to accept repositories with certain known issues but still catch
+other issues.
+
+receive.fsck.skipList::
+	The path to a sorted list of object names (i.e. one SHA-1 per
+	line) that are known to be broken in a non-fatal way and should
+	be ignored. This feature is useful when an established project
+	should be accepted despite early commits containing errors that
+	can be safely ignored such as invalid committer email addresses.
+	Note: corrupt objects cannot be skipped with this setting.
 
 receive.unpackLimit::
 	If the number of objects received in a push is below this

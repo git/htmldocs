@@ -1996,6 +1996,10 @@ ISO 8601 format.</p></div>
 format, often found in email messages.</p></div>
 <div class="paragraph"><p><code>--date=short</code> shows only the date, but not the time, in <code>YYYY-MM-DD</code> format.</p></div>
 <div class="paragraph"><p><code>--date=raw</code> shows the date in the internal raw Git format <code>%s %z</code> format.</p></div>
+<div class="paragraph"><p><code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>.
+Use <code>--date=format:%c</code> to show the date in your system locale&#8217;s
+preferred format.  See the <code>strftime</code> manual for a complete list of
+format placeholders.</p></div>
 <div class="paragraph"><p><code>--date=default</code> shows timestamps in the original time zone
 (either committer&#8217;s or author&#8217;s).</p></div>
 </dd>
@@ -3862,18 +3866,8 @@ two unresolved merge parents with the working tree file
 <div class="sect1">
 <h2 id="_discussion">DISCUSSION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>At the core level, Git is character encoding agnostic.</p></div>
+<div class="paragraph"><p>Git is to some extent character encoding agnostic.</p></div>
 <div class="ulist"><ul>
-<li>
-<p>
-The pathnames recorded in the index and in the tree objects
-   are treated as uninterpreted sequences of non-NUL bytes.
-   What readdir(2) returns are what are recorded and compared
-   with the data Git keeps track of, which in turn are expected
-   to be what lstat(2) and creat(2) accepts.  There is no such
-   thing as pathname encoding translation.
-</p>
-</li>
 <li>
 <p>
 The contents of the blob objects are uninterpreted sequences
@@ -3883,8 +3877,30 @@ The contents of the blob objects are uninterpreted sequences
 </li>
 <li>
 <p>
-The commit log messages are uninterpreted sequences of non-NUL
-   bytes.
+Path names are encoded in UTF-8 normalization form C. This
+   applies to tree objects, the index file, ref names, as well as
+   path names in command line arguments, environment variables
+   and config files (<code>.git/config</code> (see <a href="git-config.html">git-config(1)</a>),
+   <a href="gitignore.html">gitignore(5)</a>, <a href="gitattributes.html">gitattributes(5)</a> and
+   <a href="gitmodules.html">gitmodules(5)</a>).
+</p>
+<div class="paragraph"><p>Note that Git at the core level treats path names simply as
+sequences of non-NUL bytes, there are no path name encoding
+conversions (except on Mac and Windows). Therefore, using
+non-ASCII path names will mostly work even on platforms and file
+systems that use legacy extended ASCII encodings. However,
+repositories created on such systems will not work properly on
+UTF-8-based systems (e.g. Linux, Mac, Windows) and vice versa.
+Additionally, many Git-based tools simply assume path names to
+be UTF-8 and will fail to display other encodings correctly.</p></div>
+</li>
+<li>
+<p>
+Commit log messages are typically encoded in UTF-8, but other
+   extended ASCII encodings are also supported. This includes
+   ISO-8859-x, CP125x and many others, but <em>not</em> UTF-16/32,
+   EBCDIC and CJK multi-byte encodings (GBK, Shift-JIS, Big5,
+   EUC-x, CP9xx etc.).
 </p>
 </li>
 </ul></div>
@@ -3972,6 +3988,17 @@ log.date
 </p>
 </dd>
 <dt class="hdlist1">
+log.follow
+</dt>
+<dd>
+<p>
+        If a single &lt;path&gt; is given to git log, it will act as
+        if the <code>--follow</code> option was also used.  This has the same
+        limitations as <code>--follow</code>, i.e. it cannot be used to follow
+        multiple files and does not work well on non-linear history.
+</p>
+</dd>
+<dt class="hdlist1">
 log.showRoot
 </dt>
 <dd>
@@ -4020,7 +4047,7 @@ and overridden by the <code>--notes=&lt;ref&gt;</code> option.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-06 12:32:59 PDT
+Last updated 2015-08-03 12:41:59 PDT
 </div>
 </div>
 </body>

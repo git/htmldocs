@@ -816,7 +816,7 @@ the frontend program in use.</p></div>
 </dt>
 <dd>
 <p>
-        Write responses to <code>cat-blob</code> and <code>ls</code> queries to the
+        Write responses to <code>get-mark</code>, <code>cat-blob</code>, and <code>ls</code> queries to the
         file descriptor &lt;fd&gt; instead of <code>stdout</code>.  Allows <code>progress</code>
         output intended for the end-user to be separated from other
         output.
@@ -1212,6 +1212,16 @@ and control the current import process.  More detailed discussion
         Marks the end of the stream. This command is optional
         unless the <code>done</code> feature was requested using the
         <code>--done</code> command-line option or <code>feature done</code> command.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>get-mark</code>
+</dt>
+<dd>
+<p>
+        Causes fast-import to print the SHA-1 corresponding to a mark
+        to the file descriptor set with <code>--cat-blob-fd</code>, or <code>stdout</code> if
+        unspecified.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1856,6 +1866,23 @@ inform the reader when the <code>checkpoint</code> has been completed and it
 can safely access the refs that fast-import updated.</p></div>
 </div>
 <div class="sect2">
+<h3 id="_code_get_mark_code"><code>get-mark</code></h3>
+<div class="paragraph"><p>Causes fast-import to print the SHA-1 corresponding to a mark to
+stdout or to the file descriptor previously arranged with the
+<code>--cat-blob-fd</code> argument. The command otherwise has no impact on the
+current import; its purpose is to retrieve SHA-1s that later commits
+might want to refer to in their commit messages.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>        'get-mark' SP ':' &lt;idnum&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>This command can be used anywhere in the stream that comments are
+accepted.  In particular, the <code>get-mark</code> command can be used in the
+middle of a commit but not in the middle of a <code>data</code> command.</p></div>
+<div class="paragraph"><p>See &#8220;Responses To Commands&#8221; below for details about how to read
+this output safely.</p></div>
+</div>
+<div class="sect2">
 <h3 id="_code_cat_blob_code"><code>cat-blob</code></h3>
 <div class="paragraph"><p>Causes fast-import to print a blob to a file descriptor previously
 arranged with the <code>--cat-blob-fd</code> argument.  The command otherwise
@@ -1935,7 +1962,8 @@ Reading from a named tree
 </div></div>
 </div></div>
 <div class="paragraph"><p>The &lt;dataref&gt; represents the blob, tree, or commit object at &lt;path&gt;
-and can be used in later <em>cat-blob</em>, <em>filemodify</em>, or <em>ls</em> commands.</p></div>
+and can be used in later <em>get-mark</em>, <em>cat-blob</em>, <em>filemodify</em>, or
+<em>ls</em> commands.</p></div>
 <div class="paragraph"><p>If there is no file or subtree at that path, <em>git fast-import</em> will
 instead report</p></div>
 <div class="exampleblock">
@@ -1998,6 +2026,9 @@ import-marks-if-exists
 </p>
 </dd>
 <dt class="hdlist1">
+get-mark
+</dt>
+<dt class="hdlist1">
 cat-blob
 </dt>
 <dt class="hdlist1">
@@ -2005,7 +2036,8 @@ ls
 </dt>
 <dd>
 <p>
-        Require that the backend support the <em>cat-blob</em> or <em>ls</em> command.
+        Require that the backend support the <em>get-mark</em>, <em>cat-blob</em>,
+        or <em>ls</em> command respectively.
         Versions of fast-import not supporting the specified command
         will exit with a message indicating so.
         This lets the import error out early with a clear message,
@@ -2119,10 +2151,10 @@ frontend &lt;fast-import-output |
 git fast-import &gt;fast-import-output</code></pre>
 </div></div>
 </div></div>
-<div class="paragraph"><p>A frontend set up this way can use <code>progress</code>, <code>ls</code>, and <code>cat-blob</code>
-commands to read information from the import in progress.</p></div>
+<div class="paragraph"><p>A frontend set up this way can use <code>progress</code>, <code>get-mark</code>, <code>ls</code>, and
+<code>cat-blob</code> commands to read information from the import in progress.</p></div>
 <div class="paragraph"><p>To avoid deadlock, such frontends must completely consume any
-pending output from <code>progress</code>, <code>ls</code>, and <code>cat-blob</code> before
+pending output from <code>progress</code>, <code>ls</code>, <code>get-mark</code>, and <code>cat-blob</code> before
 performing writes to fast-import that might block.</p></div>
 </div>
 </div>
@@ -2454,7 +2486,7 @@ compression.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-22 13:47:07 PDT
+Last updated 2015-08-03 12:41:59 PDT
 </div>
 </div>
 </body>

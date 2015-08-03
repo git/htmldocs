@@ -1501,18 +1501,8 @@ The text up to the first blank line in a commit message is treated
 as the commit title, and that title is used throughout Git.
 For example, <a href="git-format-patch.html">git-format-patch(1)</a> turns a commit into email, and it uses
 the title on the Subject line and the rest of the commit in the body.</p></div>
-<div class="paragraph"><p>At the core level, Git is character encoding agnostic.</p></div>
+<div class="paragraph"><p>Git is to some extent character encoding agnostic.</p></div>
 <div class="ulist"><ul>
-<li>
-<p>
-The pathnames recorded in the index and in the tree objects
-   are treated as uninterpreted sequences of non-NUL bytes.
-   What readdir(2) returns are what are recorded and compared
-   with the data Git keeps track of, which in turn are expected
-   to be what lstat(2) and creat(2) accepts.  There is no such
-   thing as pathname encoding translation.
-</p>
-</li>
 <li>
 <p>
 The contents of the blob objects are uninterpreted sequences
@@ -1522,8 +1512,30 @@ The contents of the blob objects are uninterpreted sequences
 </li>
 <li>
 <p>
-The commit log messages are uninterpreted sequences of non-NUL
-   bytes.
+Path names are encoded in UTF-8 normalization form C. This
+   applies to tree objects, the index file, ref names, as well as
+   path names in command line arguments, environment variables
+   and config files (<code>.git/config</code> (see <a href="git-config.html">git-config(1)</a>),
+   <a href="gitignore.html">gitignore(5)</a>, <a href="gitattributes.html">gitattributes(5)</a> and
+   <a href="gitmodules.html">gitmodules(5)</a>).
+</p>
+<div class="paragraph"><p>Note that Git at the core level treats path names simply as
+sequences of non-NUL bytes, there are no path name encoding
+conversions (except on Mac and Windows). Therefore, using
+non-ASCII path names will mostly work even on platforms and file
+systems that use legacy extended ASCII encodings. However,
+repositories created on such systems will not work properly on
+UTF-8-based systems (e.g. Linux, Mac, Windows) and vice versa.
+Additionally, many Git-based tools simply assume path names to
+be UTF-8 and will fail to display other encodings correctly.</p></div>
+</li>
+<li>
+<p>
+Commit log messages are typically encoded in UTF-8, but other
+   extended ASCII encodings are also supported. This includes
+   ISO-8859-x, CP125x and many others, but <em>not</em> UTF-16/32,
+   EBCDIC and CJK multi-byte encodings (GBK, Shift-JIS, Big5,
+   EUC-x, CP9xx etc.).
 </p>
 </li>
 </ul></div>
