@@ -5918,13 +5918,10 @@ receive.hideRefs
 </dt>
 <dd>
 <p>
-        String(s) <code>receive-pack</code> uses to decide which refs to omit
-        from its initial advertisement.  Use more than one
-        definitions to specify multiple prefix strings. A ref that
-        are under the hierarchies listed on the value of this
-        variable is excluded, and is hidden when responding to <code>git
-        push</code>, and an attempt to update or delete a hidden ref by
-        <code>git push</code> is rejected.
+        This variable is the same as <code>transfer.hideRefs</code>, but applies
+        only to <code>receive-pack</code> (and so affects pushes, but not fetches).
+        An attempt to update or delete a hidden ref by <code>git push</code> is
+        rejected.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6500,10 +6497,18 @@ transfer.hideRefs
 </dt>
 <dd>
 <p>
-        This variable can be used to set both <code>receive.hideRefs</code>
-        and <code>uploadpack.hideRefs</code> at the same time to the same
-        values.  See entries for these other variables.
+        String(s) <code>receive-pack</code> and <code>upload-pack</code> use to decide which
+        refs to omit from their initial advertisements.  Use more than
+        one definition to specify multiple prefix strings. A ref that is
+        under the hierarchies listed in the value of this variable is
+        excluded, and is hidden when responding to <code>git push</code> or <code>git
+        fetch</code>.  See <code>receive.hideRefs</code> and <code>uploadpack.hideRefs</code> for
+        program-specific versions of this config.
 </p>
+<div class="paragraph"><p>You may also include a <code>!</code> in front of the ref name to negate the entry,
+explicitly exposing it, even if an earlier entry marked it as hidden.
+If you have multiple hideRefs values, later entries override earlier ones
+(and entries in more-specific config files override less-specific ones).</p></div>
 </dd>
 <dt class="hdlist1">
 transfer.unpackLimit
@@ -6532,13 +6537,10 @@ uploadpack.hideRefs
 </dt>
 <dd>
 <p>
-        String(s) <code>upload-pack</code> uses to decide which refs to omit
-        from its initial advertisement.  Use more than one
-        definitions to specify multiple prefix strings. A ref that
-        are under the hierarchies listed on the value of this
-        variable is excluded, and is hidden from <code>git ls-remote</code>,
-        <code>git fetch</code>, etc.  An attempt to fetch a hidden ref by <code>git
-        fetch</code> will fail.  See also <code>uploadpack.allowTipSHA1InWant</code>.
+        This variable is the same as <code>transfer.hideRefs</code>, but applies
+        only to <code>upload-pack</code> (and so affects only fetches, not pushes).
+        An attempt to fetch a hidden ref by <code>git fetch</code> will fail.  See
+        also <code>uploadpack.allowTipSHA1InWant</code>.
 </p>
 </dd>
 <dt class="hdlist1">
