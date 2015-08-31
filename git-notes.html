@@ -872,7 +872,7 @@ merge
         any) into the current notes ref (called "local").
 </p>
 <div class="paragraph"><p>If conflicts arise and a strategy for automatically resolving
-conflicting notes (see the -s/--strategy option) is not given,
+conflicting notes (see the "NOTES MERGE STRATEGIES" section) is not given,
 the "manual" resolver is used. This resolver checks out the
 conflicting notes in a special worktree (<code>.git/NOTES_MERGE_WORKTREE</code>),
 and instructs the user to manually resolve the conflicts there.
@@ -1042,6 +1042,7 @@ get-ref
         When merging notes, resolve notes conflicts using the given
         strategy. The following strategies are recognized: "manual"
         (default), "ours", "theirs", "union" and "cat_sort_uniq".
+        This option overrides the "notes.mergeStrategy" configuration setting.
         See the "NOTES MERGE STRATEGIES" section below for more
         information on each notes merge strategy.
 </p>
@@ -1130,6 +1131,8 @@ conflicts in that work tree.
 When done, the user can either finalize the merge with
 <em>git notes merge --commit</em>, or abort the merge with
 <em>git notes merge --abort</em>.</p></div>
+<div class="paragraph"><p>Users may select an automated merge strategy from among the following using
+either -s/--strategy option or configuring notes.mergeStrategy accordingly:</p></div>
 <div class="paragraph"><p>"ours" automatically resolves conflicting notes in favor of the local
 version (i.e. the current notes ref).</p></div>
 <div class="paragraph"><p>"theirs" automatically resolves notes conflicts in favor of the remote
@@ -1195,6 +1198,29 @@ core.notesRef
 </p>
 </dd>
 <dt class="hdlist1">
+notes.mergeStrategy
+</dt>
+<dd>
+<p>
+        Which merge strategy to choose by default when resolving notes
+        conflicts.  Must be one of <code>manual</code>, <code>ours</code>, <code>theirs</code>, <code>union</code>, or
+        <code>cat_sort_uniq</code>.  Defaults to <code>manual</code>.  See "NOTES MERGE STRATEGIES"
+        section above for more information on each strategy.
+</p>
+<div class="paragraph"><p>This setting can be overridden by passing the <code>--strategy</code> option.</p></div>
+</dd>
+<dt class="hdlist1">
+notes.&lt;name&gt;.mergeStrategy
+</dt>
+<dd>
+<p>
+        Which merge strategy to choose when doing a notes merge into
+        refs/notes/&lt;name&gt;.  This overrides the more general
+        "notes.mergeStrategy".  See the "NOTES MERGE STRATEGIES" section above
+        for more information on each available strategy.
+</p>
+</dd>
+<dt class="hdlist1">
 notes.displayRef
 </dt>
 <dd>
@@ -1228,7 +1254,8 @@ notes.rewriteMode
 <p>
         When copying notes during a rewrite, what to do if the target
         commit already has a note.  Must be one of <code>overwrite</code>,
-        <code>concatenate</code>, and <code>ignore</code>.  Defaults to <code>concatenate</code>.
+        <code>concatenate</code>, <code>cat_sort_uniq</code>, or <code>ignore</code>.  Defaults to
+        <code>concatenate</code>.
 </p>
 <div class="paragraph"><p>This setting can be overridden with the <code>GIT_NOTES_REWRITE_MODE</code>
 environment variable.</p></div>
@@ -1284,7 +1311,7 @@ does not match any refs is silently ignored.</p></div>
 <p>
         When copying notes during a rewrite, what to do if the target
         commit already has a note.
-        Must be one of <code>overwrite</code>, <code>concatenate</code>, and <code>ignore</code>.
+        Must be one of <code>overwrite</code>, <code>concatenate</code>, <code>cat_sort_uniq</code>, or <code>ignore</code>.
         This overrides the <code>core.rewriteMode</code> setting.
 </p>
 </dd>
@@ -1313,7 +1340,7 @@ on the <code>notes.rewrite.&lt;command&gt;</code> and <code>notes.rewriteRef</co
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-12-05 15:37:36 PST
+Last updated 2015-08-31 16:04:31 PDT
 </div>
 </div>
 </body>
