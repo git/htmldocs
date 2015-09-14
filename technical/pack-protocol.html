@@ -752,6 +752,15 @@ of data to send in order to fully update one or the other.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_pkt_line_format">pkt-line Format</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The descriptions below build on the pkt-line format described in
+protocol-common.txt. When the grammar indicate <code>PKT-LINE(...)</code>, unless
+otherwise noted the usual pkt-line LF rules apply: the sender SHOULD
+include a LF, but the receiver MUST NOT complain if it is not present.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_transports">Transports</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>There are three transports over which the packfile protocol is
@@ -897,8 +906,6 @@ with the object name that each reference currently points to.</p></div>
 003fe92df48743b7bc7d26bcaabfddde0a1e20cae47c refs/tags/v1.0^{}
 0000</code></pre>
 </div></div>
-<div class="paragraph"><p>Server SHOULD terminate each non-flush line using LF ("\n") terminator;
-client MUST NOT complain if there is no terminator.</p></div>
 <div class="paragraph"><p>The returned response is a pkt-line stream describing each ref and
 its current value.  The stream MUST be sorted by name according to
 the C locale ordering.</p></div>
@@ -916,15 +923,15 @@ MUST peel the ref if it&#8217;s an annotated tag.</p></div>
                       flush-pkt
 
   no-refs          =  PKT-LINE(zero-id SP "capabilities^{}"
-                      NUL capability-list LF)
+                      NUL capability-list)
 
   list-of-refs     =  first-ref *other-ref
   first-ref        =  PKT-LINE(obj-id SP refname
-                      NUL capability-list LF)
+                      NUL capability-list)
 
   other-ref        =  PKT-LINE(other-tip / other-peeled)
-  other-tip        =  obj-id SP refname LF
-  other-peeled     =  obj-id SP refname "^{}" LF
+  other-tip        =  obj-id SP refname
+  other-peeled     =  obj-id SP refname "^{}"
 
   shallow          =  PKT-LINE("shallow" SP obj-id)
 
@@ -966,8 +973,8 @@ out of what the server said it could do with the first <em>want</em> line.</p></
 
   depth-request     =  PKT-LINE("deepen" SP depth)
 
-  first-want        =  PKT-LINE("want" SP obj-id SP capability-list LF)
-  additional-want   =  PKT-LINE("want" SP obj-id LF)
+  first-want        =  PKT-LINE("want" SP obj-id SP capability-list)
+  additional-want   =  PKT-LINE("want" SP obj-id)
 
   depth             =  1*DIGIT</code></pre>
 </div></div>
@@ -1026,7 +1033,7 @@ so that there is always a block of 32 "in-flight on the wire" at a time.</p></di
                        compute-end
 
   have-list         =  *have-line
-  have-line         =  PKT-LINE("have" SP obj-id LF)
+  have-line         =  PKT-LINE("have" SP obj-id)
   compute-end       =  flush-pkt / PKT-LINE("done")</code></pre>
 </div></div>
 <div class="paragraph"><p>If the server reads <em>have</em> lines, it then will respond by ACKing any
@@ -1106,10 +1113,10 @@ if there is no common base found.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>  server-response = *ack_multi ack / nak
-  ack_multi       = PKT-LINE("ACK" SP obj-id ack_status LF)
+  ack_multi       = PKT-LINE("ACK" SP obj-id ack_status)
   ack_status      = "continue" / "common" / "ready"
-  ack             = PKT-LINE("ACK SP obj-id LF)
-  nak             = PKT-LINE("NAK" LF)</code></pre>
+  ack             = PKT-LINE("ACK" SP obj-id)
+  nak             = PKT-LINE("NAK")</code></pre>
 </div></div>
 <div class="paragraph"><p>A simple clone may look like this (with no <em>have</em> lines):</p></div>
 <div class="listingblock">
@@ -1219,10 +1226,10 @@ references.</p></div>
 <div class="content">
 <pre><code>  update-request    =  *shallow ( command-list | push-cert ) [packfile]
 
-  shallow           =  PKT-LINE("shallow" SP obj-id LF)
+  shallow           =  PKT-LINE("shallow" SP obj-id)
 
-  command-list      =  PKT-LINE(command NUL capability-list LF)
-                       *PKT-LINE(command LF)
+  command-list      =  PKT-LINE(command NUL capability-list)
+                       *PKT-LINE(command)
                        flush-pkt
 
   command           =  create / delete / update
@@ -1269,7 +1276,8 @@ If all of that is fine, the server will then update the references.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>A push certificate begins with a set of header lines.  After the
 header and an empty line, the protocol commands follow, one per
-line.</p></div>
+line. Note that the the trailing LF in push-cert PKT-LINEs is <em>not</em>
+optional; it must be present.</p></div>
 <div class="paragraph"><p>Currently, the following header fields are defined:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -1324,12 +1332,12 @@ update was successful, or <em>ng [refname] [error]</em> if the update was not.</
                       1*(command-status)
                       flush-pkt
 
-  unpack-status     = PKT-LINE("unpack" SP unpack-result LF)
+  unpack-status     = PKT-LINE("unpack" SP unpack-result)
   unpack-result     = "ok" / error-msg
 
   command-status    = command-ok / command-fail
-  command-ok        = PKT-LINE("ok" SP refname LF)
-  command-fail      = PKT-LINE("ng" SP refname SP error-msg LF)
+  command-ok        = PKT-LINE("ok" SP refname)
+  command-fail      = PKT-LINE("ng" SP refname SP error-msg)
 
   error-msg         = 1*(OCTECT) ; where not "ok"</code></pre>
 </div></div>
@@ -1363,7 +1371,7 @@ can be rejected.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-06-16 15:07:26 PDT
+Last updated 2015-09-14 14:08:19 PDT
 </div>
 </div>
 </body>
