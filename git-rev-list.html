@@ -784,7 +784,7 @@ git-rev-list(1) Manual Page
              [ --regexp-ignore-case | -i ]
              [ --extended-regexp | -E ]
              [ --fixed-strings | -F ]
-             [ --date=(local|relative|default|iso|iso-strict|rfc|short) ]
+             [ --date=&lt;format&gt;]
              [ [ --objects | --objects-edge | --objects-edge-aggressive ]
                [ --unpacked ] ]
              [ --pretty | --header ]
@@ -1991,17 +1991,21 @@ people using 80-column terminals.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---date=(relative|local|default|iso|iso-strict|rfc|short|raw)
+--date=&lt;format&gt;
 </dt>
 <dd>
 <p>
         Only takes effect for dates shown in human-readable format, such
         as when using <code>--pretty</code>. <code>log.date</code> config variable sets a default
-        value for the log command&#8217;s <code>--date</code> option.
+        value for the log command&#8217;s <code>--date</code> option. By default, dates
+        are shown in the original time zone (either committer&#8217;s or
+        author&#8217;s). If <code>-local</code> is appended to the format (e.g.,
+        <code>iso-local</code>), the user&#8217;s local time zone is used instead.
 </p>
 <div class="paragraph"><p><code>--date=relative</code> shows dates relative to the current time,
-e.g. &#8220;2 hours ago&#8221;.</p></div>
-<div class="paragraph"><p><code>--date=local</code> shows timestamps in user&#8217;s local time zone.</p></div>
+e.g. &#8220;2 hours ago&#8221;. The <code>-local</code> option cannot be used with
+<code>--raw</code> or <code>--relative</code>.</p></div>
+<div class="paragraph"><p><code>--date=local</code> is an alias for <code>--date=default-local</code>.</p></div>
 <div class="paragraph"><p><code>--date=iso</code> (or <code>--date=iso8601</code>) shows timestamps in a ISO 8601-like format.
 The differences to the strict ISO 8601 format are:</p></div>
 <div class="ulist"><ul>
@@ -2030,9 +2034,22 @@ format, often found in email messages.</p></div>
 <div class="paragraph"><p><code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>.
 Use <code>--date=format:%c</code> to show the date in your system locale&#8217;s
 preferred format.  See the <code>strftime</code> manual for a complete list of
-format placeholders.</p></div>
-<div class="paragraph"><p><code>--date=default</code> shows timestamps in the original time zone
-(either committer&#8217;s or author&#8217;s).</p></div>
+format placeholders. When using <code>-local</code>, the correct syntax is
+<code>--date=format-local:...</code>.</p></div>
+<div class="paragraph"><p><code>--date=default</code> is the default format, and is similar to
+<code>--date=rfc2822</code>, with a few exceptions:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+there is no comma after the day-of-week
+</p>
+</li>
+<li>
+<p>
+the time zone is omitted when the local time zone is used
+</p>
+</li>
+</ul></div>
 </dd>
 <dt class="hdlist1">
 --header
@@ -2683,7 +2700,7 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-07-10 15:27:19 PDT
+Last updated 2015-10-05 13:38:43 PDT
 </div>
 </div>
 </body>

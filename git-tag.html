@@ -748,11 +748,12 @@ git-tag(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git tag</em> [-a | -s | -u &lt;key-id&gt;] [-f] [-m &lt;msg&gt; | -F &lt;file&gt;]
+<pre class="content"><em>git tag</em> [-a | -s | -u &lt;keyid&gt;] [-f] [-m &lt;msg&gt; | -F &lt;file&gt;]
         &lt;tagname&gt; [&lt;commit&gt; | &lt;object&gt;]
 <em>git tag</em> -d &lt;tagname&gt;&#8230;
 <em>git tag</em> [-n[&lt;num&gt;]] -l [--contains &lt;commit&gt;] [--points-at &lt;object&gt;]
-        [--column[=&lt;options&gt;] | --no-column] [--create-reflog] [&lt;pattern&gt;&#8230;]
+        [--column[=&lt;options&gt;] | --no-column] [--create-reflog] [--sort=&lt;key&gt;]
+        [--format=&lt;format&gt;] [--[no-]merged [&lt;commit&gt;]] [&lt;pattern&gt;&#8230;]
 <em>git tag</em> -v &lt;tagname&gt;&#8230;</pre>
 <div class="attribution">
 </div></div>
@@ -764,16 +765,16 @@ git-tag(1) Manual Page
 <div class="paragraph"><p>Add a tag reference in <code>refs/tags/</code>, unless <code>-d/-l/-v</code> is given
 to delete, list or verify tags.</p></div>
 <div class="paragraph"><p>Unless <code>-f</code> is given, the named tag must not yet exist.</p></div>
-<div class="paragraph"><p>If one of <code>-a</code>, <code>-s</code>, or <code>-u &lt;key-id&gt;</code> is passed, the command
+<div class="paragraph"><p>If one of <code>-a</code>, <code>-s</code>, or <code>-u &lt;keyid&gt;</code> is passed, the command
 creates a <em>tag</em> object, and requires a tag message.  Unless
 <code>-m &lt;msg&gt;</code> or <code>-F &lt;file&gt;</code> is given, an editor is started for the user to type
 in the tag message.</p></div>
-<div class="paragraph"><p>If <code>-m &lt;msg&gt;</code> or <code>-F &lt;file&gt;</code> is given and <code>-a</code>, <code>-s</code>, and <code>-u &lt;key-id&gt;</code>
+<div class="paragraph"><p>If <code>-m &lt;msg&gt;</code> or <code>-F &lt;file&gt;</code> is given and <code>-a</code>, <code>-s</code>, and <code>-u &lt;keyid&gt;</code>
 are absent, <code>-a</code> is implied.</p></div>
 <div class="paragraph"><p>Otherwise just a tag reference for the SHA-1 object name of the commit object is
 created (i.e. a lightweight tag).</p></div>
 <div class="paragraph"><p>A GnuPG signed tag object will be created when <code>-s</code> or <code>-u
-&lt;key-id&gt;</code> is used.  When <code>-u &lt;key-id&gt;</code> is not used, the
+&lt;keyid&gt;</code> is used.  When <code>-u &lt;keyid&gt;</code> is not used, the
 committer identity for the current user is used to find the
 GnuPG key for signing.  The configuration variable <code>gpg.program</code>
 is used to specify custom GnuPG binary.</p></div>
@@ -815,10 +816,10 @@ lightweight tags by default.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
--u &lt;key-id&gt;
+-u &lt;keyid&gt;
 </dt>
 <dt class="hdlist1">
---local-user=&lt;key-id&gt;
+--local-user=&lt;keyid&gt;
 </dt>
 <dd>
 <p>
@@ -886,17 +887,19 @@ lightweight tags by default.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---sort=&lt;type&gt;
+--sort=&lt;key&gt;
 </dt>
 <dd>
 <p>
-        Sort in a specific order. Supported type is "refname"
-        (lexicographic order), "version:refname" or "v:refname" (tag
+        Sort based on the key given.  Prefix <code>-</code> to sort in
+        descending order of the value. You may use the --sort=&lt;key&gt; option
+        multiple times, in which case the last key becomes the primary
+        key. Also supports "version:refname" or "v:refname" (tag
         names are treated as versions). The "version:refname" sort
         order can also be affected by the
-        "versionsort.prereleaseSuffix" configuration variable. Prepend
-        "-" to reverse sort order. When this option is not given, the
-        sort order defaults to the value configured for the <em>tag.sort</em>
+        "versionsort.prereleaseSuffix" configuration variable.
+        The keys supported are the same as those in <code>git for-each-ref</code>.
+        Sort order defaults to the value configured for the <em>tag.sort</em>
         variable if it exists, or lexicographic order otherwise. See
         <a href="git-config.html">git-config(1)</a>.
 </p>
@@ -943,7 +946,7 @@ lightweight tags by default.</p></div>
         Use the given tag message (instead of prompting).
         If multiple <code>-m</code> options are given, their values are
         concatenated as separate paragraphs.
-        Implies <code>-a</code> if none of <code>-a</code>, <code>-s</code>, or <code>-u &lt;key-id&gt;</code>
+        Implies <code>-a</code> if none of <code>-a</code>, <code>-s</code>, or <code>-u &lt;keyid&gt;</code>
         is given.
 </p>
 </dd>
@@ -957,7 +960,7 @@ lightweight tags by default.</p></div>
 <p>
         Take the tag message from the given file.  Use <em>-</em> to
         read the message from the standard input.
-        Implies <code>-a</code> if none of <code>-a</code>, <code>-s</code>, or <code>-u &lt;key-id&gt;</code>
+        Implies <code>-a</code> if none of <code>-a</code>, <code>-s</code>, or <code>-u &lt;keyid&gt;</code>
         is given.
 </p>
 </dd>
@@ -1004,6 +1007,27 @@ lightweight tags by default.</p></div>
         Defaults to HEAD.
 </p>
 </dd>
+<dt class="hdlist1">
+&lt;format&gt;
+</dt>
+<dd>
+<p>
+        A string that interpolates <code>%(fieldname)</code> from the object
+        pointed at by a ref being shown.  The format is the same as
+        that of <a href="git-for-each-ref.html">git-for-each-ref(1)</a>.  When unspecified,
+        defaults to <code>%(refname:short)</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--[no-]merged [&lt;commit&gt;]
+</dt>
+<dd>
+<p>
+        Only list tags whose tips are reachable, or not reachable
+        if <em>--no-merged</em> is used, from the specified commit (<em>HEAD</em>
+        if not specified).
+</p>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -1017,7 +1041,7 @@ it in the repository configuration as follows:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>[user]
-    signingKey = &lt;gpg-key-id&gt;</code></pre>
+    signingKey = &lt;gpg-keyid&gt;</code></pre>
 </div></div>
 </div>
 </div>
@@ -1226,7 +1250,7 @@ ISO 8601
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-08-03 12:41:59 PDT
+Last updated 2015-10-05 13:38:43 PDT
 </div>
 </div>
 </body>
