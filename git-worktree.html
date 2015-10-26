@@ -749,7 +749,8 @@ git-worktree(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git worktree add</em> [-f] [--detach] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
-<em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]</pre>
+<em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
+<em>git worktree list</em> [--porcelain]</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -807,6 +808,17 @@ prune
 Prune working tree information in $GIT_DIR/worktrees.
 </p>
 </dd>
+<dt class="hdlist1">
+list
+</dt>
+<dd>
+<p>
+List details of each worktree.  The main worktree is listed first, followed by
+each of the linked worktrees.  The output details include if the worktree is
+bare, the revision currently checked out, and the branch currently checked out
+(or <em>detached HEAD</em> if none).
+</p>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -862,6 +874,16 @@ Prune working tree information in $GIT_DIR/worktrees.
 <p>
         With <code>prune</code>, do not remove anything; just report what it would
         remove.
+</p>
+</dd>
+<dt class="hdlist1">
+--porcelain
+</dt>
+<dd>
+<p>
+        With <code>list</code>, output in an easy-to-parse format for scripts.
+        This format will remain stable across Git versions and regardless of user
+        configuration.  See below for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -926,6 +948,42 @@ to <code>/path/main/.git/worktrees/test-next</code> then a file named
 </div>
 </div>
 <div class="sect1">
+<h2 id="_list_output_format">LIST OUTPUT FORMAT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The worktree list command has two output formats.  The default format shows the
+details on a single line with columns.  For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>S git worktree list
+/path/to/bare-source            (bare)
+/path/to/linked-worktree        abcd1234 [master]
+/path/to/other-linked-worktree  1234abc  (detached HEAD)</code></pre>
+</div></div>
+<div class="sect2">
+<h3 id="_porcelain_format">Porcelain Format</h3>
+<div class="paragraph"><p>The porcelain format has a line per attribute.  Attributes are listed with a
+label and value separated by a single space.  Boolean attributes (like <em>bare</em>
+and <em>detached</em>) are listed as a label only, and are only present if and only
+if the value is true.  An empty line indicates the end of a worktree.  For
+example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>S git worktree list --porcelain
+worktree /path/to/bare-source
+bare
+
+worktree /path/to/linked-worktree
+HEAD abcd1234abcd1234abcd1234abcd1234abcd1234
+branch refs/heads/master
+
+worktree /path/to/other-linked-worktree
+HEAD 1234abc1234abc1234abc1234abc1234abc1234a
+detached</code></pre>
+</div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>You are in the middle of a refactoring session and your boss comes in and
@@ -970,11 +1028,6 @@ performed manually, such as:</p></div>
 </li>
 <li>
 <p>
-<code>list</code> to list linked working trees
-</p>
-</li>
-<li>
-<p>
 <code>lock</code> to prevent automatic pruning of administrative files (for instance,
   for a working tree on a portable device)
 </p>
@@ -992,7 +1045,7 @@ performed manually, such as:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-08-12 14:58:45 PDT
+Last updated 2015-10-26 16:13:38 PDT
 </div>
 </div>
 </body>
