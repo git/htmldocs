@@ -4517,10 +4517,62 @@ http.proxy
 <dd>
 <p>
         Override the HTTP proxy, normally configured using the <em>http_proxy</em>,
-        <em>https_proxy</em>, and <em>all_proxy</em> environment variables (see
-        <code>curl(1)</code>).  This can be overridden on a per-remote basis; see
-        remote.&lt;name&gt;.proxy
+        <em>https_proxy</em>, and <em>all_proxy</em> environment variables (see <code>curl(1)</code>). In
+        addition to the syntax understood by curl, it is possible to specify a
+        proxy string with a user name but no password, in which case git will
+        attempt to acquire one in the same way it does for other credentials. See
+        <a href="gitcredentials.html">gitcredentials(7)</a> for more information. The syntax thus is
+        <em>[protocol://][user[:password]@]proxyhost[:port]</em>. This can be overridden
+        on a per-remote basis; see remote.&lt;name&gt;.proxy
 </p>
+</dd>
+<dt class="hdlist1">
+http.proxyAuthMethod
+</dt>
+<dd>
+<p>
+        Set the method with which to authenticate against the HTTP proxy. This
+        only takes effect if the configured proxy string contains a user name part
+        (i.e. is of the form <em>user@host</em> or <em>user@host:port</em>). This can be
+        overridden on a per-remote basis; see <code>remote.&lt;name&gt;.proxyAuthMethod</code>.
+        Both can be overridden by the <em>GIT_HTTP_PROXY_AUTHMETHOD</em> environment
+        variable.  Possible values are:
+</p>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+<code>anyauth</code> - Automatically pick a suitable authentication method. It is
+  assumed that the proxy answers an unauthenticated request with a 407
+  status code and one or more Proxy-authenticate headers with supported
+  authentication methods. This is the default.
+</p>
+</li>
+<li>
+<p>
+<code>basic</code> - HTTP Basic authentication
+</p>
+</li>
+<li>
+<p>
+<code>digest</code> - HTTP Digest authentication; this prevents the password from being
+  transmitted to the proxy in clear text
+</p>
+</li>
+<li>
+<p>
+<code>negotiate</code> - GSS-Negotiate authentication (compare the --negotiate option
+  of <code>curl(1)</code>)
+</p>
+</li>
+<li>
+<p>
+<code>ntlm</code> - NTLM authentication (compare the --ntlm option of <code>curl(1)</code>)
+</p>
+</li>
+</ul></div>
+</div></div>
 </dd>
 <dt class="hdlist1">
 http.cookieFile
@@ -6132,6 +6184,16 @@ remote.&lt;name&gt;.proxy
         For remotes that require curl (http, https and ftp), the URL to
         the proxy to use for that remote.  Set to the empty string to
         disable proxying for that remote.
+</p>
+</dd>
+<dt class="hdlist1">
+remote.&lt;name&gt;.proxyAuthMethod
+</dt>
+<dd>
+<p>
+        For remotes that require curl (http, https and ftp), the method to use for
+        authenticating against the proxy in use (probably set in
+        <code>remote.&lt;name&gt;.proxy</code>). See <code>http.proxyAuthMethod</code>.
 </p>
 </dd>
 <dt class="hdlist1">
