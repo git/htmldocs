@@ -771,11 +771,9 @@ The working tree&#8217;s administrative files in the repository (see
 <code>gc.worktreePruneExpire</code> in <a href="git-config.html">git-config(1)</a>), or you can run
 <code>git worktree prune</code> in the main or any linked working tree to
 clean up any stale administrative files.</p></div>
-<div class="paragraph"><p>If you move a linked working tree to another file system, or
-within a file system that does not support hard links, you need to run
-at least one git command inside the linked working tree
-(e.g. <code>git status</code>) in order to update its administrative files in the
-repository so that they do not get automatically pruned.</p></div>
+<div class="paragraph"><p>If you move a linked working tree, you need to manually update the
+administrative files so that they do not get pruned automatically. See
+section "DETAILS" for more information.</p></div>
 <div class="paragraph"><p>If a linked working tree is stored on a portable device or network share
 which is not always mounted, you can prevent its administrative files from
 being pruned by creating a file named <em>locked</em> alongside the other
@@ -936,6 +934,12 @@ since refs are shared across all working trees.</p></div>
 thumb is do not make any assumption about whether a path belongs to
 $GIT_DIR or $GIT_COMMON_DIR when you need to directly access something
 inside $GIT_DIR. Use <code>git rev-parse --git-path</code> to get the final path.</p></div>
+<div class="paragraph"><p>If you move a linked working tree, you need to update the <em>gitdir</em> file
+in the entry&#8217;s directory. For example, if a linked working tree is moved
+to <code>/newpath/test-next</code> and its <code>.git</code> file points to
+<code>/path/main/.git/worktrees/test-next</code>, then update
+<code>/path/main/.git/worktrees/test-next/gitdir</code> to reference <code>/newpath/test-next</code>
+instead.</p></div>
 <div class="paragraph"><p>To prevent a $GIT_DIR/worktrees entry from being pruned (which
 can be useful in some situations, such as when the
 entry&#8217;s working tree is stored on a portable device), add a file named
@@ -1045,7 +1049,7 @@ performed manually, such as:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-26 16:13:38 PDT
+Last updated 2016-02-10 15:41:33 PST
 </div>
 </div>
 </body>
