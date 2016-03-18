@@ -858,12 +858,12 @@ Trailing spaces are ignored unless they are quoted with backslash
 <p>
 An optional prefix "<code>!</code>" which negates the pattern; any
    matching file excluded by a previous pattern will become
-   included again.
+   included again. It is not possible to re-include a file if a parent
+   directory of that file is excluded. Git doesn&#8217;t list excluded
+   directories for performance reasons, so any patterns on contained
+   files have no effect, no matter where they are defined.
    Put a backslash ("<code>\</code>") in front of the first "<code>!</code>" for patterns
    that begin with a literal "<code>!</code>", for example, "<code>\!important!.txt</code>".
-   It is possible to re-include a file if a parent directory of that
-   file is excluded if certain conditions are met. See section NOTES
-   for detail.
 </p>
 </li>
 <li>
@@ -944,68 +944,6 @@ Other consecutive asterisks are considered invalid.
 not tracked by Git remain untracked.</p></div>
 <div class="paragraph"><p>To stop tracking a file that is currently tracked, use
 <em>git rm --cached</em>.</p></div>
-<div class="paragraph"><p>To re-include files or directories when their parent directory is
-excluded, the following conditions must be met:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-The rules to exclude a directory and re-include a subset back must
-   be in the same .gitignore file.
-</p>
-</li>
-<li>
-<p>
-The directory part in the re-include rules must be literal (i.e. no
-   wildcards and has to start with a <code>/</code>).
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>A re-inclusion of a directory makes all files in the directory
-unignored.  For example, suppose you have files <code>.gitignore</code>,
-<code>dir/file1</code>, <code>dir/file2</code>, and <code>dir/file3</code>, and have the following in
-your <code>.gitignore</code>:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code># .gitignore is not mentioned in .gitignore
-*
-!/dir
-# dir/file1 is not mentioned in .gitignore
-dir/file2
-!dir/file3</code></pre>
-</div></div>
-<div class="paragraph"><p>Then:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<code>.gitignore</code> gets ignored, because it matches the <code>*</code> at the top
-   level;
-</p>
-</li>
-<li>
-<p>
-<code>dir/file1</code> does not get ignored, because <code>/dir</code> marks everything
-   underneath <code>dir/</code> directory to be <em>re-included</em> unless otherwise
-   specified;
-</p>
-</li>
-<li>
-<p>
-<code>dir/file2</code> gets ignored, because <code>dir/file2</code> matches it.
-</p>
-</li>
-<li>
-<p>
-<code>dir/file3</code> does not get ignored, because <code>!dir/file3</code> matches it.
-   Note that the entry <code>!dir/file3</code> is redundant because everything
-   underneath <code>dir/</code> is marked to be <em>re-included</em> already.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Some earlier versions of Git treated <code>!/dir</code> above differently in
-that it did not cause the paths under it unignored (but merely told
-Git that patterns that begin with dir/ should not be ignored), but
-this has been corrected to be consistent with <code>/dir</code> that says "the
-directory <code>dir/</code> and everything below are ignored."</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1081,7 +1019,7 @@ everything within <code>foo/bar</code>):</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-03-10 14:54:48 PST
+Last updated 2016-03-18 15:52:36 PDT
 </div>
 </div>
 </body>
