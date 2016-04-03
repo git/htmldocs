@@ -795,7 +795,7 @@ configuration file by default, and options <em>--system</em>, <em>--global</em>,
 that location (you can say <em>--local</em> but that is the default).</p></div>
 <div class="paragraph"><p>This command will fail with non-zero status upon error.  Some exit
 codes are:</p></div>
-<div class="olist arabic"><ol class="arabic">
+<div class="ulist"><ul>
 <li>
 <p>
 The config file is invalid (ret=3),
@@ -831,7 +831,7 @@ you try to unset/set an option for which multiple lines match (ret=5), or
 you try to use an invalid regexp (ret=6).
 </p>
 </li>
-</ol></div>
+</ul></div>
 <div class="paragraph"><p>On success, the command returns the exit code 0.</p></div>
 </div>
 </div>
@@ -873,8 +873,7 @@ you try to use an invalid regexp (ret=6).
 </dt>
 <dd>
 <p>
-        Like get, but does not fail if the number of values for the key
-        is not exactly one.
+        Like get, but returns all values for a multi-valued key.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -899,7 +898,7 @@ you try to use an invalid regexp (ret=6).
         given URL is returned (if no such key exists, the value for
         section.key is used as a fallback).  When given just the
         section as name, do so for all the keys in the section and
-        list them.
+        list them.  Returns error code 1 if no value is found.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3095,8 +3094,9 @@ credential.helper
 <p>
         Specify an external helper to be called when a username or
         password credential is needed; the helper may consult external
-        storage to avoid prompting the user for the credentials. See
-        <a href="gitcredentials.html">gitcredentials(7)</a> for details.
+        storage to avoid prompting the user for the credentials. Note
+        that multiple helpers may be defined. See <a href="gitcredentials.html">gitcredentials(7)</a>
+        for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3366,9 +3366,13 @@ diff.renames
 </dt>
 <dd>
 <p>
-        Tells Git to detect renames.  If set to any boolean value, it
-        will enable basic rename detection.  If set to "copies" or
-        "copy", it will detect copies, as well.
+        Whether and how Git detects renames.  If set to "false",
+        rename detection is disabled. If set to "true", basic rename
+        detection is enabled.  If set to "copies" or "copy", Git will
+        detect copies, as well.  Defaults to true.  Note that this
+        affects only <em>git diff</em> Porcelain like <a href="git-diff.html">git-diff(1)</a> and
+        <a href="git-log.html">git-log(1)</a>, and not lower level commands such as
+        <a href="git-diff-files.html">git-diff-files(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5030,6 +5034,19 @@ interactive.singleKey
         <a href="git-reset.html">git-reset(1)</a>, and <a href="git-stash.html">git-stash(1)</a>. Note that this
         setting is silently ignored if portable keystroke input
         is not available; requires the Perl module Term::ReadKey.
+</p>
+</dd>
+<dt class="hdlist1">
+interactive.diffFilter
+</dt>
+<dd>
+<p>
+        When an interactive command (such as <code>git add --patch</code>) shows
+        a colorized diff, git will pipe the diff through the shell
+        command defined by this configuration variable. The command may
+        mark up the diff further for human consumption, provided that it
+        retains a one-to-one correspondence with the lines in the
+        original diff. Defaults to disabled (no filtering).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6998,7 +7015,7 @@ web.browser
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-02-26 14:09:26 PST
+Last updated 2016-04-03 12:10:53 PDT
 </div>
 </div>
 </body>
