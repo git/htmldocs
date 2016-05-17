@@ -752,7 +752,7 @@ git-submodule(1) Manual Page
               [--reference &lt;repository&gt;] [--depth &lt;depth&gt;] [--] &lt;repository&gt; [&lt;path&gt;]
 <em>git submodule</em> [--quiet] status [--cached] [--recursive] [--] [&lt;path&gt;&#8230;]
 <em>git submodule</em> [--quiet] init [--] [&lt;path&gt;&#8230;]
-<em>git submodule</em> [--quiet] deinit [-f|--force] [--] &lt;path&gt;&#8230;
+<em>git submodule</em> [--quiet] deinit [-f|--force] (--all|[--] &lt;path&gt;&#8230;)
 <em>git submodule</em> [--quiet] update [--init] [--remote] [-N|--no-fetch]
               [-f|--force] [--rebase|--merge] [--reference &lt;repository&gt;]
               [--depth &lt;depth&gt;] [--recursive] [--jobs &lt;n&gt;] [--] [&lt;path&gt;&#8230;]
@@ -894,12 +894,14 @@ deinit
         tree. Further calls to <code>git submodule update</code>, <code>git submodule foreach</code>
         and <code>git submodule sync</code> will skip any unregistered submodules until
         they are initialized again, so use this command if you don&#8217;t want to
-        have a local checkout of the submodule in your work tree anymore. If
+        have a local checkout of the submodule in your working tree anymore. If
         you really want to remove a submodule from the repository and commit
         that use <a href="git-rm.html">git-rm(1)</a> instead.
 </p>
-<div class="paragraph"><p>If <code>--force</code> is specified, the submodule&#8217;s work tree will be removed even if
-it contains local modifications.</p></div>
+<div class="paragraph"><p>When the command is run without pathspec, it errors out,
+instead of deinit-ing everything, to prevent mistakes.</p></div>
+<div class="paragraph"><p>If <code>--force</code> is specified, the submodule&#8217;s working tree will
+be removed even if it contains local modifications.</p></div>
 </dd>
 <dt class="hdlist1">
 update
@@ -1051,6 +1053,15 @@ registered submodules, and sync any nested submodules within.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--all
+</dt>
+<dd>
+<p>
+        This option is only valid for the deinit command. Unregister all
+        submodules in the working tree.
+</p>
+</dd>
+<dt class="hdlist1">
 -b
 </dt>
 <dt class="hdlist1">
@@ -1073,8 +1084,8 @@ registered submodules, and sync any nested submodules within.</p></div>
 <p>
         This option is only valid for add, deinit and update commands.
         When running add, allow adding an otherwise ignored submodule path.
-        When running deinit the submodule work trees will be removed even if
-        they contain local changes.
+        When running deinit the submodule working trees will be removed even
+        if they contain local changes.
         When running update (only effective with the checkout procedure),
         throw away local changes in submodules when switching to a
         different commit; and always run a checkout operation in the
@@ -1305,7 +1316,7 @@ for details.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-04-06 15:57:48 PDT
+Last updated 2016-05-17 15:26:41 PDT
 </div>
 </div>
 </body>

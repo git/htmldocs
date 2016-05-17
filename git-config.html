@@ -1419,13 +1419,14 @@ escape sequences) are invalid.</p></div>
 <h3 id="_includes">Includes</h3>
 <div class="paragraph"><p>You can include one config file from another by setting the special
 <code>include.path</code> variable to the name of the file to be included. The
+variable takes a pathname as its value, and is subject to tilde
+expansion.</p></div>
+<div class="paragraph"><p>The
 included file is expanded immediately, as if its contents had been
 found at the location of the include directive. If the value of the
 <code>include.path</code> variable is a relative path, the path is considered to be
 relative to the configuration file in which the include directive was
-found. The value of <code>include.path</code> is subject to tilde expansion: <code>~/</code>
-is expanded to the value of <code>$HOME</code>, and <code>~user/</code> to the specified
-user&#8217;s home directory. See below for examples.</p></div>
+found.  See below for examples.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_example">Example</h3>
@@ -1461,7 +1462,7 @@ user&#8217;s home directory. See below for examples.</p></div>
 <pre><code>[include]
         path = /path/to/foo.inc ; include by absolute path
         path = foo ; expand "foo" relative to the current file
-        path = ~/foo ; expand "foo" in your $HOME directory</code></pre>
+        path = ~/foo ; expand "foo" in your `$HOME` directory</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1539,6 +1540,18 @@ will paint that branch name in a plain <code>black</code>, even if the previous
 thing on the same output line (e.g. opening parenthesis before the
 list of branch names in <code>log --decorate</code> output) is set to be
 painted with <code>bold</code> or some other attribute.</p></div>
+</dd>
+<dt class="hdlist1">
+pathname
+</dt>
+<dd>
+<p>
+        A variable that takes a pathname value can be given a
+        string that begins with "<code>~/</code>" or "<code>~user/</code>", and the usual
+        tilde expansion happens to such a string: <code>~/</code>
+        is expanded to the value of <code>$HOME</code>, and <code>~user/</code> to the
+        specified user&#8217;s home directory.
+</p>
 </dd>
 </dl></div>
 </div>
@@ -1730,6 +1743,17 @@ Git for Windows or Eclipse).
 In such a case it may be necessary to set this variable to <em>false</em>.
 See <a href="git-update-index.html">git-update-index(1)</a>.</p></div>
 <div class="paragraph"><p>The default is true (when core.filemode is not specified in the config file).</p></div>
+</dd>
+<dt class="hdlist1">
+core.hideDotFiles
+</dt>
+<dd>
+<p>
+        (Windows-only) If true, mark newly-created directories and files whose
+        name starts with a dot as hidden.  If <em>dotGitOnly</em>, only the <code>.git/</code>
+        directory is hidden, but no other files starting with a dot.  The
+        default mode is <em>dotGitOnly</em>.
+</p>
 </dd>
 <dt class="hdlist1">
 core.ignoreCase
@@ -2024,10 +2048,10 @@ core.logAllRefUpdates
 <dd>
 <p>
         Enable the reflog. Updates to a ref &lt;ref&gt; is logged to the file
-        "$GIT_DIR/logs/&lt;ref&gt;", by appending the new and old
+        "<code>$GIT_DIR/logs/&lt;ref&gt;</code>", by appending the new and old
         SHA-1, the date/time and the reason of the update, but
         only when the file exists.  If this configuration
-        variable is set to true, missing "$GIT_DIR/logs/&lt;ref&gt;"
+        variable is set to true, missing "<code>$GIT_DIR/logs/&lt;ref&gt;</code>"
         file is automatically created for branch heads (i.e. under
         refs/heads/), remote refs (i.e. under refs/remotes/),
         note refs (i.e. under refs/notes/), and the symbolic ref HEAD.
@@ -2171,12 +2195,11 @@ core.excludesFile
 </dt>
 <dd>
 <p>
-        In addition to <em>.gitignore</em> (per-directory) and
-        <em>.git/info/exclude</em>, Git looks into this file for patterns
-        of files which are not meant to be tracked.  "<code>~/</code>" is expanded
-        to the value of <code>$HOME</code> and "<code>~user/</code>" to the specified user&#8217;s
-        home directory. Its default value is $XDG_CONFIG_HOME/git/ignore.
-        If $XDG_CONFIG_HOME is either not set or empty, $HOME/.config/git/ignore
+        Specifies the pathname to the file that contains patterns to
+        describe paths that are not meant to be tracked, in addition
+        to <em>.gitignore</em> (per-directory) and <em>.git/info/exclude</em>.
+        Defaults to <code>$XDG_CONFIG_HOME/git/ignore</code>.
+        If <code>$XDG_CONFIG_HOME</code> is either not set or empty, <code>$HOME/.config/git/ignore</code>
         is used instead. See <a href="gitignore.html">gitignore(5)</a>.
 </p>
 </dd>
@@ -2203,9 +2226,29 @@ core.attributesFile
         <em>.git/info/attributes</em>, Git looks into this file for attributes
         (see <a href="gitattributes.html">gitattributes(5)</a>). Path expansions are made the same
         way as for <code>core.excludesFile</code>. Its default value is
-        $XDG_CONFIG_HOME/git/attributes. If $XDG_CONFIG_HOME is either not
-        set or empty, $HOME/.config/git/attributes is used instead.
+        <code>$XDG_CONFIG_HOME/git/attributes</code>. If <code>$XDG_CONFIG_HOME</code> is either not
+        set or empty, <code>$HOME/.config/git/attributes</code> is used instead.
 </p>
+</dd>
+<dt class="hdlist1">
+core.hooksPath
+</dt>
+<dd>
+<p>
+        By default Git will look for your hooks in the
+        <em>$GIT_DIR/hooks</em> directory. Set this to different path,
+        e.g. <em>/etc/git/hooks</em>, and Git will try to find your hooks in
+        that directory, e.g. <em>/etc/git/hooks/pre-receive</em> instead of
+        in <em>$GIT_DIR/hooks/pre-receive</em>.
+</p>
+<div class="paragraph"><p>The path can be either absolute or relative. A relative path is
+taken as relative to the directory where the hooks are run (see
+the "DESCRIPTION" section of <a href="githooks.html">githooks(5)</a>).</p></div>
+<div class="paragraph"><p>This configuration variable is useful in cases where you&#8217;d like to
+centrally configure your Git hooks instead of configuring them on a
+per-repository basis, or as a more flexible and centralized
+alternative to having an <code>init.templateDir</code> where you&#8217;ve changed
+default hooks.</p></div>
 </dd>
 <dt class="hdlist1">
 core.editor
@@ -3082,9 +3125,8 @@ commit.template
 </dt>
 <dd>
 <p>
-        Specify a file to use as the template for new commit messages.
-        "<code>~/</code>" is expanded to the value of <code>$HOME</code> and "<code>~user/</code>" to the
-        specified user&#8217;s home directory.
+        Specify the pathname of a file to use as the template for
+        new commit messages.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4001,7 +4043,7 @@ gc.worktreePruneExpire
         <em>git worktree prune --expire 3.months.ago</em>.
         This config variable can be used to set a different grace
         period. The value "now" may be used to disable the grace
-        period and prune $GIT_DIR/worktrees immediately, or "never"
+        period and prune <code>$GIT_DIR/worktrees</code> immediately, or "never"
         may be used to suppress pruning.
 </p>
 </dd>
@@ -4273,13 +4315,13 @@ gpg.program
 </dt>
 <dd>
 <p>
-        Use this custom program instead of "gpg" found on $PATH when
+        Use this custom program instead of "<code>gpg</code>" found on <code>$PATH</code> when
         making or verifying a PGP signature. The program must support the
         same command-line interface as GPG, namely, to verify a detached
-        signature, "gpg --verify $file - &lt;$signature" is run, and the
+        signature, "<code>gpg --verify $file - &lt;$signature</code>" is run, and the
         program is expected to signal a good signature by exiting with
         code 0, and to generate an ASCII-armored detached signature, the
-        standard input of "gpg -bsau $key" is fed with the contents to be
+        standard input of "<code>gpg -bsau $key</code>" is fed with the contents to be
         signed, and the program is expected to send the result to its
         standard output.
 </p>
@@ -4307,7 +4349,7 @@ gui.displayUntracked
 </dt>
 <dd>
 <p>
-        Determines if <a href=":git-gui.html">:git-gui(1)</a> shows untracked files
+        Determines if <a href="git-gui.html">git-gui(1)</a> shows untracked files
         in the file list. The default is "true".
 </p>
 </dd>
@@ -4637,11 +4679,12 @@ http.cookieFile
 </dt>
 <dd>
 <p>
-        File containing previously stored cookie lines which should be used
+        The pathname of a file containing previously stored cookie lines,
+        which should be used
         in the Git http session, if they match the server. The file format
         of the file to read cookies from should be plain HTTP headers or
-        the Netscape/Mozilla cookie file format (see <a href="curl.html">curl(1)</a>).
-        NOTE that the file specified with http.cookieFile is only used as
+        the Netscape/Mozilla cookie file format (see <code>curl(1)</code>).
+        NOTE that the file specified with http.cookieFile is used only as
         input unless http.saveCookies is set.
 </p>
 </dd>
