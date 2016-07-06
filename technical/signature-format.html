@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.9" />
-<title>git-repack(1)</title>
+<title>Git signature format</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -731,266 +731,264 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="manpage">
+<body class="article">
 <div id="header">
-<h1>
-git-repack(1) Manual Page
-</h1>
-<h2>NAME</h2>
-<div class="sectionbody">
-<p>git-repack -
-   Pack unpacked objects in a repository
-</p>
-</div>
+<h1>Git signature format</h1>
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_synopsis">SYNOPSIS</h2>
+<h2 id="_overview">Overview</h2>
 <div class="sectionbody">
-<div class="verseblock">
-<pre class="content"><em>git repack</em> [-a] [-A] [-d] [-f] [-F] [-l] [-n] [-q] [-b] [--window=&lt;n&gt;] [--depth=&lt;n&gt;]</pre>
-<div class="attribution">
+<div class="paragraph"><p>Git uses cryptographic signatures in various places, currently objects (tags,
+commits, mergetags) and transactions (pushes). In every case, the command which
+is about to create an object or transaction determines a payload from that,
+calls gpg to obtain a detached signature for the payload (<code>gpg -bsa</code>) and
+embeds the signature into the object or transaction.</p></div>
+<div class="paragraph"><p>Signatures always begin with <code>-----BEGIN PGP SIGNATURE-----</code>
+and end with <code>-----END PGP SIGNATURE-----</code>, unless gpg is told to
+produce RFC1991 signatures which use <code>MESSAGE</code> instead of <code>SIGNATURE</code>.</p></div>
+<div class="paragraph"><p>The signed payload and the way the signature is embedded depends
+on the type of the object resp. transaction.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tag_signatures">Tag signatures</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+created by: <code>git tag -s</code>
+</p>
+</li>
+<li>
+<p>
+payload: annotated tag object
+</p>
+</li>
+<li>
+<p>
+embedding: append the signature to the unsigned tag object
+</p>
+</li>
+<li>
+<p>
+example: tag <code>signedtag</code> with subject <code>signed tag</code>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>object 04b871796dc0420f8e7561a895b52484b701d51a
+type commit
+tag signedtag
+tagger C O Mitter &lt;committer@example.com&gt; 1465981006 +0000
+
+signed tag
+
+signed tag message body
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAABAgAGBQJXYRhOAAoJEGEJLoW3InGJklkIAIcnhL7RwEb/+QeX9enkXhxn
+rxfdqrvWd1K80sl2TOt8Bg/NYwrUBw/RWJ+sg/hhHp4WtvE1HDGHlkEz3y11Lkuh
+8tSxS3qKTxXUGozyPGuE90sJfExhZlW4knIQ1wt/yWqM+33E9pN4hzPqLwyrdods
+q8FWEqPPUbSJXoMbRPw04S5jrLtZSsUWbRYjmJCHzlhSfFWW4eFd37uquIaLUBS0
+rkC3Jrx7420jkIpgFcTI2s60uhSQLzgcCwdA2ukSYIRnjg/zDkj8+3h/GaROJ72x
+lZyI6HWixKJkWw8lE9aAOD9TmTW9sFJwcVAzmAuFX2kUreDUKMZduGcoRYGpD7E=
+=jpXa
+-----END PGP SIGNATURE-----</code></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+verify with: <code>git verify-tag [-v]</code> or <code>git tag -v</code>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>gpg: Signature made Wed Jun 15 10:56:46 2016 CEST using RSA key ID B7227189
+gpg: Good signature from "Eris Discordia &lt;discord@example.net&gt;"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: D4BE 2231 1AD3 131E 5EDA  29A4 6109 2E85 B722 7189
+object 04b871796dc0420f8e7561a895b52484b701d51a
+type commit
+tag signedtag
+tagger C O Mitter &lt;committer@example.com&gt; 1465981006 +0000
+
+signed tag
+
+signed tag message body</code></pre>
 </div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_description">DESCRIPTION</h2>
+<h2 id="_commit_signatures">Commit signatures</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This command is used to combine all objects that do not currently
-reside in a "pack", into a pack.  It can also be used to re-organize
-existing packs into a single, more efficient pack.</p></div>
-<div class="paragraph"><p>A pack is a collection of objects, individually compressed, with
-delta compression applied, stored in a single file, with an
-associated index file.</p></div>
-<div class="paragraph"><p>Packs are used to reduce the load on mirror systems, backup
-engines, disk storage, etc.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+created by: <code>git commit -S</code>
+</p>
+</li>
+<li>
+<p>
+payload: commit object
+</p>
+</li>
+<li>
+<p>
+embedding: header entry <code>gpgsig</code>
+  (content is preceded by a space)
+</p>
+</li>
+<li>
+<p>
+example: commit with subject <code>signed commit</code>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>tree eebfed94e75e7760540d1485c740902590a00332
+parent 04b871796dc0420f8e7561a895b52484b701d51a
+author A U Thor &lt;author@example.com&gt; 1465981137 +0000
+committer C O Mitter &lt;committer@example.com&gt; 1465981137 +0000
+gpgsig -----BEGIN PGP SIGNATURE-----
+ Version: GnuPG v1
+
+ iQEcBAABAgAGBQJXYRjRAAoJEGEJLoW3InGJ3IwIAIY4SA6GxY3BjL60YyvsJPh/
+ HRCJwH+w7wt3Yc/9/bW2F+gF72kdHOOs2jfv+OZhq0q4OAN6fvVSczISY/82LpS7
+ DVdMQj2/YcHDT4xrDNBnXnviDO9G7am/9OE77kEbXrp7QPxvhjkicHNwy2rEflAA
+ zn075rtEERDHr8nRYiDh8eVrefSO7D+bdQ7gv+7GsYMsd2auJWi1dHOSfTr9HIF4
+ HJhWXT9d2f8W+diRYXGh4X0wYiGg6na/soXc+vdtDYBzIxanRqjg8jCAeo1eOTk1
+ EdTwhcTZlI0x5pvJ3H0+4hA2jtldVtmPM4OTB0cTrEWBad7XV6YgiyuII73Ve3I=
+ =jKHM
+ -----END PGP SIGNATURE-----
+
+signed commit
+
+signed commit message body</code></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+verify with: <code>git verify-commit [-v]</code> (or <code>git show --show-signature</code>)
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>gpg: Signature made Wed Jun 15 10:58:57 2016 CEST using RSA key ID B7227189
+gpg: Good signature from "Eris Discordia &lt;discord@example.net&gt;"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: D4BE 2231 1AD3 131E 5EDA  29A4 6109 2E85 B722 7189
+tree eebfed94e75e7760540d1485c740902590a00332
+parent 04b871796dc0420f8e7561a895b52484b701d51a
+author A U Thor &lt;author@example.com&gt; 1465981137 +0000
+committer C O Mitter &lt;committer@example.com&gt; 1465981137 +0000
+
+signed commit
+
+signed commit message body</code></pre>
+</div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_options">OPTIONS</h2>
+<h2 id="_mergetag_signatures">Mergetag signatures</h2>
 <div class="sectionbody">
-<div class="dlist"><dl>
-<dt class="hdlist1">
--a
-</dt>
-<dd>
+<div class="ulist"><ul>
+<li>
 <p>
-        Instead of incrementally packing the unpacked objects,
-        pack everything referenced into a single pack.
-        Especially useful when packing a repository that is used
-        for private development. Use
-        with <em>-d</em>.  This will clean up the objects that <code>git prune</code>
-        leaves behind, but <code>git fsck --full --dangling</code> shows as
-        dangling.
+created by: <code>git merge</code> on signed tag
 </p>
-<div class="paragraph"><p>Note that users fetching over dumb protocols will have to fetch the
-whole new pack in order to get any contained object, no matter how many
-other objects in that pack they already have locally.</p></div>
-</dd>
-<dt class="hdlist1">
--A
-</dt>
-<dd>
+</li>
+<li>
 <p>
-        Same as <code>-a</code>, unless <em>-d</em> is used.  Then any unreachable
-        objects in a previous pack become loose, unpacked objects,
-        instead of being left in the old pack.  Unreachable objects
-        are never intentionally added to a pack, even when repacking.
-        This option prevents unreachable objects from being immediately
-        deleted by way of being left in the old pack and then
-        removed.  Instead, the loose unreachable objects
-        will be pruned according to normal expiry rules
-        with the next <em>git gc</em> invocation. See <a href="git-gc.html">git-gc(1)</a>.
+payload/embedding: the whole signed tag object is embedded into
+  the (merge) commit object as header entry <code>mergetag</code>
 </p>
-</dd>
-<dt class="hdlist1">
--d
-</dt>
-<dd>
+</li>
+<li>
 <p>
-        After packing, if the newly created packs make some
-        existing packs redundant, remove the redundant packs.
-        Also run  <em>git prune-packed</em> to remove redundant
-        loose object files.
+example: merge of the signed tag <code>signedtag</code> as above
 </p>
-</dd>
-<dt class="hdlist1">
--l
-</dt>
-<dd>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>tree c7b1cff039a93f3600a1d18b82d26688668c7dea
+parent c33429be94b5f2d3ee9b0adad223f877f174b05d
+parent 04b871796dc0420f8e7561a895b52484b701d51a
+author A U Thor &lt;author@example.com&gt; 1465982009 +0000
+committer C O Mitter &lt;committer@example.com&gt; 1465982009 +0000
+mergetag object 04b871796dc0420f8e7561a895b52484b701d51a
+ type commit
+ tag signedtag
+ tagger C O Mitter &lt;committer@example.com&gt; 1465981006 +0000
+
+ signed tag
+
+ signed tag message body
+ -----BEGIN PGP SIGNATURE-----
+ Version: GnuPG v1
+
+ iQEcBAABAgAGBQJXYRhOAAoJEGEJLoW3InGJklkIAIcnhL7RwEb/+QeX9enkXhxn
+ rxfdqrvWd1K80sl2TOt8Bg/NYwrUBw/RWJ+sg/hhHp4WtvE1HDGHlkEz3y11Lkuh
+ 8tSxS3qKTxXUGozyPGuE90sJfExhZlW4knIQ1wt/yWqM+33E9pN4hzPqLwyrdods
+ q8FWEqPPUbSJXoMbRPw04S5jrLtZSsUWbRYjmJCHzlhSfFWW4eFd37uquIaLUBS0
+ rkC3Jrx7420jkIpgFcTI2s60uhSQLzgcCwdA2ukSYIRnjg/zDkj8+3h/GaROJ72x
+ lZyI6HWixKJkWw8lE9aAOD9TmTW9sFJwcVAzmAuFX2kUreDUKMZduGcoRYGpD7E=
+ =jpXa
+ -----END PGP SIGNATURE-----
+
+Merge tag 'signedtag' into downstream
+
+signed tag
+
+signed tag message body
+
+# gpg: Signature made Wed Jun 15 08:56:46 2016 UTC using RSA key ID B7227189
+# gpg: Good signature from "Eris Discordia &lt;discord@example.net&gt;"
+# gpg: WARNING: This key is not certified with a trusted signature!
+# gpg:          There is no indication that the signature belongs to the owner.
+# Primary key fingerprint: D4BE 2231 1AD3 131E 5EDA  29A4 6109 2E85 B722 7189</code></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
 <p>
-        Pass the <code>--local</code> option to <em>git pack-objects</em>. See
-        <a href="git-pack-objects.html">git-pack-objects(1)</a>.
+verify with: verification is embedded in merge commit message by default,
+  alternatively with <code>git show --show-signature</code>:
 </p>
-</dd>
-<dt class="hdlist1">
--f
-</dt>
-<dd>
-<p>
-        Pass the <code>--no-reuse-delta</code> option to <code>git-pack-objects</code>, see
-        <a href="git-pack-objects.html">git-pack-objects(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
--F
-</dt>
-<dd>
-<p>
-        Pass the <code>--no-reuse-object</code> option to <code>git-pack-objects</code>, see
-        <a href="git-pack-objects.html">git-pack-objects(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
--q
-</dt>
-<dd>
-<p>
-        Pass the <code>-q</code> option to <em>git pack-objects</em>. See
-        <a href="git-pack-objects.html">git-pack-objects(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
--n
-</dt>
-<dd>
-<p>
-        Do not update the server information with
-        <em>git update-server-info</em>.  This option skips
-        updating local catalog files needed to publish
-        this repository (or a direct copy of it)
-        over HTTP or FTP.  See <a href="git-update-server-info.html">git-update-server-info(1)</a>.
-</p>
-</dd>
-<dt class="hdlist1">
---window=&lt;n&gt;
-</dt>
-<dt class="hdlist1">
---depth=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        These two options affect how the objects contained in the pack are
-        stored using delta compression. The objects are first internally
-        sorted by type, size and optionally names and compared against the
-        other objects within <code>--window</code> to see if using delta compression saves
-        space. <code>--depth</code> limits the maximum delta depth; making it too deep
-        affects the performance on the unpacker side, because delta data needs
-        to be applied that many times to get to the necessary object.
-        The default value for --window is 10 and --depth is 50.
-</p>
-</dd>
-<dt class="hdlist1">
---window-memory=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        This option provides an additional limit on top of <code>--window</code>;
-        the window size will dynamically scale down so as to not take
-        up more than <em>&lt;n&gt;</em> bytes in memory.  This is useful in
-        repositories with a mix of large and small objects to not run
-        out of memory with a large window, but still be able to take
-        advantage of the large window for the smaller objects.  The
-        size can be suffixed with "k", "m", or "g".
-        <code>--window-memory=0</code> makes memory usage unlimited, which is the
-        default.
-</p>
-</dd>
-<dt class="hdlist1">
---max-pack-size=&lt;n&gt;
-</dt>
-<dd>
-<p>
-        Maximum size of each output pack file. The size can be suffixed with
-        "k", "m", or "g". The minimum size allowed is limited to 1 MiB.
-        If specified, multiple packfiles may be created, which also
-        prevents the creation of a bitmap index.
-        The default is unlimited, unless the config variable
-        <code>pack.packSizeLimit</code> is set.
-</p>
-</dd>
-<dt class="hdlist1">
--b
-</dt>
-<dt class="hdlist1">
---write-bitmap-index
-</dt>
-<dd>
-<p>
-        Write a reachability bitmap index as part of the repack. This
-        only makes sense when used with <code>-a</code> or <code>-A</code>, as the bitmaps
-        must be able to refer to all reachable objects. This option
-        overrides the setting of <code>repack.writeBitmaps</code>.  This option
-        has no effect if multiple packfiles are created.
-</p>
-</dd>
-<dt class="hdlist1">
---pack-kept-objects
-</dt>
-<dd>
-<p>
-        Include objects in <code>.keep</code> files when repacking.  Note that we
-        still do not delete <code>.keep</code> packs after <code>pack-objects</code> finishes.
-        This means that we may duplicate objects, but this makes the
-        option safe to use when there are concurrent pushes or fetches.
-        This option is generally only useful if you are writing bitmaps
-        with <code>-b</code> or <code>repack.writeBitmaps</code>, as it ensures that the
-        bitmapped packfile has the necessary objects.
-</p>
-</dd>
-<dt class="hdlist1">
---unpack-unreachable=&lt;when&gt;
-</dt>
-<dd>
-<p>
-        When loosening unreachable objects, do not bother loosening any
-        objects older than <code>&lt;when&gt;</code>. This can be used to optimize out
-        the write of any objects that would be immediately pruned by
-        a follow-up <code>git prune</code>.
-</p>
-</dd>
-<dt class="hdlist1">
--k
-</dt>
-<dt class="hdlist1">
---keep-unreachable
-</dt>
-<dd>
-<p>
-        When used with <code>-ad</code>, any unreachable objects from existing
-        packs will be appended to the end of the packfile instead of
-        being removed. In addition, any unreachable loose objects will
-        be packed (and their loose counterparts removed).
-</p>
-</dd>
-</dl></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_configuration">Configuration</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>By default, the command passes <code>--delta-base-offset</code> option to
-<em>git pack-objects</em>; this typically results in slightly smaller packs,
-but the generated packs are incompatible with versions of Git older than
-version 1.4.4. If you need to share your repository with such ancient Git
-versions, either directly or via the dumb http protocol, then you
-need to set the configuration variable <code>repack.UseDeltaBaseOffset</code> to
-"false" and repack. Access from old Git versions over the native protocol
-is unaffected by this option as the conversion is performed on the fly
-as needed in that case.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_see_also">SEE ALSO</h2>
-<div class="sectionbody">
-<div class="paragraph"><p><a href="git-pack-objects.html">git-pack-objects(1)</a>
-<a href="git-prune-packed.html">git-prune-packed(1)</a></p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_git">GIT</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>commit 9863f0c76ff78712b6800e199a46aa56afbcbd49
+merged tag 'signedtag'
+gpg: Signature made Wed Jun 15 10:56:46 2016 CEST using RSA key ID B7227189
+gpg: Good signature from "Eris Discordia &lt;discord@example.net&gt;"
+gpg: WARNING: This key is not certified with a trusted signature!
+gpg:          There is no indication that the signature belongs to the owner.
+Primary key fingerprint: D4BE 2231 1AD3 131E 5EDA  29A4 6109 2E85 B722 7189
+Merge: c33429b 04b8717
+Author: A U Thor &lt;author@example.com&gt;
+Date:   Wed Jun 15 09:13:29 2016 +0000
+
+    Merge tag 'signedtag' into downstream
+
+    signed tag
+
+    signed tag message body
+
+    # gpg: Signature made Wed Jun 15 08:56:46 2016 UTC using RSA key ID B7227189
+    # gpg: Good signature from "Eris Discordia &lt;discord@example.net&gt;"
+    # gpg: WARNING: This key is not certified with a trusted signature!
+    # gpg:          There is no indication that the signature belongs to the owner.
+    # Primary key fingerprint: D4BE 2231 1AD3 131E 5EDA  29A4 6109 2E85 B722 7189</code></pre>
+</div></div>
 </div>
 </div>
 </div>
