@@ -750,7 +750,9 @@ git-worktree(1) Manual Page
 <div class="verseblock">
 <pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
 <em>git worktree list</em> [--porcelain]
-<em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]</pre>
+<em>git worktree lock</em> [--reason &lt;string&gt;] &lt;worktree&gt;
+<em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
+<em>git worktree unlock</em> &lt;worktree&gt;</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -776,9 +778,8 @@ administrative files so that they do not get pruned automatically. See
 section "DETAILS" for more information.</p></div>
 <div class="paragraph"><p>If a linked working tree is stored on a portable device or network share
 which is not always mounted, you can prevent its administrative files from
-being pruned by creating a file named <em>locked</em> alongside the other
-administrative files, optionally containing a plain text reason that
-pruning should be suppressed. See section "DETAILS" for more information.</p></div>
+being pruned by issuing the <code>git worktree lock</code> command, optionally
+specifying <code>--reason</code> to explain why the working tree is locked.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -811,11 +812,31 @@ bare, the revision currently checked out, and the branch currently checked out
 </p>
 </dd>
 <dt class="hdlist1">
+lock
+</dt>
+<dd>
+<p>
+If a working tree is on a portable device or network share which
+is not always mounted, lock it to prevent its administrative
+files from being pruned automatically. This also prevents it from
+being moved or deleted. Optionally, specify a reason for the lock
+with <code>--reason</code>.
+</p>
+</dd>
+<dt class="hdlist1">
 prune
 </dt>
 <dd>
 <p>
 Prune working tree information in $GIT_DIR/worktrees.
+</p>
+</dd>
+<dt class="hdlist1">
+unlock
+</dt>
+<dd>
+<p>
+Unlock a working tree, allowing it to be pruned, moved or deleted.
 </p>
 </dd>
 </dl></div>
@@ -915,6 +936,27 @@ Prune working tree information in $GIT_DIR/worktrees.
         With <code>prune</code>, only expire unused working trees older than &lt;time&gt;.
 </p>
 </dd>
+<dt class="hdlist1">
+--reason &lt;string&gt;
+</dt>
+<dd>
+<p>
+        With <code>lock</code>, an explanation why the working tree is locked.
+</p>
+</dd>
+<dt class="hdlist1">
+&lt;worktree&gt;
+</dt>
+<dd>
+<p>
+        Working trees can be identified by path, either relative or
+        absolute.
+</p>
+<div class="paragraph"><p>If the last path components in the working tree&#8217;s path is unique among
+working trees, it can be used to identify worktrees. For example if
+you only have to working trees at "/abc/def/ghi" and "/abc/def/ggg",
+then "ghi" or "def/ghi" is enough to point to the former working tree.</p></div>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -954,7 +996,8 @@ to <code>/newpath/test-next</code> and its <code>.git</code> file points to
 instead.</p></div>
 <div class="paragraph"><p>To prevent a $GIT_DIR/worktrees entry from being pruned (which
 can be useful in some situations, such as when the
-entry&#8217;s working tree is stored on a portable device), add a file named
+entry&#8217;s working tree is stored on a portable device), use the
+<code>git worktree lock</code> command, which adds a file named
 <em>locked</em> to the entry&#8217;s directory. The file contains the reason in
 plain text. For example, if a linked working tree&#8217;s <code>.git</code> file points
 to <code>/path/main/.git/worktrees/test-next</code> then a file named
@@ -1042,12 +1085,6 @@ performed manually, such as:</p></div>
 <code>mv</code> to move or rename a working tree and update its administrative files
 </p>
 </li>
-<li>
-<p>
-<code>lock</code> to prevent automatic pruning of administrative files (for instance,
-  for a working tree on a portable device)
-</p>
-</li>
 </ul></div>
 </div>
 </div>
@@ -1061,7 +1098,7 @@ performed manually, such as:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-07-06 14:33:48 PDT
+Last updated 2016-07-28 14:57:16 PDT
 </div>
 </div>
 </body>
