@@ -953,7 +953,28 @@ crlf=input      eol=lf</code></pre>
 <div class="paragraph"><p>While Git normally leaves file contents alone, it can be configured to
 normalize line endings to LF in the repository and, optionally, to
 convert them to CRLF when files are checked out.</p></div>
-<div class="paragraph"><p>Here is an example that will make Git normalize .txt, .vcproj and .sh
+<div class="paragraph"><p>If you simply want to have CRLF line endings in your working directory
+regardless of the repository you are working with, you can set the
+config variable "core.autocrlf" without using any attributes.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>[core]
+        autocrlf = true</code></pre>
+</div></div>
+<div class="paragraph"><p>This does not force normalization of text files, but does ensure
+that text files that you introduce to the repository have their line
+endings normalized to LF when they are added, and that files that are
+already normalized in the repository stay normalized.</p></div>
+<div class="paragraph"><p>If you want to ensure that text files that any contributor introduces to
+the repository have their line endings normalized, you can set the
+<code>text</code> attribute to "auto" for <em>all</em> files.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>*       text=auto</code></pre>
+</div></div>
+<div class="paragraph"><p>The attributes allow a fine-grained control, how the line endings
+are converted.
+Here is an example that will make Git normalize .txt, .vcproj and .sh
 files, ensure that .vcproj files have CRLF and .sh files have LF in
 the working directory, and prevent .jpg files from being normalized
 regardless of their content.</p></div>
@@ -965,50 +986,20 @@ regardless of their content.</p></div>
 *.sh            text eol=lf
 *.jpg           -text</code></pre>
 </div></div>
-<div class="paragraph"><p>Other source code management systems normalize all text files in their
-repositories, and there are two ways to enable similar automatic
-normalization in Git.</p></div>
-<div class="paragraph"><p>If you simply want to have CRLF line endings in your working directory
-regardless of the repository you are working with, you can set the
-config variable "core.autocrlf" without using any attributes.</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>[core]
-        autocrlf = true</code></pre>
-</div></div>
-<div class="paragraph"><p>This does not force normalization of all text files, but does ensure
-that text files that you introduce to the repository have their line
-endings normalized to LF when they are added, and that files that are
-already normalized in the repository stay normalized.</p></div>
-<div class="paragraph"><p>If you want to interoperate with a source code management system that
-enforces end-of-line normalization, or you simply want all text files
-in your repository to be normalized, you should instead set the <code>text</code>
-attribute to "auto" for <em>all</em> files.</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>*       text=auto</code></pre>
-</div></div>
-<div class="paragraph"><p>This ensures that all files that Git considers to be text will have
-normalized (LF) line endings in the repository.  The <code>core.eol</code>
-configuration variable controls which line endings Git will use for
-normalized files in your working directory; the default is to use the
-native line ending for your platform, or CRLF if <code>core.autocrlf</code> is
-set.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">When <code>text=auto</code> normalization is enabled in an existing
-repository, any text files containing CRLFs should be normalized.  If
-they are not they will be normalized the next time someone tries to
-change them, causing unfortunate misattribution.  From a clean working
-directory:</td>
+<td class="content">When <code>text=auto</code> conversion is enabled in a cross-platform
+project using push and pull to a central repository the text files
+containing CRLFs should be normalized.</td>
 </tr></table>
 </div>
+<div class="paragraph"><p>From a clean working directory:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ echo "* text=auto" &gt;&gt;.gitattributes
+<pre><code>$ echo "* text=auto" &gt;.gitattributes
 $ rm .git/index     # Remove the index to force Git to
 $ git reset         # re-scan the working directory
 $ git status        # Show files that will be normalized
@@ -1875,7 +1866,7 @@ frotz   unspecified</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-08-12 12:42:02 PDT
+Last updated 2016-08-26 14:45:20 PDT
 </div>
 </div>
 </body>
