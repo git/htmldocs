@@ -1303,7 +1303,7 @@ excluded from the output.</p></div>
 </dt>
 <dd>
 <p>
-        List only commits on the respective side of a symmetric range,
+        List only commits on the respective side of a symmetric difference,
         i.e. only those which would be marked <code>&lt;</code> resp. <code>&gt;</code> by
         <code>--left-right</code>.
 </p>
@@ -2107,7 +2107,7 @@ the time zone is omitted when the local time zone is used
 </dt>
 <dd>
 <p>
-        Mark which side of a symmetric diff a commit is reachable from.
+        Mark which side of a symmetric difference a commit is reachable from.
         Commits from the left side are prefixed with <code>&lt;</code> and those from
         the right with <code>&gt;</code>.  If combined with <code>--boundary</code>, those
         commits are prefixed with <code>-</code>.
@@ -2644,7 +2644,7 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-<em>%m</em>: left, right or boundary mark
+<em>%m</em>: left (<code>&lt;</code>), right (<code>&gt;</code>) or boundary (<code>-</code>) mark
 </p>
 </li>
 <li>
@@ -3092,13 +3092,16 @@ any of those replacements occurred.</p></div>
 </dt>
 <dd>
 <p>
-        Specify how differences in submodules are shown.  When <code>--submodule</code>
-        or <code>--submodule=log</code> is given, the <em>log</em> format is used.  This format lists
-        the commits in the range like <a href="git-submodule.html">git-submodule(1)</a> <code>summary</code> does.
-        Omitting the <code>--submodule</code> option or specifying <code>--submodule=short</code>,
-        uses the <em>short</em> format. This format just shows the names of the commits
-        at the beginning and end of the range.  Can be tweaked via the
-        <code>diff.submodule</code> configuration variable.
+        Specify how differences in submodules are shown.  When specifying
+        <code>--submodule=short</code> the <em>short</em> format is used.  This format just
+        shows the names of the commits at the beginning and end of the range.
+        When <code>--submodule</code> or <code>--submodule=log</code> is specified, the <em>log</em>
+        format is used.  This format lists the commits in the range like
+        <a href="git-submodule.html">git-submodule(1)</a> <code>summary</code> does.  When <code>--submodule=diff</code>
+        is specified, the <em>diff</em> format is used.  This format shows an
+        inline diff of the changes in the submodule contents between the
+        commit range.  Defaults to <code>diff.submodule</code> or the <em>short</em> format
+        if the config option is unset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3645,6 +3648,14 @@ information.</p></div>
 <dd>
 <p>
         Do not show any source or destination prefix.
+</p>
+</dd>
+<dt class="hdlist1">
+--line-prefix=&lt;prefix&gt;
+</dt>
+<dd>
+<p>
+        Prepend an additional prefix to every line of output.
 </p>
 </dd>
 </dl></div>

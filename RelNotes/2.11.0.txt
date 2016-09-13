@@ -1,0 +1,97 @@
+Git 2.11 Release Notes
+======================
+
+Updates since v2.10
+-------------------
+
+UI, Workflows & Features
+
+ * "git format-patch --cover-letter HEAD^" to format a single patch
+   with a separate cover letter now numbers the output as [PATCH 0/1]
+   and [PATCH 1/1] by default.
+
+ * An incoming "git push" that attempts to push too many bytes can now
+   be rejected by setting a new configuration variable at the receiving
+   end.
+
+ * "git nosuchcommand --help" said "No manual entry for gitnosuchcommand",
+   which was not intuitive, given that "git nosuchcommand" said "git:
+   'nosuchcommand' is not a git command".
+
+ * "git clone --resurse-submodules --reference $path $URL" is a way to
+   reduce network transfer cost by borrowing objects in an existing
+   $path repository when cloning the superproject from $URL; it
+   learned to also peek into $path for presense of corresponding
+   repositories of submodules and borrow objects from there when able.
+
+ * The "git diff --submodule={short,log}" mechanism has been enhanced
+   to allow "--submodule=diff" to show the patch between the submodule
+   commits bound to the superproject.
+
+
+Performance, Internal Implementation, Development Support etc.
+
+ * The delta-base-cache mechanism has been a key to the performance in
+   a repository with a tightly packed packfile, but it did not scale
+   well even with a larger value of core.deltaBaseCacheLimit.
+
+ * Enhance "git status --porcelain" output by collecting more data on
+   the state of the index and the working tree files, which may
+   further be used to teach git-prompt (in contrib/) to make fewer
+   calls to git.
+
+ * Extract a small helper out of the function that reads the authors
+   script file "git am" internally uses.
+   (merge a77598e jc/am-read-author-file later to maint).
+
+
+Also contains various documentation updates and code clean-ups.
+
+
+Fixes since v2.10
+-----------------
+
+Unless otherwise noted, all the fixes since v2.9 in the maintenance
+track are contained in this release (see the maintenance releases'
+notes for details).
+
+ * Clarify various ways to specify the "revision ranges" in the
+   documentation.
+   (merge a117be4 po/range-doc later to maint).
+
+ * "diff-highlight" script (in contrib/) learned to work better with
+   "git log -p --graph" output.
+   (merge 3dbfe2b bh/diff-highlight-graph later to maint).
+
+ * The test framework left the number of tests and success/failure
+   count in the t/test-results directory, keyed by the name of the
+   test script plus the process ID.  The latter however turned out not
+   to serve any useful purpose.  The process ID part of the filename
+   has been removed.
+   (merge 5c885c1 jk/test-lib-drop-pid-from-results later to maint).
+
+ * Having a submodule whose ".git" repository is somehow corrupt
+   caused a few commands that recurse into submodules loop forever.
+   (merge 10f5c52 jc/submodule-anchor-git-dir later to maint).
+
+ * "git symbolic-ref -d HEAD" happily removes the symbolic ref, but
+   the resulting repository becomes an invalid one.  Teach the command
+   to forbid removal of HEAD.
+   (merge 12cfa79 jc/forbid-symbolic-ref-d-HEAD later to maint).
+
+ * A test spawned a short-lived background process, which sometimes
+   prevented the test directory from getting removed at the end of the
+   script on some platforms.
+   (merge 5babb5b js/t6026-clean-up later to maint).
+
+ * Update a few tests that used to use GIT_CURL_VERBOSE to use the
+   newer GIT_TRACE_CURL.
+   (merge 14e2411 ep/use-git-trace-curl-in-tests later to maint).
+
+ * Other minor doc, test and build updates and code cleanups.
+   (merge 3e1952e jk/squelch-false-warning-from-gcc-o3 later to maint).
+   (merge ca2baa3 rs/compat-strdup later to maint).
+   (merge d233097 rs/hex2chr later to maint).
+   (merge c00bfc9 js/t9903-chaining later to maint).
+   (merge 5e4e5bb sb/xdiff-remove-unused-static-decl later to maint).
+   (merge 5cb5fe4 sb/transport-report-missing-submodule-on-stderr later to maint).
