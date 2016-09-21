@@ -748,8 +748,8 @@ git-cat-file(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git cat-file</em> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv ) &lt;object&gt;
-<em>git cat-file</em> (--batch | --batch-check) [--follow-symlinks]</pre>
+<pre class="content"><em>git cat-file</em> (-t [--allow-unknown-type]| -s [--allow-unknown-type]| -e | -p | &lt;type&gt; | --textconv | --filters ) [--path=&lt;path&gt;] &lt;object&gt;
+<em>git cat-file</em> (--batch | --batch-check) [ --textconv | --filters ] [--follow-symlinks]</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -759,10 +759,14 @@ git-cat-file(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>In its first form, the command provides the content or the type of an object in
 the repository. The type is required unless <code>-t</code> or <code>-p</code> is used to find the
-object type, or <code>-s</code> is used to find the object size, or <code>--textconv</code> is used
-(which implies type "blob").</p></div>
+object type, or <code>-s</code> is used to find the object size, or <code>--textconv</code> or
+<code>--filters</code> is used (which imply type "blob").</p></div>
 <div class="paragraph"><p>In the second form, a list of objects (separated by linefeeds) is provided on
-stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></div>
+stdin, and the SHA-1, type, and size of each object is printed on stdout. The
+output format can be overridden using the optional <code>&lt;format&gt;</code> argument. If
+either <code>--textconv</code> or <code>--filters</code> was specified, the input is expected to
+list the object names followed by the path name, separated by a single white
+space, so that the appropriate drivers can be determined.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -833,8 +837,30 @@ stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></d
 <dd>
 <p>
         Show the content as transformed by a textconv filter. In this case,
-        &lt;object&gt; has be of the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt; in order
-        to apply the filter to the content recorded in the index at &lt;path&gt;.
+        &lt;object&gt; has to be of the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt; in
+        order to apply the filter to the content recorded in the index at
+        &lt;path&gt;.
+</p>
+</dd>
+<dt class="hdlist1">
+--filters
+</dt>
+<dd>
+<p>
+        Show the content as converted by the filters configured in
+        the current working tree for the given &lt;path&gt; (i.e. smudge filters,
+        end-of-line conversion, etc). In this case, &lt;object&gt; has to be of
+        the form &lt;tree-ish&gt;:&lt;path&gt;, or :&lt;path&gt;.
+</p>
+</dd>
+<dt class="hdlist1">
+--path=&lt;path&gt;
+</dt>
+<dd>
+<p>
+        For use with --textconv or --filters, to allow specifying an object
+        name and a path separately, e.g. when it is difficult to figure out
+        the revision from which the blob came.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -846,8 +872,10 @@ stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></d
 <dd>
 <p>
         Print object information and contents for each object provided
-        on stdin.  May not be combined with any other options or arguments.
-        See the section <code>BATCH OUTPUT</code> below for details.
+        on stdin.  May not be combined with any other options or arguments
+        except <code>--textconv</code> or <code>--filters</code>, in which case the input lines
+        also need to specify the path, separated by white space.  See the
+        section <code>BATCH OUTPUT</code> below for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -859,7 +887,9 @@ stdin, and the SHA-1, type, and size of each object is printed on stdout.</p></d
 <dd>
 <p>
         Print object information for each object provided on stdin.  May
-        not be combined with any other options or arguments.  See the
+        not be combined with any other options or arguments except
+        <code>--textconv</code> or <code>--filters</code>, in which case the input lines also
+        need to specify the path, separated by white space.  See the
         section <code>BATCH OUTPUT</code> below for details.
 </p>
 </dd>
@@ -1132,7 +1162,7 @@ will be reported.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-07-13 14:58:50 PDT
+Last updated 2016-09-21 16:26:29 PDT
 </div>
 </div>
 </body>
