@@ -2473,10 +2473,11 @@ core.abbrev
 </dt>
 <dd>
 <p>
-        Set the length object names are abbreviated to.  If unspecified,
-        many commands abbreviate to 7 hexdigits, which may not be enough
-        for abbreviated object names to stay unique for sufficiently long
-        time.
+        Set the length object names are abbreviated to.  If
+        unspecified or set to "auto", an appropriate value is
+        computed based on the approximate number of packed objects
+        in your repository, which hopefully is enough for
+        abbreviated object names to stay unique for some time.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3677,14 +3678,10 @@ xxdiff
 <dt class="hdlist1">
 diff.indentHeuristic
 </dt>
-<dt class="hdlist1">
-diff.compactionHeuristic
-</dt>
 <dd>
 <p>
-        Set one of these options to <code>true</code> to enable one of two
-        experimental heuristics that shift diff hunk boundaries to
-        make patches easier to read.
+        Set this option to <code>true</code> to enable experimental heuristics
+        that shift diff hunk boundaries to make patches easier to read.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4136,7 +4133,9 @@ gc.pruneExpire
         Override the grace period with this config variable.  The value
         "now" may be used to disable this grace period and always prune
         unreachable objects immediately, or "never" may be used to
-        suppress pruning.
+        suppress pruning.  This feature helps prevent corruption when
+        <em>git gc</em> runs concurrently with another process writing to the
+        repository; see the "NOTES" section of <a href="git-gc.html">git-gc(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -7205,6 +7204,10 @@ is omitted from the advertisements but <code>refs/heads/master</code> and
 <code>refs/namespaces/bar/refs/heads/master</code> are still advertised as so-called
 "have" lines. In order to match refs before stripping, add a <code>^</code> in front of
 the ref name. If you combine <code>!</code> and <code>^</code>, <code>!</code> must be specified first.</p></div>
+<div class="paragraph"><p>Even if you hide refs, a client may still be able to steal the target
+objects via the techniques described in the "SECURITY" section of the
+<a href="gitnamespaces.html">gitnamespaces(7)</a> man page; it&#8217;s best to keep private data in a
+separate repository.</p></div>
 </dd>
 <dt class="hdlist1">
 transfer.unpackLimit
@@ -7223,7 +7226,7 @@ uploadarchive.allowUnreachable
 <p>
         If true, allow clients to use <code>git archive --remote</code> to request
         any tree, whether reachable from the ref tips or not. See the
-        discussion in the <code>SECURITY</code> section of
+        discussion in the "SECURITY" section of
         <a href="git-upload-archive.html">git-upload-archive(1)</a> for more details. Defaults to
         <code>false</code>.
 </p>
@@ -7247,7 +7250,10 @@ uploadpack.allowTipSHA1InWant
         When <code>uploadpack.hideRefs</code> is in effect, allow <code>upload-pack</code>
         to accept a fetch request that asks for an object at the tip
         of a hidden ref (by default, such a request is rejected).
-        see also <code>uploadpack.hideRefs</code>.
+        See also <code>uploadpack.hideRefs</code>.  Even if this is false, a client
+        may be able to steal objects via the techniques described in the
+        "SECURITY" section of the <a href="gitnamespaces.html">gitnamespaces(7)</a> man page; it&#8217;s
+        best to keep private data in a separate repository.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -7258,6 +7264,19 @@ uploadpack.allowReachableSHA1InWant
         Allow <code>upload-pack</code> to accept a fetch request that asks for an
         object that is reachable from any ref tip. However, note that
         calculating object reachability is computationally expensive.
+        Defaults to <code>false</code>.  Even if this is false, a client may be able
+        to steal objects via the techniques described in the "SECURITY"
+        section of the <a href="gitnamespaces.html">gitnamespaces(7)</a> man page; it&#8217;s best to
+        keep private data in a separate repository.
+</p>
+</dd>
+<dt class="hdlist1">
+uploadpack.allowAnySHA1InWant
+</dt>
+<dd>
+<p>
+        Allow <code>upload-pack</code> to accept a fetch request that asks for any
+        object at all.
         Defaults to <code>false</code>.
 </p>
 </dd>

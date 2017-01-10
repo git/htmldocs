@@ -818,11 +818,10 @@ automatic consolidation of packs.</p></div>
 <p>
         Prune loose objects older than date (default is 2 weeks ago,
         overridable by the config variable <code>gc.pruneExpire</code>).
-        --prune=all prunes loose objects regardless of their age (do
-        not use --prune=all unless you know exactly what you are doing.
-        Unless the repository is quiescent, you will lose newly created
-        objects that haven&#8217;t been anchored with the refs and end up
-        corrupting your repository).  --prune is on by default.
+        --prune=all prunes loose objects regardless of their age and
+        increases the risk of corruption if another process is writing to
+        the repository concurrently; see "NOTES" below. --prune is on by
+        default.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -904,15 +903,41 @@ default is "2 weeks ago".</p></div>
 <div class="sect1">
 <h2 id="_notes">Notes</h2>
 <div class="sectionbody">
-<div class="paragraph"><p><em>git gc</em> tries very hard to be safe about the garbage it collects. In
+<div class="paragraph"><p><em>git gc</em> tries very hard not to delete objects that are referenced
+anywhere in your repository. In
 particular, it will keep not only objects referenced by your current set
 of branches and tags, but also objects referenced by the index,
 remote-tracking branches, refs saved by <em>git filter-branch</em> in
 refs/original/, or reflogs (which may reference commits in branches
-that were later amended or rewound).</p></div>
-<div class="paragraph"><p>If you are expecting some objects to be collected and they aren&#8217;t, check
+that were later amended or rewound).
+If you are expecting some objects to be deleted and they aren&#8217;t, check
 all of those locations and decide whether it makes sense in your case to
 remove those references.</p></div>
+<div class="paragraph"><p>On the other hand, when <em>git gc</em> runs concurrently with another process,
+there is a risk of it deleting an object that the other process is using
+but hasn&#8217;t created a reference to. This may just cause the other process
+to fail or may corrupt the repository if the other process later adds a
+reference to the deleted object. Git has two features that significantly
+mitigate this problem:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Any object with modification time newer than the <code>--prune</code> date is kept,
+  along with everything reachable from it.
+</p>
+</li>
+<li>
+<p>
+Most operations that add an object to the database update the
+  modification time of the object if it is already present so that #1
+  applies.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>However, these features fall short of a complete solution, so users who
+run commands concurrently have to live with some risk of corruption (which
+seems to be low in practice) unless they turn off automatic garbage
+collection with <em>git config gc.auto 0</em>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -941,7 +966,7 @@ remove those references.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-27 11:04:05 PDT
+Last updated 2017-01-10 15:42:58 PST
 </div>
 </div>
 </body>

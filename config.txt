@@ -783,10 +783,11 @@ core.sparseCheckout::
 	linkgit:git-read-tree[1] for more information.
 
 core.abbrev::
-	Set the length object names are abbreviated to.  If unspecified,
-	many commands abbreviate to 7 hexdigits, which may not be enough
-	for abbreviated object names to stay unique for sufficiently long
-	time.
+	Set the length object names are abbreviated to.  If
+	unspecified or set to "auto", an appropriate value is
+	computed based on the approximate number of packed objects
+	in your repository, which hopefully is enough for
+	abbreviated object names to stay unique for some time.
 
 add.ignoreErrors::
 add.ignore-errors (deprecated)::
@@ -1409,7 +1410,9 @@ gc.pruneExpire::
 	Override the grace period with this config variable.  The value
 	"now" may be used to disable this grace period and always prune
 	unreachable objects immediately, or "never" may be used to
-	suppress pruning.
+	suppress pruning.  This feature helps prevent corruption when
+	'git gc' runs concurrently with another process writing to the
+	repository; see the "NOTES" section of linkgit:git-gc[1].
 
 gc.worktreePruneExpire::
 	When 'git gc' is run, it calls
@@ -2986,6 +2989,11 @@ is omitted from the advertisements but `refs/heads/master` and
 `refs/namespaces/bar/refs/heads/master` are still advertised as so-called
 "have" lines. In order to match refs before stripping, add a `^` in front of
 the ref name. If you combine `!` and `^`, `!` must be specified first.
++
+Even if you hide refs, a client may still be able to steal the target
+objects via the techniques described in the "SECURITY" section of the
+linkgit:gitnamespaces[7] man page; it's best to keep private data in a
+separate repository.
 
 transfer.unpackLimit::
 	When `fetch.unpackLimit` or `receive.unpackLimit` are
@@ -2995,7 +3003,7 @@ transfer.unpackLimit::
 uploadarchive.allowUnreachable::
 	If true, allow clients to use `git archive --remote` to request
 	any tree, whether reachable from the ref tips or not. See the
-	discussion in the `SECURITY` section of
+	discussion in the "SECURITY" section of
 	linkgit:git-upload-archive[1] for more details. Defaults to
 	`false`.
 
@@ -3009,12 +3017,23 @@ uploadpack.allowTipSHA1InWant::
 	When `uploadpack.hideRefs` is in effect, allow `upload-pack`
 	to accept a fetch request that asks for an object at the tip
 	of a hidden ref (by default, such a request is rejected).
-	see also `uploadpack.hideRefs`.
+	See also `uploadpack.hideRefs`.  Even if this is false, a client
+	may be able to steal objects via the techniques described in the
+	"SECURITY" section of the linkgit:gitnamespaces[7] man page; it's
+	best to keep private data in a separate repository.
 
 uploadpack.allowReachableSHA1InWant::
 	Allow `upload-pack` to accept a fetch request that asks for an
 	object that is reachable from any ref tip. However, note that
 	calculating object reachability is computationally expensive.
+	Defaults to `false`.  Even if this is false, a client may be able
+	to steal objects via the techniques described in the "SECURITY"
+	section of the linkgit:gitnamespaces[7] man page; it's best to
+	keep private data in a separate repository.
+
+uploadpack.allowAnySHA1InWant::
+	Allow `upload-pack` to accept a fetch request that asks for any
+	object at all.
 	Defaults to `false`.
 
 uploadpack.keepAlive::
