@@ -3328,6 +3328,17 @@ diff.context
 </p>
 </dd>
 <dt class="hdlist1">
+diff.interHunkContext
+</dt>
+<dd>
+<p>
+        Show the context between diff hunks, up to the specified number
+        of lines, thereby fusing the hunks that are close to each other.
+        This value serves as the default for the <code>--inter-hunk-context</code>
+        command line option.
+</p>
+</dd>
+<dt class="hdlist1">
 diff.external
 </dt>
 <dd>
@@ -3422,9 +3433,10 @@ diff.orderFile
 </dt>
 <dd>
 <p>
-        File indicating how to order files within a diff, using
-        one shell glob pattern per line.
-        Can be overridden by the <em>-O</em> option to <a href="git-diff.html">git-diff(1)</a>.
+        File indicating how to order files within a diff.
+        See the <em>-O</em> option to <a href="git-diff.html">git-diff(1)</a> for details.
+        If <code>diff.orderFile</code> is a relative pathname, it is treated as
+        relative to the top of the working tree.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -7397,20 +7409,46 @@ user.signingKey
 </p>
 </dd>
 <dt class="hdlist1">
-versionsort.prereleaseSuffix
+versionsort.prereleaseSuffix (deprecated)
 </dt>
 <dd>
 <p>
-        When version sort is used in <a href="git-tag.html">git-tag(1)</a>, prerelease
-        tags (e.g. "1.0-rc1") may appear after the main release
-        "1.0". By specifying the suffix "-rc" in this variable,
-        "1.0-rc1" will appear before "1.0".
+        Deprecated alias for <code>versionsort.suffix</code>.  Ignored if
+        <code>versionsort.suffix</code> is set.
 </p>
-<div class="paragraph"><p>This variable can be specified multiple times, once per suffix. The
-order of suffixes in the config file determines the sorting order
-(e.g. if "-pre" appears before "-rc" in the config file then 1.0-preXX
-is sorted before 1.0-rcXX). The sorting order between different
-suffixes is undefined if they are in multiple config files.</p></div>
+</dd>
+<dt class="hdlist1">
+versionsort.suffix
+</dt>
+<dd>
+<p>
+        Even when version sort is used in <a href="git-tag.html">git-tag(1)</a>, tagnames
+        with the same base version but different suffixes are still sorted
+        lexicographically, resulting e.g. in prerelease tags appearing
+        after the main release (e.g. "1.0-rc1" after "1.0").  This
+        variable can be specified to determine the sorting order of tags
+        with different suffixes.
+</p>
+<div class="paragraph"><p>By specifying a single suffix in this variable, any tagname containing
+that suffix will appear before the corresponding main release.  E.g. if
+the variable is set to "-rc", then all "1.0-rcX" tags will appear before
+"1.0".  If specified multiple times, once per suffix, then the order of
+suffixes in the configuration will determine the sorting order of tagnames
+with those suffixes.  E.g. if "-pre" appears before "-rc" in the
+configuration, then all "1.0-preX" tags will be listed before any
+"1.0-rcX" tags.  The placement of the main release tag relative to tags
+with various suffixes can be determined by specifying the empty suffix
+among those other suffixes.  E.g. if the suffixes "-rc", "", "-ck" and
+"-bfs" appear in the configuration in this order, then all "v4.8-rcX" tags
+are listed first, followed by "v4.8", then "v4.8-ckX" and finally
+"v4.8-bfsX".</p></div>
+<div class="paragraph"><p>If more than one suffixes match the same tagname, then that tagname will
+be sorted according to the suffix which starts at the earliest position in
+the tagname.  If more than one different matching suffixes start at
+that earliest position, then that tagname will be sorted according to the
+longest of those suffixes.
+The sorting order between different suffixes is undefined if they are
+in multiple config files.</p></div>
 </dd>
 <dt class="hdlist1">
 web.browser
