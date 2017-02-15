@@ -1220,6 +1220,74 @@ But you can use "reset --keep" to remove the unwanted commit after
 </li>
 </ol></div>
 </dd>
+<dt class="hdlist1">
+Split a commit into two
+</dt>
+<dd>
+<div class="paragraph"><p>Suppose that you have created a commit, but later decide that you want to break
+apart the changes into two logical chunks and commit each separately. You want
+to include part of the original commit into the first commit, while including
+the remainder in a second commit. You can use git reset to rewind the history
+without changing the index, and then use git add -p to interactively select
+which hunks to put into the first commit.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git reset HEAD^                           <b>&lt;1&gt;</b>
+$ git add -p                                <b>&lt;2&gt;</b>
+$ git diff --cached                         <b>&lt;3&gt;</b>
+$ git commit -c HEAD@{1}                    <b>&lt;4&gt;</b>
+...
+$ git add ...                               <b>&lt;5&gt;</b>
+$ git diff --cached                         <b>&lt;6&gt;</b>
+$ git commit ...                            <b>&lt;7&gt;</b></code></pre>
+</div></div>
+<div class="colist arabic"><ol>
+<li>
+<p>
+First, reset the history back one commit so that we remove the original
+    commit, but leave the working tree with all the changes.
+</p>
+</li>
+<li>
+<p>
+Now, interactively select hunks to add to a new commit using git add -p.
+    This will ask for each hunk separately and you can use simple commands like
+    "yes, include", "no don&#8217;t include" or even "edit".
+</p>
+</li>
+<li>
+<p>
+Once satisfied with the hunks, you should verify that it is what you
+    expected by using git diff --cached to show all changes in the index.
+</p>
+</li>
+<li>
+<p>
+Next, commit the changes stored in the index. "-c" specifies to load the
+    editor with a commit message from a previous commit so that you can re-use the
+    HEAD used to be prior to the reset command. See <a href="git-reflog.html">git-reflog(1)</a> for
+    more details.
+</p>
+</li>
+<li>
+<p>
+Now you&#8217;ve created the first commit, and can repeat steps 2-4 as often as
+    you like to break the work into any number of commits. Here we show a second
+    step which simply adds the remaining changes.
+</p>
+</li>
+<li>
+<p>
+Then check again that the changes are what you expected to add.
+</p>
+</li>
+<li>
+<p>
+And finally commit the remaining changes.
+</p>
+</li>
+</ol></div>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -1352,7 +1420,7 @@ entries:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-04-08 12:47:26 PDT
+Last updated 2017-02-15 15:17:51 PST
 </div>
 </div>
 </body>
