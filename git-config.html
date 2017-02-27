@@ -4128,6 +4128,17 @@ gc.autoDetach
 </p>
 </dd>
 <dt class="hdlist1">
+gc.logExpiry
+</dt>
+<dd>
+<p>
+        If the file gc.log exists, then <code>git gc --auto</code> won&#8217;t run
+        unless that file is more than <em>gc.logExpiry</em> old.  Default is
+        "1.day".  See <code>gc.pruneExpire</code> for more ways to specify its
+        value.
+</p>
+</dd>
+<dt class="hdlist1">
 gc.packRefs
 </dt>
 <dd>
@@ -5109,7 +5120,10 @@ Scheme (e.g., <code>https</code> in <code>https://example.com/</code>). This fie
 <li>
 <p>
 Host/domain name (e.g., <code>example.com</code> in <code>https://example.com/</code>).
-  This field must match exactly between the config key and the URL.
+  This field must match between the config key and the URL. It is
+  possible to specify a <code>*</code> as part of the host name to match all subdomains
+  at this level. <code>https://*.example.com/</code> for example would match
+  <code>https://foo.example.com/</code>, but not <code>https://foo.bar.example.com/</code>.
 </p>
 </li>
 <li>
@@ -5153,6 +5167,21 @@ equivalent URLs that are simply spelled differently will match properly.
 Environment variable settings always override any matches.  The URLs that are
 matched against are those given directly to Git commands.  This means any URLs
 visited as a result of a redirection do not participate in matching.</p></div>
+</dd>
+<dt class="hdlist1">
+ssh.variant
+</dt>
+<dd>
+<p>
+        Depending on the value of the environment variables <code>GIT_SSH</code> or
+        <code>GIT_SSH_COMMAND</code>, or the config setting <code>core.sshCommand</code>, Git
+        auto-detects whether to adjust its command-line parameters for use
+        with plink or tortoiseplink, as opposed to the default (OpenSSH).
+</p>
+<div class="paragraph"><p>The config variable <code>ssh.variant</code> can be set to override this auto-detection;
+valid values are <code>ssh</code>, <code>plink</code>, <code>putty</code> or <code>tortoiseplink</code>. Any other value
+will be treated as normal ssh. This setting can be overridden via the
+environment variable <code>GIT_SSH_VARIANT</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 i18n.commitEncoding

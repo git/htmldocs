@@ -1402,6 +1402,12 @@ gc.autoDetach::
 	Make `git gc --auto` return immediately and run in background
 	if the system supports it. Default is true.
 
+gc.logExpiry::
+	If the file gc.log exists, then `git gc --auto` won't run
+	unless that file is more than 'gc.logExpiry' old.  Default is
+	"1.day".  See `gc.pruneExpire` for more ways to specify its
+	value.
+
 gc.packRefs::
 	Running `git pack-refs` in a repository renders it
 	unclonable by Git versions prior to 1.5.1.2 over dumb
@@ -1919,7 +1925,10 @@ http.<url>.*::
   must match exactly between the config key and the URL.
 
 . Host/domain name (e.g., `example.com` in `https://example.com/`).
-  This field must match exactly between the config key and the URL.
+  This field must match between the config key and the URL. It is
+  possible to specify a `*` as part of the host name to match all subdomains
+  at this level. `https://*.example.com/` for example would match
+  `https://foo.example.com/`, but not `https://foo.bar.example.com/`.
 
 . Port number (e.g., `8080` in `http://example.com:8080/`).
   This field must match exactly between the config key and the URL.
@@ -1953,6 +1962,17 @@ equivalent URLs that are simply spelled differently will match properly.
 Environment variable settings always override any matches.  The URLs that are
 matched against are those given directly to Git commands.  This means any URLs
 visited as a result of a redirection do not participate in matching.
+
+ssh.variant::
+	Depending on the value of the environment variables `GIT_SSH` or
+	`GIT_SSH_COMMAND`, or the config setting `core.sshCommand`, Git
+	auto-detects whether to adjust its command-line parameters for use
+	with plink or tortoiseplink, as opposed to the default (OpenSSH).
++
+The config variable `ssh.variant` can be set to override this auto-detection;
+valid values are `ssh`, `plink`, `putty` or `tortoiseplink`. Any other value
+will be treated as normal ssh. This setting can be overridden via the
+environment variable `GIT_SSH_VARIANT`.
 
 i18n.commitEncoding::
 	Character encoding the commit messages are stored in; Git itself
