@@ -1857,16 +1857,19 @@ core.quotePath
 </dt>
 <dd>
 <p>
-        The commands that output paths (e.g. <em>ls-files</em>,
-        <em>diff</em>), when not given the <code>-z</code> option, will quote
-        "unusual" characters in the pathname by enclosing the
-        pathname in a double-quote pair and with backslashes the
-        same way strings in C source code are quoted.  If this
-        variable is set to false, the bytes higher than 0x80 are
-        not quoted but output as verbatim.  Note that double
-        quote, backslash and control characters are always
-        quoted without <code>-z</code> regardless of the setting of this
-        variable.
+        Commands that output paths (e.g. <em>ls-files</em>, <em>diff</em>), will
+        quote "unusual" characters in the pathname by enclosing the
+        pathname in double-quotes and escaping those characters with
+        backslashes in the same way C escapes control characters (e.g.
+        <code>\t</code> for TAB, <code>\n</code> for LF, <code>\\</code> for backslash) or bytes with
+        values larger than 0x80 (e.g. octal <code>\302\265</code> for "micro" in
+        UTF-8).  If this variable is set to false, bytes higher than
+        0x80 are not considered "unusual" any more. Double-quotes,
+        backslash and control characters are always escaped regardless
+        of the setting of this variable.  A simple space character is
+        not considered "unusual".  Many commands can output pathnames
+        completely verbatim using the <code>-z</code> option. The default value
+        is true.
 </p>
 </dd>
 <dt class="hdlist1">
