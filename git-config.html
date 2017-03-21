@@ -1419,16 +1419,96 @@ escape sequences) are invalid.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_includes">Includes</h3>
-<div class="paragraph"><p>You can include one config file from another by setting the special
+<div class="paragraph"><p>You can include a config file from another by setting the special
 <code>include.path</code> variable to the name of the file to be included. The
 variable takes a pathname as its value, and is subject to tilde
-expansion.</p></div>
-<div class="paragraph"><p>The
-included file is expanded immediately, as if its contents had been
+expansion. <code>include.path</code> can be given multiple times.</p></div>
+<div class="paragraph"><p>The included file is expanded immediately, as if its contents had been
 found at the location of the include directive. If the value of the
-<code>include.path</code> variable is a relative path, the path is considered to be
-relative to the configuration file in which the include directive was
-found.  See below for examples.</p></div>
+<code>include.path</code> variable is a relative path, the path is considered to
+be relative to the configuration file in which the include directive
+was found.  See below for examples.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_conditional_includes">Conditional includes</h3>
+<div class="paragraph"><p>You can include a config file from another conditionally by setting a
+<code>includeIf.&lt;condition&gt;.path</code> variable to the name of the file to be
+included. The variable&#8217;s value is treated the same way as
+<code>include.path</code>. <code>includeIf.&lt;condition&gt;.path</code> can be given multiple times.</p></div>
+<div class="paragraph"><p>The condition starts with a keyword followed by a colon and some data
+whose format and meaning depends on the keyword. Supported keywords
+are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>gitdir</code>
+</dt>
+<dd>
+<p>
+        The data that follows the keyword <code>gitdir:</code> is used as a glob
+        pattern. If the location of the .git directory matches the
+        pattern, the include condition is met.
+</p>
+<div class="paragraph"><p>The .git location may be auto-discovered, or come from <code>$GIT_DIR</code>
+environment variable. If the repository is auto discovered via a .git
+file (e.g. from submodules, or a linked worktree), the .git location
+would be the final location where the .git directory is, not where the
+.git file is.</p></div>
+<div class="paragraph"><p>The pattern can contain standard globbing wildcards and two additional
+ones, <code>**/</code> and <code>/**</code>, that can match multiple path components. Please
+refer to <a href="gitignore.html">gitignore(5)</a> for details. For convenience:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+If the pattern starts with <code>~/</code>, <code>~</code> will be substituted with the
+   content of the environment variable <code>HOME</code>.
+</p>
+</li>
+<li>
+<p>
+If the pattern starts with <code>./</code>, it is replaced with the directory
+   containing the current config file.
+</p>
+</li>
+<li>
+<p>
+If the pattern does not start with either <code>~/</code>, <code>./</code> or <code>/</code>, <code>**/</code>
+   will be automatically prepended. For example, the pattern <code>foo/bar</code>
+   becomes <code>**/foo/bar</code> and would match <code>/any/path/to/foo/bar</code>.
+</p>
+</li>
+<li>
+<p>
+If the pattern ends with <code>/</code>, <code>**</code> will be automatically added. For
+   example, the pattern <code>foo/</code> becomes <code>foo/**</code>. In other words, it
+   matches "foo" and everything inside, recursively.
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
+<code>gitdir/i</code>
+</dt>
+<dd>
+<p>
+        This is the same as <code>gitdir</code> except that matching is done
+        case-insensitively (e.g. on case-insensitive file sytems)
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>A few more notes on matching via <code>gitdir</code> and <code>gitdir/i</code>:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Symlinks in <code>$GIT_DIR</code> are not resolved before matching.
+</p>
+</li>
+<li>
+<p>
+Note that "../" is not special and will match literally, which is
+   unlikely what you want.
+</p>
+</li>
+</ul></div>
 </div>
 <div class="sect2">
 <h3 id="_example">Example</h3>
@@ -1465,6 +1545,24 @@ found.  See below for examples.</p></div>
         path = /path/to/foo.inc ; include by absolute path
         path = foo ; expand "foo" relative to the current file
         path = ~/foo ; expand "foo" in your `$HOME` directory</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>; include if $GIT_DIR is /path/to/foo/.git
+[includeIf "gitdir:/path/to/foo/.git"]
+        path = /path/to/foo.inc</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>; include for all repositories inside /path/to/group
+[includeIf "gitdir:/path/to/group/"]
+        path = /path/to/foo.inc</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>; include for all repositories inside $HOME/to/group
+[includeIf "gitdir:~/to/group/"]
+        path = /path/to/foo.inc</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -6267,6 +6365,11 @@ push.default
   called <code>@{upstream}</code>).  This mode only makes sense if you are
   pushing to the same repository you would normally pull from
   (i.e. central workflow).
+</p>
+</li>
+<li>
+<p>
+<code>tracking</code> - This is a deprecated synonym for <code>upstream</code>.
 </p>
 </li>
 <li>
