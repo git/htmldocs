@@ -1220,6 +1220,88 @@ But you can use "reset --keep" to remove the unwanted commit after
 </li>
 </ol></div>
 </dd>
+<dt class="hdlist1">
+Split a commit apart into a sequence of commits
+</dt>
+<dd>
+<div class="paragraph"><p>Suppose that you have created lots of logically separate changes and commited
+them together. Then, later you decide that it might be better to have each
+logical chunk associated with its own commit. You can use git reset to rewind
+history without changing the contents of your local files, and then successively
+use <code>git add -p</code> to interactively select which hunks to include into each commit,
+using <code>git commit -c</code> to pre-populate the commit message.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git reset -N HEAD^                        <b>&lt;1&gt;</b>
+$ git add -p                                <b>&lt;2&gt;</b>
+$ git diff --cached                         <b>&lt;3&gt;</b>
+$ git commit -c HEAD@{1}                    <b>&lt;4&gt;</b>
+...                                         <b>&lt;5&gt;</b>
+$ git add ...                               <b>&lt;6&gt;</b>
+$ git diff --cached                         <b>&lt;7&gt;</b>
+$ git commit ...                            <b>&lt;8&gt;</b></code></pre>
+</div></div>
+<div class="colist arabic"><ol>
+<li>
+<p>
+First, reset the history back one commit so that we remove the original
+    commit, but leave the working tree with all the changes. The -N ensures
+    that any new files added with HEAD are still marked so that git add -p
+    will find them.
+</p>
+</li>
+<li>
+<p>
+Next, we interactively select diff hunks to add using the git add -p
+    facility. This will ask you about each diff hunk in sequence and you can
+    use simple commands such as "yes, include this", "No don&#8217;t include this"
+    or even the very powerful "edit" facility.
+</p>
+</li>
+<li>
+<p>
+Once satisfied with the hunks you want to include, you should verify what
+    has been prepared for the first commit by using git diff --cached. This
+    shows all the changes that have been moved into the index and are about
+    to be committed.
+</p>
+</li>
+<li>
+<p>
+Next, commit the changes stored in the index. The -c option specifies to
+    pre-populate the commit message from the original message that you started
+    is a special notation for the commit that HEAD used to be at prior to the
+    original reset commit (1 change ago). See <a href="git-reflog.html">git-reflog(1)</a> for more
+    details. You may also use any other valid commit reference.
+</p>
+</li>
+<li>
+<p>
+You can repeat steps 2-4 multiple times to break the original code into
+    any number of commits.
+</p>
+</li>
+<li>
+<p>
+Now you&#8217;ve split out many of the changes into their own commits, and might
+    no longer use the patch mode of git add, in order to select all remaining
+    uncommitted changes.
+</p>
+</li>
+<li>
+<p>
+Once again, check to verify that you&#8217;ve included what you want to. You may
+    also wish to verify that git diff doesn&#8217;t show any remaining changes to be
+    committed later.
+</p>
+</li>
+<li>
+<p>
+And finally create the final commit.
+</p>
+</li>
+</ol></div>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -1352,7 +1434,7 @@ entries:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2014-04-08 12:47:26 PDT
+Last updated 2017-02-16 14:58:56 PST
 </div>
 </div>
 </body>

@@ -29,7 +29,8 @@ The content to be added can be specified in several ways:
 2. by using 'git rm' to remove files from the working tree
    and the index, again before using the 'commit' command;
 
-3. by listing files as arguments to the 'commit' command, in which
+3. by listing files as arguments to the 'commit' command
+   (without --interactive or --patch switch), in which
    case the commit will ignore changes staged in the index, and instead
    record the current content of the listed files (which must already
    be known to Git);
@@ -41,7 +42,8 @@ The content to be added can be specified in several ways:
    actual commit;
 
 5. by using the --interactive or --patch switches with the 'commit' command
-   to decide one by one which files or hunks should be part of the commit,
+   to decide one by one which files or hunks should be part of the commit
+   in addition to contents in the index,
    before finalizing the operation. See the ``Interactive Mode'' section of
    linkgit:git-add[1] to learn how to operate these modes.
 
@@ -115,9 +117,12 @@ OPTIONS
 
 -z::
 --null::
-	When showing `short` or `porcelain` status output, terminate
-	entries in the status output with NUL, instead of LF. If no
-	format is given, implies the `--porcelain` output format.
+	When showing `short` or `porcelain` status output, print the
+	filename verbatim and terminate the entries with NUL, instead of LF.
+	If no format is given, implies the `--porcelain` output format.
+	Without the `-z` option, filenames with "unusual" characters are
+	quoted as explained for the configuration variable `core.quotePath`
+	(see linkgit:git-config[1]).
 
 -F <file>::
 --file=<file>::
@@ -263,7 +268,8 @@ FROM UPSTREAM REBASE" section in linkgit:git-rebase[1].)
 	If this option is specified together with `--amend`, then
 	no paths need to be specified, which can be used to amend
 	the last commit without committing changes that have
-	already been staged.
+	already been staged. If used together with `--allow-empty`
+	paths are also not required, and an empty commit will be created.
 
 -u[<mode>]::
 --untracked-files[=<mode>]::
@@ -457,7 +463,7 @@ order).  See linkgit:git-var[1] for details.
 HOOKS
 -----
 This command can run `commit-msg`, `prepare-commit-msg`, `pre-commit`,
-and `post-commit` hooks.  See linkgit:githooks[5] for more
+`post-commit` and `post-rewrite` hooks.  See linkgit:githooks[5] for more
 information.
 
 FILES

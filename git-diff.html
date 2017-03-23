@@ -931,17 +931,16 @@ and the range notations ("&lt;commit&gt;..&lt;commit&gt;" and
 </p>
 </dd>
 <dt class="hdlist1">
---compaction-heuristic
+--indent-heuristic
 </dt>
 <dt class="hdlist1">
---no-compaction-heuristic
+--no-indent-heuristic
 </dt>
 <dd>
 <p>
-        These are to help debugging and tuning an experimental
-        heuristic (which is off by default) that shifts the hunk
-        boundary in an attempt to make the resulting patch easier
-        to read.
+        These are to help debugging and tuning experimental heuristics
+        (which are off by default) that shift diff hunk boundaries to
+        make patches easier to read.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1168,10 +1167,9 @@ and accumulating child directory counts in the parent directories:
         When <code>--raw</code>, <code>--numstat</code>, <code>--name-only</code> or <code>--name-status</code> has been
         given, do not munge pathnames and use NULs as output field terminators.
 </p>
-<div class="paragraph"><p>Without this option, each pathname output will have TAB, LF, double quotes,
-and backslash characters replaced with <code>\t</code>, <code>\n</code>, <code>\"</code>, and <code>\\</code>,
-respectively, and the pathname will be enclosed in double quotes if
-any of those replacements occurred.</p></div>
+<div class="paragraph"><p>Without this option, pathnames with "unusual" characters are quoted as
+explained for the configuration variable <code>core.quotePath</code> (see
+<a href="git-config.html">git-config(1)</a>).</p></div>
 </dd>
 <dt class="hdlist1">
 --name-only
@@ -1195,13 +1193,16 @@ any of those replacements occurred.</p></div>
 </dt>
 <dd>
 <p>
-        Specify how differences in submodules are shown.  When <code>--submodule</code>
-        or <code>--submodule=log</code> is given, the <em>log</em> format is used.  This format lists
-        the commits in the range like <a href="git-submodule.html">git-submodule(1)</a> <code>summary</code> does.
-        Omitting the <code>--submodule</code> option or specifying <code>--submodule=short</code>,
-        uses the <em>short</em> format. This format just shows the names of the commits
-        at the beginning and end of the range.  Can be tweaked via the
-        <code>diff.submodule</code> configuration variable.
+        Specify how differences in submodules are shown.  When specifying
+        <code>--submodule=short</code> the <em>short</em> format is used.  This format just
+        shows the names of the commits at the beginning and end of the range.
+        When <code>--submodule</code> or <code>--submodule=log</code> is specified, the <em>log</em>
+        format is used.  This format lists the commits in the range like
+        <a href="git-submodule.html">git-submodule(1)</a> <code>summary</code> does.  When <code>--submodule=diff</code>
+        is specified, the <em>diff</em> format is used.  This format shows an
+        inline diff of the changes in the submodule contents between the
+        commit range.  Defaults to <code>diff.submodule</code> or the <em>short</em> format
+        if the config option is unset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1351,6 +1352,8 @@ override configuration settings.</p></div>
         lines are highlighted.  E.g. <code>--ws-error-highlight=new,old</code>
         highlights whitespace errors on both deleted and added lines.
         <code>all</code> can be used as a short-hand for <code>old,new,context</code>.
+        The <code>diff.wsErrorHighlight</code> configuration variable can be
+        used to specify the default behaviour.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1571,12 +1574,51 @@ information.</p></div>
 </dt>
 <dd>
 <p>
-        Output the patch in the order specified in the
-        &lt;orderfile&gt;, which has one shell glob pattern per line.
+        Control the order in which files appear in the output.
         This overrides the <code>diff.orderFile</code> configuration variable
         (see <a href="git-config.html">git-config(1)</a>).  To cancel <code>diff.orderFile</code>,
         use <code>-O/dev/null</code>.
 </p>
+<div class="paragraph"><p>The output order is determined by the order of glob patterns in
+&lt;orderfile&gt;.
+All files with pathnames that match the first pattern are output
+first, all files with pathnames that match the second pattern (but not
+the first) are output next, and so on.
+All files with pathnames that do not match any pattern are output
+last, as if there was an implicit match-all pattern at the end of the
+file.
+If multiple pathnames have the same rank (they match the same pattern
+but no earlier patterns), their output order relative to each other is
+the normal order.</p></div>
+<div class="paragraph"><p>&lt;orderfile&gt; is parsed as follows:</p></div>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+Blank lines are ignored, so they can be used as separators for
+   readability.
+</p>
+</li>
+<li>
+<p>
+Lines starting with a hash ("<code>#</code>") are ignored, so they can be used
+   for comments.  Add a backslash ("<code>\</code>") to the beginning of the
+   pattern if it starts with a hash.
+</p>
+</li>
+<li>
+<p>
+Each other line contains a single pattern.
+</p>
+</li>
+</ul></div>
+</div></div>
+<div class="paragraph"><p>Patterns have the same syntax and semantics as patterns used for
+fnmantch(3) without the FNM_PATHNAME flag, except a pathname also
+matches a pattern if removing any number of the final pathname
+components matches the pattern.  For example, the pattern "<code>foo*bar</code>"
+matches "<code>fooasdfbar</code>" and "<code>foo/bar/baz/asdf</code>" but not "<code>foobarx</code>".</p></div>
 </dd>
 <dt class="hdlist1">
 -R
@@ -1660,6 +1702,8 @@ information.</p></div>
 <p>
         Show the context between diff hunks, up to the specified number
         of lines, thereby fusing hunks that are close to each other.
+        Defaults to <code>diff.interHunkContext</code> or 0 if the config option
+        is unset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1767,6 +1811,27 @@ information.</p></div>
 <dd>
 <p>
         Do not show any source or destination prefix.
+</p>
+</dd>
+<dt class="hdlist1">
+--line-prefix=&lt;prefix&gt;
+</dt>
+<dd>
+<p>
+        Prepend an additional prefix to every line of output.
+</p>
+</dd>
+<dt class="hdlist1">
+--ita-invisible-in-index
+</dt>
+<dd>
+<p>
+        By default entries added by "git add -N" appear as an existing
+        empty file in "git diff" and a new file in "git diff --cached".
+        This option makes the entry appear as a new file in "git diff"
+        and non-existent in "git diff --cached". This option could be
+        reverted with <code>--ita-visible-in-index</code>. Both options are
+        experimental and could be removed in future.
 </p>
 </dd>
 </dl></div>
@@ -1973,9 +2038,10 @@ and it is out of sync with the index.</p></div>
 <div class="content">
 <pre><code>:100644 100644 5be4a4...... 000000...... M file.c</code></pre>
 </div></div>
-<div class="paragraph"><p>When <code>-z</code> option is not used, TAB, LF, and backslash characters
-in pathnames are represented as <code>\t</code>, <code>\n</code>, and <code>\\</code>,
-respectively.</p></div>
+<div class="paragraph"><p>Without the <code>-z</code> option, pathnames with "unusual" characters are
+quoted as explained for the configuration variable <code>core.quotePath</code>
+(see <a href="git-config.html">git-config(1)</a>).  Using <code>-z</code> the filename is output
+verbatim and the line is terminated by a NUL byte.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -2081,10 +2147,9 @@ separate lines indicate the old and the new mode.</p></div>
 </li>
 <li>
 <p>
-TAB, LF, double quote and backslash characters in pathnames
-    are represented as <code>\t</code>, <code>\n</code>, <code>\"</code> and <code>\\</code>, respectively.
-    If there is need for such substitution then the whole
-    pathname is put in double quotes.
+Pathnames with "unusual" characters are quoted as explained for
+    the configuration variable <code>core.quotePath</code> (see
+    <a href="git-config.html">git-config(1)</a>).
 </p>
 </li>
 <li>

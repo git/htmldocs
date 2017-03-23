@@ -755,9 +755,9 @@ gitrevisions(7) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Many Git commands take revision parameters as arguments. Depending on
 the command, they denote a specific commit or, for commands which
-walk the revision graph (such as <a href="git-log.html">git-log(1)</a>), all commits which can
-be reached from that commit. In the latter case one can also specify a
-range of revisions explicitly.</p></div>
+walk the revision graph (such as <a href="git-log.html">git-log(1)</a>), all commits which are
+reachable from that commit. For commands that walk the revision graph one can
+also specify a range of revisions explicitly.</p></div>
 <div class="paragraph"><p>In addition, some Git commands (such as <a href="git-show.html">git-show(1)</a>) also take
 revision parameters which denote other objects than commits, e.g. blobs
 ("files") or trees ("directories of files").</p></div>
@@ -1109,42 +1109,94 @@ J = F^2  = B^3^2   = A^^3^2</code></pre>
 <h2 id="_specifying_ranges">SPECIFYING RANGES</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>History traversing commands such as <code>git log</code> operate on a set
-of commits, not just a single commit.  To these commands,
-specifying a single revision with the notation described in the
-previous section means the set of commits reachable from that
-commit, following the commit ancestry chain.</p></div>
-<div class="paragraph"><p>To exclude commits reachable from a commit, a prefix <em>&#94;</em>
-notation is used.  E.g. <em>&#94;r1 r2</em> means commits reachable
-from <em>r2</em> but exclude the ones reachable from <em>r1</em>.</p></div>
-<div class="paragraph"><p>This set operation appears so often that there is a shorthand
-for it.  When you have two commits <em>r1</em> and <em>r2</em> (named according
-to the syntax explained in SPECIFYING REVISIONS above), you can ask
-for commits that are reachable from r2 excluding those that are reachable
-from r1 by <em>&#94;r1 r2</em> and it can be written as <em>r1..r2</em>.</p></div>
-<div class="paragraph"><p>A similar notation <em>r1...r2</em> is called symmetric difference
-of <em>r1</em> and <em>r2</em> and is defined as
-<em>r1 r2 --not $(git merge-base --all r1 r2)</em>.
-It is the set of commits that are reachable from either one of
-<em>r1</em> or <em>r2</em> but not from both.</p></div>
-<div class="paragraph"><p>In these two shorthands, you can omit one end and let it default to HEAD.
+of commits, not just a single commit.</p></div>
+<div class="paragraph"><p>For these commands,
+specifying a single revision, using the notation described in the
+previous section, means the set of commits <code>reachable</code> from the given
+commit.</p></div>
+<div class="paragraph"><p>A commit&#8217;s reachable set is the commit itself and the commits in
+its ancestry chain.</p></div>
+<div class="sect2">
+<h3 id="_commit_exclusions">Commit Exclusions</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>&#94;&lt;rev&gt;</em> (caret) Notation
+</dt>
+<dd>
+<p>
+ To exclude commits reachable from a commit, a prefix <em>&#94;</em>
+ notation is used.  E.g. <em>&#94;r1 r2</em> means commits reachable
+ from <em>r2</em> but exclude the ones reachable from <em>r1</em> (i.e. <em>r1</em> and
+ its ancestors).
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_dotted_range_notations">Dotted Range Notations</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+The <em>..</em> (two-dot) Range Notation
+</dt>
+<dd>
+<p>
+ The <em>&#94;r1 r2</em> set operation appears so often that there is a shorthand
+ for it.  When you have two commits <em>r1</em> and <em>r2</em> (named according
+ to the syntax explained in SPECIFYING REVISIONS above), you can ask
+ for commits that are reachable from r2 excluding those that are reachable
+ from r1 by <em>&#94;r1 r2</em> and it can be written as <em>r1..r2</em>.
+</p>
+</dd>
+<dt class="hdlist1">
+The <em>&#8230;</em> (three dot) Symmetric Difference Notation
+</dt>
+<dd>
+<p>
+ A similar notation <em>r1...r2</em> is called symmetric difference
+ of <em>r1</em> and <em>r2</em> and is defined as
+ <em>r1 r2 --not $(git merge-base --all r1 r2)</em>.
+ It is the set of commits that are reachable from either one of
+ <em>r1</em> (left side) or <em>r2</em> (right side) but not from both.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>In these two shorthand notations, you can omit one end and let it default to HEAD.
 For example, <em>origin..</em> is a shorthand for <em>origin..HEAD</em> and asks "What
 did I do since I forked from the origin branch?"  Similarly, <em>..origin</em>
 is a shorthand for <em>HEAD..origin</em> and asks "What did the origin do since
 I forked from them?"  Note that <em>..</em> would mean <em>HEAD..HEAD</em> which is an
 empty range that is both reachable and unreachable from HEAD.</p></div>
-<div class="paragraph"><p>Two other shorthands for naming a set that is formed by a commit
-and its parent commits exist.  The <em>r1&#94;@</em> notation means all
-parents of <em>r1</em>.  <em>r1&#94;!</em> includes commit <em>r1</em> but excludes
-all of its parents.</p></div>
-<div class="paragraph"><p>To summarize:</p></div>
+</div>
+<div class="sect2">
+<h3 id="_other_lt_rev_gt_94_parent_shorthand_notations">Other &lt;rev&gt;&#94; Parent Shorthand Notations</h3>
+<div class="paragraph"><p>Three other shorthands exist, particularly useful for merge commits,
+for naming a set that is formed by a commit and its parent commits.</p></div>
+<div class="paragraph"><p>The <em>r1&#94;@</em> notation means all parents of <em>r1</em>.</p></div>
+<div class="paragraph"><p>The <em>r1&#94;!</em> notation includes commit <em>r1</em> but excludes all of its parents.
+By itself, this notation denotes the single commit <em>r1</em>.</p></div>
+<div class="paragraph"><p>The <em>&lt;rev&gt;&#94;-{&lt;n&gt;}</em> notation includes <em>&lt;rev&gt;</em> but excludes the &lt;n&gt;th
+parent (i.e. a shorthand for <em>&lt;rev&gt;&#94;&lt;n&gt;..&lt;rev&gt;</em>), with <em>&lt;n&gt;</em> = 1 if
+not given. This is typically useful for merge commits where you
+can just pass <em>&lt;commit&gt;&#94;-</em> to get all the commits in the branch
+that was merged in merge commit <em>&lt;commit&gt;</em> (including <em>&lt;commit&gt;</em>
+itself).</p></div>
+<div class="paragraph"><p>While <em>&lt;rev&gt;&#94;&lt;n&gt;</em> was about specifying a single commit parent, these
+three notations also consider its parents. For example you can say
+<em>HEAD&#94;2&#94;@</em>, however you cannot say <em>HEAD&#94;@&#94;2</em>.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_revision_range_summary">Revision Range Summary</h2>
+<div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
 <em>&lt;rev&gt;</em>
 </dt>
 <dd>
 <p>
-        Include commits that are reachable from (i.e. ancestors of)
-        &lt;rev&gt;.
+        Include commits that are reachable from &lt;rev&gt; (i.e. &lt;rev&gt; and its
+        ancestors).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1152,8 +1204,8 @@ all of its parents.</p></div>
 </dt>
 <dd>
 <p>
-        Exclude commits that are reachable from (i.e. ancestors of)
-        &lt;rev&gt;.
+        Exclude commits that are reachable from &lt;rev&gt; (i.e. &lt;rev&gt; and its
+        ancestors).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1196,21 +1248,43 @@ all of its parents.</p></div>
   <em>&#94;</em> to exclude them (and their ancestors).
 </p>
 </dd>
+<dt class="hdlist1">
+<em>&lt;rev&gt;&#94;-{&lt;n&gt;}</em>, e.g. <em>HEAD&#94;-, HEAD&#94;-2</em>
+</dt>
+<dd>
+<p>
+        Equivalent to <em>&lt;rev&gt;&#94;&lt;n&gt;..&lt;rev&gt;</em>, with <em>&lt;n&gt;</em> = 1 if not
+        given.
+</p>
+</dd>
 </dl></div>
-<div class="paragraph"><p>Here are a handful of examples:</p></div>
+<div class="paragraph"><p>Here are a handful of examples using the Loeliger illustration above,
+with each step in the notation&#8217;s expansion and selection carefully
+spelt out:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>D                G H D
-D F              G H I J D F
-^G D             H D
-^D B             E I J F B
-B..C             C
-B...C            G H D E B C
-^D B C           E I J F B C
-C                I J F C
-C^@              I J F
-C^!              C
-F^! D            G H D F</code></pre>
+<pre><code>Args   Expanded arguments    Selected commits
+D                            G H D
+D F                          G H I J D F
+^G D                         H D
+^D B                         E I J F B
+^D B C                       E I J F B C
+C                            I J F C
+B..C   = ^B C                C
+B...C  = B ^F C              G H D E B C
+B^-    = B^..B
+       = ^B^1 B              E I J F B
+C^@    = C^1
+       = F                   I J F
+B^@    = B^1 B^2 B^3
+       = D E F               D G H E F I J
+C^!    = C ^C^@
+       = C ^C^1
+       = C ^F                C
+B^!    = B ^B^@
+       = B ^B^1 ^B^2 ^B^3
+       = B ^D ^E ^F          B
+F^! D  = F ^I ^J D           G H D F</code></pre>
 </div></div>
 </div>
 </div>
@@ -1230,7 +1304,7 @@ F^! D            G H D F</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-29 14:44:28 PDT
+Last updated 2016-09-12 17:53:34 PDT
 </div>
 </div>
 </body>

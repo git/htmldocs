@@ -780,7 +780,8 @@ by using <em>git rm</em> to remove files from the working tree
 </li>
 <li>
 <p>
-by listing files as arguments to the <em>commit</em> command, in which
+by listing files as arguments to the <em>commit</em> command
+   (without --interactive or --patch switch), in which
    case the commit will ignore changes staged in the index, and instead
    record the current content of the listed files (which must already
    be known to Git);
@@ -798,7 +799,8 @@ by using the -a switch with the <em>commit</em> command to automatically
 <li>
 <p>
 by using the --interactive or --patch switches with the <em>commit</em> command
-   to decide one by one which files or hunks should be part of the commit,
+   to decide one by one which files or hunks should be part of the commit
+   in addition to contents in the index,
    before finalizing the operation. See the &#8220;Interactive Mode&#8221; section of
    <a href="git-add.html">git-add(1)</a> to learn how to operate these modes.
 </p>
@@ -944,9 +946,12 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 </dt>
 <dd>
 <p>
-        When showing <code>short</code> or <code>porcelain</code> status output, terminate
-        entries in the status output with NUL, instead of LF. If no
-        format is given, implies the <code>--porcelain</code> output format.
+        When showing <code>short</code> or <code>porcelain</code> status output, print the
+        filename verbatim and terminate the entries with NUL, instead of LF.
+        If no format is given, implies the <code>--porcelain</code> output format.
+        Without the <code>-z</code> option, filenames with "unusual" characters are
+        quoted as explained for the configuration variable <code>core.quotePath</code>
+        (see <a href="git-config.html">git-config(1)</a>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1218,7 +1223,8 @@ FROM UPSTREAM REBASE" section in <a href="git-rebase.html">git-rebase(1)</a>.)</
         If this option is specified together with <code>--amend</code>, then
         no paths need to be specified, which can be used to amend
         the last commit without committing changes that have
-        already been staged.
+        already been staged. If used together with <code>--allow-empty</code>
+        paths are also not required, and an empty commit will be created.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1378,7 +1384,7 @@ Git internal format
         It is <code>&lt;unix timestamp&gt; &lt;time zone offset&gt;</code>, where <code>&lt;unix
         timestamp&gt;</code> is the number of seconds since the UNIX epoch.
         <code>&lt;time zone offset&gt;</code> is a positive or negative offset from UTC.
-        For example CET (which is 2 hours ahead UTC) is <code>+0200</code>.
+        For example CET (which is 1 hour ahead of UTC) is <code>+0100</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1607,7 +1613,7 @@ order).  See <a href="git-var.html">git-var(1)</a> for details.</p></div>
 <h2 id="_hooks">HOOKS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This command can run <code>commit-msg</code>, <code>prepare-commit-msg</code>, <code>pre-commit</code>,
-and <code>post-commit</code> hooks.  See <a href="githooks.html">githooks(5)</a> for more
+<code>post-commit</code> and <code>post-rewrite</code> hooks.  See <a href="githooks.html">githooks(5)</a> for more
 information.</p></div>
 </div>
 </div>
@@ -1650,7 +1656,7 @@ information.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-07-13 14:58:50 PDT
+Last updated 2017-03-21 15:39:58 PDT
 </div>
 </div>
 </body>

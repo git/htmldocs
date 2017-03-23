@@ -819,6 +819,35 @@ may be used by scripts or other git commands, such as <a href="git-pull.html">gi
 </p>
 </dd>
 <dt class="hdlist1">
+--deepen=&lt;depth&gt;
+</dt>
+<dd>
+<p>
+        Similar to --depth, except it specifies the number of commits
+        from the current shallow boundary instead of from the tip of
+        each remote branch history.
+</p>
+</dd>
+<dt class="hdlist1">
+--shallow-since=&lt;date&gt;
+</dt>
+<dd>
+<p>
+        Deepen or shorten the history of a shallow repository to
+        include all reachable commits after &lt;date&gt;.
+</p>
+</dd>
+<dt class="hdlist1">
+--shallow-exclude=&lt;revision&gt;
+</dt>
+<dd>
+<p>
+        Deepen or shorten the history of a shallow repository to
+        exclude commits reachable from a specified remote branch or tag.
+        This option can be specified multiple times.
+</p>
+</dd>
+<dt class="hdlist1">
 --unshallow
 </dt>
 <dd>
@@ -1613,6 +1642,46 @@ objects will eventually be removed by git&#8217;s built-in housekeeping (see
 </div>
 </div>
 <div class="sect1">
+<h2 id="_security">SECURITY</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The fetch and push protocols are not designed to prevent one side from
+stealing data from the other repository that was not intended to be
+shared. If you have private data that you need to protect from a malicious
+peer, your best option is to store it in another repository. This applies
+to both clients and servers. In particular, namespaces on a server are not
+effective for read access control; you should only grant read access to a
+namespace to clients that you would trust with read access to the entire
+repository.</p></div>
+<div class="paragraph"><p>The known attack vectors are as follows:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+The victim sends "have" lines advertising the IDs of objects it has that
+  are not explicitly intended to be shared but can be used to optimize the
+  transfer if the peer also has them. The attacker chooses an object ID X
+  to steal and sends a ref to X, but isn&#8217;t required to send the content of
+  X because the victim already has it. Now the victim believes that the
+  attacker has X, and it sends the content of X back to the attacker
+  later. (This attack is most straightforward for a client to perform on a
+  server, by creating a ref to X in the namespace the client has access
+  to and then fetching it. The most likely way for a server to perform it
+  on a client is to "merge" X into a public branch and hope that the user
+  does additional work on this branch and pushes it back to the server
+  without noticing the merge.)
+</p>
+</li>
+<li>
+<p>
+As in #1, the attacker chooses an object ID X to steal. The victim sends
+  an object Y that the attacker already has, and the attacker falsely
+  claims to have X and not Y, so the victim sends Y as a delta against X.
+  The delta reveals regions of X that are similar to Y to the attacker.
+</p>
+</li>
+</ol></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Using --recurse-submodules can only fetch new commits in already checked
@@ -1639,7 +1708,7 @@ version.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-07-19 14:36:50 PDT
+Last updated 2017-01-10 15:42:58 PST
 </div>
 </div>
 </body>

@@ -1,0 +1,348 @@
+Git 2.13 Release Notes
+======================
+
+Backward compatibility notes.
+
+ * Use of an empty string as a pathspec element that is used for
+   'everything matches' is still warned and Git asks users to use a
+   more explicit '.' for that instead.  The hope is that existing
+   users will not mind this change, and eventually the warning can be
+   turned into a hard error, upgrading the deprecation into removal of
+   this (mis)feature.  That is not scheduled to happen in the upcoming
+   release (yet).
+
+ * The historical argument order "git merge <msg> HEAD <commit>..."
+   has been deprecated for quite some time, and will be removed in a
+   future release.
+
+
+Updates since v2.12
+-------------------
+
+UI, Workflows & Features
+
+ * "git describe" and "git name-rev" have been taught to take more
+   than one refname patterns to restrict the set of refs to base their
+   naming output on, and also learned to take negative patterns to
+   name refs not to be used for naming via their "--exclude" option.
+
+ * Deletion of a branch "foo/bar" could remove .git/refs/heads/foo
+   once there no longer is any other branch whose name begins with
+   "foo/", but we didn't do so so far.  Now we do.
+
+ * When "git merge" detects a path that is renamed in one history
+   while the other history deleted (or modified) it, it now reports
+   both paths to help the user understand what is going on in the two
+   histories being merged.
+
+ * The <url> part in "http.<url>.<variable>" configuration variable
+   can now be spelled with '*' that serves as wildcard.
+   E.g. "http.https://*.example.com.proxy" can be used to specify the
+   proxy used for https://a.example.com, https://b.example.com, etc.,
+   i.e. any host in the example.com domain.
+
+ * "git tag" did not leave useful message when adding a new entry to
+   reflog; this was left unnoticed for a long time because refs/tags/*
+   doesn't keep reflog by default.
+
+ * The "negative" pathspec feature was somewhat more cumbersome to use
+   than necessary in that its short-hand used "!" which needed to be
+   escaped from shells, and it required "exclude from what?" specified.
+
+ * The command line options for ssh invocation needs to be tweaked for
+   some implementations of SSH (e.g. PuTTY plink wants "-P <port>"
+   while OpenSSH wants "-p <port>" to specify port to connect to), and
+   the variant was guessed when GIT_SSH environment variable is used
+   to specify it.  The logic to guess now applies to the command
+   specified by the newer GIT_SSH_COMMAND and also core.sshcommand
+   configuration variable, and comes with an escape hatch for users to
+   deal with misdetected cases.
+
+ * The "--git-path", "--git-common-dir", and "--shared-index-path"
+   options of "git rev-parse" did not produce usable output.  They are
+   now updated to show the path to the correct file, relative to where
+   the caller is.
+
+ * "git diff -W" has been taught to handle the case where a new
+   function is added at the end of the file better.
+
+ * "git update-ref -d" and other operations to delete references did
+   not leave any entry in HEAD's reflog when the reference being
+   deleted was the current branch.  This is not a problem in practice
+   because you do not want to delete the branch you are currently on,
+   but caused renaming of the current branch to something else not to
+   be logged in a useful way.
+
+ * "Cc:" on the trailer part does not have to conform to RFC strictly,
+   unlike in the e-mail header.  "git send-email" has been updated to
+   ignore anything after '>' when picking addresses, to allow non-address
+   cruft like " # stable 4.4" after the address.
+
+ * When "git submodule init" decides that the submodule in the working
+   tree is its upstream, it now gives a warning as it is not a very
+   common setup.
+   (merge d1b3b81aab sb/submodule-init-url-selection later to maint).
+
+ * "git stash save" takes a pathspec so that the local changes can be
+   stashed away only partially.
+   (merge 9e140909f6 tg/stash-push later to maint).
+
+ * Documentation for "git ls-files" did not refer to core.quotePath.
+
+ * The experimental "split index" feature has gained a few
+   configuration variables to make it easier to use.
+
+ * From a working tree of a repository, a new option of "rev-parse"
+   lets you ask if the repository is used as a submodule of another
+   project, and where the root level of the working tree of that
+   project (i.e. your superproject) is.
+
+ * The pathspec mechanism learned to further limit the paths that
+   match the pattern to those that have specified attributes attached
+   via the gitattributes mechanism.
+
+ * Our source code has used the SHA1_HEADER cpp macro after "#include"
+   in the C code to switch among the SHA-1 implementations. Instead,
+   list the exact header file names and switch among implementations
+   using "#ifdef BLK_SHA1/#include "block-sha1/sha1.h"/.../#endif";
+   this helps some IDE tools.
+
+ * The start-up sequence of "git" needs to figure out some configured
+   settings before it finds and set itself up in the location of the
+   repository and was quite messy due to its "chicken-and-egg" nature.
+   The code has been restructured.
+
+ * The command line prompt (in contrib/) learned a new 'tag' style
+   that can be specified with GIT_PS1_DESCRIBE_STYLE, to describe a
+   detached HEAD with "git describe --tags".
+
+ * The configuration file learned a new "includeIf.<condition>.path"
+   that includes the contents of the given path only when the
+   condition holds.  This allows you to say "include this work-related
+   bit only in the repositories under my ~/work/ directory".
+
+ * Recent update to "rebase -i" started showing a message that is not
+   a warning with "warning:" prefix by mistake.  This has been fixed.
+
+
+Performance, Internal Implementation, Development Support etc.
+
+ * The code to list branches in "git branch" has been consolidated
+   with the more generic ref-filter API.
+
+ * Resource usage while enumerating refs from alternate object store
+   has been optimized to help receiving end of "push" that hosts a
+   repository with many "forks".
+
+ * The gitattributes machinery is being taught to work better in a
+   multi-threaded environment.
+
+ * "git rebase -i" starts using the recently updated "sequencer" code.
+
+ * Code and design clean-up for the refs API.
+
+ * The preload-index code has been taught not to bother with the index
+   entries that are paths that are not checked out by "sparse checkout".
+
+ * Some warning() messages from "git clean" were updated to show the
+   errno from failed system calls.
+
+ * The "parse_config_key()" API function has been cleaned up.
+   (merge ad8c7cdadd jk/parse-config-key-cleanup later to maint).
+
+ * A test that creates a confusing branch whose name is HEAD has been
+   corrected not to do so.
+
+ * The code that parses header fields in the commit object has been
+   updated for (micro)performance and code hygiene.
+
+ * An helper function to make it easier to append the result from
+   real_path() to a strbuf has been added.
+   (merge 33ad9ddd0b rs/strbuf-add-real-path later to maint).
+
+ * Reduce authentication round-trip over HTTP when the server supports
+   just a single authentication method.  This also improves the
+   behaviour when Git is misconfigured to enable http.emptyAuth
+   against a server that does not authenticate without a username
+   (i.e. not using Kerberos etc., which makes http.emptyAuth
+   pointless).
+
+ * Windows port wants to use OpenSSL's implementation of SHA-1
+   routines, so let them.
+
+ * The t/perf performance test suite was not prepared to test not so
+   old versions of Git, but now it covers versions of Git that are not
+   so ancient.
+   (merge 28e1fb5466 jt/perf-updates later to maint).
+
+ * Add 32-bit Linux variant to the set of platforms to be tested with
+   Travis CI.
+
+ * "git branch --list" takes the "--abbrev" and "--no-abbrev" options
+   to control the output of the object name in its "-v"(erbose)
+   output, but a recent update started ignoring them; fix it before
+   the breakage reaches to any released version.
+
+ * Picking two versions of Git and running tests to make sure the
+   older one and the newer one interoperate happily has now become
+   possible.
+   (merge bd4d9d993c jk/interop-test later to maint).
+
+ * "uchar [40]" to "struct object_id" conversion continues.
+
+ * "git tag --contains" used to (ab)use the object bits to keep track
+   of the state of object reachability without clearing them after
+   use; this has been cleaned up and made to use the newer commit-slab
+   facility.
+
+
+Also contains various documentation updates and code clean-ups.
+
+
+Fixes since v2.12
+-----------------
+
+Unless otherwise noted, all the fixes since v2.9 in the maintenance
+track are contained in this release (see the maintenance releases'
+notes for details).
+
+ * "git repack --depth=<n>" for a long time busted the specified depth
+   when reusing delta from existing packs.  This has been corrected.
+   (merge 42b766d765 jk/delta-chain-limit later to maint).
+
+ * The code to parse the command line "git grep <patterns>... <rev>
+   [[--] <pathspec>...]" has been cleaned up, and a handful of bugs
+   have been fixed (e.g. we used to check "--" if it is a rev).
+   (merge 131f3c96d2 jk/grep-no-index-fix later to maint).
+
+ * "git ls-remote" and "git archive --remote" are designed to work
+   without being in a directory under Git's control.  However, recent
+   updates revealed that we randomly look into a directory called
+   .git/ without actually doing necessary set-up when working in a
+   repository.  Stop doing so.
+   (merge 4b0c3c7735 jn/remote-helpers-with-git-dir later to maint).
+
+ * "git show-branch" expected there were only very short branch names
+   in the repository and used a fixed-length buffer to hold them
+   without checking for overflow.
+
+ * A caller of tempfile API that uses stdio interface to write to
+   files may ignore errors while writing, which is detected when
+   tempfile is closed (with a call to ferror()).  By that time, the
+   original errno that may have told us what went wrong is likely to
+   be long gone and was overwritten by an irrelevant value.
+   close_tempfile() now resets errno to EIO to make errno at least
+   predictable.
+
+ * "git remote rm X", when a branch has remote X configured as the
+   value of its branch.*.remote, tried to remove branch.*.remote and
+   branch.*.merge and failed if either is unset.
+
+ * A "gc.log" file left by a backgrounded "gc --auto" disables further
+   automatic gc; it has been taught to run at least once a day (by
+   default) by ignoring a stale "gc.log" file that is too old.
+
+ * The code to parse "git -c VAR=VAL cmd" and set configuration
+   variable for the duration of cmd had two small bugs, which have
+   been fixed.
+   (merge 1274a155af jc/config-case-cmdline-take-2 later to maint).
+
+ * user.email that consists of only cruft chars should consistently
+   error out, but didn't.
+   (merge 94425552f3 jk/ident-empty later to maint).
+
+ * "git upload-pack", which is a counter-part of "git fetch", did not
+   report a request for a ref that was not advertised as invalid.
+   This is generally not a problem (because "git fetch" will stop
+   before making such a request), but is the right thing to do.
+
+ * A leak in a codepath to read from a packed object in (rare) cases
+   has been plugged.
+
+ * When a redirected http transport gets an error during the
+   redirected request, we ignored the error we got from the server,
+   and ended up giving a not-so-useful error message.
+
+ * The patch subcommand of "git add -i" was meant to have paths
+   selection prompt just like other subcommand, unlike "git add -p"
+   directly jumps to hunk selection.  Recently, this was broken and
+   "add -i" lost the paths selection dialog, but it now has been
+   fixed.
+
+ * Git v2.12 was shipped with an embarrassing breakage where various
+   operations that verify paths given from the user stopped dying when
+   seeing an issue, and instead later triggering segfault.
+
+ * There is no need for Python only to give a few messages to the
+   standard error stream, but we somehow did.
+
+ * The code to parse "git log -L..." command line was buggy when there
+   are many ranges specified with -L; overrun of the allocated buffer
+   has been fixed.
+
+ * The command-line parsing of "git log -L" copied internal data
+   structures using incorrect size on ILP32 systems.
+
+ * "git diff --quiet" relies on the size field in diff_filespec to be
+   correctly populated, but diff_populate_filespec() helper function
+   made an incorrect short-cut when asked only to populate the size
+   field for paths that need to go through convert_to_git() (e.g. CRLF
+   conversion).
+
+ * A few tests were run conditionally under (rare) conditions where
+   they cannot be run (like running cvs tests under 'root' account).
+   (merge c6507484a2 ab/cond-skip-tests later to maint).
+
+ * "git branch @" created refs/heads/@ as a branch, and in general the
+   code that handled @{-1} and @{upstream} was a bit too loose in
+   disambiguating.
+   (merge fd4692ff70 jk/interpret-branch-name later to maint).
+
+ * "git fetch" that requests a commit by object name, when the other
+   side does not allow such an request, failed without much
+   explanation.
+   (merge d56583ded6 mm/fetch-show-error-message-on-unadvertised-object later to maint).
+
+ * "git filter-branch --prune-empty" drops a single-parent commit that
+   becomes a no-op, but did not drop a root commit whose tree is empty.
+   (merge 32da7467eb dp/filter-branch-prune-empty later to maint).
+
+ * Recent versions of Git treats http alternates (used in dumb http
+   transport) just like HTTP redirects and requires the client to
+   enable following it, due to security concerns.  But we forgot to
+   give a warning when we decide not to honor the alternates.
+   (merge 5cae73d5d2 ew/http-alternates-as-redirects-warning later to maint).
+
+ * "git push" had a handful of codepaths that could lead to a deadlock
+   when unexpected error happened, which has been fixed.
+   (merge d1a13d3fcb jk/push-deadlock-regression-fix later to maint).
+
+ * "Dumb http" transport used to misparse a nonsense http-alternates
+   response, which has been fixed.
+
+ * "git add -p <pathspec>" unnecessarily expanded the pathspec to a
+   list of individual files that matches the pathspec by running "git
+   ls-files <pathspec>", before feeding it to "git diff-index" to see
+   which paths have changes, because historically the pathspec
+   language supported by "diff-index" was weaker.  These days they are
+   equivalent and there is no reason to internally expand it.  This
+   helps both performance and avoids command line argument limit on
+   some platforms.
+   (merge 7288e12cce jk/add-i-use-pathspecs later to maint).
+
+ * "git status --porcelain" is supposed to give a stable output, but a
+   few strings were left as translatable by mistake.
+
+ * Code to read submodule.<name>.ignore config did not state the
+   variable name correctly when giving an error message diagnosing
+   misconfiguration.
+   (merge 5ea304896e sb/submodule-config-parse-ignore-fix later to maint).
+
+ * Other minor doc, test and build updates and code cleanups.
+   (merge dfa3ad3238 rs/blame-code-cleanup later to maint).
+   (merge ffddfc6328 jk/rev-parse-cleanup later to maint).
+   (merge f20754802a jk/pack-name-cleanups later to maint).
+   (merge d4aae459cd sb/wt-status-cleanup later to maint).
+   (merge 2c7ee986c7 ab/doc-no-option-notation-fix later to maint).
+   (merge e4e016f65d ab/push-default-doc-fix later to maint).
+   (merge baced9e4e5 nd/commit-hook-doc-fix later to maint).

@@ -752,6 +752,7 @@ git(1) Manual Page
     [--exec-path[=&lt;path&gt;]] [--html-path] [--man-path] [--info-path]
     [-p|--paginate|--no-pager] [--no-replace-objects] [--bare]
     [--git-dir=&lt;path&gt;] [--work-tree=&lt;path&gt;] [--namespace=&lt;name&gt;]
+    [--super-prefix=&lt;path&gt;]
     &lt;command&gt; [&lt;args&gt;]</pre>
 <div class="attribution">
 </div></div>
@@ -928,6 +929,16 @@ foo.bar= ...</code>) sets <code>foo.bar</code> to the empty string.</p></div>
         Set the Git namespace.  See <a href="gitnamespaces.html">gitnamespaces(7)</a> for more
         details.  Equivalent to setting the <code>GIT_NAMESPACE</code> environment
         variable.
+</p>
+</dd>
+<dt class="hdlist1">
+--super-prefix=&lt;path&gt;
+</dt>
+<dd>
+<p>
+        Currently for internal use only.  Set a prefix which gives a path from
+        above a repository down to its root.  One use is to give submodules
+        context about the superproject that invoked it.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1380,14 +1391,6 @@ ancillary user utilities.</p></div>
 <dd>
 <p>
         Manage reflog information.
-</p>
-</dd>
-<dt class="hdlist1">
-<a href="git-relink.html">git-relink(1)</a>
-</dt>
-<dd>
-<p>
-        Hardlink common objects in local repositories.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2408,6 +2411,14 @@ Git so take care if using a foreign front-end.</p></div>
         of Git object directories which can be used to search for Git
         objects. New objects will not be written to these directories.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><code>Entries that begin with `"` (double-quote) will be interpreted
+as C-style quoted paths, removing leading and trailing
+double-quotes and respecting backslash escapes. E.g., the value
+`"path-with-\"-and-:-in-it":vanilla-path` has two paths:
+`path-with-"-and-:-in-it` and `vanilla-path`.</code></pre>
+</div></div>
 </dd>
 <dt class="hdlist1">
 <code>GIT_DIR</code>
@@ -2665,6 +2676,17 @@ personal <code>.ssh/config</code> file.  Please consult your ssh documentation
 for further details.</p></div>
 </dd>
 <dt class="hdlist1">
+<code>GIT_SSH_VARIANT</code>
+</dt>
+<dd>
+<p>
+        If this environment variable is set, it overrides Git&#8217;s autodetection
+        whether <code>GIT_SSH</code>/<code>GIT_SSH_COMMAND</code>/<code>core.sshCommand</code> refer to OpenSSH,
+        plink or tortoiseplink. This variable overrides the config setting
+        <code>ssh.variant</code> that serves the same purpose.
+</p>
+</dd>
+<dt class="hdlist1">
 <code>GIT_ASKPASS</code>
 </dt>
 <dd>
@@ -2895,47 +2917,26 @@ of clones and fetches.</p></div>
 </dt>
 <dd>
 <p>
-        If set, provide a colon-separated list of protocols which are
-        allowed to be used with fetch/push/clone. This is useful to
-        restrict recursive submodule initialization from an untrusted
-        repository. Any protocol not mentioned will be disallowed (i.e.,
-        this is a whitelist, not a blacklist). If the variable is not
-        set at all, all protocols are enabled.  The protocol names
-        currently used by git are:
+        If set to a colon-separated list of protocols, behave as if
+        <code>protocol.allow</code> is set to <code>never</code>, and each of the listed
+        protocols has <code>protocol.&lt;name&gt;.allow</code> set to <code>always</code>
+        (overriding any existing configuration). In other words, any
+        protocol not mentioned will be disallowed (i.e., this is a
+        whitelist, not a blacklist). See the description of
+        <code>protocol.allow</code> in <a href="git-config.html">git-config(1)</a> for more details.
 </p>
-<div class="ulist"><ul>
-<li>
+</dd>
+<dt class="hdlist1">
+<code>GIT_PROTOCOL_FROM_USER</code>
+</dt>
+<dd>
 <p>
-<code>file</code>: any local file-based path (including <code>file://</code> URLs,
-            or local paths)
+        Set to 0 to prevent protocols used by fetch/push/clone which are
+        configured to the <code>user</code> state.  This is useful to restrict recursive
+        submodule initialization from an untrusted repository or for programs
+        which feed potentially-untrusted URLS to git commands.  See
+        <a href="git-config.html">git-config(1)</a> for more details.
 </p>
-</li>
-<li>
-<p>
-<code>git</code>: the anonymous git protocol over a direct TCP
-            connection (or proxy, if configured)
-</p>
-</li>
-<li>
-<p>
-<code>ssh</code>: git over ssh (including <code>host:path</code> syntax,
-            <code>ssh://</code>, etc).
-</p>
-</li>
-<li>
-<p>
-<code>http</code>: git over http, both "smart http" and "dumb http".
-            Note that this does <em>not</em> include <code>https</code>; if you want both,
-            you should specify both as <code>http:https</code>.
-</p>
-</li>
-<li>
-<p>
-any external helpers are named by their protocol (e.g., use
-            <code>hg</code> to allow the <code>git-remote-hg</code> helper)
-</p>
-</li>
-</ul></div>
 </dd>
 </dl></div>
 </div>
@@ -3045,7 +3046,7 @@ subscribed to the list to send a message there.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-09-02 18:58:50 PDT
+Last updated 2017-02-27 15:37:25 PST
 </div>
 </div>
 </body>

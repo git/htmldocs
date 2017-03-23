@@ -1105,8 +1105,8 @@ parents) and <code>--max-parents=-1</code> (negative numbers denote no upper lim
 </dt>
 <dd>
 <p>
-        Pretend as if all the refs in <code>refs/</code> are listed on the
-        command line as <em>&lt;commit&gt;</em>.
+        Pretend as if all the refs in <code>refs/</code>, along with <code>HEAD</code>, are
+        listed on the command line as <em>&lt;commit&gt;</em>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1246,7 +1246,7 @@ excluded from the output.</p></div>
 </dt>
 <dd>
 <p>
-        List only commits on the respective side of a symmetric range,
+        List only commits on the respective side of a symmetric difference,
         i.e. only those which would be marked <code>&lt;</code> resp. <code>&gt;</code> by
         <code>--left-right</code>.
 </p>
@@ -1852,8 +1852,9 @@ together.</p></div>
 </dt>
 <dd>
 <p>
-        Output the commits in reverse order.
-        Cannot be combined with <code>--walk-reflogs</code>.
+        Output the commits chosen to be shown (see Commit Limiting
+        section above) in reverse order. Cannot be combined with
+        <code>--walk-reflogs</code>.
 </p>
 </dd>
 </dl></div>
@@ -2161,7 +2162,7 @@ the time zone is omitted when the local time zone is used
 </dt>
 <dd>
 <p>
-        Mark which side of a symmetric diff a commit is reachable from.
+        Mark which side of a symmetric difference a commit is reachable from.
         Commits from the left side are prefixed with <code>&lt;</code> and those from
         the right with <code>&gt;</code>.  If combined with <code>--boundary</code>, those
         commits are prefixed with <code>-</code>.
@@ -2558,8 +2559,14 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-<em>%G?</em>: show "G" for a good (valid) signature, "B" for a bad signature,
-  "U" for a good signature with unknown validity and "N" for no signature
+<em>%G?</em>: show "G" for a good (valid) signature,
+  "B" for a bad signature,
+  "U" for a good signature with unknown validity,
+  "X" for a good signature that has expired,
+  "Y" for a good signature made by an expired key,
+  "R" for a good signature made by a revoked key,
+  "E" if the signature cannot be checked (e.g. missing key)
+  and "N" for no signature
 </p>
 </li>
 <li>
@@ -2637,7 +2644,8 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-<em>%C(&#8230;)</em>: color specification, as described in color.branch.* config option;
+<em>%C(&#8230;)</em>: color specification, as described under Values in the
+  "CONFIGURATION FILE" section of <a href="git-config.html">git-config(1)</a>;
   adding <code>auto,</code> at the beginning will emit color only when colors are
   enabled for log output (by <code>color.diff</code>, <code>color.ui</code>, or <code>--color</code>, and
   respecting the <code>auto</code> settings of the former if we are going to a
@@ -2647,7 +2655,7 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-<em>%m</em>: left, right or boundary mark
+<em>%m</em>: left (<code>&lt;</code>), right (<code>&gt;</code>) or boundary (<code>-</code>) mark
 </p>
 </li>
 <li>
@@ -2703,6 +2711,8 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 <p>
 <em>%&gt;&lt;(&lt;N&gt;)</em>, <em>%&gt;&lt;|(&lt;N&gt;)</em>: similar to <em>% &lt;(&lt;N&gt;)</em>, <em>%&lt;|(&lt;N&gt;)</em>
   respectively, but padding both sides (i.e. the text is centered)
+-%(trailers): display the trailers of the body as interpreted by
+  <a href="git-interpret-trailers.html">git-interpret-trailers(1)</a>
 </p>
 </li>
 </ul></div>

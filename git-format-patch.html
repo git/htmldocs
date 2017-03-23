@@ -758,7 +758,8 @@ git-format-patch(1) Manual Page
                    [--start-number &lt;n&gt;] [--numbered-files]
                    [--in-reply-to=Message-Id] [--suffix=.&lt;sfx&gt;]
                    [--ignore-if-in-upstream]
-                   [--subject-prefix=Subject-Prefix] [(--reroll-count|-v) &lt;n&gt;]
+                   [--rfc] [--subject-prefix=Subject-Prefix]
+                   [(--reroll-count|-v) &lt;n&gt;]
                    [--to=&lt;email&gt;] [--cc=&lt;email&gt;]
                    [--[no-]cover-letter] [--quiet] [--notes[=&lt;ref&gt;]]
                    [&lt;common diff options&gt;]
@@ -848,17 +849,16 @@ reference.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---compaction-heuristic
+--indent-heuristic
 </dt>
 <dt class="hdlist1">
---no-compaction-heuristic
+--no-indent-heuristic
 </dt>
 <dd>
 <p>
-        These are to help debugging and tuning an experimental
-        heuristic (which is off by default) that shifts the hunk
-        boundary in an attempt to make the resulting patch easier
-        to read.
+        These are to help debugging and tuning experimental heuristics
+        (which are off by default) that shift diff hunk boundaries to
+        make patches easier to read.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1220,12 +1220,51 @@ of a delete/create pair.</p></div>
 </dt>
 <dd>
 <p>
-        Output the patch in the order specified in the
-        &lt;orderfile&gt;, which has one shell glob pattern per line.
+        Control the order in which files appear in the output.
         This overrides the <code>diff.orderFile</code> configuration variable
         (see <a href="git-config.html">git-config(1)</a>).  To cancel <code>diff.orderFile</code>,
         use <code>-O/dev/null</code>.
 </p>
+<div class="paragraph"><p>The output order is determined by the order of glob patterns in
+&lt;orderfile&gt;.
+All files with pathnames that match the first pattern are output
+first, all files with pathnames that match the second pattern (but not
+the first) are output next, and so on.
+All files with pathnames that do not match any pattern are output
+last, as if there was an implicit match-all pattern at the end of the
+file.
+If multiple pathnames have the same rank (they match the same pattern
+but no earlier patterns), their output order relative to each other is
+the normal order.</p></div>
+<div class="paragraph"><p>&lt;orderfile&gt; is parsed as follows:</p></div>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+Blank lines are ignored, so they can be used as separators for
+   readability.
+</p>
+</li>
+<li>
+<p>
+Lines starting with a hash ("<code>#</code>") are ignored, so they can be used
+   for comments.  Add a backslash ("<code>\</code>") to the beginning of the
+   pattern if it starts with a hash.
+</p>
+</li>
+<li>
+<p>
+Each other line contains a single pattern.
+</p>
+</li>
+</ul></div>
+</div></div>
+<div class="paragraph"><p>Patterns have the same syntax and semantics as patterns used for
+fnmantch(3) without the FNM_PATHNAME flag, except a pathname also
+matches a pattern if removing any number of the final pathname
+components matches the pattern.  For example, the pattern "<code>foo*bar</code>"
+matches "<code>fooasdfbar</code>" and "<code>foo/bar/baz/asdf</code>" but not "<code>foobarx</code>".</p></div>
 </dd>
 <dt class="hdlist1">
 -a
@@ -1287,6 +1326,8 @@ of a delete/create pair.</p></div>
 <p>
         Show the context between diff hunks, up to the specified number
         of lines, thereby fusing hunks that are close to each other.
+        Defaults to <code>diff.interHunkContext</code> or 0 if the config option
+        is unset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1376,6 +1417,27 @@ of a delete/create pair.</p></div>
 <dd>
 <p>
         Do not show any source or destination prefix.
+</p>
+</dd>
+<dt class="hdlist1">
+--line-prefix=&lt;prefix&gt;
+</dt>
+<dd>
+<p>
+        Prepend an additional prefix to every line of output.
+</p>
+</dd>
+<dt class="hdlist1">
+--ita-invisible-in-index
+</dt>
+<dd>
+<p>
+        By default entries added by "git add -N" appear as an existing
+        empty file in "git diff" and a new file in "git diff --cached".
+        This option makes the entry appear as a new file in "git diff"
+        and non-existent in "git diff --cached". This option could be
+        reverted with <code>--ita-visible-in-index</code>. Both options are
+        experimental and could be removed in future.
 </p>
 </dd>
 </dl></div>
@@ -1563,6 +1625,16 @@ will want to ensure that threading is disabled for <code>git send-email</code>.<
 </p>
 </dd>
 <dt class="hdlist1">
+--rfc
+</dt>
+<dd>
+<p>
+        Alias for <code>--subject-prefix="RFC PATCH"</code>. RFC means "Request For
+        Comments"; use this when sending an experimental patch for
+        discussion rather than application.
+</p>
+</dd>
+<dt class="hdlist1">
 -v &lt;n&gt;
 </dt>
 <dt class="hdlist1">
@@ -1661,7 +1733,7 @@ of the patch series (but see the discussion of the <code>notes.rewrite</code>
 configuration options in <a href="git-notes.html">git-notes(1)</a> to use this workflow).</p></div>
 </dd>
 <dt class="hdlist1">
---[no]-signature=&lt;signature&gt;
+--[no-]signature=&lt;signature&gt;
 </dt>
 <dd>
 <p>
@@ -2191,7 +2263,7 @@ as e-mailable patches:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2016-06-27 11:04:05 PDT
+Last updated 2017-03-21 15:39:58 PDT
 </div>
 </div>
 </body>
