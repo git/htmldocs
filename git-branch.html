@@ -750,8 +750,9 @@ git-branch(1) Manual Page
 <div class="verseblock">
 <pre class="content"><em>git branch</em> [--color[=&lt;when&gt;] | --no-color] [-r | -a]
         [--list] [-v [--abbrev=&lt;length&gt; | --no-abbrev]]
-        [--column[=&lt;options&gt;] | --no-column]
-        [(--merged | --no-merged | --contains) [&lt;commit&gt;]] [--sort=&lt;key&gt;]
+        [--column[=&lt;options&gt;] | --no-column] [--sort=&lt;key&gt;]
+        [(--merged | --no-merged) [&lt;commit&gt;]]
+        [--contains [&lt;commit]] [--no-contains [&lt;commit&gt;]]
         [--points-at &lt;object&gt;] [--format=&lt;format&gt;] [&lt;pattern&gt;&#8230;]
 <em>git branch</em> [--set-upstream | --track | --no-track] [-l] [-f] &lt;branchname&gt; [&lt;start-point&gt;]
 <em>git branch</em> (--set-upstream-to=&lt;upstream&gt; | -u &lt;upstream&gt;) [&lt;branchname&gt;]
@@ -777,11 +778,12 @@ it matches any of the patterns.  Note that when providing a
 as branch creation.</p></div>
 <div class="paragraph"><p>With <code>--contains</code>, shows only the branches that contain the named commit
 (in other words, the branches whose tip commits are descendants of the
-named commit).  With <code>--merged</code>, only branches merged into the named
-commit (i.e. the branches whose tip commits are reachable from the named
-commit) will be listed.  With <code>--no-merged</code> only branches not merged into
-the named commit will be listed.  If the &lt;commit&gt; argument is missing it
-defaults to <code>HEAD</code> (i.e. the tip of the current branch).</p></div>
+named commit), <code>--no-contains</code> inverts it. With <code>--merged</code>, only branches
+merged into the named commit (i.e. the branches whose tip commits are
+reachable from the named commit) will be listed.  With <code>--no-merged</code> only
+branches not merged into the named commit will be listed.  If the &lt;commit&gt;
+argument is missing it defaults to <code>HEAD</code> (i.e. the tip of the current
+branch).</p></div>
 <div class="paragraph"><p>The command&#8217;s second form creates a new branch head named &lt;branchname&gt;
 which points to the current <code>HEAD</code>, or &lt;start-point&gt; if given.</p></div>
 <div class="paragraph"><p>Note that this will create the new branch, but it will not switch the
@@ -1100,12 +1102,22 @@ start-point is either a local or remote-tracking branch.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--no-contains [&lt;commit&gt;]
+</dt>
+<dd>
+<p>
+        Only list branches which don&#8217;t contain the specified commit
+        (HEAD if not specified). Implies <code>--list</code>.
+</p>
+</dd>
+<dt class="hdlist1">
 --merged [&lt;commit&gt;]
 </dt>
 <dd>
 <p>
         Only list branches whose tips are reachable from the
-        specified commit (HEAD if not specified). Implies <code>--list</code>.
+        specified commit (HEAD if not specified). Implies <code>--list</code>,
+        incompatible with <code>--no-merged</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1114,7 +1126,8 @@ start-point is either a local or remote-tracking branch.</p></div>
 <dd>
 <p>
         Only list branches whose tips are not reachable from the
-        specified commit (HEAD if not specified). Implies <code>--list</code>.
+        specified commit (HEAD if not specified). Implies <code>--list</code>,
+        incompatible with <code>--merged</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1251,14 +1264,20 @@ is currently checked out) does not have all commits from the test branch.
 <div class="paragraph"><p>If you are creating a branch that you want to checkout immediately, it is
 easier to use the git checkout command with its <code>-b</code> option to create
 a branch and check it out with a single command.</p></div>
-<div class="paragraph"><p>The options <code>--contains</code>, <code>--merged</code> and <code>--no-merged</code> serve three related
-but different purposes:</p></div>
+<div class="paragraph"><p>The options <code>--contains</code>, <code>--no-contains</code>, <code>--merged</code> and <code>--no-merged</code>
+serve four related but different purposes:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 <code>--contains &lt;commit&gt;</code> is used to find all branches which will need
   special attention if &lt;commit&gt; were to be rebased or amended, since those
   branches contain the specified &lt;commit&gt;.
+</p>
+</li>
+<li>
+<p>
+<code>--no-contains &lt;commit&gt;</code> is the inverse of that, i.e. branches that don&#8217;t
+  contain the specified &lt;commit&gt;.
 </p>
 </li>
 <li>
@@ -1296,7 +1315,7 @@ a branch?&#8221;</a> in the Git User&#8217;s Manual.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-28 15:01:30 PDT
+Last updated 2017-04-11 01:37:50 PDT
 </div>
 </div>
 </body>
