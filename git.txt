@@ -75,7 +75,7 @@ example the following invocations are equivalent:
 Note that omitting the `=` in `git -c foo.bar ...` is allowed and sets
 `foo.bar` to the boolean true value (just like `[foo]bar` would in a
 config file). Including the equals but with an empty value (like `git -c
-foo.bar= ...`) sets `foo.bar` to the empty string which ` git config
+foo.bar= ...`) sets `foo.bar` to the empty string which `git config
 --bool` will convert to `false`.
 
 --exec-path[=<path>]::
@@ -158,6 +158,10 @@ foo.bar= ...`) sets `foo.bar` to the empty string which ` git config
 --icase-pathspecs::
 	Add "icase" magic to all pathspec. This is equivalent to setting
 	the `GIT_ICASE_PATHSPECS` environment variable to `1`.
+
+--no-optional-locks::
+	Do not perform optional operations that require locks. This is
+	equivalent to setting the `GIT_OPTIONAL_LOCKS` to `0`.
 
 GIT COMMANDS
 ------------
@@ -696,6 +700,14 @@ of clones and fetches.
 	submodule initialization from an untrusted repository or for programs
 	which feed potentially-untrusted URLS to git commands.  See
 	linkgit:git-config[1] for more details.
+
+`GIT_OPTIONAL_LOCKS`::
+	If set to `0`, Git will complete any requested operation without
+	performing any optional sub-operations that require taking a lock.
+	For example, this will prevent `git status` from refreshing the
+	index as a side effect. This is useful for processes running in
+	the background which do not want to cause lock contention with
+	other operations on the repository.  Defaults to `1`.
 
 Discussion[[Discussion]]
 ------------------------
