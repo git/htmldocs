@@ -755,9 +755,11 @@ git-update-index(1) Manual Page
              [--chmod=(+|-)x]
              [--[no-]assume-unchanged]
              [--[no-]skip-worktree]
+             [--[no-]fsmonitor-valid]
              [--ignore-submodules]
              [--[no-]split-index]
              [--[no-|test-|force-]untracked-cache]
+             [--[no-]fsmonitor]
              [--really-refresh] [--unresolve] [--again | -g]
              [--info-only] [--index-info]
              [-z] [--stdin] [--index-version &lt;n&gt;]
@@ -922,6 +924,17 @@ you will need to handle the situation manually.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--[no-]fsmonitor-valid
+</dt>
+<dd>
+<p>
+        When one of these flags is specified, the object name recorded
+        for the paths are not updated. Instead, these options
+        set and unset the "fsmonitor valid" bit for the paths. See
+        section "File System Monitor" below for more information.
+</p>
+</dd>
+<dt class="hdlist1">
 -g
 </dt>
 <dt class="hdlist1">
@@ -1077,6 +1090,22 @@ will remove the intended effect of the option.</p></div>
         compatibility with older versions of Git where
         <code>--untracked-cache</code> used to imply <code>--test-untracked-cache</code> but
         this option would enable the extension unconditionally.
+</p>
+</dd>
+<dt class="hdlist1">
+--fsmonitor
+</dt>
+<dt class="hdlist1">
+--no-fsmonitor
+</dt>
+<dd>
+<p>
+        Enable or disable files system monitor feature. These options
+        take effect whatever the value of the <code>core.fsmonitor</code>
+        configuration variable (see <a href="git-config.html">git-config(1)</a>). But a warning
+        is emitted when the change goes against the configured value, as
+        the configured value will take effect next time the index is
+        read and this will remove the intended effect of the option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1376,6 +1405,31 @@ the index.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_file_system_monitor">File System Monitor</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This feature is intended to speed up git operations for repos that have
+large working directories.</p></div>
+<div class="paragraph"><p>It enables git to work together with a file system monitor (see the
+"fsmonitor-watchman" section of <a href="githooks.html">githooks(5)</a>) that can
+inform it as to what files have been modified. This enables git to avoid
+having to lstat() every file to find modified files.</p></div>
+<div class="paragraph"><p>When used in conjunction with the untracked cache, it can further improve
+performance by avoiding the cost of scanning the entire working directory
+looking for new files.</p></div>
+<div class="paragraph"><p>If you want to enable (or disable) this feature, it is easier to use
+the <code>core.fsmonitor</code> configuration variable (see
+<a href="git-config.html">git-config(1)</a>) than using the <code>--fsmonitor</code> option to
+<code>git update-index</code> in each repository, especially if you want to do so
+across all repositories you use, because you can set the configuration
+variable to <code>true</code> (or <code>false</code>) in your <code>$HOME/.gitconfig</code> just once
+and have it affect all repositories you touch.</p></div>
+<div class="paragraph"><p>When the <code>core.fsmonitor</code> configuration variable is changed, the
+file system monitor is added to or removed from the index the next time
+a command reads the index. When <code>--[no-]fsmonitor</code> are used, the file
+system monitor is immediately added to or removed from the index.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The command honors <code>core.filemode</code> configuration variable.  If
@@ -1418,7 +1472,7 @@ ctime for marking files processed) (see <a href="git-config.html">git-config(1)<
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-09-25 16:24:34 JST
+Last updated 2017-11-21 14:32:26 JST
 </div>
 </div>
 </body>
