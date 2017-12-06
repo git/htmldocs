@@ -778,6 +778,18 @@ process locally and communicates with it over a pipe.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_extra_parameters">Extra Parameters</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The protocol provides a mechanism in which clients can send additional
+information in its first message to the server. These are called "Extra
+Parameters", and are supported by the Git, SSH, and HTTP protocols.</p></div>
+<div class="paragraph"><p>Each Extra Parameter takes the form of <code>&lt;key&gt;=&lt;value&gt;</code> or <code>&lt;key&gt;</code>.</p></div>
+<div class="paragraph"><p>Servers that receive any such Extra Parameters MUST ignore all
+unrecognized keys. Currently, the only Extra Parameter recognized is
+"version=1".</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_git_transport">Git Transport</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The Git transport starts off by sending the command and repository
@@ -785,21 +797,29 @@ on the wire using the pkt-line format, followed by a NUL byte and a
 hostname parameter, terminated by a NUL byte.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>0032git-upload-pack /project.git\0host=myserver.com\0</code></pre>
+<pre><code>0033git-upload-pack /project.git\0host=myserver.com\0</code></pre>
+</div></div>
+<div class="paragraph"><p>The transport may send Extra Parameters by adding an additional NUL
+byte, and then adding one or more NUL-terminated strings:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>003egit-upload-pack /project.git\0host=myserver.com\0\0version=1\0</code></pre>
 </div></div>
 <div class="openblock">
 <div class="content">
 <div class="literalblock">
 <div class="content">
-<pre><code>git-proto-request = request-command SP pathname NUL [ host-parameter NUL ]
+<pre><code>git-proto-request = request-command SP pathname NUL
+                    [ host-parameter NUL ] [ NUL extra-parameters ]
 request-command   = "git-upload-pack" / "git-receive-pack" /
                     "git-upload-archive"   ; case sensitive
 pathname          = *( %x01-ff ) ; exclude NUL
-host-parameter    = "host=" hostname [ ":" port ]</code></pre>
+host-parameter    = "host=" hostname [ ":" port ]
+extra-parameters  = 1*extra-parameter
+extra-parameter   = 1*( %x01-ff ) NUL</code></pre>
 </div></div>
 </div></div>
-<div class="paragraph"><p>Only host-parameter is allowed in the git-proto-request. Clients
-MUST NOT attempt to send additional parameters. It is used for the
+<div class="paragraph"><p>host-parameter is used for the
 git-daemon name based virtual hosting.  See --interpolated-path
 option to git daemon, with the %H/%CH format characters.</p></div>
 <div class="paragraph"><p>Basically what the Git client is doing to connect to an <em>upload-pack</em>
@@ -862,6 +882,11 @@ we execute it without the leading <em>/</em>.</p></div>
                   v
 ssh user@example.com "git-upload-pack '~alice/project.git'"</code></pre>
 </div></div>
+<div class="paragraph"><p>Depending on the value of the <code>protocol.version</code> configuration variable,
+Git may attempt to send Extra Parameters as a colon-separated string in
+the GIT_PROTOCOL environment variable. This is done only if
+the <code>ssh.variant</code> configuration variable indicates that the ssh command
+supports passing environment variables as an argument.</p></div>
 <div class="paragraph"><p>A few things to remember here:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -891,12 +916,14 @@ data down to the client in packfile format.</p></div>
 <h2 id="_reference_discovery">Reference Discovery</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>When the client initially connects the server will immediately respond
-with a listing of each reference it has (all branches and tags) along
+with a version number (if "version=1" is sent as an Extra Parameter),
+and a listing of each reference it has (all branches and tags) along
 with the object name that each reference currently points to.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>$ echo -e -n "0039git-upload-pack /schacon/gitbook.git\0host=example.com\0" |
+<pre><code>$ echo -e -n "0044git-upload-pack /schacon/gitbook.git\0host=example.com\0\0version=1\0" |
    nc -v example.com 9418
+000aversion 1
 00887217a7c7e582c46cec22a130adf4b9d7d950fba0 HEAD\0multi_ack thin-pack
              side-band side-band-64k ofs-delta shallow no-progress include-tag
 00441d3fcd5ced445d1abc402225c0b8a1299641f497 refs/heads/integration
@@ -918,7 +945,8 @@ immediately after the ref itself, if presented. A conforming server
 MUST peel the ref if it&#8217;s an annotated tag.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  advertised-refs  =  (no-refs / list-of-refs)
+<pre><code>  advertised-refs  =  *1("version 1")
+                      (no-refs / list-of-refs)
                       *shallow
                       flush-pkt
 
@@ -1396,7 +1424,7 @@ can be rejected.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-09-10 17:38:46 JST
+Last updated 2017-12-06 10:03:34 PST
 </div>
 </div>
 </body>
