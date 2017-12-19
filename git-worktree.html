@@ -748,7 +748,7 @@ git-worktree(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [--lock] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;branch&gt;]
+<pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [--lock] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;commit-ish&gt;]
 <em>git worktree list</em> [--porcelain]
 <em>git worktree lock</em> [--reason &lt;string&gt;] &lt;worktree&gt;
 <em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
@@ -787,19 +787,30 @@ specifying <code>--reason</code> to explain why the working tree is locked.</p><
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
-add &lt;path&gt; [&lt;branch&gt;]
+add &lt;path&gt; [&lt;commit-ish&gt;]
 </dt>
 <dd>
 <p>
-Create <code>&lt;path&gt;</code> and checkout <code>&lt;branch&gt;</code> into it. The new working directory
+Create <code>&lt;path&gt;</code> and checkout <code>&lt;commit-ish&gt;</code> into it. The new working directory
 is linked to the current repository, sharing everything except working
 directory specific files such as HEAD, index, etc. <code>-</code> may also be
-specified as <code>&lt;branch&gt;</code>; it is synonymous with <code>@{-1}</code>.
+specified as <code>&lt;commit-ish&gt;</code>; it is synonymous with <code>@{-1}</code>.
 </p>
-<div class="paragraph"><p>If <code>&lt;branch&gt;</code> is omitted and neither <code>-b</code> nor <code>-B</code> nor <code>--detach</code> used,
+<div class="paragraph"><p>If &lt;commit-ish&gt; is a branch name (call it <code>&lt;branch&gt;</code> and is not found,
+and neither <code>-b</code> nor <code>-B</code> nor <code>--detach</code> are used, but there does
+exist a tracking branch in exactly one remote (call it <code>&lt;remote&gt;</code>)
+with a matching name, treat as equivalent to</p></div>
+</dd>
+</dl></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git worktree add --track -b &lt;branch&gt; &lt;path&gt; &lt;remote&gt;/&lt;branch&gt;</code></pre>
+</div></div>
+<div class="paragraph"><p>+
+If <code>&lt;commit-ish&gt;</code> is omitted and neither <code>-b</code> nor <code>-B</code> nor <code>--detach</code> used,
 then, as a convenience, a new branch based at HEAD is created automatically,
 as if <code>-b $(basename &lt;path&gt;)</code> was specified.</p></div>
-</dd>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 list
 </dt>
@@ -854,7 +865,7 @@ Unlock a working tree, allowing it to be pruned, moved or deleted.
 </dt>
 <dd>
 <p>
-        By default, <code>add</code> refuses to create a new working tree when <code>&lt;branch&gt;</code>
+        By default, <code>add</code> refuses to create a new working tree when <code>&lt;commit-ish&gt;</code> is a branch name and
         is already checked out by another working tree. This option overrides
         that safeguard.
 </p>
@@ -868,11 +879,11 @@ Unlock a working tree, allowing it to be pruned, moved or deleted.
 <dd>
 <p>
         With <code>add</code>, create a new branch named <code>&lt;new-branch&gt;</code> starting at
-        <code>&lt;branch&gt;</code>, and check out <code>&lt;new-branch&gt;</code> into the new working tree.
-        If <code>&lt;branch&gt;</code> is omitted, it defaults to HEAD.
+        <code>&lt;commit-ish&gt;</code>, and check out <code>&lt;new-branch&gt;</code> into the new working tree.
+        If <code>&lt;commit-ish&gt;</code> is omitted, it defaults to HEAD.
         By default, <code>-b</code> refuses to create a new branch if it already
         exists. <code>-B</code> overrides this safeguard, resetting <code>&lt;new-branch&gt;</code> to
-        <code>&lt;branch&gt;</code>.
+        <code>&lt;commit-ish&gt;</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -889,10 +900,35 @@ Unlock a working tree, allowing it to be pruned, moved or deleted.
 </dt>
 <dd>
 <p>
-        By default, <code>add</code> checks out <code>&lt;branch&gt;</code>, however, <code>--no-checkout</code> can
+        By default, <code>add</code> checks out <code>&lt;commit-ish&gt;</code>, however, <code>--no-checkout</code> can
         be used to suppress checkout in order to make customizations,
         such as configuring sparse-checkout. See "Sparse checkout"
         in <a href="git-read-tree.html">git-read-tree(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+--[no-]guess-remote
+</dt>
+<dd>
+<p>
+        With <code>worktree add &lt;path&gt;</code>, without <code>&lt;commit-ish&gt;</code>, instead
+        of creating a new branch from HEAD, if there exists a tracking
+        branch in exactly one remote matching the basename of `&lt;path&gt;,
+        base the new branch on the remote-tracking branch, and mark
+        the remote-tracking branch as "upstream" from the new branch.
+</p>
+<div class="paragraph"><p>This can also be set up as the default behaviour by using the
+<code>worktree.guessRemote</code> config option.</p></div>
+</dd>
+<dt class="hdlist1">
+--[no-]track
+</dt>
+<dd>
+<p>
+        When creating a new branch, if <code>&lt;commit-ish&gt;</code> is a branch,
+        mark it as "upstream" from the new branch.  This is the
+        default if <code>&lt;commit-ish&gt;</code> is a remote-tracking branch.  See
+        "--track" in <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1108,7 +1144,7 @@ performed manually, such as:</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-04-27 11:19:22 JST
+Last updated 2017-12-19 13:57:18 PST
 </div>
 </div>
 </body>
