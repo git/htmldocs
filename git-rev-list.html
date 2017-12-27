@@ -786,7 +786,9 @@ git-rev-list(1) Manual Page
              [ --fixed-strings | -F ]
              [ --date=&lt;format&gt;]
              [ [ --objects | --objects-edge | --objects-edge-aggressive ]
-               [ --unpacked ] ]
+               [ --unpacked ]
+               [ --filter=&lt;filter-spec&gt; [ --filter-print-omitted ] ] ]
+             [ --missing=&lt;missing-action&gt; ]
              [ --pretty | --header ]
              [ --bisect ]
              [ --bisect-vars ]
@@ -1935,6 +1937,60 @@ together.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--filter=&lt;filter-spec&gt;
+</dt>
+<dd>
+<p>
+        Only useful with one of the <code>--objects*</code>; omits objects (usually
+        blobs) from the list of printed objects.  The <em>&lt;filter-spec&gt;</em>
+        may be one of the following:
+</p>
+<div class="paragraph"><p>The form <em>--filter=blob:none</em> omits all blobs.</p></div>
+<div class="paragraph"><p>The form <em>--filter=blob:limit=&lt;n&gt;[kmg]</em> omits blobs larger than n bytes
+or units.  n may be zero.  The suffixes k, m, and g can be used to name
+units in KiB, MiB, or GiB.  For example, <em>blob:limit=1k</em> is the same
+as <em>blob:limit=1024</em>.</p></div>
+<div class="paragraph"><p>The form <em>--filter=sparse:oid=&lt;blob-ish&gt;</em> uses a sparse-checkout
+specification contained in the blob (or blob-expression) <em>&lt;blob-ish&gt;</em>
+to omit blobs that would not be not required for a sparse checkout on
+the requested refs.</p></div>
+<div class="paragraph"><p>The form <em>--filter=sparse:path=&lt;path&gt;</em> similarly uses a sparse-checkout
+specification contained in &lt;path&gt;.</p></div>
+</dd>
+<dt class="hdlist1">
+--no-filter
+</dt>
+<dd>
+<p>
+        Turn off any previous <code>--filter=</code> argument.
+</p>
+</dd>
+<dt class="hdlist1">
+--filter-print-omitted
+</dt>
+<dd>
+<p>
+        Only useful with <code>--filter=</code>; prints a list of the objects omitted
+        by the filter.  Object IDs are prefixed with a &#8220;~&#8221; character.
+</p>
+</dd>
+<dt class="hdlist1">
+--missing=&lt;missing-action&gt;
+</dt>
+<dd>
+<p>
+        A debug option to help with future "partial clone" development.
+        This option specifies how missing objects are handled.
+</p>
+<div class="paragraph"><p>The form <em>--missing=error</em> requests that rev-list stop with an error if
+a missing object is encountered.  This is the default action.</p></div>
+<div class="paragraph"><p>The form <em>--missing=allow-any</em> will allow object traversal to continue
+if a missing object is encountered.  Missing objects will silently be
+omitted from the results.</p></div>
+<div class="paragraph"><p>The form <em>--missing=print</em> is like <em>allow-any</em>, but will also print a
+list of the missing objects.  Object IDs are prefixed with a &#8220;?&#8221; character.</p></div>
+</dd>
+<dt class="hdlist1">
 --no-walk[=(sorted|unsorted)]
 </dt>
 <dd>
@@ -2740,11 +2796,13 @@ The title was &gt;&gt;t4119: test autocomputing -p&lt;n&gt; for traditional diff
 </li>
 <li>
 <p>
-%(trailers): display the trailers of the body as interpreted by
-  <a href="git-interpret-trailers.html">git-interpret-trailers(1)</a>. If the <code>:only</code> option is given,
-  omit non-trailer lines from the trailer block.  If the <code>:unfold</code>
-  option is given, behave as if interpret-trailer&#8217;s <code>--unfold</code> option
-  was given. E.g., <code>%(trailers:only:unfold)</code> to do both.
+%(trailers[:options]): display the trailers of the body as interpreted
+  by <a href="git-interpret-trailers.html">git-interpret-trailers(1)</a>. The <code>trailers</code> string may be
+  followed by a colon and zero or more comma-separated options. If the
+  <code>only</code> option is given, omit non-trailer lines from the trailer block.
+  If the <code>unfold</code> option is given, behave as if interpret-trailer&#8217;s
+  <code>--unfold</code> option was given.  E.g., <code>%(trailers:only,unfold)</code> to do
+  both.
 </p>
 </li>
 </ul></div>
@@ -2818,7 +2876,7 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-10-06 05:38:43 JST
+Last updated 2017-12-27 11:58:06 PST
 </div>
 </div>
 </body>

@@ -952,7 +952,14 @@ rebase.autoStash
 </dt>
 <dd>
 <p>
-        If set to true enable <code>--autostash</code> option by default.
+        When set to true, automatically create a temporary stash entry
+        before the operation begins, and apply it after the operation
+        ends.  This means that you can run rebase on a dirty worktree.
+        However, use with care: the final stash application after a
+        successful rebase might result in non-trivial conflicts.
+        This option can be overridden by the <code>--no-autostash</code> and
+        <code>--autostash</code> options of <a href="git-rebase.html">git-rebase(1)</a>.
+        Defaults to false.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -960,10 +967,15 @@ rebase.missingCommitsCheck
 </dt>
 <dd>
 <p>
-        If set to "warn", print warnings about removed commits in
-        interactive mode. If set to "error", print the warnings and
-        stop the rebase. If set to "ignore", no checking is
-        done. "ignore" by default.
+        If set to "warn", git rebase -i will print a warning if some
+        commits are removed (e.g. a line was deleted), however the
+        rebase will still proceed. If set to "error", it will print
+        the previous warning and stop the rebase, <em>git rebase
+        --edit-todo</em> can then be used to correct the error. If set to
+        "ignore", no checking is done.
+        To drop a commit without warning or error, use the <code>drop</code>
+        command in the todo list.
+        Defaults to "ignore".
 </p>
 </dd>
 <dt class="hdlist1">
@@ -971,8 +983,33 @@ rebase.instructionFormat
 </dt>
 <dd>
 <p>
-        Custom commit list format to use during an <code>--interactive</code> rebase.
+        A format string, as specified in <a href="git-log.html">git-log(1)</a>, to be used for the
+        todo list during an interactive rebase.  The format will
+        automatically have the long commit hash prepended to the format.
 </p>
+</dd>
+<dt class="hdlist1">
+rebase.abbreviateCommands
+</dt>
+<dd>
+<p>
+        If set to true, <code>git rebase</code> will use abbreviated command names in the
+        todo list resulting in something like this:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>        p deadbee The oneline of the commit
+        p fa1afe1 The oneline of the next commit
+        ...</code></pre>
+</div></div>
+<div class="paragraph"><p>instead of:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>        pick deadbee The oneline of the commit
+        pick fa1afe1 The oneline of the next commit
+        ...</code></pre>
+</div></div>
+<div class="paragraph"><p>Defaults to false.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -2048,7 +2085,7 @@ reorder commits tend to produce counterintuitive results.</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-10-03 16:10:36 JST
+Last updated 2017-12-27 11:58:06 PST
 </div>
 </div>
 </body>
