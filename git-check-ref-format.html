@@ -865,16 +865,21 @@ at-open-brace <code>@{</code> is used as a notation to access a reflog entry.
 </ol></div>
 <div class="paragraph"><p>With the <code>--branch</code> option, the command takes a name and checks if
 it can be used as a valid branch name (e.g. when creating a new
-branch).  The rule <code>git check-ref-format --branch $name</code> implements
+branch). But be cautious when using the
+previous checkout syntax that may refer to a detached HEAD state.
+The rule <code>git check-ref-format --branch $name</code> implements
 may be stricter than what <code>git check-ref-format refs/heads/$name</code>
 says (e.g. a dash may appear at the beginning of a ref component,
 but it is explicitly forbidden at the beginning of a branch name).
 When run with <code>--branch</code> option in a repository, the input is first
-expanded for the &#8220;previous branch syntax&#8221;
-<code>@{-n}</code>.  For example, <code>@{-1}</code> is a way to refer the last branch you
-were on.  This option should be used by porcelains to accept this
-syntax anywhere a branch name is expected, so they can act as if you
-typed the branch name.</p></div>
+expanded for the &#8220;previous checkout syntax&#8221;
+<code>@{-n}</code>.  For example, <code>@{-1}</code> is a way to refer the last thing that
+was checked out using "git checkout" operation. This option should be
+used by porcelains to accept this syntax anywhere a branch name is
+expected, so they can act as if you typed the branch name. As an
+exception note that, the &#8220;previous checkout operation&#8221; might result
+in a commit object name when the N-th last thing checked out was not
+a branch.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -925,7 +930,7 @@ typed the branch name.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Print the name of the previous branch:
+Print the name of the previous thing checked out:
 </p>
 <div class="listingblock">
 <div class="content">
@@ -955,7 +960,7 @@ Determine the reference name to use for a new branch:
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-11-10 15:00:41 JST
+Last updated 2017-12-28 15:18:28 PST
 </div>
 </div>
 </body>
