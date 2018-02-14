@@ -1155,45 +1155,13 @@ content provided to them on standard input.</p></div>
 <div class="paragraph"><p>If the filter command (a string value) is defined via
 <code>filter.&lt;driver&gt;.process</code> then Git can process all blobs with a
 single filter invocation for the entire life of a single Git
-command. This is achieved by using a packet format (pkt-line,
-see technical/protocol-common.txt) based protocol over standard
-input and standard output as follows. All packets, except for the
-"*CONTENT" packets and the "0000" flush packet, are considered
-text and therefore are terminated by a LF.</p></div>
-<div class="paragraph"><p>Git starts the filter when it encounters the first file
-that needs to be cleaned or smudged. After the filter started
-Git sends a welcome message ("git-filter-client"), a list of supported
-protocol version numbers, and a flush packet. Git expects to read a welcome
-response message ("git-filter-server"), exactly one protocol version number
-from the previously sent list, and a flush packet. All further
-communication will be based on the selected version. The remaining
-protocol description below documents "version=2". Please note that
-"version=42" in the example below does not exist and is only there
-to illustrate how the protocol would look like with more than one
-version.</p></div>
-<div class="paragraph"><p>After the version negotiation Git sends a list of all capabilities that
-it supports and a flush packet. Git expects to read a list of desired
-capabilities, which must be a subset of the supported capabilities list,
-and a flush packet as response:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>packet:          git&gt; git-filter-client
-packet:          git&gt; version=2
-packet:          git&gt; version=42
-packet:          git&gt; 0000
-packet:          git&lt; git-filter-server
-packet:          git&lt; version=2
-packet:          git&lt; 0000
-packet:          git&gt; capability=clean
-packet:          git&gt; capability=smudge
-packet:          git&gt; capability=not-yet-invented
-packet:          git&gt; 0000
-packet:          git&lt; capability=clean
-packet:          git&lt; capability=smudge
-packet:          git&lt; 0000</code></pre>
-</div></div>
-<div class="paragraph"><p>Supported filter capabilities in version 2 are "clean", "smudge",
-and "delay".</p></div>
+command. This is achieved by using the long-running process protocol
+(described in technical/long-running-process-protocol.txt).</p></div>
+<div class="paragraph"><p>When Git encounters the first file that needs to be cleaned or smudged,
+it starts the filter and performs the handshake. In the handshake, the
+welcome message sent by Git is "git-filter-client", only version 2 is
+suppported, and the supported capabilities are "clean", "smudge", and
+"delay".</p></div>
 <div class="paragraph"><p>Afterwards Git sends a list of "key=value" pairs terminated with
 a flush packet. The list will contain at least the filter command
 (based on the supported capabilities) and the pathname of the file
@@ -1275,11 +1243,6 @@ mechanism.</p></div>
 the protocol then Git will stop the filter process and restart it
 with the next file that needs to be processed. Depending on the
 <code>filter.&lt;driver&gt;.required</code> flag Git will interpret that as error.</p></div>
-<div class="paragraph"><p>After the filter has processed a command it is expected to wait for
-a "key=value" list containing the next command. Git will close
-the command pipe on exit. The filter is expected to detect EOF
-and exit gracefully on its own. Git will wait until the filter
-process has stopped.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_delay">Delay</h4>
@@ -2079,7 +2042,7 @@ frotz   unspecified</code></pre>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-01-26 15:11:04 PST
+ 2018-02-13 17:28:38 PST
 </div>
 </div>
 </body>
