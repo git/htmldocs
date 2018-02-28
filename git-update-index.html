@@ -1402,6 +1402,28 @@ untracked cache is added to or removed from the index the next time a
 command reads the index; while when <code>--[no-|force-]untracked-cache</code>
 are used, the untracked cache is immediately added to or removed from
 the index.</p></div>
+<div class="paragraph"><p>Before 2.17, the untracked cache had a bug where replacing a directory
+with a symlink to another directory could cause it to incorrectly show
+files tracked by git as untracked. See the "status: add a failing test
+showing a core.untrackedCache bug" commit to git.git. A workaround for
+that is (and this might work for other undiscovered bugs in the
+future):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git -c core.untrackedCache=false status</code></pre>
+</div></div>
+<div class="paragraph"><p>This bug has also been shown to affect non-symlink cases of replacing
+a directory with a file when it comes to the internal structures of
+the untracked cache, but no case has been reported where this resulted in
+wrong "git status" output.</p></div>
+<div class="paragraph"><p>There are also cases where existing indexes written by git versions
+before 2.17 will reference directories that don&#8217;t exist anymore,
+potentially causing many "could not open directory" warnings to be
+printed on "git status". These are new warnings for existing issues
+that were previously silently discarded.</p></div>
+<div class="paragraph"><p>As with the bug described above the solution is to one-off do a "git
+status" run with <code>core.untrackedCache=false</code> to flush out the leftover
+bad data.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1421,8 +1443,8 @@ the <code>core.fsmonitor</code> configuration variable (see
 <a href="git-config.html">git-config(1)</a>) than using the <code>--fsmonitor</code> option to
 <code>git update-index</code> in each repository, especially if you want to do so
 across all repositories you use, because you can set the configuration
-variable to <code>true</code> (or <code>false</code>) in your <code>$HOME/.gitconfig</code> just once
-and have it affect all repositories you touch.</p></div>
+variable in your <code>$HOME/.gitconfig</code> just once and have it affect all
+repositories you touch.</p></div>
 <div class="paragraph"><p>When the <code>core.fsmonitor</code> configuration variable is changed, the
 file system monitor is added to or removed from the index the next time
 a command reads the index. When <code>--[no-]fsmonitor</code> are used, the file
@@ -1473,7 +1495,7 @@ ctime for marking files processed) (see <a href="git-config.html">git-config(1)<
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-01-26 15:11:04 PST
+ 2018-02-28 15:39:58 PST
 </div>
 </div>
 </body>

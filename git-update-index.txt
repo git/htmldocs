@@ -464,6 +464,32 @@ command reads the index; while when `--[no-|force-]untracked-cache`
 are used, the untracked cache is immediately added to or removed from
 the index.
 
+Before 2.17, the untracked cache had a bug where replacing a directory
+with a symlink to another directory could cause it to incorrectly show
+files tracked by git as untracked. See the "status: add a failing test
+showing a core.untrackedCache bug" commit to git.git. A workaround for
+that is (and this might work for other undiscovered bugs in the
+future):
+
+----------------
+$ git -c core.untrackedCache=false status
+----------------
+
+This bug has also been shown to affect non-symlink cases of replacing
+a directory with a file when it comes to the internal structures of
+the untracked cache, but no case has been reported where this resulted in
+wrong "git status" output.
+
+There are also cases where existing indexes written by git versions
+before 2.17 will reference directories that don't exist anymore,
+potentially causing many "could not open directory" warnings to be
+printed on "git status". These are new warnings for existing issues
+that were previously silently discarded.
+
+As with the bug described above the solution is to one-off do a "git
+status" run with `core.untrackedCache=false` to flush out the leftover
+bad data.
+
 File System Monitor
 -------------------
 
@@ -484,8 +510,8 @@ the `core.fsmonitor` configuration variable (see
 linkgit:git-config[1]) than using the `--fsmonitor` option to
 `git update-index` in each repository, especially if you want to do so
 across all repositories you use, because you can set the configuration
-variable to `true` (or `false`) in your `$HOME/.gitconfig` just once
-and have it affect all repositories you touch.
+variable in your `$HOME/.gitconfig` just once and have it affect all
+repositories you touch.
 
 When the `core.fsmonitor` configuration variable is changed, the
 file system monitor is added to or removed from the index the next time
