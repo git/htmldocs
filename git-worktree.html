@@ -751,7 +751,9 @@ git-worktree(1) Manual Page
 <pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [--lock] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;commit-ish&gt;]
 <em>git worktree list</em> [--porcelain]
 <em>git worktree lock</em> [--reason &lt;string&gt;] &lt;worktree&gt;
+<em>git worktree move</em> &lt;worktree&gt; &lt;new-path&gt;
 <em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
+<em>git worktree remove</em> [--force] &lt;worktree&gt;
 <em>git worktree unlock</em> &lt;worktree&gt;</pre>
 <div class="attribution">
 </div></div>
@@ -773,9 +775,6 @@ The working tree&#8217;s administrative files in the repository (see
 <code>gc.worktreePruneExpire</code> in <a href="git-config.html">git-config(1)</a>), or you can run
 <code>git worktree prune</code> in the main or any linked working tree to
 clean up any stale administrative files.</p></div>
-<div class="paragraph"><p>If you move a linked working tree, you need to manually update the
-administrative files so that they do not get pruned automatically. See
-section "DETAILS" for more information.</p></div>
 <div class="paragraph"><p>If a linked working tree is stored on a portable device or network share
 which is not always mounted, you can prevent its administrative files from
 being pruned by issuing the <code>git worktree lock</code> command, optionally
@@ -832,11 +831,31 @@ with <code>--reason</code>.
 </p>
 </dd>
 <dt class="hdlist1">
+move
+</dt>
+<dd>
+<p>
+Move a working tree to a new location. Note that the main working tree
+or linked working trees containing submodules cannot be moved.
+</p>
+</dd>
+<dt class="hdlist1">
 prune
 </dt>
 <dd>
 <p>
 Prune working tree information in $GIT_DIR/worktrees.
+</p>
+</dd>
+<dt class="hdlist1">
+remove
+</dt>
+<dd>
+<p>
+Remove a working tree. Only clean working trees (no untracked files
+and no modification in tracked files) can be removed. Unclean working
+trees or ones with submodules can be removed with <code>--force</code>. The main
+working tree cannot be removed.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -862,9 +881,10 @@ Unlock a working tree, allowing it to be pruned, moved or deleted.
 </dt>
 <dd>
 <p>
-        By default, <code>add</code> refuses to create a new working tree when <code>&lt;commit-ish&gt;</code> is a branch name and
-        is already checked out by another working tree. This option overrides
-        that safeguard.
+        By default, <code>add</code> refuses to create a new working tree when
+        <code>&lt;commit-ish&gt;</code> is a branch name and is already checked out by
+        another working tree and <code>remove</code> refuses to remove an unclean
+        working tree. This option overrides that safeguard.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1031,7 +1051,7 @@ since refs are shared across all working trees.</p></div>
 thumb is do not make any assumption about whether a path belongs to
 $GIT_DIR or $GIT_COMMON_DIR when you need to directly access something
 inside $GIT_DIR. Use <code>git rev-parse --git-path</code> to get the final path.</p></div>
-<div class="paragraph"><p>If you move a linked working tree, you need to update the <em>gitdir</em> file
+<div class="paragraph"><p>If you manually move a linked working tree, you need to update the <em>gitdir</em> file
 in the entry&#8217;s directory. For example, if a linked working tree is moved
 to <code>/newpath/test-next</code> and its <code>.git</code> file points to
 <code>/path/main/.git/worktrees/test-next</code>, then update
@@ -1114,21 +1134,6 @@ $ git worktree prune</code></pre>
 <div class="paragraph"><p>Multiple checkout in general is still experimental, and the support
 for submodules is incomplete. It is NOT recommended to make multiple
 checkouts of a superproject.</p></div>
-<div class="paragraph"><p>git-worktree could provide more automation for tasks currently
-performed manually, such as:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<code>remove</code> to remove a linked working tree and its administrative files (and
-  warn if the working tree is dirty)
-</p>
-</li>
-<li>
-<p>
-<code>mv</code> to move or rename a working tree and update its administrative files
-</p>
-</li>
-</ul></div>
 </div>
 </div>
 <div class="sect1">
@@ -1142,7 +1147,7 @@ performed manually, such as:</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-02-28 15:39:58 PST
+ 2018-03-14 14:56:13 PDT
 </div>
 </div>
 </body>
