@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>git-gc(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -758,8 +759,9 @@ git-gc(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Runs a number of housekeeping tasks within the current repository,
 such as compressing file revisions (to reduce disk space and increase
-performance) and removing unreachable objects which may have been
-created from prior invocations of <em>git add</em>.</p></div>
+performance), removing unreachable objects which may have been
+created from prior invocations of <em>git add</em>, packing refs, pruning
+reflog, rerere metadata or stale working trees.</p></div>
 <div class="paragraph"><p>Users are encouraged to run this task on a regular basis within
 each repository to maintain good disk space utilization and good
 operating performance.</p></div>
@@ -797,19 +799,22 @@ disable this behavior permanently without further considerations, just do:</p></
         With this option, <em>git gc</em> checks whether any housekeeping is
         required; if not, it exits without performing any work.
         Some git commands run <code>git gc --auto</code> after performing
-        operations that could create many loose objects.
+        operations that could create many loose objects. Housekeeping
+        is required if there are too many loose objects or too many
+        packs in the repository.
 </p>
-<div class="paragraph"><p>Housekeeping is required if there are too many loose objects or
-too many packs in the repository. If the number of loose objects
-exceeds the value of the <code>gc.auto</code> configuration variable, then
-all loose objects are combined into a single pack using
-<code>git repack -d -l</code>.  Setting the value of <code>gc.auto</code> to 0
-disables automatic packing of loose objects.</p></div>
+<div class="paragraph"><p>If the number of loose objects exceeds the value of the <code>gc.auto</code>
+configuration variable, then all loose objects are combined into a
+single pack using <code>git repack -d -l</code>.  Setting the value of <code>gc.auto</code>
+to 0 disables automatic packing of loose objects.</p></div>
 <div class="paragraph"><p>If the number of packs exceeds the value of <code>gc.autoPackLimit</code>,
 then existing packs (except those marked with a <code>.keep</code> file)
 are consolidated into a single pack by using the <code>-A</code> option of
 <em>git repack</em>. Setting <code>gc.autoPackLimit</code> to 0 disables
 automatic consolidation of packs.</p></div>
+<div class="paragraph"><p>If houskeeping is required due to many loose objects or packs, all
+other housekeeping tasks (e.g. rerere, working trees, reflog&#8230;) will
+be performed as well.</p></div>
 </dd>
 <dt class="hdlist1">
 --prune=&lt;date&gt;
@@ -898,6 +903,9 @@ controls --depth option in <a href="git-repack.html">git-repack(1)</a>. This def
 <div class="paragraph"><p>The optional configuration variable <code>gc.pruneExpire</code> controls how old
 the unreferenced loose objects have to be before they are pruned.  The
 default is "2 weeks ago".</p></div>
+<div class="paragraph"><p>Optional configuration variable <code>gc.worktreePruneExpire</code> controls how
+old a stale working tree should be before <code>git worktree prune</code> deletes
+it. Default is "3 months ago".</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -967,7 +975,7 @@ collection with <em>git config gc.auto 0</em>.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-01-26 15:11:04 PST
+ 2018-04-10 09:52:07 JST
 </div>
 </div>
 </body>
