@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>git-worktree(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -768,10 +769,11 @@ out more than one branch at a time.  With <code>git worktree add</code> a new wo
 tree is associated with the repository.  This new working tree is called a
 "linked working tree" as opposed to the "main working tree" prepared by "git
 init" or "git clone".  A repository has one main working tree (if it&#8217;s not a
-bare repository) and zero or more linked working trees.</p></div>
-<div class="paragraph"><p>When you are done with a linked working tree you can simply delete it.
-The working tree&#8217;s administrative files in the repository (see
-"DETAILS" below) will eventually be removed automatically (see
+bare repository) and zero or more linked working trees. When you are done
+with a linked working tree, remove it with <code>git worktree remove</code>.</p></div>
+<div class="paragraph"><p>If a working tree is deleted without using <code>git worktree remove</code>, then
+its associated administrative files, which reside in the repository
+(see "DETAILS" below), will eventually be removed automatically (see
 <code>gc.worktreePruneExpire</code> in <a href="git-config.html">git-config(1)</a>), or you can run
 <code>git worktree prune</code> in the main or any linked working tree to
 clean up any stale administrative files.</p></div>
@@ -884,7 +886,7 @@ Unlock a working tree, allowing it to be pruned, moved or deleted.
         By default, <code>add</code> refuses to create a new working tree when
         <code>&lt;commit-ish&gt;</code> is a branch name and is already checked out by
         another working tree and <code>remove</code> refuses to remove an unclean
-        working tree. This option overrides that safeguard.
+        working tree. This option overrides these safeguards.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1076,7 +1078,7 @@ to <code>/path/main/.git/worktrees/test-next</code> then a file named
 details on a single line with columns.  For example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>S git worktree list
+<pre><code>$ git worktree list
 /path/to/bare-source            (bare)
 /path/to/linked-worktree        abcd1234 [master]
 /path/to/other-linked-worktree  1234abc  (detached HEAD)</code></pre>
@@ -1090,7 +1092,7 @@ if the value is true.  An empty line indicates the end of a worktree.  For
 example:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>S git worktree list --porcelain
+<pre><code>$ git worktree list --porcelain
 worktree /path/to/bare-source
 bare
 
@@ -1123,8 +1125,7 @@ $ pushd ../temp
 # ... hack hack hack ...
 $ git commit -a -m 'emergency fix for boss'
 $ popd
-$ rm -rf ../temp
-$ git worktree prune</code></pre>
+$ git worktree remove ../temp</code></pre>
 </div></div>
 </div>
 </div>
@@ -1147,7 +1148,7 @@ checkouts of a superproject.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-03-14 14:56:13 PDT
+ 2018-04-25 17:24:48 JST
 </div>
 </div>
 </body>
