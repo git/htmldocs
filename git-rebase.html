@@ -1349,6 +1349,36 @@ rebase.instructionFormat.  A customized instruction format will automatically
 have the long commit hash prepended to the format.</p></div>
 </dd>
 <dt class="hdlist1">
+-r
+</dt>
+<dt class="hdlist1">
+--rebase-merges[=(rebase-cousins|no-rebase-cousins)]
+</dt>
+<dd>
+<p>
+        By default, a rebase will simply drop merge commits from the todo
+        list, and put the rebased commits into a single, linear branch.
+        With <code>--rebase-merges</code>, the rebase will instead try to preserve
+        the branching structure within the commits that are to be rebased,
+        by recreating the merge commits. Any resolved merge conflicts or
+        manual amendments in these merge commits will have to be
+        resolved/re-applied manually.
+</p>
+<div class="paragraph"><p>By default, or when <code>no-rebase-cousins</code> was specified, commits which do not
+have <code>&lt;upstream&gt;</code> as direct ancestor will keep their original branch point,
+i.e. commits that would be excluded by gitlink:git-log[1]'s
+<code>--ancestry-path</code> option will keep their original ancestry by default. If
+the <code>rebase-cousins</code> mode is turned on, such commits are instead rebased
+onto <code>&lt;upstream&gt;</code> (or <code>&lt;onto&gt;</code>, if specified).</p></div>
+<div class="paragraph"><p>The <code>--rebase-merges</code> mode is similar in spirit to <code>--preserve-merges</code>, but
+in contrast to that option works well in interactive rebases: commits can be
+reordered, inserted and dropped at will.</p></div>
+<div class="paragraph"><p>It is currently only possible to recreate the merge commits using the
+<code>recursive</code> merge strategy; Different merge strategies can be used only via
+explicit <code>exec git merge -s &lt;strategy&gt; [...]</code> commands.</p></div>
+<div class="paragraph"><p>See also REBASING MERGES below.</p></div>
+</dd>
+<dt class="hdlist1">
 -p
 </dt>
 <dt class="hdlist1">
@@ -2072,12 +2102,134 @@ case" recovery too!</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_rebasing_merges">REBASING MERGES</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The interactive rebase command was originally designed to handle
+individual patch series. As such, it makes sense to exclude merge
+commits from the todo list, as the developer may have merged the
+then-current <code>master</code> while working on the branch, only to rebase
+all the commits onto <code>master</code> eventually (skipping the merge
+commits).</p></div>
+<div class="paragraph"><p>However, there are legitimate reasons why a developer may want to
+recreate merge commits: to keep the branch structure (or "commit
+topology") when working on multiple, inter-related branches.</p></div>
+<div class="paragraph"><p>In the following example, the developer works on a topic branch that
+refactors the way buttons are defined, and on another topic branch
+that uses that refactoring to implement a "Report a bug" button. The
+output of <code>git log --graph --format=%s -5</code> may look like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>*   Merge branch 'report-a-bug'
+|\
+| * Add the feedback button
+* | Merge branch 'refactor-button'
+|\ \
+| |/
+| * Use the Button class for all buttons
+| * Extract a generic Button class from the DownloadButton one</code></pre>
+</div></div>
+<div class="paragraph"><p>The developer might want to rebase those commits to a newer <code>master</code>
+while keeping the branch topology, for example when the first topic
+branch is expected to be integrated into <code>master</code> much earlier than the
+second one, say, to resolve merge conflicts with changes to the
+DownloadButton class that made it into <code>master</code>.</p></div>
+<div class="paragraph"><p>This rebase can be performed using the <code>--rebase-merges</code> option.
+It will generate a todo list looking like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>label onto
+
+# Branch: refactor-button
+reset onto
+pick 123456 Extract a generic Button class from the DownloadButton one
+pick 654321 Use the Button class for all buttons
+label refactor-button
+
+# Branch: report-a-bug
+reset refactor-button # Use the Button class for all buttons
+pick abcdef Add the feedback button
+label report-a-bug
+
+reset onto
+merge -C a1b2c3 refactor-button # Merge 'refactor-button'
+merge -C 6f5e4d report-a-bug # Merge 'report-a-bug'</code></pre>
+</div></div>
+<div class="paragraph"><p>In contrast to a regular interactive rebase, there are <code>label</code>, <code>reset</code>
+and <code>merge</code> commands in addition to <code>pick</code> ones.</p></div>
+<div class="paragraph"><p>The <code>label</code> command associates a label with the current HEAD when that
+command is executed. These labels are created as worktree-local refs
+(<code>refs/rewritten/&lt;label&gt;</code>) that will be deleted when the rebase
+finishes. That way, rebase operations in multiple worktrees linked to
+the same repository do not interfere with one another. If the <code>label</code>
+command fails, it is rescheduled immediately, with a helpful message how
+to proceed.</p></div>
+<div class="paragraph"><p>The <code>reset</code> command resets the HEAD, index and worktree to the specified
+revision. It is isimilar to an <code>exec git reset --hard &lt;label&gt;</code>, but
+refuses to overwrite untracked files. If the <code>reset</code> command fails, it is
+rescheduled immediately, with a helpful message how to edit the todo list
+(this typically happens when a <code>reset</code> command was inserted into the todo
+list manually and contains a typo).</p></div>
+<div class="paragraph"><p>The <code>merge</code> command will merge the specified revision into whatever is
+HEAD at that time. With <code>-C &lt;original-commit&gt;</code>, the commit message of
+the specified merge commit will be used. When the <code>-C</code> is changed to
+a lower-case <code>-c</code>, the message will be opened in an editor after a
+successful merge so that the user can edit the message.</p></div>
+<div class="paragraph"><p>If a <code>merge</code> command fails for any reason other than merge conflicts (i.e.
+when the merge operation did not even start), it is rescheduled immediately.</p></div>
+<div class="paragraph"><p>At this time, the <code>merge</code> command will <strong>always</strong> use the <code>recursive</code>
+merge strategy, with no way to choose a different one. To work around
+this, an <code>exec</code> command can be used to call <code>git merge</code> explicitly,
+using the fact that the labels are worktree-local refs (the ref
+<code>refs/rewritten/onto</code> would correspond to the label <code>onto</code>, for example).</p></div>
+<div class="paragraph"><p>Note: the first command (<code>label onto</code>) labels the revision onto which
+the commits are rebased; The name <code>onto</code> is just a convention, as a nod
+to the <code>--onto</code> option.</p></div>
+<div class="paragraph"><p>It is also possible to introduce completely new merge commits from scratch
+by adding a command of the form <code>merge &lt;merge-head&gt;</code>. This form will
+generate a tentative commit message and always open an editor to let the
+user edit it. This can be useful e.g. when a topic branch turns out to
+address more than a single concern and wants to be split into two or
+even more topic branches. Consider this todo list:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>pick 192837 Switch from GNU Makefiles to CMake
+pick 5a6c7e Document the switch to CMake
+pick 918273 Fix detection of OpenSSL in CMake
+pick afbecd http: add support for TLS v1.3
+pick fdbaec Fix detection of cURL in CMake on Windows</code></pre>
+</div></div>
+<div class="paragraph"><p>The one commit in this list that is not related to CMake may very well
+have been motivated by working on fixing all those bugs introduced by
+switching to CMake, but it addresses a different concern. To split this
+branch into two topic branches, the todo list could be edited like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>label onto
+
+pick afbecd http: add support for TLS v1.3
+label tlsv1.3
+
+reset onto
+pick 192837 Switch from GNU Makefiles to CMake
+pick 918273 Fix detection of OpenSSL in CMake
+pick fdbaec Fix detection of cURL in CMake on Windows
+pick 5a6c7e Document the switch to CMake
+label cmake
+
+reset onto
+merge tlsv1.3
+merge cmake</code></pre>
+</div></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The todo list presented by <code>--preserve-merges --interactive</code> does not
 represent the topology of the revision graph.  Editing commits and
 rewording their commit messages should work fine, but attempts to
-reorder commits tend to produce counterintuitive results.</p></div>
+reorder commits tend to produce counterintuitive results. Use
+<code>--rebase-merges</code> in such scenarios instead.</p></div>
 <div class="paragraph"><p>For example, an attempt to rearrange</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2108,7 +2260,7 @@ reorder commits tend to produce counterintuitive results.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-04-25 17:24:48 JST
+ 2018-05-23 16:06:29 JST
 </div>
 </div>
 </body>

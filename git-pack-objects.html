@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>git-pack-objects(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -751,7 +752,7 @@ git-pack-objects(1) Manual Page
 <pre class="content"><em>git pack-objects</em> [-q | --progress | --all-progress] [--all-progress-implied]
         [--no-reuse-delta] [--delta-base-offset] [--non-empty]
         [--local] [--incremental] [--window=&lt;n&gt;] [--depth=&lt;n&gt;]
-        [--revs [--unpacked | --all]]
+        [--revs [--unpacked | --all]] [--keep-pack=&lt;pack-name&gt;]
         [--stdout [--filter=&lt;filter-spec&gt;] | base-name]
         [--shallow] [--keep-true-parents] &lt; object-list</pre>
 <div class="attribution">
@@ -872,8 +873,9 @@ base-name
         it too deep affects the performance on the unpacker
         side, because delta data needs to be applied that many
         times to get to the necessary object.
-        The default value for --window is 10 and --depth is 50.
 </p>
+<div class="paragraph"><p>The default value for --window is 10 and --depth is 50. The maximum
+depth is 4095.</p></div>
 </dd>
 <dt class="hdlist1">
 --window-memory=&lt;n&gt;
@@ -916,6 +918,18 @@ base-name
         This flag causes an object already in a local pack that
         has a .keep file to be ignored, even if it would have
         otherwise been packed.
+</p>
+</dd>
+<dt class="hdlist1">
+--keep-pack=&lt;pack-name&gt;
+</dt>
+<dd>
+<p>
+        This flag causes an object already in the given pack to be
+        ignored, even if it would have otherwise been
+        packed. <code>&lt;pack-name&gt;</code> is the the pack file name without
+        leading directory (e.g. <code>pack-123.pack</code>). The option could be
+        specified multiple times to keep multiple packs.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1154,6 +1168,34 @@ Unexpected missing object will raise an error.</p></div>
         promisor remote [with .promisor].)  This is used with partial clone.
 </p>
 </dd>
+<dt class="hdlist1">
+--keep-unreachable
+</dt>
+<dd>
+<p>
+        Objects unreachable from the refs in packs named with
+        --unpacked= option are added to the resulting pack, in
+        addition to the reachable objects that are not in packs marked
+        with *.keep files. This implies <code>--revs</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--pack-loose-unreachable
+</dt>
+<dd>
+<p>
+        Pack unreachable loose objects (and their loose counterparts
+        removed). This implies <code>--revs</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--unpack-unreachable
+</dt>
+<dd>
+<p>
+        Keep unreachable objects in loose form. This implies <code>--revs</code>.
+</p>
+</dd>
 </dl></div>
 </div>
 </div>
@@ -1176,7 +1218,7 @@ Unexpected missing object will raise an error.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-02-13 17:28:38 PST
+ 2018-05-23 16:06:29 JST
 </div>
 </div>
 </body>

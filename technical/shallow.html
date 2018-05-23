@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
     "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.9" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
 <title>Shallow commits</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -745,17 +746,19 @@ asciidoc.install();
 repo, and therefore grafts are introduced pretending that
 these commits have no parents.</p></div>
 </div></div>
-<div class="paragraph"><p>The basic idea is to write the SHA-1s of shallow commits into
-$GIT_DIR/shallow, and handle its contents like the contents
-of $GIT_DIR/info/grafts (with the difference that shallow
-cannot contain parent information).</p></div>
-<div class="paragraph"><p>This information is stored in a new file instead of grafts, or
-even the config, since the user should not touch that file
-at all (even throughout development of the shallow clone, it
-was never manually edited!).</p></div>
+<div class="paragraph"><p>$GIT_DIR/shallow lists commit object names and tells Git to
+pretend as if they are root commits (e.g. "git log" traversal
+stops after showing them; "git fsck" does not complain saying
+the commits listed on their "parent" lines do not exist).</p></div>
 <div class="paragraph"><p>Each line contains exactly one SHA-1. When read, a commit_graft
 will be constructed, which has nr_parent &lt; 0 to make it easier
 to discern from user provided grafts.</p></div>
+<div class="paragraph"><p>Note that the shallow feature could not be changed easily to
+use replace refs: a commit containing a <code>mergetag</code> is not allowed
+to be replaced, not even by a root commit. Such a commit can be
+made shallow, though. Also, having a <code>shallow</code> file explicitly
+listing all the commits made shallow makes it a <strong>lot</strong> easier to
+do shallow-specific things such as to deepen the history.</p></div>
 <div class="paragraph"><p>Since fsck-objects relies on the library to read the objects,
 it honours shallow commits automatically.</p></div>
 <div class="paragraph"><p>There are some unfinished ends of the whole shallow business:</p></div>
@@ -810,7 +813,7 @@ number a signed 32-bit integer can contain) means infinite depth.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-01-26 15:11:04 PST
+ 2018-05-23 16:06:29 JST
 </div>
 </div>
 </body>
