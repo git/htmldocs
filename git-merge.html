@@ -1423,8 +1423,9 @@ recursive
         causing mismerges by tests done on actual merge commits
         taken from Linux 2.6 kernel development history.
         Additionally this can detect and handle merges involving
-        renames.  This is the default merge strategy when
-        pulling or merging one branch.
+        renames, but currently cannot make use of detected
+        copies.  This is the default merge strategy when pulling
+        or merging one branch.
 </p>
 <div class="paragraph"><p>The <em>recursive</em> strategy can take the following options:</p></div>
 <div class="dlist"><dl>
@@ -1541,7 +1542,8 @@ no-renames
 </dt>
 <dd>
 <p>
-        Turn off rename detection.
+        Turn off rename detection. This overrides the <code>merge.renames</code>
+        configuration variable.
         See also <a href="git-diff.html">git-diff(1)</a> <code>--no-renames</code>.
 </p>
 </dd>
@@ -1551,7 +1553,8 @@ find-renames[=&lt;n&gt;]
 <dd>
 <p>
         Turn on rename detection, optionally setting the similarity
-        threshold.  This is the default.
+        threshold.  This is the default. This overrides the
+        <em>merge.renames</em> configuration variable.
         See also <a href="git-diff.html">git-diff(1)</a> <code>--find-renames</code>.
 </p>
 </dd>
@@ -1708,7 +1711,18 @@ merge.renameLimit
 <p>
         The number of files to consider when performing rename detection
         during a merge; if not specified, defaults to the value of
-        diff.renameLimit.
+        diff.renameLimit. This setting has no effect if rename detection
+        is turned off.
+</p>
+</dd>
+<dt class="hdlist1">
+merge.renames
+</dt>
+<dd>
+<p>
+        Whether and how Git detects renames.  If set to "false",
+        rename detection is disabled. If set to "true", basic rename
+        detection is enabled.  Defaults to the value of diff.renames.
 </p>
 </dd>
 <dt class="hdlist1">
