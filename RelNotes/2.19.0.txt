@@ -1,0 +1,101 @@
+Git 2.19 Release Notes
+======================
+
+Updates since v2.18
+-------------------
+
+UI, Workflows & Features
+
+ * "git diff" compares the index and the working tree.  For paths
+   added with intent-to-add bit, the command shows the full contents
+   of them as added, but the paths themselves were not marked as new
+   files.  They are now shown as new by default.
+
+   "git apply" learned the "--intent-to-add" option so that an
+   otherwise working-tree-only application of a patch will add new
+   paths to the index marked with the "intent-to-add" bit.
+
+
+Performance, Internal Implementation, Development Support etc.
+
+ * The bulk of "git submodule foreach" has been rewritten in C.
+
+ * The in-core "commit" object had an all-purpose "void *util" field,
+   which was tricky to use especially in library-ish part of the
+   code.  All of the existing uses of the field has been migrated to a
+   more dedicated "commit-slab" mechanism and the field is eliminated.
+
+ * A less often used command "git show-index" has been modernized.
+   (merge fb3010c31f jk/show-index later to maint).
+
+ * The conversion to pass "the_repository" and then "a_repository"
+   throughout the object access API continues.
+
+ * Continuing with the idea to programatically enumerate various
+   pieces of data required for command line completion, teach the
+   codebase to report the list of configuration variables
+   subcommands care about to help complete them.
+
+ * Separate "rebase -p" codepath out of "rebase -i" implementation to
+   slim down the latter and make it easier to manage.
+
+ * Make refspec parsing codepath more robust.
+
+ * Some flaky tests have been fixed.
+
+ * Continuing with the idea to programmatically enumerate various
+   pieces of data required for command line completion, the codebase
+   has been taught to enumerate options prefixed with "--no-" to
+   negate them.
+
+ * Build and test procedure for netrc credential helper (in contrib/)
+   has been updated.
+
+
+Fixes since v2.18
+-----------------
+
+ * "git remote update" can take both a single remote nickname and a
+   nickname for remote groups, and the completion script (in contrib/)
+   has been taught about it.
+   (merge 9cd4382ad5 ls/complete-remote-update-names later to maint).
+
+ * "git fetch --shallow-since=<cutoff>" that specifies the cut-off
+   point that is newer than the existing history used to end up
+   grabbing the entire history.  Such a request now errors out.
+   (merge e34de73c56 nd/reject-empty-shallow-request later to maint).
+
+ * Fix for 2.17-era regression around `core.safecrlf`.
+   (merge 6cb09125be as/safecrlf-quiet-fix later to maint).
+
+ * The recent addition of "partial clone" experimental feature kicked
+   in when it shouldn't, namely, when there is no partial-clone filter
+   defined even if extensions.partialclone is set.
+   (merge cac1137dc4 jh/partial-clone later to maint).
+
+ * "git send-pack --signed" (hence "git push --signed" over the http
+   transport) did not read user ident from the config mechanism to
+   determine whom to sign the push certificate as, which has been
+   corrected.
+   (merge d067d98887 ms/send-pack-honor-config later to maint).
+
+ * "git fetch-pack --all" used to unnecessarily fail upon seeing an
+   annotated tag that points at an object other than a commit.
+   (merge c12c9df527 jk/fetch-all-peeled-fix later to maint).
+
+ * When user edits the patch in "git add -p" and the user's editor is
+   set to strip trailing whitespaces indiscriminately, an empty line
+   that is unchanged in the patch would become completely empty
+   (instead of a line with a sole SP on it).  The code introduced in
+   Git 2.17 timeframe failed to parse such a patch, but now it learned
+   to notice the situation and cope with it.
+   (merge f4d35a6b49 pw/add-p-recount later to maint).
+
+ * The code to try seeing if a fetch is necessary in a submodule
+   during a fetch with --recurse-submodules got confused when the path
+   to the submodule was changed in the range of commits in the
+   superproject, sometimes showing "(null)".  This has been corrected.
+
+ * Code cleanup.
+   (merge aee9be2ebe sg/update-ref-stdin-cleanup later to maint).
+   (merge 037714252f jc/clean-after-sanity-tests later to maint).
