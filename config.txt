@@ -354,7 +354,7 @@ advice.*::
 		Advice on what to do when you've accidentally added one
 		git repo inside of another.
 	ignoredHook::
-		Advice shown if an hook is ignored because the hook is not
+		Advice shown if a hook is ignored because the hook is not
 		set as executable.
 	waitingForEditor::
 		Print a message to the terminal whenever Git is waiting for
@@ -390,16 +390,19 @@ core.hideDotFiles::
 	default mode is 'dotGitOnly'.
 
 core.ignoreCase::
-	If true, this option enables various workarounds to enable
+	Internal variable which enables various workarounds to enable
 	Git to work better on filesystems that are not case sensitive,
-	like FAT. For example, if a directory listing finds
-	"makefile" when Git expects "Makefile", Git will assume
+	like APFS, HFS+, FAT, NTFS, etc. For example, if a directory listing
+	finds "makefile" when Git expects "Makefile", Git will assume
 	it is really the same file, and continue to remember it as
 	"Makefile".
 +
 The default is false, except linkgit:git-clone[1] or linkgit:git-init[1]
 will probe and set core.ignoreCase true if appropriate when the repository
 is created.
++
+Git relies on the proper configuration of this variable for your operating
+and file system. Modifying this value may result in unexpected behavior.
 
 core.precomposeUnicode::
 	This option is only used by Mac OS implementation of Git.
@@ -1182,8 +1185,10 @@ color.grep.<slot>::
 	filename prefix (when not using `-h`)
 `function`;;
 	function name lines (when using `-p`)
-`linenumber`;;
+`lineNumber`;;
 	line number prefix (when using `-n`)
+`column`;;
+	column number prefix (when using `--column`)
 `match`;;
 	matching text (same as setting `matchContext` and `matchSelected`)
 `matchContext`;;
@@ -1797,6 +1802,9 @@ gitweb.snapshot::
 
 grep.lineNumber::
 	If set to true, enable `-n` option by default.
+
+grep.column::
+	If set to true, enable the `--column` option by default.
 
 grep.patternType::
 	Set the default matching behavior. Using a value of 'basic', 'extended',
@@ -3328,12 +3336,13 @@ submodule.<name>.ignore::
 submodule.<name>.active::
 	Boolean value indicating if the submodule is of interest to git
 	commands.  This config option takes precedence over the
-	submodule.active config option.
+	submodule.active config option. See linkgit:gitsubmodules[7] for
+	details.
 
 submodule.active::
 	A repeated field which contains a pathspec used to match against a
 	submodule's path to determine if the submodule is of interest to git
-	commands.
+	commands. See linkgit:gitsubmodules[7] for details.
 
 submodule.recurse::
 	Specifies if commands recurse into submodules by default. This
