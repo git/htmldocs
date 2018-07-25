@@ -1099,13 +1099,23 @@ included in the client&#8217;s request:</p></div>
     for use with partial clone and partial fetch operations. See
     `rev-list` for possible "filter-spec" values.</code></pre>
 </div></div>
+<div class="paragraph"><p>If the <em>ref-in-want</em> feature is advertised, the following argument can
+be included in the client&#8217;s request as well as the potential addition of
+the <em>wanted-refs</em> section in the server&#8217;s response as explained below.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>want-ref &lt;ref&gt;
+    Indicates to the server that the client wants to retrieve a
+    particular ref, where &lt;ref&gt; is the full name of a ref on the
+    server.</code></pre>
+</div></div>
 <div class="paragraph"><p>The response of <code>fetch</code> is broken into a number of sections separated by
 delimiter packets (0001), with each section beginning with its section
 header.</p></div>
 <div class="literalblock">
 <div class="content">
 <pre><code>output = *section
-section = (acknowledgments | shallow-info | packfile)
+section = (acknowledgments | shallow-info | wanted-refs | packfile)
           (flush-pkt | delim-pkt)</code></pre>
 </div></div>
 <div class="literalblock">
@@ -1123,6 +1133,12 @@ ack = PKT-LINE("ACK" SP obj-id LF)</code></pre>
                *PKT-LINE((shallow | unshallow) LF)
 shallow = "shallow" SP obj-id
 unshallow = "unshallow" SP obj-id</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>wanted-refs = PKT-LINE("wanted-refs" LF)
+              *PKT-LINE(wanted-ref LF)
+wanted-ref = obj-id SP refname</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -1228,6 +1244,30 @@ This section is only included if a packfile section is also
 </p>
 <div class="literalblock">
 <div class="content">
+<pre><code>wanted-refs section
+    * This section is only included if the client has requested a
+      ref using a 'want-ref' line and if a packfile section is also
+      included in the response.</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Always begins with the section header "wanted-refs".
+</p>
+</li>
+<li>
+<p>
+The server will send a ref listing ("&lt;oid&gt; &lt;refname&gt;") for
+          each reference requested using <em>want-ref</em> lines.
+</p>
+</li>
+<li>
+<p>
+The server MUST NOT send any refs which were not requested
+          using <em>want-ref</em> lines.
+</p>
+<div class="literalblock">
+<div class="content">
 <pre><code>packfile section
     * This section is only included if the client has sent 'want'
       lines in its request and either requested that no more
@@ -1281,7 +1321,7 @@ a request.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-07-18 13:16:04 PDT
+ 2018-07-25 15:10:28 PDT
 </div>
 </div>
 </body>

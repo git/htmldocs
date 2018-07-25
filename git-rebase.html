@@ -1089,6 +1089,7 @@ leave out at most one of A and B, in which case it defaults to HEAD.</p></div>
         Keep the commits that do not change anything from its
         parents in the result.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --allow-empty-message
@@ -1099,6 +1100,7 @@ leave out at most one of A and B, in which case it defaults to HEAD.</p></div>
         This option overrides that behavior, allowing commits with empty
         messages to be rebased.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --skip
@@ -1143,6 +1145,7 @@ branch on top of the &lt;upstream&gt; branch.  Because of this, when a merge
 conflict happens, the side reported as <em>ours</em> is the so-far rebased
 series, starting with &lt;upstream&gt;, and <em>theirs</em> is the working branch.  In
 other words, the sides are swapped.</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -s &lt;strategy&gt;
@@ -1158,8 +1161,9 @@ other words, the sides are swapped.</p></div>
 </p>
 <div class="paragraph"><p>Because <em>git rebase</em> replays each commit from the working branch
 on top of the &lt;upstream&gt; branch using the given strategy, using
-the <em>ours</em> strategy simply discards all patches from the &lt;branch&gt;,
+the <em>ours</em> strategy simply empties all patches from the &lt;branch&gt;,
 which makes little sense.</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -X &lt;strategy-option&gt;
@@ -1174,6 +1178,7 @@ which makes little sense.</p></div>
         specified, <code>-s recursive</code>.  Note the reversal of <em>ours</em> and
         <em>theirs</em> as noted above for the <code>-m</code> option.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -S[&lt;keyid&gt;]
@@ -1257,23 +1262,28 @@ which makes little sense.</p></div>
         context exist they all must match.  By default no context is
         ever ignored.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
--f
+--no-ff
 </dt>
 <dt class="hdlist1">
 --force-rebase
 </dt>
+<dt class="hdlist1">
+-f
+</dt>
 <dd>
 <p>
-        Force a rebase even if the current branch is up to date and
-        the command without <code>--force</code> would return without doing anything.
+        Individually replay all rebased commits instead of fast-forwarding
+        over the unchanged ones.  This ensures that the entire history of
+        the rebased branch is composed of new commits.
 </p>
-<div class="paragraph"><p>You may find this (or --no-ff with an interactive rebase) helpful after
-reverting a topic branch merge, as this option recreates the topic branch with
-fresh commits so it can be remerged successfully without needing to "revert
-the reversion" (see the
-<a href="howto/revert-a-faulty-merge.html">revert-a-faulty-merge How-To</a> for details).</p></div>
+<div class="paragraph"><p>You may find this helpful after reverting a topic branch merge, as this option
+recreates the topic branch with fresh commits so it can be remerged
+successfully without needing to "revert the reversion" (see the
+<a href="howto/revert-a-faulty-merge.html">revert-a-faulty-merge How-To</a> for
+details).</p></div>
 </dd>
 <dt class="hdlist1">
 --fork-point
@@ -1305,8 +1315,8 @@ default is <code>--no-fork-point</code>, otherwise the default is <code>--fork-p
 <p>
         These flag are passed to the <em>git apply</em> program
         (see <a href="git-apply.html">git-apply(1)</a>) that applies the patch.
-        Incompatible with the --interactive option.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --committer-date-is-author-date
@@ -1318,8 +1328,8 @@ default is <code>--no-fork-point</code>, otherwise the default is <code>--fork-p
 <p>
         These flags are passed to <em>git am</em> to easily change the dates
         of the rebased commits (see <a href="git-am.html">git-am(1)</a>).
-        Incompatible with the --interactive option.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --signoff
@@ -1328,9 +1338,9 @@ default is <code>--no-fork-point</code>, otherwise the default is <code>--fork-p
 <p>
         Add a Signed-off-by: trailer to all the rebased commits. Note
         that if <code>--interactive</code> is given then only commits marked to be
-        picked, edited or reworded will have the trailer added. Incompatible
-        with the <code>--preserve-merges</code> option.
+        picked, edited or reworded will have the trailer added.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -i
@@ -1347,6 +1357,7 @@ default is <code>--no-fork-point</code>, otherwise the default is <code>--fork-p
 <div class="paragraph"><p>The commit list format can be changed by setting the configuration option
 rebase.instructionFormat.  A customized instruction format will automatically
 have the long commit hash prepended to the format.</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -r
@@ -1376,7 +1387,7 @@ reordered, inserted and dropped at will.</p></div>
 <div class="paragraph"><p>It is currently only possible to recreate the merge commits using the
 <code>recursive</code> merge strategy; Different merge strategies can be used only via
 explicit <code>exec git merge -s &lt;strategy&gt; [...]</code> commands.</p></div>
-<div class="paragraph"><p>See also REBASING MERGES below.</p></div>
+<div class="paragraph"><p>See also REBASING MERGES and INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -p
@@ -1393,6 +1404,7 @@ explicit <code>exec git merge -s &lt;strategy&gt; [...]</code> commands.</p></di
 <div class="paragraph"><p>This uses the <code>--interactive</code> machinery internally, but combining it
 with the <code>--interactive</code> option explicitly is generally not a good
 idea unless you know what you are doing (see BUGS below).</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -x &lt;cmd&gt;
@@ -1422,6 +1434,7 @@ the intermediate commits, and will only appear at the end of each
 squash/fixup series.</p></div>
 <div class="paragraph"><p>This uses the <code>--interactive</code> machinery internally, but it can be run
 without an explicit <code>--interactive</code>.</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --root
@@ -1437,6 +1450,7 @@ without an explicit <code>--interactive</code>.</p></div>
         <em>all</em> root commits will be rewritten to have &lt;newbase&gt; as parent
         instead.
 </p>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --autosquash
@@ -1457,10 +1471,10 @@ without an explicit <code>--interactive</code>.</p></div>
         too.  The recommended way to create fixup/squash commits is by using
         the <code>--fixup</code>/<code>--squash</code> options of <a href="git-commit.html">git-commit(1)</a>.
 </p>
-<div class="paragraph"><p>This option is only valid when the <code>--interactive</code> option is used.</p></div>
 <div class="paragraph"><p>If the <code>--autosquash</code> option is enabled by default using the
 configuration variable <code>rebase.autoSquash</code>, this option can be
 used to override and disable this setting.</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 --autostash
@@ -1477,22 +1491,199 @@ used to override and disable this setting.</p></div>
         rebase might result in non-trivial conflicts.
 </p>
 </dd>
-<dt class="hdlist1">
---no-ff
-</dt>
-<dd>
-<p>
-        With --interactive, cherry-pick all rebased commits instead of
-        fast-forwarding over the unchanged ones.  This ensures that the
-        entire history of the rebased branch is composed of new commits.
-</p>
-<div class="paragraph"><p>Without --interactive, this is a synonym for --force-rebase.</p></div>
-<div class="paragraph"><p>You may find this helpful after reverting a topic branch merge, as this option
-recreates the topic branch with fresh commits so it can be remerged
-successfully without needing to "revert the reversion" (see the
-<a href="howto/revert-a-faulty-merge.html">revert-a-faulty-merge How-To</a> for details).</p></div>
-</dd>
 </dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_incompatible_options">INCOMPATIBLE OPTIONS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>git-rebase has many flags that are incompatible with each other,
+predominantly due to the fact that it has three different underlying
+implementations:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+one based on <a href="git-am.html">git-am(1)</a> (the default)
+</p>
+</li>
+<li>
+<p>
+one based on git-merge-recursive (merge backend)
+</p>
+</li>
+<li>
+<p>
+one based on <a href="git-cherry-pick.html">git-cherry-pick(1)</a> (interactive backend)
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Flags only understood by the am backend:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+--committer-date-is-author-date
+</p>
+</li>
+<li>
+<p>
+--ignore-date
+</p>
+</li>
+<li>
+<p>
+--whitespace
+</p>
+</li>
+<li>
+<p>
+--ignore-whitespace
+</p>
+</li>
+<li>
+<p>
+-C
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Flags understood by both merge and interactive backends:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+--merge
+</p>
+</li>
+<li>
+<p>
+--strategy
+</p>
+</li>
+<li>
+<p>
+--strategy-option
+</p>
+</li>
+<li>
+<p>
+--allow-empty-message
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Flags only understood by the interactive backend:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+--[no-]autosquash
+</p>
+</li>
+<li>
+<p>
+--rebase-merges
+</p>
+</li>
+<li>
+<p>
+--preserve-merges
+</p>
+</li>
+<li>
+<p>
+--interactive
+</p>
+</li>
+<li>
+<p>
+--exec
+</p>
+</li>
+<li>
+<p>
+--keep-empty
+</p>
+</li>
+<li>
+<p>
+--autosquash
+</p>
+</li>
+<li>
+<p>
+--edit-todo
+</p>
+</li>
+<li>
+<p>
+--root when used in combination with --onto
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Other incompatible flag pairs:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+--preserve-merges and --interactive
+</p>
+</li>
+<li>
+<p>
+--preserve-merges and --signoff
+</p>
+</li>
+<li>
+<p>
+--preserve-merges and --rebase-merges
+</p>
+</li>
+<li>
+<p>
+--rebase-merges and --strategy
+</p>
+</li>
+<li>
+<p>
+--rebase-merges and --strategy-option
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_behavioral_differences">BEHAVIORAL DIFFERENCES</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+empty commits:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>am-based rebase will drop any "empty" commits, whether the
+commit started empty (had no changes relative to its parent to
+start with) or ended empty (all changes were already applied
+upstream in other commits).</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>merge-based rebase does the same.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>interactive-based rebase will by default drop commits that
+started empty and halt if it hits a commit that ended up empty.
+The `--keep-empty` option exists for interactive rebases to allow
+it to keep commits that started empty.</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+directory rename detection:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>merge-based and interactive-based rebases work fine with
+directory rename detection.  am-based rebases sometimes do not.</code></pre>
+</div></div>
+</li>
+</ul></div>
 </div>
 </div>
 <div class="sect1">
@@ -2263,7 +2454,7 @@ reorder commits tend to produce counterintuitive results. Use
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-07-18 13:16:04 PDT
+ 2018-07-25 15:10:28 PDT
 </div>
 </div>
 </body>
