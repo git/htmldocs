@@ -1894,6 +1894,22 @@ detachedHead
 </p>
 </dd>
 <dt class="hdlist1">
+checkoutAmbiguousRemoteBranchName
+</dt>
+<dd>
+<p>
+                Advice shown when the argument to
+                <a href="git-checkout.html">git-checkout(1)</a> ambiguously resolves to a
+                remote tracking branch on more than one remote in
+                situations where an unambiguous argument would have
+                otherwise caused a remote-tracking branch to be
+                checked out. See the <code>checkout.defaultRemote</code>
+                configuration variable for how to set a given remote
+                to used by default in some situations where this
+                advice would be printed.
+</p>
+</dd>
+<dt class="hdlist1">
 amWorkDir
 </dt>
 <dd>
@@ -2725,12 +2741,15 @@ core.notesRef
 the <code>GIT_NOTES_REF</code> environment variable.  See <a href="git-notes.html">git-notes(1)</a>.</p></div>
 </dd>
 <dt class="hdlist1">
-core.commitGraph
+gc.commitGraph
 </dt>
 <dd>
 <p>
-        Enable git commit graph feature. Allows reading from the
-        commit-graph file.
+        If true, then gc will rewrite the commit-graph file when
+        <a href="git-gc.html">git-gc(1)</a> is run. When using <a href="git-gc.html">git-gc(1)</a>
+        <em>--auto</em> the commit-graph will be updated if housekeeping is
+        required. Default is false. See <a href="git-commit-graph.html">git-commit-graph(1)</a>
+        for details.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3030,6 +3049,26 @@ browser.&lt;tool&gt;.path
 </p>
 </dd>
 <dt class="hdlist1">
+checkout.defaultRemote
+</dt>
+<dd>
+<p>
+        When you run <em>git checkout &lt;something&gt;</em> and only have one
+        remote, it may implicitly fall back on checking out and
+        tracking e.g. <em>origin/&lt;something&gt;</em>. This stops working as soon
+        as you have more than one remote with a <em>&lt;something&gt;</em>
+        reference. This setting allows for setting the name of a
+        preferred remote that should always win when it comes to
+        disambiguation. The typical use-case is to set this to
+        <code>origin</code>.
+</p>
+<div class="paragraph"><p>Currently this is used by <a href="git-checkout.html">git-checkout(1)</a> when <em>git checkout
+&lt;something&gt;</em> will checkout the <em>&lt;something&gt;</em> branch on another remote,
+and by <a href="git-worktree.html">git-worktree(1)</a> when <em>git worktree add</em> refers to a
+remote branch. This setting might be used for other checkout-like
+commands or functionality in the future.</p></div>
+</dd>
+<dt class="hdlist1">
 clean.requireForce
 </dt>
 <dd>
@@ -3109,6 +3148,16 @@ diff.colorMoved
         see <em>--color-moved</em> in <a href="git-diff.html">git-diff(1)</a>. If simply set to
         true the default color mode will be used. When set to false,
         moved lines are not colored.
+</p>
+</dd>
+<dt class="hdlist1">
+diff.colorMovedWS
+</dt>
+<dd>
+<p>
+        When moved lines are colored using e.g. the <code>diff.colorMoved</code> setting,
+        this option controls the <code>&lt;mode&gt;</code> how spaces are treated
+        for details of valid modes see <em>--color-moved-ws</em> in <a href="git-diff.html">git-diff(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4333,6 +4382,20 @@ fetch.output
         Control how ref update status is printed. Valid values are
         <code>full</code> and <code>compact</code>. Default value is <code>full</code>. See section
         OUTPUT in <a href="git-fetch.html">git-fetch(1)</a> for detail.
+</p>
+</dd>
+<dt class="hdlist1">
+fetch.negotiationAlgorithm
+</dt>
+<dd>
+<p>
+        Control how information about the commits in the local repository is
+        sent when negotiating the contents of the packfile to be sent by the
+        server. Set to "skipping" to use an algorithm that skips commits in an
+        effort to converge faster, but may result in a larger-than-necessary
+        packfile; any other value instructs Git to use the default algorithm
+        that never skips commits (unless the server has acknowledged it or one
+        of its descendants).
 </p>
 </dd>
 <dt class="hdlist1">
