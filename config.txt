@@ -462,10 +462,20 @@ core.untrackedCache::
 	See linkgit:git-update-index[1]. `keep` by default.
 
 core.checkStat::
-	Determines which stat fields to match between the index
-	and work tree. The user can set this to 'default' or
-	'minimal'. Default (or explicitly 'default'), is to check
-	all fields, including the sub-second part of mtime and ctime.
+	When missing or is set to `default`, many fields in the stat
+	structure are checked to detect if a file has been modified
+	since Git looked at it.  When this configuration variable is
+	set to `minimal`, sub-second part of mtime and ctime, the
+	uid and gid of the owner of the file, the inode number (and
+	the device number, if Git was compiled to use it), are
+	excluded from the check among these fields, leaving only the
+	whole-second part of mtime (and ctime, if `core.trustCtime`
+	is set) and the filesize to be checked.
++
+There are implementations of Git that do not leave usable values in
+some fields (e.g. JGit); by excluding these fields from the
+comparison, the `minimal` mode may help interoperability when the
+same repository is used by these other systems at the same time.
 
 core.quotePath::
 	Commands that output paths (e.g. 'ls-files', 'diff'), will
@@ -917,12 +927,10 @@ core.notesRef::
 This setting defaults to "refs/notes/commits", and it can be overridden by
 the `GIT_NOTES_REF` environment variable.  See linkgit:git-notes[1].
 
-gc.commitGraph::
-	If true, then gc will rewrite the commit-graph file when
-	linkgit:git-gc[1] is run. When using linkgit:git-gc[1]
-	'--auto' the commit-graph will be updated if housekeeping is
-	required. Default is false. See linkgit:git-commit-graph[1]
-	for details.
+core.commitGraph::
+	If true, then git will read the commit-graph file (if it exists)
+	to parse the graph structure of commits. Defaults to false. See
+	linkgit:git-commit-graph[1] for more information.
 
 core.useReplaceRefs::
 	If set to `false`, behave as if the `--no-replace-objects`
@@ -1043,6 +1051,12 @@ branch.autoSetupRebase::
 	See "branch.autoSetupMerge" for details on how to set up a
 	branch to track another branch.
 	This option defaults to never.
+
+branch.sort::
+	This variable controls the sort ordering of branches when displayed by
+	linkgit:git-branch[1]. Without the "--sort=<value>" option provided, the
+	value of this variable will be used as the default.
+	See linkgit:git-for-each-ref[1] field names for valid values.
 
 branch.<name>.remote::
 	When on branch <name>, it tells 'git fetch' and 'git push'
@@ -1202,18 +1216,6 @@ color.diff::
 This does not affect linkgit:git-format-patch[1] or the
 'git-diff-{asterisk}' plumbing commands.  Can be overridden on the
 command line with the `--color[=<when>]` option.
-
-diff.colorMoved::
-	If set to either a valid `<mode>` or a true value, moved lines
-	in a diff are colored differently, for details of valid modes
-	see '--color-moved' in linkgit:git-diff[1]. If simply set to
-	true the default color mode will be used. When set to false,
-	moved lines are not colored.
-
-diff.colorMovedWS::
-	When moved lines are colored using e.g. the `diff.colorMoved` setting,
-	this option controls the `<mode>` how spaces are treated
-	for details of valid modes see '--color-moved-ws' in linkgit:git-diff[1].
 
 color.diff.<slot>::
 	Use customized color for diff colorization.  `<slot>` specifies
@@ -1762,6 +1764,13 @@ Note that if the number of kept packs is more than gc.autoPackLimit,
 this configuration variable is ignored, all packs except the base pack
 will be repacked. After this the number of packs should go below
 gc.autoPackLimit and gc.bigPackThreshold should be respected again.
+
+gc.writeCommitGraph::
+	If true, then gc will rewrite the commit-graph file when
+	linkgit:git-gc[1] is run. When using linkgit:git-gc[1]
+	'--auto' the commit-graph will be updated if housekeeping is
+	required. Default is false. See linkgit:git-commit-graph[1]
+	for details.
 
 gc.logExpiry::
 	If the file gc.log exists, then `git gc --auto` won't run

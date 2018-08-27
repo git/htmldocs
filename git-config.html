@@ -2097,11 +2097,20 @@ core.checkStat
 </dt>
 <dd>
 <p>
-        Determines which stat fields to match between the index
-        and work tree. The user can set this to <em>default</em> or
-        <em>minimal</em>. Default (or explicitly <em>default</em>), is to check
-        all fields, including the sub-second part of mtime and ctime.
+        When missing or is set to <code>default</code>, many fields in the stat
+        structure are checked to detect if a file has been modified
+        since Git looked at it.  When this configuration variable is
+        set to <code>minimal</code>, sub-second part of mtime and ctime, the
+        uid and gid of the owner of the file, the inode number (and
+        the device number, if Git was compiled to use it), are
+        excluded from the check among these fields, leaving only the
+        whole-second part of mtime (and ctime, if <code>core.trustCtime</code>
+        is set) and the filesize to be checked.
 </p>
+<div class="paragraph"><p>There are implementations of Git that do not leave usable values in
+some fields (e.g. JGit); by excluding these fields from the
+comparison, the <code>minimal</code> mode may help interoperability when the
+same repository is used by these other systems at the same time.</p></div>
 </dd>
 <dt class="hdlist1">
 core.quotePath
@@ -2741,15 +2750,13 @@ core.notesRef
 the <code>GIT_NOTES_REF</code> environment variable.  See <a href="git-notes.html">git-notes(1)</a>.</p></div>
 </dd>
 <dt class="hdlist1">
-gc.commitGraph
+core.commitGraph
 </dt>
 <dd>
 <p>
-        If true, then gc will rewrite the commit-graph file when
-        <a href="git-gc.html">git-gc(1)</a> is run. When using <a href="git-gc.html">git-gc(1)</a>
-        <em>--auto</em> the commit-graph will be updated if housekeeping is
-        required. Default is false. See <a href="git-commit-graph.html">git-commit-graph(1)</a>
-        for details.
+        If true, then git will read the commit-graph file (if it exists)
+        to parse the graph structure of commits. Defaults to false. See
+        <a href="git-commit-graph.html">git-commit-graph(1)</a> for more information.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2950,6 +2957,17 @@ branch.autoSetupRebase
         See "branch.autoSetupMerge" for details on how to set up a
         branch to track another branch.
         This option defaults to never.
+</p>
+</dd>
+<dt class="hdlist1">
+branch.sort
+</dt>
+<dd>
+<p>
+        This variable controls the sort ordering of branches when displayed by
+        <a href="git-branch.html">git-branch(1)</a>. Without the "--sort=&lt;value&gt;" option provided, the
+        value of this variable will be used as the default.
+        See <a href="git-for-each-ref.html">git-for-each-ref(1)</a> field names for valid values.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3186,28 +3204,6 @@ color.diff
 <div class="paragraph"><p>This does not affect <a href="git-format-patch.html">git-format-patch(1)</a> or the
 <em>git-diff-&#42;</em> plumbing commands.  Can be overridden on the
 command line with the <code>--color[=&lt;when&gt;]</code> option.</p></div>
-</dd>
-<dt class="hdlist1">
-diff.colorMoved
-</dt>
-<dd>
-<p>
-        If set to either a valid <code>&lt;mode&gt;</code> or a true value, moved lines
-        in a diff are colored differently, for details of valid modes
-        see <em>--color-moved</em> in <a href="git-diff.html">git-diff(1)</a>. If simply set to
-        true the default color mode will be used. When set to false,
-        moved lines are not colored.
-</p>
-</dd>
-<dt class="hdlist1">
-diff.colorMovedWS
-</dt>
-<dd>
-<p>
-        When moved lines are colored using e.g. the <code>diff.colorMoved</code> setting,
-        this option controls the <code>&lt;mode&gt;</code> how spaces are treated
-        for details of valid modes see <em>--color-moved-ws</em> in <a href="git-diff.html">git-diff(1)</a>.
-</p>
 </dd>
 <dt class="hdlist1">
 color.diff.&lt;slot&gt;
@@ -4300,6 +4296,28 @@ diff.wsErrorHighlight
 </p>
 </dd>
 <dt class="hdlist1">
+diff.colorMoved
+</dt>
+<dd>
+<p>
+        If set to either a valid <code>&lt;mode&gt;</code> or a true value, moved lines
+        in a diff are colored differently, for details of valid modes
+        see <em>--color-moved</em> in <a href="git-diff.html">git-diff(1)</a>. If simply set to
+        true the default color mode will be used. When set to false,
+        moved lines are not colored.
+</p>
+</dd>
+<dt class="hdlist1">
+diff.colorMovedWS
+</dt>
+<dd>
+<p>
+        When moved lines are colored using e.g. the <code>diff.colorMoved</code> setting,
+        this option controls the <code>&lt;mode&gt;</code> how spaces are treated
+        for details of valid modes see <em>--color-moved-ws</em> in <a href="git-diff.html">git-diff(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
 difftool.&lt;tool&gt;.path
 </dt>
 <dd>
@@ -4762,6 +4780,18 @@ gc.bigPackThreshold
 this configuration variable is ignored, all packs except the base pack
 will be repacked. After this the number of packs should go below
 gc.autoPackLimit and gc.bigPackThreshold should be respected again.</p></div>
+</dd>
+<dt class="hdlist1">
+gc.writeCommitGraph
+</dt>
+<dd>
+<p>
+        If true, then gc will rewrite the commit-graph file when
+        <a href="git-gc.html">git-gc(1)</a> is run. When using <a href="git-gc.html">git-gc(1)</a>
+        <em>--auto</em> the commit-graph will be updated if housekeeping is
+        required. Default is false. See <a href="git-commit-graph.html">git-commit-graph(1)</a>
+        for details.
+</p>
 </dd>
 <dt class="hdlist1">
 gc.logExpiry
