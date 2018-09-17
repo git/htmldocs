@@ -2770,6 +2770,16 @@ core.useReplaceRefs
 </p>
 </dd>
 <dt class="hdlist1">
+core.multiPackIndex
+</dt>
+<dd>
+<p>
+        Use the multi-pack-index file to track multiple packfiles using a
+        single index. See <a href="technical/multi-pack-index.html">the
+        multi-pack-index design document</a>.
+</p>
+</dd>
+<dt class="hdlist1">
 core.sparseCheckout
 </dt>
 <dd>
@@ -3106,6 +3116,15 @@ and by <a href="git-worktree.html">git-worktree(1)</a> when <em>git worktree add
 remote branch. This setting might be used for other checkout-like
 commands or functionality in the future.</p></div>
 </dd>
+</dl></div>
+<div class="paragraph"><p>checkout.optimizeNewBranch
+        Optimizes the performance of "git checkout -b &lt;new_branch&gt;" when
+        using sparse-checkout.  When set to true, git will not update the
+        repo based on the current sparse-checkout settings.  This means it
+        will not update the skip-worktree bit in the index nor add/remove
+        files in the working directory to reflect the current sparse checkout
+        settings nor will it show the local changes.</p></div>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 clean.requireForce
 </dt>
@@ -6716,6 +6735,31 @@ all existing objects. You can force recompression by passing the -F option
 to <a href="git-repack.html">git-repack(1)</a>.</p></div>
 </dd>
 <dt class="hdlist1">
+pack.island
+</dt>
+<dd>
+<p>
+        An extended regular expression configuring a set of delta
+        islands. See "DELTA ISLANDS" in <a href="git-pack-objects.html">git-pack-objects(1)</a>
+        for details.
+</p>
+</dd>
+<dt class="hdlist1">
+pack.islandCore
+</dt>
+<dd>
+<p>
+        Specify an island name which gets to have its objects be
+        packed first. This creates a kind of pseudo-pack at the front
+        of one pack, so that the objects from the specified island are
+        hopefully faster to copy into any pack that should be served
+        to a user requesting these objects. In practice this means
+        that the island specified should likely correspond to what is
+        the most commonly cloned in the repo. See also "DELTA ISLANDS"
+        in <a href="git-pack-objects.html">git-pack-objects(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
 pack.deltaCacheSize
 </dt>
 <dd>
@@ -7655,6 +7699,15 @@ repack.packKeptObjects
         details. Defaults to <code>false</code> normally, but <code>true</code> if a bitmap
         index is being written (either via <code>--write-bitmap-index</code> or
         <code>repack.writeBitmaps</code>).
+</p>
+</dd>
+<dt class="hdlist1">
+repack.useDeltaIslands
+</dt>
+<dd>
+<p>
+        If set to true, makes <code>git repack</code> act as if <code>--delta-islands</code>
+        was passed. Defaults to <code>false</code>.
 </p>
 </dd>
 <dt class="hdlist1">

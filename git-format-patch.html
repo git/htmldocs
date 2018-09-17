@@ -763,6 +763,8 @@ git-format-patch(1) Manual Page
                    [(--reroll-count|-v) &lt;n&gt;]
                    [--to=&lt;email&gt;] [--cc=&lt;email&gt;]
                    [--[no-]cover-letter] [--quiet] [--notes[=&lt;ref&gt;]]
+                   [--interdiff=&lt;previous&gt;]
+                   [--range-diff=&lt;previous&gt; [--creation-factor=&lt;percent&gt;]]
                    [--progress]
                    [&lt;common diff options&gt;]
                    [ &lt;since&gt; | &lt;revision range&gt; ]</pre>
@@ -1757,6 +1759,48 @@ feeding the result to <code>git send-email</code>.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--interdiff=&lt;previous&gt;
+</dt>
+<dd>
+<p>
+        As a reviewer aid, insert an interdiff into the cover letter,
+        or as commentary of the lone patch of a 1-patch series, showing
+        the differences between the previous version of the patch series and
+        the series currently being formatted. <code>previous</code> is a single revision
+        naming the tip of the previous series which shares a common base with
+        the series being formatted (for example <code>git format-patch
+        --cover-letter --interdiff=feature/v1 -3 feature/v2</code>).
+</p>
+</dd>
+<dt class="hdlist1">
+--range-diff=&lt;previous&gt;
+</dt>
+<dd>
+<p>
+        As a reviewer aid, insert a range-diff (see <a href="git-range-diff.html">git-range-diff(1)</a>)
+        into the cover letter, or as commentary of the lone patch of a
+        1-patch series, showing the differences between the previous
+        version of the patch series and the series currently being formatted.
+        <code>previous</code> can be a single revision naming the tip of the previous
+        series if it shares a common base with the series being formatted (for
+        example <code>git format-patch --cover-letter --range-diff=feature/v1 -3
+        feature/v2</code>), or a revision range if the two versions of the series are
+        disjoint (for example <code>git format-patch --cover-letter
+        --range-diff=feature/v1~3..feature/v1 -3 feature/v2</code>).
+</p>
+</dd>
+<dt class="hdlist1">
+--creation-factor=&lt;percent&gt;
+</dt>
+<dd>
+<p>
+        Used with <code>--range-diff</code>, tweak the heuristic which matches up commits
+        between the previous and current series of patches by adjusting the
+        creation/deletion cost fudge factor. See <a href="git-range-diff.html">git-range-diff(1)</a>)
+        for details.
+</p>
+</dd>
+<dt class="hdlist1">
 --notes[=&lt;ref&gt;]
 </dt>
 <dd>
@@ -2312,7 +2356,7 @@ as e-mailable patches:
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-05-08 00:51:20 PDT
+ 2018-09-17 15:45:24 PDT
 </div>
 </div>
 </body>
