@@ -2593,17 +2593,6 @@ core.packedRefsTimeout
 </p>
 </dd>
 <dt class="hdlist1">
-sequence.editor
-</dt>
-<dd>
-<p>
-        Text editor used by <code>git rebase -i</code> for editing the rebase instruction file.
-        The value is meant to be interpreted by the shell when it is used.
-        It can be overridden by the <code>GIT_SEQUENCE_EDITOR</code> environment variable.
-        When not configured the default commit message editor is used instead.
-</p>
-</dd>
-<dt class="hdlist1">
 core.pager
 </dt>
 <dd>
@@ -4721,13 +4710,16 @@ fsck.skipList
 </dt>
 <dd>
 <p>
-        The path to a sorted list of object names (i.e. one SHA-1 per
+        The path to a list of object names (i.e. one unabbreviated SHA-1 per
         line) that are known to be broken in a non-fatal way and should
-        be ignored. This feature is useful when an established project
-        should be accepted despite early commits containing errors that
-        can be safely ignored such as invalid committer email addresses.
-        Note: corrupt objects cannot be skipped with this setting.
+        be ignored. On versions of Git 2.20 and later comments (<em>#</em>), empty
+        lines, and any leading and trailing whitespace is ignored. Everything
+        but a SHA-1 per line will error out on older versions.
 </p>
+<div class="paragraph"><p>This feature is useful when an established project should be accepted
+despite early commits containing errors that can be safely ignored
+such as invalid committer email addresses.  Note: corrupt objects
+cannot be skipped with this setting.</p></div>
 <div class="paragraph"><p>Like <code>fsck.&lt;msg-id&gt;</code> this variable has corresponding
 <code>receive.fsck.skipList</code> and <code>fetch.fsck.skipList</code> variants.</p></div>
 <div class="paragraph"><p>Unlike variables like <code>color.ui</code> and <code>core.editor</code> the
@@ -4735,6 +4727,14 @@ fsck.skipList
 fall back on the <code>fsck.skipList</code> configuration if they aren&#8217;t set. To
 uniformly configure the same fsck settings in different circumstances
 all three of them they must all set to the same values.</p></div>
+<div class="paragraph"><p>Older versions of Git (before 2.20) documented that the object names
+list should be sorted. This was never a requirement, the object names
+could appear in any order, but when reading the list we tracked whether
+the list was sorted for the purposes of an internal binary search
+implementation, which could save itself some work with an already sorted
+list. Unless you had a humongous list there was no reason to go out of
+your way to pre-sort the list. After Git version 2.20 a hash implementation
+is used instead, so there&#8217;s now no reason to pre-sort the list.</p></div>
 </dd>
 <dt class="hdlist1">
 gc.aggressiveDepth
@@ -7916,7 +7916,18 @@ sendemail.smtpReloginDelay
 </p>
 </dd>
 <dt class="hdlist1">
-showbranch.default
+sequence.editor
+</dt>
+<dd>
+<p>
+        Text editor used by <code>git rebase -i</code> for editing the rebase instruction file.
+        The value is meant to be interpreted by the shell when it is used.
+        It can be overridden by the <code>GIT_SEQUENCE_EDITOR</code> environment variable.
+        When not configured the default commit message editor is used instead.
+</p>
+</dd>
+<dt class="hdlist1">
+showBranch.default
 </dt>
 <dd>
 <p>
@@ -8666,7 +8677,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-08-20 13:12:02 PDT
+ 2018-08-21 05:12:02 JST
 </div>
 </div>
 </body>
