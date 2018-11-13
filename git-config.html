@@ -786,12 +786,14 @@ outgoing values are canonicalize-able under the given &lt;type&gt;.  If no
 unset an existing <code>--type</code> specifier with <code>--no-type</code>.</p></div>
 <div class="paragraph"><p>When reading, the values are read from the system, global and
 repository local configuration files by default, and options
-<code>--system</code>, <code>--global</code>, <code>--local</code> and <code>--file &lt;filename&gt;</code> can be
-used to tell the command to read from only that location (see <a href="#FILES">[FILES]</a>).</p></div>
+<code>--system</code>, <code>--global</code>, <code>--local</code>, <code>--worktree</code> and
+<code>--file &lt;filename&gt;</code> can be used to tell the command to read from only
+that location (see <a href="#FILES">[FILES]</a>).</p></div>
 <div class="paragraph"><p>When writing, the new value is written to the repository local
 configuration file by default, and options <code>--system</code>, <code>--global</code>,
-<code>--file &lt;filename&gt;</code> can be used to tell the command to write to
-that location (you can say <code>--local</code> but that is the default).</p></div>
+<code>--worktree</code>, <code>--file &lt;filename&gt;</code> can be used to tell the command to
+write to that location (you can say <code>--local</code> but that is the
+default).</p></div>
 <div class="paragraph"><p>This command will fail with non-zero status upon error.  Some exit
 codes are:</p></div>
 <div class="ulist"><ul>
@@ -938,6 +940,16 @@ rather than from all available files.</p></div>
 <div class="paragraph"><p>For reading options: read only from the repository <code>.git/config</code> rather than
 from all available files.</p></div>
 <div class="paragraph"><p>See also <a href="#FILES">[FILES]</a>.</p></div>
+</dd>
+<dt class="hdlist1">
+--worktree
+</dt>
+<dd>
+<p>
+        Similar to <code>--local</code> except that <code>.git/config.worktree</code> is
+        read from or written to if <code>extensions.worktreeConfig</code> is
+        present. If not it&#8217;s the same as <code>--local</code>.
+</p>
 </dd>
 <dt class="hdlist1">
 -f config-file
@@ -1239,6 +1251,15 @@ $GIT_DIR/config
         Repository specific configuration file.
 </p>
 </dd>
+<dt class="hdlist1">
+$GIT_DIR/config.worktree
+</dt>
+<dd>
+<p>
+        This is optional and is only searched when
+        <code>extensions.worktreeConfig</code> is present in $GIT_DIR/config.
+</p>
+</dd>
 </dl></div>
 <div class="paragraph"><p>If no further options are given, all reading options will read all of these
 files that are available. If the global or the system-wide configuration
@@ -1254,9 +1275,10 @@ command by using the <code>-c</code> option. See <a href="git.html">git(1)</a> f
 configuration file. Note that this also affects options like <code>--replace-all</code>
 and <code>--unset</code>. <strong><em>git config</em> will only ever change one file at a time</strong>.</p></div>
 <div class="paragraph"><p>You can override these rules either by command-line options or by environment
-variables. The <code>--global</code> and the <code>--system</code> options will limit the file used
-to the global or system-wide file respectively. The <code>GIT_CONFIG</code> environment
-variable has a similar effect, but you can specify any filename you want.</p></div>
+variables. The <code>--global</code>, <code>--system</code> and <code>--worktree</code> options will limit
+the file used to the global, system-wide or per-worktree file respectively.
+The <code>GIT_CONFIG</code> environment variable has a similar effect, but you
+can specify any filename you want.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1417,8 +1439,9 @@ http.sslverify false</code></pre>
 <h2 id="_configuration_file">CONFIGURATION FILE</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The Git configuration file contains a number of variables that affect
-the Git commands' behavior. The <code>.git/config</code> file in each repository
-is used to store the configuration for that repository, and
+the Git commands' behavior. The files <code>.git/config</code> and optionally
+<code>config.worktree</code> (see <code>extensions.worktreeConfig</code> below) in each
+repository are used to store the configuration for that repository, and
 <code>$HOME/.gitconfig</code> is used to store a per-user configuration as
 fallback values for the <code>.git/config</code> file. The file <code>/etc/gitconfig</code>
 can be used to store a system-wide default configuration.</p></div>
@@ -1862,6 +1885,16 @@ commitBeforeMerge
 <p>
                 Advice shown when <a href="git-merge.html">git-merge(1)</a> refuses to
                 merge to avoid overwriting local changes.
+</p>
+</dd>
+<dt class="hdlist1">
+resetQuiet
+</dt>
+<dd>
+<p>
+                Advice to consider using the <code>--quiet</code> option to <a href="git-reset.html">git-reset(1)</a>
+                when the command takes more than 2 seconds to enumerate unstaged
+                changes after reset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2740,6 +2773,17 @@ index comparison to the filesystem data in parallel, allowing
 overlapping IO&#8217;s.  Defaults to true.</p></div>
 </dd>
 <dt class="hdlist1">
+core.unsetenvvars
+</dt>
+<dd>
+<p>
+        Windows-only: comma-separated list of environment variables'
+        names that need to be unset before spawning any other process.
+        Defaults to <code>PERL5LIB</code> to account for the fact that Git for
+        Windows insists on using its own Perl interpreter.
+</p>
+</dd>
+<dt class="hdlist1">
 core.createObject
 </dt>
 <dd>
@@ -2815,6 +2859,18 @@ core.abbrev
         in your repository, which hopefully is enough for
         abbreviated object names to stay unique for some time.
         The minimum length is 4.
+</p>
+</dd>
+<dt class="hdlist1">
+extensions.worktreeConfig
+</dt>
+<dd>
+<p>
+        If set, by default "git config" reads from both "config" and
+        "config.worktree" file from GIT_DIR in that order. In
+        multiple working directory mode, "config" file is shared while
+        "config.worktree" is per-working directory (i.e., it&#8217;s in
+        GIT_COMMON_DIR/worktrees/&lt;id&gt;/config.worktree)
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5970,57 +6026,6 @@ matched against are those given directly to Git commands.  This means any URLs
 visited as a result of a redirection do not participate in matching.</p></div>
 </dd>
 <dt class="hdlist1">
-ssh.variant
-</dt>
-<dd>
-<p>
-        By default, Git determines the command line arguments to use
-        based on the basename of the configured SSH command (configured
-        using the environment variable <code>GIT_SSH</code> or <code>GIT_SSH_COMMAND</code> or
-        the config setting <code>core.sshCommand</code>). If the basename is
-        unrecognized, Git will attempt to detect support of OpenSSH
-        options by first invoking the configured SSH command with the
-        <code>-G</code> (print configuration) option and will subsequently use
-        OpenSSH options (if that is successful) or no options besides
-        the host and remote command (if it fails).
-</p>
-<div class="paragraph"><p>The config variable <code>ssh.variant</code> can be set to override this detection.
-Valid values are <code>ssh</code> (to use OpenSSH options), <code>plink</code>, <code>putty</code>,
-<code>tortoiseplink</code>, <code>simple</code> (no options except the host and remote command).
-The default auto-detection can be explicitly requested using the value
-<code>auto</code>.  Any other value is treated as <code>ssh</code>.  This setting can also be
-overridden via the environment variable <code>GIT_SSH_VARIANT</code>.</p></div>
-<div class="paragraph"><p>The current command-line parameters used for each variant are as
-follows:</p></div>
-<div class="openblock">
-<div class="content">
-<div class="ulist"><ul>
-<li>
-<p>
-<code>ssh</code> - [-p port] [-4] [-6] [-o option] [username@]host command
-</p>
-</li>
-<li>
-<p>
-<code>simple</code> - [username@]host command
-</p>
-</li>
-<li>
-<p>
-<code>plink</code> or <code>putty</code> - [-P port] [-4] [-6] [username@]host command
-</p>
-</li>
-<li>
-<p>
-<code>tortoiseplink</code> - [-P port] [-4] [-6] -batch [username@]host command
-</p>
-</li>
-</ul></div>
-</div></div>
-<div class="paragraph"><p>Except for the <code>simple</code> variant, command-line parameters are likely to
-change as git gains new features.</p></div>
-</dd>
-<dt class="hdlist1">
 i18n.commitEncoding
 </dt>
 <dd>
@@ -6042,12 +6047,93 @@ i18n.logOutputEncoding
 </p>
 </dd>
 <dt class="hdlist1">
-imap
+imap.folder
 </dt>
 <dd>
 <p>
-        The configuration variables in the <em>imap</em> section are described
-        in <a href="git-imap-send.html">git-imap-send(1)</a>.
+        The folder to drop the mails into, which is typically the Drafts
+        folder. For example: "INBOX.Drafts", "INBOX/Drafts" or
+        "[Gmail]/Drafts". Required.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.tunnel
+</dt>
+<dd>
+<p>
+        Command used to setup a tunnel to the IMAP server through which
+        commands will be piped instead of using a direct network connection
+        to the server. Required when imap.host is not set.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.host
+</dt>
+<dd>
+<p>
+        A URL identifying the server. Use an <code>imap://</code> prefix for non-secure
+        connections and an <code>imaps://</code> prefix for secure connections.
+        Ignored when imap.tunnel is set, but required otherwise.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.user
+</dt>
+<dd>
+<p>
+        The username to use when logging in to the server.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.pass
+</dt>
+<dd>
+<p>
+        The password to use when logging in to the server.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.port
+</dt>
+<dd>
+<p>
+        An integer port number to connect to on the server.
+        Defaults to 143 for imap:// hosts and 993 for imaps:// hosts.
+        Ignored when imap.tunnel is set.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.sslverify
+</dt>
+<dd>
+<p>
+        A boolean to enable/disable verification of the server certificate
+        used by the SSL/TLS connection. Default is <code>true</code>. Ignored when
+        imap.tunnel is set.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.preformattedHTML
+</dt>
+<dd>
+<p>
+        A boolean to enable/disable the use of html encoding when sending
+        a patch.  An html encoded patch will be bracketed with &lt;pre&gt;
+        and have a content type of text/html.  Ironically, enabling this
+        option causes Thunderbird to send the patch as a plain/text,
+        format=fixed email.  Default is <code>false</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+imap.authMethod
+</dt>
+<dd>
+<p>
+        Specify authenticate method for authentication with IMAP server.
+        If Git was built with the NO_CURL option, or if your curl version is older
+        than 7.34.0, or if you&#8217;re running git-imap-send with the <code>--no-curl</code>
+        option, the only supported method is <em>CRAM-MD5</em>. If this is not set
+        then <em>git imap-send</em> uses the basic IMAP plaintext LOGIN command.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -7857,6 +7943,14 @@ rerere.enabled
 </p>
 </dd>
 <dt class="hdlist1">
+reset.quiet
+</dt>
+<dd>
+<p>
+        When set to true, <em>git reset</em> will default to the <em>--quiet</em> option.
+</p>
+</dd>
+<dt class="hdlist1">
 sendemail.identity
 </dt>
 <dd>
@@ -8069,6 +8163,57 @@ splitIndex.sharedIndexExpire
         either created based on it or read from it.
         See <a href="git-update-index.html">git-update-index(1)</a>.
 </p>
+</dd>
+<dt class="hdlist1">
+ssh.variant
+</dt>
+<dd>
+<p>
+        By default, Git determines the command line arguments to use
+        based on the basename of the configured SSH command (configured
+        using the environment variable <code>GIT_SSH</code> or <code>GIT_SSH_COMMAND</code> or
+        the config setting <code>core.sshCommand</code>). If the basename is
+        unrecognized, Git will attempt to detect support of OpenSSH
+        options by first invoking the configured SSH command with the
+        <code>-G</code> (print configuration) option and will subsequently use
+        OpenSSH options (if that is successful) or no options besides
+        the host and remote command (if it fails).
+</p>
+<div class="paragraph"><p>The config variable <code>ssh.variant</code> can be set to override this detection.
+Valid values are <code>ssh</code> (to use OpenSSH options), <code>plink</code>, <code>putty</code>,
+<code>tortoiseplink</code>, <code>simple</code> (no options except the host and remote command).
+The default auto-detection can be explicitly requested using the value
+<code>auto</code>.  Any other value is treated as <code>ssh</code>.  This setting can also be
+overridden via the environment variable <code>GIT_SSH_VARIANT</code>.</p></div>
+<div class="paragraph"><p>The current command-line parameters used for each variant are as
+follows:</p></div>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+<code>ssh</code> - [-p port] [-4] [-6] [-o option] [username@]host command
+</p>
+</li>
+<li>
+<p>
+<code>simple</code> - [username@]host command
+</p>
+</li>
+<li>
+<p>
+<code>plink</code> or <code>putty</code> - [-P port] [-4] [-6] [username@]host command
+</p>
+</li>
+<li>
+<p>
+<code>tortoiseplink</code> - [-P port] [-4] [-6] -batch [username@]host command
+</p>
+</li>
+</ul></div>
+</div></div>
+<div class="paragraph"><p>Except for the <code>simple</code> variant, command-line parameters are likely to
+change as git gains new features.</p></div>
 </dd>
 <dt class="hdlist1">
 status.relativePaths
@@ -8777,7 +8922,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-10-16 16:37:05 JST
+ 2018-11-13 23:05:48 JST
 </div>
 </div>
 </body>
