@@ -821,6 +821,36 @@ update some ref at the destination with <code>&lt;src&gt;</code> with
 be omitted&#8212;such a push will update a ref that <code>&lt;src&gt;</code> normally updates
 without any <code>&lt;refspec&gt;</code> on the command line.  Otherwise, missing
 <code>:&lt;dst&gt;</code> means to update the same ref as the <code>&lt;src&gt;</code>.</p></div>
+<div class="paragraph"><p>If &lt;dst&gt; doesn&#8217;t start with <code>refs/</code> (e.g. <code>refs/heads/master</code>) we will
+try to infer where in <code>refs/*</code> on the destination &lt;repository&gt; it
+belongs based on the the type of &lt;src&gt; being pushed and whether &lt;dst&gt;
+is ambiguous.</p></div>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+If &lt;dst&gt; unambiguously refers to a ref on the &lt;repository&gt; remote,
+  then push to that ref.
+</p>
+</li>
+<li>
+<p>
+If &lt;src&gt; resolves to a ref starting with refs/heads/ or refs/tags/,
+  then prepend that to &lt;dst&gt;.
+</p>
+</li>
+<li>
+<p>
+Other ambiguity resolutions might be added in the future, but for
+  now any other cases will error out with an error indicating what we
+  tried, and depending on the <code>advice.pushUnqualifiedRefname</code>
+  configuration (see <a href="git-config.html">git-config(1)</a>) suggest what refs/
+  namespace you may have wanted to push to.
+</p>
+</li>
+</ul></div>
+</div></div>
 <div class="paragraph"><p>The object referenced by &lt;src&gt; is used to update the &lt;dst&gt; reference
 on the remote side. Whether this is allowed depends on where in
 <code>refs/*</code> the &lt;dst&gt; reference lives as described in detail below, in
@@ -1789,6 +1819,8 @@ the ones in the examples below) can be configured as the default for
         <code>refs/remotes/satellite/master</code>) in the <code>mothership</code> repository;
         do the same for <code>dev</code> and <code>satellite/dev</code>.
 </p>
+<div class="paragraph"><p>See the section describing <code>&lt;refspec&gt;...</code> above for a discussion of
+the matching semantics.</p></div>
 <div class="paragraph"><p>This is to emulate <code>git fetch</code> run on the <code>mothership</code> using <code>git
 push</code> that is run in the opposite direction in order to integrate
 the work done on <code>satellite</code>, and is often necessary when you can
@@ -1912,7 +1944,7 @@ As in #1, the attacker chooses an object ID X to steal. The victim sends
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-09-21 06:53:21 JST
+ 2019-01-04 14:31:36 PST
 </div>
 </div>
 </body>

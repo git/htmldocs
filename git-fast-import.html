@@ -792,9 +792,10 @@ the frontend program in use.</p></div>
 </dt>
 <dd>
 <p>
-        Disable all non-fatal output, making fast-import silent when it
-        is successful.  This option disables the output shown by
-        --stats.
+        Disable the output shown by --stats, making fast-import usually
+        be silent when it is successful.  However, if the import stream
+        has directives intended to show user output (e.g. <code>progress</code>
+        directives), the corresponding messages will still be shown.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1282,6 +1283,7 @@ change to the project.</p></div>
 <div class="content">
 <pre><code>        'commit' SP &lt;ref&gt; LF
         mark?
+        original-oid?
         ('author' (SP &lt;name&gt;)? SP LT &lt;email&gt; GT SP &lt;when&gt; LF)?
         'committer' (SP &lt;name&gt;)? SP LT &lt;email&gt; GT SP &lt;when&gt; LF
         data
@@ -1683,6 +1685,18 @@ to another object simply by reusing the same <code>&lt;idnum&gt;</code> in anoth
 <code>mark</code> command.</p></div>
 </div>
 <div class="sect2">
+<h3 id="_code_original_oid_code"><code>original-oid</code></h3>
+<div class="paragraph"><p>Provides the name of the object in the original source control system.
+fast-import will simply ignore this directive, but filter processes
+which operate on and modify the stream before feeding to fast-import
+may have uses for this information</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>        'original-oid' SP &lt;object-identifier&gt; LF</code></pre>
+</div></div>
+<div class="paragraph"><p>where <code>&lt;object-identifer&gt;</code> is any string not containing LF.</p></div>
+</div>
+<div class="sect2">
 <h3 id="_code_tag_code"><code>tag</code></h3>
 <div class="paragraph"><p>Creates an annotated tag referring to a specific commit.  To create
 lightweight (non-annotated) tags see the <code>reset</code> command below.</p></div>
@@ -1690,6 +1704,7 @@ lightweight (non-annotated) tags see the <code>reset</code> command below.</p></
 <div class="content">
 <pre><code>        'tag' SP &lt;name&gt; LF
         'from' SP &lt;commit-ish&gt; LF
+        original-oid?
         'tagger' (SP &lt;name&gt;)? SP LT &lt;email&gt; GT SP &lt;when&gt; LF
         data</code></pre>
 </div></div>
@@ -1756,6 +1771,7 @@ assigned mark.</p></div>
 <div class="content">
 <pre><code>        'blob' LF
         mark?
+        original-oid?
         data</code></pre>
 </div></div>
 <div class="paragraph"><p>The mark command is optional here as some frontends have chosen
@@ -2496,7 +2512,7 @@ compression.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-06-01 16:13:01 JST
+ 2019-01-04 14:31:36 PST
 </div>
 </div>
 </body>
