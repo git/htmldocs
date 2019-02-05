@@ -759,6 +759,14 @@ of data to send in order to fully update one or the other.</p></div>
 protocol-common.txt. When the grammar indicate <code>PKT-LINE(...)</code>, unless
 otherwise noted the usual pkt-line LF rules apply: the sender SHOULD
 include a LF, but the receiver MUST NOT complain if it is not present.</p></div>
+<div class="paragraph"><p>An error packet is a special pkt-line that contains an error string.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>  error-line     =  PKT-LINE("ERR" SP explanation-text)</code></pre>
+</div></div>
+<div class="paragraph"><p>Throughout the protocol, where <code>PKT-LINE(...)</code> is expected, an error packet MAY
+be sent. Once this packet is sent by a client or a server, the data transfer
+process defined in this protocol is terminated.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -831,12 +839,6 @@ process on the server side over the Git protocol is this:</p></div>
 <pre><code>$ echo -e -n \
   "0039git-upload-pack /schacon/gitbook.git\0host=example.com\0" |
   nc -v example.com 9418</code></pre>
-</div></div>
-<div class="paragraph"><p>If the server refuses the request for some reasons, it could abort
-gracefully with an error message.</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>  error-line     =  PKT-LINE("ERR" SP explanation-text)</code></pre>
 </div></div>
 </div>
 </div>
@@ -1156,12 +1158,11 @@ from the client).</p></div>
 <div class="paragraph"><p>Then the server will start sending its packfile data.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>  server-response = *ack_multi ack / nak / error-line
+<pre><code>  server-response = *ack_multi ack / nak
   ack_multi       = PKT-LINE("ACK" SP obj-id ack_status)
   ack_status      = "continue" / "common" / "ready"
   ack             = PKT-LINE("ACK" SP obj-id)
-  nak             = PKT-LINE("NAK")
-  error-line     =  PKT-LINE("ERR" SP explanation-text)</code></pre>
+  nak             = PKT-LINE("NAK")</code></pre>
 </div></div>
 <div class="paragraph"><p>A simple clone may look like this (with no <em>have</em> lines):</p></div>
 <div class="listingblock">
@@ -1436,7 +1437,7 @@ can be rejected.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-08-17 15:20:20 PDT
+ 2019-02-05 15:33:20 PST
 </div>
 </div>
 </body>

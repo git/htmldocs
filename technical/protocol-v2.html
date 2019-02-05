@@ -1097,7 +1097,13 @@ included in the client&#8217;s request:</p></div>
     Request that various objects from the packfile be omitted
     using one of several filtering techniques. These are intended
     for use with partial clone and partial fetch operations. See
-    `rev-list` for possible "filter-spec" values.</code></pre>
+    `rev-list` for possible "filter-spec" values. When communicating
+    with other processes, senders SHOULD translate scaled integers
+    (e.g. "1k") into a fully-expanded form (e.g. "1024") to aid
+    interoperability with older receivers that may not understand
+    newly-invented scaling suffixes. However, receivers SHOULD
+    accept the following suffixes: 'k', 'm', and 'g' for 1024,
+    1048576, and 1073741824, respectively.</code></pre>
 </div></div>
 <div class="paragraph"><p>If the <em>ref-in-want</em> feature is advertised, the following argument can
 be included in the client&#8217;s request as well as the potential addition of
@@ -1108,6 +1114,17 @@ the <em>wanted-refs</em> section in the server&#8217;s response as explained bel
     Indicates to the server that the client wants to retrieve a
     particular ref, where &lt;ref&gt; is the full name of a ref on the
     server.</code></pre>
+</div></div>
+<div class="paragraph"><p>If the <em>sideband-all</em> feature is advertised, the following argument can be
+included in the client&#8217;s request:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>sideband-all
+    Instruct the server to send the whole response multiplexed, not just
+    the packfile section. All non-flush and non-delim PKT-LINE in the
+    response (not only in the packfile section) will then start with a byte
+    indicating its sideband (1, 2, or 3), and the server may send "0005\2"
+    (a PKT-LINE of sideband 2 with no payload) as a keepalive packet.</code></pre>
 </div></div>
 <div class="paragraph"><p>The response of <code>fetch</code> is broken into a number of sections separated by
 delimiter packets (0001), with each section beginning with its section
@@ -1321,7 +1338,7 @@ a request.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2019-01-29 12:37:18 PST
+ 2019-02-05 15:33:20 PST
 </div>
 </div>
 </body>
