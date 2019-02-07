@@ -2184,11 +2184,14 @@ core.eol
 <dd>
 <p>
         Sets the line ending type to use in the working directory for
-        files that have the <code>text</code> property set when core.autocrlf is false.
+        files that are marked as text (either by having the <code>text</code>
+        attribute set, or by having <code>text=auto</code> and Git auto-detecting
+        the contents as text).
         Alternatives are <em>lf</em>, <em>crlf</em> and <em>native</em>, which uses the platform&#8217;s
         native line ending.  The default value is <code>native</code>.  See
         <a href="gitattributes.html">gitattributes(5)</a> for more information on end-of-line
-        conversion.
+        conversion. Note that this value is ignored if <code>core.autocrlf</code>
+        is set to <code>true</code> or <code>input</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -7089,6 +7092,20 @@ pack.useBitmaps
         to stdout (e.g., during the server side of a fetch). Defaults to
         true. You should not generally need to turn this off unless
         you are debugging pack bitmaps.
+</p>
+</dd>
+<dt class="hdlist1">
+pack.useSparse
+</dt>
+<dd>
+<p>
+        When true, git will default to using the <em>--sparse</em> option in
+        <em>git pack-objects</em> when the <em>--revs</em> option is present. This
+        algorithm only walks trees that appear in paths that introduce new
+        objects. This can have significant performance benefits when
+        computing a pack to send a small change. However, it is possible
+        that extra objects are added to the pack-file if the included
+        commits contain certain types of direct renames.
 </p>
 </dd>
 <dt class="hdlist1">
