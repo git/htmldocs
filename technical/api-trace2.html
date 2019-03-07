@@ -1,0 +1,2434 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.10" />
+<title>Trace2 API</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Trace2 API</h1>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph"><p>The Trace2 API can be used to print debug, performance, and telemetry
+information to stderr or a file.  The Trace2 feature is inactive unless
+explicitly enabled by enabling one or more Trace2 Targets.</p></div>
+<div class="paragraph"><p>The Trace2 API is intended to replace the existing (Trace1)
+printf-style tracing provided by the existing <code>GIT_TRACE</code> and
+<code>GIT_TRACE_PERFORMANCE</code> facilities.  During initial implementation,
+Trace2 and Trace1 may operate in parallel.</p></div>
+<div class="paragraph"><p>The Trace2 API defines a set of high-level messages with known fields,
+such as (<code>start</code>: <code>argv</code>) and (<code>exit</code>: {<code>exit-code</code>, <code>elapsed-time</code>}).</p></div>
+<div class="paragraph"><p>Trace2 instrumentation throughout the Git code base sends Trace2
+messages to the enabled Trace2 Targets.  Targets transform these
+messages content into purpose-specific formats and write events to
+their data streams.  In this manner, the Trace2 API can drive
+many different types of analysis.</p></div>
+<div class="paragraph"><p>Targets are defined using a VTable allowing easy extension to other
+formats in the future.  This might be used to define a binary format,
+for example.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_trace2_targets">Trace2 Targets</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Trace2 defines the following set of Trace2 Targets.
+Format details are given in a later section.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>GIT_TR2</code> (NORMAL)
+</dt>
+<dd>
+<p>
+        a simple printf format like GIT_TRACE.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2=~/log.normal
+$ git version
+git version 2.20.1.155.g426c96fcdb</code></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ cat ~/log.normal
+12:28:42.620009 common-main.c:38                  version 2.20.1.155.g426c96fcdb
+12:28:42.620989 common-main.c:39                  start git version
+12:28:42.621101 git.c:432                         cmd_name version (version)
+12:28:42.621215 git.c:662                         exit elapsed:0.001227 code:0
+12:28:42.621250 trace2/tr2_tgt_normal.c:124       atexit elapsed:0.001265 code:0</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>GIT_TR2_PERF</code> (PERF)
+</dt>
+<dd>
+<p>
+        a column-based format to replace GIT_TRACE_PERFORMANCE suitable for
+        development and testing, possibly to complement tools like gprof.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_PERF=~/log.perf
+$ git version
+git version 2.20.1.155.g426c96fcdb</code></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ cat ~/log.perf
+12:28:42.620675 common-main.c:38                  | d0 | main                     | version      |     |           |           |            | 2.20.1.155.g426c96fcdb
+12:28:42.621001 common-main.c:39                  | d0 | main                     | start        |     |           |           |            | git version
+12:28:42.621111 git.c:432                         | d0 | main                     | cmd_name     |     |           |           |            | version (version)
+12:28:42.621225 git.c:662                         | d0 | main                     | exit         |     |  0.001227 |           |            | code:0
+12:28:42.621259 trace2/tr2_tgt_perf.c:211         | d0 | main                     | atexit       |     |  0.001265 |           |            | code:0</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>GIT_TR2_EVENT</code> (EVENT)
+</dt>
+<dd>
+<p>
+        a JSON-based format of event data suitable for telemetry analysis.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_EVENT=~/log.event
+$ git version
+git version 2.20.1.155.g426c96fcdb</code></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ cat ~/log.event
+{"event":"version","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.620713","file":"common-main.c","line":38,"evt":"1","exe":"2.20.1.155.g426c96fcdb"}
+{"event":"start","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621027","file":"common-main.c","line":39,"argv":["git","version"]}
+{"event":"cmd_name","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621122","file":"git.c","line":432,"name":"version","hierarchy":"version"}
+{"event":"exit","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621236","file":"git.c","line":662,"t_abs":0.001227,"code":0}
+{"event":"atexit","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621268","file":"trace2/tr2_tgt_event.c","line":163,"t_abs":0.001265,"code":0}</code></pre>
+</div></div>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_enabling_a_target">Enabling a Target</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A Trace2 Target is enabled when the corresponding environment variable
+(<code>GIT_TR2</code>, <code>GIT_TR2_PERF</code>, or <code>GIT_TR2_EVENT</code>) is set.  The following
+values are recognized.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>0</code>
+</dt>
+<dt class="hdlist1">
+<code>false</code>
+</dt>
+<dd>
+<p>
+        Disables the target.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>1</code>
+</dt>
+<dt class="hdlist1">
+<code>true</code>
+</dt>
+<dd>
+<p>
+        Enables the target and writes stream to <code>STDERR</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>[2-9]</code>
+</dt>
+<dd>
+<p>
+        Enables the target and writes to the already opened file descriptor.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;absolute-pathname&gt;</code>
+</dt>
+<dd>
+<p>
+        Enables the target, opens and writes to the file in append mode.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>af_unix:[&lt;socket_type&gt;:]&lt;absolute-pathname&gt;</code>
+</dt>
+<dd>
+<p>
+        Enables the target, opens and writes to a Unix Domain Socket
+        (on platforms that support them).
+</p>
+<div class="paragraph"><p>Socket type can be either <code>stream</code> or <code>dgram</code>.  If the socket type is
+omitted, Git will try both.</p></div>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_trace2_api">Trace2 API</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>All public Trace2 functions and macros are defined in <code>trace2.h</code> and
+<code>trace2.c</code>.  All public symbols are prefixed with <code>trace2_</code>.</p></div>
+<div class="paragraph"><p>There are no public Trace2 data structures.</p></div>
+<div class="paragraph"><p>The Trace2 code also defines a set of private functions and data types
+in the <code>trace2/</code> directory.  These symbols are prefixed with <code>tr2_</code>
+and should only be used by functions in <code>trace2.c</code>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_conventions_for_public_functions_and_macros">Conventions for Public Functions and Macros</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The functions defined by the Trace2 API are declared and documented
+in <code>trace2.h</code>.  It defines the API functions and wrapper macros for
+Trace2.</p></div>
+<div class="paragraph"><p>Some functions have a <code>_fl()</code> suffix to indicate that they take <code>file</code>
+and <code>line-number</code> arguments.</p></div>
+<div class="paragraph"><p>Some functions have a <code>_va_fl()</code> suffix to indicate that they also
+take a <code>va_list</code> argument.</p></div>
+<div class="paragraph"><p>Some functions have a <code>_printf_fl()</code> suffix to indicate that they also
+take a varargs argument.</p></div>
+<div class="paragraph"><p>There are CPP wrapper macros and ifdefs to hide most of these details.
+See <code>trace2.h</code> for more details.  The following discussion will only
+describe the simplified forms.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_public_api">Public API</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>All Trace2 API functions send a messsage to all of the active
+Trace2 Targets.  This section describes the set of available
+messages.</p></div>
+<div class="paragraph"><p>It helps to divide these functions into groups for discussion
+purposes.</p></div>
+<div class="sect2">
+<h3 id="_basic_command_messages">Basic Command Messages</h3>
+<div class="paragraph"><p>These are concerned with the lifetime of the overall git process.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>void trace2_initialize()</code>
+</dt>
+<dd>
+<p>
+        Determines if any Trace2 Targets should be enabled and
+        initializes the Trace2 facility.  This includes starting the
+        elapsed time clocks and thread local storage (TLS).
+</p>
+<div class="paragraph"><p>This function emits a "version" message containing the version of git
+and the Trace2 protocol.</p></div>
+<div class="paragraph"><p>This function should be called from <code>main()</code> as early as possible in
+the life of the process.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>int trace2_is_enabled()</code>
+</dt>
+<dd>
+<p>
+        Returns 1 if Trace2 is enabled (at least one target is
+        active).
+</p>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_start(int argc, const char **argv)</code>
+</dt>
+<dd>
+<p>
+        Emits a "start" message containing the process command line
+        arguments.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>int trace2_cmd_exit(int exit_code)</code>
+</dt>
+<dd>
+<p>
+        Emits an "exit" message containing the process exit-code and
+        elapsed time.
+</p>
+<div class="paragraph"><p>Returns the exit-code.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_error(const char *fmt, va_list ap)</code>
+</dt>
+<dd>
+<p>
+        Emits an "error" message containing a formatted error message.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_path(const char *pathname)</code>
+</dt>
+<dd>
+<p>
+        Emits a "cmd_path" message with the full pathname of the
+        current process.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_command_detail_messages">Command Detail Messages</h3>
+<div class="paragraph"><p>These are concerned with describing the specific Git command
+after the command line, config, and environment are inspected.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>void trace2_cmd_name(const char *name)</code>
+</dt>
+<dd>
+<p>
+        Emits a "cmd_name" message with the canonical name of the
+        command, for example "status" or "checkout".
+</p>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_mode(const char *mode)</code>
+</dt>
+<dd>
+<p>
+        Emits a "cmd_mode" message with a qualifier name to further
+        describe the current git command.
+</p>
+<div class="paragraph"><p>This message is intended to be used with git commands having multiple
+major modes.  For example, a "checkout" command can checkout a new
+branch or it can checkout a single file, so the checkout code could
+emit a cmd_mode message of "branch" or "file".</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_alias(const char *alias, const char **argv_expansion)</code>
+</dt>
+<dd>
+<p>
+        Emits an "alias" message containing the alias used and the
+        argument expansion.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_def_param(const char *parameter, const char *value)</code>
+</dt>
+<dd>
+<p>
+        Emits a "def_param" message containing a key/value pair.
+</p>
+<div class="paragraph"><p>This message is intended to report some global aspect of the current
+command, such as a configuration setting or command line switch that
+significantly affects program performance or behavior, such as
+<code>core.abbrev</code>, <code>status.showUntrackedFiles</code>, or <code>--no-ahead-behind</code>.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_list_config()</code>
+</dt>
+<dd>
+<p>
+        Emits a "def_param" messages for "important" configuration
+        settings.
+</p>
+<div class="paragraph"><p>The environment variable <code>GIT_TR2_CONFIG_PARAMS</code> can be set to a
+list of patterns of important configuration settings, for example:
+<code>core.*,remote.*.url</code>.  This function will iterate over all config
+settings and emit a "def_param" message for each match.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_cmd_set_config(const char *key, const char *value)</code>
+</dt>
+<dd>
+<p>
+        Emits a "def_param" message for a specific configuration
+        setting IFF it matches the <code>GIT_TR2_CONFIG_PARAMS</code> pattern.
+</p>
+<div class="paragraph"><p>This is used to hook into <code>git_config_set()</code> and catch any
+configuration changes and update a value previously reported by
+<code>trace2_cmd_list_config()</code>.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_def_repo(struct repository *repo)</code>
+</dt>
+<dd>
+<p>
+        Registers a repository with the Trace2 layer.  Assigns a
+        unique "repo-id" to <code>repo-&gt;trace2_repo_id</code>.
+</p>
+<div class="paragraph"><p>Emits a "worktree" messages containing the repo-id and the worktree
+pathname.</p></div>
+<div class="paragraph"><p>Region and data messages (described later) may refer to this repo-id.</p></div>
+<div class="paragraph"><p>The main/top-level repository will have repo-id value 1 (aka "r1").</p></div>
+<div class="paragraph"><p>The repo-id field is in anticipation of future in-proc submodule
+repositories.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_child_process_messages">Child Process Messages</h3>
+<div class="paragraph"><p>These are concerned with the various spawned child processes,
+including shell scripts, git commands, editors, pagers, and hooks.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>void trace2_child_start(struct child_process *cmd)</code>
+</dt>
+<dd>
+<p>
+        Emits a "child_start" message containing the "child-id",
+        "child-argv", and "child-classification".
+</p>
+<div class="paragraph"><p>Before calling this, set <code>cmd-&gt;trace2_child_class</code> to a name
+describing the type of child process, for example "editor".</p></div>
+<div class="paragraph"><p>This function assigns a unique "child-id" to <code>cmd-&gt;trace2_child_id</code>.
+This field is used later during the "child_exit" message to associate
+it with the "child_start" message.</p></div>
+<div class="paragraph"><p>This function should be called before spawning the child process.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_child_exit(struct child_proess *cmd, int child_exit_code)</code>
+</dt>
+<dd>
+<p>
+        Emits a "child_exit" message containing the "child-id",
+        the child&#8217;s elapsed time and exit-code.
+</p>
+<div class="paragraph"><p>The reported elapsed time includes the process creation overhead and
+time spend waiting for it to exit, so it may be slightly longer than
+the time reported by the child itself.</p></div>
+<div class="paragraph"><p>This function should be called after reaping the child process.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>int trace2_exec(const char *exe, const char **argv)</code>
+</dt>
+<dd>
+<p>
+        Emits a "exec" message containing the "exec-id" and the
+        argv of the new process.
+</p>
+<div class="paragraph"><p>This function should be called before calling one of the <code>exec()</code>
+variants, such as <code>execvp()</code>.</p></div>
+<div class="paragraph"><p>This function returns a unique "exec-id".  This value is used later
+if the exec() fails and a "exec-result" message is necessary.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_exec_result(int exec_id, int error_code)</code>
+</dt>
+<dd>
+<p>
+        Emits a "exec_result" message containing the "exec-id"
+        and the error code.
+</p>
+<div class="paragraph"><p>On Unix-based systems, <code>exec()</code> does not return if successful.
+This message is used to indicate that the <code>exec()</code> failed and
+that the current program is continuing.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_git_thread_messages">Git Thread Messages</h3>
+<div class="paragraph"><p>These messages are concerned with Git thread usage.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>void trace2_thread_start(const char *thread_name)</code>
+</dt>
+<dd>
+<p>
+        Emits a "thread_start" message.
+</p>
+<div class="paragraph"><p>The <code>thread_name</code> field should be a descriptive name, such as the
+unique name of the thread-proc.  A unique "thread-id" will be added
+to the name to uniquely identify thread instances.</p></div>
+<div class="paragraph"><p>Region and data messages (described later) may refer to this thread
+name.</p></div>
+<div class="paragraph"><p>This function must be called by the thread-proc of the new thread
+(so that TLS data is properly initialized) and not by the caller
+of <code>pthread_create()</code>.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_thread_exit()</code>
+</dt>
+<dd>
+<p>
+        Emits a "thread_exit" message containing the thread name
+        and the thread elapsed time.
+</p>
+<div class="paragraph"><p>This function must be called by the thread-proc before it returns
+(so that the coorect TLS data is used and cleaned up.  It should
+not be called by the caller of <code>pthread_join()</code>.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_region_and_data_messages">Region and Data Messages</h3>
+<div class="paragraph"><p>These are concerned with recording performance data
+over regions or spans of code.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>void trace2_region_enter(const char *category, const char *label, const struct repository *repo)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_region_enter_printf(const char *category, const char *label, const struct repository *repo, const char *fmt, ...)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_region_enter_printf_va(const char *category, const char *label, const struct repository *repo, const char *fmt, va_list ap)</code>
+</dt>
+<dd>
+<p>
+        Emits a thread-relative "region_enter" message with optional
+        printf string.
+</p>
+<div class="paragraph"><p>This function pushes a new region nesting stack level on the current
+thread and starts a clock for the new stack frame.</p></div>
+<div class="paragraph"><p>The <code>category</code> field is an arbitrary category name used to classify
+regions by feature area, such as "status" or "index".  At this time
+it is only just printed along with the rest of the message.  It may
+be used in the future to filter messages.</p></div>
+<div class="paragraph"><p>The <code>label</code> field is an arbitrary label used to describe the activity
+being started, such as "read_recursive" or "do_read_index".</p></div>
+<div class="paragraph"><p>The <code>repo</code> field, if set, will be used to get the "repo-id", so that
+recursive oerations can be attributed to the correct repository.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_region_leave(const char *category, const char *label, const struct repository *repo)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_region_leave_printf(const char *category, const char *label, const struct repository *repo, const char *fmt, ...)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_region_leave_printf_va(const char *category, const char *label, const struct repository *repo, const char *fmt, va_list ap)</code>
+</dt>
+<dd>
+<p>
+        Emits a thread-relative "region_leave" message with optional
+        printf string.
+</p>
+<div class="paragraph"><p>This function pops the region nesting stack on the current thread
+and reports the elapsed time of the stack frame.</p></div>
+<div class="paragraph"><p>The <code>category</code>, <code>label</code>, and <code>repo</code> fields are the same as above.
+The <code>category</code> and <code>label</code> do not need to match the correpsonding
+"region_enter" message, but it makes the data stream easier to
+understand.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_data_string(const char *category, const struct repository *repo, const char *key, const char * value)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_data_intmax(const char *category, const struct repository *repo, const char *key, intmax value)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_data_json(const char *category, const struct repository *repo, const char *key, const struct json_writer *jw)</code>
+</dt>
+<dd>
+<p>
+        Emits a region- and thread-relative "data" or "data_json" message.
+</p>
+<div class="paragraph"><p>This is a key/value pair message containing information about the
+current thread, region stack, and repository.  This could be used
+to print the number of files in a directory during a multi-threaded
+recursive tree walk.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>void trace2_printf(const char *fmt, ...)</code>
+</dt>
+<dt class="hdlist1">
+<code>void trace2_printf_va(const char *fmt, va_list ap)</code>
+</dt>
+<dd>
+<p>
+        Emits a region- and thread-relative "printf" message.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_trace2_target_formats">Trace2 Target Formats</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_normal_format">NORMAL Format</h3>
+<div class="paragraph"><p>NORMAL format is enabled when the <code>GIT_TR2</code> environment variable is
+set.</p></div>
+<div class="paragraph"><p>Events are written as lines of the form:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>[&lt;time&gt; SP &lt;filename&gt;:&lt;line&gt; SP+] &lt;event-name&gt; [[SP] &lt;event-message&gt;] LF</code></pre>
+</div></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>&lt;event-name&gt;</code>
+</dt>
+<dd>
+<p>
+        is the event name.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;event-message&gt;</code>
+</dt>
+<dd>
+<p>
+        is a free-form printf message intended for human consumption.
+</p>
+<div class="paragraph"><p>Note that this may contain embedded LF or CRLF characters that are
+not escaped, so the event may spill across multiple lines.</p></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>If <code>GIT_TR2_BRIEF</code> is true, the <code>time</code>, <code>filename</code>, and <code>line</code> fields
+are omitted.</p></div>
+<div class="paragraph"><p>This target is intended to be more of a summary (like GIT_TRACE) and
+less detailed than the other targets.  It ignores thread, region, and
+data messages, for example.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_perf_format">PERF Format</h3>
+<div class="paragraph"><p>PERF format is enabled when the <code>GIT_TR2_PERF</code> environment variable
+is set.</p></div>
+<div class="paragraph"><p>Events are written as lines of the form:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>[&lt;time&gt; SP &lt;filename&gt;:&lt;line&gt; SP+
+    BAR SP] d&lt;depth&gt; SP
+    BAR SP &lt;thread-name&gt; SP+
+    BAR SP &lt;event-name&gt; SP+
+    BAR SP [r&lt;repo-id&gt;] SP+
+    BAR SP [&lt;t_abs&gt;] SP+
+    BAR SP [&lt;t_rel&gt;] SP+
+    BAR SP [&lt;category&gt;] SP+
+    BAR SP DOTS* &lt;perf-event-message&gt;
+    LF</code></pre>
+</div></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>&lt;depth&gt;</code>
+</dt>
+<dd>
+<p>
+        is the git process depth.  This is the number of parent
+        git processes.  A top-level git command has depth value "d0".
+        A child of it has depth value "d1".  A second level child
+        has depth value "d2" and so on.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;thread-name&gt;</code>
+</dt>
+<dd>
+<p>
+        is a unique name for the thread.  The primary thread
+        is called "main".  Other thread names are of the form "th%d:%s"
+        and include a unique number and the name of the thread-proc.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;event-name&gt;</code>
+</dt>
+<dd>
+<p>
+        is the event name.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;repo-id&gt;</code>
+</dt>
+<dd>
+<p>
+        when present, is a number indicating the repository
+        in use.  A <code>def_repo</code> event is emitted when a repository is
+        opened.  This defines the repo-id and associated worktree.
+        Subsequent repo-specific events will reference this repo-id.
+</p>
+<div class="paragraph"><p>Currently, this is always "r1" for the main repository.
+This field is in anticipation of in-proc submodules in the future.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>&lt;t_abs&gt;</code>
+</dt>
+<dd>
+<p>
+        when present, is the absolute time in seconds since the
+        program started.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;t_rel&gt;</code>
+</dt>
+<dd>
+<p>
+        when present, is time in seconds relative to the start of
+        the current region.  For a thread-exit event, it is the elapsed
+        time of the thread.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;category&gt;</code>
+</dt>
+<dd>
+<p>
+        is present on region and data events and is used to
+        indicate a broad category, such as "index" or "status".
+</p>
+</dd>
+<dt class="hdlist1">
+<code>&lt;perf-event-message&gt;</code>
+</dt>
+<dd>
+<p>
+        is a free-form printf message intended for human consumption.
+</p>
+</dd>
+</dl></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>15:33:33.532712 wt-status.c:2310                  | d0 | main                     | region_enter | r1  |  0.126064 |           | status     | label:print
+15:33:33.532712 wt-status.c:2331                  | d0 | main                     | region_leave | r1  |  0.127568 |  0.001504 | status     | label:print</code></pre>
+</div></div>
+<div class="paragraph"><p>If <code>GIT_TR2_PERF_BRIEF</code> is true, the <code>time</code>, <code>file</code>, and <code>line</code>
+fields are omitted.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>d0 | main                     | region_leave | r1  |  0.011717 |  0.009122 | index      | label:preload</code></pre>
+</div></div>
+<div class="paragraph"><p>The PERF target is intended for interactive performance analysis
+during development and is quite noisy.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_event_format">EVENT Format</h3>
+<div class="paragraph"><p>EVENT format is enabled when the <code>GIT_TR2_EVENT</code> environment
+variable is set.</p></div>
+<div class="paragraph"><p>Each event is a JSON-object containing multiple key/value pairs
+written as a single line and followed by a LF.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>'{' &lt;key&gt; ':' &lt;value&gt; [',' &lt;key&gt; ':' &lt;value&gt;]* '}' LF</code></pre>
+</div></div>
+<div class="paragraph"><p>Some key/value pairs are common to all events and some are
+event-specific.</p></div>
+<div class="sect3">
+<h4 id="_common_key_value_pairs">Common Key/Value Pairs</h4>
+<div class="paragraph"><p>The following key/value pairs are common to all events:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"version",
+        "sid":"1547659722619736-11614",
+        "thread":"main",
+        "time":"2019-01-16 17:28:42.620713",
+        "file":"common-main.c",
+        "line":38,
+        ...
+}</code></pre>
+</div></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>"event":&lt;event&gt;</code>
+</dt>
+<dd>
+<p>
+        is the event name.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>"sid":&lt;sid&gt;</code>
+</dt>
+<dd>
+<p>
+        is the session-id.  This is a unique string to identify the
+        process instance to allow all events emitted by a process to
+        be identified.  A session-id is used instead of a PID because
+        PIDs are recycled by the OS.  For child git processes, the
+        session-id is prepended with the session-id of the parent git
+        process to allow parent-child relationships to be identified
+        during post-processing.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>"thread":&lt;thread&gt;</code>
+</dt>
+<dd>
+<p>
+        is the thread name.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>"time":&lt;time&gt;</code>
+</dt>
+<dd>
+<p>
+        is the UTC time of the event.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>"file":&lt;filename&gt;</code>
+</dt>
+<dd>
+<p>
+        is source file generating the event.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>"line":&lt;line-number&gt;</code>
+</dt>
+<dd>
+<p>
+        is the integer source line number generating the event.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>"repo":&lt;repo-id&gt;</code>
+</dt>
+<dd>
+<p>
+        when present, is the integer repo-id as described previously.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>If <code>GIT_TR2_EVENT_BRIEF</code> is true, the <code>file</code> and <code>line</code> fields are omitted
+from all events and the <code>time</code> field is only present on the "start" and
+"atexit" events.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_event_specific_key_value_pairs">Event-Specific Key/Value Pairs</h4>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>"version"</code>
+</dt>
+<dd>
+<p>
+        This event gives the version of the executable and the EVENT format.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"version",
+        ...
+        "evt":"1",                     # EVENT format version
+        "exe":"2.20.1.155.g426c96fcdb" # git version
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"start"</code>
+</dt>
+<dd>
+<p>
+        This event contains the complete argv received by main().
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"start",
+        ...
+        "argv":["git","version"]
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"exit"</code>
+</dt>
+<dd>
+<p>
+        This event is emitted when git calls <code>exit()</code>.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"exit",
+        ...
+        "t_abs":0.001227, # elapsed time in seconds
+        "code":0          # exit code
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"atexit"</code>
+</dt>
+<dd>
+<p>
+        This event is emitted by the Trace2 <code>atexit</code> routine during
+        final shutdown.  It should be the last event emitted by the
+        process.
+</p>
+<div class="paragraph"><p>(The elapsed time reported here is greater than the time reported in
+the "exit" event because it runs after all other atexit tasks have
+completed.)</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"atexit",
+        ...
+        "t_abs":0.001227, # elapsed time in seconds
+        "code":0          # exit code
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"signal"</code>
+</dt>
+<dd>
+<p>
+        This event is emitted when the program is terminated by a user
+        signal.  Depending on the platform, the signal event may
+        prevent the "atexit" event from being generated.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"signal",
+        ...
+        "t_abs":0.001227,  # elapsed time in seconds
+        "signal":13        # SIGTERM, SIGINT, etc.
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"error"</code>
+</dt>
+<dd>
+<p>
+        This event is emitted when one of the <code>error()</code>, <code>die()</code>,
+        or <code>usage()</code> functions are called.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"error",
+        ...
+        "msg":"invalid option: --cahced", # formatted error message
+        "fmt":"invalid option: %s"        # error format string
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>The error event may be emitted more than once.  The format string
+allows post-processors to group errors by type without worrying
+about specific error arguments.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"cmd_path"</code>
+</dt>
+<dd>
+<p>
+        This event contains the discovered full path of the git
+        executable (on platforms that are configured to resolve it).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"cmd_path",
+        ...
+        "path":"C:/work/gfw/git.exe"
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"cmd_name"</code>
+</dt>
+<dd>
+<p>
+        This event contains the command name for this git process
+        and the hierarchy of commands from parent git processes.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"cmd_name",
+        ...
+        "name":"pack-objects",
+        "hierarchy":"push/pack-objects"
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>Normally, the "name" field contains the canonical name of the
+command.  When a canonical name is not available, one of
+these special values are used:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>"_query_"            # "git --html-path"
+"_run_dashed_"       # when "git foo" tries to run "git-foo"
+"_run_shell_alias_"  # alias expansion to a shell command
+"_run_git_alias_"    # alias expansion to a git command
+"_usage_"            # usage error</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"cmd_mode"</code>
+</dt>
+<dd>
+<p>
+        This event, when present, describes the command variant This
+        event may be emitted more than once.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"cmd_mode",
+        ...
+        "name":"branch"
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>The "name" field is an arbitrary string to describe the command mode.
+For example, checkout can checkout a branch or an individual file.
+And these variations typically have different performance
+characteristics that are not comparable.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"alias"</code>
+</dt>
+<dd>
+<p>
+        This event is present when an alias is expanded.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"alias",
+        ...
+        "alias":"l",             # registered alias
+        "argv":["log","--graph"] # alias expansion
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"child_start"</code>
+</dt>
+<dd>
+<p>
+        This event describes a child process that is about to be
+        spawned.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"child_start",
+        ...
+        "child_id":2,
+        "child_class":"?",
+        "use_shell":false,
+        "argv":["git","rev-list","--objects","--stdin","--not","--all","--quiet"]
+
+        "hook_name":"&lt;hook_name&gt;"  # present when child_class is "hook"
+        "cd":"&lt;path&gt;"              # present when cd is required
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>The "child_id" field can be used to match this child_start with the
+corresponding child_exit event.</p></div>
+<div class="paragraph"><p>The "child_class" field is a rough classification, such as "editor",
+"pager", "transport/*", and "hook".  Unclassified children are classified
+with "?".</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"child_exit"</code>
+</dt>
+<dd>
+<p>
+        This event is generated after the current process has returned
+        from the waitpid() and collected the exit information from the
+        child.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"child_exit",
+        ...
+        "child_id":2,
+        "pid":14708,     # child PID
+        "code":0,        # child exit-code
+        "t_rel":0.110605 # observed run-time of child process
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>Note that the session-id of the child process is not available to
+the current/spawning process, so the child&#8217;s PID is reported here as
+a hint for post-processing.  (But it is only a hint because the child
+proces may be a shell script which doesn&#8217;t have a session-id.)</p></div>
+<div class="paragraph"><p>Note that the <code>t_rel</code> field contains the observed run time in seconds
+for the child process (starting before the fork/exec/spawn and
+stopping after the waitpid() and includes OS process creation overhead).
+So this time will be slightly larger than the atexit time reported by
+the child process itself.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"exec"</code>
+</dt>
+<dd>
+<p>
+        This event is generated before git attempts to <code>exec()</code>
+        another command rather than starting a child process.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"exec",
+        ...
+        "exec_id":0,
+        "exe":"git",
+        "argv":["foo", "bar"]
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>The "exec_id" field is a command-unique id and is only useful if the
+<code>exec()</code> fails and a corresponding exec_result event is generated.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"exec_result"</code>
+</dt>
+<dd>
+<p>
+        This event is generated if the <code>exec()</code> fails and control
+        returns to the current git command.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"exec_result",
+        ...
+        "exec_id":0,
+        "code":1      # error code (errno) from exec()
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"thread_start"</code>
+</dt>
+<dd>
+<p>
+        This event is generated when a thread is started.  It is
+        generated from <strong>within</strong> the new thread&#8217;s thread-proc (for TLS
+        reasons).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"thread_start",
+        ...
+        "thread":"th02:preload_thread" # thread name
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"thread_exit"</code>
+</dt>
+<dd>
+<p>
+        This event is generated when a thread exits.  It is generated
+        from <strong>within</strong> the thread&#8217;s thread-proc (for TLS reasons).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"thread_exit",
+        ...
+        "thread":"th02:preload_thread", # thread name
+        "t_rel":0.007328                # thread elapsed time
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"def_param"</code>
+</dt>
+<dd>
+<p>
+        This event is generated to log a global parameter.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"def_param",
+        ...
+        "param":"core.abbrev",
+        "value":"7"
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"def_repo"</code>
+</dt>
+<dd>
+<p>
+        This event defines a repo-id and associates it with the root
+        of the worktree.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"def_repo",
+        ...
+        "repo":1,
+        "worktree":"/Users/jeffhost/work/gfw"
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>As stated earlier, the repo-id is currently always 1, so there will
+only be one def_repo event.  Later, if in-proc submodules are
+supported, a def_repo event should be emitted for each submodule
+visited.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"region_enter"</code>
+</dt>
+<dd>
+<p>
+        This event is generated when entering a region.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"region_enter",
+        ...
+        "repo":1,                # optional
+        "nesting":1,             # current region stack depth
+        "category":"index",      # optional
+        "label":"do_read_index", # optional
+        "msg":".git/index"       # optional
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>The <code>category</code> field may be used in a future enhancement to
+do category-based filtering.</p></div>
+<div class="paragraph"><p>The <code>GIT_TR2_EVENT_NESTING</code> environment variable can be used to
+filter deeply nested regions and data events.  It defaults to "2".</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"region_leave"</code>
+</dt>
+<dd>
+<p>
+        This event is generated when leaving a region.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"region_leave",
+        ...
+        "repo":1,                # optional
+        "t_rel":0.002876,        # time spent in region in seconds
+        "nesting":1,             # region stack depth
+        "category":"index",      # optional
+        "label":"do_read_index", # optional
+        "msg":".git/index"       # optional
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"data"</code>
+</dt>
+<dd>
+<p>
+        This event is generated to log a thread- and region-local
+        key/value pair.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"data",
+        ...
+        "repo":1,              # optional
+        "t_abs":0.024107,      # absolute elapsed time
+        "t_rel":0.001031,      # elapsed time in region/thread
+        "nesting":2,           # region stack depth
+        "category":"index",
+        "key":"read/cache_nr",
+        "value":"3552"
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>The "value" field may be an integer or a string.</p></div>
+</dd>
+<dt class="hdlist1">
+<code>"data-json"</code>
+</dt>
+<dd>
+<p>
+        This event is generated to log a pre-formatted JSON string
+        containing structured data.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"data_json",
+        ...
+        "repo":1,              # optional
+        "t_abs":0.015905,
+        "t_rel":0.015905,
+        "nesting":1,
+        "category":"process",
+        "key":"windows/ancestry",
+        "value":["bash.exe","bash.exe"]
+}</code></pre>
+</div></div>
+</dd>
+</dl></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_trace2_api_usage">Example Trace2 API Usage</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Here is a hypothetical usage of the Trace2 API showing the intended
+usage (without worrying about the actual Git details).</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Initialization
+</dt>
+<dd>
+<p>
+        Initialization happens in <code>main()</code>.  Behind the scenes, an
+        <code>atexit</code> and <code>signal</code> handler are registered.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>int main(int argc, const char **argv)
+{
+        int exit_code;
+
+        trace2_initialize();
+        trace2_cmd_start(argv);
+
+        exit_code = cmd_main(argc, argv);
+
+        trace2_cmd_exit(exit_code);
+
+        return exit_code;
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Command Details
+</dt>
+<dd>
+<p>
+        After the basics are established, additional command
+        information can be sent to Trace2 as it is discovered.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>int cmd_checkout(int argc, const char **argv)
+{
+        trace2_cmd_name("checkout");
+        trace2_cmd_mode("branch");
+        trace2_def_repo(the_repository);
+
+        // emit "def_param" messages for "interesting" config settings.
+        trace2_cmd_list_config();
+
+        if (do_something())
+            trace2_cmd_error("Path '%s': cannot do something", path);
+
+        return 0;
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Child Processes
+</dt>
+<dd>
+<p>
+        Wrap code spawning child processes.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>void run_child(...)
+{
+        int child_exit_code;
+        struct child_process cmd = CHILD_PROCESS_INIT;
+        ...
+        cmd.trace2_child_class = "editor";
+
+        trace2_child_start(&amp;cmd);
+        child_exit_code = spawn_child_and_wait_for_it();
+        trace2_child_exit(&amp;cmd, child_exit_code);
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>For example, the following fetch command spawned ssh, index-pack,
+rev-list, and gc.  This example also shows that fetch took
+5.199 seconds and of that 4.932 was in ssh.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_BRIEF=1
+$ export GIT_TR2=~/log.normal
+$ git fetch origin
+...</code></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ cat ~/log.normal
+version 2.20.1.vfs.1.1.47.g534dbe1ad1
+start git fetch origin
+worktree /Users/jeffhost/work/gfw
+cmd_name fetch (fetch)
+child_start[0] ssh git@github.com ...
+child_start[1] git index-pack ...
+... (Trace2 events from child processes omitted)
+child_exit[1] pid:14707 code:0 elapsed:0.076353
+child_exit[0] pid:14706 code:0 elapsed:4.931869
+child_start[2] git rev-list ...
+... (Trace2 events from child process omitted)
+child_exit[2] pid:14708 code:0 elapsed:0.110605
+child_start[3] git gc --auto
+... (Trace2 events from child process omitted)
+child_exit[3] pid:14709 code:0 elapsed:0.006240
+exit elapsed:5.198503 code:0
+atexit elapsed:5.198541 code:0</code></pre>
+</div></div>
+<div class="paragraph"><p>When a git process is a (direct or indirect) child of another
+git process, it inherits Trace2 context information.  This
+allows the child to print the command hierarchy.  This example
+shows gc as child[3] of fetch.  When the gc process reports
+its name as "gc", it also reports the hierarchy as "fetch/gc".
+(In this example, trace2 messages from the child process is
+indented for clarity.)</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_BRIEF=1
+$ export GIT_TR2=~/log.normal
+$ git fetch origin
+...</code></pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ cat ~/log.normal
+version 2.20.1.160.g5676107ecd.dirty
+start git fetch official
+worktree /Users/jeffhost/work/gfw
+cmd_name fetch (fetch)
+...
+child_start[3] git gc --auto
+    version 2.20.1.160.g5676107ecd.dirty
+    start /Users/jeffhost/work/gfw/git gc --auto
+    worktree /Users/jeffhost/work/gfw
+    cmd_name gc (fetch/gc)
+    exit elapsed:0.001959 code:0
+    atexit elapsed:0.001997 code:0
+child_exit[3] pid:20303 code:0 elapsed:0.007564
+exit elapsed:3.868938 code:0
+atexit elapsed:3.868970 code:0</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Regions
+</dt>
+<dd>
+<p>
+        Regions can be use to time an interesting section of code.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>void wt_status_collect(struct wt_status *s)
+{
+        trace2_region_enter("status", "worktrees", s-&gt;repo);
+        wt_status_collect_changes_worktree(s);
+        trace2_region_leave("status", "worktrees", s-&gt;repo);
+
+        trace2_region_enter("status", "index", s-&gt;repo);
+        wt_status_collect_changes_index(s);
+        trace2_region_leave("status", "index", s-&gt;repo);
+
+        trace2_region_enter("status", "untracked", s-&gt;repo);
+        wt_status_collect_untracked(s);
+        trace2_region_leave("status", "untracked", s-&gt;repo);
+}
+
+void wt_status_print(struct wt_status *s)
+{
+        trace2_region_enter("status", "print", s-&gt;repo);
+        switch (s-&gt;status_format) {
+            ...
+        }
+        trace2_region_leave("status", "print", s-&gt;repo);
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>In this example, scanning for untracked files ran from +0.012568 to
++0.027149 (since the process started) and took 0.014581 seconds.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_PERF_BRIEF=1
+$ export GIT_TR2_PERF=~/log.perf
+$ git status
+...
+
+$ cat ~/log.perf
+d0 | main                     | version      |     |           |           |            | 2.20.1.160.g5676107ecd.dirty
+d0 | main                     | start        |     |           |           |            | git status
+d0 | main                     | def_repo     | r1  |           |           |            | worktree:/Users/jeffhost/work/gfw
+d0 | main                     | cmd_name     |     |           |           |            | status (status)
+...
+d0 | main                     | region_enter | r1  |  0.010988 |           | status     | label:worktrees
+d0 | main                     | region_leave | r1  |  0.011236 |  0.000248 | status     | label:worktrees
+d0 | main                     | region_enter | r1  |  0.011260 |           | status     | label:index
+d0 | main                     | region_leave | r1  |  0.012542 |  0.001282 | status     | label:index
+d0 | main                     | region_enter | r1  |  0.012568 |           | status     | label:untracked
+d0 | main                     | region_leave | r1  |  0.027149 |  0.014581 | status     | label:untracked
+d0 | main                     | region_enter | r1  |  0.027411 |           | status     | label:print
+d0 | main                     | region_leave | r1  |  0.028741 |  0.001330 | status     | label:print
+d0 | main                     | exit         |     |  0.028778 |           |            | code:0
+d0 | main                     | atexit       |     |  0.028809 |           |            | code:0</code></pre>
+</div></div>
+<div class="paragraph"><p>Regions may be nested.  This causes messages to be indented in the
+PERF target, for example.
+Elapsed times are relative to the start of the correpsonding nesting
+level as expected.  For example, if we add region message to:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>static enum path_treatment read_directory_recursive(struct dir_struct *dir,
+        struct index_state *istate, const char *base, int baselen,
+        struct untracked_cache_dir *untracked, int check_only,
+        int stop_at_first_file, const struct pathspec *pathspec)
+{
+        enum path_treatment state, subdir_state, dir_state = path_none;
+
+        trace2_region_enter_printf("dir", "read_recursive", NULL, "%.*s", baselen, base);
+        ...
+        trace2_region_leave_printf("dir", "read_recursive", NULL, "%.*s", baselen, base);
+        return dir_state;
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>We can further investigate the time spent scanning for untracked files.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_PERF_BRIEF=1
+$ export GIT_TR2_PERF=~/log.perf
+$ git status
+...
+$ cat ~/log.perf
+d0 | main                     | version      |     |           |           |            | 2.20.1.162.gb4ccea44db.dirty
+d0 | main                     | start        |     |           |           |            | git status
+d0 | main                     | def_repo     | r1  |           |           |            | worktree:/Users/jeffhost/work/gfw
+d0 | main                     | cmd_name     |     |           |           |            | status (status)
+...
+d0 | main                     | region_enter | r1  |  0.015047 |           | status     | label:untracked
+d0 | main                     | region_enter |     |  0.015132 |           | dir        | ..label:read_recursive
+d0 | main                     | region_enter |     |  0.016341 |           | dir        | ....label:read_recursive vcs-svn/
+d0 | main                     | region_leave |     |  0.016422 |  0.000081 | dir        | ....label:read_recursive vcs-svn/
+d0 | main                     | region_enter |     |  0.016446 |           | dir        | ....label:read_recursive xdiff/
+d0 | main                     | region_leave |     |  0.016522 |  0.000076 | dir        | ....label:read_recursive xdiff/
+d0 | main                     | region_enter |     |  0.016612 |           | dir        | ....label:read_recursive git-gui/
+d0 | main                     | region_enter |     |  0.016698 |           | dir        | ......label:read_recursive git-gui/po/
+d0 | main                     | region_enter |     |  0.016810 |           | dir        | ........label:read_recursive git-gui/po/glossary/
+d0 | main                     | region_leave |     |  0.016863 |  0.000053 | dir        | ........label:read_recursive git-gui/po/glossary/
+...
+d0 | main                     | region_enter |     |  0.031876 |           | dir        | ....label:read_recursive builtin/
+d0 | main                     | region_leave |     |  0.032270 |  0.000394 | dir        | ....label:read_recursive builtin/
+d0 | main                     | region_leave |     |  0.032414 |  0.017282 | dir        | ..label:read_recursive
+d0 | main                     | region_leave | r1  |  0.032454 |  0.017407 | status     | label:untracked
+...
+d0 | main                     | exit         |     |  0.034279 |           |            | code:0
+d0 | main                     | atexit       |     |  0.034322 |           |            | code:0</code></pre>
+</div></div>
+<div class="paragraph"><p>Trace2 regions are similar to the existing trace_performance_enter()
+and trace_performance_leave() routines, but are thread safe and
+maintain per-thread stacks of timers.</p></div>
+</dd>
+<dt class="hdlist1">
+Data Messages
+</dt>
+<dd>
+<p>
+        Data messages added to a region.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>int read_index_from(struct index_state *istate, const char *path,
+        const char *gitdir)
+{
+        trace2_region_enter_printf("index", "do_read_index", the_repository, "%s", path);
+
+        ...
+
+        trace2_data_intmax("index", the_repository, "read/version", istate-&gt;version);
+        trace2_data_intmax("index", the_repository, "read/cache_nr", istate-&gt;cache_nr);
+
+        trace2_region_leave_printf("index", "do_read_index", the_repository, "%s", path);
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>This example shows that the index contained 3552 entries.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_PERF_BRIEF=1
+$ export GIT_TR2_PERF=~/log.perf
+$ git status
+...
+$ cat ~/log.perf
+d0 | main                     | version      |     |           |           |            | 2.20.1.156.gf9916ae094.dirty
+d0 | main                     | start        |     |           |           |            | git status
+d0 | main                     | def_repo     | r1  |           |           |            | worktree:/Users/jeffhost/work/gfw
+d0 | main                     | cmd_name     |     |           |           |            | status (status)
+d0 | main                     | region_enter | r1  |  0.001791 |           | index      | label:do_read_index .git/index
+d0 | main                     | data         | r1  |  0.002494 |  0.000703 | index      | ..read/version:2
+d0 | main                     | data         | r1  |  0.002520 |  0.000729 | index      | ..read/cache_nr:3552
+d0 | main                     | region_leave | r1  |  0.002539 |  0.000748 | index      | label:do_read_index .git/index
+...</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+Thread Events
+</dt>
+<dd>
+<p>
+        Thread messages added to a thread-proc.
+</p>
+<div class="paragraph"><p>For example, the multithreaded preload-index code can be
+instrumented with a region around the thread pool and then
+per-thread start and exit events within the threadproc.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>static void *preload_thread(void *_data)
+{
+        // start the per-thread clock and emit a message.
+        trace2_thread_start("preload_thread");
+
+        // report which chunk of the array this thread was assigned.
+        trace2_data_intmax("index", the_repository, "offset", p-&gt;offset);
+        trace2_data_intmax("index", the_repository, "count", nr);
+
+        do {
+            ...
+        } while (--nr &gt; 0);
+        ...
+
+        // report elapsed time taken by this thread.
+        trace2_thread_exit();
+        return NULL;
+}
+
+void preload_index(struct index_state *index,
+        const struct pathspec *pathspec,
+        unsigned int refresh_flags)
+{
+        trace2_region_enter("index", "preload", the_repository);
+
+        for (i = 0; i &lt; threads; i++) {
+            ... /* create thread */
+        }
+
+        for (i = 0; i &lt; threads; i++) {
+            ... /* join thread */
+        }
+
+        trace2_region_leave("index", "preload", the_repository);
+}</code></pre>
+</div></div>
+<div class="paragraph"><p>In this example preload_index() was executed by the <code>main</code> thread
+and started the <code>preload</code> region.  Seven threads, named
+<code>th01:preload_thread</code> through <code>th07:preload_thread</code>, were started.
+Events from each thread are atomically appended to the shared target
+stream as they occur so they may appear in random order with respect
+other threads. Finally, the main thread waits for the threads to
+finish and leaves the region.</p></div>
+<div class="paragraph"><p>Data events are tagged with the active thread name.  They are used
+to report the per-thread parameters.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ export GIT_TR2_PERF_BRIEF=1
+$ export GIT_TR2_PERF=~/log.perf
+$ git status
+...
+$ cat ~/log.perf
+...
+d0 | main                     | region_enter | r1  |  0.002595 |           | index      | label:preload
+d0 | th01:preload_thread      | thread_start |     |  0.002699 |           |            |
+d0 | th02:preload_thread      | thread_start |     |  0.002721 |           |            |
+d0 | th01:preload_thread      | data         | r1  |  0.002736 |  0.000037 | index      | offset:0
+d0 | th02:preload_thread      | data         | r1  |  0.002751 |  0.000030 | index      | offset:2032
+d0 | th03:preload_thread      | thread_start |     |  0.002711 |           |            |
+d0 | th06:preload_thread      | thread_start |     |  0.002739 |           |            |
+d0 | th01:preload_thread      | data         | r1  |  0.002766 |  0.000067 | index      | count:508
+d0 | th06:preload_thread      | data         | r1  |  0.002856 |  0.000117 | index      | offset:2540
+d0 | th03:preload_thread      | data         | r1  |  0.002824 |  0.000113 | index      | offset:1016
+d0 | th04:preload_thread      | thread_start |     |  0.002710 |           |            |
+d0 | th02:preload_thread      | data         | r1  |  0.002779 |  0.000058 | index      | count:508
+d0 | th06:preload_thread      | data         | r1  |  0.002966 |  0.000227 | index      | count:508
+d0 | th07:preload_thread      | thread_start |     |  0.002741 |           |            |
+d0 | th07:preload_thread      | data         | r1  |  0.003017 |  0.000276 | index      | offset:3048
+d0 | th05:preload_thread      | thread_start |     |  0.002712 |           |            |
+d0 | th05:preload_thread      | data         | r1  |  0.003067 |  0.000355 | index      | offset:1524
+d0 | th05:preload_thread      | data         | r1  |  0.003090 |  0.000378 | index      | count:508
+d0 | th07:preload_thread      | data         | r1  |  0.003037 |  0.000296 | index      | count:504
+d0 | th03:preload_thread      | data         | r1  |  0.002971 |  0.000260 | index      | count:508
+d0 | th04:preload_thread      | data         | r1  |  0.002983 |  0.000273 | index      | offset:508
+d0 | th04:preload_thread      | data         | r1  |  0.007311 |  0.004601 | index      | count:508
+d0 | th05:preload_thread      | thread_exit  |     |  0.008781 |  0.006069 |            |
+d0 | th01:preload_thread      | thread_exit  |     |  0.009561 |  0.006862 |            |
+d0 | th03:preload_thread      | thread_exit  |     |  0.009742 |  0.007031 |            |
+d0 | th06:preload_thread      | thread_exit  |     |  0.009820 |  0.007081 |            |
+d0 | th02:preload_thread      | thread_exit  |     |  0.010274 |  0.007553 |            |
+d0 | th07:preload_thread      | thread_exit  |     |  0.010477 |  0.007736 |            |
+d0 | th04:preload_thread      | thread_exit  |     |  0.011657 |  0.008947 |            |
+d0 | main                     | region_leave | r1  |  0.011717 |  0.009122 | index      | label:preload
+...
+d0 | main                     | exit         |     |  0.029996 |           |            | code:0
+d0 | main                     | atexit       |     |  0.030027 |           |            | code:0</code></pre>
+</div></div>
+<div class="paragraph"><p>In this example, the preload region took 0.009122 seconds.  The 7 threads
+took between 0.006069 and 0.008947 seconds to work on their portion of
+the index.  Thread "th01" worked on 508 items at offset 0.  Thread "th02"
+worked on 508 items at offset 2032.  Thread "th04" worked on 508 itemts
+at offset 508.</p></div>
+<div class="paragraph"><p>This example also shows that thread names are assigned in a racy manner
+as each thread starts and allocates TLS storage.</p></div>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_future_work">Future Work</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_relationship_to_the_existing_trace_api_api_trace_txt">Relationship to the Existing Trace Api (api-trace.txt)</h3>
+<div class="paragraph"><p>There are a few issues to resolve before we can completely
+switch to Trace2.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Updating existing tests that assume GIT_TRACE format messages.
+</p>
+</li>
+<li>
+<p>
+How to best handle custom GIT_TRACE_&lt;key&gt; messages?
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+The GIT_TRACE_&lt;key&gt; mechanism allows each &lt;key&gt; to write to a
+different file (in addition to just stderr).
+</p>
+</li>
+<li>
+<p>
+Do we want to maintain that ability or simply write to the existing
+Trace2 targets (and convert &lt;key&gt; to a "category").
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated
+ 2019-03-07 12:16:20 JST
+</div>
+</div>
+</body>
+</html>

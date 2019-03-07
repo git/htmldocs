@@ -803,8 +803,32 @@ files are compared.</p></div>
 <dd>
 <p>
         Generate diffs with &lt;n&gt; lines of context instead of
-        the usual three.
+        the usual three. Implies <code>--patch</code>.
         Implies <code>-p</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--output=&lt;file&gt;
+</dt>
+<dd>
+<p>
+        Output to a specific file instead of stdout.
+</p>
+</dd>
+<dt class="hdlist1">
+--output-indicator-new=&lt;char&gt;
+</dt>
+<dt class="hdlist1">
+--output-indicator-old=&lt;char&gt;
+</dt>
+<dt class="hdlist1">
+--output-indicator-context=&lt;char&gt;
+</dt>
+<dd>
+<p>
+        Specify the character used to indicate new, old or context
+        lines in the generated patch. Normally they are <em>+</em>, <em>-</em> and
+        ' ' respectively.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -987,6 +1011,9 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+-X[&lt;param1,param2,&#8230;&gt;]
+</dt>
+<dt class="hdlist1">
 --dirstat[=&lt;param1,param2,&#8230;&gt;]
 </dt>
 <dd>
@@ -1065,6 +1092,22 @@ have to use <code>--diff-algorithm=default</code> option.</p></div>
 directories with less than 10% of the total amount of changed files,
 and accumulating child directory counts in the parent directories:
 <code>--dirstat=files,10,cumulative</code>.</p></div>
+</dd>
+<dt class="hdlist1">
+--cumulative
+</dt>
+<dd>
+<p>
+        Synonym for --dirstat=cumulative
+</p>
+</dd>
+<dt class="hdlist1">
+--dirstat-by-file[=&lt;param1,param2&gt;&#8230;]
+</dt>
+<dd>
+<p>
+        Synonym for --dirstat=files,param1,param2&#8230;
+</p>
 </dd>
 <dt class="hdlist1">
 --summary
@@ -1403,6 +1446,14 @@ override configuration settings.</p></div>
 <p>
         Turn off rename detection, even when the configuration
         file gives the default to do so.
+</p>
+</dd>
+<dt class="hdlist1">
+--[no-]rename-empty
+</dt>
+<dd>
+<p>
+        Whether to use empty blobs as rename source.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2199,14 +2250,27 @@ no optional "score" number
 </li>
 <li>
 <p>
-single path, only for "dst"
+tab-separated pathname(s) of the file
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Example:</p></div>
+<div class="paragraph"><p>For <code>-c</code> and <code>--cc</code>, only the destination or final path is shown even
+if the file was renamed on any side of history.  With
+<code>--combined-all-paths</code>, the name of the path in each parent is shown
+followed by the name of the path in the merge commit.</p></div>
+<div class="paragraph"><p>Examples for <code>-c</code> and <code>--cc</code> without <code>--combined-all-paths</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>::100644 100644 100644 fabadb8 cc95eb0 4866510 MM       describe.c</code></pre>
+<pre><code>::100644 100644 100644 fabadb8 cc95eb0 4866510 MM       desc.c
+::100755 100755 100755 52b7a2d 6d1ac04 d2ac7d7 RM       bar.sh
+::100644 100644 100644 e07d6c5 9042e82 ee91881 RR       phooey.c</code></pre>
+</div></div>
+<div class="paragraph"><p>Examples when <code>--combined-all-paths</code> added to either <code>-c</code> or <code>--cc</code>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>::100644 100644 100644 fabadb8 cc95eb0 4866510 MM       desc.c  desc.c  desc.c
+::100755 100755 100755 52b7a2d 6d1ac04 d2ac7d7 RM       foo.sh  bar.sh  bar.sh
+::100644 100644 100644 e07d6c5 9042e82 ee91881 RR       fooey.c fuey.c  phooey.c</code></pre>
 </div></div>
 <div class="paragraph"><p>Note that <em>combined diff</em> lists only files which were modified from
 all parents.</p></div>
@@ -2383,6 +2447,19 @@ It is followed by two-line from-file/to-file header
 <div class="paragraph"><p>Similar to two-line header for traditional <em>unified</em> diff
 format, <code>/dev/null</code> is used to signal created or deleted
 files.</p></div>
+<div class="paragraph"><p>However, if the --combined-all-paths option is provided, instead of a
+two-line from-file/to-file you get a N+1 line from-file/to-file header,
+where N is the number of parents in the merge commit</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>--- a/file
+--- a/file
+--- a/file
++++ b/file</code></pre>
+</div></div>
+<div class="paragraph"><p>This extended format can be useful if rename or copy detection is
+active, to allow you to see the original name of the file in different
+parents.</p></div>
 </li>
 <li>
 <p>
@@ -2653,7 +2730,7 @@ always have the special all-zero sha1.</td>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2018-05-23 00:06:29 PDT
+ 2018-05-23 16:06:29 JST
 </div>
 </div>
 </body>
