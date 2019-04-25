@@ -4850,8 +4850,11 @@ gc.aggressiveDepth
 <p>
         The depth parameter used in the delta compression
         algorithm used by <em>git gc --aggressive</em>.  This defaults
-        to 50.
+        to 50, which is the default for the <code>--depth</code> option when
+        <code>--aggressive</code> isn&#8217;t in use.
 </p>
+<div class="paragraph"><p>See the documentation for the <code>--depth</code> option in
+<a href="git-repack.html">git-repack(1)</a> for more details.</p></div>
 </dd>
 <dt class="hdlist1">
 gc.aggressiveWindow
@@ -4860,8 +4863,11 @@ gc.aggressiveWindow
 <p>
         The window size parameter used in the delta compression
         algorithm used by <em>git gc --aggressive</em>.  This defaults
-        to 250.
+        to 250, which is a much more aggressive window size than
+        the default <code>--window</code> of 10.
 </p>
+<div class="paragraph"><p>See the documentation for the <code>--window</code> option in
+<a href="git-repack.html">git-repack(1)</a> for more details.</p></div>
 </dd>
 <dt class="hdlist1">
 gc.auto
@@ -4872,8 +4878,12 @@ gc.auto
         objects in the repository, <code>git gc --auto</code> will pack them.
         Some Porcelain commands use this command to perform a
         light-weight garbage collection from time to time.  The
-        default value is 6700.  Setting this to 0 disables it.
+        default value is 6700.
 </p>
+<div class="paragraph"><p>Setting this to 0 disables not only automatic packing based on the
+number of loose objects, but any other heuristic <code>git gc --auto</code> will
+otherwise use to determine if there&#8217;s work to do, such as
+<code>gc.autoPackLimit</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 gc.autoPackLimit
@@ -4884,7 +4894,10 @@ gc.autoPackLimit
         marked with <code>*.keep</code> file in the repository, <code>git gc
         --auto</code> consolidates them into one larger pack.  The
         default value is 50.  Setting this to 0 disables it.
+        Setting <code>gc.auto</code> to 0 will also disable this.
 </p>
+<div class="paragraph"><p>See the <code>gc.bigPackThreshold</code> configuration variable below. When in
+use, it&#8217;ll affect how the auto pack limit works.</p></div>
 </dd>
 <dt class="hdlist1">
 gc.autoDetach
@@ -4910,6 +4923,10 @@ gc.bigPackThreshold
 this configuration variable is ignored, all packs except the base pack
 will be repacked. After this the number of packs should go below
 gc.autoPackLimit and gc.bigPackThreshold should be respected again.</p></div>
+<div class="paragraph"><p>If the amount of memory estimated for <code>git repack</code> to run smoothly is
+not available and <code>gc.bigPackThreshold</code> is not set, the largest pack
+will also be excluded (this is the equivalent of running <code>git gc</code> with
+<code>--keep-base-pack</code>).</p></div>
 </dd>
 <dt class="hdlist1">
 gc.writeCommitGraph
@@ -4917,8 +4934,8 @@ gc.writeCommitGraph
 <dd>
 <p>
         If true, then gc will rewrite the commit-graph file when
-        <a href="git-gc.html">git-gc(1)</a> is run. When using <a href="git-gc.html">git-gc(1)</a>
-        <em>--auto</em> the commit-graph will be updated if housekeeping is
+        <a href="git-gc.html">git-gc(1)</a> is run. When using <code>git gc --auto</code>
+        the commit-graph will be updated if housekeeping is
         required. Default is false. See <a href="git-commit-graph.html">git-commit-graph(1)</a>
         for details.
 </p>
@@ -5007,6 +5024,11 @@ gc.&lt;pattern&gt;.reflogExpireUnreachable
         in the middle, the setting applies only to the refs that
         match the &lt;pattern&gt;.
 </p>
+<div class="paragraph"><p>These types of entries are generally created as a result of using <code>git
+commit --amend</code> or <code>git rebase</code> and are the commits prior to the amend
+or rebase occurring.  Since these changes are not part of the current
+project most users will want to expire them sooner, which is why the
+default is more aggressive than <code>gc.reflogExpire</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 gc.rerereResolved
