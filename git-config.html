@@ -7187,9 +7187,7 @@ pack.writeBitmapHashCache
         bitmapped and non-bitmapped objects (e.g., when serving a fetch
         between an older, bitmapped pack and objects that have been
         pushed since the last gc). The downside is that it consumes 4
-        bytes per object of disk space, and that JGit&#8217;s bitmap
-        implementation does not understand it, causing it to complain if
-        Git and JGit are used on the same repository. Defaults to false.
+        bytes per object of disk space. Defaults to true.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -8065,7 +8063,7 @@ repack.writeBitmaps
         packs created for clones and fetches, at the cost of some disk
         space and extra time spent on the initial repack.  This has
         no effect if multiple packfiles are created.
-        Defaults to false.
+        Defaults to true on bare repos, false otherwise.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -8683,6 +8681,140 @@ tar.umask
         world write bit.  The special value "user" indicates that the
         archiving user&#8217;s umask will be used instead.  See umask(2) and
         <a href="git-archive.html">git-archive(1)</a>.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Trace2 config settings are only read from the system and global
+config files; repository local and worktree config files and <code>-c</code>
+command line arguments are not respected.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+trace2.normalTarget
+</dt>
+<dd>
+<p>
+        This variable controls the normal target destination.
+        It may be overridden by the <code>GIT_TR2</code> environment variable.
+        The following table shows possible values.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.perfTarget
+</dt>
+<dd>
+<p>
+        This variable controls the performance target destination.
+        It may be overridden by the <code>GIT_TR2_PERF</code> environment variable.
+        The following table shows possible values.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.eventTarget
+</dt>
+<dd>
+<p>
+        This variable controls the event target destination.
+        It may be overridden by the <code>GIT_TR2_EVENT</code> environment variable.
+        The following table shows possible values.
+</p>
+<div class="openblock">
+<div class="content">
+<div class="ulist"><ul>
+<li>
+<p>
+<code>0</code> or <code>false</code> - Disables the target.
+</p>
+</li>
+<li>
+<p>
+<code>1</code> or <code>true</code> - Writes to <code>STDERR</code>.
+</p>
+</li>
+<li>
+<p>
+<code>[2-9]</code> - Writes to the already opened file descriptor.
+</p>
+</li>
+<li>
+<p>
+<code>&lt;absolute-pathname&gt;</code> - Writes to the file in append mode.
+</p>
+</li>
+<li>
+<p>
+<code>af_unix:[&lt;socket_type&gt;:]&lt;absolute-pathname&gt;</code> - Write to a
+Unix DomainSocket (on platforms that support them).  Socket
+type can be either <code>stream</code> or <code>dgram</code>; if omitted Git will
+try both.
+</p>
+</li>
+</ul></div>
+</div></div>
+</dd>
+<dt class="hdlist1">
+trace2.normalBrief
+</dt>
+<dd>
+<p>
+        Boolean.  When true <code>time</code>, <code>filename</code>, and <code>line</code> fields are
+        omitted from normal output.  May be overridden by the
+        <code>GIT_TR2_BRIEF</code> environment variable.  Defaults to false.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.perfBrief
+</dt>
+<dd>
+<p>
+        Boolean.  When true <code>time</code>, <code>filename</code>, and <code>line</code> fields are
+        omitted from PERF output.  May be overridden by the
+        <code>GIT_TR2_PERF_BRIEF</code> environment variable.  Defaults to false.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.eventBrief
+</dt>
+<dd>
+<p>
+        Boolean.  When true <code>time</code>, <code>filename</code>, and <code>line</code> fields are
+        omitted from event output.  May be overridden by the
+        <code>GIT_TR2_EVENT_BRIEF</code> environment variable.  Defaults to false.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.eventNesting
+</dt>
+<dd>
+<p>
+        Integer.  Specifies desired depth of nested regions in the
+        event output.  Regions deeper than this value will be
+        omitted.  May be overridden by the <code>GIT_TR2_EVENT_NESTING</code>
+        environment variable.  Defaults to 2.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.configParams
+</dt>
+<dd>
+<p>
+        A comma-separated list of patterns of "important" config
+        settings that should be recorded in the trace2 output.
+        For example, <code>core.*,remote.*.url</code> would cause the trace2
+        output to contain events listing each configured remote.
+        May be overridden by the <code>GIT_TR2_CONFIG_PARAMS</code> environment
+        variable.  Unset by default.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.destinationDebug
+</dt>
+<dd>
+<p>
+        Boolean.  When true Git will print error messages when a
+        trace target destination cannot be opened for writing.
+        By default, these errors are suppressed and tracing is
+        silently disabled.  May be overridden by the
+        <code>GIT_TR2_DST_DEBUG</code> environment variable.
 </p>
 </dd>
 <dt class="hdlist1">

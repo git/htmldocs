@@ -1375,7 +1375,7 @@ some output processing may assume ref names in UTF-8.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<em>&lt;refname&gt;@{&lt;date&gt;}</em>, e.g. <em>master@{yesterday}</em>, <em>HEAD@{5 minutes ago}</em>
+<em>[&lt;refname&gt;]@{&lt;date&gt;}</em>, e.g. <em>master@{yesterday}</em>, <em>HEAD@{5 minutes ago}</em>
 </dt>
 <dd>
 <p>
@@ -1425,7 +1425,7 @@ some output processing may assume ref names in UTF-8.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<em>&lt;branchname&gt;@{upstream}</em>, e.g. <em>master@{upstream}</em>, <em>@{u}</em>
+<em>[&lt;branchname&gt;]@{upstream}</em>, e.g. <em>master@{upstream}</em>, <em>@{u}</em>
 </dt>
 <dd>
 <p>
@@ -1438,7 +1438,7 @@ some output processing may assume ref names in UTF-8.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<em>&lt;branchname&gt;@{push}</em>, e.g. <em>master@{push}</em>, <em>@{push}</em>
+<em>[&lt;branchname&gt;]@{push}</em>, e.g. <em>master@{push}</em>, <em>@{push}</em>
 </dt>
 <dd>
 <p>
@@ -1468,7 +1468,7 @@ from one location and push to another. In a non-triangular workflow,
 thing no matter the case.</p></div>
 </dd>
 <dt class="hdlist1">
-<em>&lt;rev&gt;&#94;</em>, e.g. <em>HEAD&#94;, v1.5.1&#94;0</em>
+<em>&lt;rev&gt;&#94;[&lt;n&gt;]</em>, e.g. <em>HEAD&#94;, v1.5.1&#94;0</em>
 </dt>
 <dd>
 <p>
@@ -1481,10 +1481,12 @@ thing no matter the case.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<em>&lt;rev&gt;&#126;&lt;n&gt;</em>, e.g. <em>master&#126;3</em>
+<em>&lt;rev&gt;&#126;[&lt;n&gt;]</em>, e.g. <em>HEAD&#126;, master&#126;3</em>
 </dt>
 <dd>
 <p>
+  A suffix <em>&#126;</em> to a revision parameter means the first parent of
+  that commit object.
   A suffix <em>&#126;&lt;n&gt;</em> to a revision parameter means the commit
   object that is the &lt;n&gt;th generation ancestor of the named
   commit object, following only the first parents.  I.e. <em>&lt;rev&gt;&#126;3</em> is
@@ -1509,11 +1511,11 @@ thing no matter the case.</p></div>
   <em>&lt;rev&gt;&#94;0</em>
   is a short-hand for <em>&lt;rev&gt;&#94;{commit}</em>.
 </p>
-<div class="paragraph"><p><em>rev&#94;{object}</em> can be used to make sure <em>rev</em> names an
-object that exists, without requiring <em>rev</em> to be a tag, and
-without dereferencing <em>rev</em>; because a tag is already an object,
+<div class="paragraph"><p><em>&lt;rev&gt;&#94;{object}</em> can be used to make sure <em>&lt;rev&gt;</em> names an
+object that exists, without requiring <em>&lt;rev&gt;</em> to be a tag, and
+without dereferencing <em>&lt;rev&gt;</em>; because a tag is already an object,
 it does not have to be dereferenced even once to get to an object.</p></div>
-<div class="paragraph"><p><em>rev&#94;{tag}</em> can be used to ensure that <em>rev</em> identifies an
+<div class="paragraph"><p><em>&lt;rev&gt;&#94;{tag}</em> can be used to ensure that <em>&lt;rev&gt;</em> identifies an
 existing tag object.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1559,16 +1561,13 @@ existing tag object.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<em>&lt;rev&gt;:&lt;path&gt;</em>, e.g. <em>HEAD:README</em>, <em>:README</em>, <em>master:./README</em>
+<em>&lt;rev&gt;:&lt;path&gt;</em>, e.g. <em>HEAD:README</em>, <em>master:./README</em>
 </dt>
 <dd>
 <p>
   A suffix <em>:</em> followed by a path names the blob or tree
   at the given path in the tree-ish object named by the part
   before the colon.
-  <em>:path</em> (with an empty part before the colon)
-  is a special case of the syntax described next: content
-  recorded in the index at the given path.
   A path starting with <em>./</em> or <em>../</em> is relative to the current working directory.
   The given path will be converted to be relative to the working tree&#8217;s root directory.
   This is most useful to address a blob or tree from a commit or tree that has
@@ -1576,7 +1575,7 @@ existing tag object.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
-<em>:&lt;n&gt;:&lt;path&gt;</em>, e.g. <em>:0:README</em>, <em>:README</em>
+<em>:[&lt;n&gt;:]&lt;path&gt;</em>, e.g. <em>:0:README</em>, <em>:README</em>
 </dt>
 <dd>
 <p>
@@ -1690,7 +1689,7 @@ for naming a set that is formed by a commit and its parent commits.</p></div>
 <div class="paragraph"><p>The <em>r1&#94;@</em> notation means all parents of <em>r1</em>.</p></div>
 <div class="paragraph"><p>The <em>r1&#94;!</em> notation includes commit <em>r1</em> but excludes all of its parents.
 By itself, this notation denotes the single commit <em>r1</em>.</p></div>
-<div class="paragraph"><p>The <em>&lt;rev&gt;&#94;-&lt;n&gt;</em> notation includes <em>&lt;rev&gt;</em> but excludes the &lt;n&gt;th
+<div class="paragraph"><p>The <em>&lt;rev&gt;&#94;-[&lt;n&gt;]</em> notation includes <em>&lt;rev&gt;</em> but excludes the &lt;n&gt;th
 parent (i.e. a shorthand for <em>&lt;rev&gt;&#94;&lt;n&gt;..&lt;rev&gt;</em>), with <em>&lt;n&gt;</em> = 1 if
 not given. This is typically useful for merge commits where you
 can just pass <em>&lt;commit&gt;&#94;-</em> to get all the commits in the branch

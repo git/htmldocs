@@ -756,6 +756,10 @@ many different types of analysis.</p></div>
 <div class="paragraph"><p>Targets are defined using a VTable allowing easy extension to other
 formats in the future.  This might be used to define a binary format,
 for example.</p></div>
+<div class="paragraph"><p>Trace2 is controlled using <code>trace2.*</code> config values in the system and
+global config files and <code>GIT_TR2*</code> environment variables.  Trace2 does
+not read from repo local or worktree config files or respect <code>-c</code>
+command line config settings.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -763,20 +767,27 @@ for example.</p></div>
 <div class="sectionbody">
 <div class="paragraph"><p>Trace2 defines the following set of Trace2 Targets.
 Format details are given in a later section.</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<code>GIT_TR2</code> (NORMAL)
-</dt>
-<dd>
-<p>
-        a simple printf format like GIT_TRACE.
-</p>
+<div class="sect2">
+<h3 id="_the_normal_format_target">The Normal Format Target</h3>
+<div class="paragraph"><p>The normal format target is a tradition printf format and similar
+to GIT_TRACE format.  This format is enabled with the <code>GIT_TR</code>
+environment variable or the <code>trace2.normalTarget</code> system or global
+config setting.</p></div>
+<div class="paragraph"><p>For example</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ export GIT_TR2=~/log.normal
 $ git version
 git version 2.20.1.155.g426c96fcdb</code></pre>
 </div></div>
+<div class="paragraph"><p>or</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git config --global trace2.normalTarget ~/log.normal
+$ git version
+git version 2.20.1.155.g426c96fcdb</code></pre>
+</div></div>
+<div class="paragraph"><p>yields</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ cat ~/log.normal
@@ -786,121 +797,112 @@ git version 2.20.1.155.g426c96fcdb</code></pre>
 12:28:42.621215 git.c:662                         exit elapsed:0.001227 code:0
 12:28:42.621250 trace2/tr2_tgt_normal.c:124       atexit elapsed:0.001265 code:0</code></pre>
 </div></div>
-</dd>
-<dt class="hdlist1">
-<code>GIT_TR2_PERF</code> (PERF)
-</dt>
-<dd>
-<p>
-        a column-based format to replace GIT_TRACE_PERFORMANCE suitable for
-        development and testing, possibly to complement tools like gprof.
-</p>
+</div>
+<div class="sect2">
+<h3 id="_the_performance_format_target">The Performance Format Target</h3>
+<div class="paragraph"><p>The performance format target (PERF) is a column-based format to
+replace GIT_TRACE_PERFORMANCE and is suitable for development and
+testing, possibly to complement tools like gprof.  This format is
+enabled with the <code>GIT_TR2_PERF</code> environment variable or the
+<code>trace2.perfTarget</code> system or global config setting.</p></div>
+<div class="paragraph"><p>For example</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ export GIT_TR2_PERF=~/log.perf
 $ git version
 git version 2.20.1.155.g426c96fcdb</code></pre>
 </div></div>
+<div class="paragraph"><p>or</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git config --global trace2.perfTarget ~/log.perf
+$ git version
+git version 2.20.1.155.g426c96fcdb</code></pre>
+</div></div>
+<div class="paragraph"><p>yields</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ cat ~/log.perf
 12:28:42.620675 common-main.c:38                  | d0 | main                     | version      |     |           |           |            | 2.20.1.155.g426c96fcdb
-12:28:42.621001 common-main.c:39                  | d0 | main                     | start        |     |           |           |            | git version
+12:28:42.621001 common-main.c:39                  | d0 | main                     | start        |     |  0.001173 |           |            | git version
 12:28:42.621111 git.c:432                         | d0 | main                     | cmd_name     |     |           |           |            | version (version)
 12:28:42.621225 git.c:662                         | d0 | main                     | exit         |     |  0.001227 |           |            | code:0
 12:28:42.621259 trace2/tr2_tgt_perf.c:211         | d0 | main                     | atexit       |     |  0.001265 |           |            | code:0</code></pre>
 </div></div>
-</dd>
-<dt class="hdlist1">
-<code>GIT_TR2_EVENT</code> (EVENT)
-</dt>
-<dd>
-<p>
-        a JSON-based format of event data suitable for telemetry analysis.
-</p>
+</div>
+<div class="sect2">
+<h3 id="_the_event_format_target">The Event Format Target</h3>
+<div class="paragraph"><p>The event format target is a JSON-based format of event data suitable
+for telemetry analysis.  This format is enabled with the <code>GIT_TR2_EVENT</code>
+environment variable or the <code>trace2.eventTarget</code> system or global config
+setting.</p></div>
+<div class="paragraph"><p>For example</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ export GIT_TR2_EVENT=~/log.event
 $ git version
 git version 2.20.1.155.g426c96fcdb</code></pre>
 </div></div>
+<div class="paragraph"><p>or</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git config --global trace2.eventTarget ~/log.event
+$ git version
+git version 2.20.1.155.g426c96fcdb</code></pre>
+</div></div>
+<div class="paragraph"><p>yields</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ cat ~/log.event
-{"event":"version","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.620713","file":"common-main.c","line":38,"evt":"1","exe":"2.20.1.155.g426c96fcdb"}
-{"event":"start","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621027","file":"common-main.c","line":39,"argv":["git","version"]}
-{"event":"cmd_name","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621122","file":"git.c","line":432,"name":"version","hierarchy":"version"}
-{"event":"exit","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621236","file":"git.c","line":662,"t_abs":0.001227,"code":0}
-{"event":"atexit","sid":"1547659722619736-11614","thread":"main","time":"2019-01-16 17:28:42.621268","file":"trace2/tr2_tgt_event.c","line":163,"t_abs":0.001265,"code":0}</code></pre>
+{"event":"version","sid":"sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.620713Z","file":"common-main.c","line":38,"evt":"1","exe":"2.20.1.155.g426c96fcdb"}
+{"event":"start","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621027Z","file":"common-main.c","line":39,"t_abs":0.001173,"argv":["git","version"]}
+{"event":"cmd_name","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621122Z","file":"git.c","line":432,"name":"version","hierarchy":"version"}
+{"event":"exit","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621236Z","file":"git.c","line":662,"t_abs":0.001227,"code":0}
+{"event":"atexit","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621268Z","file":"trace2/tr2_tgt_event.c","line":163,"t_abs":0.001265,"code":0}</code></pre>
 </div></div>
-</dd>
-</dl></div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_enabling_a_target">Enabling a Target</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>A Trace2 Target is enabled when the corresponding environment variable
-(<code>GIT_TR2</code>, <code>GIT_TR2_PERF</code>, or <code>GIT_TR2_EVENT</code>) is set.  The following
-values are recognized.</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
-<code>0</code>
-</dt>
-<dt class="hdlist1">
-<code>false</code>
-</dt>
-<dd>
-<p>
-        Disables the target.
-</p>
-</dd>
-<dt class="hdlist1">
-<code>1</code>
-</dt>
-<dt class="hdlist1">
-<code>true</code>
-</dt>
-<dd>
-<p>
-        Enables the target and writes stream to <code>STDERR</code>.
-</p>
-</dd>
-<dt class="hdlist1">
-<code>[2-9]</code>
-</dt>
-<dd>
-<p>
-        Enables the target and writes to the already opened file descriptor.
-</p>
-</dd>
-<dt class="hdlist1">
-<code>&lt;absolute-pathname&gt;</code>
-</dt>
-<dd>
-<p>
-        Enables the target, opens and writes to the file in append mode.
-</p>
-<div class="literalblock">
+<div class="sect2">
+<h3 id="_enabling_a_target">Enabling a Target</h3>
+<div class="paragraph"><p>To enable a target, set the corresponding environment variable or
+system or global config value to one of the following:</p></div>
+<div class="openblock">
 <div class="content">
-<pre><code>If the target already exists and is a directory, the traces will be
+<div class="ulist"><ul>
+<li>
+<p>
+<code>0</code> or <code>false</code> - Disables the target.
+</p>
+</li>
+<li>
+<p>
+<code>1</code> or <code>true</code> - Writes to <code>STDERR</code>.
+</p>
+</li>
+<li>
+<p>
+<code>[2-9]</code> - Writes to the already opened file descriptor.
+</p>
+</li>
+<li>
+<p>
+<code>&lt;absolute-pathname&gt;</code> - Writes to the file in append mode.
+</p>
+</li>
+<li>
+<p>
+<code>af_unix:[&lt;socket_type&gt;:]&lt;absolute-pathname&gt;</code> - Write to a
+Unix DomainSocket (on platforms that support them).  Socket
+type can be either <code>stream</code> or <code>dgram</code>; if omitted Git will
+try both.
+</p>
+</li>
+</ul></div>
+</div></div>
+<div class="paragraph"><p>If the target already exists and is a directory, the traces will be
 written to files (one per process) underneath the given directory. They
 will be named according to the last component of the SID (optionally
-followed by a counter to avoid filename collisions).</code></pre>
-</div></div>
-</dd>
-<dt class="hdlist1">
-<code>af_unix:[&lt;socket_type&gt;:]&lt;absolute-pathname&gt;</code>
-</dt>
-<dd>
-<p>
-        Enables the target, opens and writes to a Unix Domain Socket
-        (on platforms that support them).
-</p>
-<div class="paragraph"><p>Socket type can be either <code>stream</code> or <code>dgram</code>.  If the socket type is
-omitted, Git will try both.</p></div>
-</dd>
-</dl></div>
+followed by a counter to avoid filename collisions).</p></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -944,18 +946,28 @@ purposes.</p></div>
 <div class="paragraph"><p>These are concerned with the lifetime of the overall git process.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
+<code>void trace2_initialize_clock()</code>
+</dt>
+<dd>
+<p>
+        Initialize the Trace2 start clock and nothing else.  This should
+        be called at the very top of main() to capture the process start
+        time and reduce startup order dependencies.
+</p>
+</dd>
+<dt class="hdlist1">
 <code>void trace2_initialize()</code>
 </dt>
 <dd>
 <p>
         Determines if any Trace2 Targets should be enabled and
-        initializes the Trace2 facility.  This includes starting the
-        elapsed time clocks and thread local storage (TLS).
+        initializes the Trace2 facility.  This includes setting up the
+        Trace2 thread local storage (TLS).
 </p>
 <div class="paragraph"><p>This function emits a "version" message containing the version of git
 and the Trace2 protocol.</p></div>
 <div class="paragraph"><p>This function should be called from <code>main()</code> as early as possible in
-the life of the process.</p></div>
+the life of the process after essential process initialization.</p></div>
 </dd>
 <dt class="hdlist1">
 <code>int trace2_is_enabled()</code>
@@ -1060,7 +1072,8 @@ significantly affects program performance or behavior, such as
         Emits a "def_param" messages for "important" configuration
         settings.
 </p>
-<div class="paragraph"><p>The environment variable <code>GIT_TR2_CONFIG_PARAMS</code> can be set to a
+<div class="paragraph"><p>The environment variable <code>GIT_TR2_CONFIG_PARAMS</code> or the <code>trace2.configParams</code>
+config value can be set to a
 list of patterns of important configuration settings, for example:
 <code>core.*,remote.*.url</code>.  This function will iterate over all config
 settings and emit a "def_param" message for each match.</p></div>
@@ -1070,8 +1083,8 @@ settings and emit a "def_param" message for each match.</p></div>
 </dt>
 <dd>
 <p>
-        Emits a "def_param" message for a specific configuration
-        setting IFF it matches the <code>GIT_TR2_CONFIG_PARAMS</code> pattern.
+        Emits a "def_param" message for a new or updated key/value
+        pair IF <code>key</code> is considered important.
 </p>
 <div class="paragraph"><p>This is used to hook into <code>git_config_set()</code> and catch any
 configuration changes and update a value previously reported by
@@ -1277,8 +1290,6 @@ recursive tree walk.</p></div>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_normal_format">NORMAL Format</h3>
-<div class="paragraph"><p>NORMAL format is enabled when the <code>GIT_TR2</code> environment variable is
-set.</p></div>
 <div class="paragraph"><p>Events are written as lines of the form:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1304,16 +1315,14 @@ set.</p></div>
 not escaped, so the event may spill across multiple lines.</p></div>
 </dd>
 </dl></div>
-<div class="paragraph"><p>If <code>GIT_TR2_BRIEF</code> is true, the <code>time</code>, <code>filename</code>, and <code>line</code> fields
-are omitted.</p></div>
+<div class="paragraph"><p>If <code>GIT_TR2_BRIEF</code> or <code>trace2.normalBrief</code> is true, the <code>time</code>, <code>filename</code>,
+and <code>line</code> fields are omitted.</p></div>
 <div class="paragraph"><p>This target is intended to be more of a summary (like GIT_TRACE) and
 less detailed than the other targets.  It ignores thread, region, and
 data messages, for example.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_perf_format">PERF Format</h3>
-<div class="paragraph"><p>PERF format is enabled when the <code>GIT_TR2_PERF</code> environment variable
-is set.</p></div>
 <div class="paragraph"><p>Events are written as lines of the form:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1413,8 +1422,8 @@ This field is in anticipation of in-proc submodules in the future.</p></div>
 <pre><code>15:33:33.532712 wt-status.c:2310                  | d0 | main                     | region_enter | r1  |  0.126064 |           | status     | label:print
 15:33:33.532712 wt-status.c:2331                  | d0 | main                     | region_leave | r1  |  0.127568 |  0.001504 | status     | label:print</code></pre>
 </div></div>
-<div class="paragraph"><p>If <code>GIT_TR2_PERF_BRIEF</code> is true, the <code>time</code>, <code>file</code>, and <code>line</code>
-fields are omitted.</p></div>
+<div class="paragraph"><p>If <code>GIT_TR2_PERF_BRIEF</code> or <code>trace2.perfBrief</code> is true, the <code>time</code>, <code>file</code>,
+and <code>line</code> fields are omitted.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>d0 | main                     | region_leave | r1  |  0.011717 |  0.009122 | index      | label:preload</code></pre>
@@ -1424,8 +1433,6 @@ during development and is quite noisy.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_event_format">EVENT Format</h3>
-<div class="paragraph"><p>EVENT format is enabled when the <code>GIT_TR2_EVENT</code> environment
-variable is set.</p></div>
 <div class="paragraph"><p>Each event is a JSON-object containing multiple key/value pairs
 written as a single line and followed by a LF.</p></div>
 <div class="listingblock">
@@ -1441,11 +1448,11 @@ event-specific.</p></div>
 <div class="content">
 <pre><code>{
         "event":"version",
-        "sid":"1547659722619736-11614",
+        "sid":"20190408T191827.272759Z-H9b68c35f-P00003510",
         "thread":"main",
-        "time":"2019-01-16 17:28:42.620713",
+        "time":"2019-04-08T19:18:27.282761Z",
         "file":"common-main.c",
-        "line":38,
+        "line":42,
         ...
 }</code></pre>
 </div></div>
@@ -1513,9 +1520,9 @@ event-specific.</p></div>
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>If <code>GIT_TR2_EVENT_BRIEF</code> is true, the <code>file</code> and <code>line</code> fields are omitted
-from all events and the <code>time</code> field is only present on the "start" and
-"atexit" events.</p></div>
+<div class="paragraph"><p>If <code>GIT_TR2_EVENT_BRIEF</code> or <code>trace2.eventBrief</code> is true, the <code>file</code>
+and <code>line</code> fields are omitted from all events and the <code>time</code> field is
+only present on the "start" and "atexit" events.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_event_specific_key_value_pairs">Event-Specific Key/Value Pairs</h4>
@@ -1549,6 +1556,7 @@ from all events and the <code>time</code> field is only present on the "start" a
 <pre><code>{
         "event":"start",
         ...
+        "t_abs":0.001227, # elapsed time in seconds
         "argv":["git","version"]
 }</code></pre>
 </div></div>
@@ -1909,7 +1917,7 @@ visited.</p></div>
 </div></div>
 <div class="paragraph"><p>The <code>category</code> field may be used in a future enhancement to
 do category-based filtering.</p></div>
-<div class="paragraph"><p>The <code>GIT_TR2_EVENT_NESTING</code> environment variable can be used to
+<div class="paragraph"><p><code>GIT_TR2_EVENT_NESTING</code> or <code>trace2.eventNesting</code> can be used to
 filter deeply nested regions and data events.  It defaults to "2".</p></div>
 </dd>
 <dt class="hdlist1">
@@ -2172,7 +2180,7 @@ $ git status
 
 $ cat ~/log.perf
 d0 | main                     | version      |     |           |           |            | 2.20.1.160.g5676107ecd.dirty
-d0 | main                     | start        |     |           |           |            | git status
+d0 | main                     | start        |     |  0.001173 |           |            | git status
 d0 | main                     | def_repo     | r1  |           |           |            | worktree:/Users/jeffhost/work/gfw
 d0 | main                     | cmd_name     |     |           |           |            | status (status)
 ...
@@ -2215,7 +2223,7 @@ $ git status
 ...
 $ cat ~/log.perf
 d0 | main                     | version      |     |           |           |            | 2.20.1.162.gb4ccea44db.dirty
-d0 | main                     | start        |     |           |           |            | git status
+d0 | main                     | start        |     |  0.001173 |           |            | git status
 d0 | main                     | def_repo     | r1  |           |           |            | worktree:/Users/jeffhost/work/gfw
 d0 | main                     | cmd_name     |     |           |           |            | status (status)
 ...
@@ -2273,7 +2281,7 @@ $ git status
 ...
 $ cat ~/log.perf
 d0 | main                     | version      |     |           |           |            | 2.20.1.156.gf9916ae094.dirty
-d0 | main                     | start        |     |           |           |            | git status
+d0 | main                     | start        |     |  0.001173 |           |            | git status
 d0 | main                     | def_repo     | r1  |           |           |            | worktree:/Users/jeffhost/work/gfw
 d0 | main                     | cmd_name     |     |           |           |            | status (status)
 d0 | main                     | region_enter | r1  |  0.001791 |           | index      | label:do_read_index .git/index
@@ -2434,7 +2442,7 @@ Trace2 targets (and convert &lt;key&gt; to a "category").
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2019-05-09 02:15:17 JST
+ 2019-05-14 01:01:04 JST
 </div>
 </div>
 </body>
