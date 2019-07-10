@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.10" />
-<title>How to integrate new subcommands</title>
+<title>git-switch(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,130 +732,392 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>How to integrate new subcommands</h1>
+<h1>
+git-switch(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-switch -
+   Switch branches
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This is how-to documentation for people who want to add extension
-commands to Git.  It should be read alongside api-builtin.txt.</p></div>
+<div class="verseblock">
+<pre class="content"><em>git switch</em> [&lt;options&gt;] [--no-guess] &lt;branch&gt;
+<em>git switch</em> [&lt;options&gt;] --detach [&lt;start-point&gt;]
+<em>git switch</em> [&lt;options&gt;] (-c|-C) &lt;new-branch&gt; [&lt;start-point&gt;]
+<em>git switch</em> [&lt;options&gt;] --orphan &lt;new-branch&gt;</pre>
+<div class="attribution">
+</div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_runtime_environment">Runtime environment</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Git subcommands are standalone executables that live in the Git exec
-path, normally /usr/lib/git-core.  The git executable itself is a
-thin wrapper that knows where the subcommands live, and runs them by
-passing command-line arguments to them.</p></div>
-<div class="paragraph"><p>(If "git foo" is not found in the Git exec path, the wrapper
-will look in the rest of your $PATH for it.  Thus, it&#8217;s possible
-to write local Git extensions that don&#8217;t live in system space.)</p></div>
+<div class="paragraph"><p>Switch to a specified branch. The working tree and the index are
+updated to match the branch. All new commits will be added to the tip
+of this branch.</p></div>
+<div class="paragraph"><p>Optionally a new branch could be created with either <code>-c</code>, <code>-C</code>,
+automatically from a remote branch of same name (see <code>--guess</code>), or
+detach the working tree from any branch with <code>--detach</code>, along with
+switching.</p></div>
+<div class="paragraph"><p>Switching branches does not require a clean index and working tree
+(i.e. no differences compared to <code>HEAD</code>). The operation is aborted
+however if the operation leads to loss of local changes, unless told
+otherwise with <code>--discard-changes</code> or <code>--merge</code>.</p></div>
+<div class="paragraph"><p>THIS COMMAND IS EXPERIMENTAL. THE BEHAVIOR MAY CHANGE.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_implementation_languages">Implementation languages</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Most subcommands are written in C or shell.  A few are written in
-Perl.</p></div>
-<div class="paragraph"><p>While we strongly encourage coding in portable C for portability,
-these specific scripting languages are also acceptable.  We won&#8217;t
-accept more without a very strong technical case, as we don&#8217;t want
-to broaden the Git suite&#8217;s required dependencies.  Import utilities,
-surgical tools, remote helpers and other code at the edges of the
-Git suite are more lenient and we allow Python (and even Tcl/tk),
-but they should not be used for core functions.</p></div>
-<div class="paragraph"><p>This may change in the future.  Especially Python is not allowed in
-core because we need better Python integration in the Git Windows
-installer before we can be confident people in that environment
-won&#8217;t experience an unacceptably large loss of capability.</p></div>
-<div class="paragraph"><p>C commands are normally written as single modules, named after the
-command, that link a collection of functions called libgit.  Thus,
-your command <em>git-foo</em> would normally be implemented as a single
-"git-foo.c" (or "builtin/foo.c" if it is to be linked to the main
-binary); this organization makes it easy for people reading the code
-to find things.</p></div>
-<div class="paragraph"><p>See the CodingGuidelines document for other guidance on what we consider
-good practice in C and shell, and api-builtin.txt for the support
-functions available to built-in commands written in C.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+&lt;branch&gt;
+</dt>
+<dd>
+<p>
+        Branch to switch to.
+</p>
+</dd>
+<dt class="hdlist1">
+&lt;new-branch&gt;
+</dt>
+<dd>
+<p>
+        Name for the new branch.
+</p>
+</dd>
+<dt class="hdlist1">
+&lt;start-point&gt;
+</dt>
+<dd>
+<p>
+        The starting point for the new branch. Specifying a
+        <code>&lt;start-point&gt;</code> allows you to create a branch based on some
+        other point in history than where HEAD currently points. (Or,
+        in the case of <code>--detach</code>, allows you to inspect and detach
+        from some other point.)
+</p>
+<div class="paragraph"><p>You can use the <code>@{-N}</code> syntax to refer to the N-th last
+branch/commit switched to using "git switch" or "git checkout"
+operation. You may also specify <code>-</code> which is synonymous to <code>@{-1}</code>.
+This is often used to switch quickly between two branches, or to undo
+a branch switch by mistake.</p></div>
+<div class="paragraph"><p>As a special case, you may use <code>A...B</code> as a shortcut for the merge
+base of <code>A</code> and <code>B</code> if there is exactly one merge base. You can leave
+out at most one of <code>A</code> and <code>B</code>, in which case it defaults to <code>HEAD</code>.</p></div>
+</dd>
+<dt class="hdlist1">
+-c &lt;new-branch&gt;
+</dt>
+<dt class="hdlist1">
+--create &lt;new-branch&gt;
+</dt>
+<dd>
+<p>
+        Create a new branch named <code>&lt;new-branch&gt;</code> starting at
+        <code>&lt;start-point&gt;</code> before switching to the branch. This is a
+        convenient shortcut for:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git branch &lt;new-branch&gt;
+$ git switch &lt;new-branch&gt;</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+-C &lt;new-branch&gt;
+</dt>
+<dt class="hdlist1">
+--force-create &lt;new-branch&gt;
+</dt>
+<dd>
+<p>
+        Similar to <code>--create</code> except that if <code>&lt;new-branch&gt;</code> already
+        exists, it will be reset to <code>&lt;start-point&gt;</code>. This is a
+        convenient shortcut for:
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git branch -f &lt;new-branch&gt;
+$ git switch &lt;new-branch&gt;</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+-d
+</dt>
+<dt class="hdlist1">
+--detach
+</dt>
+<dd>
+<p>
+        Switch to a commit for inspection and discardable
+        experiments. See the "DETACHED HEAD" section in
+        <a href="git-checkout.html">git-checkout(1)</a> for details.
+</p>
+</dd>
+<dt class="hdlist1">
+--guess
+</dt>
+<dt class="hdlist1">
+--no-guess
+</dt>
+<dd>
+<p>
+        If <code>&lt;branch&gt;</code> is not found but there does exist a tracking
+        branch in exactly one remote (call it <code>&lt;remote&gt;</code>) with a
+        matching name, treat as equivalent to
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch -c &lt;branch&gt; --track &lt;remote&gt;/&lt;branch&gt;</code></pre>
+</div></div>
+<div class="paragraph"><p>If the branch exists in multiple remotes and one of them is named by
+the <code>checkout.defaultRemote</code> configuration variable, we&#8217;ll use that
+one for the purposes of disambiguation, even if the <code>&lt;branch&gt;</code> isn&#8217;t
+unique across all remotes. Set it to e.g. <code>checkout.defaultRemote=origin</code>
+to always checkout remote branches from there if <code>&lt;branch&gt;</code> is
+ambiguous but exists on the <em>origin</em> remote. See also
+<code>checkout.defaultRemote</code> in <a href="git-config.html">git-config(1)</a>.</p></div>
+<div class="paragraph"><p><code>--guess</code> is the default behavior. Use <code>--no-guess</code> to disable it.</p></div>
+</dd>
+<dt class="hdlist1">
+-f
+</dt>
+<dt class="hdlist1">
+--force
+</dt>
+<dd>
+<p>
+        An alias for <code>--discard-changes</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--discard-changes
+</dt>
+<dd>
+<p>
+        Proceed even if the index or the working tree differs from
+        <code>HEAD</code>. Both the index and working tree are restored to match
+        the switching target. If <code>--recurse-submodules</code> is specified,
+        submodule content is also restored to match the switching
+        target. This is used to throw away local changes.
+</p>
+</dd>
+<dt class="hdlist1">
+-m
+</dt>
+<dt class="hdlist1">
+--merge
+</dt>
+<dd>
+<p>
+        If you have local modifications to one or more files that are
+        different between the current branch and the branch to which
+        you are switching, the command refuses to switch branches in
+        order to preserve your modifications in context.  However,
+        with this option, a three-way merge between the current
+        branch, your working tree contents, and the new branch is
+        done, and you will be on the new branch.
+</p>
+<div class="paragraph"><p>When a merge conflict happens, the index entries for conflicting
+paths are left unmerged, and you need to resolve the conflicts
+and mark the resolved paths with <code>git add</code> (or <code>git rm</code> if the merge
+should result in deletion of the path).</p></div>
+</dd>
+<dt class="hdlist1">
+--conflict=&lt;style&gt;
+</dt>
+<dd>
+<p>
+        The same as <code>--merge</code> option above, but changes the way the
+        conflicting hunks are presented, overriding the
+        <code>merge.conflictStyle</code> configuration variable.  Possible values are
+        "merge" (default) and "diff3" (in addition to what is shown by
+        "merge" style, shows the original contents).
+</p>
+</dd>
+<dt class="hdlist1">
+-q
+</dt>
+<dt class="hdlist1">
+--quiet
+</dt>
+<dd>
+<p>
+        Quiet, suppress feedback messages.
+</p>
+</dd>
+<dt class="hdlist1">
+--progress
+</dt>
+<dt class="hdlist1">
+--no-progress
+</dt>
+<dd>
+<p>
+        Progress status is reported on the standard error stream
+        by default when it is attached to a terminal, unless <code>--quiet</code>
+        is specified. This flag enables progress reporting even if not
+        attached to a terminal, regardless of <code>--quiet</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+-t
+</dt>
+<dt class="hdlist1">
+--track
+</dt>
+<dd>
+<p>
+        When creating a new branch, set up "upstream" configuration.
+        <code>-c</code> is implied. See <code>--track</code> in <a href="git-branch.html">git-branch(1)</a> for
+        details.
+</p>
+<div class="paragraph"><p>If no <code>-c</code> option is given, the name of the new branch will be derived
+from the remote-tracking branch, by looking at the local part of the
+refspec configured for the corresponding remote, and then stripping
+the initial part up to the "*".  This would tell us to use <code>hack</code> as
+the local branch when branching off of <code>origin/hack</code> (or
+<code>remotes/origin/hack</code>, or even <code>refs/remotes/origin/hack</code>).  If the
+given name has no slash, or the above guessing results in an empty
+name, the guessing is aborted.  You can explicitly give a name with
+<code>-c</code> in such a case.</p></div>
+</dd>
+<dt class="hdlist1">
+--no-track
+</dt>
+<dd>
+<p>
+        Do not set up "upstream" configuration, even if the
+        <code>branch.autoSetupMerge</code> configuration variable is true.
+</p>
+</dd>
+<dt class="hdlist1">
+--orphan &lt;new-branch&gt;
+</dt>
+<dd>
+<p>
+        Create a new <em>orphan</em> branch, named <code>&lt;new-branch&gt;</code>. All
+        tracked files are removed.
+</p>
+</dd>
+<dt class="hdlist1">
+--ignore-other-worktrees
+</dt>
+<dd>
+<p>
+        <code>git switch</code> refuses when the wanted ref is already
+        checked out by another worktree. This option makes it check
+        the ref out anyway. In other words, the ref can be held by
+        more than one worktree.
+</p>
+</dd>
+<dt class="hdlist1">
+--recurse-submodules
+</dt>
+<dt class="hdlist1">
+--no-recurse-submodules
+</dt>
+<dd>
+<p>
+        Using <code>--recurse-submodules</code> will update the content of all
+        initialized submodules according to the commit recorded in the
+        superproject. If nothing (or <code>--no-recurse-submodules</code>) is
+        used, the work trees of submodules will not be updated. Just
+        like <a href="git-submodule.html">git-submodule(1)</a>, this will detach <code>HEAD</code> of the
+        submodules.
+</p>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_every_extension_command_needs">What every extension command needs</h2>
+<h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>You must have a man page, written in asciidoc (this is what Git help
-followed by your subcommand name will display).  Be aware that there is
-a local asciidoc configuration and macros which you should use.  It&#8217;s
-often helpful to start by cloning an existing page and replacing the
-text content.</p></div>
-<div class="paragraph"><p>You must have a test, written to report in TAP (Test Anything Protocol).
-Tests are executables (usually shell scripts) that live in the <em>t</em>
-subdirectory of the tree.  Each test name begins with <em>t</em> and a sequence
-number that controls where in the test sequence it will be executed;
-conventionally the rest of the name stem is that of the command
-being tested.</p></div>
-<div class="paragraph"><p>Read the file t/README to learn more about the conventions to be used
-in writing tests, and the test support library.</p></div>
+<div class="paragraph"><p>The following command switches to the "master" branch:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch master</code></pre>
+</div></div>
+<div class="paragraph"><p>After working in the wrong branch, switching to the correct branch
+would be done using:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch mytopic</code></pre>
+</div></div>
+<div class="paragraph"><p>However, your "wrong" branch and correct "mytopic" branch may differ
+in files that you have modified locally, in which case the above
+switch would fail like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch mytopic
+error: You have local changes to 'frotz'; not switching branches.</code></pre>
+</div></div>
+<div class="paragraph"><p>You can give the <code>-m</code> flag to the command, which would try a three-way
+merge:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch -m mytopic
+Auto-merging frotz</code></pre>
+</div></div>
+<div class="paragraph"><p>After this three-way merge, the local modifications are <em>not</em>
+registered in your index file, so <code>git diff</code> would show you what
+changes you made since the tip of the new branch.</p></div>
+<div class="paragraph"><p>To switch back to the previous branch before we switched to mytopic
+(i.e. "master" branch):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch -</code></pre>
+</div></div>
+<div class="paragraph"><p>You can grow a new branch from any commit. For example, switch to
+"HEAD~3" and create branch "fixup":</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch -c fixup HEAD~3
+Switched to a new branch 'fixup'</code></pre>
+</div></div>
+<div class="paragraph"><p>If you want to start a new branch from a remote branch of the same
+name:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch new-topic
+Branch 'new-topic' set up to track remote branch 'new-topic' from 'origin'
+Switched to a new branch 'new-topic'</code></pre>
+</div></div>
+<div class="paragraph"><p>To check out commit <code>HEAD~3</code> for temporary inspection or experiment
+without creating a new branch:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch --detach HEAD~3
+HEAD is now at 9fc9555312 Merge branch 'cc/shared-index-permbits'</code></pre>
+</div></div>
+<div class="paragraph"><p>If it turns out whatever you have done is worth keeping, you can
+always create a new name for it (without switching away):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ git switch -c good-surprises</code></pre>
+</div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_integrating_a_command">Integrating a command</h2>
+<h2 id="_see_also">SEE ALSO</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Here are the things you need to do when you want to merge a new
-subcommand into the Git tree.</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Don&#8217;t forget to sign off your patch!
-</p>
-</li>
-<li>
-<p>
-Append your command name to one of the variables BUILTIN_OBJS,
-EXTRA_PROGRAMS, SCRIPT_SH, SCRIPT_PERL or SCRIPT_PYTHON.
-</p>
-</li>
-<li>
-<p>
-Drop its test in the t directory.
-</p>
-</li>
-<li>
-<p>
-If your command is implemented in an interpreted language with a
-p-code intermediate form, make sure .gitignore in the main directory
-includes a pattern entry that ignores such files.  Python .pyc and
-.pyo files will already be covered.
-</p>
-</li>
-<li>
-<p>
-If your command has any dependency on a particular version of
-your language, document it in the INSTALL file.
-</p>
-</li>
-<li>
-<p>
-There is a file command-list.txt in the distribution main directory
-that categorizes commands by type, so they can be listed in appropriate
-subsections in the documentation&#8217;s summary command list.  Add an entry
-for yours.  To understand the categories, look at command-list.txt
-in the main directory.  If the new command is part of the typical Git
-workflow and you believe it common enough to be mentioned in <em>git help</em>,
-map this command to a common group in the column [common].
-</p>
-</li>
-<li>
-<p>
-Give the maintainer one paragraph to include in the RelNotes file
-to describe the new feature; a good place to do so is in the cover
-letter [PATCH 0/n].
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>That&#8217;s all there is to it.</p></div>
+<div class="paragraph"><p><a href="git-checkout.html">git-checkout(1)</a>,
+<a href="git-branch.html">git-branch(1)</a></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -863,7 +1125,7 @@ letter [PATCH 0/n].
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2019-07-09 19:51:51 PDT
+ 2019-07-09 19:51:04 PDT
 </div>
 </div>
 </body>

@@ -1586,6 +1586,24 @@ If the pattern ends with <code>/</code>, <code>**</code> will be automatically a
         case-insensitively (e.g. on case-insensitive file sytems)
 </p>
 </dd>
+<dt class="hdlist1">
+<code>onbranch</code>
+</dt>
+<dd>
+<p>
+        The data that follows the keyword <code>onbranch:</code> is taken to be a
+        pattern with standard globbing wildcards and two additional
+        ones, <code>**/</code> and <code>/**</code>, that can match multiple path components.
+        If we are in a worktree where the name of the branch that is
+        currently checked out matches the pattern, the include condition
+        is met.
+</p>
+<div class="paragraph"><p>If the pattern ends with <code>/</code>, <code>**</code> will be automatically added. For
+example, the pattern <code>foo/</code> becomes <code>foo/**</code>. In other words, it matches
+all branches that begin with <code>foo/</code>. This is useful if your branches are
+organized hierarchically and you would like to apply a configuration to
+all the branches in that hierarchy.</p></div>
+</dd>
 </dl></div>
 <div class="paragraph"><p>A few more notes on matching via <code>gitdir</code> and <code>gitdir/i</code>:</p></div>
 <div class="ulist"><ul>
@@ -1674,6 +1692,13 @@ Note that "../" is not special and will match literally, which is
 ; file (if the condition is true); their location is not
 ; affected by the condition
 [includeIf "gitdir:/path/to/group/"]
+        path = foo.inc</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>; include only if we are in a worktree where foo-branch is
+; currently checked out
+[includeIf "onbranch:foo-branch"]
         path = foo.inc</code></pre>
 </div></div>
 </div>
@@ -1797,6 +1822,16 @@ advice.*
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
+fetchShowForcedUpdates
+</dt>
+<dd>
+<p>
+                Advice shown when <a href="git-fetch.html">git-fetch(1)</a> takes a long time
+                to calculate forced updates after ref updates, or to warn
+                that the check is disabled.
+</p>
+</dd>
+<dt class="hdlist1">
 pushUpdateRejected
 </dt>
 <dd>
@@ -1872,6 +1907,18 @@ pushUnqualifiedRefname
 </p>
 </dd>
 <dt class="hdlist1">
+statusAheadBehind
+</dt>
+<dd>
+<p>
+                Shown when <a href="git-status.html">git-status(1)</a> computes the ahead/behind
+                counts for a local ref compared to its remote tracking ref,
+                and that calculation takes longer than expected. Will not
+                appear if <code>status.aheadBehind</code> is false or the option
+                <code>--no-ahead-behind</code> is given.
+</p>
+</dd>
+<dt class="hdlist1">
 statusHints
 </dt>
 <dd>
@@ -1880,7 +1927,8 @@ statusHints
                 state in the output of <a href="git-status.html">git-status(1)</a>, in
                 the template shown when writing commit messages in
                 <a href="git-commit.html">git-commit(1)</a>, and in the help message shown
-                by <a href="git-checkout.html">git-checkout(1)</a> when switching branch.
+                by <a href="git-switch.html">git-switch(1)</a> or
+                <a href="git-checkout.html">git-checkout(1)</a> when switching branch.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1936,9 +1984,10 @@ detachedHead
 </dt>
 <dd>
 <p>
-                Advice shown when you used <a href="git-checkout.html">git-checkout(1)</a> to
-                move to the detach HEAD state, to instruct how to create
-                a local branch after the fact.
+                Advice shown when you used
+                <a href="git-switch.html">git-switch(1)</a> or <a href="git-checkout.html">git-checkout(1)</a>
+                to move to the detach HEAD state, to instruct how to
+                create a local branch after the fact.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1947,7 +1996,8 @@ checkoutAmbiguousRemoteBranchName
 <dd>
 <p>
                 Advice shown when the argument to
-                <a href="git-checkout.html">git-checkout(1)</a> ambiguously resolves to a
+                <a href="git-checkout.html">git-checkout(1)</a> and <a href="git-switch.html">git-switch(1)</a>
+                ambiguously resolves to a
                 remote tracking branch on more than one remote in
                 situations where an unambiguous argument would have
                 otherwise caused a remote-tracking branch to be
@@ -2908,21 +2958,30 @@ alias.*
 <dd>
 <p>
         Command aliases for the <a href="git.html">git(1)</a> command wrapper - e.g.
-        after defining "alias.last = cat-file commit HEAD", the invocation
-        "git last" is equivalent to "git cat-file commit HEAD". To avoid
+        after defining <code>alias.last = cat-file commit HEAD</code>, the invocation
+        <code>git last</code> is equivalent to <code>git cat-file commit HEAD</code>. To avoid
         confusion and troubles with script usage, aliases that
         hide existing Git commands are ignored. Arguments are split by
         spaces, the usual shell quoting and escaping is supported.
         A quote pair or a backslash can be used to quote them.
 </p>
+<div class="paragraph"><p>Note that the first word of an alias does not necessarily have to be a
+command. It can be a command-line option that will be passed into the
+invocation of <code>git</code>. In particular, this is useful when used with <code>-c</code>
+to pass in one-time configurations or <code>-p</code> to force pagination. For example,
+<code>loud-rebase = -c commit.verbose=true rebase</code> can be defined such that
+running <code>git loud-rebase</code> would be equivalent to
+<code>git -c commit.verbose=true rebase</code>. Also, <code>ps = -p status</code> would be a
+helpful alias since <code>git ps</code> would paginate the output of <code>git status</code>
+where the original command does not.</p></div>
 <div class="paragraph"><p>If the alias expansion is prefixed with an exclamation point,
 it will be treated as a shell command.  For example, defining
-"alias.new = !gitk --all --not ORIG_HEAD", the invocation
-"git new" is equivalent to running the shell command
-"gitk --all --not ORIG_HEAD".  Note that shell commands will be
+<code>alias.new = !gitk --all --not ORIG_HEAD</code>, the invocation
+<code>git new</code> is equivalent to running the shell command
+<code>gitk --all --not ORIG_HEAD</code>.  Note that shell commands will be
 executed from the top-level directory of a repository, which may
 not necessarily be the current directory.
-<code>GIT_PREFIX</code> is set as returned by running <em>git rev-parse --show-prefix</em>
+<code>GIT_PREFIX</code> is set as returned by running <code>git rev-parse --show-prefix</code>
 from the original current directory. See <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -3024,7 +3083,7 @@ branch.autoSetupMerge
 </dt>
 <dd>
 <p>
-        Tells <em>git branch</em> and <em>git checkout</em> to set up new branches
+        Tells <em>git branch</em>, <em>git switch</em> and <em>git checkout</em> to set up new branches
         so that <a href="git-pull.html">git-pull(1)</a> will appropriately merge from the
         starting point branch. Note that even if this option is not set,
         this behavior can be chosen per-branch using the <code>--track</code>
@@ -3040,7 +3099,7 @@ branch.autoSetupRebase
 </dt>
 <dd>
 <p>
-        When a new branch is created with <em>git branch</em> or <em>git checkout</em>
+        When a new branch is created with <em>git branch</em>, <em>git switch</em> or <em>git checkout</em>
         that tracks another branch, this variable tells Git to set
         up pull to rebase instead of merge (see "branch.&lt;name&gt;.rebase").
         When <code>never</code>, rebase is never automatically set to true.
@@ -3187,7 +3246,8 @@ checkout.defaultRemote
 </dt>
 <dd>
 <p>
-        When you run <em>git checkout &lt;something&gt;</em> and only have one
+        When you run <em>git checkout &lt;something&gt;</em>
+        or <em>git switch &lt;something&gt;</em> and only have one
         remote, it may implicitly fall back on checking out and
         tracking e.g. <em>origin/&lt;something&gt;</em>. This stops working as soon
         as you have more than one remote with a <em>&lt;something&gt;</em>
@@ -3196,24 +3256,13 @@ checkout.defaultRemote
         disambiguation. The typical use-case is to set this to
         <code>origin</code>.
 </p>
-<div class="paragraph"><p>Currently this is used by <a href="git-checkout.html">git-checkout(1)</a> when <em>git checkout
-&lt;something&gt;</em> will checkout the <em>&lt;something&gt;</em> branch on another remote,
+<div class="paragraph"><p>Currently this is used by <a href="git-switch.html">git-switch(1)</a> and
+<a href="git-checkout.html">git-checkout(1)</a> when <em>git checkout &lt;something&gt;</em>
+or <em>git switch &lt;something&gt;</em>
+will checkout the <em>&lt;something&gt;</em> branch on another remote,
 and by <a href="git-worktree.html">git-worktree(1)</a> when <em>git worktree add</em> refers to a
 remote branch. This setting might be used for other checkout-like
 commands or functionality in the future.</p></div>
-</dd>
-<dt class="hdlist1">
-checkout.optimizeNewBranch
-</dt>
-<dd>
-<p>
-        Optimizes the performance of "git checkout -b &lt;new_branch&gt;" when
-        using sparse-checkout.  When set to true, git will not update the
-        repo based on the current sparse-checkout settings.  This means it
-        will not update the skip-worktree bit in the index nor add/remove
-        files in the working directory to reflect the current sparse checkout
-        settings nor will it show the local changes.
-</p>
 </dd>
 <dt class="hdlist1">
 clean.requireForce
@@ -4000,7 +4049,8 @@ diff.ignoreSubmodules
 <p>
         Sets the default value of --ignore-submodules. Note that this
         affects only <em>git diff</em> Porcelain, and not lower level <em>diff</em>
-        commands such as <em>git diff-files</em>. <em>git checkout</em> also honors
+        commands such as <em>git diff-files</em>. <em>git checkout</em>
+        and <em>git switch</em> also honor
         this setting when reporting uncommitted changes. Setting it to
         <em>all</em> disables the submodule summary normally shown by <em>git commit</em>
         and <em>git status</em> when <code>status.submoduleSummary</code> is set unless it is
@@ -4597,6 +4647,16 @@ fetch.negotiationAlgorithm
         Unknown values will cause <em>git fetch</em> to error out.
 </p>
 <div class="paragraph"><p>See also the <code>--negotiation-tip</code> option for <a href="git-fetch.html">git-fetch(1)</a>.</p></div>
+</dd>
+<dt class="hdlist1">
+fetch.showForcedUpdates
+</dt>
+<dd>
+<p>
+        Set to false to enable <code>--no-show-forced-updates</code> in
+        <a href="git-fetch.html">git-fetch(1)</a> and <a href="git-pull.html">git-pull(1)</a> commands.
+        Defaults to true.
+</p>
 </dd>
 <dt class="hdlist1">
 format.attach
@@ -6328,7 +6388,8 @@ interactive.singleKey
         In interactive commands, allow the user to provide one-letter
         input with a single key (i.e., without hitting enter).
         Currently this is used by the <code>--patch</code> mode of
-        <a href="git-add.html">git-add(1)</a>, <a href="git-checkout.html">git-checkout(1)</a>, <a href="git-commit.html">git-commit(1)</a>,
+        <a href="git-add.html">git-add(1)</a>, <a href="git-checkout.html">git-checkout(1)</a>,
+        <a href="git-restore.html">git-restore(1)</a>, <a href="git-commit.html">git-commit(1)</a>,
         <a href="git-reset.html">git-reset(1)</a>, and <a href="git-stash.html">git-stash(1)</a>. Note that this
         setting is silently ignored if portable keystroke input
         is not available; requires the Perl module Term::ReadKey.
@@ -8410,6 +8471,16 @@ status.branch
 </p>
 </dd>
 <dt class="hdlist1">
+status.aheadBehind
+</dt>
+<dd>
+<p>
+        Set to true to enable <code>--ahead-behind</code> and false to enable
+        <code>--no-ahead-behind</code> by default in <a href="git-status.html">git-status(1)</a> for
+        non-porcelain status formats.  Defaults to true.
+</p>
+</dd>
+<dt class="hdlist1">
 status.displayCommentPrefix
 </dt>
 <dd>
@@ -8705,6 +8776,19 @@ tag.sort
         This variable controls the sort ordering of tags when displayed by
         <a href="git-tag.html">git-tag(1)</a>. Without the "--sort=&lt;value&gt;" option provided, the
         value of this variable will be used as the default.
+</p>
+</dd>
+<dt class="hdlist1">
+tag.gpgSign
+</dt>
+<dd>
+<p>
+        A boolean to specify whether all tags should be GPG signed.
+        Use of this option when running in an automated script can
+        result in a large number of tags being signed. It is therefore
+        convenient to use an agent to avoid typing your gpg passphrase
+        several times. Note that this option doesn&#8217;t affects tag signing
+        behavior enabled by "-u &lt;keyid&gt;" or "--local-user=&lt;keyid&gt;" options.
 </p>
 </dd>
 <dt class="hdlist1">
