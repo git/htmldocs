@@ -772,12 +772,19 @@ large binary assets.  For example, in a repository where large build
 advance</strong> during clone and fetch operations and thereby reduce download
 times and disk usage.  Missing objects can later be "demand fetched"
 if/when needed.</p></div>
+<div class="paragraph"><p>A remote that can later provide the missing objects is called a
+promisor remote, as it promises to send the objects when
+requested. Initialy Git supported only one promisor remote, the origin
+remote from which the user cloned and that was configured in the
+"extensions.partialClone" config option. Later support for more than
+one promisor remote has been implemented.</p></div>
 <div class="paragraph"><p>Use of partial clone requires that the user be online and the origin
-remote be available for on-demand fetching of missing objects.  This may
-or may not be problematic for the user.  For example, if the user can
-stay within the pre-selected subset of the source tree, they may not
-encounter any missing objects.  Alternatively, the user could try to
-pre-fetch various objects if they know that they are going offline.</p></div>
+remote or other promisor remotes be available for on-demand fetching
+of missing objects.  This may or may not be problematic for the user.
+For example, if the user can stay within the pre-selected subset of
+the source tree, they may not encounter any missing objects.
+Alternatively, the user could try to pre-fetch various objects if they
+know that they are going offline.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -874,10 +881,10 @@ On the client a repository extension is added to the local config to
 <div class="ulist"><ul>
 <li>
 <p>
-An object may be missing due to a partial clone or fetch, or missing due
-  to repository corruption.  To differentiate these cases, the local
-  repository specially indicates such filtered packfiles obtained from the
-  promisor remote as "promisor packfiles".
+An object may be missing due to a partial clone or fetch, or missing
+  due to repository corruption.  To differentiate these cases, the
+  local repository specially indicates such filtered packfiles
+  obtained from promisor remotes as "promisor packfiles".
 </p>
 <div class="paragraph"><p>These promisor packfiles consist of a "&lt;name&gt;.promisor" file with
 arbitrary contents (like the "&lt;name&gt;.keep" files), in addition to
@@ -886,8 +893,8 @@ their "&lt;name&gt;.pack" and "&lt;name&gt;.idx" files.</p></div>
 <li>
 <p>
 The local repository considers a "promisor object" to be an object that
-  it knows (to the best of its ability) that the promisor remote has promised
-  that it has, either because the local repository has that object in one of
+  it knows (to the best of its ability) that promisor remotes have promised
+  that they have, either because the local repository has that object in one of
   its promisor packfiles, or because another promisor object refers to it.
 </p>
 <div class="paragraph"><p>When Git encounters a missing object, Git can see if it is a promisor object
@@ -900,12 +907,12 @@ expensive-to-modify list of missing objects.[a]</p></div>
 Since almost all Git code currently expects any referenced object to be
   present locally and because we do not want to force every command to do
   a dry-run first, a fallback mechanism is added to allow Git to attempt
-  to dynamically fetch missing objects from the promisor remote.
+  to dynamically fetch missing objects from promisor remotes.
 </p>
 <div class="paragraph"><p>When the normal object lookup fails to find an object, Git invokes
-fetch-object to try to get the object from the server and then retry
-the object lookup.  This allows objects to be "faulted in" without
-complicated prediction algorithms.</p></div>
+promisor_remote_get_direct() to try to get the object from a promisor
+remote and then retry the object lookup.  This allows objects to be
+"faulted in" without complicated prediction algorithms.</p></div>
 <div class="paragraph"><p>For efficiency reasons, no check as to whether the missing object is
 actually a promisor object is performed.</p></div>
 <div class="paragraph"><p>Dynamic object fetching tends to be slow as objects are fetched one at
@@ -945,8 +952,7 @@ The global variable "fetch_if_missing" is used to control whether an
 </p>
 <div class="paragraph"><p>We are not happy with this global variable and would like to remove it,
 but that requires significant refactoring of the object code to pass an
-additional flag.  We hope that concurrent efforts to add an ODB API can
-encompass this.</p></div>
+additional flag.</p></div>
 </li>
 </ul></div>
 </div>
@@ -984,24 +990,74 @@ Because we are reusing the existing fetch-pack mechanism, fetching
 </div>
 </div>
 <div class="sect1">
+<h2 id="_using_many_promisor_remotes">Using many promisor remotes</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Many promisor remotes can be configured and used.</p></div>
+<div class="paragraph"><p>This allows for example a user to have multiple geographically-close
+cache servers for fetching missing blobs while continuing to do
+filtered <code>git-fetch</code> commands from the central server.</p></div>
+<div class="paragraph"><p>When fetching objects, promisor remotes are tried one after the other
+until all the objects have been fetched.</p></div>
+<div class="paragraph"><p>Remotes that are considered "promisor" remotes are those specified by
+the following configuration variables:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>extensions.partialClone = &lt;name&gt;</code>
+</p>
+</li>
+<li>
+<p>
+<code>remote.&lt;name&gt;.promisor = true</code>
+</p>
+</li>
+<li>
+<p>
+<code>remote.&lt;name&gt;.partialCloneFilter = ...</code>
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Only one promisor remote can be configured using the
+<code>extensions.partialClone</code> config variable. This promisor remote will
+be the last one tried when fetching objects.</p></div>
+<div class="paragraph"><p>We decided to make it the last one we try, because it is likely that
+someone using many promisor remotes is doing so because the other
+promisor remotes are better for some reason (maybe they are closer or
+faster for some kind of objects) than the origin, and the origin is
+likely to be the remote specified by extensions.partialClone.</p></div>
+<div class="paragraph"><p>This justification is not very strong, but one choice had to be made,
+and anyway the long term plan should be to make the order somehow
+fully configurable.</p></div>
+<div class="paragraph"><p>For now though the other promisor remotes will be tried in the order
+they appear in the config file.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_current_limitations">Current Limitations</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
 <li>
 <p>
-The remote used for a partial clone (or the first partial fetch
-  following a regular clone) is marked as the "promisor remote".
+It is not possible to specify the order in which the promisor
+  remotes are tried in other ways than the order in which they appear
+  in the config file.
 </p>
-<div class="paragraph"><p>We are currently limited to a single promisor remote and only that
-remote may be used for subsequent partial fetches.</p></div>
-<div class="paragraph"><p>We accept this limitation because we believe initial users of this
-feature will be using it on repositories with a strong single central
-server.</p></div>
+<div class="paragraph"><p>It is also not possible to specify an order to be used when fetching
+from one remote and a different order when fetching from another
+remote.</p></div>
 </li>
 <li>
 <p>
-Dynamic object fetching will only ask the promisor remote for missing
-  objects.  We assume that the promisor remote has a complete view of the
+It is not possible to push only specific objects to a promisor
+  remote.
+</p>
+<div class="paragraph"><p>It is not possible to push at the same time to multiple promisor
+remote in a specific order.</p></div>
+</li>
+<li>
+<p>
+Dynamic object fetching will only ask promisor remotes for missing
+  objects.  We assume that promisor remotes have a complete view of the
   repository and can satisfy all such requests.
 </p>
 </li>
@@ -1038,14 +1094,19 @@ Dynamic object fetching currently uses the existing pack protocol V0
 <div class="ulist"><ul>
 <li>
 <p>
-Allow more than one promisor remote and define a strategy for fetching
-  missing objects from specific promisor remotes or of iterating over the
-  set of promisor remotes until a missing object is found.
+Improve the way to specify the order in which promisor remotes are
+  tried.
 </p>
-<div class="paragraph"><p>A user might want to have multiple geographically-close cache servers
-for fetching missing blobs while continuing to do filtered <code>git-fetch</code>
-commands from the central server, for example.</p></div>
-<div class="paragraph"><p>Or the user might want to work in a triangular work flow with multiple
+<div class="paragraph"><p>For example this could allow to specify explicitly something like:
+"When fetching from this remote, I want to use these promisor remotes
+in this order, though, when pushing or fetching to that remote, I want
+to use those promisor remotes in that order."</p></div>
+</li>
+<li>
+<p>
+Allow pushing to promisor remotes.
+</p>
+<div class="paragraph"><p>The user might want to work in a triangular work flow with multiple
 promisor remotes that each have an incomplete view of the repository.</p></div>
 </li>
 <li>
@@ -1158,7 +1219,7 @@ type of packfile that references it.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2019-01-29 13:16:51 PST
+ 2019-09-18 12:25:17 PDT
 </div>
 </div>
 </body>
