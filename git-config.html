@@ -4749,6 +4749,19 @@ fetch.showForcedUpdates
 </p>
 </dd>
 <dt class="hdlist1">
+fetch.parallel
+</dt>
+<dd>
+<p>
+        Specifies the maximal number of fetch operations to be run in parallel
+        at a time (submodules, or remotes when the <code>--multiple</code> option of
+        <a href="git-fetch.html">git-fetch(1)</a> is in effect).
+</p>
+<div class="paragraph"><p>A value of 0 will give some reasonable default. If unset, it defaults to 1.</p></div>
+<div class="paragraph"><p>For submodules, this setting can be overridden using the <code>submodule.fetchJobs</code>
+config setting.</p></div>
+</dd>
+<dt class="hdlist1">
 fetch.writeCommitGraph
 </dt>
 <dd>
@@ -8984,7 +8997,9 @@ trace2.eventTarget
 </li>
 <li>
 <p>
-<code>&lt;absolute-pathname&gt;</code> - Writes to the file in append mode.
+<code>&lt;absolute-pathname&gt;</code> - Writes to the file in append mode. If the target
+already exists and is a directory, the traces will be written to files (one
+per process) underneath the given directory.
 </p>
 </li>
 <li>
@@ -9062,6 +9077,17 @@ trace2.destinationDebug
         By default, these errors are suppressed and tracing is
         silently disabled.  May be overridden by the
         <code>GIT_TRACE2_DST_DEBUG</code> environment variable.
+</p>
+</dd>
+<dt class="hdlist1">
+trace2.maxFiles
+</dt>
+<dd>
+<p>
+        Integer.  When writing trace files to a target directory, do not
+        write additional traces if we would exceed this many files. Instead,
+        write a sentinel file that will block further tracing to this
+        directory. Defaults to 0, which disables this check.
 </p>
 </dd>
 <dt class="hdlist1">

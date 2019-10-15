@@ -854,7 +854,7 @@ git version 2.20.1.155.g426c96fcdb</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ cat ~/log.event
-{"event":"version","sid":"sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.620713Z","file":"common-main.c","line":38,"evt":"1","exe":"2.20.1.155.g426c96fcdb"}
+{"event":"version","sid":"sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.620713Z","file":"common-main.c","line":38,"evt":"2","exe":"2.20.1.155.g426c96fcdb"}
 {"event":"start","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621027Z","file":"common-main.c","line":39,"t_abs":0.001173,"argv":["git","version"]}
 {"event":"cmd_name","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621122Z","file":"git.c","line":432,"name":"version","hierarchy":"version"}
 {"event":"exit","sid":"20190408T191610.507018Z-H9b68c35f-P000059a8","thread":"main","time":"2019-01-16T17:28:42.621236Z","file":"git.c","line":662,"t_abs":0.001227,"code":0}
@@ -885,7 +885,9 @@ system or global config value to one of the following:</p></div>
 </li>
 <li>
 <p>
-<code>&lt;absolute-pathname&gt;</code> - Writes to the file in append mode.
+<code>&lt;absolute-pathname&gt;</code> - Writes to the file in append mode. If the target
+already exists and is a directory, the traces will be written to files (one
+per process) underneath the given directory.
 </p>
 </li>
 <li>
@@ -898,10 +900,9 @@ try both.
 </li>
 </ul></div>
 </div></div>
-<div class="paragraph"><p>If the target already exists and is a directory, the traces will be
-written to files (one per process) underneath the given directory. They
-will be named according to the last component of the SID (optionally
-followed by a counter to avoid filename collisions).</p></div>
+<div class="paragraph"><p>When trace files are written to a target directory, they will be named according
+to the last component of the SID (optionally followed by a counter to avoid
+filename collisions).</p></div>
 </div>
 </div>
 </div>
@@ -1532,15 +1533,38 @@ only present on the "start" and "atexit" events.</p></div>
 </dt>
 <dd>
 <p>
-        This event gives the version of the executable and the EVENT format.
+        This event gives the version of the executable and the EVENT format. It
+        should always be the first event in a trace session. The EVENT format
+        version will be incremented if new event types are added, if existing
+        fields are removed, or if there are significant changes in
+        interpretation of existing events or fields. Smaller changes, such as
+        adding a new field to an existing event, will not require an increment
+        to the EVENT format version.
 </p>
 <div class="listingblock">
 <div class="content">
 <pre><code>{
         "event":"version",
         ...
-        "evt":"1",                     # EVENT format version
+        "evt":"2",                     # EVENT format version
         "exe":"2.20.1.155.g426c96fcdb" # git version
+}</code></pre>
+</div></div>
+</dd>
+<dt class="hdlist1">
+<code>"discard"</code>
+</dt>
+<dd>
+<p>
+        This event is written to the git-trace2-discard sentinel file if there
+        are too many files in the target trace directory (see the
+        trace2.maxFiles config option).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>{
+        "event":"discard",
+        ...
 }</code></pre>
 </div></div>
 </dd>
@@ -2442,7 +2466,7 @@ Trace2 targets (and convert &lt;key&gt; to a "category").
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2019-07-20 04:46:47 JST
+ 2019-10-15 14:20:15 JST
 </div>
 </div>
 </body>
