@@ -763,11 +763,12 @@ git-bundle(1) Manual Page
 <div class="paragraph"><p>Some workflows require that one or more branches of development on one
 machine be replicated on another machine, but the two machines cannot
 be directly connected, and therefore the interactive Git protocols (git,
-ssh, http) cannot be used.  This command provides support for
-<em>git fetch</em> and <em>git pull</em> to operate by packaging objects and references
-in an archive at the originating machine, then importing those into
-another repository using <em>git fetch</em> and <em>git pull</em>
-after moving the archive by some means (e.g., by sneakernet).  As no
+ssh, http) cannot be used.</p></div>
+<div class="paragraph"><p>The <em>git bundle</em> command packages objects and references in an archive
+at the originating machine, which can then be imported into another
+repository using <em>git fetch</em>, <em>git pull</em>, or <em>git clone</em>,
+after moving the archive by some means (e.g., by sneakernet).</p></div>
+<div class="paragraph"><p>As no
 direct connection between the repositories exists, the user must specify a
 basis for the bundle that is held by the destination repository: the
 bundle assumes that all objects in the basis are already in the
@@ -784,7 +785,7 @@ create [options] &lt;file&gt; &lt;git-rev-list-args&gt;
 <dd>
 <p>
         Used to create a bundle named <em>file</em>.  This requires the
-        <em>git-rev-list-args</em> arguments to define the bundle contents.
+        <em>&lt;git-rev-list-args&gt;</em> arguments to define the bundle contents.
         <em>options</em> contains the options specific to the <em>git bundle create</em>
         subcommand.
 </p>
@@ -918,6 +919,13 @@ specified explicitly (e.g. <code>^master~10</code>), or implicitly (e.g.
 It is okay to err on the side of caution, causing the bundle file
 to contain objects already in the destination, as these are ignored
 when unpacking at the destination.</p></div>
+<div class="paragraph"><p><code>git clone</code> can use any bundle created without negative refspecs
+(e.g., <code>new</code>, but not <code>old..new</code>).
+If you want to match <code>git clone --mirror</code>, which would include your
+refs such as <code>refs/remotes/*</code>, use <code>--all</code>.
+If you want to provide the same set of refs that a clone directly
+from the source repository would get, use <code>--branches --tags</code> for
+the <code>&lt;git-rev-list-args&gt;</code>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1026,7 +1034,7 @@ references when fetching:</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2019-12-01 14:55:34 PST
+ 2019-12-10 15:12:20 PST
 </div>
 </div>
 </body>
