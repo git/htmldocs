@@ -5578,6 +5578,47 @@ gpg.&lt;format&gt;.program
 </p>
 </dd>
 <dt class="hdlist1">
+gpg.minTrustLevel
+</dt>
+<dd>
+<p>
+        Specifies a minimum trust level for signature verification.  If
+        this option is unset, then signature verification for merge
+        operations require a key with at least <code>marginal</code> trust.  Other
+        operations that perform signature verification require a key
+        with at least <code>undefined</code> trust.  Setting this option overrides
+        the required trust-level for all operations.  Supported values,
+        in increasing order of significance:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>undefined</code>
+</p>
+</li>
+<li>
+<p>
+<code>never</code>
+</p>
+</li>
+<li>
+<p>
+<code>marginal</code>
+</p>
+</li>
+<li>
+<p>
+<code>fully</code>
+</p>
+</li>
+<li>
+<p>
+<code>ultimate</code>
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
 gui.commitMsgWidth
 </dt>
 <dd>
@@ -5987,7 +6028,7 @@ http.version
 <p>
         Use the specified HTTP protocol version when communicating with a server.
         If you want to force the default. The available and default version depend
-        on libcurl. Actually the possible values of
+        on libcurl. Currently the possible values of
         this option are:
 </p>
 <div class="ulist"><ul>
@@ -6014,7 +6055,7 @@ http.sslVersion
         particular configuration of the crypto library in use. Internally
         this sets the <em>CURLOPT_SSL_VERSION</em> option; see the libcurl
         documentation for more details on the format of this option and
-        for the ssl version supported. Actually the possible values of
+        for the ssl version supported. Currently the possible values of
         this option are:
 </p>
 <div class="ulist"><ul>
@@ -6231,6 +6272,13 @@ http.postBuffer
         massive pack file locally.  Default is 1 MiB, which is
         sufficient for most requests.
 </p>
+<div class="paragraph"><p>Note that raising this limit is only effective for disabling chunked
+transfer encoding and therefore should be used only where the remote
+server or a proxy only supports HTTP/1.0 or is noncompliant with the
+HTTP standard.  Raising this is not, in general, an effective solution
+for most push problems, but can increase memory consumption
+significantly since the entire buffer is allocated even for small
+pushes.</p></div>
 </dd>
 <dt class="hdlist1">
 http.lowSpeedLimit, http.lowSpeedTime
@@ -9423,8 +9471,12 @@ committer.email
         Also, all of these can be overridden by the <code>GIT_AUTHOR_NAME</code>,
         <code>GIT_AUTHOR_EMAIL</code>, <code>GIT_COMMITTER_NAME</code>,
         <code>GIT_COMMITTER_EMAIL</code> and <code>EMAIL</code> environment variables.
-        See <a href="git-commit-tree.html">git-commit-tree(1)</a> for more information.
 </p>
+<div class="paragraph"><p>Note that the <code>name</code> forms of these variables conventionally refer to
+some form of a personal name.  See <a href="git-commit.html">git-commit(1)</a> and the
+environment variables section of <a href="git.html">git(1)</a> for more information on
+these settings and the <code>credential.username</code> option if you&#8217;re looking
+for authentication credentials instead.</p></div>
 </dd>
 <dt class="hdlist1">
 user.useConfigOnly
