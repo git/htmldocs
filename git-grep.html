@@ -828,8 +828,8 @@ grep.threads
 </dt>
 <dd>
 <p>
-        Number of grep worker threads to use.  If unset (or set to 0),
-        8 threads are used by default (for now).
+        Number of grep worker threads to use. If unset (or set to 0), Git will
+        use as many threads as the number of logical cores available.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1444,6 +1444,17 @@ in <a href="gitglossary.html">gitglossary(7)</a>.</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_notes_on_threads">NOTES ON THREADS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The <code>--threads</code> option (and the grep.threads configuration) will be ignored when
+<code>--open-files-in-pager</code> is used, forcing a single-threaded execution.</p></div>
+<div class="paragraph"><p>When grepping the object store (with <code>--cached</code> or giving tree objects), running
+with multiple threads might perform slower than single threaded if <code>--textconv</code>
+is given and there&#8217;re too many text conversions. So if you experience low
+performance in this case, it might be desirable to use <code>--threads=1</code>.</p></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
@@ -1454,7 +1465,7 @@ in <a href="gitglossary.html">gitglossary(7)</a>.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-02-12 13:38:42 PST
+ 2020-02-14 15:32:19 PST
 </div>
 </div>
 </body>

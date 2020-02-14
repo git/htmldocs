@@ -2053,6 +2053,24 @@ submoduleAlternateErrorStrategyDie
                 configured to "die" causes a fatal error.
 </p>
 </dd>
+<dt class="hdlist1">
+addIgnoredFile
+</dt>
+<dd>
+<p>
+                Advice shown if a user attempts to add an ignored file to
+                the index.
+</p>
+</dd>
+<dt class="hdlist1">
+addEmptyPathspec
+</dt>
+<dd>
+<p>
+                Advice shown if a user runs the add command without providing
+                the pathspec parameter.
+</p>
+</dd>
 </dl></div>
 </div></div>
 </dd>
@@ -2154,6 +2172,22 @@ core.fsmonitor
         requested date/time. This information is used to speed up git by
         avoiding unnecessary processing of files that have not changed.
         See the "fsmonitor-watchman" section of <a href="githooks.html">githooks(5)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+core.fsmonitorHookVersion
+</dt>
+<dd>
+<p>
+        Sets the version of hook that is to be used when calling fsmonitor.
+        There are currently versions 1 and 2. When this is not set,
+        version 2 will be tried first and if it fails then version 1
+        will be tried. Version 1 uses a timestamp as input to determine
+        which files have changes since that time but some monitors
+        like watchman have race conditions when used with a timestamp.
+        Version 2 uses an opaque string so that the monitor can return
+        something that can be used to determine what files have changed
+        without race conditions.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -7352,6 +7386,18 @@ all existing objects. You can force recompression by passing the -F option
 to <a href="git-repack.html">git-repack(1)</a>.</p></div>
 </dd>
 <dt class="hdlist1">
+pack.allowPackReuse
+</dt>
+<dd>
+<p>
+        When true, and when reachability bitmaps are enabled,
+        pack-objects will try to send parts of the bitmapped packfile
+        verbatim. This can reduce memory and CPU usage to serve fetches,
+        but might result in sending a slightly larger pack. Defaults to
+        true.
+</p>
+</dd>
+<dt class="hdlist1">
 pack.island
 </dt>
 <dd>
@@ -7622,11 +7668,10 @@ protocol.version
 </dt>
 <dd>
 <p>
-        Experimental. If set, clients will attempt to communicate with a
-        server using the specified protocol version.  If unset, no
-        attempt will be made by the client to communicate using a
-        particular protocol version, this results in protocol version 0
-        being used.
+        If set, clients will attempt to communicate with a server
+        using the specified protocol version.  If the server does
+        not support it, communication falls back to version 0.
+        If unset, the default is <code>2</code>.
         Supported versions:
 </p>
 <div class="openblock">
