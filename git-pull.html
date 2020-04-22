@@ -936,11 +936,16 @@ When not possible, refuse to merge and exit with a non-zero status.</p></div>
 <dt class="hdlist1">
 --gpg-sign[=&lt;keyid&gt;]
 </dt>
+<dt class="hdlist1">
+--no-gpg-sign
+</dt>
 <dd>
 <p>
         GPG-sign the resulting merge commit. The <code>keyid</code> argument is
         optional and defaults to the committer identity; if specified,
-        it must be stuck to the option without a space.
+        it must be stuck to the option without a space. <code>--no-gpg-sign</code>
+        is useful to countermand both <code>commit.gpgSign</code> configuration variable,
+        and earlier <code>--gpg-sign</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1386,22 +1391,6 @@ default fetches are performed sequentially, not in parallel.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
--u
-</dt>
-<dt class="hdlist1">
---update-head-ok
-</dt>
-<dd>
-<p>
-        By default <em>git fetch</em> refuses to update the head which
-        corresponds to the current branch.  This flag disables the
-        check.  This is purely for the internal use for <em>git pull</em>
-        to communicate with <em>git fetch</em>, and unless you are
-        implementing your own Porcelain you are not supposed to
-        use it.
-</p>
-</dd>
-<dt class="hdlist1">
 --upload-pack &lt;upload-pack&gt;
 </dt>
 <dd>
@@ -1503,7 +1492,8 @@ default fetches are performed sequentially, not in parallel.</p></div>
         Specifies which refs to fetch and which local refs to update.
         When no &lt;refspec&gt;s appear on the command line, the refs to fetch
         are read from <code>remote.&lt;repository&gt;.fetch</code> variables instead
-        (see <a href="git-fetch.html">git-fetch(1)</a>).
+        (see the section "CONFIGURED REMOTE-TRACKING BRANCHES"
+        in <a href="git-fetch.html">git-fetch(1)</a>).
 </p>
 <div class="paragraph"><p>The format of a &lt;refspec&gt; parameter is an optional plus
 <code>+</code>, followed by the source &lt;src&gt;, followed
@@ -2139,9 +2129,9 @@ Merge into the current branch the remote branch <code>next</code>:
 <div class="content">
 <pre><code>$ git pull origin next</code></pre>
 </div></div>
-<div class="paragraph"><p>This leaves a copy of <code>next</code> temporarily in FETCH_HEAD, but
-does not update any remote-tracking branches. Using remote-tracking
-branches, the same can be done by invoking fetch and merge:</p></div>
+<div class="paragraph"><p>This leaves a copy of <code>next</code> temporarily in FETCH_HEAD, and
+updates the remote-tracking branch <code>origin/next</code>.
+The same can be done by invoking fetch and merge:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ git fetch origin
@@ -2221,7 +2211,7 @@ version.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-03-10 08:03:13 PDT
+ 2020-04-22 14:37:28 PDT
 </div>
 </div>
 </body>
