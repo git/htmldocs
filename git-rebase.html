@@ -1869,9 +1869,17 @@ and thus has no such limitations.</p></div>
 <div class="sect2">
 <h3 id="_hooks">Hooks</h3>
 <div class="paragraph"><p>The apply backend has not traditionally called the post-commit hook,
-while the merge backend has.  However, this was by accident of
-implementation rather than by design.  Both backends should have the
-same behavior, though it is not clear which one is correct.</p></div>
+while the merge backend has.  Both have called the post-checkout hook,
+though the merge backend has squelched its output.  Further, both
+backends only call the post-checkout hook with the starting point
+commit of the rebase, not the intermediate commits nor the final
+commit.  In each case, the calling of these hooks was by accident of
+implementation rather than by design (both backends were originally
+implemented as shell scripts and happened to invoke other commands
+like <em>git checkout</em> or <em>git commit</em> that would call the hooks).  Both
+backends should have the same behavior, though it is not entirely
+clear which, if any, is correct.  We will likely make rebase stop
+calling either of these hooks in the future.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_interruptability">Interruptability</h3>
@@ -2698,7 +2706,7 @@ Use <code>--rebase-merges</code> in such scenarios instead.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-04-22 14:37:28 PDT
+ 2020-04-29 14:18:27 PDT
 </div>
 </div>
 </body>

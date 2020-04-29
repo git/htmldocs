@@ -4712,13 +4712,16 @@ fetch.recurseSubmodules
 </dt>
 <dd>
 <p>
-        This option can be either set to a boolean value or to <em>on-demand</em>.
+        This option controls whether <code>git fetch</code> (and the underlying fetch
+        in <code>git pull</code>) will recursively fetch into populated submodules.
+        This option can be set either to a boolean value or to <em>on-demand</em>.
         Setting it to a boolean changes the behavior of fetch and pull to
-        unconditionally recurse into submodules when set to true or to not
-        recurse at all when set to false. When set to <em>on-demand</em> (the default
-        value), fetch and pull will only recurse into a populated submodule
-        when its superproject retrieves a commit that updates the submodule&#8217;s
+        recurse unconditionally into submodules when set to true or to not
+        recurse at all when set to false. When set to <em>on-demand</em>, fetch and
+        pull will only recurse into a populated submodule when its
+        superproject retrieves a commit that updates the submodule&#8217;s
         reference.
+        Defaults to <em>on-demand</em>, or to the value of <em>submodule.recurse</em> if set.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6768,6 +6771,17 @@ log.decorate
 </p>
 </dd>
 <dt class="hdlist1">
+log.excludeDecoration
+</dt>
+<dd>
+<p>
+        Exclude the specified patterns from the log decorations. This is
+        similar to the <code>--decorate-refs-exclude</code> command-line option, but
+        the config option can be overridden by the <code>--decorate-refs</code>
+        option.
+</p>
+</dd>
+<dt class="hdlist1">
 log.follow
 </dt>
 <dd>
@@ -7727,7 +7741,7 @@ protocol.version
         If set, clients will attempt to communicate with a server
         using the specified protocol version.  If the server does
         not support it, communication falls back to version 0.
-        If unset, the default is <code>2</code>.
+        If unset, the default is <code>0</code>.
         Supported versions:
 </p>
 <div class="openblock">
@@ -7956,6 +7970,8 @@ push.recurseSubmodules
         is <em>no</em> then default behavior of ignoring submodules when pushing
         is retained. You may override this configuration at time of push by
         specifying <em>--recurse-submodules=check|on-demand|no</em>.
+        If not set, <em>no</em> is used by default, unless <em>submodule.recurse</em> is
+        set (in which case a <em>true</em> value means <em>on-demand</em>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -9086,9 +9102,17 @@ submodule.recurse
 <dd>
 <p>
         Specifies if commands recurse into submodules by default. This
-        applies to all commands that have a <code>--recurse-submodules</code> option,
-        except <code>clone</code>.
+        applies to all commands that have a <code>--recurse-submodules</code> option
+        (<code>checkout</code>, <code>fetch</code>, <code>grep</code>, <code>pull</code>, <code>push</code>, <code>read-tree</code>, <code>reset</code>,
+        <code>restore</code> and <code>switch</code>) except <code>clone</code> and <code>ls-files</code>.
         Defaults to false.
+        When set to true, it can be deactivated via the
+        <code>--no-recurse-submodules</code> option. Note that some Git commands
+        lacking this option may call some of the above commands affected by
+        <code>submodule.recurse</code>; for instance <code>git remote update</code> will call
+        <code>git fetch</code> but does not have a <code>--no-recurse-submodules</code> option.
+        For these commands a workaround is to temporarily change the
+        configuration value by using <code>git -c submodule.recurse=0</code>.
 </p>
 </dd>
 <dt class="hdlist1">
