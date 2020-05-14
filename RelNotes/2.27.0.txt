@@ -108,6 +108,13 @@ UI, Workflows & Features
  * "git restore --staged --worktree" now defaults to take the contents
    out of "HEAD", instead of erring out.
 
+ * "git p4" learned to recover from a (broken) state where a directory
+   and a file are recorded at the same path in the Perforce repository
+   the same way as their clients do.
+
+ * "git multi-pack-index repack" has been taught to honor some
+   repack.* configuration variables.
+
 
 Performance, Internal Implementation, Development Support etc.
 
@@ -160,6 +167,16 @@ Performance, Internal Implementation, Development Support etc.
    filter stored in the commit-graph file.
 
  * The "bugreport" tool has been added.
+
+ * The object walk with object filter "--filter=tree:0" can now take
+   advantage of the pack bitmap when available.
+
+ * Instead of always building all branches at GitHub via Actions,
+   users can specify which branches to build.
+
+ * Codepaths that show progress meter have been taught to also use the
+   start_progress() and the stop_progress() calls as a "region" to be
+   traced.
 
 
 Fixes since v2.26
@@ -420,6 +437,39 @@ Fixes since v2.26
    been corrected.
    (merge 0555e4af58 cb/t0000-use-the-configured-shell later to maint).
 
+ * Minor in-code comments and documentation updates around credential
+   API.
+   (merge 1aed817f99 cb/credential-doc-fixes later to maint).
+
+ * Teach "am", "commit", "merge" and "rebase", when they are run with
+   the "--quiet" option, to pass "--quiet" down to "gc --auto".
+   (merge 7c3e9e8cfb jc/auto-gc-quiet later to maint).
+
+ * The code to skip unmerged paths in the index when sparse checkout
+   is in use would have made out-of-bound access of the in-core index
+   when the last path was unmerged, which has been corrected.
+
+ * Serving a "git fetch" client over "git://" and "ssh://" protocols
+   using the on-wire protocol version 2 was buggy on the server end
+   when the client needs to make a follow-up request to
+   e.g. auto-follow tags.
+   (merge 08450ef791 cc/upload-pack-v2-fetch-fix later to maint).
+
+ * "git bisect replay" had trouble with input files when they used
+   CRLF line ending, which has been corrected.
+   (merge 6c722cbe5a cw/bisect-replay-with-dos later to maint).
+
+ * "rebase -i" segfaulted when rearranging a sequence that has a
+   fix-up that applies another fix-up (which may or may not be a
+   fix-up of yet another step).
+   (merge 02471e7e20 js/rebase-autosquash-double-fixup-fix later to maint).
+
+ * "git fsck" ensures that the paths recorded in tree objects are
+   sorted and without duplicates, but it failed to notice a case where
+   a blob is followed by entries that sort before a tree with the same
+   name.  This has been corrected.
+   (merge 9068cfb20f rs/fsck-duplicate-names-in-trees later to maint).
+
  * Other code cleanup, docfix, build fix, etc.
    (merge 564956f358 jc/maintain-doc later to maint).
    (merge 7422b2a0a1 sg/commit-slab-clarify-peek later to maint).
@@ -448,3 +498,4 @@ Fixes since v2.26
    (merge bdccbf7047 mt/doc-worktree-ref later to maint).
    (merge ce9baf234f dl/push-recurse-submodules-fix later to maint).
    (merge 4153274052 bc/doc-credential-helper-value later to maint).
+   (merge 5c7bb0146e jc/codingstyle-compare-with-null later to maint).
