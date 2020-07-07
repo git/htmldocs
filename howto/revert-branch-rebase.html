@@ -743,7 +743,7 @@ asciidoc.install();
 break building Git with GCC 2.95.  While they were well-intentioned
 portability fixes, keeping things working with gcc-2.95 was also
 important.  Here is what I did to revert the change in the <em>master</em>
-branch and to adjust the <em>pu</em> branch, using core Git tools and
+branch and to adjust the <em>seen</em> branch, using core Git tools and
 barebone Porcelain.</p></div>
 <div class="paragraph"><p>First, prepare a throw-away branch in case I screw things up.</p></div>
 <div class="listingblock">
@@ -823,11 +823,11 @@ and we know <em>master</em> matches <em>revert-c99</em> exactly.  In fact:</p></
 <pre><code>$ git diff master..revert-c99</code></pre>
 </div></div>
 <div class="paragraph"><p>says nothing.</p></div>
-<div class="paragraph"><p>Then we rebase the <em>pu</em> branch as usual.</p></div>
+<div class="paragraph"><p>Then we rebase the <em>seen</em> branch as usual.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git checkout pu
-$ git tag pu-anchor pu
+<pre><code>$ git checkout seen
+$ git tag seen-anchor seen
 $ git rebase master
 * Applying: Redo "revert" using three-way merge machinery.
 First trying simple merge strategy to cherry-pick.
@@ -845,11 +845,11 @@ First trying simple merge strategy to cherry-pick.
 * Applying: More documentation updates.
 First trying simple merge strategy to cherry-pick.</code></pre>
 </div></div>
-<div class="paragraph"><p>The temporary tag <em>pu-anchor</em> is me just being careful, in case <em>git
+<div class="paragraph"><p>The temporary tag <em>seen-anchor</em> is me just being careful, in case <em>git
 rebase</em> screws up.  After this, I can do these for sanity check:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git diff pu-anchor..pu ;# make sure we got the master fix.
+<pre><code>$ git diff seen-anchor..seen ;# make sure we got the master fix.
 $ make CC=gcc-2.95 clean test ;# make sure it fixed the breakage.
 $ make clean test ;# make sure it did not cause other breakage.</code></pre>
 </div></div>
@@ -857,7 +857,7 @@ $ make clean test ;# make sure it did not cause other breakage.</code></pre>
 or tag anymore, so remove them:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ rm -f .git/refs/tags/pu-anchor
+<pre><code>$ rm -f .git/refs/tags/seen-anchor
 $ git branch -d revert-c99</code></pre>
 </div></div>
 <div class="paragraph"><p>It was an emergency fix, so we might as well merge it into the
@@ -883,18 +883,18 @@ Committed merge 7fb9b7262a1d1e0a47bbfdcbbcf50ce0635d3f8f
 <div class="paragraph"><p>And the final repository status looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git show-branch --more=1 master pu rc
+<pre><code>$ git show-branch --more=1 master seen rc
 ! [master] Revert "Replace zero-length array decls with []."
- ! [pu] git-repack: Add option to repack all objects.
+ ! [seen] git-repack: Add option to repack all objects.
   * [rc] Merge refs/heads/master from .
 ---
- +  [pu] git-repack: Add option to repack all objects.
- +  [pu~1] More documentation updates.
- +  [pu~2] Show commits in topo order and name all commits.
- +  [pu~3] mailinfo and applymbox updates
- +  [pu~4] Document "git cherry-pick" and "git revert"
- +  [pu~5] Remove git-apply-patch-script.
- +  [pu~6] Redo "revert" using three-way merge machinery.
+ +  [seen] git-repack: Add option to repack all objects.
+ +  [seen~1] More documentation updates.
+ +  [seen~2] Show commits in topo order and name all commits.
+ +  [seen~3] mailinfo and applymbox updates
+ +  [seen~4] Document "git cherry-pick" and "git revert"
+ +  [seen~5] Remove git-apply-patch-script.
+ +  [seen~6] Redo "revert" using three-way merge machinery.
   - [rc] Merge refs/heads/master from .
 ++* [master] Revert "Replace zero-length array decls with []."
   - [rc~1] Merge refs/heads/master from .
@@ -907,7 +907,7 @@ Committed merge 7fb9b7262a1d1e0a47bbfdcbbcf50ce0635d3f8f
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-06-29 16:26:31 PDT
+ 2020-07-06 22:34:08 PDT
 </div>
 </div>
 </body>
