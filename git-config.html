@@ -4641,6 +4641,19 @@ difftool.prompt
 </p>
 </dd>
 <dt class="hdlist1">
+extensions.objectFormat
+</dt>
+<dd>
+<p>
+        Specify the hash algorithm to use.  The acceptable values are <code>sha1</code> and
+        <code>sha256</code>.  If not specified, <code>sha1</code> is assumed.  It is an error to specify
+        this key unless <code>core.repositoryFormatVersion</code> is 1.
+</p>
+<div class="paragraph"><p>Note that this setting should only be set by <a href="git-init.html">git-init(1)</a> or
+<a href="git-clone.html">git-clone(1)</a>.  Trying to change it after initialization will not
+work and will produce hard-to-diagnose issues.</p></div>
+</dd>
+<dt class="hdlist1">
 fastimport.unpackLimit
 </dt>
 <dd>
@@ -9587,6 +9600,39 @@ uploadpack.allowFilter
 <p>
         If this option is set, <code>upload-pack</code> will support partial
         clone and partial fetch object filtering.
+</p>
+</dd>
+<dt class="hdlist1">
+uploadpackfilter.allow
+</dt>
+<dd>
+<p>
+        Provides a default value for unspecified object filters (see: the
+        below configuration variable).
+        Defaults to <code>true</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+uploadpackfilter.&lt;filter&gt;.allow
+</dt>
+<dd>
+<p>
+        Explicitly allow or ban the object filter corresponding to
+        <code>&lt;filter&gt;</code>, where <code>&lt;filter&gt;</code> may be one of: <code>blob:none</code>,
+        <code>blob:limit</code>, <code>tree</code>, <code>sparse:oid</code>, or <code>combine</code>. If using
+        combined filters, both <code>combine</code> and all of the nested filter
+        kinds must be allowed. Defaults to <code>uploadpackfilter.allow</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+uploadpackfilter.tree.maxDepth
+</dt>
+<dd>
+<p>
+        Only allow <code>--filter=tree=&lt;n&gt;</code> when <code>n</code> is no more than the value of
+        <code>uploadpackfilter.tree.maxDepth</code>. If set, this also implies
+        <code>uploadpackfilter.tree.allow=true</code>, unless this configuration
+        variable had already been set. Has no effect if unset.
 </p>
 </dd>
 <dt class="hdlist1">
