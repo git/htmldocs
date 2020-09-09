@@ -755,6 +755,7 @@ git-worktree(1) Manual Page
 <em>git worktree move</em> &lt;worktree&gt; &lt;new-path&gt;
 <em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
 <em>git worktree remove</em> [-f] &lt;worktree&gt;
+<em>git worktree repair</em> [&lt;path&gt;&#8230;]
 <em>git worktree unlock</em> &lt;worktree&gt;</pre>
 <div class="attribution">
 </div></div>
@@ -852,7 +853,10 @@ move
 <dd>
 <p>
 Move a working tree to a new location. Note that the main working tree
-or linked working trees containing submodules cannot be moved.
+or linked working trees containing submodules cannot be moved with this
+command. (The <code>git worktree repair</code> command, however, can reestablish
+the connection with linked working trees if you move the main working
+tree manually.)
 </p>
 </dd>
 <dt class="hdlist1">
@@ -873,6 +877,25 @@ and no modification in tracked files) can be removed. Unclean working
 trees or ones with submodules can be removed with <code>--force</code>. The main
 working tree cannot be removed.
 </p>
+</dd>
+<dt class="hdlist1">
+repair [&lt;path&gt;&#8230;]
+</dt>
+<dd>
+<p>
+Repair working tree administrative files, if possible, if they have
+become corrupted or outdated due to external factors.
+</p>
+<div class="paragraph"><p>For instance, if the main working tree (or bare repository) is moved,
+linked working trees will be unable to locate it. Running <code>repair</code> in
+the main working tree will reestablish the connection from linked
+working trees back to the main working tree.</p></div>
+<div class="paragraph"><p>Similarly, if a linked working tree is moved without using <code>git worktree
+move</code>, the main working tree (or bare repository) will be unable to
+locate it. Running <code>repair</code> within the recently-moved working tree will
+reestablish the connection. If multiple linked working trees are moved,
+running <code>repair</code> from any working tree with each tree&#8217;s new <code>&lt;path&gt;</code> as
+an argument, will reestablish the connection to all the specified paths.</p></div>
 </dd>
 <dt class="hdlist1">
 unlock
@@ -1156,7 +1179,8 @@ in the entry&#8217;s directory. For example, if a linked working tree is moved
 to <code>/newpath/test-next</code> and its <code>.git</code> file points to
 <code>/path/main/.git/worktrees/test-next</code>, then update
 <code>/path/main/.git/worktrees/test-next/gitdir</code> to reference <code>/newpath/test-next</code>
-instead.</p></div>
+instead. Better yet, run <code>git worktree repair</code> to reestablish the connection
+automatically.</p></div>
 <div class="paragraph"><p>To prevent a <code>$GIT_DIR/worktrees</code> entry from being pruned (which
 can be useful in some situations, such as when the
 entry&#8217;s working tree is stored on a portable device), use the
@@ -1248,7 +1272,7 @@ checkouts of a superproject.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-08-11 18:39:25 PDT
+ 2020-09-09 15:23:32 PDT
 </div>
 </div>
 </body>
