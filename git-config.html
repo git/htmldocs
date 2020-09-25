@@ -6808,6 +6808,33 @@ mailmap.blob
 </p>
 </dd>
 <dt class="hdlist1">
+maintenance.&lt;task&gt;.enabled
+</dt>
+<dd>
+<p>
+        This boolean config option controls whether the maintenance task
+        with name <code>&lt;task&gt;</code> is run when no <code>--task</code> option is specified to
+        <code>git maintenance run</code>. These config values are ignored if a
+        <code>--task</code> option exists. By default, only <code>maintenance.gc.enabled</code>
+        is true.
+</p>
+</dd>
+<dt class="hdlist1">
+maintenance.commit-graph.auto
+</dt>
+<dd>
+<p>
+        This integer config option controls how often the <code>commit-graph</code> task
+        should be run as part of <code>git maintenance run --auto</code>. If zero, then
+        the <code>commit-graph</code> task will not run with the <code>--auto</code> option. A
+        negative value will force the task to run every time. Otherwise, a
+        positive value implies the command should run when the number of
+        reachable commits that are not in the commit-graph file is at least
+        the value of <code>maintenance.commit-graph.auto</code>. The default value is
+        100.
+</p>
+</dd>
+<dt class="hdlist1">
 man.viewer
 </dt>
 <dd>
@@ -8171,6 +8198,33 @@ receive.hideRefs
         An attempt to update or delete a hidden ref by <code>git push</code> is
         rejected.
 </p>
+</dd>
+<dt class="hdlist1">
+receive.procReceiveRefs
+</dt>
+<dd>
+<p>
+        This is a multi-valued variable that defines reference prefixes
+        to match the commands in <code>receive-pack</code>.  Commands matching the
+        prefixes will be executed by an external hook "proc-receive",
+        instead of the internal <code>execute_commands</code> function.  If this
+        variable is not defined, the "proc-receive" hook will never be
+        used, and all commands will be executed by the internal
+        <code>execute_commands</code> function.
+</p>
+<div class="paragraph"><p>For example, if this variable is set to "refs/for", pushing to reference
+such as "refs/for/master" will not create or update a reference named
+"refs/for/master", but may create or update a pull request directly by
+running the hook "proc-receive".</p></div>
+<div class="paragraph"><p>Optional modifiers can be provided in the beginning of the value to filter
+commands for specific actions: create (a), modify (m), delete (d).
+A <code>!</code> can be included in the modifiers to negate the reference prefix entry.
+E.g.:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>git config --system --add receive.procReceiveRefs ad:refs/heads
+git config --system --add receive.procReceiveRefs !:refs/heads</code></pre>
+</div></div>
 </dd>
 <dt class="hdlist1">
 receive.updateServerInfo

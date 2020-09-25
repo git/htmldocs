@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 9.0.0rc2" />
-<title>How to use a signed tag in pull requests</title>
+<title>git-maintenance(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,219 +732,137 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>How to use a signed tag in pull requests</h1>
+<h1>
+git-maintenance(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-maintenance -
+   Run tasks to optimize Git repository data
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph"><p>A typical distributed workflow using Git is for a contributor to fork a
-project, build on it, publish the result to her public repository, and ask
-the "upstream" person (often the owner of the project where she forked
-from) to pull from her public repository. Requesting such a "pull" is made
-easy by the <code>git request-pull</code> command.</p></div>
-<div class="paragraph"><p>Earlier, a typical pull request may have started like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> The following changes since commit 406da78032179...:
-
-   Froboz 3.2 (2011-09-30 14:20:57 -0700)
-
- are available in the Git repository at:
-
-   example.com:/git/froboz.git for-xyzzy</code></pre>
-</div></div>
-<div class="paragraph"><p>followed by a shortlog of the changes and a diffstat.</p></div>
-<div class="paragraph"><p>The request was for a branch name (e.g. <code>for-xyzzy</code>) in the public
-repository of the contributor, and even though it stated where the
-contributor forked her work from, the message did not say anything about
-the commit to expect at the tip of the for-xyzzy branch. If the site that
-hosts the public repository of the contributor cannot be fully trusted, it
-was unnecessarily hard to make sure what was pulled by the integrator was
-genuinely what the contributor had produced for the project. Also there
-was no easy way for third-party auditors to later verify the resulting
-history.</p></div>
-<div class="paragraph"><p>Starting from Git release v1.7.9, a contributor can add a signed tag to
-the commit at the tip of the history and ask the integrator to pull that
-signed tag. When the integrator runs <code>git pull</code>, the signed tag is
-automatically verified to assure that the history is not tampered with.
-In addition, the resulting merge commit records the content of the signed
-tag, so that other people can verify that the branch merged by the
-integrator was signed by the contributor, without fetching the signed tag
-used to validate the pull request separately and keeping it in the refs
-namespace.</p></div>
-<div class="paragraph"><p>This document describes the workflow between the contributor and the
-integrator, using Git v1.7.9 or later.</p></div>
-</div>
-</div>
 <div class="sect1">
-<h2 id="_a_contributor_or_a_lieutenant">A contributor or a lieutenant</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>After preparing her work to be pulled, the contributor uses <code>git tag -s</code>
-to create a signed tag:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> $ git checkout work
- $ ... "git pull" from sublieutenants, "git commit" your own work ...
- $ git tag -s -m "Completed frotz feature" frotz-for-xyzzy work</code></pre>
-</div></div>
-<div class="paragraph"><p>Note that this example uses the <code>-m</code> option to create a signed tag with
-just a one-liner message, but this is for illustration purposes only. It
-is advisable to compose a well-written explanation of what the topic does
-to justify why it is worthwhile for the integrator to pull it, as this
-message will eventually become part of the final history after the
-integrator responds to the pull request (as we will see later).</p></div>
-<div class="paragraph"><p>Then she pushes the tag out to her public repository:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> $ git push example.com:/git/froboz.git/ +frotz-for-xyzzy</code></pre>
-</div></div>
-<div class="paragraph"><p>There is no need to push the <code>work</code> branch or anything else.</p></div>
-<div class="paragraph"><p>Note that the above command line used a plus sign at the beginning of
-<code>+frotz-for-xyzzy</code> to allow forcing the update of a tag, as the same
-contributor may want to reuse a signed tag with the same name after the
-previous pull request has already been responded to.</p></div>
-<div class="paragraph"><p>The contributor then prepares a message to request a "pull":</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> $ git request-pull v3.2 example.com:/git/froboz.git/ frotz-for-xyzzy &gt;msg.txt</code></pre>
-</div></div>
-<div class="paragraph"><p>The arguments are:</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-the version of the integrator&#8217;s commit the contributor based her work on;
-</p>
-</li>
-<li>
-<p>
-the URL of the repository, to which the contributor has pushed what she
-  wants to get pulled; and
-</p>
-</li>
-<li>
-<p>
-the name of the tag the contributor wants to get pulled (earlier, she could
-  write only a branch name here).
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>The resulting msg.txt file begins like so:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> The following changes since commit 406da78032179...:
-
-   Froboz 3.2 (2011-09-30 14:20:57 -0700)
-
- are available in the Git repository at:
-
-   example.com:/git/froboz.git tags/frotz-for-xyzzy
-
- for you to fetch changes up to 703f05ad5835c...:
-
-   Add tests and documentation for frotz (2011-12-02 10:02:52 -0800)
-
- -----------------------------------------------
- Completed frotz feature
- -----------------------------------------------</code></pre>
-</div></div>
-<div class="paragraph"><p>followed by a shortlog of the changes and a diffstat.  Comparing this with
-the earlier illustration of the output from the traditional <code>git request-pull</code>
-command, the reader should notice that:</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-The tip commit to expect is shown to the integrator; and
-</p>
-</li>
-<li>
-<p>
-The signed tag message is shown prominently between the dashed lines
-  before the shortlog.
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>The latter is why the contributor would want to justify why pulling her
-work is worthwhile when creating the signed tag.  The contributor then
-opens her favorite MUA, reads msg.txt, edits and sends it to her upstream
-integrator.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_integrator">Integrator</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>After receiving such a pull request message, the integrator fetches and
-integrates the tag named in the request, with:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> $ git pull example.com:/git/froboz.git/ tags/frotz-for-xyzzy</code></pre>
-</div></div>
-<div class="paragraph"><p>This operation will always open an editor to allow the integrator to fine
-tune the commit log message when merging a signed tag.  Also, pulling a
-signed tag will always create a merge commit even when the integrator does
-not have any new commit since the contributor&#8217;s work forked (i.e. <em>fast
-forward</em>), so that the integrator can properly explain what the merge is
-about and why it was made.</p></div>
-<div class="paragraph"><p>In the editor, the integrator will see something like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> Merge tag 'frotz-for-xyzzy' of example.com:/git/froboz.git/
-
- Completed frotz feature
- # gpg: Signature made Fri 02 Dec 2011 10:03:01 AM PST using RSA key ID 96AFE6CB
- # gpg: Good signature from "Con Tributor &lt;nitfol@example.com&gt;"</code></pre>
-</div></div>
-<div class="paragraph"><p>Notice that the message recorded in the signed tag "Completed frotz
-feature" appears here, and again that is why it is important for the
-contributor to explain her work well when creating the signed tag.</p></div>
-<div class="paragraph"><p>As usual, the lines commented with <code>#</code> are stripped out. The resulting
-commit records the signed tag used for this validation in a hidden field
-so that it can later be used by others to audit the history. There is no
-need for the integrator to keep a separate copy of the tag in his
-repository (i.e. <code>git tag -l</code> won&#8217;t list the <code>frotz-for-xyzzy</code> tag in the
-above example), and there is no need to publish the tag to his public
-repository, either.</p></div>
-<div class="paragraph"><p>After the integrator responds to the pull request and her work becomes
-part of the permanent history, the contributor can remove the tag from
-her public repository, if she chooses, in order to keep the tag namespace
-of her public repository clean, with:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> $ git push example.com:/git/froboz.git :frotz-for-xyzzy</code></pre>
+<div class="verseblock">
+<pre class="content"><em>git maintenance</em> run [&lt;options&gt;]</pre>
+<div class="attribution">
 </div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_auditors">Auditors</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <code>--show-signature</code> option can be given to <code>git log</code> or <code>git show</code> and
-shows the verification status of the embedded signed tag in merge commits
-created when the integrator responded to a pull request of a signed tag.</p></div>
-<div class="paragraph"><p>A typical output from <code>git show --show-signature</code> may look like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code> $ git show --show-signature
- commit 02306ef6a3498a39118aef9df7975bdb50091585
- merged tag 'frotz-for-xyzzy'
- gpg: Signature made Fri 06 Jan 2012 12:41:49 PM PST using RSA key ID 96AFE6CB
- gpg: Good signature from "Con Tributor &lt;nitfol@example.com&gt;"
- Merge: 406da78 703f05a
- Author: Inte Grator &lt;xyzzy@example.com&gt;
- Date:   Tue Jan 17 13:49:41 2012 -0800
-
-     Merge tag 'frotz-for-xyzzy' of example.com:/git/froboz.git/
-
-     Completed frotz feature
-
-     * tag 'frotz-for-xyzzy' (100 commits)
-       Add tests and documentation for frotz
-       ...</code></pre>
-</div></div>
-<div class="paragraph"><p>There is no need for the auditor to explicitly fetch the contributor&#8217;s
-signature, or to even be aware of what tag(s) the contributor and integrator
-used to communicate the signature.  All the required information is recorded
-as part of the merge commit.</p></div>
+<div class="paragraph"><p>Run tasks to optimize Git repository data, speeding up other Git commands
+and reducing storage requirements for the repository.</p></div>
+<div class="paragraph"><p>Git commands that add repository data, such as <code>git add</code> or <code>git fetch</code>,
+are optimized for a responsive user experience. These commands do not take
+time to optimize the Git data, since such optimizations scale with the full
+size of the repository while these user commands each perform a relatively
+small action.</p></div>
+<div class="paragraph"><p>The <code>git maintenance</code> command provides flexibility for how to optimize the
+Git repository.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_subcommands">SUBCOMMANDS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+run
+</dt>
+<dd>
+<p>
+        Run one or more maintenance tasks. If one or more <code>--task</code> options
+        are specified, then those tasks are run in that order. Otherwise,
+        the tasks are determined by which <code>maintenance.&lt;task&gt;.enabled</code>
+        config options are true. By default, only <code>maintenance.gc.enabled</code>
+        is true.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_tasks">TASKS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+commit-graph
+</dt>
+<dd>
+<p>
+        The <code>commit-graph</code> job updates the <code>commit-graph</code> files incrementally,
+        then verifies that the written data is correct. The incremental
+        write is safe to run alongside concurrent Git processes since it
+        will not expire <code>.graph</code> files that were in the previous
+        <code>commit-graph-chain</code> file. They will be deleted by a later run based
+        on the expiration delay.
+</p>
+</dd>
+<dt class="hdlist1">
+gc
+</dt>
+<dd>
+<p>
+        Clean up unnecessary files and optimize the local repository. "GC"
+        stands for "garbage collection," but this task performs many
+        smaller tasks. This task can be expensive for large repositories,
+        as it repacks all Git objects into a single pack-file. It can also
+        be disruptive in some situations, as it deletes stale data. See
+        <a href="git-gc.html">git-gc(1)</a> for more details on garbage collection in Git.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--auto
+</dt>
+<dd>
+<p>
+        When combined with the <code>run</code> subcommand, run maintenance tasks
+        only if certain thresholds are met. For example, the <code>gc</code> task
+        runs when the number of loose objects exceeds the number stored
+        in the <code>gc.auto</code> config setting, or when the number of pack-files
+        exceeds the <code>gc.autoPackLimit</code> config setting.
+</p>
+</dd>
+<dt class="hdlist1">
+--quiet
+</dt>
+<dd>
+<p>
+        Do not report progress or other information over <code>stderr</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--task=&lt;task&gt;
+</dt>
+<dd>
+<p>
+        If this option is specified one or more times, then only run the
+        specified tasks in the specified order. If no <code>--task=&lt;task&gt;</code>
+        arguments are specified, then only the tasks with
+        <code>maintenance.&lt;task&gt;.enabled</code> configured as <code>true</code> are considered.
+        See the <em>TASKS</em> section for the list of accepted <code>&lt;task&gt;</code> values.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -952,7 +870,7 @@ as part of the merge commit.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-09-25 15:48:08 PDT
+ 2020-09-25 15:47:14 PDT
 </div>
 </div>
 </body>
