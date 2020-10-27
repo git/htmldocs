@@ -1824,9 +1824,8 @@ pushUpdateRejected
 <dd>
 <p>
                 Set this variable to <em>false</em> if you want to disable
-                <em>pushNonFFCurrent</em>,
-                <em>pushNonFFMatching</em>, <em>pushAlreadyExists</em>,
-                <em>pushFetchFirst</em>, and <em>pushNeedsForce</em>
+                <em>pushNonFFCurrent</em>, <em>pushNonFFMatching</em>, <em>pushAlreadyExists</em>,
+                <em>pushFetchFirst</em>, <em>pushNeedsForce</em>, and <em>pushRefNeedsUpdate</em>
                 simultaneously.
 </p>
 </dd>
@@ -1891,6 +1890,16 @@ pushUnqualifiedRefname
                 we can still suggest that the user push to either
                 refs/heads/* or refs/tags/* based on the type of the
                 source object.
+</p>
+</dd>
+<dt class="hdlist1">
+pushRefNeedsUpdate
+</dt>
+<dd>
+<p>
+                Shown when <a href="git-push.html">git-push(1)</a> rejects a forced update of
+                a branch when its remote-tracking ref has updates that we
+                do not have locally.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2962,8 +2971,8 @@ core.multiPackIndex
 <dd>
 <p>
         Use the multi-pack-index file to track multiple packfiles using a
-        single index. See <a href="technical/multi-pack-index.html">the
-        multi-pack-index design document</a>.
+        single index. See <a href="git-multi-pack-index.html">git-multi-pack-index(1)</a> for more
+        information. Defaults to true.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3350,23 +3359,33 @@ checkout.defaultRemote
 </dt>
 <dd>
 <p>
-        When you run <em>git checkout &lt;something&gt;</em>
-        or <em>git switch &lt;something&gt;</em> and only have one
+        When you run <code>git checkout &lt;something&gt;</code>
+        or <code>git switch &lt;something&gt;</code> and only have one
         remote, it may implicitly fall back on checking out and
-        tracking e.g. <em>origin/&lt;something&gt;</em>. This stops working as soon
-        as you have more than one remote with a <em>&lt;something&gt;</em>
+        tracking e.g. <code>origin/&lt;something&gt;</code>. This stops working as soon
+        as you have more than one remote with a <code>&lt;something&gt;</code>
         reference. This setting allows for setting the name of a
         preferred remote that should always win when it comes to
         disambiguation. The typical use-case is to set this to
         <code>origin</code>.
 </p>
 <div class="paragraph"><p>Currently this is used by <a href="git-switch.html">git-switch(1)</a> and
-<a href="git-checkout.html">git-checkout(1)</a> when <em>git checkout &lt;something&gt;</em>
-or <em>git switch &lt;something&gt;</em>
-will checkout the <em>&lt;something&gt;</em> branch on another remote,
-and by <a href="git-worktree.html">git-worktree(1)</a> when <em>git worktree add</em> refers to a
+<a href="git-checkout.html">git-checkout(1)</a> when <code>git checkout &lt;something&gt;</code>
+or <code>git switch &lt;something&gt;</code>
+will checkout the <code>&lt;something&gt;</code> branch on another remote,
+and by <a href="git-worktree.html">git-worktree(1)</a> when <code>git worktree add</code> refers to a
 remote branch. This setting might be used for other checkout-like
 commands or functionality in the future.</p></div>
+</dd>
+<dt class="hdlist1">
+checkout.guess
+</dt>
+<dd>
+<p>
+        Provides the default value for the <code>--guess</code> or <code>--no-guess</code>
+        option in <code>git checkout</code> and <code>git switch</code>. See
+        <a href="git-switch.html">git-switch(1)</a> and <a href="git-checkout.html">git-checkout(1)</a>.
+</p>
 </dd>
 <dt class="hdlist1">
 clean.requireForce
@@ -3375,6 +3394,16 @@ clean.requireForce
 <p>
         A boolean to make git-clean do nothing unless given -f,
         -i or -n.   Defaults to true.
+</p>
+</dd>
+<dt class="hdlist1">
+clone.defaultRemoteName
+</dt>
+<dd>
+<p>
+        The name of the remote to create when cloning a repository.  Defaults to
+        <code>origin</code>, and can be overridden by passing the <code>--origin</code> command-line
+        option to <a href="git-clone.html">git-clone(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6849,6 +6878,34 @@ maintenance.commit-graph.auto
 </p>
 </dd>
 <dt class="hdlist1">
+maintenance.loose-objects.auto
+</dt>
+<dd>
+<p>
+        This integer config option controls how often the <code>loose-objects</code> task
+        should be run as part of <code>git maintenance run --auto</code>. If zero, then
+        the <code>loose-objects</code> task will not run with the <code>--auto</code> option. A
+        negative value will force the task to run every time. Otherwise, a
+        positive value implies the command should run when the number of
+        loose objects is at least the value of <code>maintenance.loose-objects.auto</code>.
+        The default value is 100.
+</p>
+</dd>
+<dt class="hdlist1">
+maintenance.incremental-repack.auto
+</dt>
+<dd>
+<p>
+        This integer config option controls how often the <code>incremental-repack</code>
+        task should be run as part of <code>git maintenance run --auto</code>. If zero,
+        then the <code>incremental-repack</code> task will not run with the <code>--auto</code>
+        option. A negative value will force the task to run every time.
+        Otherwise, a positive value implies the command should run when the
+        number of pack-files not in the multi-pack-index is at least the value
+        of <code>maintenance.incremental-repack.auto</code>. The default value is 10.
+</p>
+</dd>
+<dt class="hdlist1">
 man.viewer
 </dt>
 <dd>
@@ -7902,6 +7959,17 @@ push.recurseSubmodules
         specifying <em>--recurse-submodules=check|on-demand|no</em>.
         If not set, <em>no</em> is used by default, unless <em>submodule.recurse</em> is
         set (in which case a <em>true</em> value means <em>on-demand</em>).
+</p>
+</dd>
+<dt class="hdlist1">
+push.useForceIfIncludes
+</dt>
+<dd>
+<p>
+        If set to "true", it is equivalent to specifying
+        <code>--force-if-includes</code> as an option to <a href="git-push.html">git-push(1)</a>
+        in the command line. Adding <code>--no-force-if-includes</code> at the
+        time of push overrides this configuration setting.
 </p>
 </dd>
 <dt class="hdlist1">

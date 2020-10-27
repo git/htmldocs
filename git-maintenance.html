@@ -805,6 +805,25 @@ commit-graph
 </p>
 </dd>
 <dt class="hdlist1">
+prefetch
+</dt>
+<dd>
+<p>
+        The <code>prefetch</code> task updates the object directory with the latest
+        objects from all registered remotes. For each remote, a <code>git fetch</code>
+        command is run. The refmap is custom to avoid updating local or remote
+        branches (those in <code>refs/heads</code> or <code>refs/remotes</code>). Instead, the
+        remote refs are stored in <code>refs/prefetch/&lt;remote&gt;/</code>. Also, tags are
+        not updated.
+</p>
+<div class="paragraph"><p>This is done to avoid disrupting the remote-tracking branches. The end users
+expect these refs to stay unmoved unless they initiate a fetch.  With prefetch
+task, however, the objects necessary to complete a later real fetch would
+already be obtained, so the real fetch would go faster.  In the ideal case,
+it will just become an update to bunch of remote-tracking branches without
+any object transfer.</p></div>
+</dd>
+<dt class="hdlist1">
 gc
 </dt>
 <dd>
@@ -815,6 +834,49 @@ gc
         as it repacks all Git objects into a single pack-file. It can also
         be disruptive in some situations, as it deletes stale data. See
         <a href="git-gc.html">git-gc(1)</a> for more details on garbage collection in Git.
+</p>
+</dd>
+<dt class="hdlist1">
+loose-objects
+</dt>
+<dd>
+<p>
+        The <code>loose-objects</code> job cleans up loose objects and places them into
+        pack-files. In order to prevent race conditions with concurrent Git
+        commands, it follows a two-step process. First, it deletes any loose
+        objects that already exist in a pack-file; concurrent Git processes
+        will examine the pack-file for the object data instead of the loose
+        object. Second, it creates a new pack-file (starting with "loose-")
+        containing a batch of loose objects. The batch size is limited to 50
+        thousand objects to prevent the job from taking too long on a
+        repository with many loose objects. The <code>gc</code> task writes unreachable
+        objects as loose objects to be cleaned up by a later step only if
+        they are not re-added to a pack-file; for this reason it is not
+        advisable to enable both the <code>loose-objects</code> and <code>gc</code> tasks at the
+        same time.
+</p>
+</dd>
+<dt class="hdlist1">
+incremental-repack
+</dt>
+<dd>
+<p>
+        The <code>incremental-repack</code> job repacks the object directory
+        using the <code>multi-pack-index</code> feature. In order to prevent race
+        conditions with concurrent Git commands, it follows a two-step
+        process. First, it calls <code>git multi-pack-index expire</code> to delete
+        pack-files unreferenced by the <code>multi-pack-index</code> file. Second, it
+        calls <code>git multi-pack-index repack</code> to select several small
+        pack-files and repack them into a bigger one, and then update the
+        <code>multi-pack-index</code> entries that refer to the small pack-files to
+        refer to the new pack-file. This prepares those small pack-files
+        for deletion upon the next run of <code>git multi-pack-index expire</code>.
+        The selection of the small pack-files is such that the expected
+        size of the big pack-file is at least the batch size; see the
+        <code>--batch-size</code> option for the <code>repack</code> subcommand in
+        <a href="git-multi-pack-index.html">git-multi-pack-index(1)</a>. The default batch-size is zero,
+        which is a special case that attempts to repack all pack-files
+        into a single pack-file.
 </p>
 </dd>
 </dl></div>
@@ -870,7 +932,7 @@ gc
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-09-25 15:47:14 PDT
+ 2020-10-27 15:58:27 PDT
 </div>
 </div>
 </body>
