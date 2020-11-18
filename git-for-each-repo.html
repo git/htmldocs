@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 9.0.0rc2" />
-<title>Keep authoritative canonical history correct with git pull</title>
+<title>git-for-each-repo(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,205 +732,79 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>Keep authoritative canonical history correct with git pull</h1>
+<h1>
+git-for-each-repo(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-for-each-repo -
+   Run a Git command on a list of repositories
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Sometimes a new project integrator will end up with project history
-that appears to be "backwards" from what other project developers
-expect. This howto presents a suggested integration workflow for
-maintaining a central repository.</p></div>
-<div class="paragraph"><p>Suppose that that central repository has this history:</p></div>
+<div class="verseblock">
+<pre class="content"><em>git for-each-repo</em> --config=&lt;config&gt; [--] &lt;arguments&gt;</pre>
+<div class="attribution">
+</div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_description">DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Run a Git command on a list of repositories. The arguments after the
+known options or <code>--</code> indicator are used as the arguments for the Git
+subprocess.</p></div>
+<div class="paragraph"><p>THIS COMMAND IS EXPERIMENTAL. THE BEHAVIOR MAY CHANGE.</p></div>
+<div class="paragraph"><p>For example, we could run maintenance on each of a list of repositories
+stored in a <code>maintenance.repo</code> config variable using</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    ---o---o---A</code></pre>
+<pre><code>git for-each-repo --config=maintenance.repo maintenance run</code></pre>
 </div></div>
-<div class="paragraph"><p>which ends at commit <code>A</code> (time flows from left to right and each node
-in the graph is a commit, lines between them indicating parent-child
-relationship).</p></div>
-<div class="paragraph"><p>Then you clone it and work on your own commits, which leads you to
-have this history in <strong>your</strong> repository:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    ---o---o---A---B---C</code></pre>
-</div></div>
-<div class="paragraph"><p>Imagine your coworker did the same and built on top of <code>A</code> in <strong>his</strong>
-repository in the meantime, and then pushed it to the
-central repository:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    ---o---o---A---X---Y---Z</code></pre>
-</div></div>
-<div class="paragraph"><p>Now, if you <code>git push</code> at this point, because your history that leads
-to <code>C</code> lacks <code>X</code>, <code>Y</code> and <code>Z</code>, it will fail.  You need to somehow make
-the tip of your history a descendant of <code>Z</code>.</p></div>
-<div class="paragraph"><p>One suggested way to solve the problem is "fetch and then merge", aka
-<code>git pull</code>. When you fetch, your repository will have a history like
-this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    ---o---o---A---B---C
-                \
-                 X---Y---Z</code></pre>
-</div></div>
-<div class="paragraph"><p>Once you run merge after that, while still on <strong>your</strong> branch, i.e. <code>C</code>,
-you will create a merge <code>M</code> and make the history look like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    ---o---o---A---B---C---M
-                \         /
-                 X---Y---Z</code></pre>
-</div></div>
-<div class="paragraph"><p><code>M</code> is a descendant of <code>Z</code>, so you can push to update the central
-repository.  Such a merge <code>M</code> does not lose any commit in both
-histories, so in that sense it may not be wrong, but when people want
-to talk about "the authoritative canonical history that is shared
-among the project participants", i.e. "the trunk", they often view
-it as "commits you see by following the first-parent chain", and use
-this command to view it:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    $ git log --first-parent</code></pre>
-</div></div>
-<div class="paragraph"><p>For all other people who observed the central repository after your
-coworker pushed <code>Z</code> but before you pushed <code>M</code>, the commit on the trunk
-used to be <code>o-o-A-X-Y-Z</code>.  But because you made <code>M</code> while you were on
-<code>C</code>, <code>M</code>'s first parent is <code>C</code>, so by pushing <code>M</code> to advance the
-central repository, you made <code>X-Y-Z</code> a side branch, not on the trunk.</p></div>
-<div class="paragraph"><p>You would rather want to have a history of this shape:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    ---o---o---A---X---Y---Z---M'
-                \             /
-                 B-----------C</code></pre>
-</div></div>
-<div class="paragraph"><p>so that in the first-parent chain, it is clear that the project first
-did <code>X</code> and then <code>Y</code> and then <code>Z</code> and merged a change that consists of
-two commits <code>B</code> and <code>C</code> that achieves a single goal.  You may have
-worked on fixing the bug #12345 with these two patches, and the merge
-<code>M'</code> with swapped parents can say in its log message "Merge
-fix-bug-12345". Having a way to tell <code>git pull</code> to create a merge
-but record the parents in reverse order may be a way to do so.</p></div>
-<div class="paragraph"><p>Note that I said "achieves a single goal" above, because this is
-important.  "Swapping the merge order" only covers a special case
-where the project does not care too much about having unrelated
-things done on a single merge but cares a lot about first-parent
-chain.</p></div>
-<div class="paragraph"><p>There are multiple schools of thought about the "trunk" management.</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
+<div class="paragraph"><p>This will run <code>git -C &lt;repo&gt; maintenance run</code> for each value <code>&lt;repo&gt;</code>
+in the multi-valued config variable <code>maintenance.repo</code>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--config=&lt;config&gt;
+</dt>
+<dd>
 <p>
-Some projects want to keep a completely linear history without any
-    merges.  Obviously, swapping the merge order would not match their
-    taste.  You would need to flatten your history on top of the
-    updated upstream to result in a history of this shape instead:
+        Use the given config variable as a multi-valued list storing
+        absolute path names. Iterate on that list of paths to run
+        the given arguments.
 </p>
-<div class="listingblock">
-<div class="content">
-<pre><code>    ---o---o---A---X---Y---Z---B---C</code></pre>
-</div></div>
-<div class="paragraph"><p>with <code>git pull --rebase</code> or something.</p></div>
-</li>
-<li>
-<p>
-Some projects tolerate merges in their history, but do not worry
-    too much about the first-parent order, and allow fast-forward
-    merges.  To them, swapping the merge order does not hurt, but
-    it is unnecessary.
-</p>
-</li>
-<li>
-<p>
-Some projects want each commit on the "trunk" to do one single
-    thing.  The output of <code>git log --first-parent</code> in such a project
-    would show either a merge of a side branch that completes a single
-    theme, or a single commit that completes a single theme by itself.
-    If your two commits <code>B</code> and <code>C</code> (or they may even be two groups of
-    commits) were solving two independent issues, then the merge <code>M'</code>
-    we made in the earlier example by swapping the merge order is
-    still not up to the project standard.  It merges two unrelated
-    efforts <code>B</code> and <code>C</code> at the same time.
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>For projects in the last category (Git itself is one of them),
-individual developers would want to prepare a history more like
-this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>                 C0--C1--C2     topic-c
-                /
-    ---o---o---A                master
-                \
-                 B0--B1--B2     topic-b</code></pre>
-</div></div>
-<div class="paragraph"><p>That is, keeping separate topics on separate branches, perhaps like
-so:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    $ git clone $URL work &amp;&amp; cd work
-    $ git checkout -b topic-b master
-    $ ... work to create B0, B1 and B2 to complete one theme
-    $ git checkout -b topic-c master
-    $ ... same for the theme of topic-c</code></pre>
-</div></div>
-<div class="paragraph"><p>And then</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    $ git checkout master
-    $ git pull --ff-only</code></pre>
-</div></div>
-<div class="paragraph"><p>would grab <code>X</code>, <code>Y</code> and <code>Z</code> from the upstream and advance your master
-branch:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>                 C0--C1--C2     topic-c
-                /
-    ---o---o---A---X---Y---Z    master
-                \
-                 B0--B1--B2     topic-b</code></pre>
-</div></div>
-<div class="paragraph"><p>And then you would merge these two branches separately:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    $ git merge topic-b
-    $ git merge topic-c</code></pre>
-</div></div>
-<div class="paragraph"><p>to result in</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>                 C0--C1---------C2
-                /                 \
-    ---o---o---A---X---Y---Z---M---N
-                \             /
-                 B0--B1-----B2</code></pre>
-</div></div>
-<div class="paragraph"><p>and push it back to the central repository.</p></div>
-<div class="paragraph"><p>It is very much possible that while you are merging topic-b and
-topic-c, somebody again advanced the history in the central repository
-to put <code>W</code> on top of <code>Z</code>, and make your <code>git push</code> fail.</p></div>
-<div class="paragraph"><p>In such a case, you would rewind to discard <code>M</code> and <code>N</code>, update the
-tip of your <em>master</em> again and redo the two merges:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>    $ git reset --hard origin/master
-    $ git pull --ff-only
-    $ git merge topic-b
-    $ git merge topic-c</code></pre>
-</div></div>
-<div class="paragraph"><p>The procedure will result in a history that looks like this:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>                 C0--C1--------------C2
-                /                     \
-    ---o---o---A---X---Y---Z---W---M'--N'
-                \                 /
-                 B0--B1---------B2</code></pre>
-</div></div>
-<div class="paragraph"><p>See also <a href="http://git-blame.blogspot.com/2013/09/fun-with-first-parent-history.html">http://git-blame.blogspot.com/2013/09/fun-with-first-parent-history.html</a></p></div>
+<div class="paragraph"><p>These config values are loaded from system, global, and local Git config,
+as available. If <code>git for-each-repo</code> is run in a directory that is not a
+Git repository, then only the system and global config is used.</p></div>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_subprocess_behavior">SUBPROCESS BEHAVIOR</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If any <code>git -C &lt;repo&gt; &lt;arguments&gt;</code> subprocess returns a non-zero exit code,
+then the <code>git for-each-repo</code> process returns that exit code without running
+more subprocesses.</p></div>
+<div class="paragraph"><p>Each <code>git -C &lt;repo&gt; &lt;arguments&gt;</code> subprocess inherits the standard file
+descriptors <code>stdin</code>, <code>stdout</code>, and <code>stderr</code>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -938,7 +812,7 @@ tip of your <em>master</em> again and redo the two merges:</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-11-18 14:13:14 PST
+ 2020-11-18 14:12:24 PST
 </div>
 </div>
 </body>

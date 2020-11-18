@@ -6851,6 +6851,45 @@ mailmap.blob
 </p>
 </dd>
 <dt class="hdlist1">
+maintenance.auto
+</dt>
+<dd>
+<p>
+        This boolean config option controls whether some commands run
+        <code>git maintenance run --auto</code> after doing their normal work. Defaults
+        to true.
+</p>
+</dd>
+<dt class="hdlist1">
+maintenance.strategy
+</dt>
+<dd>
+<p>
+        This string config option provides a way to specify one of a few
+        recommended schedules for background maintenance. This only affects
+        which tasks are run during <code>git maintenance run --schedule=X</code>
+        commands, provided no <code>--task=&lt;task&gt;</code> arguments are provided.
+        Further, if a <code>maintenance.&lt;task&gt;.schedule</code> config value is set,
+        then that value is used instead of the one provided by
+        <code>maintenance.strategy</code>. The possible strategy strings are:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>none</code>: This default setting implies no task are run at any schedule.
+</p>
+</li>
+<li>
+<p>
+<code>incremental</code>: This setting optimizes for performing small maintenance
+  activities that do not delete any data. This does not schedule the <code>gc</code>
+  task, but runs the <code>prefetch</code> and <code>commit-graph</code> tasks hourly and the
+  <code>loose-objects</code> and <code>incremental-repack</code> tasks daily.
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
 maintenance.&lt;task&gt;.enabled
 </dt>
 <dd>
@@ -6860,6 +6899,16 @@ maintenance.&lt;task&gt;.enabled
         <code>git maintenance run</code>. These config values are ignored if a
         <code>--task</code> option exists. By default, only <code>maintenance.gc.enabled</code>
         is true.
+</p>
+</dd>
+<dt class="hdlist1">
+maintenance.&lt;task&gt;.schedule
+</dt>
+<dd>
+<p>
+        This config option controls whether or not the given <code>&lt;task&gt;</code> runs
+        during a <code>git maintenance run --schedule=&lt;frequency&gt;</code> command. The
+        value must be one of "hourly", "daily", or "weekly".
 </p>
 </dd>
 <dt class="hdlist1">
