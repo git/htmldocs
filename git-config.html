@@ -749,15 +749,15 @@ git-config(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] name [value [value_regex]]
+<pre class="content"><em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--fixed-value] [--show-origin] [--show-scope] [-z|--null] name [value [value-pattern]]
 <em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] --add name value
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] --replace-all name value [value_regex]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] --get name [value_regex]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] --get-all name [value_regex]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--name-only] --get-regexp name_regex [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--fixed-value] --replace-all name value [value-pattern]
+<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] --get name [value-pattern]
+<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] --get-all name [value-pattern]
+<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] [--name-only] --get-regexp name_regex [value-pattern]
 <em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [-z|--null] --get-urlmatch name URL
-<em>git config</em> [&lt;file-option&gt;] --unset name [value_regex]
-<em>git config</em> [&lt;file-option&gt;] --unset-all name [value_regex]
+<em>git config</em> [&lt;file-option&gt;] [--fixed-value] --unset name [value-pattern]
+<em>git config</em> [&lt;file-option&gt;] [--fixed-value] --unset-all name [value-pattern]
 <em>git config</em> [&lt;file-option&gt;] --rename-section old_name new_name
 <em>git config</em> [&lt;file-option&gt;] --remove-section name
 <em>git config</em> [&lt;file-option&gt;] [--show-origin] [--show-scope] [-z|--null] [--name-only] -l | --list
@@ -776,10 +776,13 @@ actually the section and the key separated by a dot, and the value will be
 escaped.</p></div>
 <div class="paragraph"><p>Multiple lines can be added to an option by using the <code>--add</code> option.
 If you want to update or unset an option which can occur on multiple
-lines, a POSIX regexp <code>value_regex</code> needs to be given.  Only the
-existing values that match the regexp are updated or unset.  If
-you want to handle the lines that do <strong>not</strong> match the regex, just
-prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPLES]</a>).</p></div>
+lines, a <code>value-pattern</code> (which is an extended regular expression,
+unless the <code>--fixed-value</code> option is given) needs to be given.  Only the
+existing values that match the pattern are updated or unset.  If
+you want to handle the lines that do <strong>not</strong> match the pattern, just
+prepend a single exclamation mark in front (see also <a href="#EXAMPLES">[EXAMPLES]</a>),
+but note that this only works when the <code>--fixed-value</code> option is not
+in use.</p></div>
 <div class="paragraph"><p>The <code>--type=&lt;type&gt;</code> option instructs <em>git config</em> to ensure that incoming and
 outgoing values are canonicalize-able under the given &lt;type&gt;.  If no
 <code>--type=&lt;type&gt;</code> is given, no canonicalization will be performed. Callers may
@@ -846,7 +849,7 @@ you try to use an invalid regexp (ret=6).
 <dd>
 <p>
         Default behavior is to replace at most one line. This replaces
-        all lines matching the key (and optionally the value_regex).
+        all lines matching the key (and optionally the <code>value-pattern</code>).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -855,7 +858,7 @@ you try to use an invalid regexp (ret=6).
 <dd>
 <p>
         Adds a new line to the option without altering any existing
-        values.  This is the same as providing <em>^$</em> as the value_regex
+        values.  This is the same as providing <em>^$</em> as the <code>value-pattern</code>
         in <code>--replace-all</code>.
 </p>
 </dd>
@@ -1015,6 +1018,17 @@ from all available files.</p></div>
 <dd>
 <p>
         List all variables set in config file, along with their values.
+</p>
+</dd>
+<dt class="hdlist1">
+--fixed-value
+</dt>
+<dd>
+<p>
+        When used with the <code>value-pattern</code> argument, treat <code>value-pattern</code> as
+        an exact string instead of a regular expression. This will restrict
+        the name/value pairs that are matched to only those where the value
+        is exactly equal to the <code>value-pattern</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1495,7 +1509,7 @@ the variable is the boolean "true").
 The variable names are case-insensitive, allow only alphanumeric characters
 and <code>-</code>, and must start with an alphabetic character.</p></div>
 <div class="paragraph"><p>A line that defines a value can be continued to the next line by
-ending it with a <code>\</code>; the backquote and the end-of-line are
+ending it with a <code>\</code>; the backslash and the end-of-line are
 stripped.  Leading whitespaces after <em>name =</em>, the remainder of the
 line after the first comment character <em>#</em> or <em>;</em>, and trailing
 whitespaces of the line are discarded unless they are enclosed in
@@ -9551,6 +9565,15 @@ transfer.unpackLimit
 </p>
 </dd>
 <dt class="hdlist1">
+transfer.advertiseSID
+</dt>
+<dd>
+<p>
+        Boolean. When true, client and server processes will advertise their
+        unique session IDs to their remote counterpart. Defaults to false.
+</p>
+</dd>
+<dt class="hdlist1">
 uploadarchive.allowUnreachable
 </dt>
 <dd>
@@ -9906,7 +9929,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-03-10 08:03:13 PDT
+ 2020-12-08 16:10:07 PST
 </div>
 </div>
 </body>
