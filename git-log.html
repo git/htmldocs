@@ -1211,6 +1211,11 @@ parents) and <code>--max-parents=-1</code> (negative numbers denote no upper lim
         this option allows you to ignore the individual commits
         brought in to your history by such a merge.
 </p>
+<div class="literalblock">
+<div class="content">
+<pre><code>This option also changes default diff format for merge commits
+to `first-parent`, see `--diff-merges=first-parent` for details.</code></pre>
+</div></div>
 </dd>
 <dt class="hdlist1">
 --not
@@ -3344,74 +3349,12 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 <div class="sectionbody">
 <div class="paragraph"><p>By default, <code>git log</code> does not generate any diff output. The options
 below can be used to show the changes made by each commit.</p></div>
-<div class="paragraph"><p>Note that unless one of <code>-c</code>, <code>--cc</code>, or <code>-m</code> is given, merge commits
-will never show a diff, even if a diff format like <code>--patch</code> is
-selected, nor will they match search options like <code>-S</code>. The exception is
-when <code>--first-parent</code> is in use, in which merges are treated like normal
-single-parent commits (this can be overridden by providing a
-combined-diff option or with <code>--no-diff-merges</code>).</p></div>
-<div class="dlist"><dl>
-<dt class="hdlist1">
--c
-</dt>
-<dd>
-<p>
-        With this option, diff output for a merge commit
-        shows the differences from each of the parents to the merge result
-        simultaneously instead of showing pairwise diff between a parent
-        and the result one at a time. Furthermore, it lists only files
-        which were modified from all parents.
-</p>
-</dd>
-<dt class="hdlist1">
---cc
-</dt>
-<dd>
-<p>
-        This flag implies the <code>-c</code> option and further compresses the
-        patch output by omitting uninteresting hunks whose contents in
-        the parents have only two variants and the merge result picks
-        one of them without modification.
-</p>
-</dd>
-<dt class="hdlist1">
---combined-all-paths
-</dt>
-<dd>
-<p>
-        This flag causes combined diffs (used for merge commits) to
-        list the name of the file from all parents.  It thus only has
-        effect when -c or --cc are specified, and is likely only
-        useful if filename changes are detected (i.e. when either
-        rename or copy detection have been requested).
-</p>
-</dd>
-<dt class="hdlist1">
--m
-</dt>
-<dd>
-<p>
-        This flag makes the merge commits show the full diff like
-        regular commits; for each merge parent, a separate log entry
-        and diff is generated. An exception is that only diff against
-        the first parent is shown when <code>--first-parent</code> option is given;
-        in that case, the output represents the changes the merge
-        brought <em>into</em> the then-current branch.
-</p>
-</dd>
-<dt class="hdlist1">
---diff-merges=off
-</dt>
-<dt class="hdlist1">
---no-diff-merges
-</dt>
-<dd>
-<p>
-        Disable output of diffs for merge commits (default). Useful to
-        override <code>-m</code>, <code>-c</code>, or <code>--cc</code>.
-</p>
-</dd>
-</dl></div>
+<div class="paragraph"><p>Note that unless one of <code>--diff-merges</code> variants (including short
+<code>-m</code>, <code>-c</code>, and <code>--cc</code> options) is explicitly given, merge commits
+will not show a diff, even if a diff format like <code>--patch</code> is
+selected, nor will they match search options like <code>-S</code>. The exception
+is when <code>--first-parent</code> is in use, in which case <code>first-parent</code> is
+the default format.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 -p
@@ -3437,6 +3380,110 @@ combined-diff option or with <code>--no-diff-merges</code>).</p></div>
 <p>
         Suppress diff output. Useful for commands like <code>git show</code> that
         show the patch by default, or to cancel the effect of <code>--patch</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=(off|none|first-parent|1|separate|m|combined|c|dense-combined|cc)
+</dt>
+<dt class="hdlist1">
+--no-diff-merges
+</dt>
+<dd>
+<p>
+        Specify diff format to be used for merge commits. Default is
+        <code>off</code> unless <code>--first-parent</code> is in use, in which case
+        <code>first-parent</code> is the default.
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--diff-merges=(off|none)
+</dt>
+<dt class="hdlist1">
+--no-diff-merges
+</dt>
+<dd>
+<p>
+        Disable output of diffs for merge commits. Useful to override
+        implied value.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=first-parent
+</dt>
+<dt class="hdlist1">
+--diff-merges=1
+</dt>
+<dd>
+<p>
+        This option makes merge commits show the full diff with
+        respect to the first parent only.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=separate
+</dt>
+<dt class="hdlist1">
+--diff-merges=m
+</dt>
+<dt class="hdlist1">
+-m
+</dt>
+<dd>
+<p>
+        This makes merge commits show the full diff with respect to
+        each of the parents. Separate log entry and diff is generated
+        for each parent. <code>-m</code> doesn&#8217;t produce any output without <code>-p</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=combined
+</dt>
+<dt class="hdlist1">
+--diff-merges=c
+</dt>
+<dt class="hdlist1">
+-c
+</dt>
+<dd>
+<p>
+        With this option, diff output for a merge commit shows the
+        differences from each of the parents to the merge result
+        simultaneously instead of showing pairwise diff between a
+        parent and the result one at a time. Furthermore, it lists
+        only files which were modified from all parents. <code>-c</code> implies
+        <code>-p</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=dense-combined
+</dt>
+<dt class="hdlist1">
+--diff-merges=cc
+</dt>
+<dt class="hdlist1">
+--cc
+</dt>
+<dd>
+<p>
+        With this option the output produced by
+        <code>--diff-merges=combined</code> is further compressed by omitting
+        uninteresting hunks whose contents in the parents have only
+        two variants and the merge result picks one of them without
+        modification.  <code>--cc</code> implies <code>-p</code>.
+</p>
+</dd>
+</dl></div>
+</dd>
+<dt class="hdlist1">
+--combined-all-paths
+</dt>
+<dd>
+<p>
+        This flag causes combined diffs (used for merge commits) to
+        list the name of the file from all parents.  It thus only has
+        effect when <code>--diff-merges=[dense-]combined</code> is in use, and
+        is likely only useful if filename changes are detected (i.e.
+        when either rename or copy detection have been requested).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4758,9 +4805,9 @@ rename to a</code></pre>
 <div class="paragraph"><p>Any diff-generating command can take the <code>-c</code> or <code>--cc</code> option to
 produce a <em>combined diff</em> when showing a merge. This is the default
 format when showing merges with <a href="git-diff.html">git-diff(1)</a> or
-<a href="git-show.html">git-show(1)</a>. Note also that you can give the <code>-m</code> option to any
-of these commands to force generation of diffs with individual parents
-of a merge.</p></div>
+<a href="git-show.html">git-show(1)</a>. Note also that you can give suitable
+<code>--diff-merges</code> option to any of these commands to force generation of
+diffs in specific format.</p></div>
 <div class="paragraph"><p>A "combined diff" format looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -5192,7 +5239,7 @@ and overridden by the <code>--notes=&lt;ref&gt;</code> option.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-11-18 14:12:24 PST
+ 2021-02-05 17:34:58 PST
 </div>
 </div>
 </body>

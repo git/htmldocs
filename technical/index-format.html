@@ -784,7 +784,7 @@ be ignored if Git does not understand them.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>Git currently supports cached tree and resolve undo extensions.</code></pre>
+<pre><code>Git currently supports cache tree and resolve undo extensions.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -974,17 +974,42 @@ different. See below for details.</code></pre>
 <h2 id="_extensions">Extensions</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_cached_tree">Cached tree</h3>
+<h3 id="_cache_tree">Cache tree</h3>
 <div class="literalblock">
 <div class="content">
-<pre><code>Cached tree extension contains pre-computed hashes for trees that can
-be derived from the index. It helps speed up tree object generation
-from index for a new commit.</code></pre>
+<pre><code>Since the index does not record entries for directories, the cache
+entries cannot describe tree objects that already exist in the object
+database for regions of the index that are unchanged from an existing
+commit. The cache tree extension stores a recursive tree structure that
+describes the trees that already exist and completely match sections of
+the cache entries. This speeds up tree object generation from the index
+for a new commit by only computing the trees that are "new" to that
+commit. It also assists when comparing the index to another tree, such
+as `HEAD^{tree}`, since sections of the index can be skipped when a tree
+comparison demonstrates equality.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>When a path is updated in index, the path must be invalidated and
-removed from tree cache.</code></pre>
+<pre><code>The recursive tree structure uses nodes that store a number of cache
+entries, a list of subnodes, and an object ID (OID). The OID references
+the existing tree for that node, if it is known to exist. The subnodes
+correspond to subdirectories that themselves have cache tree nodes. The
+number of cache entries corresponds to the number of cache entries in
+the index that describe paths within that tree's directory.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>The extension tracks the full directory structure in the cache tree
+extension, but this is generally smaller than the full cache entry list.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>When a path is updated in index, Git invalidates all nodes of the
+recursive cache tree corresponding to the parent directories of that
+path. We store these tree nodes as being "invalid" by using "-1" as the
+number of cache entries. Invalid nodes still store a span of index
+entries, allowing Git to focus its efforts when reconstructing a full
+cache tree.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
@@ -1041,7 +1066,8 @@ When writing an invalid entry, -1 should always be used as entry_count.</code></
 first entry represents the root level of the repository, followed by the
 first subtree--let's call this A--of the root level (with its name
 relative to the root level), followed by the first subtree of A (with
-its name relative to A), ...</code></pre>
+its name relative to A), and so on. The specified number of subtrees
+indicates when the current level of the recursive stack is complete.</code></pre>
 </div></div>
 </li>
 </ul></div>
@@ -1412,7 +1438,7 @@ A number of index offset entries each consisting of:
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-12-17 15:41:40 PST
+ 2021-02-05 17:34:58 PST
 </div>
 </div>
 </body>

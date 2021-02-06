@@ -1874,8 +1874,10 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_common_diff_options">COMMON DIFF OPTIONS</h2>
+<h2 id="_diff_formatting">DIFF FORMATTING</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>The options below can be used to change the way <code>git show</code> generates
+diff output.</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 -p
@@ -1901,6 +1903,110 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 <p>
         Suppress diff output. Useful for commands like <code>git show</code> that
         show the patch by default, or to cancel the effect of <code>--patch</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=(off|none|first-parent|1|separate|m|combined|c|dense-combined|cc)
+</dt>
+<dt class="hdlist1">
+--no-diff-merges
+</dt>
+<dd>
+<p>
+        Specify diff format to be used for merge commits. Default is
+        <code>dense-combined</code> unless <code>--first-parent</code> is in use, in which case
+        <code>first-parent</code> is the default.
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--diff-merges=(off|none)
+</dt>
+<dt class="hdlist1">
+--no-diff-merges
+</dt>
+<dd>
+<p>
+        Disable output of diffs for merge commits. Useful to override
+        implied value.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=first-parent
+</dt>
+<dt class="hdlist1">
+--diff-merges=1
+</dt>
+<dd>
+<p>
+        This option makes merge commits show the full diff with
+        respect to the first parent only.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=separate
+</dt>
+<dt class="hdlist1">
+--diff-merges=m
+</dt>
+<dt class="hdlist1">
+-m
+</dt>
+<dd>
+<p>
+        This makes merge commits show the full diff with respect to
+        each of the parents. Separate log entry and diff is generated
+        for each parent. <code>-m</code> doesn&#8217;t produce any output without <code>-p</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=combined
+</dt>
+<dt class="hdlist1">
+--diff-merges=c
+</dt>
+<dt class="hdlist1">
+-c
+</dt>
+<dd>
+<p>
+        With this option, diff output for a merge commit shows the
+        differences from each of the parents to the merge result
+        simultaneously instead of showing pairwise diff between a
+        parent and the result one at a time. Furthermore, it lists
+        only files which were modified from all parents. <code>-c</code> implies
+        <code>-p</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--diff-merges=dense-combined
+</dt>
+<dt class="hdlist1">
+--diff-merges=cc
+</dt>
+<dt class="hdlist1">
+--cc
+</dt>
+<dd>
+<p>
+        With this option the output produced by
+        <code>--diff-merges=combined</code> is further compressed by omitting
+        uninteresting hunks whose contents in the parents have only
+        two variants and the merge result picks one of them without
+        modification.  <code>--cc</code> implies <code>-p</code>.
+</p>
+</dd>
+</dl></div>
+</dd>
+<dt class="hdlist1">
+--combined-all-paths
+</dt>
+<dd>
+<p>
+        This flag causes combined diffs (used for merge commits) to
+        list the name of the file from all parents.  It thus only has
+        effect when <code>--diff-merges=[dense-]combined</code> is in use, and
+        is likely only useful if filename changes are detected (i.e.
+        when either rename or copy detection have been requested).
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3222,9 +3328,9 @@ rename to a</code></pre>
 <div class="paragraph"><p>Any diff-generating command can take the <code>-c</code> or <code>--cc</code> option to
 produce a <em>combined diff</em> when showing a merge. This is the default
 format when showing merges with <a href="git-diff.html">git-diff(1)</a> or
-<a href="git-show.html">git-show(1)</a>. Note also that you can give the <code>-m</code> option to any
-of these commands to force generation of diffs with individual parents
-of a merge.</p></div>
+<a href="git-show.html">git-show(1)</a>. Note also that you can give suitable
+<code>--diff-merges</code> option to any of these commands to force generation of
+diffs in specific format.</p></div>
 <div class="paragraph"><p>A "combined diff" format looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -3509,7 +3615,7 @@ reversible operation.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-03-10 08:03:13 PDT
+ 2021-02-05 17:34:58 PST
 </div>
 </div>
 </body>
