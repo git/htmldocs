@@ -6820,7 +6820,7 @@ init.defaultBranch
 <dd>
 <p>
         Allows overriding the default branch name e.g. when initializing
-        a new repository or when cloning an empty repository.
+        a new repository.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -6994,6 +6994,21 @@ log.mailmap
 </p>
 </dd>
 <dt class="hdlist1">
+lsrefs.unborn
+</dt>
+<dd>
+<p>
+        May be "advertise" (the default), "allow", or "ignore". If "advertise",
+        the server will respond to the client sending "unborn" (as described in
+        protocol-v2.txt) and will advertise support for this feature during the
+        protocol v2 capability advertisement. "allow" is the same as
+        "advertise" except that the server will not advertise support for this
+        feature; this is useful for load-balanced servers that cannot be
+        updated atomically (for example), since the administrator could
+        configure "allow", then after a delay, configure "advertise".
+</p>
+</dd>
+<dt class="hdlist1">
 mailinfo.scissors
 </dt>
 <dd>
@@ -7064,8 +7079,9 @@ maintenance.strategy
 <p>
 <code>incremental</code>: This setting optimizes for performing small maintenance
   activities that do not delete any data. This does not schedule the <code>gc</code>
-  task, but runs the <code>prefetch</code> and <code>commit-graph</code> tasks hourly and the
-  <code>loose-objects</code> and <code>incremental-repack</code> tasks daily.
+  task, but runs the <code>prefetch</code> and <code>commit-graph</code> tasks hourly, the
+  <code>loose-objects</code> and <code>incremental-repack</code> tasks daily, and the <code>pack-refs</code>
+  task weekly.
 </p>
 </li>
 </ul></div>
@@ -7571,6 +7587,16 @@ mergetool.&lt;tool&gt;.cmd
 </p>
 </dd>
 <dt class="hdlist1">
+mergetool.&lt;tool&gt;.hideResolved
+</dt>
+<dd>
+<p>
+        Allows the user to override the global <code>mergetool.hideResolved</code> value
+        for a specific tool. See <code>mergetool.hideResolved</code> for the full
+        description.
+</p>
+</dd>
+<dt class="hdlist1">
 mergetool.&lt;tool&gt;.trustExitCode
 </dt>
 <dd>
@@ -7610,6 +7636,21 @@ mergetool.meld.useAutoMerge
         is supported and will only use <code>--auto-merge</code> when available.  A
         value of <code>false</code> avoids using <code>--auto-merge</code> altogether, and is the
         default value.
+</p>
+</dd>
+<dt class="hdlist1">
+mergetool.hideResolved
+</dt>
+<dd>
+<p>
+        During a merge Git will automatically resolve as many conflicts as
+        possible and write the <em>MERGED</em> file containing conflict markers around
+        any conflicts that it cannot resolve; <em>LOCAL</em> and <em>REMOTE</em> normally
+        represent the versions of the file from before Git&#8217;s conflict
+        resolution. This flag causes <em>LOCAL</em> and <em>REMOTE</em> to be overwriten so
+        that only the unresolved conflicts are presented to the merge tool. Can
+        be configured per-tool via the <code>mergetool.&lt;tool&gt;.hideResolved</code>
+        configuration variable. Defaults to <code>true</code>.
 </p>
 </dd>
 <dt class="hdlist1">
