@@ -1194,6 +1194,20 @@ explicitly.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
+--disk-usage
+</dt>
+<dd>
+<p>
+        Suppress normal output; instead, print the sum of the bytes used
+        for on-disk storage by the selected commits or objects. This is
+        equivalent to piping the output into <code>git cat-file
+        --batch-check='%(objectsize:disk)'</code>, except that it runs much
+        faster (especially with <code>--use-bitmap-index</code>). See the <code>CAVEATS</code>
+        section in <a href="git-cat-file.html">git-cat-file(1)</a> for the limitations of what
+        "on-disk storage" means.
+</p>
+</dd>
+<dt class="hdlist1">
 --cherry-mark
 </dt>
 <dd>
@@ -3414,6 +3428,133 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_examples">EXAMPLES</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+Print the list of commits reachable from the current branch.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list HEAD</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Print the list of commits on this branch, but not present in the
+  upstream branch.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list @{upstream}..HEAD</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Format commits with their author and commit message (see also the
+  porcelain <a href="git-log.html">git-log(1)</a>).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list --format=medium HEAD</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Format commits along with their diffs (see also the porcelain
+  <a href="git-log.html">git-log(1)</a>, which can do this in a single process).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list HEAD |
+git diff-tree --stdin --format=medium -p</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Print the list of commits on the current branch that touched any
+  file in the <code>Documentation</code> directory.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list HEAD -- Documentation/</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Print the list of commits authored by you in the past year, on
+  any branch, tag, or other ref.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list --author=you@example.com --since=1.year.ago --all</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Print the list of objects reachable from the current branch (i.e., all
+  commits and the blobs and trees they contain).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list --objects HEAD</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Compare the disk size of all reachable objects, versus those
+  reachable from reflogs, versus the total packed size. This can tell
+  you whether running <code>git repack -ad</code> might reduce the repository size
+  (by dropping unreachable objects), and whether expiring reflogs might
+  help.
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code># reachable objects
+git rev-list --disk-usage --objects --all
+# plus reflogs
+git rev-list --disk-usage --objects --all --reflog
+# total disk size used
+du -c .git/objects/pack/*.pack .git/objects/??/*
+# alternative to du: add up "size" and "size-pack" fields
+git count-objects -v</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Report the disk size of each branch, not including objects used by the
+  current branch. This can find outliers that are contributing to a
+  bloated repository size (e.g., because somebody accidentally committed
+  large build artifacts).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git for-each-ref --format='%(refname)' |
+while read branch
+do
+        size=$(git rev-list --disk-usage --objects HEAD..$branch)
+        echo "$size $branch"
+done |
+sort -n</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+Compare the on-disk size of branches in one group of refs, excluding
+  another. If you co-mingle objects from multiple remotes in a single
+  repository, this can show which remotes are contributing to the
+  repository size (taking the size of <code>origin</code> as a baseline).
+</p>
+<div class="listingblock">
+<div class="content">
+<pre><code>git rev-list --disk-usage --objects --remotes=$suspect --not --remotes=origin</code></pre>
+</div></div>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
@@ -3424,7 +3565,7 @@ $ git log -2 --pretty=%h 4da45bef</code></pre>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-07-30 14:18:13 PDT
+ 2021-02-25 17:29:29 PST
 </div>
 </div>
 </body>
