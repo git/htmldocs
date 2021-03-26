@@ -1655,16 +1655,17 @@ without an explicit <code>--interactive</code>.</p></div>
 </dt>
 <dd>
 <p>
-        When the commit log message begins with "squash! &#8230;" (or
-        "fixup! &#8230;"), and there is already a commit in the todo list that
-        matches the same <code>...</code>, automatically modify the todo list of rebase
-        -i so that the commit marked for squashing comes right after the
-        commit to be modified, and change the action of the moved commit
-        from <code>pick</code> to <code>squash</code> (or <code>fixup</code>).  A commit matches the <code>...</code> if
-        the commit subject matches, or if the <code>...</code> refers to the commit&#8217;s
-        hash. As a fall-back, partial matches of the commit subject work,
-        too.  The recommended way to create fixup/squash commits is by using
-        the <code>--fixup</code>/<code>--squash</code> options of <a href="git-commit.html">git-commit(1)</a>.
+        When the commit log message begins with "squash! &#8230;" or "fixup! &#8230;"
+        or "amend! &#8230;", and there is already a commit in the todo list that
+        matches the same <code>...</code>, automatically modify the todo list of
+        <code>rebase -i</code>, so that the commit marked for squashing comes right after
+        the commit to be modified, and change the action of the moved commit
+        from <code>pick</code> to <code>squash</code> or <code>fixup</code> or <code>fixup -C</code> respectively. A commit
+        matches the <code>...</code> if the commit subject matches, or if the <code>...</code> refers
+        to the commit&#8217;s hash. As a fall-back, partial matches of the commit
+        subject work, too. The recommended way to create fixup/amend/squash
+        commits is by using the <code>--fixup</code>, <code>--fixup=amend:</code> or <code>--fixup=reword:</code>
+        and <code>--squash</code> options respectively of <a href="git-commit.html">git-commit(1)</a>.
 </p>
 <div class="paragraph"><p>If the <code>--autosquash</code> option is enabled by default using the
 configuration variable <code>rebase.autoSquash</code>, this option can be
@@ -2337,9 +2338,16 @@ delete the matching line.</p></div>
 "pick" for the second and subsequent commits with "squash" or "fixup".
 If the commits had different authors, the folded commit will be
 attributed to the author of the first commit.  The suggested commit
-message for the folded commit is the concatenation of the commit
-messages of the first commit and of those with the "squash" command,
-but omits the commit messages of commits with the "fixup" command.</p></div>
+message for the folded commit is the concatenation of the first
+commit&#8217;s message with those identified by "squash" commands, omitting the
+messages of commits identified by "fixup" commands, unless "fixup -c"
+is used.  In that case the suggested commit message is only the message
+of the "fixup -c" commit, and an editor is opened allowing you to edit
+the message.  The contents (patch) of the "fixup -c" commit are still
+incorporated into the folded commit. If there is more than one "fixup -c"
+commit, the message from the final one is used.  You can also use
+"fixup -C" to get the same behavior as "fixup -c" except without opening
+an editor.</p></div>
 <div class="paragraph"><p><em>git rebase</em> will stop when "pick" has been replaced with "edit" or
 when a command fails due to merge errors. When you are done editing
 and/or resolving conflicts you can continue with <code>git rebase --continue</code>.</p></div>
@@ -2762,7 +2770,7 @@ Use <code>--rebase-merges</code> in such scenarios instead.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-11-02 14:02:22 PST
+ 2021-03-26 15:44:23 PDT
 </div>
 </div>
 </body>

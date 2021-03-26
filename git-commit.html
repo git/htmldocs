@@ -750,7 +750,7 @@ git-commit(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git commit</em> [-a | --interactive | --patch] [-s] [-v] [-u&lt;mode&gt;] [--amend]
-           [--dry-run] [(-c | -C | --fixup | --squash) &lt;commit&gt;]
+           [--dry-run] [(-c | -C | --squash) &lt;commit&gt; | --fixup [(amend|reword):]&lt;commit&gt;)]
            [-F &lt;file&gt; | -m &lt;msg&gt;] [--reset-author] [--allow-empty]
            [--allow-empty-message] [--no-verify] [-e] [--author=&lt;author&gt;]
            [--date=&lt;date&gt;] [--cleanup=&lt;mode&gt;] [--[no-]status]
@@ -875,15 +875,44 @@ that, you can recover from it with <em>git reset</em>.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---fixup=&lt;commit&gt;
+--fixup=[(amend|reword):]&lt;commit&gt;
 </dt>
 <dd>
 <p>
-        Construct a commit message for use with <code>rebase --autosquash</code>.
-        The commit message will be the subject line from the specified
-        commit with a prefix of "fixup! ".  See <a href="git-rebase.html">git-rebase(1)</a>
-        for details.
+        Create a new commit which "fixes up" <code>&lt;commit&gt;</code> when applied with
+        <code>git rebase --autosquash</code>. Plain <code>--fixup=&lt;commit&gt;</code> creates a
+        "fixup!" commit which changes the content of <code>&lt;commit&gt;</code> but leaves
+        its log message untouched. <code>--fixup=amend:&lt;commit&gt;</code> is similar but
+        creates an "amend!" commit which also replaces the log message of
+        <code>&lt;commit&gt;</code> with the log message of the "amend!" commit.
+        <code>--fixup=reword:&lt;commit&gt;</code> creates an "amend!" commit which
+        replaces the log message of <code>&lt;commit&gt;</code> with its own log message
+        but makes no changes to the content of <code>&lt;commit&gt;</code>.
 </p>
+<div class="paragraph"><p>The commit created by plain <code>--fixup=&lt;commit&gt;</code> has a subject
+composed of "fixup!" followed by the subject line from &lt;commit&gt;,
+and is recognized specially by <code>git rebase --autosquash</code>. The <code>-m</code>
+option may be used to supplement the log message of the created
+commit, but the additional commentary will be thrown away once the
+"fixup!" commit is squashed into <code>&lt;commit&gt;</code> by
+<code>git rebase --autosquash</code>.</p></div>
+<div class="paragraph"><p>The commit created by <code>--fixup=amend:&lt;commit&gt;</code> is similar but its
+subject is instead prefixed with "amend!". The log message of
+&lt;commit&gt; is copied into the log message of the "amend!" commit and
+opened in an editor so it can be refined. When <code>git rebase
+--autosquash</code> squashes the "amend!" commit into <code>&lt;commit&gt;</code>, the
+log message of <code>&lt;commit&gt;</code> is replaced by the refined log message
+from the "amend!" commit. It is an error for the "amend!" commit&#8217;s
+log message to be empty unless <code>--allow-empty-message</code> is
+specified.</p></div>
+<div class="paragraph"><p><code>--fixup=reword:&lt;commit&gt;</code> is shorthand for <code>--fixup=amend:&lt;commit&gt;
+--only</code>. It creates an "amend!" commit with only a log message
+(ignoring any changes staged in the index). When squashed by <code>git
+rebase --autosquash</code>, it replaces the log message of <code>&lt;commit&gt;</code>
+without making any other changes.</p></div>
+<div class="paragraph"><p>Neither "fixup!" nor "amend!" commits change authorship of
+<code>&lt;commit&gt;</code> when applied by <code>git rebase --autosquash</code>.
+See <a href="git-rebase.html">git-rebase(1)</a> for details.</p></div>
 </dd>
 <dt class="hdlist1">
 --squash=&lt;commit&gt;
@@ -1734,7 +1763,7 @@ information.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-11-02 14:02:22 PST
+ 2021-03-26 15:44:23 PDT
 </div>
 </div>
 </body>
