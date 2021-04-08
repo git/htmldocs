@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 9.0.0rc2" />
-<title>How to rebase from an internal branch</title>
+<title>How we coordinate embargoed releases</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -734,160 +734,138 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>How to rebase from an internal branch</h1>
+<h1>How we coordinate embargoed releases</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="listingblock">
+<div class="paragraph"><p>To protect Git users from critical vulnerabilities, we do not just release
+fixed versions like regular maintenance releases. Instead, we coordinate
+releases with packagers, keeping the fixes under an embargo until the release
+date. That way, users will have a chance to upgrade on that date, no matter
+what Operating System or distribution they run.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_open_a_security_advisory_draft">Open a Security Advisory draft</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The first step is to <a href="https://github.com/git/git/security/advisories/new">open an
+advisory</a>. Technically, it is not necessary, but it is convenient and saves a
+bit of hassle. This advisory can also be used to obtain the CVE number and it
+will give us a private fork associated with it that can be used to collaborate
+on a fix.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_release_date_of_the_embargoed_version">Release date of the embargoed version</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If the vulnerability affects Windows users, we want to have our friends over at
+Visual Studio on board. This means we need to target a "Patch Tuesday" (i.e. a
+second Tuesday of the month), at the minimum three weeks from heads-up to
+coordinated release.</p></div>
+<div class="paragraph"><p>If the vulnerability affects the server side, or can benefit from scans on the
+server side (i.e. if <code>git fsck</code> can detect an attack), it is important to give
+all involved Git repository hosting sites enough time to scan all of those
+repositories.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_notifying_the_linux_distributions">Notifying the Linux distributions</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>At most two weeks before release date, we need to send a notification to
+<a href="mailto:distros@vs.openwall.org">distros@vs.openwall.org</a>, preferably less than 7 days before the release date.
+This will reach most (all?) Linux distributions. See an example below, and the
+guidelines for this mailing list at
+<a href="https://oss-security.openwall.org/wiki/mailing-lists/distros#how-to-use-the-lists">here</a>.</p></div>
+<div class="paragraph"><p>Once the version has been published, we send a note about that to oss-security.
+As an example, see <a href="https://www.openwall.com/lists/oss-security/2019/12/13/1">the
+v2.24.1 mail</a>;
+<a href="https://oss-security.openwall.org/wiki/mailing-lists/oss-security">Here</a> are
+their guidelines.</p></div>
+<div class="paragraph"><p>The mail to oss-security should also describe the exploit, and give credit to
+the reporter(s): security researchers still receive too little respect for the
+invaluable service they provide, and public credit goes a long way to keep them
+paid by their respective organizations.</p></div>
+<div class="paragraph"><p>Technically, describing any exploit can be delayed up to 7 days, but we usually
+refrain from doing that, including it right away.</p></div>
+<div class="paragraph"><p>As a courtesy we typically attach a Git bundle (as <code>.tar.xz</code> because the list
+will drop <code>.bundle</code> attachments) in the mail to distros@ so that the involved
+parties can take care of integrating/backporting them. This bundle is typically
+created using a command like this:</p></div>
+<div class="literalblock">
 <div class="content">
-<pre><code>Petr Baudis &lt;pasky@suse.cz&gt; writes:
+<pre><code>git bundle create cve-xxx.bundle ^origin/master vA.B.C vD.E.F
+tar cJvf cve-xxx.bundle.tar.xz cve-xxx.bundle</code></pre>
+</div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_mail_to_a_href_mailto_distros_vs_openwall_org_distros_vs_openwall_org_a">Example mail to <a href="mailto:distros@vs.openwall.org">distros@vs.openwall.org</a></h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><code>To: distros@vs.openwall.org
+Cc: git-security@googlegroups.com, &lt;other people involved in the report/fix&gt;
+Subject: [vs] Upcoming Git security fix release
 
-&gt; Dear diary, on Sun, Aug 14, 2005 at 09:57:13AM CEST, I got a letter
-&gt; where Junio C Hamano &lt;junkio@cox.net&gt; told me that...
-&gt;&gt; Linus Torvalds &lt;torvalds@osdl.org&gt; writes:
-&gt;&gt;
-&gt;&gt; &gt; Junio, maybe you want to talk about how you move patches from your
-&gt;&gt; &gt; "seen" branch to the real branches.
-&gt;&gt;
-&gt; Actually, wouldn't this be also precisely for what StGIT is intended to?</code></pre>
+Team,
+
+The Git project will release new versions on &lt;date&gt; at 10am Pacific Time or
+soon thereafter. I have attached a Git bundle (embedded in a `.tar.xz` to avoid
+it being dropped) which you can fetch into a clone of
+https://github.com/git/git via `git fetch --tags /path/to/cve-xxx.bundle`,
+containing the tags for versions &lt;versions&gt;.
+
+You can verify with `git tag -v &lt;tag&gt;` that the versions were signed by
+the Git maintainer, using the same GPG key as e.g. v2.24.0.
+
+Please use these tags to prepare `git` packages for your various
+distributions, using the appropriate tagged versions. The added test cases
+help verify the correctness.
+
+The addressed issues are:
+
+&lt;list of CVEs with a short description, typically copy/pasted from Git's
+release notes, usually demo exploit(s), too&gt;
+
+Credit for finding the vulnerability goes to &lt;reporter&gt;, credit for fixing
+it goes to &lt;developer&gt;.
+
+Thanks,
+&lt;name&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>Exactly my feeling.  I was sort of waiting for Catalin to speak
-up.  With its basing philosophical ancestry on quilt, this is
-the kind of task StGIT is designed to do.</p></div>
-<div class="paragraph"><p>I just have done a simpler one, this time using only the core
-Git tools.</p></div>
-<div class="paragraph"><p>I had a handful of commits that were ahead of master in <em>seen</em>, and I
-wanted to add some documentation bypassing my usual habit of
-placing new things in <em>seen</em> first.  At the beginning, the commit
-ancestry graph looked like this:</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_example_mail_to_a_href_mailto_oss_security_lists_openwall_com_oss_security_lists_openwall_com_a">Example mail to <a href="mailto:oss-security@lists.openwall.com">oss-security@lists.openwall.com</a></h2>
+<div class="sectionbody">
 <div class="literalblock">
 <div class="content">
-<pre><code>                         *"seen" head
-master --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
+<pre><code>To: oss-security@lists.openwall.com
+Cc: git-security@googlegroups.com, &lt;other people involved in the report/fix&gt;
+Subject: git: &lt;copy from security advisory&gt;
+
+Team,
+
+The Git project released new versions on &lt;date&gt;, addressing &lt;CVE&gt;.
+
+All supported platforms are affected in one way or another, and all Git
+versions all the way back to &lt;version&gt; are affected. The fixed versions are:
+&lt;versions&gt;.
+
+Link to the announcement: &lt;link to lore.kernel.org/git&gt;
+
+We highly recommend to upgrade.
+
+The addressed issues are:
+* &lt;list of CVEs and their explanations, along with demo exploits&gt;
+
+Credit for finding the vulnerability goes to &lt;reporter&gt;, credit for fixing
+it goes to &lt;developer&gt;.
+
+Thanks,
+&lt;name&gt;</code></pre>
 </div></div>
-<div class="paragraph"><p>So I started from master, made a bunch of edits, and committed:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout master
-$ cd Documentation; ed git.txt ...
-$ cd ..; git add Documentation/*.txt
-$ git commit -s</code></pre>
-</div></div>
-<div class="paragraph"><p>After the commit, the ancestry graph would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                          *"seen" head
-master^ --&gt; #1 --&gt; #2 --&gt; #3
-      \
-        \---&gt; master</code></pre>
-</div></div>
-<div class="paragraph"><p>The old master is now master^ (the first parent of the master).
-The new master commit holds my documentation updates.</p></div>
-<div class="paragraph"><p>Now I have to deal with "seen" branch.</p></div>
-<div class="paragraph"><p>This is the kind of situation I used to have all the time when
-Linus was the maintainer and I was a contributor, when you look
-at "master" branch being the "maintainer" branch, and "seen"
-branch being the "contributor" branch.  Your work started at the
-tip of the "maintainer" branch some time ago, you made a lot of
-progress in the meantime, and now the maintainer branch has some
-other commits you do not have yet.  And "git rebase" was written
-with the explicit purpose of helping to maintain branches like
-"seen".  You <em>could</em> merge master to <em>seen</em> and keep going, but if you
-eventually want to cherrypick and merge some but not necessarily
-all changes back to the master branch, it often makes later
-operations for <em>you</em> easier if you rebase (i.e. carry forward
-your changes) "seen" rather than merge.  So I ran "git rebase":</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout seen
-$ git rebase master seen</code></pre>
-</div></div>
-<div class="paragraph"><p>What this does is to pick all the commits since the current
-branch (note that I now am on "seen" branch) forked from the
-master branch, and forward port these changes.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>master^ --&gt; #1 --&gt; #2 --&gt; #3
-      \                                  *"seen" head
-        \---&gt; master --&gt; #1' --&gt; #2' --&gt; #3'</code></pre>
-</div></div>
-<div class="paragraph"><p>The diff between master^ and #1 is applied to master and
-committed to create #1' commit with the commit information (log,
-author and date) taken from commit #1.  On top of that #2' and #3'
-commits are made similarly out of #2 and #3 commits.</p></div>
-<div class="paragraph"><p>Old #3 is not recorded in any of the .git/refs/heads/ file
-anymore, so after doing this you will have dangling commit if
-you ran fsck-cache, which is normal.  After testing "seen", you
-can run "git prune" to get rid of those original three commits.</p></div>
-<div class="paragraph"><p>While I am talking about "git rebase", I should talk about how
-to do cherrypicking using only the core Git tools.</p></div>
-<div class="paragraph"><p>Let&#8217;s go back to the earlier picture, with different labels.</p></div>
-<div class="paragraph"><p>You, as an individual developer, cloned upstream repository and
-made a couple of commits on top of it.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                           *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
-</div></div>
-<div class="paragraph"><p>You would want changes #2 and #3 incorporated in the upstream,
-while you feel that #1 may need further improvements.  So you
-prepare #2 and #3 for e-mail submission.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git format-patch master^^ master</code></pre>
-</div></div>
-<div class="paragraph"><p>This creates two files, 0001-XXXX.patch and 0002-XXXX.patch.  Send
-them out "To: " your project maintainer and "Cc: " your mailing
-list.  You could use contributed script git-send-email if
-your host has necessary perl modules for this, but your usual
-MUA would do as long as it does not corrupt whitespaces in the
-patch.</p></div>
-<div class="paragraph"><p>Then you would wait, and you find out that the upstream picked
-up your changes, along with other changes.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code> where                      *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3
-  used   \
- to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C
-                                              *upstream head</code></pre>
-</div></div>
-<div class="paragraph"><p>The two commits #2' and #3' in the above picture record the same
-changes your e-mail submission for #2 and #3 contained, but
-probably with the new sign-off line added by the upstream
-maintainer and definitely with different committer and ancestry
-information, they are different objects from #2 and #3 commits.</p></div>
-<div class="paragraph"><p>You fetch from upstream, but not merge.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git fetch upstream</code></pre>
-</div></div>
-<div class="paragraph"><p>This leaves the updated upstream head in .git/FETCH_HEAD but
-does not touch your .git/HEAD or .git/refs/heads/master.
-You run "git rebase" now.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git rebase FETCH_HEAD master</code></pre>
-</div></div>
-<div class="paragraph"><p>Earlier, I said that rebase applies all the commits from your
-branch on top of the upstream head.  Well, I lied.  "git rebase"
-is a bit smarter than that and notices that #2 and #3 need not
-be applied, so it only applies #1.  The commit ancestry graph
-becomes something like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code> where                     *your old "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3
-  used   \                      your new "master" head*
- to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C --&gt; #1'
-                                              *upstream
-                                              head</code></pre>
-</div></div>
-<div class="paragraph"><p>Again, "git prune" would discard the disused commits #1-#3 and
-you continue on starting from the new "master" head, which is
-the #1' commit.</p></div>
-<div class="paragraph"><p>-jc</p></div>
 </div>
 </div>
 </div>
