@@ -820,6 +820,15 @@ with the same name are sorted by their stage field.</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
+<pre><code>An index entry typically represents a file. However, if sparse-checkout
+is enabled in cone mode (`core.sparseCheckoutCone` is enabled) and the
+`extensions.sparseIndex` extension is enabled, then the index may
+contain entries for directories outside of the sparse-checkout definition.
+These entries have mode `040000`, include the `SKIP_WORKTREE` bit, and
+the path ends in a directory separator.</code></pre>
+</div></div>
+<div class="literalblock">
+<div class="content">
 <pre><code>32-bit ctime seconds, the last time a file's metadata changed
   this is stat(2) data</code></pre>
 </div></div>
@@ -1433,12 +1442,29 @@ A number of index offset entries each consisting of:
 </ul></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_sparse_directory_entries">Sparse Directory Entries</h2>
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><code>When using sparse-checkout in cone mode, some entire directories within
+the index can be summarized by pointing to a tree object instead of the
+entire expanded list of paths within that tree. An index containing such
+entries is a "sparse index". Index format versions 4 and less were not
+implemented with such entries in mind. Thus, for these versions, an
+index containing sparse directory entries will include this extension
+with signature { 's', 'd', 'i', 'r' }. Like the split-index extension,
+tools should avoid interacting with a sparse index unless they understand
+this extension.</code></pre>
+</div></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-02-25 17:29:29 PST
+ 2021-04-30 15:03:30 JST
 </div>
 </div>
 </body>

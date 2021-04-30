@@ -75,6 +75,11 @@ UI, Workflows & Features
  * The command line completion (in contrib/) has learned that
    CHERRY_PICK_HEAD is a possible pseudo-ref.
 
+ * Userdiff patterns for "Scheme" has been added.
+
+ * "git log" learned "--diff-merges=<style>" option, with an
+   associated configuration variable log.diffMerges.
+
 
 Performance, Internal Implementation, Development Support etc.
 
@@ -125,6 +130,24 @@ Performance, Internal Implementation, Development Support etc.
    three-way merges internally, like cherry-pick, rebase etc.,
    primarily to enhance its test coverage (the strategy has been
    available as an explicit "-s ort" choice).
+
+ * A bit of code clean-up and a lot of test clean-up around userdiff
+   area.
+
+ * Handling of "promisor packs" that allows certain objects to be
+   missing and lazily retrievable has been optimized (a bit).
+
+ * When packet_write() fails, we gave an extra error message
+   unnecessarily, which has been corrected.
+
+ * The checkout machinery has been taught to perform the actual
+   write-out of the files in parallel when able.
+
+ * Show errno in the trace output in the error codepath that calls
+   read_raw_ref method.
+
+ * Effort to make the command line completion (in contrib/) safe with
+   "set -u" continues.
 
 
 Fixes since v2.31
@@ -215,6 +238,30 @@ Fixes since v2.31
    option.
    (merge c5c0548d79 vs/completion-with-set-u later to maint).
 
+ * When "git pack-objects" makes a literal copy of a part of existing
+   packfile using the reachability bitmaps, its update to the progress
+   meter was broken.
+   (merge 8e118e8490 jk/pack-objects-bitmap-progress-fix later to maint).
+
+ * The dependencies for config-list.h and command-list.h were broken
+   when the former was split out of the latter, which has been
+   corrected.
+   (merge 56550ea718 sg/bugreport-fixes later to maint).
+
+ * "git push --quiet --set-upstream" was not quiet when setting the
+   upstream branch configuration, which has been corrected.
+   (merge f3cce896a8 ow/push-quiet-set-upstream later to maint).
+
+ * The prefetch task in "git maintenance" assumed that "git fetch"
+   from any remote would fetch all its local branches, which would
+   fetch too much if the user is interested in only a subset of
+   branches there.
+   (merge 32f67888d8 ds/maintenance-prefetch-fix later to maint).
+
+ * Clarify that pathnames recorded in Git trees are most often (but
+   not necessarily) encoded in UTF-8.
+   (merge 9364bf465d ab/pathname-encoding-doc later to maint).
+
  * Other code cleanup, docfix, build fix, etc.
    (merge f451960708 dl/cat-file-doc-cleanup later to maint).
    (merge 12604a8d0c sv/t9801-test-path-is-file-cleanup later to maint).
@@ -229,3 +276,7 @@ Fixes since v2.31
    (merge 28e29ee38b jc/doc-format-patch-clarify later to maint).
    (merge fc12b6fdde fm/user-manual-use-preface later to maint).
    (merge dba94e3a85 cc/test-helper-bloom-usage-fix later to maint).
+   (merge 61a7660516 hn/reftable-tables-doc-update later to maint).
+   (merge 81ed96a9b2 jt/fetch-pack-request-fix later to maint).
+   (merge 151b6c2dd7 jc/doc-do-not-capitalize-clarification later to maint).
+   (merge 9160068ac6 js/access-nul-emulation-on-windows later to maint).

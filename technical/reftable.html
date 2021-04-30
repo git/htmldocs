@@ -1925,8 +1925,36 @@ from being deleted.</p></div>
 reftable stack, reload <code>tables.list</code>, and delete any tables no longer mentioned
 in <code>tables.list</code>.</p></div>
 <div class="paragraph"><p>Irregular program exit may still leave about unused files. In this case, a
-cleanup operation can read <code>tables.list</code>, note its modification timestamp, and
-delete any unreferenced <code>*.ref</code> files that are older.</p></div>
+cleanup operation should proceed as follows:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+take a lock <code>tables.list.lock</code> to prevent concurrent modifications
+</p>
+</li>
+<li>
+<p>
+refresh the reftable stack, by reading <code>tables.list</code>
+</p>
+</li>
+<li>
+<p>
+for each <code>*.ref</code> file, remove it if
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+it is not mentioned in <code>tables.list</code>, and
+</p>
+</li>
+<li>
+<p>
+its max update_index is not beyond the max update_index of the stack
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
 </div>
 </div>
 <div class="sect2">
@@ -2028,7 +2056,7 @@ impossible.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-03-02 23:05:01 PST
+ 2021-04-30 15:03:30 JST
 </div>
 </div>
 </body>
