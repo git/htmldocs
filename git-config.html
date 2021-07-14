@@ -3236,7 +3236,7 @@ blame.ignoreRevsFile
 </p>
 </dd>
 <dt class="hdlist1">
-blame.markUnblamables
+blame.markUnblamableLines
 </dt>
 <dd>
 <p>
@@ -7312,7 +7312,7 @@ merge.defaultToUpstream
         branches at the remote named by <code>branch.&lt;current branch&gt;.remote</code>
         are consulted, and then they are mapped via <code>remote.&lt;remote&gt;.fetch</code>
         to their corresponding remote-tracking branches, and the tips of
-        these tracking branches are merged.
+        these tracking branches are merged. Defaults to true.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -8061,13 +8061,21 @@ pack.packSizeLimit
         packing to a file when repacking, i.e. the git:// protocol
         is unaffected.  It can be overridden by the <code>--max-pack-size</code>
         option of <a href="git-repack.html">git-repack(1)</a>.  Reaching this limit results
-        in the creation of multiple packfiles; which in turn prevents
-        bitmaps from being created.
-        The minimum size allowed is limited to 1 MiB.
-        The default is unlimited.
-        Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are
-        supported.
+        in the creation of multiple packfiles.
 </p>
+<div class="paragraph"><p>Note that this option is rarely useful, and may result in a larger total
+on-disk size (because Git will not store deltas between packs), as well
+as worse runtime performance (object lookup within multiple packs is
+slower than a single pack, and optimizations like reachability bitmaps
+cannot cope with multiple packs).</p></div>
+<div class="paragraph"><p>If you need to actively run Git using smaller packfiles (e.g., because your
+filesystem does not support large files), this option may help. But if
+your goal is to transmit a packfile over a medium that supports limited
+sizes (e.g., removable media that cannot store the whole repository),
+you are likely better off creating a single large packfile and splitting
+it using a generic multi-volume archive tool (e.g., Unix <code>split</code>).</p></div>
+<div class="paragraph"><p>The minimum size allowed is limited to 1 MiB. The default is unlimited.
+Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are supported.</p></div>
 </dd>
 <dt class="hdlist1">
 pack.useBitmaps
@@ -8391,14 +8399,13 @@ push.default
 </li>
 <li>
 <p>
-<code>simple</code> - in centralized workflow, work like <code>upstream</code> with an
-  added safety to refuse to push if the upstream branch&#8217;s name is
-  different from the local one.
+<code>simple</code> - pushes the current branch with the same name on the remote.
 </p>
-<div class="paragraph"><p>When pushing to a remote that is different from the remote you normally
-pull from, work as <code>current</code>.  This is the safest option and is suited
-for beginners.</p></div>
-<div class="paragraph"><p>This mode has become the default in Git 2.0.</p></div>
+<div class="paragraph"><p>If you are working on a centralized workflow (pushing to the same repository you
+pull from, which is typically <code>origin</code>), then you need to configure an upstream
+branch with the same name.</p></div>
+<div class="paragraph"><p>This mode is the default since Git 2.0, and is the safest option suited for
+beginners.</p></div>
 </li>
 <li>
 <p>
@@ -10393,7 +10400,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-05-07 13:16:48 JST
+ 2021-05-06 21:16:48 PDT
 </div>
 </div>
 </body>
