@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 9.0.0rc2" />
-<title>How we coordinate embargoed releases</title>
+<title>git-version(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,140 +732,56 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>How we coordinate embargoed releases</h1>
+<h1>
+git-version(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-version -
+   Display version information about Git
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="paragraph"><p>To protect Git users from critical vulnerabilities, we do not just release
-fixed versions like regular maintenance releases. Instead, we coordinate
-releases with packagers, keeping the fixes under an embargo until the release
-date. That way, users will have a chance to upgrade on that date, no matter
-what Operating System or distribution they run.</p></div>
-</div>
-</div>
 <div class="sect1">
-<h2 id="_open_a_security_advisory_draft">Open a Security Advisory draft</h2>
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The first step is to <a href="https://github.com/git/git/security/advisories/new">open an
-advisory</a>. Technically, it is not necessary, but it is convenient and saves a
-bit of hassle. This advisory can also be used to obtain the CVE number and it
-will give us a private fork associated with it that can be used to collaborate
-on a fix.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_release_date_of_the_embargoed_version">Release date of the embargoed version</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>If the vulnerability affects Windows users, we want to have our friends over at
-Visual Studio on board. This means we need to target a "Patch Tuesday" (i.e. a
-second Tuesday of the month), at the minimum three weeks from heads-up to
-coordinated release.</p></div>
-<div class="paragraph"><p>If the vulnerability affects the server side, or can benefit from scans on the
-server side (i.e. if <code>git fsck</code> can detect an attack), it is important to give
-all involved Git repository hosting sites enough time to scan all of those
-repositories.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_notifying_the_linux_distributions">Notifying the Linux distributions</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>At most two weeks before release date, we need to send a notification to
-<a href="mailto:distros@vs.openwall.org">distros@vs.openwall.org</a>, preferably less than 7 days before the release date.
-This will reach most (all?) Linux distributions. See an example below, and the
-guidelines for this mailing list at
-<a href="https://oss-security.openwall.org/wiki/mailing-lists/distros#how-to-use-the-lists">here</a>.</p></div>
-<div class="paragraph"><p>Once the version has been published, we send a note about that to oss-security.
-As an example, see <a href="https://www.openwall.com/lists/oss-security/2019/12/13/1">the
-v2.24.1 mail</a>;
-<a href="https://oss-security.openwall.org/wiki/mailing-lists/oss-security">Here</a> are
-their guidelines.</p></div>
-<div class="paragraph"><p>The mail to oss-security should also describe the exploit, and give credit to
-the reporter(s): security researchers still receive too little respect for the
-invaluable service they provide, and public credit goes a long way to keep them
-paid by their respective organizations.</p></div>
-<div class="paragraph"><p>Technically, describing any exploit can be delayed up to 7 days, but we usually
-refrain from doing that, including it right away.</p></div>
-<div class="paragraph"><p>As a courtesy we typically attach a Git bundle (as <code>.tar.xz</code> because the list
-will drop <code>.bundle</code> attachments) in the mail to distros@ so that the involved
-parties can take care of integrating/backporting them. This bundle is typically
-created using a command like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>git bundle create cve-xxx.bundle ^origin/master vA.B.C vD.E.F
-tar cJvf cve-xxx.bundle.tar.xz cve-xxx.bundle</code></pre>
+<div class="verseblock">
+<pre class="content"><em>git version</em> [--build-options]</pre>
+<div class="attribution">
 </div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_example_mail_to_a_href_mailto_distros_vs_openwall_org_distros_vs_openwall_org_a">Example mail to <a href="mailto:distros@vs.openwall.org">distros@vs.openwall.org</a></h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre><code>To: distros@vs.openwall.org
-Cc: git-security@googlegroups.com, &lt;other people involved in the report/fix&gt;
-Subject: [vs] Upcoming Git security fix release
-
-Team,
-
-The Git project will release new versions on &lt;date&gt; at 10am Pacific Time or
-soon thereafter. I have attached a Git bundle (embedded in a `.tar.xz` to avoid
-it being dropped) which you can fetch into a clone of
-https://github.com/git/git via `git fetch --tags /path/to/cve-xxx.bundle`,
-containing the tags for versions &lt;versions&gt;.
-
-You can verify with `git tag -v &lt;tag&gt;` that the versions were signed by
-the Git maintainer, using the same GPG key as e.g. v2.24.0.
-
-Please use these tags to prepare `git` packages for your various
-distributions, using the appropriate tagged versions. The added test cases
-help verify the correctness.
-
-The addressed issues are:
-
-&lt;list of CVEs with a short description, typically copy/pasted from Git's
-release notes, usually demo exploit(s), too&gt;
-
-Credit for finding the vulnerability goes to &lt;reporter&gt;, credit for fixing
-it goes to &lt;developer&gt;.
-
-Thanks,
-&lt;name&gt;</code></pre>
-</div></div>
+<div class="paragraph"><p>With no options given, the version of <em>git</em> is printed on the standard output.</p></div>
+<div class="paragraph"><p>Note that <code>git --version</code> is identical to <code>git version</code> because the
+former is internally converted into the latter.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_example_mail_to_a_href_mailto_oss_security_lists_openwall_com_oss_security_lists_openwall_com_a">Example mail to <a href="mailto:oss-security@lists.openwall.com">oss-security@lists.openwall.com</a></h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="literalblock">
-<div class="content">
-<pre><code>To: oss-security@lists.openwall.com
-Cc: git-security@googlegroups.com, &lt;other people involved in the report/fix&gt;
-Subject: git: &lt;copy from security advisory&gt;
-
-Team,
-
-The Git project released new versions on &lt;date&gt;, addressing &lt;CVE&gt;.
-
-All supported platforms are affected in one way or another, and all Git
-versions all the way back to &lt;version&gt; are affected. The fixed versions are:
-&lt;versions&gt;.
-
-Link to the announcement: &lt;link to lore.kernel.org/git&gt;
-
-We highly recommend to upgrade.
-
-The addressed issues are:
-* &lt;list of CVEs and their explanations, along with demo exploits&gt;
-
-Credit for finding the vulnerability goes to &lt;reporter&gt;, credit for fixing
-it goes to &lt;developer&gt;.
-
-Thanks,
-&lt;name&gt;</code></pre>
-</div></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--build-options
+</dt>
+<dd>
+<p>
+        Include additional information about how git was built for diagnostic
+        purposes.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -873,7 +789,7 @@ Thanks,
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-09-23 14:34:35 PDT
+ 2021-09-23 14:33:59 PDT
 </div>
 </div>
 </body>
