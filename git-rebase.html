@@ -1436,31 +1436,10 @@ i.e. commits that would be excluded by <a href="git-log.html">git-log(1)</a>'s
 <code>--ancestry-path</code> option will keep their original ancestry by default. If
 the <code>rebase-cousins</code> mode is turned on, such commits are instead rebased
 onto <code>&lt;upstream&gt;</code> (or <code>&lt;onto&gt;</code>, if specified).</p></div>
-<div class="paragraph"><p>The <code>--rebase-merges</code> mode is similar in spirit to the deprecated
-<code>--preserve-merges</code> but works with interactive rebases,
-where commits can be reordered, inserted and dropped at will.</p></div>
 <div class="paragraph"><p>It is currently only possible to recreate the merge commits using the
 <code>ort</code> merge strategy; different merge strategies can be used only via
 explicit <code>exec git merge -s &lt;strategy&gt; [...]</code> commands.</p></div>
 <div class="paragraph"><p>See also REBASING MERGES and INCOMPATIBLE OPTIONS below.</p></div>
-</dd>
-<dt class="hdlist1">
--p
-</dt>
-<dt class="hdlist1">
---preserve-merges
-</dt>
-<dd>
-<p>
-        [DEPRECATED: use <code>--rebase-merges</code> instead] Recreate merge commits
-        instead of flattening the history by replaying commits a merge commit
-        introduces. Merge conflict resolutions or manual amendments to merge
-        commits are not preserved.
-</p>
-<div class="paragraph"><p>This uses the <code>--interactive</code> machinery internally, but combining it
-with the <code>--interactive</code> option explicitly is generally not a good
-idea unless you know what you are doing (see BUGS below).</p></div>
-<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
 -x &lt;cmd&gt;
@@ -1503,9 +1482,6 @@ without an explicit <code>--interactive</code>.</p></div>
         the root commit(s) on a branch.  When used with --onto, it
         will skip changes already contained in &lt;newbase&gt; (instead of
         &lt;upstream&gt;) whereas without --onto it will operate on every change.
-        When used together with both --onto and --preserve-merges,
-        <em>all</em> root commits will be rewritten to have &lt;newbase&gt; as parent
-        instead.
 </p>
 <div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
@@ -1626,11 +1602,6 @@ start would be overridden by the presence of
 </li>
 <li>
 <p>
---preserve-merges
-</p>
-</li>
-<li>
-<p>
 --interactive
 </p>
 </li>
@@ -1667,41 +1638,6 @@ start would be overridden by the presence of
 </ul></div>
 <div class="paragraph"><p>In addition, the following pairs of options are incompatible:</p></div>
 <div class="ulist"><ul>
-<li>
-<p>
---preserve-merges and --interactive
-</p>
-</li>
-<li>
-<p>
---preserve-merges and --signoff
-</p>
-</li>
-<li>
-<p>
---preserve-merges and --rebase-merges
-</p>
-</li>
-<li>
-<p>
---preserve-merges and --empty=
-</p>
-</li>
-<li>
-<p>
---preserve-merges and --ignore-whitespace
-</p>
-</li>
-<li>
-<p>
---preserve-merges and --committer-date-is-author-date
-</p>
-</li>
-<li>
-<p>
---preserve-merges and --ignore-date
-</p>
-</li>
 <li>
 <p>
 --keep-base and --onto
@@ -2757,33 +2693,6 @@ sequence.editor
 </div>
 </div>
 <div class="sect1">
-<h2 id="_bugs">BUGS</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>The todo list presented by the deprecated <code>--preserve-merges --interactive</code>
-does not represent the topology of the revision graph (use <code>--rebase-merges</code>
-instead).  Editing commits and rewording their commit messages should work
-fine, but attempts to reorder commits tend to produce counterintuitive results.
-Use <code>--rebase-merges</code> in such scenarios instead.</p></div>
-<div class="paragraph"><p>For example, an attempt to rearrange</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>1 --- 2 --- 3 --- 4 --- 5</code></pre>
-</div></div>
-<div class="paragraph"><p>to</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>1 --- 2 --- 4 --- 3 --- 5</code></pre>
-</div></div>
-<div class="paragraph"><p>by moving the "pick 4" line will result in the following history:</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>        3
-       /
-1 --- 2 --- 4 --- 5</code></pre>
-</div></div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_git">GIT</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
@@ -2794,7 +2703,7 @@ Use <code>--rebase-merges</code> in such scenarios instead.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-10-06 14:16:38 PDT
+ 2021-10-18 17:00:13 PDT
 </div>
 </div>
 </body>
