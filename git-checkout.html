@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 9.0.0rc2" />
+<meta name="generator" content="AsciiDoc 10.0.1" />
 <title>git-checkout(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -539,195 +539,6 @@ body.manpage div.sectionbody {
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-var asciidoc = {  // Namespace.
-
-/////////////////////////////////////////////////////////////////////
-// Table Of Contents generator
-/////////////////////////////////////////////////////////////////////
-
-/* Author: Mihai Bazon, September 2002
- * http://students.infoiasi.ro/~mishoo
- *
- * Table Of Content generator
- * Version: 0.4
- *
- * Feel free to use this script under the terms of the GNU General Public
- * License, as long as you do not remove or alter this notice.
- */
-
- /* modified by Troy D. Hanson, September 2006. License: GPL */
- /* modified by Stuart Rackham, 2006, 2009. License: GPL */
-
-// toclevels = 1..4.
-toc: function (toclevels) {
-
-  function getText(el) {
-    var text = "";
-    for (var i = el.firstChild; i != null; i = i.nextSibling) {
-      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
-        text += i.data;
-      else if (i.firstChild != null)
-        text += getText(i);
-    }
-    return text;
-  }
-
-  function TocEntry(el, text, toclevel) {
-    this.element = el;
-    this.text = text;
-    this.toclevel = toclevel;
-  }
-
-  function tocEntries(el, toclevels) {
-    var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
-    // Function that scans the DOM tree for header elements (the DOM2
-    // nodeIterator API would be a better technique but not supported by all
-    // browsers).
-    var iterate = function (el) {
-      for (var i = el.firstChild; i != null; i = i.nextSibling) {
-        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
-          var mo = re.exec(i.tagName);
-          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
-            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
-          }
-          iterate(i);
-        }
-      }
-    }
-    iterate(el);
-    return result;
-  }
-
-  var toc = document.getElementById("toc");
-  if (!toc) {
-    return;
-  }
-
-  // Delete existing TOC entries in case we're reloading the TOC.
-  var tocEntriesToRemove = [];
-  var i;
-  for (i = 0; i < toc.childNodes.length; i++) {
-    var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
-     && entry.getAttribute("class")
-     && entry.getAttribute("class").match(/^toclevel/))
-      tocEntriesToRemove.push(entry);
-  }
-  for (i = 0; i < tocEntriesToRemove.length; i++) {
-    toc.removeChild(tocEntriesToRemove[i]);
-  }
-
-  // Rebuild TOC entries.
-  var entries = tocEntries(document.getElementById("content"), toclevels);
-  for (var i = 0; i < entries.length; ++i) {
-    var entry = entries[i];
-    if (entry.element.id == "")
-      entry.element.id = "_toc_" + i;
-    var a = document.createElement("a");
-    a.href = "#" + entry.element.id;
-    a.appendChild(document.createTextNode(entry.text));
-    var div = document.createElement("div");
-    div.appendChild(a);
-    div.className = "toclevel" + entry.toclevel;
-    toc.appendChild(div);
-  }
-  if (entries.length == 0)
-    toc.parentNode.removeChild(toc);
-},
-
-
-/////////////////////////////////////////////////////////////////////
-// Footnotes generator
-/////////////////////////////////////////////////////////////////////
-
-/* Based on footnote generation code from:
- * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
- */
-
-footnotes: function () {
-  // Delete existing footnote entries in case we're reloading the footnodes.
-  var i;
-  var noteholder = document.getElementById("footnotes");
-  if (!noteholder) {
-    return;
-  }
-  var entriesToRemove = [];
-  for (i = 0; i < noteholder.childNodes.length; i++) {
-    var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
-      entriesToRemove.push(entry);
-  }
-  for (i = 0; i < entriesToRemove.length; i++) {
-    noteholder.removeChild(entriesToRemove[i]);
-  }
-
-  // Rebuild footnote entries.
-  var cont = document.getElementById("content");
-  var spans = cont.getElementsByTagName("span");
-  var refs = {};
-  var n = 0;
-  for (i=0; i<spans.length; i++) {
-    if (spans[i].className == "footnote") {
-      n++;
-      var note = spans[i].getAttribute("data-note");
-      if (!note) {
-        // Use [\s\S] in place of . so multi-line matches work.
-        // Because JavaScript has no s (dotall) regex flag.
-        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
-        spans[i].innerHTML =
-          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-          "' title='View footnote' class='footnote'>" + n + "</a>]";
-        spans[i].setAttribute("data-note", note);
-      }
-      noteholder.innerHTML +=
-        "<div class='footnote' id='_footnote_" + n + "'>" +
-        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
-        n + "</a>. " + note + "</div>";
-      var id =spans[i].getAttribute("id");
-      if (id != null) refs["#"+id] = n;
-    }
-  }
-  if (n == 0)
-    noteholder.parentNode.removeChild(noteholder);
-  else {
-    // Process footnoterefs.
-    for (i=0; i<spans.length; i++) {
-      if (spans[i].className == "footnoteref") {
-        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
-        href = href.match(/#.*/)[0];  // Because IE return full URL.
-        n = refs[href];
-        spans[i].innerHTML =
-          "[<a href='#_footnote_" + n +
-          "' title='View footnote' class='footnote'>" + n + "</a>]";
-      }
-    }
-  }
-},
-
-install: function(toclevels) {
-  var timerId;
-
-  function reinstall() {
-    asciidoc.footnotes();
-    if (toclevels) {
-      asciidoc.toc(toclevels);
-    }
-  }
-
-  function reinstallAndRemoveTimer() {
-    clearInterval(timerId);
-    reinstall();
-  }
-
-  timerId = setInterval(reinstall, 500);
-  if (document.addEventListener)
-    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
-  else
-    window.onload = reinstallAndRemoveTimer;
-}
-
-}
 asciidoc.install();
 /*]]>*/
 </script>
@@ -752,7 +563,7 @@ git-checkout(1) Manual Page
 <pre class="content"><em>git checkout</em> [-q] [-f] [-m] [&lt;branch&gt;]
 <em>git checkout</em> [-q] [-f] [-m] --detach [&lt;branch&gt;]
 <em>git checkout</em> [-q] [-f] [-m] [--detach] &lt;commit&gt;
-<em>git checkout</em> [-q] [-f] [-m] [[-b|-B|--orphan] &lt;new_branch&gt;] [&lt;start_point&gt;]
+<em>git checkout</em> [-q] [-f] [-m] [[-b|-B|--orphan] &lt;new-branch&gt;] [&lt;start-point&gt;]
 <em>git checkout</em> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] [--] &lt;pathspec&gt;&#8230;
 <em>git checkout</em> [-f|--ours|--theirs|-m|--conflict=&lt;style&gt;] [&lt;tree-ish&gt;] --pathspec-from-file=&lt;file&gt; [--pathspec-file-nul]
 <em>git checkout</em> (-p|--patch) [&lt;tree-ish&gt;] [--] [&lt;pathspec&gt;&#8230;]</pre>
@@ -792,7 +603,7 @@ rather expensive side-effects to show only the tracking information,
 if exists, for the current branch.</p></div>
 </dd>
 <dt class="hdlist1">
-<em>git checkout</em> -b|-B &lt;new_branch&gt; [&lt;start point&gt;]
+<em>git checkout</em> -b|-B &lt;new-branch&gt; [&lt;start-point&gt;]
 </dt>
 <dd>
 <p>
@@ -803,11 +614,11 @@ if exists, for the current branch.</p></div>
         <code>--track</code> without <code>-b</code> implies branch creation; see the
         description of <code>--track</code> below.
 </p>
-<div class="paragraph"><p>If <code>-B</code> is given, <code>&lt;new_branch&gt;</code> is created if it doesn&#8217;t exist; otherwise, it
+<div class="paragraph"><p>If <code>-B</code> is given, <code>&lt;new-branch&gt;</code> is created if it doesn&#8217;t exist; otherwise, it
 is reset. This is the transactional equivalent of</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ git branch -f &lt;branch&gt; [&lt;start point&gt;]
+<pre><code>$ git branch -f &lt;branch&gt; [&lt;start-point&gt;]
 $ git checkout &lt;branch&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>that is to say, the branch is not reset/created unless "git checkout" is
@@ -940,21 +751,21 @@ on your side branch as <code>theirs</code> (i.e. "one contributor&#8217;s work o
 of it").</p></div>
 </dd>
 <dt class="hdlist1">
--b &lt;new_branch&gt;
+-b &lt;new-branch&gt;
 </dt>
 <dd>
 <p>
-        Create a new branch named <code>&lt;new_branch&gt;</code> and start it at
-        <code>&lt;start_point&gt;</code>; see <a href="git-branch.html">git-branch(1)</a> for details.
+        Create a new branch named <code>&lt;new-branch&gt;</code> and start it at
+        <code>&lt;start-point&gt;</code>; see <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
 </dd>
 <dt class="hdlist1">
--B &lt;new_branch&gt;
+-B &lt;new-branch&gt;
 </dt>
 <dd>
 <p>
-        Creates the branch <code>&lt;new_branch&gt;</code> and start it at <code>&lt;start_point&gt;</code>;
-        if it already exists, then reset it to <code>&lt;start_point&gt;</code>. This is
+        Creates the branch <code>&lt;new-branch&gt;</code> and start it at <code>&lt;start-point&gt;</code>;
+        if it already exists, then reset it to <code>&lt;start-point&gt;</code>. This is
         equivalent to running "git branch" with "-f"; see
         <a href="git-branch.html">git-branch(1)</a> for details.
 </p>
@@ -1042,19 +853,19 @@ variable.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---orphan &lt;new_branch&gt;
+--orphan &lt;new-branch&gt;
 </dt>
 <dd>
 <p>
-        Create a new <em>orphan</em> branch, named <code>&lt;new_branch&gt;</code>, started from
-        <code>&lt;start_point&gt;</code> and switch to it.  The first commit made on this
+        Create a new <em>orphan</em> branch, named <code>&lt;new-branch&gt;</code>, started from
+        <code>&lt;start-point&gt;</code> and switch to it.  The first commit made on this
         new branch will have no parents and it will be the root of a new
         history totally disconnected from all the other branches and
         commits.
 </p>
 <div class="paragraph"><p>The index and the working tree are adjusted as if you had previously run
-<code>git checkout &lt;start_point&gt;</code>.  This allows you to start a new history
-that records a set of paths similar to <code>&lt;start_point&gt;</code> by easily running
+<code>git checkout &lt;start-point&gt;</code>.  This allows you to start a new history
+that records a set of paths similar to <code>&lt;start-point&gt;</code> by easily running
 <code>git commit -a</code> to make the root commit.</p></div>
 <div class="paragraph"><p>This can be useful when you want to publish the tree from a commit
 without exposing its full history. You might want to do this to publish
@@ -1062,7 +873,7 @@ an open source branch of a project whose current tree is "clean", but
 whose full history contains proprietary or otherwise encumbered bits of
 code.</p></div>
 <div class="paragraph"><p>If you want to start a disconnected history that records a set of paths
-that is totally different from the one of <code>&lt;start_point&gt;</code>, then you should
+that is totally different from the one of <code>&lt;start-point&gt;</code>, then you should
 clear the index and the working tree right after creating the orphan
 branch by running <code>git rm -rf .</code> from the top level of the working tree.
 Afterwards you will be ready to prepare your new files, repopulating the
@@ -1233,7 +1044,7 @@ merge base of <code>A</code> and <code>B</code> if there is exactly one merge ba
 leave out at most one of <code>A</code> and <code>B</code>, in which case it defaults to <code>HEAD</code>.</p></div>
 </dd>
 <dt class="hdlist1">
-&lt;new_branch&gt;
+&lt;new-branch&gt;
 </dt>
 <dd>
 <p>
@@ -1241,7 +1052,7 @@ leave out at most one of <code>A</code> and <code>B</code>, in which case it def
 </p>
 </dd>
 <dt class="hdlist1">
-&lt;start_point&gt;
+&lt;start-point&gt;
 </dt>
 <dd>
 <p>
@@ -1561,7 +1372,7 @@ $ git add frotz</code></pre>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-10-14 10:10:01 PDT
+ 2021-12-10 14:52:02 PST
 </div>
 </div>
 </body>

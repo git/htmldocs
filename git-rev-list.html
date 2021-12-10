@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 9.0.0rc2" />
+<meta name="generator" content="AsciiDoc 10.0.1" />
 <title>git-rev-list(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -539,195 +539,6 @@ body.manpage div.sectionbody {
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
-var asciidoc = {  // Namespace.
-
-/////////////////////////////////////////////////////////////////////
-// Table Of Contents generator
-/////////////////////////////////////////////////////////////////////
-
-/* Author: Mihai Bazon, September 2002
- * http://students.infoiasi.ro/~mishoo
- *
- * Table Of Content generator
- * Version: 0.4
- *
- * Feel free to use this script under the terms of the GNU General Public
- * License, as long as you do not remove or alter this notice.
- */
-
- /* modified by Troy D. Hanson, September 2006. License: GPL */
- /* modified by Stuart Rackham, 2006, 2009. License: GPL */
-
-// toclevels = 1..4.
-toc: function (toclevels) {
-
-  function getText(el) {
-    var text = "";
-    for (var i = el.firstChild; i != null; i = i.nextSibling) {
-      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
-        text += i.data;
-      else if (i.firstChild != null)
-        text += getText(i);
-    }
-    return text;
-  }
-
-  function TocEntry(el, text, toclevel) {
-    this.element = el;
-    this.text = text;
-    this.toclevel = toclevel;
-  }
-
-  function tocEntries(el, toclevels) {
-    var result = new Array;
-    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
-    // Function that scans the DOM tree for header elements (the DOM2
-    // nodeIterator API would be a better technique but not supported by all
-    // browsers).
-    var iterate = function (el) {
-      for (var i = el.firstChild; i != null; i = i.nextSibling) {
-        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
-          var mo = re.exec(i.tagName);
-          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
-            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
-          }
-          iterate(i);
-        }
-      }
-    }
-    iterate(el);
-    return result;
-  }
-
-  var toc = document.getElementById("toc");
-  if (!toc) {
-    return;
-  }
-
-  // Delete existing TOC entries in case we're reloading the TOC.
-  var tocEntriesToRemove = [];
-  var i;
-  for (i = 0; i < toc.childNodes.length; i++) {
-    var entry = toc.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div'
-     && entry.getAttribute("class")
-     && entry.getAttribute("class").match(/^toclevel/))
-      tocEntriesToRemove.push(entry);
-  }
-  for (i = 0; i < tocEntriesToRemove.length; i++) {
-    toc.removeChild(tocEntriesToRemove[i]);
-  }
-
-  // Rebuild TOC entries.
-  var entries = tocEntries(document.getElementById("content"), toclevels);
-  for (var i = 0; i < entries.length; ++i) {
-    var entry = entries[i];
-    if (entry.element.id == "")
-      entry.element.id = "_toc_" + i;
-    var a = document.createElement("a");
-    a.href = "#" + entry.element.id;
-    a.appendChild(document.createTextNode(entry.text));
-    var div = document.createElement("div");
-    div.appendChild(a);
-    div.className = "toclevel" + entry.toclevel;
-    toc.appendChild(div);
-  }
-  if (entries.length == 0)
-    toc.parentNode.removeChild(toc);
-},
-
-
-/////////////////////////////////////////////////////////////////////
-// Footnotes generator
-/////////////////////////////////////////////////////////////////////
-
-/* Based on footnote generation code from:
- * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
- */
-
-footnotes: function () {
-  // Delete existing footnote entries in case we're reloading the footnodes.
-  var i;
-  var noteholder = document.getElementById("footnotes");
-  if (!noteholder) {
-    return;
-  }
-  var entriesToRemove = [];
-  for (i = 0; i < noteholder.childNodes.length; i++) {
-    var entry = noteholder.childNodes[i];
-    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
-      entriesToRemove.push(entry);
-  }
-  for (i = 0; i < entriesToRemove.length; i++) {
-    noteholder.removeChild(entriesToRemove[i]);
-  }
-
-  // Rebuild footnote entries.
-  var cont = document.getElementById("content");
-  var spans = cont.getElementsByTagName("span");
-  var refs = {};
-  var n = 0;
-  for (i=0; i<spans.length; i++) {
-    if (spans[i].className == "footnote") {
-      n++;
-      var note = spans[i].getAttribute("data-note");
-      if (!note) {
-        // Use [\s\S] in place of . so multi-line matches work.
-        // Because JavaScript has no s (dotall) regex flag.
-        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
-        spans[i].innerHTML =
-          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
-          "' title='View footnote' class='footnote'>" + n + "</a>]";
-        spans[i].setAttribute("data-note", note);
-      }
-      noteholder.innerHTML +=
-        "<div class='footnote' id='_footnote_" + n + "'>" +
-        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
-        n + "</a>. " + note + "</div>";
-      var id =spans[i].getAttribute("id");
-      if (id != null) refs["#"+id] = n;
-    }
-  }
-  if (n == 0)
-    noteholder.parentNode.removeChild(noteholder);
-  else {
-    // Process footnoterefs.
-    for (i=0; i<spans.length; i++) {
-      if (spans[i].className == "footnoteref") {
-        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
-        href = href.match(/#.*/)[0];  // Because IE return full URL.
-        n = refs[href];
-        spans[i].innerHTML =
-          "[<a href='#_footnote_" + n +
-          "' title='View footnote' class='footnote'>" + n + "</a>]";
-      }
-    }
-  }
-},
-
-install: function(toclevels) {
-  var timerId;
-
-  function reinstall() {
-    asciidoc.footnotes();
-    if (toclevels) {
-      asciidoc.toc(toclevels);
-    }
-  }
-
-  function reinstallAndRemoveTimer() {
-    clearInterval(timerId);
-    reinstall();
-  }
-
-  timerId = setInterval(reinstall, 500);
-  if (document.addEventListener)
-    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
-  else
-    window.onload = reinstallAndRemoveTimer;
-}
-
-}
 asciidoc.install();
 /*]]>*/
 </script>
@@ -2375,7 +2186,7 @@ omitted.</p></div>
 1970).  As with <code>--raw</code>, this is always in UTC and therefore <code>-local</code>
 has no effect.</p></div>
 <div class="paragraph"><p><code>--date=format:...</code> feeds the format <code>...</code> to your system <code>strftime</code>,
-except for %z and %Z, which are handled internally.
+except for %s, %z, and %Z, which are handled internally.
 Use <code>--date=format:%c</code> to show the date in your system locale&#8217;s
 preferred format.  See the <code>strftime</code> manual for a complete list of
 format placeholders. When using <code>-local</code>, the correct syntax is
@@ -2551,7 +2362,7 @@ built-in formats:</p></div>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;hash&gt; &lt;title line&gt;</code></pre>
+<pre><code>&lt;hash&gt; &lt;title-line&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>This is designed to be as compact as possible.</p></div>
 </li>
@@ -2566,7 +2377,7 @@ Author: &lt;author&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;title line&gt;</code></pre>
+<pre><code>&lt;title-line&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -2577,15 +2388,15 @@ Author: &lt;author&gt;</code></pre>
 <div class="content">
 <pre><code>commit &lt;hash&gt;
 Author: &lt;author&gt;
-Date:   &lt;author date&gt;</code></pre>
+Date:   &lt;author-date&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;title line&gt;</code></pre>
+<pre><code>&lt;title-line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;full commit message&gt;</code></pre>
+<pre><code>&lt;full-commit-message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -2600,11 +2411,11 @@ Commit: &lt;committer&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;title line&gt;</code></pre>
+<pre><code>&lt;title-line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;full commit message&gt;</code></pre>
+<pre><code>&lt;full-commit-message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -2615,17 +2426,17 @@ Commit: &lt;committer&gt;</code></pre>
 <div class="content">
 <pre><code>commit &lt;hash&gt;
 Author:     &lt;author&gt;
-AuthorDate: &lt;author date&gt;
+AuthorDate: &lt;author-date&gt;
 Commit:     &lt;committer&gt;
-CommitDate: &lt;committer date&gt;</code></pre>
+CommitDate: &lt;committer-date&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;title line&gt;</code></pre>
+<pre><code>&lt;title-line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;full commit message&gt;</code></pre>
+<pre><code>&lt;full-commit-message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -2634,7 +2445,7 @@ CommitDate: &lt;committer date&gt;</code></pre>
 </p>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;abbrev hash&gt; (&lt;title line&gt;, &lt;short author date&gt;)</code></pre>
+<pre><code>&lt;abbrev-hash&gt; (&lt;title-line&gt;, &lt;short-author-date&gt;)</code></pre>
 </div></div>
 <div class="paragraph"><p>This format is used to refer to another commit in a commit message and
 is the same as <code>--pretty='format:%C(auto)%h (%s, %ad)'</code>.  By default,
@@ -2651,12 +2462,12 @@ placeholders, its output is not affected by other options like
 <div class="content">
 <pre><code>From &lt;hash&gt; &lt;date&gt;
 From: &lt;author&gt;
-Date: &lt;author date&gt;
-Subject: [PATCH] &lt;title line&gt;</code></pre>
+Date: &lt;author-date&gt;
+Subject: [PATCH] &lt;title-line&gt;</code></pre>
 </div></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>&lt;full commit message&gt;</code></pre>
+<pre><code>&lt;full-commit-message&gt;</code></pre>
 </div></div>
 </li>
 <li>
@@ -2683,9 +2494,9 @@ use <code>--no-abbrev</code>.</p></div>
 </li>
 <li>
 <p>
-<em>format:&lt;string&gt;</em>
+<em>format:&lt;format-string&gt;</em>
 </p>
-<div class="paragraph"><p>The <em>format:&lt;string&gt;</em> format allows you to specify which information
+<div class="paragraph"><p>The <em>format:&lt;format-string&gt;</em> format allows you to specify which information
 you want to show. It works a little bit like printf format,
 with the notable exception that you get a newline with <em>%n</em>
 instead of <em>\n</em>.</p></div>
@@ -3380,14 +3191,14 @@ display the trailers of the body as
                           If any option is provided multiple times the
                           last occurrence wins.
 </p>
-<div class="paragraph"><p>The boolean options accept an optional value <code>[=&lt;BOOL&gt;]</code>. The values
+<div class="paragraph"><p>The boolean options accept an optional value <code>[=&lt;value&gt;]</code>. The values
 <code>true</code>, <code>false</code>, <code>on</code>, <code>off</code> etc. are all accepted. See the "boolean"
 sub-section in "EXAMPLES" in <a href="git-config.html">git-config(1)</a>. If a boolean
 option is given with no value, it&#8217;s enabled.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<em>key=&lt;K&gt;</em>: only show trailers with specified key. Matching is done
+<em>key=&lt;key&gt;</em>: only show trailers with specified &lt;key&gt;. Matching is done
    case-insensitively and trailing colon is optional. If option is
    given multiple times trailer lines matching any of the keys are
    shown. This option automatically enables the <code>only</code> option so that
@@ -3399,15 +3210,15 @@ option is given with no value, it&#8217;s enabled.</p></div>
 </li>
 <li>
 <p>
-<em>only[=&lt;BOOL&gt;]</em>: select whether non-trailer lines from the trailer
+<em>only[=&lt;bool&gt;]</em>: select whether non-trailer lines from the trailer
    block should be included.
 </p>
 </li>
 <li>
 <p>
-<em>separator=&lt;SEP&gt;</em>: specify a separator inserted between trailer
+<em>separator=&lt;sep&gt;</em>: specify a separator inserted between trailer
    lines. When this option is not given each trailer line is
-   terminated with a line feed character. The string SEP may contain
+   terminated with a line feed character. The string &lt;sep&gt; may contain
    the literal formatting codes described above. To use comma as
    separator one must use <code>%x2C</code> as it would otherwise be parsed as
    next option. E.g., <code>%(trailers:key=Ticket,separator=%x2C )</code>
@@ -3417,27 +3228,27 @@ option is given with no value, it&#8217;s enabled.</p></div>
 </li>
 <li>
 <p>
-<em>unfold[=&lt;BOOL&gt;]</em>: make it behave as if interpret-trailer&#8217;s <code>--unfold</code>
+<em>unfold[=&lt;bool&gt;]</em>: make it behave as if interpret-trailer&#8217;s <code>--unfold</code>
    option was given. E.g.,
    <code>%(trailers:only,unfold=true)</code> unfolds and shows all trailer lines.
 </p>
 </li>
 <li>
 <p>
-<em>keyonly[=&lt;BOOL&gt;]</em>: only show the key part of the trailer.
+<em>keyonly[=&lt;bool&gt;]</em>: only show the key part of the trailer.
 </p>
 </li>
 <li>
 <p>
-<em>valueonly[=&lt;BOOL&gt;]</em>: only show the value part of the trailer.
+<em>valueonly[=&lt;bool&gt;]</em>: only show the value part of the trailer.
 </p>
 </li>
 <li>
 <p>
-<em>key_value_separator=&lt;SEP&gt;</em>: specify a separator inserted between
+<em>key_value_separator=&lt;sep&gt;</em>: specify a separator inserted between
    trailer lines. When this option is not given each trailer key-value
    pair is separated by ": ". Otherwise it shares the same semantics
-   as <em>separator=&lt;SEP&gt;</em> above.
+   as <em>separator=&lt;sep&gt;</em> above.
 </p>
 </li>
 </ul></div>
