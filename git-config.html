@@ -5838,7 +5838,8 @@ grep.patternType
         Set the default matching behavior. Using a value of <em>basic</em>, <em>extended</em>,
         <em>fixed</em>, or <em>perl</em> will enable the <code>--basic-regexp</code>, <code>--extended-regexp</code>,
         <code>--fixed-strings</code>, or <code>--perl-regexp</code> option accordingly, while the
-        value <em>default</em> will return to the default matching behavior.
+        value <em>default</em> will use the <code>grep.extendedRegexp</code> option to choose
+        between <em>basic</em> and <em>extended</em>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5978,6 +5979,10 @@ from automation that already handles developer ssh keys.</p></div>
 <div class="paragraph"><p>A repository that only allows signed commits can store the file
 in the repository itself using a path relative to the top-level of the working tree.
 This way only committers with an already valid key can add or change keys in the keyring.</p></div>
+<div class="paragraph"><p>Since OpensSSH 8.8 this file allows specifying a key lifetime using valid-after &amp;
+valid-before options. Git will mark signatures as valid if the signing key was
+valid at the time of the signatures creation. This allows users to change a
+signing key without invalidating all previously made signatures.</p></div>
 <div class="paragraph"><p>Using a SSH CA key with the cert-authority option
 (see ssh-keygen(1) "CERTIFICATES") is also valid.</p></div>
 </dd>
@@ -10406,13 +10411,16 @@ user.signingKey
         commit, you can override the default selection with this variable.
         This option is passed unchanged to gpg&#8217;s --local-user parameter,
         so you may specify a key using any method that gpg supports.
-        If gpg.format is set to "ssh" this can contain the literal ssh public
-        key (e.g.: "ssh-rsa XXXXXX identifier") or a file which contains it and
-        corresponds to the private key used for signing. The private key
-        needs to be available via ssh-agent. Alternatively it can be set to
-        a file containing a private key directly. If not set git will call
-        gpg.ssh.defaultKeyCommand (e.g.: "ssh-add -L") and try to use the first
-        key available.
+        If gpg.format is set to <code>ssh</code> this can contain the path to either
+        your private ssh key or the public key when ssh-agent is used.
+        Alternatively it can contain a public key prefixed with <code>key::</code>
+        directly (e.g.: "key::ssh-rsa XXXXXX identifier"). The private key
+        needs to be available via ssh-agent. If not set git will call
+        gpg.ssh.defaultKeyCommand (e.g.: "ssh-add -L") and try to use the
+        first key available. For backward compatibility, a raw key which
+        begins with "ssh-", such as "ssh-rsa XXXXXX identifier", is treated
+        as "key::ssh-rsa XXXXXX identifier", but this form is deprecated;
+        use the <code>key::</code> form instead.
 </p>
 </dd>
 <dt class="hdlist1">
