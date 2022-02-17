@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.1.1" />
-<title>git-mktree(1)</title>
+<title>git-hook(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -735,12 +735,12 @@ asciidoc.install();
 <body class="manpage">
 <div id="header">
 <h1>
-git-mktree(1) Manual Page
+git-hook(1) Manual Page
 </h1>
 <h2>NAME</h2>
 <div class="sectionbody">
-<p>git-mktree -
-   Build a tree-object from ls-tree formatted text
+<p>git-hook -
+   Run git hooks
 </p>
 </div>
 </div>
@@ -749,7 +749,7 @@ git-mktree(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git mktree</em> [-z] [--missing] [--batch]</pre>
+<pre class="content"><em>git hook</em> run [--ignore-missing] &lt;hook-name&gt; [-- &lt;hook-args&gt;]</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -757,10 +757,27 @@ git-mktree(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Reads standard input in non-recursive <code>ls-tree</code> output format, and creates
-a tree object.  The order of the tree entries is normalized by mktree so
-pre-sorting the input is not required.  The object name of the tree object
-built is written to the standard output.</p></div>
+<div class="paragraph"><p>A command interface to running git hooks (see <a href="githooks.html">githooks(5)</a>),
+for use by other scripted git commands.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_subcommands">SUBCOMMANDS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+run
+</dt>
+<dd>
+<p>
+        Run the <code>&lt;hook-name&gt;</code> hook. See <a href="githooks.html">githooks(5)</a> for
+        supported hook names.
+</p>
+<div class="paragraph"><p>Any positional arguments to the hook should be passed after a
+mandatory <code>--</code> (or <code>--end-of-options</code>, see <a href="gitcli.html">gitcli(7)</a>). See
+<a href="githooks.html">githooks(5)</a> for arguments hooks might expect (if any).</p></div>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
@@ -768,36 +785,22 @@ built is written to the standard output.</p></div>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
--z
+--ignore-missing
 </dt>
 <dd>
 <p>
-        Read the NUL-terminated <code>ls-tree -z</code> output instead.
-</p>
-</dd>
-<dt class="hdlist1">
---missing
-</dt>
-<dd>
-<p>
-        Allow missing objects.  The default behaviour (without this option)
-        is to verify that each tree entry&#8217;s sha1 identifies an existing
-        object.  This option has no effect on the treatment of gitlink entries
-        (aka "submodules") which are always allowed to be missing.
-</p>
-</dd>
-<dt class="hdlist1">
---batch
-</dt>
-<dd>
-<p>
-        Allow building of more than one tree object before exiting.  Each
-        tree is separated by a single blank line. The final new-line is
-        optional.  Note - if the <code>-z</code> option is used, lines are terminated
-        with NUL.
+        Ignore any missing hook by quietly returning zero. Used for
+        tools that want to do a blind one-shot run of a hook that may
+        or may not be present.
 </p>
 </dd>
 </dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_see_also">SEE ALSO</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><a href="githooks.html">githooks(5)</a></p></div>
 </div>
 </div>
 <div class="sect1">

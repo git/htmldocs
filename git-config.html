@@ -1665,6 +1665,35 @@ all branches that begin with <code>foo/</code>. This is useful if your branches 
 organized hierarchically and you would like to apply a configuration to
 all the branches in that hierarchy.</p></div>
 </dd>
+<dt class="hdlist1">
+<code>hasconfig:remote.*.url:</code>
+</dt>
+<dd>
+<p>
+        The data that follows this keyword is taken to
+        be a pattern with standard globbing wildcards and two
+        additional ones, <code>**/</code> and <code>/**</code>, that can match multiple
+        components. The first time this keyword is seen, the rest of
+        the config files will be scanned for remote URLs (without
+        applying any values). If there exists at least one remote URL
+        that matches this pattern, the include condition is met.
+</p>
+<div class="paragraph"><p>Files included by this option (directly or indirectly) are not allowed
+to contain remote URLs.</p></div>
+<div class="paragraph"><p>Note that unlike other includeIf conditions, resolving this condition
+relies on information that is not yet known at the point of reading the
+condition. A typical use case is this option being present as a
+system-level or global-level config, and the remote URL being in a
+local-level config; hence the need to scan ahead when resolving this
+condition. In order to avoid the chicken-and-egg problem in which
+potentially-included files can affect whether such files are potentially
+included, Git breaks the cycle by prohibiting these files from affecting
+the resolution of these conditions (thus, prohibiting them from
+declaring remote URLs).</p></div>
+<div class="paragraph"><p>As for the naming of this keyword, it is for forwards compatibiliy with
+a naming scheme that supports more variable-based include conditions,
+but currently Git only supports the exact keyword described above.</p></div>
+</dd>
 </dl></div>
 <div class="paragraph"><p>A few more notes on matching via <code>gitdir</code> and <code>gitdir/i</code>:</p></div>
 <div class="ulist"><ul>
@@ -1742,7 +1771,15 @@ Note that "../" is not special and will match literally, which is
 ; include only if we are in a worktree where foo-branch is
 ; currently checked out
 [includeIf "onbranch:foo-branch"]
-        path = foo.inc</code></pre>
+        path = foo.inc
+
+; include only if a remote with the given URL exists (note
+; that such a URL may be provided later in a file or in a
+; file read after this file is read, as seen in this example)
+[includeIf "hasconfig:remote.*.url:https://example.com/**"]
+        path = foo.inc
+[remote "origin"]
+        url = https://example.com/git</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -5071,18 +5108,19 @@ fetch.negotiationAlgorithm
 </dt>
 <dd>
 <p>
-        Control how information about the commits in the local repository is
-        sent when negotiating the contents of the packfile to be sent by the
-        server. Set to "skipping" to use an algorithm that skips commits in an
-        effort to converge faster, but may result in a larger-than-necessary
-        packfile; or set to "noop" to not send any information at all, which
-        will almost certainly result in a larger-than-necessary packfile, but
-        will skip the negotiation step.
-        The default is "default" which instructs Git to use the default algorithm
-        that never skips commits (unless the server has acknowledged it or one
-        of its descendants). If <code>feature.experimental</code> is enabled, then this
-        setting defaults to "skipping".
-        Unknown values will cause <em>git fetch</em> to error out.
+        Control how information about the commits in the local repository
+        is sent when negotiating the contents of the packfile to be sent by
+        the server.  Set to "consecutive" to use an algorithm that walks
+        over consecutive commits checking each one.  Set to "skipping" to
+        use an algorithm that skips commits in an effort to converge
+        faster, but may result in a larger-than-necessary packfile; or set
+        to "noop" to not send any information at all, which will almost
+        certainly result in a larger-than-necessary packfile, but will skip
+        the negotiation step.  Set to "default" to override settings made
+        previously and use the default behaviour.  The default is normally
+        "consecutive", but if <code>feature.experimental</code> is true, then the
+        default is "skipping".  Unknown values will cause <em>git fetch</em> to
+        error out.
 </p>
 <div class="paragraph"><p>See also the <code>--negotiate-only</code> and <code>--negotiation-tip</code> options to
 <a href="git-fetch.html">git-fetch(1)</a>.</p></div>
@@ -5986,7 +6024,7 @@ in the repository itself using a path relative to the top-level of the working t
 This way only committers with an already valid key can add or change keys in the keyring.</p></div>
 <div class="paragraph"><p>Since OpensSSH 8.8 this file allows specifying a key lifetime using valid-after &amp;
 valid-before options. Git will mark signatures as valid if the signing key was
-valid at the time of the signatures creation. This allows users to change a
+valid at the time of the signature&#8217;s creation. This allows users to change a
 signing key without invalidating all previously made signatures.</p></div>
 <div class="paragraph"><p>Using a SSH CA key with the cert-authority option
 (see ssh-keygen(1) "CERTIFICATES") is also valid.</p></div>
@@ -9674,18 +9712,6 @@ status.submoduleSummary
         the --ignore-submodules=dirty command-line option or the <em>git
         submodule summary</em> command, which shows a similar output but does
         not honor these settings.
-</p>
-</dd>
-<dt class="hdlist1">
-stash.useBuiltin
-</dt>
-<dd>
-<p>
-        Unused configuration variable.  Used in Git versions 2.22 to
-        2.26 as an escape hatch to enable the legacy shellscript
-        implementation of stash.  Now the built-in rewrite of it in C
-        is always used. Setting this will emit a warning, to alert any
-        remaining users that setting this now does nothing.
 </p>
 </dd>
 <dt class="hdlist1">
