@@ -2196,6 +2196,15 @@ submoduleAlternateErrorStrategyDie
 </p>
 </dd>
 <dt class="hdlist1">
+submodulesNotUpdated
+</dt>
+<dd>
+<p>
+                Advice shown when a user runs a submodule command that fails
+                because <code>git submodule update --init</code> was not run.
+</p>
+</dd>
+<dt class="hdlist1">
 addIgnoredFile
 </dt>
 <dd>
@@ -9844,18 +9853,49 @@ submodule.recurse
 <dd>
 <p>
         A boolean indicating if commands should enable the <code>--recurse-submodules</code>
-        option by default.
-        Applies to all commands that support this option
-        (<code>checkout</code>, <code>fetch</code>, <code>grep</code>, <code>pull</code>, <code>push</code>, <code>read-tree</code>, <code>reset</code>,
-        <code>restore</code> and <code>switch</code>) except <code>clone</code> and <code>ls-files</code>.
+        option by default. Defaults to false.
+</p>
+<div class="paragraph"><p>When set to true, it can be deactivated via the
+<code>--no-recurse-submodules</code> option. Note that some Git commands
+lacking this option may call some of the above commands affected by
+<code>submodule.recurse</code>; for instance <code>git remote update</code> will call
+<code>git fetch</code> but does not have a <code>--no-recurse-submodules</code> option.
+For these commands a workaround is to temporarily change the
+configuration value by using <code>git -c submodule.recurse=0</code>.</p></div>
+<div class="paragraph"><p>The following list shows the commands that accept
+<code>--recurse-submodules</code> and whether they are supported by this
+setting.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>checkout</code>, <code>fetch</code>, <code>grep</code>, <code>pull</code>, <code>push</code>, <code>read-tree</code>,
+<code>reset</code>, <code>restore</code> and <code>switch</code> are always supported.
+</p>
+</li>
+<li>
+<p>
+<code>clone</code> and <code>ls-files</code> are not supported.
+</p>
+</li>
+<li>
+<p>
+<code>branch</code> is supported only if <code>submodule.propagateBranches</code> is
+enabled
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
+submodule.propagateBranches
+</dt>
+<dd>
+<p>
+        [EXPERIMENTAL] A boolean that enables branching support when
+        using <code>--recurse-submodules</code> or <code>submodule.recurse=true</code>.
+        Enabling this will allow certain commands to accept
+        <code>--recurse-submodules</code> and certain commands that already accept
+        <code>--recurse-submodules</code> will now consider branches.
         Defaults to false.
-        When set to true, it can be deactivated via the
-        <code>--no-recurse-submodules</code> option. Note that some Git commands
-        lacking this option may call some of the above commands affected by
-        <code>submodule.recurse</code>; for instance <code>git remote update</code> will call
-        <code>git fetch</code> but does not have a <code>--no-recurse-submodules</code> option.
-        For these commands a workaround is to temporarily change the
-        configuration value by using <code>git -c submodule.recurse=0</code>.
 </p>
 </dd>
 <dt class="hdlist1">
