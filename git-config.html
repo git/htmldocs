@@ -951,9 +951,13 @@ from all available files.</p></div>
 </dt>
 <dd>
 <p>
-        Similar to <code>--local</code> except that <code>.git/config.worktree</code> is
+        Similar to <code>--local</code> except that <code>$GIT_DIR/config.worktree</code> is
         read from or written to if <code>extensions.worktreeConfig</code> is
-        present. If not it&#8217;s the same as <code>--local</code>.
+        enabled. If not it&#8217;s the same as <code>--local</code>. Note that <code>$GIT_DIR</code>
+        is equal to <code>$GIT_COMMON_DIR</code> for the main working tree, but is of
+        the form <code>$GIT_DIR/worktrees/&lt;id&gt;/</code> for other working trees. See
+        <a href="git-worktree.html">git-worktree(1)</a> to learn how to enable
+        <code>extensions.worktreeConfig</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3587,6 +3591,16 @@ clone.rejectShallow
 </p>
 </dd>
 <dt class="hdlist1">
+clone.filterSubmodules
+</dt>
+<dd>
+<p>
+        If a partial clone filter is provided (see <code>--filter</code> in
+        <a href="git-rev-list.html">git-rev-list(1)</a>) and <code>--recurse-submodules</code> is used, also apply
+        the filter to submodules.
+</p>
+</dd>
+<dt class="hdlist1">
 color.advice
 </dt>
 <dd>
@@ -4945,6 +4959,48 @@ extensions.objectFormat
 <div class="paragraph"><p>Note that this setting should only be set by <a href="git-init.html">git-init(1)</a> or
 <a href="git-clone.html">git-clone(1)</a>.  Trying to change it after initialization will not
 work and will produce hard-to-diagnose issues.</p></div>
+</dd>
+<dt class="hdlist1">
+extensions.worktreeConfig
+</dt>
+<dd>
+<p>
+        If enabled, then worktrees will load config settings from the
+        <code>$GIT_DIR/config.worktree</code> file in addition to the
+        <code>$GIT_COMMON_DIR/config</code> file. Note that <code>$GIT_COMMON_DIR</code> and
+        <code>$GIT_DIR</code> are the same for the main working tree, while other
+        working trees have <code>$GIT_DIR</code> equal to
+        <code>$GIT_COMMON_DIR/worktrees/&lt;id&gt;/</code>. The settings in the
+        <code>config.worktree</code> file will override settings from any other
+        config files.
+</p>
+<div class="paragraph"><p>When enabling <code>extensions.worktreeConfig</code>, you must be careful to move
+certain values from the common config file to the main working tree&#8217;s
+<code>config.worktree</code> file, if present:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>core.worktree</code> must be moved from <code>$GIT_COMMON_DIR/config</code> to
+  <code>$GIT_COMMON_DIR/config.worktree</code>.
+</p>
+</li>
+<li>
+<p>
+If <code>core.bare</code> is true, then it must be moved from <code>$GIT_COMMON_DIR/config</code>
+  to <code>$GIT_COMMON_DIR/config.worktree</code>.
+</p>
+<div class="paragraph"><p>It may also be beneficial to adjust the locations of <code>core.sparseCheckout</code>
+and <code>core.sparseCheckoutCone</code> depending on your desire for customizable
+sparse-checkout settings for each worktree. By default, the <code>git
+sparse-checkout</code> builtin enables <code>extensions.worktreeConfig</code>, assigns
+these config values on a per-worktree basis, and uses the
+<code>$GIT_DIR/info/sparse-checkout</code> file to specify the sparsity for each
+worktree independently. See <a href="git-sparse-checkout.html">git-sparse-checkout(1)</a> for more
+details.</p></div>
+<div class="paragraph"><p>For historical reasons, <code>extensions.worktreeConfig</code> is respected
+regardless of the <code>core.repositoryFormatVersion</code> setting.</p></div>
+</li>
+</ul></div>
 </dd>
 <dt class="hdlist1">
 fastimport.unpackLimit
@@ -10597,7 +10653,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-12-10 14:52:02 PST
+ 2022-02-25 16:19:34 PST
 </div>
 </div>
 </body>
