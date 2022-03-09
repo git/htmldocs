@@ -740,7 +740,7 @@ git-sparse-checkout(1) Manual Page
 <h2>NAME</h2>
 <div class="sectionbody">
 <p>git-sparse-checkout -
-   Initialize and modify the sparse-checkout configuration, which reduces the checkout to a set of paths given by a list of patterns.
+   Reduce your working tree to a subset of tracked files
 </p>
 </div>
 </div>
@@ -757,8 +757,18 @@ git-sparse-checkout(1) Manual Page
 <div class="sect1">
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Initialize and modify the sparse-checkout configuration, which reduces
-the checkout to a set of paths given by a list of patterns.</p></div>
+<div class="paragraph"><p>This command is used to create sparse checkouts, which means that it
+changes the working tree from having all tracked files present, to only
+have a subset of them.  It can also switch which subset of files are
+present, or undo and go back to having all tracked files present in the
+working copy.</p></div>
+<div class="paragraph"><p>The subset of files is chosen by providing a list of directories in
+cone mode (which is recommended), or by providing a list of patterns
+in non-cone mode.</p></div>
+<div class="paragraph"><p>When in a sparse-checkout, other Git commands behave a bit differently.
+For example, switching branches will not update paths outside the
+sparse-checkout directories/patterns, and <code>git commit -a</code> will not record
+paths outside the sparse-checkout directories/patterns as deleted.</p></div>
 <div class="paragraph"><p>THIS COMMAND IS EXPERIMENTAL. ITS BEHAVIOR, AND THE BEHAVIOR OF OTHER
 COMMANDS IN THE PRESENCE OF SPARSE-CHECKOUTS, WILL LIKELY CHANGE IN
 THE FUTURE.</p></div>
@@ -773,7 +783,7 @@ THE FUTURE.</p></div>
 </dt>
 <dd>
 <p>
-        Describe the patterns in the sparse-checkout file.
+        Describe the directories or patterns in the sparse-checkout file.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -795,19 +805,24 @@ config if not already present. The sparsity defined by the arguments to
 the <em>set</em> subcommand are stored in the worktree-specific sparse-checkout
 file. See <a href="git-worktree.html">git-worktree(1)</a> and the documentation of
 <code>extensions.worktreeConfig</code> in <a href="git-config.html">git-config(1)</a> for more details.</p></div>
-<div class="paragraph"><p>When the <code>--stdin</code> option is provided, the patterns are read from
-standard in as a newline-delimited list instead of from the arguments.</p></div>
+<div class="paragraph"><p>When the <code>--stdin</code> option is provided, the directories or patterns are
+read from standard in as a newline-delimited list instead of from the
+arguments.</p></div>
 <div class="paragraph"><p>When <code>--cone</code> is passed or <code>core.sparseCheckoutCone</code> is enabled, the
-input list is considered a list of directories instead of
-sparse-checkout patterns.  This allows for better performance with a
-limited set of patterns (see <em>CONE PATTERN SET</em> below).  Note that the
-set command will write patterns to the sparse-checkout file to include
-all files contained in those directories (recursively) as well as
-files that are siblings of ancestor directories. The input format
-matches the output of <code>git ls-tree --name-only</code>.  This includes
-interpreting pathnames that begin with a double quote (") as C-style
-quoted strings.  This may become the default in the future; --no-cone
-can be passed to request non-cone mode.</p></div>
+input list is considered a list of directories.  This allows for
+better performance with a limited set of patterns (see <em>CONE PATTERN
+SET</em> below).  The input format matches the output of <code>git ls-tree
+--name-only</code>.  This includes interpreting pathnames that begin with a
+double quote (") as C-style quoted strings.  Note that the set command
+will write patterns to the sparse-checkout file to include all files
+contained in those directories (recursively) as well as files that are
+siblings of ancestor directories. This may become the default in the
+future; --no-cone can be passed to request non-cone mode.</p></div>
+<div class="paragraph"><p>When <code>--no-cone</code> is passed or <code>core.sparseCheckoutCone</code> is not enabled,
+the input list is considered a list of patterns.  This mode is harder
+to use and less performant, and is thus not recommended.  See the
+"Sparse Checkout" section of <a href="git-read-tree.html">git-read-tree(1)</a> and the "Pattern
+Set" sections below for more details.</p></div>
 <div class="paragraph"><p>Use the <code>--[no-]sparse-index</code> option to use a sparse index (the
 default is to not use it).  A sparse index reduces the size of the
 index to be more closely aligned with your sparse-checkout
@@ -827,11 +842,10 @@ interact with your repository until it is disabled.</p></div>
 </dt>
 <dd>
 <p>
-        Update the sparse-checkout file to include additional patterns.
-        By default, these patterns are read from the command-line arguments,
-        but they can be read from stdin using the <code>--stdin</code> option. When
-        <code>core.sparseCheckoutCone</code> is enabled, the given patterns are interpreted
-        as directory names as in the <em>set</em> subcommand.
+        Update the sparse-checkout file to include additional directories
+        (in cone mode) or patterns (in non-cone mode).  By default, these
+        directories or patterns are read from the command-line arguments,
+        but they can be read from stdin using the <code>--stdin</code> option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -891,13 +905,14 @@ decreased in utility.</p></div>
 <div class="sect1">
 <h2 id="_sparse_checkout">SPARSE CHECKOUT</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>"Sparse checkout" allows populating the working directory sparsely.
-It uses the skip-worktree bit (see <a href="git-update-index.html">git-update-index(1)</a>) to tell
-Git whether a file in the working directory is worth looking at. If
-the skip-worktree bit is set, then the file is ignored in the working
-directory. Git will avoid populating the contents of those files, which
-makes a sparse checkout helpful when working in a repository with many
-files, but only a few are important to the current user.</p></div>
+<div class="paragraph"><p>"Sparse checkout" allows populating the working directory sparsely.  It
+uses the skip-worktree bit (see <a href="git-update-index.html">git-update-index(1)</a>) to tell Git
+whether a file in the working directory is worth looking at. If the
+skip-worktree bit is set, and the file is not present in the working tree,
+then its absence is ignored. Git will avoid populating the contents of
+those files, which makes a sparse checkout helpful when working in a
+repository with many files, but only a few are important to the current
+user.</p></div>
 <div class="paragraph"><p>The <code>$GIT_DIR/info/sparse-checkout</code> file is used to define the
 skip-worktree reference bitmap. When Git updates the working
 directory, it updates the skip-worktree bits in the index based
@@ -1048,7 +1063,7 @@ of these restrictions.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-02-25 16:19:34 PST
+ 2022-03-09 14:17:38 PST
 </div>
 </div>
 </body>
