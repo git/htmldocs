@@ -3027,16 +3027,133 @@ core.whitespace
 </ul></div>
 </dd>
 <dt class="hdlist1">
+core.fsync
+</dt>
+<dd>
+<p>
+        A comma-separated list of components of the repository that
+        should be hardened via the core.fsyncMethod when created or
+        modified.  You can disable hardening of any component by
+        prefixing it with a <em>-</em>.  Items that are not hardened may be
+        lost in the event of an unclean system shutdown. Unless you
+        have special requirements, it is recommended that you leave
+        this option empty or pick one of <code>committed</code>, <code>added</code>,
+        or <code>all</code>.
+</p>
+<div class="paragraph"><p>When this configuration is encountered, the set of components starts with
+the platform default value, disabled components are removed, and additional
+components are added. <code>none</code> resets the state so that the platform default
+is ignored.</p></div>
+<div class="paragraph"><p>The empty string resets the fsync configuration to the platform
+default. The default on most platforms is equivalent to
+<code>core.fsync=committed,-loose-object</code>, which has good performance,
+but risks losing recent work in the event of an unclean system shutdown.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>none</code> clears the set of fsynced components.
+</p>
+</li>
+<li>
+<p>
+<code>loose-object</code> hardens objects added to the repo in loose-object form.
+</p>
+</li>
+<li>
+<p>
+<code>pack</code> hardens objects added to the repo in packfile form.
+</p>
+</li>
+<li>
+<p>
+<code>pack-metadata</code> hardens packfile bitmaps and indexes.
+</p>
+</li>
+<li>
+<p>
+<code>commit-graph</code> hardens the commit graph file.
+</p>
+</li>
+<li>
+<p>
+<code>index</code> hardens the index when it is modified.
+</p>
+</li>
+<li>
+<p>
+<code>objects</code> is an aggregate option that is equivalent to
+  <code>loose-object,pack</code>.
+</p>
+</li>
+<li>
+<p>
+<code>reference</code> hardens references modified in the repo.
+</p>
+</li>
+<li>
+<p>
+<code>derived-metadata</code> is an aggregate option that is equivalent to
+  <code>pack-metadata,commit-graph</code>.
+</p>
+</li>
+<li>
+<p>
+<code>committed</code> is an aggregate option that is currently equivalent to
+  <code>objects</code>. This mode sacrifices some performance to ensure that work
+  that is committed to the repository with <code>git commit</code> or similar commands
+  is hardened.
+</p>
+</li>
+<li>
+<p>
+<code>added</code> is an aggregate option that is currently equivalent to
+  <code>committed,index</code>. This mode sacrifices additional performance to
+  ensure that the results of commands like <code>git add</code> and similar operations
+  are hardened.
+</p>
+</li>
+<li>
+<p>
+<code>all</code> is an aggregate option that syncs all individual components above.
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
+core.fsyncMethod
+</dt>
+<dd>
+<p>
+        A value indicating the strategy Git will use to harden repository data
+        using fsync and related primitives.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>fsync</code> uses the fsync() system call or platform equivalents.
+</p>
+</li>
+<li>
+<p>
+<code>writeout-only</code> issues pagecache writeback requests, but depending on the
+  filesystem and storage hardware, data added to the repository may not be
+  durable in the event of a system crash. This is the default mode on macOS.
+</p>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
 core.fsyncObjectFiles
 </dt>
 <dd>
 <p>
         This boolean will enable <em>fsync()</em> when writing object files.
+        This setting is deprecated. Use core.fsync instead.
 </p>
-<div class="paragraph"><p>This is a total waste of time and effort on a filesystem that orders
-data writes properly, but can be useful for filesystems that do not use
-journalling (traditional UNIX filesystems) or that only journal metadata
-and not file contents (OS X&#8217;s HFS+, or Linux ext3 with "data=writeback").</p></div>
+<div class="paragraph"><p>This setting affects data added to the Git repository in loose-object
+form. When set to true, Git will issue an fsync or similar system call
+to flush caches so that loose-objects remain consistent in the face
+of a unclean system shutdown.</p></div>
 </dd>
 <dt class="hdlist1">
 core.preloadIndex
@@ -9347,6 +9464,16 @@ repack.writeBitmaps
         space and extra time spent on the initial repack.  This has
         no effect if multiple packfiles are created.
         Defaults to true on bare repos, false otherwise.
+</p>
+</dd>
+<dt class="hdlist1">
+repack.updateServerInfo
+</dt>
+<dd>
+<p>
+        If set to false, <a href="git-repack.html">git-repack(1)</a> will not run
+        <a href="git-update-server-info.html">git-update-server-info(1)</a>. Defaults to true. Can be overridden
+        when true by the <code>-n</code> option of <a href="git-repack.html">git-repack(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">

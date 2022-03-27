@@ -1091,16 +1091,22 @@ Internally this is used to implement the <code>push.negotiate</code> option, see
 <dd>
 <p>
         This option controls if and under what conditions new commits of
-        populated submodules should be fetched too. It can be used as a
-        boolean option to completely disable recursion when set to <em>no</em> or to
-        unconditionally recurse into all populated submodules when set to
-        <em>yes</em>, which is the default when this option is used without any
-        value. Use <em>on-demand</em> to only recurse into a populated submodule
-        when the superproject retrieves a commit that updates the submodule&#8217;s
-        reference to a commit that isn&#8217;t already in the local submodule
-        clone. By default, <em>on-demand</em> is used, unless
-        <code>fetch.recurseSubmodules</code> is set (see <a href="git-config.html">git-config(1)</a>).
+        submodules should be fetched too. When recursing through submodules,
+        <code>git fetch</code> always attempts to fetch "changed" submodules, that is, a
+        submodule that has commits that are referenced by a newly fetched
+        superproject commit but are missing in the local submodule clone. A
+        changed submodule can be fetched as long as it is present locally e.g.
+        in <code>$GIT_DIR/modules/</code> (see <a href="gitsubmodules.html">gitsubmodules(7)</a>); if the upstream
+        adds a new submodule, that submodule cannot be fetched until it is
+        cloned e.g. by <code>git submodule update</code>.
 </p>
+<div class="paragraph"><p>When set to <em>on-demand</em>, only changed submodules are fetched. When set
+to <em>yes</em>, all populated submodules are fetched and submodules that are
+both unpopulated and changed are fetched. When set to <em>no</em>, submodules
+are never fetched.</p></div>
+<div class="paragraph"><p>When unspecified, this uses the value of <code>fetch.recurseSubmodules</code> if it
+is set (see <a href="git-config.html">git-config(1)</a>), defaulting to <em>on-demand</em> if unset.
+When this option is used without any value, it defaults to <em>yes</em>.</p></div>
 </dd>
 <dt class="hdlist1">
 -j
@@ -1976,12 +1982,10 @@ As in #1, the attacker chooses an object ID X to steal. The victim sends
 <div class="sect1">
 <h2 id="_bugs">BUGS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Using --recurse-submodules can only fetch new commits in already checked
-out submodules right now. When e.g. upstream added a new submodule in the
-just fetched commits of the superproject the submodule itself cannot be
-fetched, making it impossible to check out that submodule later without
-having to do a fetch again. This is expected to be fixed in a future Git
-version.</p></div>
+<div class="paragraph"><p>Using --recurse-submodules can only fetch new commits in submodules that are
+present locally e.g. in <code>$GIT_DIR/modules/</code>. If the upstream adds a new
+submodule, that submodule cannot be fetched until it is cloned e.g. by <code>git
+submodule update</code>. This is expected to be fixed in a future Git version.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -2001,7 +2005,7 @@ version.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-08-06 16:16:38 PDT
+ 2022-03-27 10:29:17 PDT
 </div>
 </div>
 </body>

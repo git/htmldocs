@@ -74,6 +74,16 @@ UI, Workflows & Features
    refs involved, takes long time renaming them.  The command has been
    taught to show progress bar while making the user wait.
 
+ * Bundle file format gets extended to allow a partial bundle,
+   filtered by similar criteria you would give when making a
+   partial/lazy clone.
+
+ * A new built-in userdiff driver for kotlin has been added.
+
+ * "git repack" learned a new configuration to disable triggering of
+   age-old "update-server-info" command, which is rarely useful these
+   days.
+
 
 Performance, Internal Implementation, Development Support etc.
 
@@ -131,6 +141,22 @@ Performance, Internal Implementation, Development Support etc.
    via run_command() API.
 
  * Count string_list items in size_t, not "unsigned int".
+
+ * The single-key interactive operation used by "git add -p" has been
+   made more robust.
+
+ * Remove unneeded <meta http-equiv=content-type...> from gitweb
+   output.
+
+ * "git name-rev" learned to use the generation numbers when setting
+   the lower bound of searching commits used to explain the revision,
+   when available, instead of committer time.
+
+ * Replace core.fsyncObjectFiles with two new configuration variables,
+   core.fsync and core.fsyncMethod.
+
+ * Updates to refs traditionally weren't fsync'ed, but we can
+   configure using core.fsync variable to do so.
 
 
 Fixes since v2.35
@@ -320,6 +346,16 @@ Fixes since v2.35
    (not) handled has been corrected.
    (merge 6dbf4b8172 ds/commit-graph-gen-v2-fixes later to maint).
 
+ * The method to trigger malloc check used in our tests no longer work
+   with newer versions of glibc.
+   (merge baedc59543 ep/test-malloc-check-with-glibc-2.34 later to maint).
+
+ * When "git fetch --recurse-submodules" grabbed submodule commits
+   that would be needed to recursively check out newly fetched commits
+   in the superproject, it only paid attention to submodules that are
+   in the current checkout of the superproject.  We now do so for all
+   submodules that have been run "git submodule init" on.
+
  * Other code cleanup, docfix, build fix, etc.
    (merge cfc5cf428b jc/find-header later to maint).
    (merge 40e7cfdd46 jh/p4-fix-use-of-process-error-exception later to maint).
@@ -345,3 +381,7 @@ Fixes since v2.35
    (merge 04bf052eef ab/grep-patterntype later to maint).
    (merge 6ee36364eb ab/diff-free-more later to maint).
    (merge 63a36017fe nj/read-tree-doc-reffix later to maint).
+   (merge eed36fce38 sm/no-git-in-upstream-of-pipe-in-tests later to maint).
+   (merge c614beb933 ep/t6423-modernize later to maint).
+   (merge 57be9c6dee ab/reflog-prep-fix later to maint).
+   (merge 5327d8982a js/in-place-reverse-in-sequencer later to maint).

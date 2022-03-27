@@ -749,7 +749,9 @@ git-maintenance(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git maintenance</em> run [&lt;options&gt;]</pre>
+<pre class="content"><em>git maintenance</em> run [&lt;options&gt;]
+<em>git maintenance</em> start [--scheduler=&lt;scheduler&gt;]
+<em>git maintenance</em> (stop|register|unregister)</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -772,6 +774,39 @@ Git repository.</p></div>
 <h2 id="_subcommands">SUBCOMMANDS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
+<dt class="hdlist1">
+run
+</dt>
+<dd>
+<p>
+        Run one or more maintenance tasks. If one or more <code>--task</code> options
+        are specified, then those tasks are run in that order. Otherwise,
+        the tasks are determined by which <code>maintenance.&lt;task&gt;.enabled</code>
+        config options are true. By default, only <code>maintenance.gc.enabled</code>
+        is true.
+</p>
+</dd>
+<dt class="hdlist1">
+start
+</dt>
+<dd>
+<p>
+        Start running maintenance on the current repository. This performs
+        the same config updates as the <code>register</code> subcommand, then updates
+        the background scheduler to run <code>git maintenance run --scheduled</code>
+        on an hourly basis.
+</p>
+</dd>
+<dt class="hdlist1">
+stop
+</dt>
+<dd>
+<p>
+        Halt the background maintenance schedule. The current repository
+        is not removed from the list of maintained repositories, in case
+        the background maintenance is restarted later.
+</p>
+</dd>
 <dt class="hdlist1">
 register
 </dt>
@@ -822,39 +857,6 @@ task:</p></div>
 <div class="paragraph"><p><code>git maintenance register</code> will also disable foreground maintenance by
 setting <code>maintenance.auto = false</code> in the current repository. This config
 setting will remain after a <code>git maintenance unregister</code> command.</p></div>
-</dd>
-<dt class="hdlist1">
-run
-</dt>
-<dd>
-<p>
-        Run one or more maintenance tasks. If one or more <code>--task</code> options
-        are specified, then those tasks are run in that order. Otherwise,
-        the tasks are determined by which <code>maintenance.&lt;task&gt;.enabled</code>
-        config options are true. By default, only <code>maintenance.gc.enabled</code>
-        is true.
-</p>
-</dd>
-<dt class="hdlist1">
-start
-</dt>
-<dd>
-<p>
-        Start running maintenance on the current repository. This performs
-        the same config updates as the <code>register</code> subcommand, then updates
-        the background scheduler to run <code>git maintenance run --scheduled</code>
-        on an hourly basis.
-</p>
-</dd>
-<dt class="hdlist1">
-stop
-</dt>
-<dd>
-<p>
-        Halt the background maintenance schedule. The current repository
-        is not removed from the list of maintained repositories, in case
-        the background maintenance is restarted later.
-</p>
 </dd>
 <dt class="hdlist1">
 unregister
@@ -1239,7 +1241,7 @@ custom tasks.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-09-20 15:44:03 PDT
+ 2022-03-27 10:29:17 PDT
 </div>
 </div>
 </body>
