@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.1.2" />
-<title>Git Tools</title>
+<title>git-fsmonitor&#8212;daemon(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,19 +732,115 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>Git Tools</h1>
+<h1>
+git-fsmonitor&#8212;daemon(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-fsmonitor--daemon -
+   A Built-in File System Monitor
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>When Git was young, people looking for third-party Git-related tools came
-to the Git project itself to find them, thus a list of such tools was
-maintained here. These days, however, search engines fill that role much
-more efficiently, so this manually-maintained list has been retired.</p></div>
-<div class="paragraph"><p>See also the <code>contrib/</code> area, and the Git wiki:
-<a href="https://git.wiki.kernel.org/index.php/InterfacesFrontendsAndTools">https://git.wiki.kernel.org/index.php/InterfacesFrontendsAndTools</a></p></div>
+<div class="verseblock">
+<pre class="content"><em>git fsmonitor&#8212;daemon</em> start
+<em>git fsmonitor&#8212;daemon</em> run
+<em>git fsmonitor&#8212;daemon</em> stop
+<em>git fsmonitor&#8212;daemon</em> status</pre>
+<div class="attribution">
+</div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_description">DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A daemon to watch the working directory for file and directory
+changes using platform-specific file system notification facilities.</p></div>
+<div class="paragraph"><p>This daemon communicates directly with commands like <code>git status</code>
+using the <a href="technical/api-simple-ipc.html">simple IPC</a> interface
+instead of the slower <a href="githooks.html">githooks(5)</a> interface.</p></div>
+<div class="paragraph"><p>This daemon is built into Git so that no third-party tools are
+required.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_options">OPTIONS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+start
+</dt>
+<dd>
+<p>
+        Starts a daemon in the background.
+</p>
+</dd>
+<dt class="hdlist1">
+run
+</dt>
+<dd>
+<p>
+        Runs a daemon in the foreground.
+</p>
+</dd>
+<dt class="hdlist1">
+stop
+</dt>
+<dd>
+<p>
+        Stops the daemon running in the current working
+        directory, if present.
+</p>
+</dd>
+<dt class="hdlist1">
+status
+</dt>
+<dd>
+<p>
+        Exits with zero status if a daemon is watching the
+        current working directory.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_remarks">REMARKS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This daemon is a long running process used to watch a single working
+directory and maintain a list of the recently changed files and
+directories.  Performance of commands such as <code>git status</code> can be
+increased if they just ask for a summary of changes to the working
+directory and can avoid scanning the disk.</p></div>
+<div class="paragraph"><p>When <code>core.fsmonitor</code> is set to <code>true</code> (see <a href="git-config.html">git-config(1)</a>)
+commands, such as <code>git status</code>, will ask the daemon for changes and
+automatically start it (if necessary).</p></div>
+<div class="paragraph"><p>For more information see the "File System Monitor" section in
+<a href="git-update-index.html">git-update-index(1)</a>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_caveats">CAVEATS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The fsmonitor daemon does not currently know about submodules and does
+not know to filter out file system events that happen within a
+submodule.  If fsmonitor daemon is watching a super repo and a file is
+modified within the working directory of a submodule, it will report
+the change (as happening against the super repo).  However, the client
+will properly ignore these extra events, so performance may be affected
+but it will not cause an incorrect result.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -752,7 +848,7 @@ more efficiently, so this manually-maintained list has been retired.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-03-10 15:02:33 PDT
+ 2022-04-04 11:19:32 PDT
 </div>
 </div>
 </body>

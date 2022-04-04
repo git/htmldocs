@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 10.1.1" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
 <title>git-config(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -1926,6 +1926,16 @@ advice.*
 <div class="content">
 <div class="dlist"><dl>
 <dt class="hdlist1">
+ambiguousFetchRefspec
+</dt>
+<dd>
+<p>
+                Advice shown when fetch refspec for multiple remotes map to
+                the same remote-tracking branch namespace and causes branch
+                tracking set-up to fail.
+</p>
+</dd>
+<dt class="hdlist1">
 fetchShowForcedUpdates
 </dt>
 <dd>
@@ -2073,13 +2083,13 @@ commitBeforeMerge
 </p>
 </dd>
 <dt class="hdlist1">
-resetQuiet
+resetNoRefresh
 </dt>
 <dd>
 <p>
-                Advice to consider using the <code>--quiet</code> option to <a href="git-reset.html">git-reset(1)</a>
-                when the command takes more than 2 seconds to enumerate unstaged
-                changes after reset.
+                Advice to consider using the <code>--no-refresh</code> option to
+                <a href="git-reset.html">git-reset(1)</a> when the command takes more than 2 seconds
+                to refresh the index after reset.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2341,28 +2351,56 @@ core.fsmonitor
 </dt>
 <dd>
 <p>
-        If set, the value of this variable is used as a command which
-        will identify all files that may have changed since the
-        requested date/time. This information is used to speed up git by
-        avoiding unnecessary processing of files that have not changed.
-        See the "fsmonitor-watchman" section of <a href="githooks.html">githooks(5)</a>.
+        If set to true, enable the built-in file system monitor
+        daemon for this working directory (<a href="git-fsmonitor&#8212;daemon.html">git-fsmonitor&#8212;daemon(1)</a>).
 </p>
+<div class="paragraph"><p>Like hook-based file system monitors, the built-in file system monitor
+can speed up Git commands that need to refresh the Git index
+(e.g. <code>git status</code>) in a working directory with many files.  The
+built-in monitor eliminates the need to install and maintain an
+external third-party tool.</p></div>
+<div class="paragraph"><p>The built-in file system monitor is currently available only on a
+limited set of supported platforms.  Currently, this includes Windows
+and MacOS.</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>Otherwise, this variable contains the pathname of the "fsmonitor"
+hook command.</code></pre>
+</div></div>
+<div class="paragraph"><p>This hook command is used to identify all files that may have changed
+since the requested date/time. This information is used to speed up
+git by avoiding unnecessary scanning of files that have not changed.</p></div>
+<div class="paragraph"><p>See the "fsmonitor-watchman" section of <a href="githooks.html">githooks(5)</a>.</p></div>
+<div class="paragraph"><p>Note that if you concurrently use multiple versions of Git, such
+as one version on the command line and another version in an IDE
+tool, that the definition of <code>core.fsmonitor</code> was extended to
+allow boolean values in addition to hook pathnames.  Git versions
+2.35.1 and prior will not understand the boolean values and will
+consider the "true" or "false" values as hook pathnames to be
+invoked.  Git versions 2.26 thru 2.35.1 default to hook protocol
+V2 and will fall back to no fsmonitor (full scan).  Git versions
+prior to 2.26 default to hook protocol V1 and will silently
+assume there were no changes to report (no scan), so status
+commands may report incomplete results.  For this reason, it is
+best to upgrade all of your Git versions before using the built-in
+file system monitor.</p></div>
 </dd>
 <dt class="hdlist1">
 core.fsmonitorHookVersion
 </dt>
 <dd>
 <p>
-        Sets the version of hook that is to be used when calling fsmonitor.
-        There are currently versions 1 and 2. When this is not set,
-        version 2 will be tried first and if it fails then version 1
-        will be tried. Version 1 uses a timestamp as input to determine
-        which files have changes since that time but some monitors
-        like watchman have race conditions when used with a timestamp.
-        Version 2 uses an opaque string so that the monitor can return
-        something that can be used to determine what files have changed
-        without race conditions.
+        Sets the protocol version to be used when invoking the
+        "fsmonitor" hook.
 </p>
+<div class="paragraph"><p>There are currently versions 1 and 2. When this is not set,
+version 2 will be tried first and if it fails then version 1
+will be tried. Version 1 uses a timestamp as input to determine
+which files have changes since that time but some monitors
+like Watchman have race conditions when used with a timestamp.
+Version 2 uses an opaque string so that the monitor can return
+something that can be used to determine what files have changed
+without race conditions.</p></div>
 </dd>
 <dt class="hdlist1">
 core.trustctime
@@ -9405,8 +9443,10 @@ remote.&lt;name&gt;.partialclonefilter
 </dt>
 <dd>
 <p>
-        The filter that will be applied when fetching from this
-        promisor remote.
+        The filter that will be applied when fetching from this promisor remote.
+        Changing or clearing this value will only affect fetches for new commits.
+        To fetch associated objects for commits already present in the local object
+        database, use the <code>--refetch</code> option of <a href="git-fetch.html">git-fetch(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -9497,14 +9537,6 @@ rerere.enabled
         enabled if there is an <code>rr-cache</code> directory under the
         <code>$GIT_DIR</code>, e.g. if "rerere" was previously used in the
         repository.
-</p>
-</dd>
-<dt class="hdlist1">
-reset.quiet
-</dt>
-<dd>
-<p>
-        When set to true, <em>git reset</em> will default to the <em>--quiet</em> option.
 </p>
 </dd>
 <dt class="hdlist1">

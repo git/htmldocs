@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 10.1.1" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
 <title>git-worktree(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -750,7 +750,7 @@ git-worktree(1) Manual Page
 <div class="sectionbody">
 <div class="verseblock">
 <pre class="content"><em>git worktree add</em> [-f] [--detach] [--checkout] [--lock [--reason &lt;string&gt;]] [-b &lt;new-branch&gt;] &lt;path&gt; [&lt;commit-ish&gt;]
-<em>git worktree list</em> [-v | --porcelain]
+<em>git worktree list</em> [-v | --porcelain [-z]]
 <em>git worktree lock</em> [--reason &lt;string&gt;] &lt;worktree&gt;
 <em>git worktree move</em> &lt;worktree&gt; &lt;new-path&gt;
 <em>git worktree prune</em> [-n] [-v] [--expire &lt;expire&gt;]
@@ -1044,7 +1044,19 @@ To remove a locked worktree, specify <code>--force</code> twice.</p></div>
 <p>
         With <code>list</code>, output in an easy-to-parse format for scripts.
         This format will remain stable across Git versions and regardless of user
-        configuration.  See below for details.
+        configuration.  It is recommended to combine this with <code>-z</code>.
+        See below for details.
+</p>
+</dd>
+<dt class="hdlist1">
+-z
+</dt>
+<dd>
+<p>
+        Terminate each line with a NUL rather than a newline when
+        <code>--porcelain</code> is specified with <code>list</code>. This makes it possible
+        to parse the output when a worktree path contains a newline
+        character.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1275,7 +1287,8 @@ information is available, otherwise it stays on the same line as the
 worktree itself.</p></div>
 <div class="sect2">
 <h3 id="_porcelain_format">Porcelain Format</h3>
-<div class="paragraph"><p>The porcelain format has a line per attribute.  Attributes are listed with a
+<div class="paragraph"><p>The porcelain format has a line per attribute.  If <code>-z</code> is given then the lines
+are terminated with NUL rather than a newline.  Attributes are listed with a
 label and value separated by a single space.  Boolean attributes (like <code>bare</code>
 and <code>detached</code>) are listed as a label only, and are present only
 if the value is true.  Some attributes (like <code>locked</code>) can be listed as a label
@@ -1311,7 +1324,7 @@ HEAD 1233def1234def1234def1234def1234def1234b
 detached
 prunable gitdir file points to non-existent location</code></pre>
 </div></div>
-<div class="paragraph"><p>If the lock reason contains "unusual" characters such as newline, they
+<div class="paragraph"><p>Unless <code>-z</code> is used any "unusual" characters in the lock reason such as newlines
 are escaped and the entire reason is quoted as explained for the
 configuration variable <code>core.quotePath</code> (see <a href="git-config.html">git-config(1)</a>).
 For Example:</p></div>
@@ -1366,7 +1379,7 @@ checkouts of a superproject.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-03-07 14:39:03 PST
+ 2022-04-04 11:19:32 PDT
 </div>
 </div>
 </body>
