@@ -3515,7 +3515,9 @@ branch.autoSetupMerge
         starting point is a remote-tracking branch; <code>always</code>&#8201;&#8212;&#8201;        automatic setup is done when the starting point is either a
         local branch or remote-tracking branch; <code>inherit</code>&#8201;&#8212;&#8201;if the starting point
         has a tracking configuration, it is copied to the new
-        branch. This option defaults to true.
+        branch; <code>simple</code>&#8201;&#8212;&#8201;automatic setup is done only when the starting point
+        is a remote-tracking branch and the new branch has the same name as the
+        remote branch. This option defaults to true.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3559,8 +3561,9 @@ branch.&lt;name&gt;.remote
         may be overridden with <code>remote.pushDefault</code> (for all branches).
         The remote to push to, for the current branch, may be further
         overridden by <code>branch.&lt;name&gt;.pushRemote</code>.  If no remote is
-        configured, or if you are not on any branch, it defaults to
-        <code>origin</code> for fetching and <code>remote.pushDefault</code> for pushing.
+        configured, or if you are not on any branch and there is more than
+        one remote defined in the repository, it defaults to <code>origin</code> for
+        fetching and <code>remote.pushDefault</code> for pushing.
         Additionally, <code>.</code> (a period) is the current local repository
         (a dot-repository), see <code>branch.&lt;name&gt;.merge</code>'s final note below.
 </p>
@@ -8885,6 +8888,22 @@ pull.twohead
 </p>
 </dd>
 <dt class="hdlist1">
+push.autoSetupRemote
+</dt>
+<dd>
+<p>
+        If set to "true" assume <code>--set-upstream</code> on default push when no
+        upstream tracking exists for the current branch; this option
+        takes effect with push.default options <em>simple</em>, <em>upstream</em>,
+        and <em>current</em>. It is useful if by default you want new branches
+        to be pushed to the default remote (like the behavior of
+        <em>push.default=current</em>) and you also want the upstream tracking
+        to be set. Workflows most likely to benefit from this option are
+        <em>simple</em> central workflows where all branches are expected to
+        have the same name on the remote.
+</p>
+</dd>
+<dt class="hdlist1">
 push.default
 </dt>
 <dd>
@@ -9706,6 +9725,18 @@ directory was listed in the <code>safe.directory</code> list. If <code>safe.dire
 is set in system config and you want to re-enable this protection, then
 initialize your list with an empty value before listing the repositories
 that you deem safe.</p></div>
+<div class="paragraph"><p>As explained, Git only allows you to access repositories owned by
+yourself, i.e. the user who is running Git, by default.  When Git
+is running as <em>root</em> in a non Windows platform that provides sudo,
+ however, git checks the SUDO_UID environment variable that sudo creates
+and will allow access to the uid recorded as its value instead.
+This is to make it easy to perform a common sequence during installation
+"make &amp;&amp; sudo make install".  A git process running under <em>sudo</em> runs as
+<em>root</em> but the <em>sudo</em> command exports the environment variable to record
+which id the original user has.
+If that is not what you would prefer and want git to only trust
+repositories that are owned by root instead, then you must remove
+the <code>SUDO_UID</code> variable from root&#8217;s environment before invoking git.</p></div>
 </dd>
 <dt class="hdlist1">
 sendemail.identity
