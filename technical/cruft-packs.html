@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.1.4" />
-<title>How to separate topic branches</title>
+<title>Cruft packs</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -734,106 +734,158 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>How to separate topic branches</h1>
+<h1>Cruft packs</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="paragraph"><p>This text was originally a footnote to a discussion about the
-behaviour of the git diff commands.</p></div>
-<div class="paragraph"><p>Often I find myself doing that [running diff against something other
-than HEAD] while rewriting messy development history.  For example, I
-start doing some work without knowing exactly where it leads, and end
-up with a history like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>    "master"
-o---o
-     \                    "topic"
-      o---o---o---o---o---o</code></pre>
+<div class="paragraph"><p>The cruft packs feature offer an alternative to Git&#8217;s traditional mechanism of
+removing unreachable objects. This document provides an overview of Git&#8217;s
+pruning mechanism, and how a cruft pack can be used instead to accomplish the
+same.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_background">Background</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>To remove unreachable objects from your repository, Git offers <code>git repack -Ad</code>
+(see <a href="../git-repack.html">git-repack(1)</a>). Quoting from the documentation:</p></div>
+<div class="quoteblock">
+<div class="content">[&#8230;] unreachable objects in a previous pack become loose, unpacked objects,
+instead of being left in the old pack. [&#8230;] loose unreachable objects will be
+pruned according to normal expiry rules with the next <em>git gc</em> invocation.</div>
+<div class="attribution">
 </div></div>
-<div class="paragraph"><p>At this point, "topic" contains something I know I want, but it
-contains two concepts that turned out to be completely independent.
-And often, one topic component is larger than the other.  It may
-contain more than two topics.</p></div>
-<div class="paragraph"><p>In order to rewrite this mess to be more manageable, I would first do
-"diff master..topic", to extract the changes into a single patch, start
-picking pieces from it to get logically self-contained units, and
-start building on top of "master":</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git diff master..topic &gt;P.diff
-$ git checkout -b topicA master
-... pick and apply pieces from P.diff to build
-... commits on topicA branch.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>      o---o---o
-     /        "topicA"
-o---o"master"
-     \                    "topic"
-      o---o---o---o---o---o</code></pre>
-</div></div>
-<div class="paragraph"><p>Before doing each commit on "topicA" HEAD, I run "diff HEAD"
-before update-index the affected paths, or "diff --cached HEAD"
-after.  Also I would run "diff --cached master" to make sure
-that the changes are only the ones related to "topicA".  Usually
-I do this for smaller topics first.</p></div>
-<div class="paragraph"><p>After that, I&#8217;d do the remainder of the original "topic", but
-for that, I do not start from the patchfile I extracted by
-comparing "master" and "topic" I used initially.  Still on
-"topicA", I extract "diff topic", and use it to rebuild the
-other topic:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git diff -R topic &gt;P.diff ;# --cached also would work fine
-$ git checkout -b topicB master
-... pick and apply pieces from P.diff to build
-... commits on topicB branch.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                        "topicB"
-       o---o---o---o---o
-      /
-     /o---o---o
-    |/        "topicA"
-o---o"master"
-     \                    "topic"
-      o---o---o---o---o---o</code></pre>
-</div></div>
-<div class="paragraph"><p>After I am done, I&#8217;d try a pretend-merge between "topicA" and
-"topicB" in order to make sure I have not missed anything:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git pull . topicA ;# merge it into current "topicB"
-$ git diff topic
-                        "topicB"
-       o---o---o---o---o---* (pretend merge)
-      /                   /
-     /o---o---o----------'
-    |/        "topicA"
-o---o"master"
-     \                    "topic"
-      o---o---o---o---o---o</code></pre>
-</div></div>
-<div class="paragraph"><p>The last diff better not to show anything other than cleanups
-for cruft.  Then I can finally clean things up:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git branch -D topic
-$ git reset --hard HEAD^ ;# nuke pretend merge</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                        "topicB"
-       o---o---o---o---o
-      /
-     /o---o---o
-    |/        "topicA"
-o---o"master"</code></pre>
-</div></div>
+<div class="paragraph"><p>Unreachable objects aren&#8217;t removed immediately, since doing so could race with
+an incoming push which may reference an object which is about to be deleted.
+Instead, those unreachable objects are stored as loose objects and stay that way
+until they are older than the expiration window, at which point they are removed
+by <a href="../git-prune.html">git-prune(1)</a>.</p></div>
+<div class="paragraph"><p>Git must store these unreachable objects loose in order to keep track of their
+per-object mtimes. If these unreachable objects were written into one big pack,
+then either freshening that pack (because an object contained within it was
+re-written) or creating a new pack of unreachable objects would cause the pack&#8217;s
+mtime to get updated, and the objects within it would never leave the expiration
+window. Instead, objects are stored loose in order to keep track of the
+individual object mtimes and avoid a situation where all cruft objects are
+freshened at once.</p></div>
+<div class="paragraph"><p>This can lead to undesirable situations when a repository contains many
+unreachable objects which have not yet left the grace period. Having large
+directories in the shards of <code>.git/objects</code> can lead to decreased performance in
+the repository. But given enough unreachable objects, this can lead to inode
+starvation and degrade the performance of the whole system. Since we
+can never pack those objects, these repositories often take up a large amount of
+disk space, since we can only zlib compress them, but not store them in delta
+chains.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_cruft_packs">Cruft packs</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A cruft pack eliminates the need for storing unreachable objects in a loose
+state by including the per-object mtimes in a separate file alongside a single
+pack containing all loose objects.</p></div>
+<div class="paragraph"><p>A cruft pack is written by <code>git repack --cruft</code> when generating a new pack.
+<a href="../git-pack-objects.html">git-pack-objects(1)</a>'s <code>--cruft</code> option. Note that <code>git repack --cruft</code>
+is a classic all-into-one repack, meaning that everything in the resulting pack is
+reachable, and everything else is unreachable. Once written, the <code>--cruft</code>
+option instructs <code>git repack</code> to generate another pack containing only objects
+not packed in the previous step (which equates to packing all unreachable
+objects together). This progresses as follows:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Enumerate every object, marking any object which is (a) not contained in a
+     kept-pack, and (b) whose mtime is within the grace period as a traversal
+     tip.
+</p>
+</li>
+<li>
+<p>
+Perform a reachability traversal based on the tips gathered in the previous
+     step, adding every object along the way to the pack.
+</p>
+</li>
+<li>
+<p>
+Write the pack out, along with a <code>.mtimes</code> file that records the per-object
+     timestamps.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>This mode is invoked internally by <a href="../git-repack.html">git-repack(1)</a> when instructed to
+write a cruft pack. Crucially, the set of in-core kept packs is exactly the set
+of packs which will not be deleted by the repack; in other words, they contain
+all of the repository&#8217;s reachable objects.</p></div>
+<div class="paragraph"><p>When a repository already has a cruft pack, <code>git repack --cruft</code> typically only
+adds objects to it. An exception to this is when <code>git repack</code> is given the
+<code>--cruft-expiration</code> option, which allows the generated cruft pack to omit
+expired objects instead of waiting for <a href="../git-gc.html">git-gc(1)</a> to expire those objects
+later on.</p></div>
+<div class="paragraph"><p>It is <a href="../git-gc.html">git-gc(1)</a> that is typically responsible for removing expired
+unreachable objects.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_caution_for_mixed_version_environments">Caution for mixed-version environments</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Repositories that have cruft packs in them will continue to work with any older
+version of Git. Note, however, that previous versions of Git which do not
+understand the <code>.mtimes</code> file will use the cruft pack&#8217;s mtime as the mtime for
+all of the objects in it. In other words, do not expect older (pre-cruft pack)
+versions of Git to interpret or even read the contents of the <code>.mtimes</code> file.</p></div>
+<div class="paragraph"><p>Note that having mixed versions of Git GC-ing the same repository can lead to
+unreachable objects never being completely pruned. This can happen under the
+following circumstances:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+An older version of Git running GC explodes the contents of an existing
+    cruft pack loose, using the cruft pack&#8217;s mtime.
+</p>
+</li>
+<li>
+<p>
+A newer version running GC collects those loose objects into a cruft pack,
+    where the .mtime file reflects the loose object&#8217;s actual mtimes, but the
+    cruft pack mtime is "now".
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Repeating this process will lead to unreachable objects not getting pruned as a
+result of repeatedly resetting the objects' mtimes to the present time.</p></div>
+<div class="paragraph"><p>If you are GC-ing repositories in a mixed version environment, consider omitting
+the <code>--cruft</code> option when using <a href="../git-repack.html">git-repack(1)</a> and <a href="../git-gc.html">git-gc(1)</a>, and
+leaving the <code>gc.cruftPacks</code> configuration unset until all writers understand
+cruft packs.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_alternatives">Alternatives</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Notable alternatives to this design include:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The location of the per-object mtime data, and
+</p>
+</li>
+<li>
+<p>
+Storing unreachable objects in multiple cruft packs.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>On the location of mtime data, a new auxiliary file tied to the pack was chosen
+to avoid complicating the <code>.idx</code> format. If the <code>.idx</code> format were ever to gain
+support for optional chunks of data, it may make sense to consolidate the
+<code>.mtimes</code> format into the <code>.idx</code> itself.</p></div>
+<div class="paragraph"><p>Storing unreachable objects among multiple cruft packs (e.g., creating a new
+cruft pack during each repacking operation including only unreachable objects
+which aren&#8217;t already stored in an earlier cruft pack) is significantly more
+complicated to construct, and so aren&#8217;t pursued here. The obvious drawback to
+the current implementation is that the entire cruft pack must be re-written from
+scratch.</p></div>
 </div>
 </div>
 </div>
@@ -841,7 +893,7 @@ o---o"master"</code></pre>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-06-03 15:24:59 PDT
+ 2022-06-03 15:24:31 PDT
 </div>
 </div>
 </body>

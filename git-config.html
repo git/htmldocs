@@ -3178,6 +3178,17 @@ core.fsyncMethod
   durable in the event of a system crash. This is the default mode on macOS.
 </p>
 </li>
+<li>
+<p>
+<code>batch</code> enables a mode that uses writeout-only flushes to stage multiple
+  updates in the disk writeback cache and then does a single full fsync of
+  a dummy file to trigger the disk cache flush at the end of the operation.
+</p>
+<div class="paragraph"><p>Currently <code>batch</code> mode only applies to loose-object files. Other repository
+data is made durable as if <code>fsync</code> was specified. This mode is expected to
+be as safe as <code>fsync</code> on macOS for repos stored on HFS+ or APFS filesystems
+and on Windows for repos stored on NTFS or ReFS filesystems.</p></div>
+</li>
 </ul></div>
 </dd>
 <dt class="hdlist1">
@@ -3299,8 +3310,10 @@ core.sparseCheckoutCone
 <dd>
 <p>
         Enables the "cone mode" of the sparse checkout feature. When the
-        sparse-checkout file contains a limited set of patterns, then this
-        mode provides significant performance advantages. See
+        sparse-checkout file contains a limited set of patterns, this
+        mode provides significant performance advantages. The "non
+        cone mode" can be requested to allow specifying a more flexible
+        patterns by setting this variable to <em>false</em>. See
         <a href="git-sparse-checkout.html">git-sparse-checkout(1)</a> for more information.
 </p>
 </dd>
@@ -5863,17 +5876,29 @@ gc.packRefs
 </p>
 </dd>
 <dt class="hdlist1">
+gc.cruftPacks
+</dt>
+<dd>
+<p>
+        Store unreachable objects in a cruft pack (see
+        <a href="git-repack.html">git-repack(1)</a>) instead of as loose objects. The default
+        is <code>false</code>.
+</p>
+</dd>
+<dt class="hdlist1">
 gc.pruneExpire
 </dt>
 <dd>
 <p>
-        When <em>git gc</em> is run, it will call <em>prune --expire 2.weeks.ago</em>.
-        Override the grace period with this config variable.  The value
-        "now" may be used to disable this grace period and always prune
-        unreachable objects immediately, or "never" may be used to
-        suppress pruning.  This feature helps prevent corruption when
-        <em>git gc</em> runs concurrently with another process writing to the
-        repository; see the "NOTES" section of <a href="git-gc.html">git-gc(1)</a>.
+        When <em>git gc</em> is run, it will call <em>prune --expire 2.weeks.ago</em>
+        (and <em>repack --cruft --cruft-expiration 2.weeks.ago</em> if using
+        cruft packs via <code>gc.cruftPacks</code> or <code>--cruft</code>).  Override the
+        grace period with this config variable.  The value "now" may be
+        used to disable this grace period and always prune unreachable
+        objects immediately, or "never" may be used to suppress pruning.
+        This feature helps prevent corruption when <em>git gc</em> runs
+        concurrently with another process writing to the repository; see
+        the "NOTES" section of <a href="git-gc.html">git-gc(1)</a>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -9699,6 +9724,26 @@ repack.updateServerInfo
         If set to false, <a href="git-repack.html">git-repack(1)</a> will not run
         <a href="git-update-server-info.html">git-update-server-info(1)</a>. Defaults to true. Can be overridden
         when true by the <code>-n</code> option of <a href="git-repack.html">git-repack(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+repack.cruftWindow
+</dt>
+<dt class="hdlist1">
+repack.cruftWindowMemory
+</dt>
+<dt class="hdlist1">
+repack.cruftDepth
+</dt>
+<dt class="hdlist1">
+repack.cruftThreads
+</dt>
+<dd>
+<p>
+        Parameters used by <a href="git-pack-objects.html">git-pack-objects(1)</a> when generating
+        a cruft pack and the respective parameters are not given over
+        the command line. See similarly named <code>pack.*</code> configuration
+        variables for defaults and meaning.
 </p>
 </dd>
 <dt class="hdlist1">
