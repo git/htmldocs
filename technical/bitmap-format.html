@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.1.4" />
-<title>How to integrate new subcommands</title>
+<title>GIT bitmap v1 format</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -734,128 +734,386 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>How to integrate new subcommands</h1>
+<h1>GIT bitmap v1 format</h1>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_pack_and_multi_pack_bitmaps">Pack and multi-pack bitmaps</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This is how-to documentation for people who want to add extension
-commands to Git.  It should be read alongside api-builtin.txt.</p></div>
+<div class="paragraph"><p>Bitmaps store reachability information about the set of objects in a packfile,
+or a multi-pack index (MIDX). The former is defined obviously, and the latter is
+defined as the union of objects in packs contained in the MIDX.</p></div>
+<div class="paragraph"><p>A bitmap may belong to either one pack, or the repository&#8217;s multi-pack index (if
+it exists). A repository may have at most one bitmap.</p></div>
+<div class="paragraph"><p>An object is uniquely described by its bit position within a bitmap:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+If the bitmap belongs to a packfile, the <em>n</em>th bit corresponds to
+        the <em>n</em>th object in pack order. For a function <code>offset</code> which maps
+        objects to their byte offset within a pack, pack order is defined as
+        follows:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>o1 &lt;= o2 &lt;==&gt; offset(o1) &lt;= offset(o2)</code></pre>
+</div></div>
+</li>
+<li>
+<p>
+If the bitmap belongs to a MIDX, the <em>n</em>th bit corresponds to the
+        <em>n</em>th object in MIDX order. With an additional function <code>pack</code> which
+        maps objects to the pack they were selected from by the MIDX, MIDX order
+        is defined as follows:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>o1 &lt;= o2 &lt;==&gt; pack(o1) &lt;= pack(o2) /\ offset(o1) &lt;= offset(o2)</code></pre>
+</div></div>
+<div class="paragraph"><p>The ordering between packs is done according to the MIDX&#8217;s .rev file.
+Notably, the preferred pack sorts ahead of all other packs.</p></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>The on-disk representation (described below) of a bitmap is the same regardless
+of whether or not that bitmap belongs to a packfile or a MIDX. The only
+difference is the interpretation of the bits, which is described above.</p></div>
+<div class="paragraph"><p>Certain bitmap extensions are supported (see: Appendix B). No extensions are
+required for bitmaps corresponding to packfiles. For bitmaps that correspond to
+MIDXs, both the bit-cache and rev-cache extensions are required.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_runtime_environment">Runtime environment</h2>
+<h2 id="_on_disk_format">On-disk format</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Git subcommands are standalone executables that live in the Git exec
-path, normally /usr/lib/git-core.  The git executable itself is a
-thin wrapper that knows where the subcommands live, and runs them by
-passing command-line arguments to them.</p></div>
-<div class="paragraph"><p>(If "git foo" is not found in the Git exec path, the wrapper
-will look in the rest of your $PATH for it.  Thus, it&#8217;s possible
-to write local Git extensions that don&#8217;t live in system space.)</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+A header appears at the beginning:
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+4-byte signature: 
+</dt>
+<dd>
+<p>
+{<em>B</em>, <em>I</em>, <em>T</em>, <em>M</em>}
+</p>
+</dd>
+<dt class="hdlist1">
+2-byte version number (network byte order): 
+</dt>
+<dd>
+<p>
+            The current implementation only supports version 1
+            of the bitmap index (the same one as JGit).
+</p>
+</dd>
+<dt class="hdlist1">
+2-byte flags (network byte order): 
+</dt>
+<dd>
+<p>
+            The following flags are supported:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+BITMAP_OPT_FULL_DAG (0x1) REQUIRED: 
+</dt>
+<dd>
+<p>
+            This flag must always be present. It implies that the
+            bitmap index has been generated for a packfile or
+            multi-pack index (MIDX) with full closure (i.e. where
+            every single object in the packfile/MIDX can find its
+            parent links inside the same packfile/MIDX). This is a
+            requirement for the bitmap index format, also present in
+            JGit, that greatly reduces the complexity of the
+            implementation.
+</p>
+</dd>
+</dl></div>
+</li>
+<li>
+<p>
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+BITMAP_OPT_HASH_CACHE (0x4): 
+</dt>
+<dd>
+<p>
+            If present, the end of the bitmap file contains
+            <code>N</code> 32-bit name-hash values, one per object in the
+            pack/MIDX. The format and meaning of the name-hash is
+            described below.
+</p>
+</dd>
+</dl></div>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
+4-byte entry count (network byte order): 
+</dt>
+<dd>
+<p>
+            The total count of entries (bitmapped commits) in this bitmap index.
+</p>
+</dd>
+<dt class="hdlist1">
+20-byte checksum: 
+</dt>
+<dd>
+<p>
+            The SHA1 checksum of the pack/MIDX this bitmap index
+            belongs to.
+</p>
+</dd>
+</dl></div>
+</li>
+<li>
+<p>
+4 EWAH bitmaps that act as type indexes
+</p>
+<div class="paragraph"><p>Type indexes are serialized after the hash cache in the shape
+of four EWAH bitmaps stored consecutively (see Appendix A for
+the serialization format of an EWAH bitmap).</p></div>
+<div class="paragraph"><p>There is a bitmap for each Git object type, stored in the following
+order:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Commits
+</p>
+</li>
+<li>
+<p>
+Trees
+</p>
+</li>
+<li>
+<p>
+Blobs
+</p>
+</li>
+<li>
+<p>
+Tags
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In each bitmap, the `n`th bit is set to true if the `n`th object
+in the packfile or multi-pack index is of that type.</p></div>
+<div class="paragraph"><p>The obvious consequence is that the OR of all 4 bitmaps will result
+in a full set (all bits set), and the AND of all 4 bitmaps will
+result in an empty bitmap (no bits set).</p></div>
+</li>
+<li>
+<p>
+N entries with compressed bitmaps, one for each indexed commit
+</p>
+<div class="paragraph"><p>Where <code>N</code> is the total amount of entries in this bitmap index.
+Each entry contains the following:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+4-byte object position (network byte order): 
+</dt>
+<dd>
+<p>
+            The position <strong>in the index for the packfile or
+            multi-pack index</strong> where the bitmap for this commit is
+            found.
+</p>
+</dd>
+</dl></div>
+</li>
+<li>
+<p>
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+1-byte XOR-offset: 
+</dt>
+<dd>
+<p>
+            The xor offset used to compress this bitmap. For an entry
+            in position <code>x</code>, a XOR offset of <code>y</code> means that the actual
+            bitmap representing this commit is composed by XORing the
+            bitmap for this entry with the bitmap in entry <code>x-y</code> (i.e.
+            the bitmap <code>y</code> entries before this one).
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">This compression can be recursive. In order to
+XOR this entry with a previous one, the previous entry needs
+to be decompressed first, and so on.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>The hard-limit for this offset is 160 (an entry can only be
+xor&#8217;ed against one of the 160 entries preceding it). This
+number is always positive, and hence entries are always xor&#8217;ed
+with <strong>previous</strong> bitmaps, not bitmaps that will come afterwards
+in the index.</p></div>
+</dd>
+</dl></div>
+</li>
+<li>
+<p>
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+1-byte flags for this bitmap: 
+</dt>
+<dd>
+<p>
+            At the moment the only available flag is <code>0x1</code>, which hints
+            that this bitmap can be re-used when rebuilding bitmap indexes
+            for the repository.
+</p>
+</dd>
+</dl></div>
+</li>
+<li>
+<p>
+The compressed bitmap itself, see Appendix A.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+</p>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+TRAILER: 
+</dt>
+<dd>
+<p>
+                Trailing checksum of the preceding contents.
+</p>
+</dd>
+</dl></div>
+</li>
+</ul></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_implementation_languages">Implementation languages</h2>
+<h2 id="_appendix_a_serialization_format_for_an_ewah_bitmap">Appendix A: Serialization format for an EWAH bitmap</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Most subcommands are written in C or shell.  A few are written in
-Perl.</p></div>
-<div class="paragraph"><p>While we strongly encourage coding in portable C for portability,
-these specific scripting languages are also acceptable.  We won&#8217;t
-accept more without a very strong technical case, as we don&#8217;t want
-to broaden the Git suite&#8217;s required dependencies.  Import utilities,
-surgical tools, remote helpers and other code at the edges of the
-Git suite are more lenient and we allow Python (and even Tcl/tk),
-but they should not be used for core functions.</p></div>
-<div class="paragraph"><p>This may change in the future.  Especially Python is not allowed in
-core because we need better Python integration in the Git Windows
-installer before we can be confident people in that environment
-won&#8217;t experience an unacceptably large loss of capability.</p></div>
-<div class="paragraph"><p>C commands are normally written as single modules, named after the
-command, that link a collection of functions called libgit.  Thus,
-your command <em>git-foo</em> would normally be implemented as a single
-"git-foo.c" (or "builtin/foo.c" if it is to be linked to the main
-binary); this organization makes it easy for people reading the code
-to find things.</p></div>
-<div class="paragraph"><p>See the CodingGuidelines document for other guidance on what we consider
-good practice in C and shell, and api-builtin.txt for the support
-functions available to built-in commands written in C.</p></div>
+<div class="paragraph"><p>Ewah bitmaps are serialized in the same protocol as the JAVAEWAH
+library, making them backwards compatible with the JGit
+implementation:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+4-byte number of bits of the resulting UNCOMPRESSED bitmap
+</p>
+</li>
+<li>
+<p>
+4-byte number of words of the COMPRESSED bitmap, when stored
+</p>
+</li>
+<li>
+<p>
+N x 8-byte words, as specified by the previous field
+</p>
+<div class="paragraph"><p>This is the actual content of the compressed bitmap.</p></div>
+</li>
+<li>
+<p>
+4-byte position of the current RLW for the compressed
+                bitmap
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>All words are stored in network byte order for their corresponding
+sizes.</p></div>
+<div class="paragraph"><p>The compressed bitmap is stored in a form of run-length encoding, as
+follows.  It consists of a concatenation of an arbitrary number of
+chunks.  Each chunk consists of one or more 64-bit words</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>H  L_1  L_2  L_3 .... L_M</code></pre>
+</div></div>
+<div class="paragraph"><p>H is called RLW (run length word).  It consists of (from lower to higher
+order bits):</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+1 bit: the repeated bit B
+</p>
+</li>
+<li>
+<p>
+32 bits: repetition count K (unsigned)
+</p>
+</li>
+<li>
+<p>
+31 bits: literal word count M (unsigned)
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The bitstream represented by the above chunk is then:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+K repetitions of B
+</p>
+</li>
+<li>
+<p>
+The bits stored in <code>L_1</code> through <code>L_M</code>.  Within a word, bits at
+       lower order come earlier in the stream than those at higher
+       order.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The next word after <code>L_M</code> (if any) must again be a RLW, for the next
+chunk.  For efficient appending to the bitstream, the EWAH stores a
+pointer to the last RLW in the stream.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_every_extension_command_needs">What every extension command needs</h2>
+<h2 id="_appendix_b_optional_bitmap_sections">Appendix B: Optional Bitmap Sections</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>You must have a man page, written in asciidoc (this is what Git help
-followed by your subcommand name will display).  Be aware that there is
-a local asciidoc configuration and macros which you should use.  It&#8217;s
-often helpful to start by cloning an existing page and replacing the
-text content.</p></div>
-<div class="paragraph"><p>You must have a test, written to report in TAP (Test Anything Protocol).
-Tests are executables (usually shell scripts) that live in the <em>t</em>
-subdirectory of the tree.  Each test name begins with <em>t</em> and a sequence
-number that controls where in the test sequence it will be executed;
-conventionally the rest of the name stem is that of the command
-being tested.</p></div>
-<div class="paragraph"><p>Read the file t/README to learn more about the conventions to be used
-in writing tests, and the test support library.</p></div>
+<div class="paragraph"><p>These sections may or may not be present in the <code>.bitmap</code> file; their
+presence is indicated by the header flags section described above.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_integrating_a_command">Integrating a command</h2>
+<h2 id="_name_hash_cache">Name-hash cache</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Here are the things you need to do when you want to merge a new
-subcommand into the Git tree.</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Don&#8217;t forget to sign off your patch!
-</p>
-</li>
-<li>
-<p>
-Append your command name to one of the variables BUILTIN_OBJS,
-EXTRA_PROGRAMS, SCRIPT_SH, SCRIPT_PERL or SCRIPT_PYTHON.
-</p>
-</li>
-<li>
-<p>
-Drop its test in the t directory.
-</p>
-</li>
-<li>
-<p>
-If your command is implemented in an interpreted language with a
-p-code intermediate form, make sure .gitignore in the main directory
-includes a pattern entry that ignores such files.  Python .pyc and
-.pyo files will already be covered.
-</p>
-</li>
-<li>
-<p>
-If your command has any dependency on a particular version of
-your language, document it in the INSTALL file.
-</p>
-</li>
-<li>
-<p>
-There is a file command-list.txt in the distribution main directory
-that categorizes commands by type, so they can be listed in appropriate
-subsections in the documentation&#8217;s summary command list.  Add an entry
-for yours.  To understand the categories, look at command-list.txt
-in the main directory.  If the new command is part of the typical Git
-workflow and you believe it common enough to be mentioned in <em>git help</em>,
-map this command to a common group in the column [common].
-</p>
-</li>
-<li>
-<p>
-Give the maintainer one paragraph to include in the RelNotes file
-to describe the new feature; a good place to do so is in the cover
-letter [PATCH 0/n].
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>That&#8217;s all there is to it.</p></div>
+<div class="paragraph"><p>If the BITMAP_OPT_HASH_CACHE flag is set, the end of the bitmap contains
+a cache of 32-bit values, one per object in the pack/MIDX. The value at
+position <code>i</code> is the hash of the pathname at which the `i`th object
+(counting in index or multi-pack index order) in the pack/MIDX can be found.
+This can be fed into the delta heuristics to compare objects with similar
+pathnames.</p></div>
+<div class="paragraph"><p>The hash algorithm used is:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>hash = 0;
+while ((c = *name++))
+        if (!isspace(c))
+                hash = (hash &gt;&gt; 2) + (c &lt;&lt; 24);</code></pre>
+</div></div>
+<div class="paragraph"><p>Note that this hashing scheme is tied to the BITMAP_OPT_HASH_CACHE flag.
+If implementations want to choose a different hashing scheme, they are
+free to do so, but MUST allocate a new header flag (because comparing
+hashes made under two different schemes would be pointless).</p></div>
 </div>
 </div>
 </div>
@@ -863,7 +1121,7 @@ letter [PATCH 0/n].
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-07-11 16:06:55 PDT
+ 2022-07-11 16:06:18 PDT
 </div>
 </div>
 </body>
