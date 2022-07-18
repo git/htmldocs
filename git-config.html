@@ -2852,16 +2852,41 @@ core.bigFileThreshold
 </dt>
 <dd>
 <p>
-        Files larger than this size are stored deflated, without
-        attempting delta compression.  Storing large files without
-        delta compression avoids excessive memory usage, at the
-        slight expense of increased disk usage. Additionally files
-        larger than this size are always treated as binary.
+        The size of files considered "big", which as discussed below
+        changes the behavior of numerous git commands, as well as how
+        such files are stored within the repository. The default is
+        512 MiB. Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are
+        supported.
 </p>
-<div class="paragraph"><p>Default is 512 MiB on all platforms.  This should be reasonable
-for most projects as source code and other text files can still
-be delta compressed, but larger binary media files won&#8217;t be.</p></div>
-<div class="paragraph"><p>Common unit suffixes of <em>k</em>, <em>m</em>, or <em>g</em> are supported.</p></div>
+<div class="paragraph"><p>Files above the configured limit will be:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Stored deflated in packfiles, without attempting delta compression.
+</p>
+<div class="paragraph"><p>The default limit is primarily set with this use-case in mind. With it,
+most projects will have their source code and other text files delta
+compressed, but not larger binary media files.</p></div>
+<div class="paragraph"><p>Storing large files without delta compression avoids excessive memory
+usage, at the slight expense of increased disk usage.</p></div>
+</li>
+<li>
+<p>
+Will be treated as if they were labeled "binary" (see
+  <a href="gitattributes.html">gitattributes(5)</a>). e.g. <a href="git-log.html">git-log(1)</a> and
+  <a href="git-diff.html">git-diff(1)</a> will not compute diffs for files above this limit.
+</p>
+</li>
+<li>
+<p>
+Will generally be streamed when written, which avoids excessive
+memory usage, at the cost of some fixed overhead. Commands that make
+use of this include <a href="git-archive.html">git-archive(1)</a>,
+<a href="git-fast-import.html">git-fast-import(1)</a>, <a href="git-index-pack.html">git-index-pack(1)</a>,
+<a href="git-unpack-objects.html">git-unpack-objects(1)</a> and <a href="git-fsck.html">git-fsck(1)</a>.
+</p>
+</li>
+</ul></div>
 </dd>
 <dt class="hdlist1">
 core.excludesFile
@@ -9133,6 +9158,16 @@ push.negotiate
         server attempt to find commits in common. If "false", Git will
         rely solely on the server&#8217;s ref advertisement to find commits
         in common.
+</p>
+</dd>
+<dt class="hdlist1">
+push.useBitmaps
+</dt>
+<dd>
+<p>
+        If set to "false", disable use of bitmaps for "git push" even if
+        <code>pack.useBitmaps</code> is "true", without preventing other git operations
+        from using bitmaps. Default is true.
 </p>
 </dd>
 <dt class="hdlist1">
