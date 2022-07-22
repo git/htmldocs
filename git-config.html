@@ -1246,8 +1246,8 @@ The default is to use a pager.</p></div>
 <div class="sect1">
 <h2 id="FILES">FILES</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>If not set explicitly with <code>--file</code>, there are four files where
-<em>git config</em> will search for configuration options:</p></div>
+<div class="paragraph"><p>By default, <em>git config</em> will read configuration options from multiple
+files:</p></div>
 <div class="dlist"><dl>
 <dt class="hdlist1">
 $(prefix)/etc/gitconfig
@@ -1260,24 +1260,17 @@ $(prefix)/etc/gitconfig
 <dt class="hdlist1">
 $XDG_CONFIG_HOME/git/config
 </dt>
-<dd>
-<p>
-        Second user-specific configuration file. If $XDG_CONFIG_HOME is not set
-        or empty, <code>$HOME/.config/git/config</code> will be used. Any single-valued
-        variable set in this file will be overwritten by whatever is in
-        <code>~/.gitconfig</code>.  It is a good idea not to create this file if
-        you sometimes use older versions of Git, as support for this
-        file was added fairly recently.
-</p>
-</dd>
 <dt class="hdlist1">
 ~/.gitconfig
 </dt>
 <dd>
 <p>
-        User-specific configuration file. Also called "global"
-        configuration file.
+        User-specific configuration files. When the XDG_CONFIG_HOME environment
+        variable is not set or empty, $HOME/.config/ is used as
+        $XDG_CONFIG_HOME.
 </p>
+<div class="paragraph"><p>These are also called "global" configuration files. If both files exist, both
+files are read in the order given above.</p></div>
 </dd>
 <dt class="hdlist1">
 $GIT_DIR/config
@@ -1297,26 +1290,98 @@ $GIT_DIR/config.worktree
 </p>
 </dd>
 </dl></div>
-<div class="paragraph"><p>If no further options are given, all reading options will read all of these
-files that are available. If the global or the system-wide configuration
-file are not available they will be ignored. If the repository configuration
-file is not available or readable, <em>git config</em> will exit with a non-zero
-error code. However, in neither case will an error message be issued.</p></div>
+<div class="paragraph"><p>You may also provide additional configuration parameters when running any
+git command by using the <code>-c</code> option. See <a href="git.html">git(1)</a> for details.</p></div>
+<div class="paragraph"><p>Options will be read from all of these files that are available. If the
+global or the system-wide configuration files are missing or unreadable they
+will be ignored. If the repository configuration file is missing or unreadable,
+<em>git config</em> will exit with a non-zero error code. An error message is produced
+if the file is unreadable, but not if it is missing.</p></div>
 <div class="paragraph"><p>The files are read in the order given above, with last value found taking
 precedence over values read earlier.  When multiple values are taken then all
 values of a key from all files will be used.</p></div>
-<div class="paragraph"><p>You may override individual configuration parameters when running any git
-command by using the <code>-c</code> option. See <a href="git.html">git(1)</a> for details.</p></div>
-<div class="paragraph"><p>All writing options will per default write to the repository specific
+<div class="paragraph"><p>By default, options are only written to the repository specific
 configuration file. Note that this also affects options like <code>--replace-all</code>
 and <code>--unset</code>. <strong><em>git config</em> will only ever change one file at a time</strong>.</p></div>
-<div class="paragraph"><p>You can override these rules using the <code>--global</code>, <code>--system</code>,
-<code>--local</code>, <code>--worktree</code>, and <code>--file</code> command-line options; see
-<a href="#OPTIONS">[OPTIONS]</a> above.</p></div>
+<div class="paragraph"><p>You can limit which configuration sources are read from or written to by
+specifying the path of a file with the <code>--file</code> option, or by specifying a
+configuration scope with <code>--system</code>, <code>--global</code>, <code>--local</code>, or <code>--worktree</code>.
+For more, see <a href="#OPTIONS">[OPTIONS]</a> above.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_environment">ENVIRONMENT</h2>
+<h2 id="SCOPES">SCOPES</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Each configuration source falls within a configuration scope. The scopes
+are:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+system
+</dt>
+<dd>
+<p>
+        $(prefix)/etc/gitconfig
+</p>
+</dd>
+<dt class="hdlist1">
+global
+</dt>
+<dd>
+<p>
+        $XDG_CONFIG_HOME/git/config
+</p>
+<div class="paragraph"><p>~/.gitconfig</p></div>
+</dd>
+<dt class="hdlist1">
+local
+</dt>
+<dd>
+<p>
+        $GIT_DIR/config
+</p>
+</dd>
+<dt class="hdlist1">
+worktree
+</dt>
+<dd>
+<p>
+        $GIT_DIR/config.worktree
+</p>
+</dd>
+<dt class="hdlist1">
+command
+</dt>
+<dd>
+<p>
+        GIT_CONFIG_{COUNT,KEY,VALUE} environment variables (see <a href="#ENVIRONMENT">[ENVIRONMENT]</a>
+        below)
+</p>
+<div class="paragraph"><p>the <code>-c</code> option</p></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>With the exception of <em>command</em>, each scope corresponds to a command line
+option: <code>--system</code>, <code>--global</code>, <code>--local</code>, <code>--worktree</code>.</p></div>
+<div class="paragraph"><p>When reading options, specifying a scope will only read options from the
+files within that scope. When writing options, specifying a scope will write
+to the files within that scope (instead of the repository specific
+configuration file). See <a href="#OPTIONS">[OPTIONS]</a> above for a complete description.</p></div>
+<div class="paragraph"><p>Most configuration options are respected regardless of the scope it is
+defined in, but some options are only respected in certain scopes. See the
+respective option&#8217;s documentation for the full details.</p></div>
+<div class="sect2">
+<h3 id="_protected_configuration">Protected configuration</h3>
+<div class="paragraph"><p>Protected configuration refers to the <em>system</em>, <em>global</em>, and <em>command</em> scopes.
+For security reasons, certain options are only respected when they are
+specified in protected configuration, and ignored otherwise.</p></div>
+<div class="paragraph"><p>Git treats these scopes as if they are controlled by the user or a trusted
+administrator. This is because an attacker who controls these scopes can do
+substantial harm without using Git, so it is assumed that the user&#8217;s environment
+protects these scopes against attackers.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="ENVIRONMENT">ENVIRONMENT</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
@@ -9817,6 +9882,37 @@ revert.reference
 </p>
 </dd>
 <dt class="hdlist1">
+safe.bareRepository
+</dt>
+<dd>
+<p>
+        Specifies which bare repositories Git will work with. The currently
+        supported values are:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>all</code>: Git works with all bare repositories. This is the default.
+</p>
+</li>
+<li>
+<p>
+<code>explicit</code>: Git only works with bare repositories specified via
+  the top-level <code>--git-dir</code> command-line option, or the <code>GIT_DIR</code>
+  environment variable (see <a href="git.html">git(1)</a>).
+</p>
+<div class="paragraph"><p>If you do not use bare repositories in your workflow, then it may be
+beneficial to set <code>safe.bareRepository</code> to <code>explicit</code> in your global
+config. This will protect you from attacks that involve cloning a
+repository that contains a bare repository and running a Git command
+within that directory.</p></div>
+<div class="paragraph"><p>This config setting is only respected in protected configuration (see
+<a href="#SCOPES">[SCOPES]</a>). This prevents the untrusted repository from tampering with
+this value.</p></div>
+</li>
+</ul></div>
+</dd>
+<dt class="hdlist1">
 safe.directory
 </dt>
 <dd>
@@ -9833,9 +9929,9 @@ safe.directory
 via <code>git config --add</code>. To reset the list of safe directories (e.g. to
 override any such directories specified in the system config), add a
 <code>safe.directory</code> entry with an empty value.</p></div>
-<div class="paragraph"><p>This config setting is only respected when specified in a system or global
-config, not when it is specified in a repository config, via the command
-line option <code>-c safe.directory=&lt;path&gt;</code>, or in environment variables.</p></div>
+<div class="paragraph"><p>This config setting is only respected in protected configuration (see
+<a href="#SCOPES">[SCOPES]</a>). This prevents the untrusted repository from tampering with this
+value.</p></div>
 <div class="paragraph"><p>The value of this setting is interpolated, i.e. <code>~/&lt;path&gt;</code> expands to a
 path relative to the home directory and <code>%(prefix)/&lt;path&gt;</code> expands to a
 path relative to Git&#8217;s (runtime) prefix.</p></div>
@@ -10960,9 +11056,9 @@ uploadpack.packObjectsHook
         <code>pack-objects</code> to the hook, and expects a completed packfile on
         stdout.
 </p>
-<div class="paragraph"><p>Note that this configuration variable is ignored if it is seen in the
-repository-level config (this is a safety measure against fetching from
-untrusted repositories).</p></div>
+<div class="paragraph"><p>Note that this configuration variable is only respected when it is specified
+in protected configuration (see <a href="#SCOPES">[SCOPES]</a>). This is a safety measure
+against fetching from untrusted repositories.</p></div>
 </dd>
 <dt class="hdlist1">
 uploadpack.allowFilter
@@ -11235,7 +11331,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-06-13 16:41:53 PDT
+ 2022-07-22 15:56:51 PDT
 </div>
 </div>
 </body>
