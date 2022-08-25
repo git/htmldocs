@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.2.0" />
-<title>How to integrate new subcommands</title>
+<title>git-diagnose(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,130 +732,125 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>How to integrate new subcommands</h1>
+<h1>
+git-diagnose(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>git-diagnose -
+   Generate a zip archive of diagnostic information
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This is how-to documentation for people who want to add extension
-commands to Git.  It should be read alongside api-builtin.txt.</p></div>
+<div class="verseblock">
+<pre class="content"><em>git diagnose</em> [(-o | --output-directory) &lt;path&gt;] [(-s | --suffix) &lt;format&gt;]
+               [--mode=&lt;mode&gt;]</pre>
+<div class="attribution">
+</div></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_runtime_environment">Runtime environment</h2>
+<h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Git subcommands are standalone executables that live in the Git exec
-path, normally /usr/lib/git-core.  The git executable itself is a
-thin wrapper that knows where the subcommands live, and runs them by
-passing command-line arguments to them.</p></div>
-<div class="paragraph"><p>(If "git foo" is not found in the Git exec path, the wrapper
-will look in the rest of your $PATH for it.  Thus, it&#8217;s possible
-to write local Git extensions that don&#8217;t live in system space.)</p></div>
+<div class="paragraph"><p>Collects detailed information about the user&#8217;s machine, Git client, and
+repository state and packages that information into a zip archive. The
+generated archive can then, for example, be shared with the Git mailing list to
+help debug an issue or serve as a reference for independent debugging.</p></div>
+<div class="paragraph"><p>By default, the following information is captured in the archive:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<em>git version --build-options</em>
+</p>
+</li>
+<li>
+<p>
+The path to the repository root
+</p>
+</li>
+<li>
+<p>
+The available disk space on the filesystem
+</p>
+</li>
+<li>
+<p>
+The name and size of each packfile, including those in alternate object
+    stores
+</p>
+</li>
+<li>
+<p>
+The total count of loose objects, as well as counts broken down by
+    <code>.git/objects</code> subdirectory
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Additional information can be collected by selecting a different diagnostic mode
+using the <code>--mode</code> option.</p></div>
+<div class="paragraph"><p>This tool differs from <a href="git-bugreport.html">git-bugreport(1)</a> in that it collects much more
+detailed information with a greater focus on reporting the size and data shape
+of repository contents.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_implementation_languages">Implementation languages</h2>
+<h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Most subcommands are written in C or shell.  A few are written in
-Perl.</p></div>
-<div class="paragraph"><p>While we strongly encourage coding in portable C for portability,
-these specific scripting languages are also acceptable.  We won&#8217;t
-accept more without a very strong technical case, as we don&#8217;t want
-to broaden the Git suite&#8217;s required dependencies.  Import utilities,
-surgical tools, remote helpers and other code at the edges of the
-Git suite are more lenient and we allow Python (and even Tcl/tk),
-but they should not be used for core functions.</p></div>
-<div class="paragraph"><p>This may change in the future.  Especially Python is not allowed in
-core because we need better Python integration in the Git Windows
-installer before we can be confident people in that environment
-won&#8217;t experience an unacceptably large loss of capability.</p></div>
-<div class="paragraph"><p>C commands are normally written as single modules, named after the
-command, that link a collection of functions called libgit.  Thus,
-your command <em>git-foo</em> would normally be implemented as a single
-"git-foo.c" (or "builtin/foo.c" if it is to be linked to the main
-binary); this organization makes it easy for people reading the code
-to find things.</p></div>
-<div class="paragraph"><p>See the CodingGuidelines document for other guidance on what we consider
-good practice in C and shell, and api-builtin.txt for the support
-functions available to built-in commands written in C.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+-o &lt;path&gt;
+</dt>
+<dt class="hdlist1">
+--output-directory &lt;path&gt;
+</dt>
+<dd>
+<p>
+        Place the resulting diagnostics archive in <code>&lt;path&gt;</code> instead of the
+        current directory.
+</p>
+</dd>
+<dt class="hdlist1">
+-s &lt;format&gt;
+</dt>
+<dt class="hdlist1">
+--suffix &lt;format&gt;
+</dt>
+<dd>
+<p>
+        Specify an alternate suffix for the diagnostics archive name, to create
+        a file named <em>git-diagnostics-&lt;formatted suffix&gt;</em>. This should take the
+        form of a strftime(3) format string; the current local time will be
+        used.
+</p>
+</dd>
+<dt class="hdlist1">
+--mode=(stats|all)
+</dt>
+<dd>
+<p>
+        Specify the type of diagnostics that should be collected. The default behavior
+        of <em>git diagnose</em> is equivalent to <code>--mode=stats</code>.
+</p>
+<div class="paragraph"><p>The <code>--mode=all</code> option collects everything included in <code>--mode=stats</code>, as well
+as copies of <code>.git</code>, <code>.git/hooks</code>, <code>.git/info</code>, <code>.git/logs</code>, and
+<code>.git/objects/info</code> directories. This additional information may be sensitive,
+as it can be used to reconstruct the full contents of the diagnosed repository.
+Users should exercise caution when sharing an archive generated with
+<code>--mode=all</code>.</p></div>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_what_every_extension_command_needs">What every extension command needs</h2>
+<h2 id="_git">GIT</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>You must have a man page, written in asciidoc (this is what Git help
-followed by your subcommand name will display).  Be aware that there is
-a local asciidoc configuration and macros which you should use.  It&#8217;s
-often helpful to start by cloning an existing page and replacing the
-text content.</p></div>
-<div class="paragraph"><p>You must have a test, written to report in TAP (Test Anything Protocol).
-Tests are executables (usually shell scripts) that live in the <em>t</em>
-subdirectory of the tree.  Each test name begins with <em>t</em> and a sequence
-number that controls where in the test sequence it will be executed;
-conventionally the rest of the name stem is that of the command
-being tested.</p></div>
-<div class="paragraph"><p>Read the file t/README to learn more about the conventions to be used
-in writing tests, and the test support library.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_integrating_a_command">Integrating a command</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Here are the things you need to do when you want to merge a new
-subcommand into the Git tree.</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Don&#8217;t forget to sign off your patch!
-</p>
-</li>
-<li>
-<p>
-Append your command name to one of the variables BUILTIN_OBJS,
-EXTRA_PROGRAMS, SCRIPT_SH, SCRIPT_PERL or SCRIPT_PYTHON.
-</p>
-</li>
-<li>
-<p>
-Drop its test in the t directory.
-</p>
-</li>
-<li>
-<p>
-If your command is implemented in an interpreted language with a
-p-code intermediate form, make sure .gitignore in the main directory
-includes a pattern entry that ignores such files.  Python .pyc and
-.pyo files will already be covered.
-</p>
-</li>
-<li>
-<p>
-If your command has any dependency on a particular version of
-your language, document it in the INSTALL file.
-</p>
-</li>
-<li>
-<p>
-There is a file command-list.txt in the distribution main directory
-that categorizes commands by type, so they can be listed in appropriate
-subsections in the documentation&#8217;s summary command list.  Add an entry
-for yours.  To understand the categories, look at command-list.txt
-in the main directory.  If the new command is part of the typical Git
-workflow and you believe it common enough to be mentioned in <em>git help</em>,
-map this command to a common group in the column [common].
-</p>
-</li>
-<li>
-<p>
-Give the maintainer one paragraph to include in the RelNotes file
-to describe the new feature; a good place to do so is in the cover
-letter [PATCH 0/n].
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>That&#8217;s all there is to it.</p></div>
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -863,7 +858,7 @@ letter [PATCH 0/n].
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-08-25 15:15:35 PDT
+ 2022-08-25 15:15:05 PDT
 </div>
 </div>
 </body>
