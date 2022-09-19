@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.2.0" />
-<title>How to rebase from an internal branch</title>
+<title>scalar(1)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,162 +732,255 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>How to rebase from an internal branch</h1>
+<h1>
+scalar(1) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>scalar -
+   A tool for managing large Git repositories
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre><code>Petr Baudis &lt;pasky@suse.cz&gt; writes:
-
-&gt; Dear diary, on Sun, Aug 14, 2005 at 09:57:13AM CEST, I got a letter
-&gt; where Junio C Hamano &lt;junkio@cox.net&gt; told me that...
-&gt;&gt; Linus Torvalds &lt;torvalds@osdl.org&gt; writes:
-&gt;&gt;
-&gt;&gt; &gt; Junio, maybe you want to talk about how you move patches from your
-&gt;&gt; &gt; "seen" branch to the real branches.
-&gt;&gt;
-&gt; Actually, wouldn't this be also precisely for what StGIT is intended to?</code></pre>
+<div class="verseblock">
+<pre class="content">scalar clone [--single-branch] [--branch &lt;main-branch&gt;] [--full-clone] &lt;url&gt; [&lt;enlistment&gt;]
+scalar list
+scalar register [&lt;enlistment&gt;]
+scalar unregister [&lt;enlistment&gt;]
+scalar run ( all | config | commit-graph | fetch | loose-objects | pack-files ) [&lt;enlistment&gt;]
+scalar reconfigure [ --all | &lt;enlistment&gt; ]
+scalar diagnose [&lt;enlistment&gt;]
+scalar delete &lt;enlistment&gt;</pre>
+<div class="attribution">
 </div></div>
-<div class="paragraph"><p>Exactly my feeling.  I was sort of waiting for Catalin to speak
-up.  With its basing philosophical ancestry on quilt, this is
-the kind of task StGIT is designed to do.</p></div>
-<div class="paragraph"><p>I just have done a simpler one, this time using only the core
-Git tools.</p></div>
-<div class="paragraph"><p>I had a handful of commits that were ahead of master in <em>seen</em>, and I
-wanted to add some documentation bypassing my usual habit of
-placing new things in <em>seen</em> first.  At the beginning, the commit
-ancestry graph looked like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                         *"seen" head
-master --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
-</div></div>
-<div class="paragraph"><p>So I started from master, made a bunch of edits, and committed:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout master
-$ cd Documentation; ed git.txt ...
-$ cd ..; git add Documentation/*.txt
-$ git commit -s</code></pre>
-</div></div>
-<div class="paragraph"><p>After the commit, the ancestry graph would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                          *"seen" head
-master^ --&gt; #1 --&gt; #2 --&gt; #3
-      \
-        \---&gt; master</code></pre>
-</div></div>
-<div class="paragraph"><p>The old master is now master^ (the first parent of the master).
-The new master commit holds my documentation updates.</p></div>
-<div class="paragraph"><p>Now I have to deal with "seen" branch.</p></div>
-<div class="paragraph"><p>This is the kind of situation I used to have all the time when
-Linus was the maintainer and I was a contributor, when you look
-at "master" branch being the "maintainer" branch, and "seen"
-branch being the "contributor" branch.  Your work started at the
-tip of the "maintainer" branch some time ago, you made a lot of
-progress in the meantime, and now the maintainer branch has some
-other commits you do not have yet.  And "git rebase" was written
-with the explicit purpose of helping to maintain branches like
-"seen".  You <em>could</em> merge master to <em>seen</em> and keep going, but if you
-eventually want to cherrypick and merge some but not necessarily
-all changes back to the master branch, it often makes later
-operations for <em>you</em> easier if you rebase (i.e. carry forward
-your changes) "seen" rather than merge.  So I ran "git rebase":</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout seen
-$ git rebase master seen</code></pre>
-</div></div>
-<div class="paragraph"><p>What this does is to pick all the commits since the current
-branch (note that I now am on "seen" branch) forked from the
-master branch, and forward port these changes.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>master^ --&gt; #1 --&gt; #2 --&gt; #3
-      \                                  *"seen" head
-        \---&gt; master --&gt; #1' --&gt; #2' --&gt; #3'</code></pre>
-</div></div>
-<div class="paragraph"><p>The diff between master^ and #1 is applied to master and
-committed to create #1' commit with the commit information (log,
-author and date) taken from commit #1.  On top of that #2' and #3'
-commits are made similarly out of #2 and #3 commits.</p></div>
-<div class="paragraph"><p>Old #3 is not recorded in any of the .git/refs/heads/ file
-anymore, so after doing this you will have dangling commit if
-you ran fsck-cache, which is normal.  After testing "seen", you
-can run "git prune" to get rid of those original three commits.</p></div>
-<div class="paragraph"><p>While I am talking about "git rebase", I should talk about how
-to do cherrypicking using only the core Git tools.</p></div>
-<div class="paragraph"><p>Let&#8217;s go back to the earlier picture, with different labels.</p></div>
-<div class="paragraph"><p>You, as an individual developer, cloned upstream repository and
-made a couple of commits on top of it.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                           *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
-</div></div>
-<div class="paragraph"><p>You would want changes #2 and #3 incorporated in the upstream,
-while you feel that #1 may need further improvements.  So you
-prepare #2 and #3 for e-mail submission.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git format-patch master^^ master</code></pre>
-</div></div>
-<div class="paragraph"><p>This creates two files, 0001-XXXX.patch and 0002-XXXX.patch.  Send
-them out "To: " your project maintainer and "Cc: " your mailing
-list.  You could use contributed script git-send-email if
-your host has necessary perl modules for this, but your usual
-MUA would do as long as it does not corrupt whitespaces in the
-patch.</p></div>
-<div class="paragraph"><p>Then you would wait, and you find out that the upstream picked
-up your changes, along with other changes.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code> where                      *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3
-  used   \
- to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C
-                                              *upstream head</code></pre>
-</div></div>
-<div class="paragraph"><p>The two commits #2' and #3' in the above picture record the same
-changes your e-mail submission for #2 and #3 contained, but
-probably with the new sign-off line added by the upstream
-maintainer and definitely with different committer and ancestry
-information, they are different objects from #2 and #3 commits.</p></div>
-<div class="paragraph"><p>You fetch from upstream, but not merge.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git fetch upstream</code></pre>
-</div></div>
-<div class="paragraph"><p>This leaves the updated upstream head in .git/FETCH_HEAD but
-does not touch your .git/HEAD or .git/refs/heads/master.
-You run "git rebase" now.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git rebase FETCH_HEAD master</code></pre>
-</div></div>
-<div class="paragraph"><p>Earlier, I said that rebase applies all the commits from your
-branch on top of the upstream head.  Well, I lied.  "git rebase"
-is a bit smarter than that and notices that #2 and #3 need not
-be applied, so it only applies #1.  The commit ancestry graph
-becomes something like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code> where                     *your old "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3
-  used   \                      your new "master" head*
- to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C --&gt; #1'
-                                              *upstream
-                                              head</code></pre>
-</div></div>
-<div class="paragraph"><p>Again, "git prune" would discard the disused commits #1-#3 and
-you continue on starting from the new "master" head, which is
-the #1' commit.</p></div>
-<div class="paragraph"><p>-jc</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_description">DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Scalar is a repository management tool that optimizes Git for use in large
+repositories. Scalar improves performance by configuring advanced Git settings,
+maintaining repositories in the background, and helping to reduce data sent
+across the network.</p></div>
+<div class="paragraph"><p>An important Scalar concept is the enlistment: this is the top-level directory
+of the project. It usually contains the subdirectory <code>src/</code> which is a Git
+worktree. This encourages the separation between tracked files (inside <code>src/</code>)
+and untracked files, such as build artifacts (outside <code>src/</code>). When registering
+an existing Git worktree with Scalar whose name is not <code>src</code>, the enlistment
+will be identical to the worktree.</p></div>
+<div class="paragraph"><p>The <code>scalar</code> command implements various subcommands, and different options
+depending on the subcommand. With the exception of <code>clone</code>, <code>list</code> and
+<code>reconfigure --all</code>, all subcommands expect to be run in an enlistment.</p></div>
+<div class="paragraph"><p>The following options can be specified <em>before</em> the subcommand:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+-C &lt;directory&gt;
+</dt>
+<dd>
+<p>
+        Before running the subcommand, change the working directory. This
+        option imitates the same option of <a href="git.html">git(1)</a>.
+</p>
+</dd>
+<dt class="hdlist1">
+-c &lt;key&gt;=&lt;value&gt;
+</dt>
+<dd>
+<p>
+        For the duration of running the specified subcommand, configure this
+        setting. This option imitates the same option of <a href="git.html">git(1)</a>.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_commands">COMMANDS</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_clone">Clone</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+clone [&lt;options&gt;] &lt;url&gt; [&lt;enlistment&gt;]
+</dt>
+<dd>
+<p>
+        Clones the specified repository, similar to <a href="git-clone.html">git-clone(1)</a>. By
+        default, only commit and tree objects are cloned. Once finished, the
+        worktree is located at <code>&lt;enlistment&gt;/src</code>.
+</p>
+<div class="paragraph"><p>The sparse-checkout feature is enabled (except when run with <code>--full-clone</code>)
+and the only files present are those in the top-level directory. Use
+<code>git sparse-checkout set</code> to expand the set of directories you want to see,
+or <code>git sparse-checkout disable</code> to expand to all files (see
+<a href="git-sparse-checkout.html">git-sparse-checkout(1)</a> for more details). You can explore the
+subdirectories outside your sparse-checkout by using <code>git ls-tree
+HEAD[:&lt;directory&gt;]</code>.</p></div>
+</dd>
+<dt class="hdlist1">
+-b &lt;name&gt;
+</dt>
+<dt class="hdlist1">
+--branch &lt;name&gt;
+</dt>
+<dd>
+<p>
+        Instead of checking out the branch pointed to by the cloned
+        repository&#8217;s HEAD, check out the <code>&lt;name&gt;</code> branch instead.
+</p>
+</dd>
+<dt class="hdlist1">
+--[no-]single-branch
+</dt>
+<dd>
+<p>
+        Clone only the history leading to the tip of a single branch, either
+        specified by the <code>--branch</code> option or the primary branch remote&#8217;s
+        <code>HEAD</code> points at.
+</p>
+<div class="paragraph"><p>Further fetches into the resulting repository will only update the
+remote-tracking branch for the branch this option was used for the initial
+cloning. If the HEAD at the remote did not point at any branch when
+<code>--single-branch</code> clone was made, no remote-tracking branch is created.</p></div>
+</dd>
+<dt class="hdlist1">
+--[no-]full-clone
+</dt>
+<dd>
+<p>
+        A sparse-checkout is initialized by default. This behavior can be
+        turned off via <code>--full-clone</code>.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_list">List</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+list
+</dt>
+<dd>
+<p>
+        List enlistments that are currently registered by Scalar. This
+        subcommand does not need to be run inside an enlistment.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_register">Register</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+register [&lt;enlistment&gt;]
+</dt>
+<dd>
+<p>
+        Adds the enlistment&#8217;s repository to the list of registered repositories
+        and starts background maintenance. If <code>&lt;enlistment&gt;</code> is not provided,
+        then the enlistment associated with the current working directory is
+        registered.
+</p>
+<div class="paragraph"><p>Note: when this subcommand is called in a worktree that is called <code>src/</code>, its
+parent directory is considered to be the Scalar enlistment. If the worktree is
+<em>not</em> called <code>src/</code>, it itself will be considered to be the Scalar enlistment.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_unregister">Unregister</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+unregister [&lt;enlistment&gt;]
+</dt>
+<dd>
+<p>
+        Remove the specified repository from the list of repositories
+        registered with Scalar and stop the scheduled background maintenance.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_run">Run</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+scalar run ( all | config | commit-graph | fetch | loose-objects | pack-files ) [&lt;enlistment&gt;]
+</dt>
+<dd>
+<p>
+        Run the given maintenance task (or all tasks, if <code>all</code> was specified).
+        Except for <code>all</code> and <code>config</code>, this subcommand simply hands off to
+        <a href="git-maintenance.html">git-maintenance(1)</a> (mapping <code>fetch</code> to <code>prefetch</code> and
+        <code>pack-files</code> to <code>incremental-repack</code>).
+</p>
+<div class="paragraph"><p>These tasks are run automatically as part of the scheduled maintenance,
+as soon as the repository is registered with Scalar. It should therefore
+not be necessary to run this subcommand manually.</p></div>
+<div class="paragraph"><p>The <code>config</code> task is specific to Scalar and configures all those
+opinionated default settings that make Git work more efficiently with
+large repositories. As this task is run as part of <code>scalar clone</code>
+automatically, explicit invocations of this task are rarely needed.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_reconfigure">Reconfigure</h3>
+<div class="paragraph"><p>After a Scalar upgrade, or when the configuration of a Scalar enlistment
+was somehow corrupted or changed by mistake, this subcommand allows to
+reconfigure the enlistment.</p></div>
+<div class="paragraph"><p>With the <code>--all</code> option, all enlistments currently registered with Scalar
+will be reconfigured. Use this option after each Scalar upgrade.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_diagnose">Diagnose</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+diagnose [&lt;enlistment&gt;]
+</dt>
+<dd>
+<p>
+    When reporting issues with Scalar, it is often helpful to provide the
+    information gathered by this command, including logs and certain
+    statistics describing the data shape of the current enlistment.
+</p>
+<div class="paragraph"><p>The output of this command is a <code>.zip</code> file that is written into
+a directory adjacent to the worktree in the <code>src</code> directory.</p></div>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_delete">Delete</h3>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+delete &lt;enlistment&gt;
+</dt>
+<dd>
+<p>
+        This subcommand lets you delete an existing Scalar enlistment from your
+        local file system, unregistering the repository.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_see_also">SEE ALSO</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><a href="git-clone.html">git-clone(1)</a>, <a href="git-maintenance.html">git-maintenance(1)</a>.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -895,7 +988,7 @@ the #1' commit.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-09-19 15:04:18 PDT
+ 2022-09-19 15:03:44 PDT
 </div>
 </div>
 </body>

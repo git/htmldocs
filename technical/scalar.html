@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.2.0" />
-<title>How to rebase from an internal branch</title>
+<title>Scalar</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -734,160 +734,98 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>How to rebase from an internal branch</h1>
+<h1>Scalar</h1>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
-<div class="listingblock">
-<div class="content">
-<pre><code>Petr Baudis &lt;pasky@suse.cz&gt; writes:
-
-&gt; Dear diary, on Sun, Aug 14, 2005 at 09:57:13AM CEST, I got a letter
-&gt; where Junio C Hamano &lt;junkio@cox.net&gt; told me that...
-&gt;&gt; Linus Torvalds &lt;torvalds@osdl.org&gt; writes:
-&gt;&gt;
-&gt;&gt; &gt; Junio, maybe you want to talk about how you move patches from your
-&gt;&gt; &gt; "seen" branch to the real branches.
-&gt;&gt;
-&gt; Actually, wouldn't this be also precisely for what StGIT is intended to?</code></pre>
-</div></div>
-<div class="paragraph"><p>Exactly my feeling.  I was sort of waiting for Catalin to speak
-up.  With its basing philosophical ancestry on quilt, this is
-the kind of task StGIT is designed to do.</p></div>
-<div class="paragraph"><p>I just have done a simpler one, this time using only the core
-Git tools.</p></div>
-<div class="paragraph"><p>I had a handful of commits that were ahead of master in <em>seen</em>, and I
-wanted to add some documentation bypassing my usual habit of
-placing new things in <em>seen</em> first.  At the beginning, the commit
-ancestry graph looked like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                         *"seen" head
-master --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
-</div></div>
-<div class="paragraph"><p>So I started from master, made a bunch of edits, and committed:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout master
-$ cd Documentation; ed git.txt ...
-$ cd ..; git add Documentation/*.txt
-$ git commit -s</code></pre>
-</div></div>
-<div class="paragraph"><p>After the commit, the ancestry graph would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                          *"seen" head
-master^ --&gt; #1 --&gt; #2 --&gt; #3
-      \
-        \---&gt; master</code></pre>
-</div></div>
-<div class="paragraph"><p>The old master is now master^ (the first parent of the master).
-The new master commit holds my documentation updates.</p></div>
-<div class="paragraph"><p>Now I have to deal with "seen" branch.</p></div>
-<div class="paragraph"><p>This is the kind of situation I used to have all the time when
-Linus was the maintainer and I was a contributor, when you look
-at "master" branch being the "maintainer" branch, and "seen"
-branch being the "contributor" branch.  Your work started at the
-tip of the "maintainer" branch some time ago, you made a lot of
-progress in the meantime, and now the maintainer branch has some
-other commits you do not have yet.  And "git rebase" was written
-with the explicit purpose of helping to maintain branches like
-"seen".  You <em>could</em> merge master to <em>seen</em> and keep going, but if you
-eventually want to cherrypick and merge some but not necessarily
-all changes back to the master branch, it often makes later
-operations for <em>you</em> easier if you rebase (i.e. carry forward
-your changes) "seen" rather than merge.  So I ran "git rebase":</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout seen
-$ git rebase master seen</code></pre>
-</div></div>
-<div class="paragraph"><p>What this does is to pick all the commits since the current
-branch (note that I now am on "seen" branch) forked from the
-master branch, and forward port these changes.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>master^ --&gt; #1 --&gt; #2 --&gt; #3
-      \                                  *"seen" head
-        \---&gt; master --&gt; #1' --&gt; #2' --&gt; #3'</code></pre>
-</div></div>
-<div class="paragraph"><p>The diff between master^ and #1 is applied to master and
-committed to create #1' commit with the commit information (log,
-author and date) taken from commit #1.  On top of that #2' and #3'
-commits are made similarly out of #2 and #3 commits.</p></div>
-<div class="paragraph"><p>Old #3 is not recorded in any of the .git/refs/heads/ file
-anymore, so after doing this you will have dangling commit if
-you ran fsck-cache, which is normal.  After testing "seen", you
-can run "git prune" to get rid of those original three commits.</p></div>
-<div class="paragraph"><p>While I am talking about "git rebase", I should talk about how
-to do cherrypicking using only the core Git tools.</p></div>
-<div class="paragraph"><p>Let&#8217;s go back to the earlier picture, with different labels.</p></div>
-<div class="paragraph"><p>You, as an individual developer, cloned upstream repository and
-made a couple of commits on top of it.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>                           *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3</code></pre>
-</div></div>
-<div class="paragraph"><p>You would want changes #2 and #3 incorporated in the upstream,
-while you feel that #1 may need further improvements.  So you
-prepare #2 and #3 for e-mail submission.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git format-patch master^^ master</code></pre>
-</div></div>
-<div class="paragraph"><p>This creates two files, 0001-XXXX.patch and 0002-XXXX.patch.  Send
-them out "To: " your project maintainer and "Cc: " your mailing
-list.  You could use contributed script git-send-email if
-your host has necessary perl modules for this, but your usual
-MUA would do as long as it does not corrupt whitespaces in the
-patch.</p></div>
-<div class="paragraph"><p>Then you would wait, and you find out that the upstream picked
-up your changes, along with other changes.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code> where                      *your "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3
-  used   \
- to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C
-                                              *upstream head</code></pre>
-</div></div>
-<div class="paragraph"><p>The two commits #2' and #3' in the above picture record the same
-changes your e-mail submission for #2 and #3 contained, but
-probably with the new sign-off line added by the upstream
-maintainer and definitely with different committer and ancestry
-information, they are different objects from #2 and #3 commits.</p></div>
-<div class="paragraph"><p>You fetch from upstream, but not merge.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git fetch upstream</code></pre>
-</div></div>
-<div class="paragraph"><p>This leaves the updated upstream head in .git/FETCH_HEAD but
-does not touch your .git/HEAD or .git/refs/heads/master.
-You run "git rebase" now.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git rebase FETCH_HEAD master</code></pre>
-</div></div>
-<div class="paragraph"><p>Earlier, I said that rebase applies all the commits from your
-branch on top of the upstream head.  Well, I lied.  "git rebase"
-is a bit smarter than that and notices that #2 and #3 need not
-be applied, so it only applies #1.  The commit ancestry graph
-becomes something like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code> where                     *your old "master" head
-upstream --&gt; #1 --&gt; #2 --&gt; #3
-  used   \                      your new "master" head*
- to be     \--&gt; #A --&gt; #2' --&gt; #3' --&gt; #B --&gt; #C --&gt; #1'
-                                              *upstream
-                                              head</code></pre>
-</div></div>
-<div class="paragraph"><p>Again, "git prune" would discard the disused commits #1-#3 and
-you continue on starting from the new "master" head, which is
-the #1' commit.</p></div>
-<div class="paragraph"><p>-jc</p></div>
+<div class="paragraph"><p>Scalar is a repository management tool that optimizes Git for use in large
+repositories. It accomplishes this by helping users to take advantage of
+advanced performance features in Git. Unlike most other Git built-in commands,
+Scalar is not executed as a subcommand of <em>git</em>; rather, it is built as a
+separate executable containing its own series of subcommands.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_background">Background</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Scalar was originally designed as an add-on to Git and implemented as a .NET
+Core application. It was created based on the learnings from the VFS for Git
+project (another application aimed at improving the experience of working with
+large repositories). As part of its initial implementation, Scalar relied on
+custom features in the Microsoft fork of Git that have since been integrated
+into core Git:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+partial clone,
+</p>
+</li>
+<li>
+<p>
+commit graphs,
+</p>
+</li>
+<li>
+<p>
+multi-pack index,
+</p>
+</li>
+<li>
+<p>
+sparse checkout (cone mode),
+</p>
+</li>
+<li>
+<p>
+scheduled background maintenance,
+</p>
+</li>
+<li>
+<p>
+etc
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>With the requisite Git functionality in place and a desire to bring the benefits
+of Scalar to the larger Git community, the Scalar application itself was ported
+from C# to C and integrated upstream.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_features">Features</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Scalar is comprised of two major pieces of functionality: automatically
+configuring built-in Git performance features and managing repository
+enlistments.</p></div>
+<div class="paragraph"><p>The Git performance features configured by Scalar (see "Background" for
+examples) confer substantial performance benefits to large repositories, but are
+either too experimental to enable for all of Git yet, or only benefit large
+repositories. As new features are introduced, Scalar should be updated
+accordingly to incorporate them. This will prevent the tool from becoming stale
+while also providing a path for more easily bringing features to the appropriate
+users.</p></div>
+<div class="paragraph"><p>Enlistments are how Scalar knows which repositories on a user&#8217;s system should
+utilize Scalar-configured features. This allows it to update performance
+settings when new ones are added to the tool, as well as centrally manage
+repository maintenance. The enlistment structure - a root directory with a
+<code>src/</code> subdirectory containing the cloned repository itself - is designed to
+encourage users to route build outputs outside of the repository to avoid the
+performance-limiting overhead of ignoring those files in Git.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_design">Design</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Scalar is implemented in C and interacts with Git via a mix of child process
+invocations of Git and direct usage of <code>libgit.a</code>. Internally, it is structured
+much like other built-ins with subcommands (e.g., <code>git stash</code>), containing a
+<code>cmd_&lt;subcommand&gt;()</code> function for each subcommand, routed through a <code>cmd_main()</code>
+function. Most options are unique to each subcommand, with <code>scalar</code> respecting
+some "global" <code>git</code> options (e.g., <code>-c</code> and <code>-C</code>).</p></div>
+<div class="paragraph"><p>Because <code>scalar</code> is not invoked as a Git subcommand (like <code>git scalar</code>), it is
+built and installed as its own executable in the <code>bin/</code> directory, alongside
+<code>git</code>, <code>git-gui</code>, etc.</p></div>
 </div>
 </div>
 </div>
@@ -895,7 +833,7 @@ the #1' commit.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-09-19 15:04:18 PDT
+ 2022-09-19 15:03:44 PDT
 </div>
 </div>
 </body>
