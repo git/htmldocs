@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.2.0" />
-<title>How to setup Git server over http</title>
+<title>Reviewing Patches in the Git Project</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -734,336 +734,239 @@ asciidoc.install();
 </head>
 <body class="article">
 <div id="header">
-<h1>How to setup Git server over http</h1>
+<h1>Reviewing Patches in the Git Project</h1>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">This document is from 2006.  A lot has happened since then, and this
-document is now relevant mainly if your web host is not CGI capable.
-Almost everyone else should instead look at <a href="../git-http-backend.html">git-http-backend(1)</a>.</td>
-</tr></table>
+<div class="paragraph"><p>The Git development community is a widely distributed, diverse, ever-changing
+group of individuals. Asynchronous communication via the Git mailing list poses
+unique challenges when reviewing or discussing patches. This document contains
+some guiding principles and helpful tools you can use to make your reviews both
+more efficient for yourself and more effective for other contributors.</p></div>
+<div class="paragraph"><p>Note that none of the recommendations here are binding or in any way a
+requirement of participation in the Git community. They are provided as a
+resource to supplement your skills as a contributor.</p></div>
 </div>
-<div class="paragraph"><p>Since Apache is one of those packages people like to compile
-themselves while others prefer the bureaucrat&#8217;s dream Debian, it is
-impossible to give guidelines which will work for everyone. Just send
-some feedback to the mailing list at <a href="mailto:git@vger.kernel.org">git@vger.kernel.org</a> to get this
-document tailored to your favorite distro.</p></div>
-<div class="paragraph"><p>What&#8217;s needed:</p></div>
+</div>
+<div class="sect1">
+<h2 id="_principles">Principles</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_selecting_patch_es_to_review">Selecting patch(es) to review</h3>
+<div class="paragraph"><p>If you are looking for a patch series in need of review, start by checking
+latest "What&#8217;s cooking in git.git" email
+(<a href="https://lore.kernel.org/git/xmqqilm1yp3m.fsf@gitster.g/">example</a>). The "What&#8217;s
+cooking" emails &amp; replies can be found using the query <code>s:"What's cooking"</code> on
+the <a href="https://lore.kernel.org/git/"><code>lore.kernel.org</code> mailing list archive</a>;
+alternatively, you can find the contents of the "What&#8217;s cooking" email tracked
+in <code>whats-cooking.txt</code> on the <code>todo</code> branch of Git. Topics tagged with "Needs
+review" and those in the "[New Topics]" section are typically those that would
+benefit the most from additional review.</p></div>
+<div class="paragraph"><p>Patches can also be searched manually in the mailing list archive using a query
+like <code>s:"PATCH" -s:"Re:"</code>. You can browse these results for topics relevant to
+your expertise or interest.</p></div>
+<div class="paragraph"><p>If you&#8217;ve already contributed to Git, you may also be CC&#8217;d in another
+contributor&#8217;s patch series. These are topics where the author feels that your
+attention is warranted. This may be because their patch changes something you
+wrote previously (making you a good judge of whether the new approach does or
+doesn&#8217;t work), or because you have the expertise to provide an exceptionally
+helpful review. There is no requirement to review these patches but, in the
+spirit of open source collaboration, you should strongly consider doing so.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_reviewing_patches">Reviewing patches</h3>
+<div class="paragraph"><p>While every contributor takes their own approach to reviewing patches, here are
+some general pieces of advice to make your reviews as clear and helpful as
+possible. The advice is broken into two rough categories: high-level reviewing
+guidance, and concrete tips for interacting with patches on the mailing list.</p></div>
+<div class="sect3">
+<h4 id="_high_level_guidance">High-level guidance</h4>
 <div class="ulist"><ul>
 <li>
 <p>
-Have an Apache web-server
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian:
-  $ apt-get install apache2
-  To get apache2 by default started,
-  edit /etc/default/apache2 and set NO_START=0</code></pre>
-</div></div>
-</li>
-<li>
-<p>
-can edit the configuration of it.
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><code>This could be found under /etc/httpd, or refer to your Apache documentation.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian: this means being able to edit files under /etc/apache2</code></pre>
-</div></div>
-</li>
-<li>
-<p>
-can restart it.
-</p>
-<div class="literalblock">
-<div class="content">
-<pre><code>'apachectl --graceful' might do. If it doesn't, just stop and
-restart apache. Be warning that active connections to your server
-might be aborted by this.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian:
-  $ /etc/init.d/apache2 restart
-or
-  $ /etc/init.d/apache2 force-reload
-  (which seems to do the same)
-This adds symlinks from the /etc/apache2/mods-enabled to
-/etc/apache2/mods-available.</code></pre>
-</div></div>
-</li>
-<li>
-<p>
-have permissions to chown a directory
+Remember to review the content of commit messages for correctness and clarity,
+  in addition to the code change in the patch&#8217;s diff. The commit message of a
+  patch should accurately and fully explain the code change being made in the
+  diff.
 </p>
 </li>
 <li>
 <p>
-have Git installed on the client, and
+Reviewing test coverage is an important - but easy to overlook - component of
+  reviews. A patch&#8217;s changes may be covered by existing tests, or new tests may
+  be introduced to exercise new behavior. Checking out a patch or series locally
+  allows you to manually mutate lines of new &amp; existing tests to verify expected
+  pass/fail behavior. You can use this information to verify proper coverage or
+  to suggest additional tests the author could add.
 </p>
 </li>
 <li>
 <p>
-either have Git installed on the server or have a webdav client on
-  the client.
+When providing a recommendation, be as clear as possible about whether you
+  consider it "blocking" (the code would be broken or otherwise made worse if an
+  issue isn&#8217;t fixed) or "non-blocking" (the patch could be made better by taking
+  the recommendation, but acceptance of the series does not require it).
+  Non-blocking recommendations can be particularly ambiguous when they are
+  related to - but outside the scope of - a series ("nice-to-have"s), or when
+  they represent only stylistic differences between the author and reviewer.
+</p>
+</li>
+<li>
+<p>
+When commenting on an issue, try to include suggestions for how the author
+  could fix it. This not only helps the author to understand and fix the issue,
+  it also deepens and improves your understanding of the topic.
+</p>
+</li>
+<li>
+<p>
+Reviews do not need to exclusively point out problems. Feel free to "think out
+  loud" in your review: describe how you read &amp; understood a complex section of
+  a patch, ask a question about something that confused you, point out something
+  you found exceptionally well-written, etc. In particular, uplifting feedback
+  goes a long way towards encouraging contributors to participate more actively
+  in the Git community.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>In effect, this means you&#8217;re going to be root, or that you&#8217;re using a
-preconfigured WebDAV server.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_performing_your_review">Performing your review</h4>
+<div class="ulist"><ul>
+<li>
+<p>
+Provide your review comments per-patch in a plaintext "Reply-All" email to the
+  relevant patch. Comments should be made inline, immediately below the relevant
+  section(s).
+</p>
+</li>
+<li>
+<p>
+You may find that the limited context provided in the patch diff is sometimes
+  insufficient for a thorough review. In such cases, you can review patches in
+  your local tree by either applying patches with <a href="git-am.html">git-am(1)</a> or checking
+  out the associated branch from <a href="https://github.com/gitster/git">https://github.com/gitster/git</a> once the series
+  is tracked there.
+</p>
+</li>
+<li>
+<p>
+Large, complicated patch diffs are sometimes unavoidable, such as when they
+  refactor existing code. If you find such a patch difficult to parse, try
+  reviewing the diff produced with the <code>--color-moved</code> and/or
+  <code>--ignore-space-change</code> options.
+</p>
+</li>
+<li>
+<p>
+If a patch is long, you are encouraged to delete parts of it that are
+  unrelated to your review from the email reply. Make sure to leave enough
+  context for readers to understand your comments!
+</p>
+</li>
+<li>
+<p>
+If you cannot complete a full review of a series all at once, consider letting
+  the author know (on- or off-list) if/when you plan to review the rest of the
+  series.
+</p>
+</li>
+</ul></div>
 </div>
 </div>
-<div class="sect1">
-<h2 id="_step_1_setup_a_bare_git_repository">Step 1: setup a bare Git repository</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>At the time of writing, git-http-push cannot remotely create a Git
-repository. So we have to do that at the server side with Git. Another
-option is to generate an empty bare repository at the client and copy
-it to the server with a WebDAV client (which is the only option if Git
-is not installed on the server).</p></div>
-<div class="paragraph"><p>Create the directory under the DocumentRoot of the directories served
-by Apache. As an example we take /usr/local/apache2, but try "grep
-DocumentRoot /where/ever/httpd.conf" to find your root:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ cd /usr/local/apache/htdocs
-$ mkdir my-new-repo.git</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian:</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ cd /var/www
-$ mkdir my-new-repo.git</code></pre>
-</div></div>
-<div class="paragraph"><p>Initialize a bare repository</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ cd my-new-repo.git
-$ git --bare init</code></pre>
-</div></div>
-<div class="paragraph"><p>Change the ownership to your web-server&#8217;s credentials. Use <code>"grep ^User
-httpd.conf"</code> and <code>"grep ^Group httpd.conf"</code> to find out:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ chown -R www.www .</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian:</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ chown -R www-data.www-data .</code></pre>
-</div></div>
-<div class="paragraph"><p>If you do not know which user Apache runs as, you can alternatively do
-a "chmod -R a+w .", inspect the files which are created later on, and
-set the permissions appropriately.</p></div>
-<div class="paragraph"><p>Restart apache2, and check whether <a href="http://server/my-new-repo.git">http://server/my-new-repo.git</a> gives
-a directory listing. If not, check whether apache started up
-successfully.</p></div>
+<div class="sect2">
+<h3 id="_completing_a_review">Completing a review</h3>
+<div class="paragraph"><p>Once each patch of a series is reviewed, the author (and/or other contributors)
+may discuss the review(s). This may result in no changes being applied, or the
+author will send a new version of their patch(es).</p></div>
+<div class="paragraph"><p>After a series is rerolled in response to your or others' review, make sure to
+re-review the updates. If you are happy with the state of the patch series,
+explicitly indicate your approval (typically with a reply to the latest
+version&#8217;s cover letter). Optionally, you can let the author know that they can
+add a "Reviewed-by: &lt;you&gt;" trailer if they resubmit the reviewed patch verbatim
+in a later iteration of the series.</p></div>
+<div class="paragraph"><p>Finally, subsequent "What&#8217;s cooking" emails may explicitly ask whether a
+reviewed topic is ready for merging to the &#8216;next` branch (typically phrased
+"Will merge to 'next&#8217;?"). You can help the maintainer and author by responding
+with a short description of the state of your (and others', if applicable)
+review, including the links to the relevant thread(s).</p></div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_step_2_enable_dav_on_this_repository">Step 2: enable DAV on this repository</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>First make sure the dav_module is loaded. For this, insert in httpd.conf:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>LoadModule dav_module libexec/httpd/libdav.so
-AddModule mod_dav.c</code></pre>
-</div></div>
-<div class="paragraph"><p>Also make sure that this line exists which is the file used for
-locking DAV operations:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>DAVLockDB "/usr/local/apache2/temp/DAV.lock"</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian these steps can be performed with:</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Enable the dav and dav_fs modules of apache:
-$ a2enmod dav_fs
-(just to be sure. dav_fs might be unneeded, I don't know)
-$ a2enmod dav
-The DAV lock is located in /etc/apache2/mods-available/dav_fs.conf:
-  DAVLockDB /var/lock/apache2/DAVLock</code></pre>
-</div></div>
-<div class="paragraph"><p>Of course, it can point somewhere else, but the string is actually just a
-prefix in some Apache configurations, and therefore the <em>directory</em> has to
-be writable by the user Apache runs as.</p></div>
-<div class="paragraph"><p>Then, add something like this to your httpd.conf</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>&lt;Location /my-new-repo.git&gt;
-   DAV on
-   AuthType Basic
-   AuthName "Git"
-   AuthUserFile /usr/local/apache2/conf/passwd.git
-   Require valid-user
-&lt;/Location&gt;</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian:
-  Create (or add to) /etc/apache2/conf.d/git.conf :</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>&lt;Location /my-new-repo.git&gt;
-   DAV on
-   AuthType Basic
-   AuthName "Git"
-   AuthUserFile /etc/apache2/passwd.git
-   Require valid-user
-&lt;/Location&gt;</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Debian automatically reads all files under /etc/apache2/conf.d.</code></pre>
-</div></div>
-<div class="paragraph"><p>The password file can be somewhere else, but it has to be readable by
-Apache and preferably not readable by the world.</p></div>
-<div class="paragraph"><p>Create this file by
-    $ htpasswd -c /usr/local/apache2/conf/passwd.git &lt;user&gt;</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian:
-  $ htpasswd -c /etc/apache2/passwd.git &lt;user&gt;</code></pre>
-</div></div>
-<div class="paragraph"><p>You will be asked a password, and the file is created. Subsequent calls
-to htpasswd should omit the <em>-c</em> option, since you want to append to the
-existing file.</p></div>
-<div class="paragraph"><p>You need to restart Apache.</p></div>
-<div class="paragraph"><p>Now go to <a href="http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git">http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git</a> in your
-browser to check whether it asks for a password and accepts the right
-password.</p></div>
-<div class="paragraph"><p>On Debian:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>To test the WebDAV part, do:</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ apt-get install litmus
-$ litmus http://&lt;servername&gt;/my-new-repo.git &lt;username&gt; &lt;password&gt;</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Most tests should pass.</code></pre>
-</div></div>
-<div class="paragraph"><p>A command-line tool to test WebDAV is cadaver. If you prefer GUIs, for
-example, konqueror can open WebDAV URLs as "webdav://&#8230;" or
-"webdavs://&#8230;".</p></div>
-<div class="paragraph"><p>If you&#8217;re into Windows, from XP onwards Internet Explorer supports
-WebDAV. For this, do Internet Explorer &#8594; Open Location &#8594;
-<a href="http://&lt;servername&gt;/my-new-repo.git">http://&lt;servername&gt;/my-new-repo.git</a> [x] Open as webfolder &#8594; login .</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_step_3_setup_the_client">Step 3: setup the client</h2>
+<h2 id="_terminology">Terminology</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Make sure that you have HTTP support, i.e. your Git was built with
-libcurl (version more recent than 7.10). The command <em>git http-push</em> with
-no argument should display a usage message.</p></div>
-<div class="paragraph"><p>Then, add the following to your $HOME/.netrc (you can do without, but will be
-asked to input your password a <em>lot</em> of times):</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>machine &lt;servername&gt;
-login &lt;username&gt;
-password &lt;password&gt;</code></pre>
-</div></div>
-<div class="paragraph"><p>&#8230;and set permissions:
-     chmod 600 ~/.netrc</p></div>
-<div class="paragraph"><p>If you want to access the web-server by its IP, you have to type that in,
-instead of the server name.</p></div>
-<div class="paragraph"><p>To check whether all is OK, do:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>curl --netrc --location -v http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git/HEAD</code></pre>
-</div></div>
-<div class="paragraph"><p>&#8230;this should give something like <em>ref: refs/heads/master</em>, which is
-the content of the file HEAD on the server.</p></div>
-<div class="paragraph"><p>Now, add the remote in your existing repository which contains the project
-you want to export:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git-config remote.upload.url \
-    http://&lt;username&gt;@&lt;servername&gt;/my-new-repo.git/</code></pre>
-</div></div>
-<div class="paragraph"><p>It is important to put the last <em>/</em>; Without it, the server will send
-a redirect which git-http-push does not (yet) understand, and git-http-push
-will repeat the request infinitely.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+nit: 
+</dt>
+<dd>
+<p>
+        Denotes a small issue that should be fixed, such as a typographical error
+        or mis-alignment of conditions in an <code>if()</code> statement.
+</p>
+</dd>
+<dt class="hdlist1">
+aside: 
+</dt>
+<dt class="hdlist1">
+optional: 
+</dt>
+<dt class="hdlist1">
+non-blocking: 
+</dt>
+<dd>
+<p>
+        Indicates to the reader that the following comment should not block the
+        acceptance of the patch or series. These are typically recommendations
+        related to code organization &amp; style, or musings about topics related to
+        the patch in question, but beyond its scope.
+</p>
+</dd>
+<dt class="hdlist1">
+s/&lt;before&gt;/&lt;after&gt;/
+</dt>
+<dd>
+<p>
+        Shorthand for "you wrote &lt;before&gt;, but I think you meant &lt;after&gt;," usually
+        for misspellings or other typographical errors. The syntax is a reference
+        to "substitute" command commonly found in Unix tools such as <code>ed</code>, <code>sed</code>,
+        <code>vim</code>, and <code>perl</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+cover letter
+</dt>
+<dd>
+<p>
+        The "Patch 0" of a multi-patch series. This email describes the
+        high-level intent and structure of the patch series to readers on the
+        Git mailing list. It is also where the changelog notes and range-diff of
+        subsequent versions are provided by the author.
+</p>
+<div class="paragraph"><p>On single-patch submissions, cover letter content is typically not sent as a
+separate email. Instead, it is inserted between the end of the patch&#8217;s commit
+message (after the <code>---</code>) and the beginning of the diff.</p></div>
+</dd>
+<dt class="hdlist1">
+#leftoverbits
+</dt>
+<dd>
+<p>
+  Used by either an author or a reviewer to describe features or suggested
+  changes that are out-of-scope of a given patch or series, but are relevant
+  to the topic for the sake of discussion.
+</p>
+</dd>
+</dl></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_step_4_make_the_initial_push">Step 4: make the initial push</h2>
+<h2 id="_see_also">See Also</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>From your client repository, do</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git push upload master</code></pre>
-</div></div>
-<div class="paragraph"><p>This pushes branch <em>master</em> (which is assumed to be the branch you
-want to export) to repository called <em>upload</em>, which we previously
-defined with git-config.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_using_a_proxy">Using a proxy:</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>If you have to access the WebDAV server from behind an HTTP(S) proxy,
-set the variable <em>all_proxy</em> to <code>http://proxy-host.com:port</code>, or
-<code>http://login-on-proxy:passwd-on-proxy@proxy-host.com:port</code>. See <em>man
-curl</em> for details.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_troubleshooting">Troubleshooting:</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>If git-http-push says</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Error: no DAV locking support on remote repo http://...</code></pre>
-</div></div>
-<div class="paragraph"><p>then it means the web-server did not accept your authentication. Make sure
-that the user name and password matches in httpd.conf, .netrc and the URL
-you are uploading to.</p></div>
-<div class="paragraph"><p>If git-http-push shows you an error (22/502) when trying to MOVE a blob,
-it means that your web-server somehow does not recognize its name in the
-request; This can happen when you start Apache, but then disable the
-network interface. A simple restart of Apache helps.</p></div>
-<div class="paragraph"><p>Errors like (22/502) are of format (curl error code/http error
-code). So (22/404) means something like <em>not found</em> at the server.</p></div>
-<div class="paragraph"><p>Reading /usr/local/apache2/logs/error_log is often helpful.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>On Debian: Read /var/log/apache2/error.log instead.</code></pre>
-</div></div>
-<div class="paragraph"><p>If you access HTTPS locations, Git may fail verifying the SSL
-certificate (this is return code 60). Setting http.sslVerify=false can
-help diagnosing the problem, but removes security checks.</p></div>
-<div class="paragraph"><p>Debian References: <a href="http://www.debian-administration.org/articles/285">http://www.debian-administration.org/articles/285</a></p></div>
-<div class="paragraph"><p>Authors
-  Johannes Schindelin &lt;<a href="mailto:Johannes.Schindelin@gmx.de">Johannes.Schindelin@gmx.de</a>&gt;
-  Rutger Nijlunsing &lt;<a href="mailto:git@wingding.demon.nl">git@wingding.demon.nl</a>&gt;
-  Matthieu Moy &lt;<a href="mailto:Matthieu.Moy@imag.fr">Matthieu.Moy@imag.fr</a>&gt;</p></div>
+<div class="paragraph"><p><a href="MyFirstContribution.html">MyFirstContribution</a></p></div>
 </div>
 </div>
 </div>
@@ -1071,7 +974,7 @@ help diagnosing the problem, but removes security checks.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-09-21 15:44:42 PDT
+ 2022-09-21 15:44:34 PDT
 </div>
 </div>
 </body>
