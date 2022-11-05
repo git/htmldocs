@@ -955,12 +955,14 @@ leave out at most one of A and B, in which case it defaults to HEAD.</p></div>
         merge base of <code>&lt;upstream&gt;</code> and <code>&lt;branch&gt;</code>. Running
         <code>git rebase --keep-base &lt;upstream&gt; &lt;branch&gt;</code> is equivalent to
         running
-        <code>git rebase --onto &lt;upstream&gt;...&lt;branch&gt; &lt;upstream&gt; &lt;branch&gt;</code>.
+        <code>git rebase --reapply-cherry-picks --no-fork-point --onto &lt;upstream&gt;...&lt;branch&gt; &lt;upstream&gt; &lt;branch&gt;</code>.
 </p>
 <div class="paragraph"><p>This option is useful in the case where one is developing a feature on
 top of an upstream branch. While the feature is being worked on, the
 upstream branch may advance and it may not be the best idea to keep
-rebasing on top of the upstream but to keep the base commit as-is.</p></div>
+rebasing on top of the upstream but to keep the base commit as-is. As
+the base commit is unchanged this option implies <code>--reapply-cherry-picks</code>
+to avoid losing commits.</p></div>
 <div class="paragraph"><p>Although both this option and <code>--fork-point</code> find the merge base between
 <code>&lt;upstream&gt;</code> and <code>&lt;branch&gt;</code>, this option uses the merge base as the <em>starting
 point</em> on which new commits will be created, whereas <code>--fork-point</code> uses
@@ -1046,7 +1048,8 @@ the merge base to determine the <em>set of commits</em> which will be rebased.</
 <div class="paragraph"><p>Note that commits which start empty are kept (unless <code>--no-keep-empty</code>
 is specified), and commits which are clean cherry-picks (as determined
 by <code>git log --cherry-mark ...</code>) are detected and dropped as a
-preliminary step (unless <code>--reapply-cherry-picks</code> is passed).</p></div>
+preliminary step (unless <code>--reapply-cherry-picks</code> or <code>--keep-base</code> is
+passed).</p></div>
 <div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1088,17 +1091,22 @@ see the <code>--empty</code> flag.</p></div>
         upstream changes, the behavior towards them is controlled by
         the <code>--empty</code> flag.)
 </p>
-<div class="paragraph"><p>By default (or if <code>--no-reapply-cherry-picks</code> is given), these commits
-will be automatically dropped.  Because this necessitates reading all
-upstream commits, this can be expensive in repos with a large number
-of upstream commits that need to be read.  When using the <em>merge</em>
-backend, warnings will be issued for each dropped commit (unless
-<code>--quiet</code> is given). Advice will also be issued unless
-<code>advice.skippedCherryPicks</code> is set to false (see <a href="git-config.html">git-config(1)</a>).</p></div>
-<div class="paragraph"><p><code>--reapply-cherry-picks</code> allows rebase to forgo reading all upstream
-commits, potentially improving performance.</p></div>
-<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
+<div class="paragraph"><p>In the absence of <code>--keep-base</code> (or if <code>--no-reapply-cherry-picks</code> is
+given), these commits will be automatically dropped.  Because this
+necessitates reading all upstream commits, this can be expensive in
+repositories with a large number of upstream commits that need to be
+read. When using the <em>merge</em> backend, warnings will be issued for each
+dropped commit (unless <code>--quiet</code> is given). Advice will also be issued
+unless <code>advice.skippedCherryPicks</code> is set to false (see
+<a href="git-config.html">git-config(1)</a>).</p></div>
 </dd>
+</dl></div>
+<div class="paragraph"><p>+
+<code>--reapply-cherry-picks</code> allows rebase to forgo reading all upstream
+commits, potentially improving performance.</p></div>
+<div class="paragraph"><p>+
+See also INCOMPATIBLE OPTIONS below.</p></div>
+<div class="dlist"><dl>
 <dt class="hdlist1">
 --allow-empty-message
 </dt>
@@ -1330,9 +1338,9 @@ details).</p></div>
 <em>fork_point</em> is the result of <code>git merge-base --fork-point &lt;upstream&gt;
 &lt;branch&gt;</code> command (see <a href="git-merge-base.html">git-merge-base(1)</a>).  If <em>fork_point</em>
 ends up being empty, the <code>&lt;upstream&gt;</code> will be used as a fallback.</p></div>
-<div class="paragraph"><p>If <code>&lt;upstream&gt;</code> is given on the command line, then the default is
-<code>--no-fork-point</code>, otherwise the default is <code>--fork-point</code>. See also
-<code>rebase.forkpoint</code> in <a href="git-config.html">git-config(1)</a>.</p></div>
+<div class="paragraph"><p>If <code>&lt;upstream&gt;</code> or <code>--keep-base</code> is given on the command line, then
+the default is <code>--no-fork-point</code>, otherwise the default is
+<code>--fork-point</code>. See also <code>rebase.forkpoint</code> in <a href="git-config.html">git-config(1)</a>.</p></div>
 <div class="paragraph"><p>If your branch was based on <code>&lt;upstream&gt;</code> but <code>&lt;upstream&gt;</code> was rewound and
 your branch contains commits which were dropped, this option can be used
 with <code>--keep-base</code> in order to drop those commits from your branch.</p></div>
@@ -2757,7 +2765,7 @@ sequence.editor
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-09-14 13:23:11 PDT
+ 2022-11-04 21:49:36 PDT
 </div>
 </div>
 </body>
