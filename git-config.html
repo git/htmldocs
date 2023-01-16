@@ -5423,6 +5423,14 @@ feature.manyFiles
 <div class="ulist"><ul>
 <li>
 <p>
+<code>index.skipHash=true</code> speeds up index writes by not computing a trailing
+  checksum. Note that this will cause Git versions earlier than 2.13.0 to
+  refuse to parse the index and Git versions earlier than 2.40.0 will report
+  a corrupted index during <code>git fsck</code>.
+</p>
+</li>
+<li>
+<p>
 <code>index.version=4</code> enables path-prefix compression in the index.
 </p>
 </li>
@@ -7591,6 +7599,21 @@ index.version
         initialized.  This does not affect existing repositories.
         If <code>feature.manyFiles</code> is enabled, then the default is 4.
 </p>
+</dd>
+<dt class="hdlist1">
+index.skipHash
+</dt>
+<dd>
+<p>
+        When enabled, do not compute the trailing hash for the index file.
+        This accelerates Git commands that manipulate the index, such as
+        <code>git add</code>, <code>git commit</code>, or <code>git status</code>. Instead of storing the
+        checksum, write a trailing set of bytes with value zero, indicating
+        that the computation was skipped.
+</p>
+<div class="paragraph"><p>If you enable <code>index.skipHash</code>, then Git clients older than 2.13.0 will
+refuse to parse the index and Git clients older than 2.40.0 will report an
+error during <code>git fsck</code>.</p></div>
 </dd>
 <dt class="hdlist1">
 init.templateDir
@@ -11570,7 +11593,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-07-23 07:56:51 JST
+ 2022-07-22 15:56:51 PDT
 </div>
 </div>
 </body>
