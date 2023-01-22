@@ -765,6 +765,17 @@ $GIT_DIR in a bare repository or the root of the working tree in a non-bare
 repository. An exception are hooks triggered during a push (<em>pre-receive</em>,
 <em>update</em>, <em>post-receive</em>, <em>post-update</em>, <em>push-to-checkout</em>) which are always
 executed in $GIT_DIR.</p></div>
+<div class="paragraph"><p>Environment variables, such as <code>GIT_DIR</code>, <code>GIT_WORK_TREE</code>, etc., are exported
+so that Git commands run by the hook can correctly locate the repository.  If
+your hook needs to invoke Git commands in a foreign repository or in a
+different working tree of the same repository, then it should clear these
+environment variables so they do not interfere with Git operations at the
+foreign location.  For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>local_desc=$(git describe)
+foreign_desc=$(unset $(git rev-parse --local-env-vars); git -C ../foreign-repo describe)</code></pre>
+</div></div>
 <div class="paragraph"><p>Hooks can get their arguments via the environment, command-line
 arguments, and stdin. See the documentation for each hook below for
 details.</p></div>
@@ -1383,7 +1394,7 @@ running passing "1", "1" should not be possible.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-02-16 17:29:08 PST
+ 2023-01-21 17:52:14 PST
 </div>
 </div>
 </body>
