@@ -941,6 +941,72 @@ desired resolution, you can continue the rebasing process with</p></div>
 </div>
 </div>
 <div class="sect1">
+<h2 id="_mode_options">MODE OPTIONS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The options in this section cannot be used with any other option,
+including not with each other:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+--continue
+</dt>
+<dd>
+<p>
+        Restart the rebasing process after having resolved a merge conflict.
+</p>
+</dd>
+<dt class="hdlist1">
+--skip
+</dt>
+<dd>
+<p>
+        Restart the rebasing process by skipping the current patch.
+</p>
+</dd>
+<dt class="hdlist1">
+--abort
+</dt>
+<dd>
+<p>
+        Abort the rebase operation and reset HEAD to the original
+        branch. If <code>&lt;branch&gt;</code> was provided when the rebase operation was
+        started, then <code>HEAD</code> will be reset to <code>&lt;branch&gt;</code>. Otherwise <code>HEAD</code>
+        will be reset to where it was when the rebase operation was
+        started.
+</p>
+</dd>
+<dt class="hdlist1">
+--quit
+</dt>
+<dd>
+<p>
+        Abort the rebase operation but <code>HEAD</code> is not reset back to the
+        original branch. The index and working tree are also left
+        unchanged as a result. If a temporary stash entry was created
+        using <code>--autostash</code>, it will be saved to the stash list.
+</p>
+</dd>
+<dt class="hdlist1">
+--edit-todo
+</dt>
+<dd>
+<p>
+        Edit the todo list during an interactive rebase.
+</p>
+</dd>
+<dt class="hdlist1">
+--show-current-patch
+</dt>
+<dd>
+<p>
+        Show the current patch in an interactive rebase or when rebase
+        is stopped because of conflicts. This is the equivalent of
+        <code>git show REBASE_HEAD</code>.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="_options">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -997,37 +1063,6 @@ the merge base to determine the <em>set of commits</em> which will be rebased.</
 <dd>
 <p>
         Working branch; defaults to <code>HEAD</code>.
-</p>
-</dd>
-<dt class="hdlist1">
---continue
-</dt>
-<dd>
-<p>
-        Restart the rebasing process after having resolved a merge conflict.
-</p>
-</dd>
-<dt class="hdlist1">
---abort
-</dt>
-<dd>
-<p>
-        Abort the rebase operation and reset HEAD to the original
-        branch. If <code>&lt;branch&gt;</code> was provided when the rebase operation was
-        started, then <code>HEAD</code> will be reset to <code>&lt;branch&gt;</code>. Otherwise <code>HEAD</code>
-        will be reset to where it was when the rebase operation was
-        started.
-</p>
-</dd>
-<dt class="hdlist1">
---quit
-</dt>
-<dd>
-<p>
-        Abort the rebase operation but <code>HEAD</code> is not reset back to the
-        original branch. The index and working tree are also left
-        unchanged as a result. If a temporary stash entry was created
-        using <code>--autostash</code>, it will be saved to the stash list.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1111,14 +1146,10 @@ read. When using the <em>merge</em> backend, warnings will be issued for each
 dropped commit (unless <code>--quiet</code> is given). Advice will also be issued
 unless <code>advice.skippedCherryPicks</code> is set to false (see
 <a href="git-config.html">git-config(1)</a>).</p></div>
-</dd>
-</dl></div>
-<div class="paragraph"><p>+
-<code>--reapply-cherry-picks</code> allows rebase to forgo reading all upstream
+<div class="paragraph"><p><code>--reapply-cherry-picks</code> allows rebase to forgo reading all upstream
 commits, potentially improving performance.</p></div>
-<div class="paragraph"><p>+
-See also INCOMPATIBLE OPTIONS below.</p></div>
-<div class="dlist"><dl>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
+</dd>
 <dt class="hdlist1">
 --allow-empty-message
 </dt>
@@ -1130,32 +1161,6 @@ See also INCOMPATIBLE OPTIONS below.</p></div>
         message do not cause rebasing to halt.
 </p>
 <div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
-</dd>
-<dt class="hdlist1">
---skip
-</dt>
-<dd>
-<p>
-        Restart the rebasing process by skipping the current patch.
-</p>
-</dd>
-<dt class="hdlist1">
---edit-todo
-</dt>
-<dd>
-<p>
-        Edit the todo list during an interactive rebase.
-</p>
-</dd>
-<dt class="hdlist1">
---show-current-patch
-</dt>
-<dd>
-<p>
-        Show the current patch in an interactive rebase or when rebase
-        is stopped because of conflicts. This is the equivalent of
-        <code>git show REBASE_HEAD</code>.
-</p>
 </dd>
 <dt class="hdlist1">
 -m
@@ -1521,10 +1526,7 @@ without an explicit <code>--interactive</code>.</p></div>
 <p>
         Rebase all commits reachable from <code>&lt;branch&gt;</code>, instead of
         limiting them with an <code>&lt;upstream&gt;</code>.  This allows you to rebase
-        the root commit(s) on a branch.  When used with <code>--onto</code>, it
-        will skip changes already contained in <code>&lt;newbase&gt;</code> (instead of
-        <code>&lt;upstream&gt;</code>) whereas without <code>--onto</code> it will operate on every
-        change.
+        the root commit(s) on a branch.
 </p>
 <div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
@@ -1601,6 +1603,7 @@ start would be overridden by the presence of
 </p>
 <div class="paragraph"><p>If the configuration variable <code>rebase.updateRefs</code> is set, then this option
 can be used to override and disable this setting.</p></div>
+<div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 </dl></div>
 </div>
@@ -1645,12 +1648,7 @@ can be used to override and disable this setting.</p></div>
 </li>
 <li>
 <p>
---allow-empty-message
-</p>
-</li>
-<li>
-<p>
---[no-]autosquash
+--autosquash
 </p>
 </li>
 <li>
@@ -1680,12 +1678,7 @@ can be used to override and disable this setting.</p></div>
 </li>
 <li>
 <p>
---reapply-cherry-picks
-</p>
-</li>
-<li>
-<p>
---edit-todo
+--[no-]reapply-cherry-picks when used without --keep-base
 </p>
 </li>
 <li>
@@ -1695,7 +1688,7 @@ can be used to override and disable this setting.</p></div>
 </li>
 <li>
 <p>
---root when used in combination with --onto
+--root when used without --onto
 </p>
 </li>
 </ul></div>
@@ -2777,7 +2770,7 @@ sequence.editor
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-01-21 17:52:14 PST
+ 2023-02-03 21:26:01 PST
 </div>
 </div>
 </body>
