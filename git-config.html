@@ -3442,9 +3442,10 @@ add.interactive.useBuiltin
 </dt>
 <dd>
 <p>
-        Set to <code>false</code> to fall back to the original Perl implementation of
-        the interactive version of <a href="git-add.html">git-add(1)</a> instead of the built-in
-        version. Is <code>true</code> by default.
+        Unused configuration variable. Used in Git versions v2.25.0 to
+        v2.36.0 to enable the built-in version of <a href="git-add.html">git-add(1)</a>'s
+        interactive mode, which then became the default in Git
+        versions v2.37.0 to v2.39.0.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -3799,6 +3800,18 @@ bundle.mode
         whether all of the advertised bundles are required to unbundle a
         complete understanding of the bundled information (<code>all</code>) or if any one
         of the listed bundle URIs is sufficient (<code>any</code>).
+</p>
+</dd>
+<dt class="hdlist1">
+bundle.heuristic
+</dt>
+<dd>
+<p>
+        If this string-valued key exists, then the bundle list is designed to
+        work well with incremental <code>git fetch</code> commands. The heuristic signals
+        that there are additional keys available for each bundle that help
+        determine which subset of bundles the client should download. The
+        only value currently understood is <code>creationToken</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -5597,6 +5610,38 @@ fetch.writeCommitGraph
         file helps performance of many Git commands, including <code>git merge-base</code>,
         <code>git push -f</code>, and <code>git log --graph</code>. Defaults to false.
 </p>
+</dd>
+<dt class="hdlist1">
+fetch.bundleURI
+</dt>
+<dd>
+<p>
+        This value stores a URI for downloading Git object data from a bundle
+        URI before performing an incremental fetch from the origin Git server.
+        This is similar to how the <code>--bundle-uri</code> option behaves in
+        <a href="git-clone.html">git-clone(1)</a>. <code>git clone --bundle-uri</code> will set the
+        <code>fetch.bundleURI</code> value if the supplied bundle URI contains a bundle
+        list that is organized for incremental fetches.
+</p>
+<div class="paragraph"><p>If you modify this value and your repository has a <code>fetch.bundleCreationToken</code>
+value, then remove that <code>fetch.bundleCreationToken</code> value before fetching from
+the new bundle URI.</p></div>
+</dd>
+<dt class="hdlist1">
+fetch.bundleCreationToken
+</dt>
+<dd>
+<p>
+        When using <code>fetch.bundleURI</code> to fetch incrementally from a bundle
+        list that uses the "creationToken" heuristic, this config value
+        stores the maximum <code>creationToken</code> value of the downloaded bundles.
+        This value is used to prevent downloading bundles in the future
+        if the advertised <code>creationToken</code> is not strictly larger than this
+        value.
+</p>
+<div class="paragraph"><p>The creation token values are chosen by the provider serving the specific
+bundle URI. If you modify the URI at <code>fetch.bundleURI</code>, then be sure to
+remove the value for the <code>fetch.bundleCreationToken</code> value before fetching.</p></div>
 </dd>
 <dt class="hdlist1">
 format.attach
