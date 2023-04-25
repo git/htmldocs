@@ -1290,6 +1290,37 @@ processed by rebase.</p></div>
 the name of the file that holds the e-mail to be sent.  Exiting with a
 non-zero status causes <code>git send-email</code> to abort before sending any
 e-mails.</p></div>
+<div class="paragraph"><p>The following environment variables are set when executing the hook.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<code>GIT_SENDEMAIL_FILE_COUNTER</code>
+</dt>
+<dd>
+<p>
+        A 1-based counter incremented by one for every file holding an e-mail
+        to be sent (excluding any FIFOs). This counter does not follow the
+        patch series counter scheme. It will always start at 1 and will end at
+        GIT_SENDEMAIL_FILE_TOTAL.
+</p>
+</dd>
+<dt class="hdlist1">
+<code>GIT_SENDEMAIL_FILE_TOTAL</code>
+</dt>
+<dd>
+<p>
+        The total number of files that will be sent (excluding any FIFOs). This
+        counter does not follow the patch series counter scheme. It will always
+        be equal to the number of files being sent, whether there is a cover
+        letter or not.
+</p>
+</dd>
+</dl></div>
+<div class="paragraph"><p>These variables may for instance be used to validate patch series.</p></div>
+<div class="paragraph"><p>The sample <code>sendemail-validate</code> hook that comes with Git checks that all sent
+patches (excluding the cover letter) can be applied on top of the upstream
+repository default branch without conflicts. Some placeholders are left for
+additional validation steps to be performed after all patches of a given series
+have been applied.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_fsmonitor_watchman">fsmonitor-watchman</h3>
@@ -1394,7 +1425,7 @@ running passing "1", "1" should not be possible.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-01-21 17:52:14 PST
+ 2023-04-25 14:39:23 PDT
 </div>
 </div>
 </body>
