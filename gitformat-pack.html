@@ -1525,49 +1525,12 @@ later on.</p></div>
 unreachable objects.</p></div>
 </div>
 <div class="sect2">
-<h3 id="_caution_for_mixed_version_environments">Caution for mixed-version environments</h3>
-<div class="paragraph"><p>Repositories that have cruft packs in them will continue to work with any older
-version of Git. Note, however, that previous versions of Git which do not
-understand the <code>.mtimes</code> file will use the cruft pack&#8217;s mtime as the mtime for
-all of the objects in it. In other words, do not expect older (pre-cruft pack)
-versions of Git to interpret or even read the contents of the <code>.mtimes</code> file.</p></div>
-<div class="paragraph"><p>Note that having mixed versions of Git GC-ing the same repository can lead to
-unreachable objects never being completely pruned. This can happen under the
-following circumstances:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-An older version of Git running GC explodes the contents of an existing
-    cruft pack loose, using the cruft pack&#8217;s mtime.
-</p>
-</li>
-<li>
-<p>
-A newer version running GC collects those loose objects into a cruft pack,
-    where the .mtime file reflects the loose object&#8217;s actual mtimes, but the
-    cruft pack mtime is "now".
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>Repeating this process will lead to unreachable objects not getting pruned as a
-result of repeatedly resetting the objects' mtimes to the present time.</p></div>
-<div class="paragraph"><p>If you are GC-ing repositories in a mixed version environment, consider omitting
-the <code>--cruft</code> option when using <a href="git-repack.html">git-repack(1)</a> and <a href="git-gc.html">git-gc(1)</a>, and
-setting the <code>gc.cruftPacks</code> configuration to "false" until all writers
-understand cruft packs.</p></div>
-</div>
-<div class="sect2">
 <h3 id="_alternatives">Alternatives</h3>
 <div class="paragraph"><p>Notable alternatives to this design include:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-The location of the per-object mtime data, and
-</p>
-</li>
-<li>
-<p>
-Storing unreachable objects in multiple cruft packs.
+The location of the per-object mtime data.
 </p>
 </li>
 </ul></div>
@@ -1575,12 +1538,6 @@ Storing unreachable objects in multiple cruft packs.
 to avoid complicating the <code>.idx</code> format. If the <code>.idx</code> format were ever to gain
 support for optional chunks of data, it may make sense to consolidate the
 <code>.mtimes</code> format into the <code>.idx</code> itself.</p></div>
-<div class="paragraph"><p>Storing unreachable objects among multiple cruft packs (e.g., creating a new
-cruft pack during each repacking operation including only unreachable objects
-which aren&#8217;t already stored in an earlier cruft pack) is significantly more
-complicated to construct, and so aren&#8217;t pursued here. The obvious drawback to
-the current implementation is that the entire cruft pack must be re-written from
-scratch.</p></div>
 </div>
 </div>
 </div>
@@ -1595,7 +1552,7 @@ scratch.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-04-28 16:26:53 PDT
+ 2023-09-07 15:10:34 PDT
 </div>
 </div>
 </body>
