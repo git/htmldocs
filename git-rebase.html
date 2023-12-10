@@ -1545,21 +1545,25 @@ without an explicit <code>--interactive</code>.</p></div>
 </dt>
 <dd>
 <p>
-        When the commit log message begins with "squash! &#8230;" or "fixup! &#8230;"
-        or "amend! &#8230;", and there is already a commit in the todo list that
-        matches the same <code>...</code>, automatically modify the todo list of
-        <code>rebase -i</code>, so that the commit marked for squashing comes right after
-        the commit to be modified, and change the action of the moved commit
-        from <code>pick</code> to <code>squash</code> or <code>fixup</code> or <code>fixup -C</code> respectively. A commit
-        matches the <code>...</code> if the commit subject matches, or if the <code>...</code> refers
-        to the commit&#8217;s hash. As a fall-back, partial matches of the commit
-        subject work, too. The recommended way to create fixup/amend/squash
-        commits is by using the <code>--fixup</code>, <code>--fixup=amend:</code> or <code>--fixup=reword:</code>
-        and <code>--squash</code> options respectively of <a href="git-commit.html">git-commit(1)</a>.
+        Automatically squash commits with specially formatted messages into
+        previous commits being rebased.  If a commit message starts with
+        "squash! ", "fixup! " or "amend! ", the remainder of the subject line
+        is taken as a commit specifier, which matches a previous commit if it
+        matches the subject line or the hash of that commit.  If no commit
+        matches fully, matches of the specifier with the start of commit
+        subjects are considered.
 </p>
-<div class="paragraph"><p>If the <code>--autosquash</code> option is enabled by default using the
-configuration variable <code>rebase.autoSquash</code>, this option can be
-used to override and disable this setting.</p></div>
+<div class="paragraph"><p>In the rebase todo list, the actions of squash, fixup and amend commits are
+changed from <code>pick</code> to <code>squash</code>, <code>fixup</code> or <code>fixup -C</code>, respectively, and they
+are moved right after the commit they modify.  The <code>--interactive</code> option can
+be used to review and edit the todo list before proceeding.</p></div>
+<div class="paragraph"><p>The recommended way to create commits with squash markers is by using the
+<code>--squash</code>, <code>--fixup</code>, <code>--fixup=amend:</code> or <code>--fixup=reword:</code> options of
+<a href="git-commit.html">git-commit(1)</a>, which take the target commit as an argument and
+automatically fill in the subject line of the new commit from that.</p></div>
+<div class="paragraph"><p>Settting configuration variable <code>rebase.autoSquash</code> to true enables
+auto-squashing by default for interactive rebase.  The <code>--no-autosquash</code>
+option can be used to override that setting.</p></div>
 <div class="paragraph"><p>See also INCOMPATIBLE OPTIONS below.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -2659,7 +2663,9 @@ rebase.autoSquash
 </dt>
 <dd>
 <p>
-        If set to true enable <code>--autosquash</code> option by default.
+        If set to true, enable the <code>--autosquash</code> option of
+        <a href="git-rebase.html">git-rebase(1)</a> by default for interactive mode.
+        This can be overridden with the <code>--no-autosquash</code> option.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -2803,7 +2809,7 @@ sequence.editor
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-11-07 12:13:08 JST
+ 2023-12-09 17:40:53 PST
 </div>
 </div>
 </body>
