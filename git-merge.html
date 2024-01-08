@@ -764,18 +764,18 @@ git-merge(1) Manual Page
 <div class="sectionbody">
 <div class="paragraph"><p>Incorporates changes from the named commits (since the time their
 histories diverged from the current branch) into the current
-branch.  This command is used by <em>git pull</em> to incorporate changes
+branch.  This command is used by <code>git pull</code> to incorporate changes
 from another repository and can be used by hand to merge changes
 from one branch into another.</p></div>
 <div class="paragraph"><p>Assume the following history exists and the current branch is
-"<code>master</code>":</p></div>
+<code>master</code>:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>          A---B---C topic
          /
     D---E---F---G master</code></pre>
 </div></div>
-<div class="paragraph"><p>Then "<code>git merge topic</code>" will replay the changes made on the
+<div class="paragraph"><p>Then <code>git merge topic</code> will replay the changes made on the
 <code>topic</code> branch since it diverged from <code>master</code> (i.e., <code>E</code>) until
 its current commit (<code>C</code>) on top of <code>master</code>, and record the result
 in a new commit along with the names of the two parent commits and
@@ -787,18 +787,18 @@ a log message from the user describing the changes. Before the operation,
          /         \
     D---E---F---G---H master</code></pre>
 </div></div>
-<div class="paragraph"><p>The second syntax ("<code>git merge --abort</code>") can only be run after the
-merge has resulted in conflicts. <em>git merge --abort</em> will abort the
-merge process and try to reconstruct the pre-merge state. However,
-if there were uncommitted changes when the merge started (and
-especially if those changes were further modified after the merge
-was started), <em>git merge --abort</em> will in some cases be unable to
-reconstruct the original (pre-merge) changes. Therefore:</p></div>
-<div class="paragraph"><p><strong>Warning</strong>: Running <em>git merge</em> with non-trivial uncommitted changes is
+<div class="paragraph"><p>A merge stops if there&#8217;s a conflict that cannot be resolved
+automatically or if <code>--no-commit</code> was provided when initiating the
+merge. At that point you can run <code>git merge --abort</code> or <code>git merge
+--continue</code>.</p></div>
+<div class="paragraph"><p><code>git merge --abort</code> will abort the merge process and try to reconstruct
+the pre-merge state. However, if there were uncommitted changes when the
+merge started (and especially if those changes were further modified
+after the merge was started), <code>git merge --abort</code> will in some cases be
+unable to reconstruct the original (pre-merge) changes. Therefore:</p></div>
+<div class="paragraph"><p><strong>Warning</strong>: Running <code>git merge</code> with non-trivial uncommitted changes is
 discouraged: while possible, it may leave you in a state that is hard to
 back out of in the case of a conflict.</p></div>
-<div class="paragraph"><p>The third syntax ("<code>git merge --continue</code>") can only be run after the
-merge has resulted in conflicts.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1119,8 +1119,8 @@ option can be used to override --squash.</p></div>
 </p>
 <div class="paragraph"><p>If <code>--log</code> is specified, a shortlog of the commits being merged
 will be appended to the specified message.</p></div>
-<div class="paragraph"><p>The <em>git fmt-merge-msg</em> command can be
-used to give a good default for automated <em>git merge</em>
+<div class="paragraph"><p>The <code>git fmt-merge-msg</code> command can be
+used to give a good default for automated <code>git merge</code>
 invocations. The automated message can include the branch description.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1186,13 +1186,13 @@ will be appended to the specified message.</p></div>
         present, apply it to the worktree.
 </p>
 <div class="paragraph"><p>If there were uncommitted worktree changes present when the merge
-started, <em>git merge --abort</em> will in some cases be unable to
+started, <code>git merge --abort</code> will in some cases be unable to
 reconstruct these changes. It is therefore recommended to always
-commit or stash your changes before running <em>git merge</em>.</p></div>
-<div class="paragraph"><p><em>git merge --abort</em> is equivalent to <em>git reset --merge</em> when
+commit or stash your changes before running <code>git merge</code>.</p></div>
+<div class="paragraph"><p><code>git merge --abort</code> is equivalent to <code>git reset --merge</code> when
 <code>MERGE_HEAD</code> is present unless <code>MERGE_AUTOSTASH</code> is also present in
-which case <em>git merge --abort</em> applies the stash entry to the worktree
-whereas <em>git reset --merge</em> will save the stashed changes in the stash
+which case <code>git merge --abort</code> applies the stash entry to the worktree
+whereas <code>git reset --merge</code> will save the stashed changes in the stash
 list.</p></div>
 </dd>
 <dt class="hdlist1">
@@ -1210,8 +1210,8 @@ list.</p></div>
 </dt>
 <dd>
 <p>
-        After a <em>git merge</em> stops due to conflicts you can conclude the
-        merge by running <em>git merge --continue</em> (see "HOW TO RESOLVE
+        After a <code>git merge</code> stops due to conflicts you can conclude the
+        merge by running <code>git merge --continue</code> (see "HOW TO RESOLVE
         CONFLICTS" section below).
 </p>
 </dd>
@@ -1240,15 +1240,15 @@ of <code>git fetch</code> for merging are merged to the current branch.</p></div
 <div class="paragraph"><p>Before applying outside changes, you should get your own work in
 good shape and committed locally, so it will not be clobbered if
 there are conflicts.  See also <a href="git-stash.html">git-stash(1)</a>.
-<em>git pull</em> and <em>git merge</em> will stop without doing anything when
-local uncommitted changes overlap with files that <em>git pull</em>/<em>git
-merge</em> may need to update.</p></div>
+<code>git pull</code> and <code>git merge</code> will stop without doing anything when
+local uncommitted changes overlap with files that <code>git pull</code>/<code>git
+merge</code> may need to update.</p></div>
 <div class="paragraph"><p>To avoid recording unrelated changes in the merge commit,
-<em>git pull</em> and <em>git merge</em> will also abort if there are any changes
+<code>git pull</code> and <code>git merge</code> will also abort if there are any changes
 registered in the index relative to the <code>HEAD</code> commit.  (Special
 narrow exceptions to this rule may exist depending on which merge
 strategy is in use, but generally, the index must match HEAD.)</p></div>
-<div class="paragraph"><p>If all named commits are already ancestors of <code>HEAD</code>, <em>git merge</em>
+<div class="paragraph"><p>If all named commits are already ancestors of <code>HEAD</code>, <code>git merge</code>
 will exit early with the message "Already up to date."</p></div>
 </div>
 </div>
@@ -1256,8 +1256,8 @@ will exit early with the message "Already up to date."</p></div>
 <h2 id="_fast_forward_merge">FAST-FORWARD MERGE</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Often the current branch head is an ancestor of the named commit.
-This is the most common case especially when invoked from <em>git
-pull</em>: you are tracking an upstream repository, you have committed
+This is the most common case especially when invoked from <code>git
+pull</code>: you are tracking an upstream repository, you have committed
 no local changes, and now you want to update to a newer upstream
 revision.  In this case, a new commit is not needed to store the
 combined history; instead, the <code>HEAD</code> (along with the index) is
@@ -1381,7 +1381,7 @@ area.  You cannot tell how many lines are deleted and replaced with
 Barbie&#8217;s remark on your side.  The only thing you can tell is that your
 side wants to say it is hard and you&#8217;d prefer to go shopping, while the
 other side wants to claim it is easy.</p></div>
-<div class="paragraph"><p>An alternative style can be used by setting the "merge.conflictStyle"
+<div class="paragraph"><p>An alternative style can be used by setting the <code>merge.conflictStyle</code>
 configuration variable to either "diff3" or "zdiff3".  In "diff3"
 style, the above conflict may look like this:</p></div>
 <div class="listingblock">
@@ -1443,10 +1443,10 @@ Decide not to merge.  The only clean-ups you need are to reset
 <p>
 Resolve the conflicts.  Git will mark the conflicts in
    the working tree.  Edit the files into shape and
-   <em>git add</em> them to the index.  Use <em>git commit</em> or
-   <em>git merge --continue</em> to seal the deal. The latter command
+   <code>git add</code> them to the index.  Use <code>git commit</code> or
+   <code>git merge --continue</code> to seal the deal. The latter command
    checks whether there is a (interrupted) merge in progress
-   before calling <em>git commit</em>.
+   before calling <code>git commit</code>.
 </p>
 </li>
 </ul></div>
@@ -1797,7 +1797,7 @@ branch.&lt;name&gt;.mergeOptions
 <dd>
 <p>
         Sets default options for merging into branch &lt;name&gt;. The syntax and
-        supported options are the same as those of <em>git merge</em>, but option
+        supported options are the same as those of <code>git merge</code>, but option
         values containing whitespace characters are currently not supported.
 </p>
 </dd>
@@ -2336,7 +2336,7 @@ merge.&lt;driver&gt;.recursive
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-12-27 15:50:18 PST
+ 2024-01-08 14:58:46 PST
 </div>
 </div>
 </body>
