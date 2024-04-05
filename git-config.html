@@ -749,9 +749,9 @@ git-config(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--fixed-value] [--show-origin] [--show-scope] [-z|--null] &lt;name&gt; [&lt;value&gt; [&lt;value-pattern&gt;]]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] --add &lt;name&gt; &lt;value&gt;
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--fixed-value] --replace-all &lt;name&gt; &lt;value&gt; [&lt;value-pattern&gt;]
+<pre class="content"><em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--comment=&lt;message&gt;] [--fixed-value] [--show-origin] [--show-scope] [-z|--null] &lt;name&gt; [&lt;value&gt; [&lt;value-pattern&gt;]]
+<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--comment=&lt;message&gt;] --add &lt;name&gt; &lt;value&gt;
+<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--comment=&lt;message&gt;] [--fixed-value] --replace-all &lt;name&gt; &lt;value&gt; [&lt;value-pattern&gt;]
 <em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] --get &lt;name&gt; [&lt;value-pattern&gt;]
 <em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] --get-all &lt;name&gt; [&lt;value-pattern&gt;]
 <em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] [--name-only] --get-regexp &lt;name-regex&gt; [&lt;value-pattern&gt;]
@@ -863,6 +863,25 @@ you try to use an invalid regexp (ret=6).
         values.  This is the same as providing <em>^$</em> as the <code>value-pattern</code>
         in <code>--replace-all</code>.
 </p>
+</dd>
+<dt class="hdlist1">
+--comment &lt;message&gt;
+</dt>
+<dd>
+<p>
+        Append a comment at the end of new or modified lines.
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><code>If _&lt;message&gt;_ begins with one or more whitespaces followed
+by "#", it is used as-is.  If it begins with "#", a space is
+prepended before it is used.  Otherwise, a string " # " (a
+space followed by a hash followed by a space) is prepended
+to it.  And the resulting string is placed immediately after
+the value defined for the variable.  The _&lt;message&gt;_ must
+not contain linefeed characters (no multi-line comments are
+permitted).</code></pre>
+</div></div>
 </dd>
 <dt class="hdlist1">
 --get
@@ -4222,15 +4241,33 @@ core.editor
 <dt class="hdlist1">
 core.commentChar
 </dt>
+<dt class="hdlist1">
+core.commentString
+</dt>
 <dd>
 <p>
         Commands such as <code>commit</code> and <code>tag</code> that let you edit
-        messages consider a line that begins with this ASCII character
+        messages consider a line that begins with this character
         commented, and removes them after the editor returns
         (default <em>#</em>).
 </p>
 <div class="paragraph"><p>If set to "auto", <code>git-commit</code> would select a character that is not
 the beginning character of any line in existing commit messages.</p></div>
+<div class="paragraph"><p>Note that these two variables are aliases of each other, and in modern
+versions of Git you are free to use a string (e.g., <code>//</code> or <code>⁑⁕⁑</code>) with
+<code>commentChar</code>. Versions of Git prior to v2.45.0 will ignore
+<code>commentString</code> but will reject a value of <code>commentChar</code> that consists
+of more than a single ASCII byte. If you plan to use your config with
+older and newer versions of Git, you may want to specify both:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>[core]
+# single character for older versions
+commentChar = "#"
+# string for newer versions (which will override commentChar
+# because it comes later in the file)
+commentString = "//"</code></pre>
+</div></div>
 </dd>
 <dt class="hdlist1">
 core.filesRefLockTimeout
@@ -11978,7 +12015,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-03-25 17:24:49 PDT
+ 2024-04-05 11:03:41 PDT
 </div>
 </div>
 </body>
