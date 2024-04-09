@@ -735,7 +735,7 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>My First Object Walk</h1>
-<span id="revdate">2024-04-05</span>
+<span id="revdate">2024-04-09</span>
 </div>
 <div id="content">
 <div class="sect1">
@@ -989,13 +989,14 @@ We&#8217;ll also need to include the <code>config.h</code> header:</p></div>
 
 ...
 
-static int git_walken_config(const char *var, const char *value, void *cb)
+static int git_walken_config(const char *var, const char *value,
+                             const struct config_context *ctx, void *cb)
 {
         /*
          * For now, we don't have any custom configuration, so fall back to
          * the default config.
          */
-        return git_default_config(var, value, cb);
+        return git_default_config(var, value, ctx, cb);
 }</code></pre>
 </div></div>
 <div class="paragraph"><p>Make sure to invoke <code>git_config()</code> with it in your <code>cmd_walken()</code>:</p></div>
@@ -1180,10 +1181,11 @@ modifying <code>rev_info.grep_filter</code>, which is a <code>struct grep_opt</c
 <div class="paragraph"><p>First some setup. Add <code>grep_config()</code> to <code>git_walken_config()</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>static int git_walken_config(const char *var, const char *value, void *cb)
+<pre><code>static int git_walken_config(const char *var, const char *value,
+                             const struct config_context *ctx, void *cb)
 {
-        grep_config(var, value, cb);
-        return git_default_config(var, value, cb);
+        grep_config(var, value, ctx, cb);
+        return git_default_config(var, value, ctx, cb);
 }</code></pre>
 </div></div>
 <div class="paragraph"><p>Next, we can modify the <code>grep_filter</code>. This is done with convenience functions
@@ -1317,7 +1319,7 @@ that! Let&#8217;s see if we can walk <em>all</em> objects, and find out some inf
 about each one.</p></div>
 <div class="paragraph"><p>We can base our work on an example. <code>git pack-objects</code> prepares all kinds of
 objects for packing into a bitmap or packfile. The work we are interested in
-resides in <code>builtins/pack-objects.c:get_object_list()</code>; examination of that
+resides in <code>builtin/pack-objects.c:get_object_list()</code>; examination of that
 function shows that the all-object walk is being performed by
 <code>traverse_commit_list()</code> or <code>traverse_commit_list_filtered()</code>. Those two
 functions reside in <code>list-objects.c</code>; examining the source shows that, despite
@@ -1549,8 +1551,8 @@ walk we&#8217;ve just performed:</p></div>
         } else {
                 trace_printf(
                         _("Filtered object walk with filterspec 'tree:1'.\n"));
-                CALLOC_ARRAY(rev-&gt;filter, 1);
-                parse_list_objects_filter(rev-&gt;filter, "tree:1");
+
+                parse_list_objects_filter(&amp;rev-&gt;filter, "tree:1");
         }
         traverse_commit_list(rev, walken_show_commit,
                              walken_show_object, NULL);</code></pre>
@@ -1567,10 +1569,12 @@ points to the same tree object as its grandparent.)</p></div>
 <div class="sect2">
 <h3 id="_counting_omitted_objects">Counting Omitted Objects</h3>
 <div class="paragraph"><p>We also have the capability to enumerate all objects which were omitted by a
-filter, like with <code>git log --filter=&lt;spec&gt; --filter-print-omitted</code>. Asking
-<code>traverse_commit_list_filtered()</code> to populate the <code>omitted</code> list means that our
-object walk does not perform any better than an unfiltered object walk; all
-reachable objects are walked in order to populate the list.</p></div>
+filter, like with <code>git log --filter=&lt;spec&gt; --filter-print-omitted</code>. To do this,
+change <code>traverse_commit_list()</code> to <code>traverse_commit_list_filtered()</code>, which is
+able to populate an <code>omitted</code> list.  Asking for this list of filtered objects
+may cause performance degradations, however, because in this case, despite
+filtering objects, the possibly much larger set of all reachable objects must
+be processed in order to populate that list.</p></div>
 <div class="paragraph"><p>First, add the <code>struct oidset</code> and related items we will use to iterate it:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1589,8 +1593,9 @@ static void walken_object_walk(
 
         ...</code></pre>
 </div></div>
-<div class="paragraph"><p>Modify the call to <code>traverse_commit_list_filtered()</code> to include your <code>omitted</code>
-object:</p></div>
+<div class="paragraph"><p>Replace the call to <code>traverse_commit_list()</code> with
+<code>traverse_commit_list_filtered()</code> and pass a pointer to the <code>omitted</code> oidset
+defined and initialized above:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>        ...
@@ -1658,7 +1663,7 @@ those lines without having to recompile.</td>
 <div class="paragraph"><p>With only that change, run again (but save yourself some scrollback):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ GIT_TRACE=1 ./bin-wrappers/git walken | head -n 10</code></pre>
+<pre><code>$ GIT_TRACE=1 ./bin-wrappers/git walken 2&gt;&amp;1 | head -n 10</code></pre>
 </div></div>
 <div class="paragraph"><p>Take a look at the top commit with <code>git show</code> and the object ID you printed; it
 should be the same as the output of <code>git show HEAD</code>.</p></div>
@@ -1683,7 +1688,7 @@ of the first handful:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>$ make
-$ GIT_TRACE=1 ./bin-wrappers git walken | tail -n 10</code></pre>
+$ GIT_TRACE=1 ./bin-wrappers/git walken 2&gt;&amp;1 | tail -n 10</code></pre>
 </div></div>
 <div class="paragraph"><p>The last commit object given should have the same OID as the one we saw at the
 top before, and running <code>git show &lt;oid&gt;</code> with that OID should give you again
@@ -1737,7 +1742,7 @@ Changed the display order of the filtered object walk
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-07-17 11:51:48 PDT
+ 2024-04-09 14:45:01 PDT
 </div>
 </div>
 </body>
