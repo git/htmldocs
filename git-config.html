@@ -749,21 +749,14 @@ git-config(1) Manual Page
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--comment=&lt;message&gt;] [--fixed-value] [--show-origin] [--show-scope] [-z|--null] &lt;name&gt; [&lt;value&gt; [&lt;value-pattern&gt;]]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--comment=&lt;message&gt;] --add &lt;name&gt; &lt;value&gt;
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--comment=&lt;message&gt;] [--fixed-value] --replace-all &lt;name&gt; &lt;value&gt; [&lt;value-pattern&gt;]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] --get &lt;name&gt; [&lt;value-pattern&gt;]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] --get-all &lt;name&gt; [&lt;value-pattern&gt;]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--show-origin] [--show-scope] [-z|--null] [--fixed-value] [--name-only] --get-regexp &lt;name-regex&gt; [&lt;value-pattern&gt;]
-<em>git config</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [-z|--null] --get-urlmatch &lt;name&gt; &lt;URL&gt;
-<em>git config</em> [&lt;file-option&gt;] [--fixed-value] --unset &lt;name&gt; [&lt;value-pattern&gt;]
-<em>git config</em> [&lt;file-option&gt;] [--fixed-value] --unset-all &lt;name&gt; [&lt;value-pattern&gt;]
-<em>git config</em> [&lt;file-option&gt;] --rename-section &lt;old-name&gt; &lt;new-name&gt;
-<em>git config</em> [&lt;file-option&gt;] --remove-section &lt;name&gt;
-<em>git config</em> [&lt;file-option&gt;] [--show-origin] [--show-scope] [-z|--null] [--name-only] -l | --list
-<em>git config</em> [&lt;file-option&gt;] --get-color &lt;name&gt; [&lt;default&gt;]
-<em>git config</em> [&lt;file-option&gt;] --get-colorbool &lt;name&gt; [&lt;stdout-is-tty&gt;]
-<em>git config</em> [&lt;file-option&gt;] -e | --edit</pre>
+<pre class="content"><em>git config list</em> [&lt;file-option&gt;] [&lt;display-option&gt;] [--includes]
+<em>git config get</em> [&lt;file-option&gt;] [&lt;display-option&gt;] [--includes] [--all] [--regexp=&lt;regexp&gt;] [--value=&lt;value&gt;] [--fixed-value] [--default=&lt;default&gt;] &lt;name&gt;
+<em>git config set</em> [&lt;file-option&gt;] [--type=&lt;type&gt;] [--all] [--value=&lt;value&gt;] [--fixed-value] &lt;name&gt; &lt;value&gt;
+<em>git config unset</em> [&lt;file-option&gt;] [--all] [--value=&lt;value&gt;] [--fixed-value] &lt;name&gt; &lt;value&gt;
+<em>git config rename-section</em> [&lt;file-option&gt;] &lt;old-name&gt; &lt;new-name&gt;
+<em>git config remove-section</em> [&lt;file-option&gt;] &lt;name&gt;
+<em>git config edit</em> [&lt;file-option&gt;]
+<em>git config</em> [&lt;file-option&gt;] --get-colorbool &lt;name&gt; [&lt;stdout-is-tty&gt;]</pre>
 <div class="attribution">
 </div></div>
 </div>
@@ -774,7 +767,7 @@ git-config(1) Manual Page
 <div class="paragraph"><p>You can query/set/replace/unset options with this command. The name is
 actually the section and the key separated by a dot, and the value will be
 escaped.</p></div>
-<div class="paragraph"><p>Multiple lines can be added to an option by using the <code>--add</code> option.
+<div class="paragraph"><p>Multiple lines can be added to an option by using the <code>--append</code> option.
 If you want to update or unset an option which can occur on multiple
 lines, a <code>value-pattern</code> (which is an extended regular expression,
 unless the <code>--fixed-value</code> option is given) needs to be given.  Only the
@@ -842,6 +835,81 @@ you try to use an invalid regexp (ret=6).
 </div>
 </div>
 <div class="sect1">
+<h2 id="_commands">COMMANDS</h2>
+<div class="sectionbody">
+<div class="dlist"><dl>
+<dt class="hdlist1">
+list
+</dt>
+<dd>
+<p>
+        List all variables set in config file, along with their values.
+</p>
+</dd>
+<dt class="hdlist1">
+get
+</dt>
+<dd>
+<p>
+        Emits the value of the specified key. If key is present multiple times
+        in the configuration, emits the last value. If <code>--all</code> is specified,
+        emits all values associated with key. Returns error code 1 if key is
+        not present.
+</p>
+</dd>
+<dt class="hdlist1">
+set
+</dt>
+<dd>
+<p>
+        Set value for one or more config options. By default, this command
+        refuses to write multi-valued config options. Passing <code>--all</code> will
+        replace all multi-valued config options with the new value, whereas
+        <code>--value=</code> will replace all config options whose values match the given
+        pattern.
+</p>
+</dd>
+<dt class="hdlist1">
+unset
+</dt>
+<dd>
+<p>
+        Unset value for one or more config options. By default, this command
+        refuses to unset multi-valued keys. Passing <code>--all</code> will unset all
+        multi-valued config options, whereas <code>--value</code> will unset all config
+        options whose values match the given pattern.
+</p>
+</dd>
+<dt class="hdlist1">
+rename-section
+</dt>
+<dd>
+<p>
+        Rename the given section to a new name.
+</p>
+</dd>
+<dt class="hdlist1">
+remove-section
+</dt>
+<dd>
+<p>
+        Remove the given section from the configuration file.
+</p>
+</dd>
+<dt class="hdlist1">
+edit
+</dt>
+<dd>
+<p>
+        Opens an editor to modify the specified config file; either
+        <code>--system</code>, <code>--global</code>, <code>--local</code> (default), <code>--worktree</code>, or
+        <code>--file &lt;config-file&gt;</code>.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="OPTIONS">OPTIONS</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
@@ -855,13 +923,12 @@ you try to use an invalid regexp (ret=6).
 </p>
 </dd>
 <dt class="hdlist1">
---add
+--append
 </dt>
 <dd>
 <p>
         Adds a new line to the option without altering any existing
-        values.  This is the same as providing <em>^$</em> as the <code>value-pattern</code>
-        in <code>--replace-all</code>.
+        values. This is the same as providing <em>--value=^$</em> in <code>set</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -884,37 +951,26 @@ permitted).</code></pre>
 </div></div>
 </dd>
 <dt class="hdlist1">
---get
+--all
 </dt>
 <dd>
 <p>
-        Get the value for a given key (optionally filtered by a regex
-        matching the value). Returns error code 1 if the key was not
-        found and the last value if multiple key values were found.
+        With <code>get</code>, return all values for a multi-valued key.
 </p>
 </dd>
 <dt class="hdlist1">
---get-all
+---regexp
 </dt>
 <dd>
 <p>
-        Like get, but returns all values for a multi-valued key.
+        With <code>get</code>, interpret the name as a regular expression. Regular
+        expression matching is currently case-sensitive and done against a
+        canonicalized version of the key in which section and variable names
+        are lowercased, but subsection names are not.
 </p>
 </dd>
 <dt class="hdlist1">
---get-regexp
-</dt>
-<dd>
-<p>
-        Like --get-all, but interprets the name as a regular expression and
-        writes out the key names.  Regular expression matching is currently
-        case-sensitive and done against a canonicalized version of the key
-        in which section and variable names are lowercased, but subsection
-        names are not.
-</p>
-</dd>
-<dt class="hdlist1">
---get-urlmatch &lt;name&gt; &lt;URL&gt;
+--url=&lt;URL&gt;
 </dt>
 <dd>
 <p>
@@ -1004,49 +1060,6 @@ available files.</p></div>
         <em>.gitmodules</em> in the master branch. See "SPECIFYING REVISIONS"
         section in <a href="gitrevisions.html">gitrevisions(7)</a> for a more complete list of
         ways to spell blob names.
-</p>
-</dd>
-<dt class="hdlist1">
---remove-section
-</dt>
-<dd>
-<p>
-        Remove the given section from the configuration file.
-</p>
-</dd>
-<dt class="hdlist1">
---rename-section
-</dt>
-<dd>
-<p>
-        Rename the given section to a new name.
-</p>
-</dd>
-<dt class="hdlist1">
---unset
-</dt>
-<dd>
-<p>
-        Remove the line matching the key from config file.
-</p>
-</dd>
-<dt class="hdlist1">
---unset-all
-</dt>
-<dd>
-<p>
-        Remove all lines matching the key from config file.
-</p>
-</dd>
-<dt class="hdlist1">
--l
-</dt>
-<dt class="hdlist1">
---list
-</dt>
-<dd>
-<p>
-        List all variables set in config file, along with their values.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1165,8 +1178,8 @@ available files.</p></div>
 </dt>
 <dd>
 <p>
-        Output only the names of config variables for <code>--list</code> or
-        <code>--get-regexp</code>.
+        Output only the names of config variables for <code>list</code> or
+        <code>get</code>.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -1206,33 +1219,6 @@ available files.</p></div>
 </p>
 </dd>
 <dt class="hdlist1">
---get-color &lt;name&gt; [&lt;default&gt;]
-</dt>
-<dd>
-<p>
-        Find the color configured for <code>name</code> (e.g. <code>color.diff.new</code>) and
-        output it as the ANSI color escape sequence to the standard
-        output.  The optional <code>default</code> parameter is used instead, if
-        there is no color configured for <code>name</code>.
-</p>
-<div class="paragraph"><p><code>--type=color [--default=&lt;default&gt;]</code> is preferred over <code>--get-color</code>
-(but note that <code>--get-color</code> will omit the trailing newline printed by
-<code>--type=color</code>).</p></div>
-</dd>
-<dt class="hdlist1">
--e
-</dt>
-<dt class="hdlist1">
---edit
-</dt>
-<dd>
-<p>
-        Opens an editor to modify the specified config file; either
-        <code>--system</code>, <code>--global</code>, <code>--local</code> (default), <code>--worktree</code>, or
-        <code>--file &lt;config-file&gt;</code>.
-</p>
-</dd>
-<dt class="hdlist1">
 --[no-]includes
 </dt>
 <dd>
@@ -1248,8 +1234,135 @@ available files.</p></div>
 </dt>
 <dd>
 <p>
-  When using <code>--get</code>, and the requested variable is not found, behave as if
+  When using <code>get</code>, and the requested variable is not found, behave as if
   &lt;value&gt; were the value assigned to that variable.
+</p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_deprecated_modes">DEPRECATED MODES</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The following modes have been deprecated in favor of subcommands. It is
+recommended to migrate to the new syntax.</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+<em>git config &lt;name&gt;</em>
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config get &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+<em>git config &lt;name&gt; &lt;value&gt; [&lt;value-pattern&gt;]</em>
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config set [--value=&lt;pattern&gt;] &lt;name&gt; &lt;value&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+-l
+</dt>
+<dt class="hdlist1">
+--list
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config list</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--get &lt;name&gt; [&lt;value-pattern&gt;]
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config get [--value=&lt;pattern&gt;] &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--get-all &lt;name&gt; [&lt;value-pattern&gt;]
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config get [--value=&lt;pattern&gt;] --all --show-names &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--get-regexp &lt;name-regexp&gt;
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config get --all --show-names --regexp &lt;name-regexp&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--get-urlmatch &lt;name&gt; &lt;URL&gt;
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config get --all --show-names --url=&lt;URL&gt; &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--get-color &lt;name&gt; [&lt;default&gt;]
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config get --type=color [--default=&lt;default&gt;] &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--add &lt;name&gt; &lt;value&gt;
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config set --append &lt;name&gt; &lt;value&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--unset &lt;name&gt; [&lt;value-pattern&gt;]
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config unset [--value=&lt;pattern&gt;] &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--unset-all &lt;name&gt; [&lt;value-pattern&gt;]
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config unset [--value=&lt;pattern&gt;] --all &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--rename-section &lt;old-name&gt; &lt;new-name&gt;
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config rename-section &lt;old-name&gt; &lt;new-name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+--remove-section &lt;name&gt;
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config remove-section &lt;name&gt;</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+-e
+</dt>
+<dt class="hdlist1">
+--edit
+</dt>
+<dd>
+<p>
+        Replaced by <code>git config edit</code>.
 </p>
 </dd>
 </dl></div>
@@ -1259,8 +1372,8 @@ available files.</p></div>
 <h2 id="_configuration">CONFIGURATION</h2>
 <div class="sectionbody">
 <div class="paragraph"><p><code>pager.config</code> is only respected when listing configuration, i.e., when
-using <code>--list</code> or any of the <code>--get-*</code> which may return multiple results.
-The default is to use a pager.</p></div>
+using <code>list</code> or <code>get</code> which may return multiple results. The default is to use
+a pager.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1321,8 +1434,8 @@ if the file is unreadable, but not if it is missing.</p></div>
 precedence over values read earlier.  When multiple values are taken then all
 values of a key from all files will be used.</p></div>
 <div class="paragraph"><p>By default, options are only written to the repository specific
-configuration file. Note that this also affects options like <code>--replace-all</code>
-and <code>--unset</code>. <strong><em>git config</em> will only ever change one file at a time</strong>.</p></div>
+configuration file. Note that this also affects options like <code>set</code>
+and <code>unset</code>. <strong><em>git config</em> will only ever change one file at a time</strong>.</p></div>
 <div class="paragraph"><p>You can limit which configuration sources are read from or written to by
 specifying the path of a file with the <code>--file</code> option, or by specifying a
 configuration scope with <code>--system</code>, <code>--global</code>, <code>--local</code>, or <code>--worktree</code>.
@@ -1504,83 +1617,78 @@ GIT_CONFIG
 <div class="paragraph"><p>you can set the filemode to true with</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config core.filemode true</code></pre>
+<pre><code>% git config set core.filemode true</code></pre>
 </div></div>
 <div class="paragraph"><p>The hypothetical proxy command entries actually have a postfix to discern
 what URL they apply to. Here is how to change the entry for kernel.org
 to "ssh".</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config core.gitproxy '"ssh" for kernel.org' 'for kernel.org$'</code></pre>
+<pre><code>% git config set --value='for kernel.org$' core.gitproxy '"ssh" for kernel.org'</code></pre>
 </div></div>
 <div class="paragraph"><p>This makes sure that only the key/value pair for kernel.org is replaced.</p></div>
 <div class="paragraph"><p>To delete the entry for renames, do</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --unset diff.renames</code></pre>
+<pre><code>% git config unset diff.renames</code></pre>
 </div></div>
 <div class="paragraph"><p>If you want to delete an entry for a multivar (like core.gitproxy above),
 you have to provide a regex matching the value of exactly one line.</p></div>
 <div class="paragraph"><p>To query the value for a given key, do</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --get core.filemode</code></pre>
-</div></div>
-<div class="paragraph"><p>or</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><code>% git config core.filemode</code></pre>
+<pre><code>% git config get core.filemode</code></pre>
 </div></div>
 <div class="paragraph"><p>or, to query a multivar:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --get core.gitproxy "for kernel.org$"</code></pre>
+<pre><code>% git config get --value="for kernel.org$" core.gitproxy</code></pre>
 </div></div>
 <div class="paragraph"><p>If you want to know all the values for a multivar, do:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --get-all core.gitproxy</code></pre>
+<pre><code>% git config get --all --show-names core.gitproxy</code></pre>
 </div></div>
 <div class="paragraph"><p>If you like to live dangerously, you can replace <strong>all</strong> core.gitproxy by a
 new one with</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --replace-all core.gitproxy ssh</code></pre>
+<pre><code>% git config set --all core.gitproxy ssh</code></pre>
 </div></div>
 <div class="paragraph"><p>However, if you really only want to replace the line for the default proxy,
 i.e. the one without a "for &#8230;" postfix, do something like this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config core.gitproxy ssh '! for '</code></pre>
+<pre><code>% git config set --value='! for ' core.gitproxy ssh</code></pre>
 </div></div>
 <div class="paragraph"><p>To actually match only values with an exclamation mark, you have to</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config section.key value '[!]'</code></pre>
+<pre><code>% git config set --value='[!]' section.key value</code></pre>
 </div></div>
 <div class="paragraph"><p>To add a new proxy, without altering any of the existing ones, use</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --add core.gitproxy '"proxy-command" for example.com'</code></pre>
+<pre><code>% git config set --append core.gitproxy '"proxy-command" for example.com'</code></pre>
 </div></div>
 <div class="paragraph"><p>An example to use customized color from the configuration in your
 script:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><code>#!/bin/sh
-WS=$(git config --get-color color.diff.whitespace "blue reverse")
-RESET=$(git config --get-color "" "reset")
+WS=$(git config get --type=color --default="blue reverse" color.diff.whitespace)
+RESET=$(git config get --type=color --default="reset" "")
 echo "${WS}your whitespace color or blue reverse${RESET}"</code></pre>
 </div></div>
 <div class="paragraph"><p>For URLs in <code>https://weak.example.com</code>, <code>http.sslVerify</code> is set to
 false, while it is set to <code>true</code> for all others:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>% git config --type=bool --get-urlmatch http.sslverify https://good.example.com
+<pre><code>% git config get --type=bool --url=https://good.example.com http.sslverify
 true
-% git config --type=bool --get-urlmatch http.sslverify https://weak.example.com
+% git config get --type=bool --url=https://weak.example.com http.sslverify
 false
-% git config --get-urlmatch http https://weak.example.com
+% git config get --url=https://weak.example.com http
 http.cookieFile /tmp/cookie.txt
 http.sslverify false</code></pre>
 </div></div>
@@ -12018,7 +12126,7 @@ looks like</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-04-05 11:03:41 PDT
+ 2024-05-16 11:09:25 PDT
 </div>
 </div>
 </body>
