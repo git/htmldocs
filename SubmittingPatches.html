@@ -735,7 +735,7 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>Submitting Patches</h1>
-<span id="revdate">2024-05-16</span>
+<span id="revdate">2024-05-23</span>
 </div>
 <div id="content">
 <div class="sect1">
@@ -744,6 +744,91 @@ asciidoc.install();
 <div class="paragraph"><p>Here are some guidelines for contributing back to this
 project. There is also a <a href="MyFirstContribution.html">step-by-step tutorial</a>
 available which covers many of these same guidelines.</p></div>
+<div class="sect2">
+<h3 id="patch-flow">A typical life cycle of a patch series</h3>
+<div class="paragraph"><p>To help us understand the reason behind various guidelines given later
+in the document, first let&#8217;s understand how the life cycle of a
+typical patch series for this project goes.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+You come up with an itch.  You code it up.  You do not need any
+  pre-authorization from the project to do so.
+</p>
+<div class="paragraph"><p>Your patches will be reviewed by other contributors on the mailing
+list, and the reviews will be done to assess the merit of various
+things, like the general idea behind your patch (including "is it
+solving a problem worth solving in the first place?"), the reason
+behind the design of the solution, and the actual implementation.
+The guidelines given here are there to help your patches by making
+them easier to understand by the reviewers.</p></div>
+</li>
+<li>
+<p>
+You send the patches to the list and cc people who may need to know
+  about the change.  Your goal is <strong>not</strong> necessarily to convince others
+  that what you are building is good.  Your goal is to get help in
+  coming up with a solution for the "itch" that is better than what
+  you can build alone.
+</p>
+<div class="paragraph"><p>The people who may need to know are the ones who worked on the code
+you are touching.  These people happen to be the ones who are
+most likely to be knowledgeable enough to help you, but
+they have no obligation to help you (i.e. you ask them for help,
+you don&#8217;t demand).  <code>git log -p &#45;&#45; <em>$area_you_are_modifying</em></code> would
+help you find out who they are.</p></div>
+</li>
+<li>
+<p>
+You get comments and suggestions for improvements.  You may even get
+  them in an "on top of your change" patch form.  You are expected to
+  respond to them with "Reply-All" on the mailing list, while taking
+  them into account while preparing an updated set of patches.
+</p>
+</li>
+<li>
+<p>
+Polish, refine, and re-send your patches to the list and to the people
+  who spent their time to improve your patch.  Go back to step (2).
+</p>
+</li>
+<li>
+<p>
+While the above iterations improve your patches, the maintainer may
+  pick the patches up from the list and queue them to the <code>seen</code>
+  branch, in order to make it easier for people to play with it
+  without having to pick up and apply the patches to their trees
+  themselves.  Being in <code>seen</code> has no other meaning.  Specifically, it
+  does not mean the patch was "accepted" in any way.
+</p>
+</li>
+<li>
+<p>
+When the discussion reaches a consensus that the latest iteration of
+  the patches are in good enough shape, the maintainer includes the
+  topic in the "What&#8217;s cooking" report that are sent out a few times a
+  week to the mailing list, marked as "Will merge to <em>next</em>."  This
+  decision is primarily made by the maintainer with help from those
+  who participated in the review discussion.
+</p>
+</li>
+<li>
+<p>
+After the patches are merged to the <em>next</em> branch, the discussion
+  can still continue to further improve them by adding more patches on
+  top, but by the time a topic gets merged to <em>next</em>, it is expected
+  that everybody agrees that the scope and the basic direction of the
+  topic are appropriate, so such an incremental updates are limited to
+  small corrections and polishing.  After a topic cooks for some time
+  (like 7 calendar days) in <em>next</em> without needing further tweaks on
+  top, it gets merged to the <em>master</em> branch and wait to become part
+  of the next major release.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>In the following sections, many techniques and conventions are listed
+to help your patches get reviewed effectively in such a life cycle.</p></div>
+</div>
 <div class="sect2">
 <h3 id="choose-starting-point">Choose a starting point.</h3>
 <div class="paragraph"><p>As a preliminary step, you must first choose a starting point for your
@@ -945,8 +1030,9 @@ Your code may be doing things that were only necessary for your
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>The goal of your log message is to convey the <em>why</em> behind your
-change to help future developers.</p></div>
+<div class="paragraph"><p>The goal of your log message is to convey the <em>why</em> behind your change
+to help future developers.  The reviewers will also make sure that
+your proposed log message will serve this purpose well.</p></div>
 <div class="paragraph"><p>The first line of the commit message should be a short description (50
 characters is the soft limit, see DISCUSSION in <a href="git-commit.html">git-commit(1)</a>),
 and should skip the full stop.  It is also conventional in most cases to
@@ -1381,84 +1467,6 @@ maintain it, cf. &lt;YntxL/fTplFm8lr6@cleo&gt;.</code></pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="patch-flow">An ideal patch flow</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>Here is an ideal patch flow for this project the current maintainer
-suggests to the contributors:</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-You come up with an itch.  You code it up.
-</p>
-</li>
-<li>
-<p>
-Send it to the list and cc people who may need to know about
-  the change.
-</p>
-<div class="paragraph"><p>The people who may need to know are the ones whose code you
-are butchering.  These people happen to be the ones who are
-most likely to be knowledgeable enough to help you, but
-they have no obligation to help you (i.e. you ask for help,
-don&#8217;t demand).  <code>git log -p &#45;&#45; <em>$area_you_are_modifying</em></code> would
-help you find out who they are.</p></div>
-</li>
-<li>
-<p>
-You get comments and suggestions for improvements.  You may
-  even get them in an "on top of your change" patch form.
-</p>
-</li>
-<li>
-<p>
-Polish, refine, and re-send to the list and the people who
-  spend their time to improve your patch.  Go back to step (2).
-</p>
-</li>
-<li>
-<p>
-The list forms consensus that the last round of your patch is
-  good.  Send it to the maintainer and cc the list.
-</p>
-</li>
-<li>
-<p>
-A topic branch is created with the patch and is merged to <code>next</code>,
-  and cooked further and eventually graduates to <code>master</code>.
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>In any time between the (2)-(3) cycle, the maintainer may pick it up
-from the list and queue it to <code>seen</code>, in order to make it easier for
-people to play with it without having to pick up and apply the patch to
-their trees themselves.</p></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="patch-status">Know the status of your patch after submission</h2>
-<div class="sectionbody">
-<div class="ulist"><ul>
-<li>
-<p>
-You can use Git itself to find out when your patch is merged in
-  master. <code>git pull --rebase</code> will automatically skip already-applied
-  patches, and will let you know. This works only if you rebase on top
-  of the branch in which your patch has been merged (i.e. it will not
-  tell you if your patch is merged in <code>seen</code> if you rebase on top of
-  master).
-</p>
-</li>
-<li>
-<p>
-Read the Git mailing list, the maintainer regularly posts messages
-  entitled "What&#8217;s cooking in git.git" giving
-  the status of various proposed changes.
-</p>
-</li>
-</ul></div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_github_ci_a_id_ghci_a">GitHub CI<a id="GHCI"></a></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>With an account at GitHub, you can use GitHub CI to test your changes
@@ -1582,7 +1590,7 @@ this problem around.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-05-13 12:26:57 PDT
+ 2024-05-23 12:14:59 PDT
 </div>
 </div>
 </body>
