@@ -1594,21 +1594,26 @@ exclude
 </dt>
 <dd>
 <p>
-        Pseudorefs are a class of files under <code>$GIT_DIR</code> which behave
-        like refs for the purposes of rev-parse, but which are treated
-        specially by git.  Pseudorefs both have names that are all-caps,
-        and always start with a line consisting of a
-        <a href="#def_SHA1">SHA-1</a> followed by whitespace.  So, HEAD is not a
-        pseudoref, because it is sometimes a symbolic ref.  They might
-        optionally contain some additional data.  <code>MERGE_HEAD</code> and
-        <code>CHERRY_PICK_HEAD</code> are examples.  Unlike
-        <a href="#def_per_worktree_ref">per-worktree refs</a>, these files cannot
-        be symbolic refs, and never have reflogs.  They also cannot be
-        updated through the normal ref update machinery.  Instead,
-        they are updated by directly writing to the files.  However,
-        they can be read as if they were refs, so <code>git rev-parse
-        MERGE_HEAD</code> will work.
+        A ref that has different semantics than normal refs. These refs can be
+        read via normal Git commands, but cannot be written to by commands like
+        <a href="git-update-ref.html">git-update-ref(1)</a>.
 </p>
+<div class="paragraph"><p>The following pseudorefs are known to Git:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<code>FETCH_HEAD</code> is written by <a href="git-fetch.html">git-fetch(1)</a> or <a href="git-pull.html">git-pull(1)</a>. It
+   may refer to multiple object IDs. Each object ID is annotated with metadata
+   indicating where it was fetched from and its fetch status.
+</p>
+</li>
+<li>
+<p>
+<code>MERGE_HEAD</code> is written by <a href="git-merge.html">git-merge(1)</a> when resolving merge
+   conflicts. It contains all commit IDs which are being merged.
+</p>
+</li>
+</ul></div>
 </dd>
 <dt class="hdlist1">
 <a id="def_pull"></a>pull
@@ -1679,19 +1684,59 @@ exclude
 </dt>
 <dd>
 <p>
-        A name that begins with <code>refs/</code> (e.g. <code>refs/heads/master</code>)
-        that points to an <a href="#def_object_name">object name</a> or another
-        ref (the latter is called a <a href="#def_symref">symbolic ref</a>).
+        A name that that points to an <a href="#def_object_name">object name</a> or
+        another ref (the latter is called a <a href="#def_symref">symbolic ref</a>).
         For convenience, a ref can sometimes be abbreviated when used
         as an argument to a Git command; see <a href="gitrevisions.html">gitrevisions(7)</a>
         for details.
         Refs are stored in the <a href="#def_repository">repository</a>.
 </p>
 <div class="paragraph"><p>The ref namespace is hierarchical.
-Different subhierarchies are used for different purposes (e.g. the
-<code>refs/heads/</code> hierarchy is used to represent local branches).</p></div>
-<div class="paragraph"><p>There are a few special-purpose refs that do not begin with <code>refs/</code>.
-The most notable example is <code>HEAD</code>.</p></div>
+Ref names must either start with <code>refs/</code> or be located in the root of
+the hierarchy. For the latter, their name must follow these rules:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The name consists of only upper-case characters or underscores.
+</p>
+</li>
+<li>
+<p>
+The name ends with "<code>_HEAD</code>" or is equal to "<code>HEAD</code>".
+</p>
+<div class="paragraph"><p>There are some irregular refs in the root of the hierarchy that do not
+match these rules. The following list is exhaustive and shall not be
+extended in the future:</p></div>
+</li>
+<li>
+<p>
+<code>AUTO_MERGE</code>
+</p>
+</li>
+<li>
+<p>
+<code>BISECT_EXPECTED_REV</code>
+</p>
+</li>
+<li>
+<p>
+<code>NOTES_MERGE_PARTIAL</code>
+</p>
+</li>
+<li>
+<p>
+<code>NOTES_MERGE_REF</code>
+</p>
+</li>
+<li>
+<p>
+<code>MERGE_AUTOSTASH</code>
+</p>
+<div class="paragraph"><p>Different subhierarchies are used for different purposes. For example,
+the <code>refs/heads/</code> hierarchy is used to represent local branches whereas
+the <code>refs/tags/</code> hierarchy is used to represent local tags..</p></div>
+</li>
+</ul></div>
 </dd>
 <dt class="hdlist1">
 <a id="def_reflog"></a>reflog
@@ -1828,32 +1873,6 @@ The most notable example is <code>HEAD</code>.</p></div>
         An <a href="#def_object">object</a> used to temporarily store the contents of a
         <a href="#def_dirty">dirty</a> working directory and the index for future reuse.
 </p>
-</dd>
-<dt class="hdlist1">
-<a id="def_special_ref"></a>special ref
-</dt>
-<dd>
-<p>
-        A ref that has different semantics than normal refs. These refs can be
-        accessed via normal Git commands but may not behave the same as a
-        normal ref in some cases.
-</p>
-<div class="paragraph"><p>The following special refs are known to Git:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-"<code>FETCH_HEAD</code>" is written by <a href="git-fetch.html">git-fetch(1)</a> or <a href="git-pull.html">git-pull(1)</a>. It
-   may refer to multiple object IDs. Each object ID is annotated with metadata
-   indicating where it was fetched from and its fetch status.
-</p>
-</li>
-<li>
-<p>
-"<code>MERGE_HEAD</code>" is written by <a href="git-merge.html">git-merge(1)</a> when resolving merge
-   conflicts. It contains all commit IDs which are being merged.
-</p>
-</li>
-</ul></div>
 </dd>
 <dt class="hdlist1">
 <a id="def_submodule"></a>submodule
