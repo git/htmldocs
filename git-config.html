@@ -2125,17 +2125,6 @@ add.ignore-errors (deprecated)
 </p>
 </dd>
 <dt class="hdlist1">
-add.interactive.useBuiltin
-</dt>
-<dd>
-<p>
-        Unused configuration variable. Used in Git versions v2.25.0 to
-        v2.36.0 to enable the built-in version of <a href="git-add.html">git-add(1)</a>'s
-        interactive mode, which then became the default in Git
-        versions v2.37.0 to v2.39.0.
-</p>
-</dd>
-<dt class="hdlist1">
 advice.*
 </dt>
 <dd>
@@ -2669,11 +2658,136 @@ attr.tree
 <dd>
 <p>
         A reference to a tree in the repository from which to read attributes,
-        instead of the <code>.gitattributes</code> file in the working tree. In a bare
-        repository, this defaults to <code>HEAD:.gitattributes</code>. If the value does
-        not resolve to a valid tree object, an empty tree is used instead.
+        instead of the <code>.gitattributes</code> file in the working tree. If the value
+        does not resolve to a valid tree object, an empty tree is used instead.
         When the <code>GIT_ATTR_SOURCE</code> environment variable or <code>--attr-source</code>
         command line option are used, this configuration variable has no effect.
+</p>
+</dd>
+</dl></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">The configuration options in <code>bitmapPseudoMerge.*</code> are considered
+EXPERIMENTAL and may be subject to change or be removed entirely in the
+future. For more information about the pseudo-merge bitmap feature, see
+the "Pseudo-merge bitmaps" section of <a href="gitpacking.html">gitpacking(7)</a>.</td>
+</tr></table>
+</div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.pattern
+</dt>
+<dd>
+<p>
+        Regular expression used to match reference names. Commits
+        pointed to by references matching this pattern (and meeting
+        the below criteria, like <code>bitmapPseudoMerge.&lt;name&gt;.sampleRate</code>
+        and <code>bitmapPseudoMerge.&lt;name&gt;.threshold</code>) will be considered
+        for inclusion in a pseudo-merge bitmap.
+</p>
+<div class="paragraph"><p>Commits are grouped into pseudo-merge groups based on whether or not
+any reference(s) that point at a given commit match the pattern, which
+is an extended regular expression.</p></div>
+<div class="paragraph"><p>Within a pseudo-merge group, commits may be further grouped into
+sub-groups based on the capture groups in the pattern. These
+sub-groupings are formed from the regular expressions by concatenating
+any capture groups from the regular expression, with a <em>-</em> dash in
+between.</p></div>
+<div class="paragraph"><p>For example, if the pattern is <code>refs/tags/</code>, then all tags (provided
+they meet the below criteria) will be considered candidates for the
+same pseudo-merge group. However, if the pattern is instead
+<code>refs/remotes/([0-9])+/tags/</code>, then tags from different remotes will
+be grouped into separate pseudo-merge groups, based on the remote
+number.</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.decay
+</dt>
+<dd>
+<p>
+        Determines the rate at which consecutive pseudo-merge bitmap
+        groups decrease in size. Must be non-negative. This parameter
+        can be thought of as <code>k</code> in the function <code>f(n) = C * n^-k</code>,
+        where <code>f(n)</code> is the size of the `n`th group.
+</p>
+<div class="paragraph"><p>Setting the decay rate equal to <code>0</code> will cause all groups to be the
+same size. Setting the decay rate equal to <code>1</code> will cause the <code>n`th
+group to be `1/n</code> the size of the initial group.  Higher values of the
+decay rate cause consecutive groups to shrink at an increasing rate.
+The default is <code>1</code>.</p></div>
+<div class="paragraph"><p>If all groups are the same size, it is possible that groups containing
+newer commits will be able to be used less often than earlier groups,
+since it is more likely that the references pointing at newer commits
+will be updated more often than a reference pointing at an old commit.</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.sampleRate
+</dt>
+<dd>
+<p>
+        Determines the proportion of non-bitmapped commits (among
+        reference tips) which are selected for inclusion in an
+        unstable pseudo-merge bitmap. Must be between <code>0</code> and <code>1</code>
+        (inclusive). The default is <code>1</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.threshold
+</dt>
+<dd>
+<p>
+        Determines the minimum age of non-bitmapped commits (among
+        reference tips, as above) which are candidates for inclusion
+        in an unstable pseudo-merge bitmap. The default is
+        <code>1.week.ago</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.maxMerges
+</dt>
+<dd>
+<p>
+        Determines the maximum number of pseudo-merge commits among
+        which commits may be distributed.
+</p>
+<div class="paragraph"><p>For pseudo-merge groups whose pattern does not contain any capture
+groups, this setting is applied for all commits matching the regular
+expression. For patterns that have one or more capture groups, this
+setting is applied for each distinct capture group.</p></div>
+<div class="paragraph"><p>For example, if your capture group is <code>refs/tags/</code>, then this setting
+will distribute all tags into a maximum of <code>maxMerges</code> pseudo-merge
+commits. However, if your capture group is, say,
+<code>refs/remotes/([0-9]+)/tags/</code>, then this setting will be applied to
+each remote&#8217;s set of tags individually.</p></div>
+<div class="paragraph"><p>Must be non-negative. The default value is 64.</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.stableThreshold
+</dt>
+<dd>
+<p>
+        Determines the minimum age of commits (among reference tips,
+        as above, however stable commits are still considered
+        candidates even when they have been covered by a bitmap) which
+        are candidates for a stable a pseudo-merge bitmap. The default
+        is <code>1.month.ago</code>.
+</p>
+<div class="paragraph"><p>Setting this threshold to a smaller value (e.g., 1.week.ago) will cause
+more stable groups to be generated (which impose a one-time generation
+cost) but those groups will likely become stale over time. Using a
+larger value incurs the opposite penalty (fewer stable groups which are
+more useful).</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.stableSize
+</dt>
+<dd>
+<p>
+        Determines the size (in number of commits) of a stable
+        psuedo-merge bitmap. The default is <code>512</code>.
 </p>
 </dd>
 <dt class="hdlist1">

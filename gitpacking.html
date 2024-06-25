@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 10.2.0" />
-<title>How to revert a faulty merge</title>
+<title>gitpacking(7)</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -732,293 +732,340 @@ asciidoc.install();
 /*]]>*/
 </script>
 </head>
-<body class="article">
+<body class="manpage">
 <div id="header">
-<h1>How to revert a faulty merge</h1>
-<span id="revdate">2024-06-24</span>
+<h1>
+gitpacking(7) Manual Page
+</h1>
+<h2>NAME</h2>
+<div class="sectionbody">
+<p>gitpacking -
+   Advanced concepts related to packing in Git
+</p>
+</div>
 </div>
 <div id="content">
-<div id="preamble">
+<div class="sect1">
+<h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Alan &lt;<a href="mailto:alan@clueserver.org">alan@clueserver.org</a>&gt; said:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>I have a master branch.  We have a branch off of that that some
-developers are doing work on.  They claim it is ready. We merge it
-into the master branch.  It breaks something so we revert the merge.
-They make changes to the code.  they get it to a point where they say
-it is ok and we merge again.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>When examined, we find that code changes made before the revert are
-not in the master branch, but code changes after are in the master
-branch.</code></pre>
-</div></div>
-<div class="paragraph"><p>and asked for help recovering from this situation.</p></div>
-<div class="paragraph"><p>The history immediately after the "revert of the merge" would look like
-this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x---W
-              /
-      ---A---B</code></pre>
-</div></div>
-<div class="paragraph"><p>where A and B are on the side development that was not so good, M is the
-merge that brings these premature changes into the mainline, x are changes
-unrelated to what the side branch did and already made on the mainline,
-and W is the "revert of the merge M" (doesn&#8217;t W look M upside down?).
-IOW, <code>"diff W^..W"</code> is similar to <code>"diff -R M^..M"</code>.</p></div>
-<div class="paragraph"><p>Such a "revert" of a merge can be made with:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git revert -m 1 M</code></pre>
-</div></div>
-<div class="paragraph"><p>After the developers of the side branch fix their mistakes, the history
-may look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x---W---x
-              /
-      ---A---B-------------------C---D</code></pre>
-</div></div>
-<div class="paragraph"><p>where C and D are to fix what was broken in A and B, and you may already
-have some other changes on the mainline after W.</p></div>
-<div class="paragraph"><p>If you merge the updated side branch (with D at its tip), none of the
-changes made in A or B will be in the result, because they were reverted
-by W.  That is what Alan saw.</p></div>
-<div class="paragraph"><p>Linus explains the situation:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>Reverting a regular commit just effectively undoes what that commit
-did, and is fairly straightforward. But reverting a merge commit also
-undoes the _data_ that the commit changed, but it does absolutely
-nothing to the effects on _history_ that the merge had.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>So the merge will still exist, and it will still be seen as joining
-the two branches together, and future merges will see that merge as
-the last shared state - and the revert that reverted the merge brought
-in will not affect that at all.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>So a "revert" undoes the data changes, but it's very much _not_ an
-"undo" in the sense that it doesn't undo the effects of a commit on
-the repository history.</code></pre>
-</div></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>So if you think of "revert" as "undo", then you're going to always
-miss this part of reverts. Yes, it undoes the data, but no, it doesn't
-undo history.</code></pre>
-</div></div>
-<div class="paragraph"><p>In such a situation, you would want to first revert the previous revert,
-which would make the history look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x---W---x---Y
-              /
-      ---A---B-------------------C---D</code></pre>
-</div></div>
-<div class="paragraph"><p>where Y is the revert of W.  Such a "revert of the revert" can be done
-with:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git revert W</code></pre>
-</div></div>
-<div class="paragraph"><p>This history would (ignoring possible conflicts between what W and W..Y
-changed) be equivalent to not having W or Y at all in the history:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x-------x----
-              /
-      ---A---B-------------------C---D</code></pre>
-</div></div>
-<div class="paragraph"><p>and merging the side branch again will not have conflict arising from an
-earlier revert and revert of the revert.</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x-------x-------*
-              /                       /
-      ---A---B-------------------C---D</code></pre>
-</div></div>
-<div class="paragraph"><p>Of course the changes made in C and D still can conflict with what was
-done by any of the x, but that is just a normal merge conflict.</p></div>
-<div class="paragraph"><p>On the other hand, if the developers of the side branch discarded their
-faulty A and B, and redone the changes on top of the updated mainline
-after the revert, the history would have looked like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x---W---x---x
-              /                 \
-      ---A---B                   A'--B'--C'</code></pre>
-</div></div>
-<div class="paragraph"><p>If you reverted the revert in such a case as in the previous example:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x---W---x---x---Y---*
-              /                 \         /
-      ---A---B                   A'--B'--C'</code></pre>
-</div></div>
-<div class="paragraph"><p>where Y is the revert of W, A' and B' are rerolled A and B, and there may
-also be a further fix-up C' on the side branch.  <code>"diff Y^..Y"</code> is similar
-to <code>"diff -R W^..W"</code> (which in turn means it is similar to <code>"diff M^..M"</code>),
-and <code>"diff A'^..C'"</code> by definition would be similar but different from that,
-because it is a rerolled series of the earlier change.  There will be a
-lot of overlapping changes that result in conflicts.  So do not do "revert
-of revert" blindly without thinking..</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>---o---o---o---M---x---x---W---x---x
-              /                 \
-      ---A---B                   A'--B'--C'</code></pre>
-</div></div>
-<div class="paragraph"><p>In the history with rebased side branch, W (and M) are behind the merge
-base of the updated branch and the tip of the mainline, and they should
-merge without the past faulty merge and its revert getting in the way.</p></div>
-<div class="paragraph"><p>To recap, these are two very different scenarios, and they want two very
-different resolution strategies:</p></div>
-<div class="ulist"><ul>
-<li>
+<div class="paragraph"><p>gitpacking</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_description">DESCRIPTION</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This document aims to describe some advanced concepts related to packing
+in Git.</p></div>
+<div class="paragraph"><p>Many concepts are currently described scattered between manual pages of
+various Git commands, including <a href="git-pack-objects.html">git-pack-objects(1)</a>,
+<a href="git-repack.html">git-repack(1)</a>, and others, as well as <a href="gitformat-pack.html">gitformat-pack(5)</a>,
+and parts of the <code>Documentation/technical</code> tree.</p></div>
+<div class="paragraph"><p>There are many aspects of packing in Git that are not covered in this
+document that instead live in the aforementioned areas. Over time, those
+scattered bits may coalesce into this document.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_pseudo_merge_bitmaps">Pseudo-merge bitmaps</h2>
+<div class="sectionbody">
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">Pseudo-merge bitmaps are considered an experimental feature, so
+the configuration and many of the ideas are subject to change.</td>
+</tr></table>
+</div>
+<div class="sect2">
+<h3 id="_background">Background</h3>
+<div class="paragraph"><p>Reachability bitmaps are most efficient when we have on-disk stored
+bitmaps for one or more of the starting points of a traversal. For this
+reason, Git prefers storing bitmaps for commits at the tips of refs,
+because traversals tend to start with those points.</p></div>
+<div class="paragraph"><p>But if you have a large number of refs, it&#8217;s not feasible to store a
+bitmap for <em>every</em> ref tip. It takes up space, and just OR-ing all of
+those bitmaps together is expensive.</p></div>
+<div class="paragraph"><p>One way we can deal with that is to create bitmaps that represent
+<em>groups</em> of refs. When a traversal asks about the entire group, then we
+can use this single bitmap instead of considering each ref individually.
+Because these bitmaps represent the set of objects which would be
+reachable in a hypothetical merge of all of the commits, we call them
+pseudo-merge bitmaps.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_overview">Overview</h3>
+<div class="paragraph"><p>A "pseudo-merge bitmap" is used to refer to a pair of bitmaps, as
+follows:</p></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+Commit bitmap
+</dt>
+<dd>
 <p>
-If the faulty side branch was fixed by adding corrections on top, then
-   doing a revert of the previous revert would be the right thing to do.
+  A bitmap whose set bits describe the set of commits included in the
+  pseudo-merge&#8217;s "merge" bitmap (as below).
 </p>
-</li>
-<li>
+</dd>
+<dt class="hdlist1">
+Merge bitmap
+</dt>
+<dd>
 <p>
-If the faulty side branch whose effects were discarded by an earlier
-   revert of a merge was rebuilt from scratch (i.e. rebasing and fixing,
-   as you seem to have interpreted), then re-merging the result without
-   doing anything else fancy would be the right thing to do.
-   (See the ADDENDUM below for how to rebuild a branch from scratch
-   without changing its original branching-off point.)
+  A bitmap whose set bits describe the reachability closure over the set
+  of commits in the pseudo-merge&#8217;s "commits" bitmap (as above). An
+  identical bitmap would be generated for an octopus merge with the same
+  set of parents as described in the commits bitmap.
 </p>
-</li>
-</ul></div>
-<div class="paragraph"><p>However, there are things to keep in mind when reverting a merge (and
-reverting such a revert).</p></div>
-<div class="paragraph"><p>For example, think about what reverting a merge (and then reverting the
-revert) does to bisectability. Ignore the fact that the revert of a revert
-is undoing it - just think of it as a "single commit that does a lot".
-Because that is what it does.</p></div>
-<div class="paragraph"><p>When you have a problem you are chasing down, and you hit a "revert this
-merge", what you&#8217;re hitting is essentially a single commit that contains
-all the changes (but obviously in reverse) of all the commits that got
-merged. So it&#8217;s debugging hell, because now you don&#8217;t have lots of small
-changes that you can try to pinpoint which <em>part</em> of it changes.</p></div>
-<div class="paragraph"><p>But does it all work? Sure it does. You can revert a merge, and from a
-purely technical angle, Git did it very naturally and had no real
-troubles. It just considered it a change from "state before merge" to
-"state after merge", and that was it. Nothing complicated, nothing odd,
-nothing really dangerous. Git will do it without even thinking about it.</p></div>
-<div class="paragraph"><p>So from a technical angle, there&#8217;s nothing wrong with reverting a merge,
-but from a workflow angle it&#8217;s something that you generally should try to
-avoid.</p></div>
-<div class="paragraph"><p>If at all possible, for example, if you find a problem that got merged
-into the main tree, rather than revert the merge, try <em>really</em> hard to
-bisect the problem down into the branch you merged, and just fix it, or
-try to revert the individual commit that caused it.</p></div>
-<div class="paragraph"><p>Yes, it&#8217;s more complex, and no, it&#8217;s not always going to work (sometimes
-the answer is: "oops, I really shouldn&#8217;t have merged it, because it wasn&#8217;t
-ready yet, and I really need to undo <em>all</em> of the merge"). So then you
-really should revert the merge, but when you want to re-do the merge, you
-now need to do it by reverting the revert.</p></div>
-<div class="paragraph"><p>ADDENDUM</p></div>
-<div class="paragraph"><p>Sometimes you have to rewrite one of a topic branch&#8217;s commits <strong>and</strong> you can&#8217;t
-change the topic&#8217;s branching-off point.  Consider the following situation:</p></div>
+</dd>
+</dl></div>
+<div class="paragraph"><p>Pseudo-merge bitmaps can accelerate bitmap traversals when all commits
+for a given pseudo-merge are listed on either side of the traversal,
+either directly (by explicitly asking for them as part of the <code>HAVES</code>
+or <code>WANTS</code>) or indirectly (by encountering them during a fill-in
+traversal).</p></div>
+</div>
+<div class="sect2">
+<h3 id="_use_cases">Use-cases</h3>
+<div class="paragraph"><p>For example, suppose there exists a pseudo-merge bitmap with a large
+number of commits, all of which are listed in the <code>WANTS</code> section of
+some bitmap traversal query. When pseudo-merge bitmaps are enabled, the
+bitmap machinery can quickly determine there is a pseudo-merge which
+satisfies some subset of the wanted objects on either side of the query.
+Then, we can inflate the EWAH-compressed bitmap, and <code>OR</code> it in to the
+resulting bitmap. By contrast, without pseudo-merge bitmaps, we would
+have to repeat the decompression and <code>OR</code>-ing step over a potentially
+large number of individual bitmaps, which can take proportionally more
+time.</p></div>
+<div class="paragraph"><p>Another benefit of pseudo-merges arises when there is some combination
+of (a) a large number of references, with (b) poor bitmap coverage, and
+(c) deep, nested trees, making fill-in traversal relatively expensive.
+For example, suppose that there are a large enough number of tags where
+bitmapping each of the tags individually is infeasible. Without
+pseudo-merge bitmaps, computing the result of, say, <code>git rev-list
+--use-bitmap-index --count --objects --tags</code> would likely require a
+large amount of fill-in traversal. But when a large quantity of those
+tags are stored together in a pseudo-merge bitmap, the bitmap machinery
+can take advantage of the fact that we only care about the union of
+objects reachable from all of those tags, and answer the query much
+faster.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_configuration">Configuration</h3>
+<div class="paragraph"><p>Reference tips are grouped into different pseudo-merge groups according
+to two criteria. A reference name matches one or more of the defined
+pseudo-merge patterns, and optionally one or more capture groups within
+that pattern which further partition the group.</p></div>
+<div class="paragraph"><p>Within a group, commits may be considered "stable", or "unstable"
+depending on their age. These are adjusted by setting the
+<code>bitmapPseudoMerge.&lt;name&gt;.stableThreshold</code> and
+<code>bitmapPseudoMerge.&lt;name&gt;.threshold</code> configuration values, respectively.</p></div>
+<div class="paragraph"><p>All stable commits are grouped into pseudo-merges of equal size
+(<code>bitmapPseudoMerge.&lt;name&gt;.stableSize</code>). If the <code>stableSize</code>
+configuration is set to, say, 100, then the first 100 commits (ordered
+by committer date) which are older than the <code>stableThreshold</code> value will
+form one group, the next 100 commits will form another group, and so on.</p></div>
+<div class="paragraph"><p>Among unstable commits, the pseudo-merge machinery will attempt to
+combine older commits into large groups as opposed to newer commits
+which will appear in smaller groups. This is based on the heuristic that
+references whose tip commit is older are less likely to be modified to
+point at a different commit than a reference whose tip commit is newer.</p></div>
+<div class="paragraph"><p>The size of groups is determined by a power-law decay function, and the
+decay parameter roughly corresponds to "k" in <code>f(n) = C*n^(-k/100)</code>,
+where <code>f(n)</code> describes the size of the <code>n</code>-th pseudo-merge group. The
+sample rate controls what percentage of eligible commits are considered
+as candidates. The threshold parameter indicates the minimum age (so as
+to avoid including too-recent commits in a pseudo-merge group, making it
+less likely to be valid). The "maxMerges" parameter sets an upper-bound
+on the number of pseudo-merge commits an individual group</p></div>
+<div class="paragraph"><p>The "stable"-related parameters control "stable" pseudo-merge groups,
+comprised of a fixed number of commits which are older than the
+configured "stable threshold" value and may be grouped together in
+chunks of "stableSize" in order of age.</p></div>
+<div class="paragraph"><p>The exact configuration for pseudo-merges is as follows:</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">The configuration options in <code>bitmapPseudoMerge.*</code> are considered
+EXPERIMENTAL and may be subject to change or be removed entirely in the
+future. For more information about the pseudo-merge bitmap feature, see
+the "Pseudo-merge bitmaps" section of <a href="gitpacking.html">gitpacking(7)</a>.</td>
+</tr></table>
+</div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.pattern
+</dt>
+<dd>
+<p>
+        Regular expression used to match reference names. Commits
+        pointed to by references matching this pattern (and meeting
+        the below criteria, like <code>bitmapPseudoMerge.&lt;name&gt;.sampleRate</code>
+        and <code>bitmapPseudoMerge.&lt;name&gt;.threshold</code>) will be considered
+        for inclusion in a pseudo-merge bitmap.
+</p>
+<div class="paragraph"><p>Commits are grouped into pseudo-merge groups based on whether or not
+any reference(s) that point at a given commit match the pattern, which
+is an extended regular expression.</p></div>
+<div class="paragraph"><p>Within a pseudo-merge group, commits may be further grouped into
+sub-groups based on the capture groups in the pattern. These
+sub-groupings are formed from the regular expressions by concatenating
+any capture groups from the regular expression, with a <em>-</em> dash in
+between.</p></div>
+<div class="paragraph"><p>For example, if the pattern is <code>refs/tags/</code>, then all tags (provided
+they meet the below criteria) will be considered candidates for the
+same pseudo-merge group. However, if the pattern is instead
+<code>refs/remotes/([0-9])+/tags/</code>, then tags from different remotes will
+be grouped into separate pseudo-merge groups, based on the remote
+number.</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.decay
+</dt>
+<dd>
+<p>
+        Determines the rate at which consecutive pseudo-merge bitmap
+        groups decrease in size. Must be non-negative. This parameter
+        can be thought of as <code>k</code> in the function <code>f(n) = C * n^-k</code>,
+        where <code>f(n)</code> is the size of the `n`th group.
+</p>
+<div class="paragraph"><p>Setting the decay rate equal to <code>0</code> will cause all groups to be the
+same size. Setting the decay rate equal to <code>1</code> will cause the <code>n`th
+group to be `1/n</code> the size of the initial group.  Higher values of the
+decay rate cause consecutive groups to shrink at an increasing rate.
+The default is <code>1</code>.</p></div>
+<div class="paragraph"><p>If all groups are the same size, it is possible that groups containing
+newer commits will be able to be used less often than earlier groups,
+since it is more likely that the references pointing at newer commits
+will be updated more often than a reference pointing at an old commit.</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.sampleRate
+</dt>
+<dd>
+<p>
+        Determines the proportion of non-bitmapped commits (among
+        reference tips) which are selected for inclusion in an
+        unstable pseudo-merge bitmap. Must be between <code>0</code> and <code>1</code>
+        (inclusive). The default is <code>1</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.threshold
+</dt>
+<dd>
+<p>
+        Determines the minimum age of non-bitmapped commits (among
+        reference tips, as above) which are candidates for inclusion
+        in an unstable pseudo-merge bitmap. The default is
+        <code>1.week.ago</code>.
+</p>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.maxMerges
+</dt>
+<dd>
+<p>
+        Determines the maximum number of pseudo-merge commits among
+        which commits may be distributed.
+</p>
+<div class="paragraph"><p>For pseudo-merge groups whose pattern does not contain any capture
+groups, this setting is applied for all commits matching the regular
+expression. For patterns that have one or more capture groups, this
+setting is applied for each distinct capture group.</p></div>
+<div class="paragraph"><p>For example, if your capture group is <code>refs/tags/</code>, then this setting
+will distribute all tags into a maximum of <code>maxMerges</code> pseudo-merge
+commits. However, if your capture group is, say,
+<code>refs/remotes/([0-9]+)/tags/</code>, then this setting will be applied to
+each remote&#8217;s set of tags individually.</p></div>
+<div class="paragraph"><p>Must be non-negative. The default value is 64.</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.stableThreshold
+</dt>
+<dd>
+<p>
+        Determines the minimum age of commits (among reference tips,
+        as above, however stable commits are still considered
+        candidates even when they have been covered by a bitmap) which
+        are candidates for a stable a pseudo-merge bitmap. The default
+        is <code>1.month.ago</code>.
+</p>
+<div class="paragraph"><p>Setting this threshold to a smaller value (e.g., 1.week.ago) will cause
+more stable groups to be generated (which impose a one-time generation
+cost) but those groups will likely become stale over time. Using a
+larger value incurs the opposite penalty (fewer stable groups which are
+more useful).</p></div>
+</dd>
+<dt class="hdlist1">
+bitmapPseudoMerge.&lt;name&gt;.stableSize
+</dt>
+<dd>
+<p>
+        Determines the size (in number of commits) of a stable
+        psuedo-merge bitmap. The default is <code>512</code>.
+</p>
+</dd>
+</dl></div>
+</div>
+<div class="sect2">
+<h3 id="_examples">Examples</h3>
+<div class="paragraph"><p>Suppose that you have a repository with a large number of references,
+and you want a bare-bones configuration of pseudo-merge bitmaps that
+will enhance bitmap coverage of the <code>refs/</code> namespace. You may start
+wiht a configuration like so:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>P---o---o---M---x---x---W---x
- \         /
-  A---B---C</code></pre>
+<pre><code>[bitmapPseudoMerge "all"]
+    pattern = "refs/"
+    threshold = now
+    stableThreshold = never
+    sampleRate = 100
+    maxMerges = 64</code></pre>
 </div></div>
-<div class="paragraph"><p>where commit W reverted commit M because it turned out that commit B was wrong
-and needs to be rewritten, but you need the rewritten topic to still branch
-from commit P (perhaps P is a branching-off point for yet another branch, and
-you want be able to merge the topic into both branches).</p></div>
-<div class="paragraph"><p>The natural thing to do in this case is to checkout the A-B-C branch and use
-"rebase -i P" to change commit B.  However this does not rewrite commit A,
-because "rebase -i" by default fast-forwards over any initial commits selected
-with the "pick" command.  So you end up with this:</p></div>
+<div class="paragraph"><p>This will create pseudo-merge bitmaps for all references, regardless of
+their age, and group them into 64 pseudo-merge commits.</p></div>
+<div class="paragraph"><p>If you wanted to separate tags from branches when generating
+pseudo-merge commits, you would instead define the pattern with a
+capture group, like so:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>P---o---o---M---x---x---W---x
- \         /
-  A---B---C   &lt;-- old branch
-   \
-    B'---C'   &lt;-- naively rewritten branch</code></pre>
+<pre><code>[bitmapPseudoMerge "all"]
+    pattern = "refs/(heads/tags)/"</code></pre>
 </div></div>
-<div class="paragraph"><p>To merge A-B'-C' into the mainline branch you would still have to first revert
-commit W in order to pick up the changes in A, but then it&#8217;s likely that the
-changes in B' will conflict with the original B changes re-introduced by the
-reversion of W.</p></div>
-<div class="paragraph"><p>However, you can avoid these problems if you recreate the entire branch,
-including commit A:</p></div>
+<div class="paragraph"><p>Suppose instead that you are working in a fork-network repository, with
+each fork specified by some numeric ID, and whose refs reside in
+<code>refs/virtual/NNN/</code> (where <code>NNN</code> is the numeric ID corresponding to some
+fork) in the network. In this instance, you may instead write something
+like:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><code>  A'---B'---C'  &lt;-- completely rewritten branch
- /
-P---o---o---M---x---x---W---x
- \         /
-  A---B---C</code></pre>
+<pre><code>[bitmapPseudoMerge "all"]
+    pattern = "refs/virtual/([0-9]+)/(heads|tags)/"
+    threshold = now
+    stableThreshold = never
+    sampleRate = 100
+    maxMerges = 64</code></pre>
 </div></div>
-<div class="paragraph"><p>You can merge A'-B'-C' into the mainline branch without worrying about first
-reverting W.  Mainline&#8217;s history would look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>  A'---B'---C'------------------
- /                              \
-P---o---o---M---x---x---W---x---M2
- \         /
-  A---B---C</code></pre>
-</div></div>
-<div class="paragraph"><p>But if you don&#8217;t actually need to change commit A, then you need some way to
-recreate it as a new commit with the same changes in it.  The rebase command&#8217;s
---no-ff option provides a way to do this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git rebase [-i] --no-ff P</code></pre>
-</div></div>
-<div class="paragraph"><p>The --no-ff option creates a new branch A'-B'-C' with all-new commits (all the
-SHA IDs will be different) even if in the interactive case you only actually
-modify commit B.  You can then merge this new branch directly into the mainline
-branch and be sure you&#8217;ll get all of the branch&#8217;s changes.</p></div>
-<div class="paragraph"><p>You can also use --no-ff in cases where you just add extra commits to the topic
-to fix it up.  Let&#8217;s revisit the situation discussed at the start of this howto:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>P---o---o---M---x---x---W---x
- \         /
-  A---B---C----------------D---E   &lt;-- fixed-up topic branch</code></pre>
-</div></div>
-<div class="paragraph"><p>At this point, you can use --no-ff to recreate the topic branch:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>$ git checkout E
-$ git rebase --no-ff P</code></pre>
-</div></div>
-<div class="paragraph"><p>yielding</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>  A'---B'---C'------------D'---E'  &lt;-- recreated topic branch
- /
-P---o---o---M---x---x---W---x
- \         /
-  A---B---C----------------D---E</code></pre>
-</div></div>
-<div class="paragraph"><p>You can merge the recreated branch into the mainline without reverting commit W,
-and mainline&#8217;s history will look like this:</p></div>
-<div class="literalblock">
-<div class="content">
-<pre><code>  A'---B'---C'------------D'---E'
- /                              \
-P---o---o---M---x---x---W---x---M2
- \         /
-  A---B---C</code></pre>
-</div></div>
+<div class="paragraph"><p>Which would generate pseudo-merge group identifiers like "1234-heads",
+and "5678-tags" (for branches in fork "1234", and tags in remote "5678",
+respectively).</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_see_also">SEE ALSO</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><a href="git-pack-objects.html">git-pack-objects(1)</a>
+<a href="git-repack.html">git-repack(1)</a></p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_git">GIT</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Part of the <a href="git.html">git(1)</a> suite</p></div>
 </div>
 </div>
 </div>
@@ -1026,7 +1073,7 @@ P---o---o---M---x---x---W---x---M2
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-06-24 17:33:23 PDT
+ 2024-06-24 17:32:59 PDT
 </div>
 </div>
 </body>
