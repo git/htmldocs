@@ -186,6 +186,21 @@ Performance, Internal Implementation, Development Support etc.
    after writing MERGE_HEAD etc. files, which was useless for the
    purpose to recover from the failure.
 
+ * The output from "git cat-file --batch-check" and "--batch-command
+   (info)" should not be unbuffered, for which some tests have been
+   added.
+
+ * A CPP macro USE_THE_REPOSITORY_VARIABLE is introduced to help
+   transition the codebase to rely less on the availability of the
+   singleton the_repository instance.
+
+ * "git version --build-options" reports the version information of
+   OpenSSL and other libraries (if used) in the build.
+
+ * Memory ownership rules for the in-core representation of
+   remote.*.url configuration values have been straightened out, which
+   resulted in a few leak fixes and code clarification.
+
 
 Fixes since v2.45
 -----------------
@@ -202,7 +217,6 @@ Fixes since v2.45
    when used together, as one tells us not to add anything to the
    title of the commit, and the other one tells us to add "RFC" in
    addition to "PATCH".
-   (merge cadcf58085 ds/format-patch-rfc-and-k later to maint).
 
  * "git stash -S" did not handle binary files correctly, which has
    been corrected.
@@ -302,18 +316,15 @@ Fixes since v2.45
  * When the user adds to "git rebase -i" instruction to "pick" a merge
    commit, the error experience is not pleasant.  Such an error is now
    caught earlier in the process that parses the todo list.
-   (merge 4c063c82e9 pw/rebase-i-error-message later to maint).
 
  * We forgot to normalize the result of getcwd() to NFC on macOS where
    all other paths are normalized, which has been corrected.  This still
    does not address the case where core.precomposeUnicode configuration
    is not defined globally.
-   (merge 71fa8d2212 tb/precompose-getcwd later to maint).
 
  * Earlier we stopped using the tree of HEAD as the default source of
    attributes in a bare repository, but failed to document it.  This
    has been corrected.
-   (merge 5c71d6b63a jc/no-default-attr-tree-in-bare later to maint).
 
  * "git update-server-info" and "git commit-graph --write" have been
    updated to use the tempfile API to avoid leaving cruft after
@@ -321,16 +332,21 @@ Fixes since v2.45
 
  * An unused extern declaration for mingw has been removed to prevent
    it from causing build failure.
-   (merge 3c295c87c2 js/mingw-remove-unused-extern-decl later to maint).
 
  * A helper function shared between two tests had a copy-paste bug,
    which has been corrected.
-   (merge 40d817875d jk/t5500-typofix later to maint).
 
  * "git fetch-pack -k -k" without passing "--lock-pack" (which we
    never do ourselves) did not work at all, which has been corrected.
-   (merge 96a6621d25 jk/fetch-pack-fsck-wo-lock-pack later to maint).
+
+ * CI job to build minimum fuzzers learned to pass NO_CURL=NoThanks to
+   the build procedure, as its build environment does not offer, or
+   the rest of the build needs, anything cURL.
+   (merge 4e66b5a990 jc/fuzz-sans-curl later to maint).
+
+ * "git diff --no-ext-diff" when diff.external is configured ignored
+   the "--color-moved" option.
+   (merge 0f4b0d4cf0 rs/diff-color-moved-w-no-ext-diff-fix later to maint).
 
  * Other code cleanup, docfix, build fix, etc.
-   (merge bf6a86236e jc/worktree-git-path later to maint).
-   (merge 28dc26dc33 rs/remove-unused-find-header-mem later to maint).
+   (merge 493fdae046 ew/object-convert-leakfix later to maint).
