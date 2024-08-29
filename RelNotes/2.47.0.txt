@@ -43,6 +43,9 @@ UI, Workflows & Features
    that the history leading to a given commit "%(is-base:<commit>)" is
    likely based on.
 
+ * The command line prompt support used to be littered with bash-isms,
+   which has been corrected to work with more shells.
+
 
 Performance, Internal Implementation, Development Support etc.
 --------------------------------------------------------------
@@ -93,9 +96,15 @@ Performance, Internal Implementation, Development Support etc.
    object in the config subsystem has been rewritten to pass a
    repository object through the callchain.
 
- * Drop unused parameters from functions.
+ * Unused parameters have been either marked as UNUSED to squelch
+   -Wunused warnings or dropped from many functions..
 
- * Mark unused parameters as UNUSED to squelch -Wunused warnings.
+ * The code in the reftable library has been cleaned up by discarding
+   unused "generic" interface.
+
+ * The underlying machinery for "git diff-index" has long been made to
+   expand the sparse index as needed, but the command fully expanded
+   the sparse index upfront, which now has been taught not to do.
 
 
 Fixes since v2.46
@@ -170,6 +179,8 @@ Fixes since v2.46
    0 commits, and attempted to include commits that are not in packs,
    which made no sense.  These bugs have been corrected.
    (merge a72dfab8b8 tb/pseudo-merge-bitmap-fixes later to maint).
+
+ * "git rebase -x --quiet" was not quiet, which was corrected.
 
  * Other code cleanup, docfix, build fix, etc.
    (merge bb0498b1bb jc/how-to-maintain-updates later to maint).
