@@ -1237,12 +1237,14 @@ Requests size information to be returned for each listed object id.</pre>
 <div class="content">
 <pre>oid &lt;oid&gt;
 Indicates to the server an object which the client wants to obtain
-information for.</pre>
+information for. They must be full OIDs.</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The response of <code>object-info</code> is a list of the requested object ids
-and associated requested information, each separated by a single space.</p>
+<p>The response of <code>object-info</code> consists of one pkt-line per requested attribute,
+echoing the attributes the server will report, followed by one pkt-line per
+requested object id with its information, each field separated by a single
+space.</p>
 </div>
 <div class="literalblock">
 <div class="content">
@@ -1251,13 +1253,8 @@ and associated requested information, each separated by a single space.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>info = PKT-LINE(attrs) LF)
-	*PKT-LINE(obj-info LF)</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>attrs = attr | attrs SP attrs</pre>
+<pre>info = *PKT-LINE(attr LF)
+       *PKT-LINE(obj-info LF)</pre>
 </div>
 </div>
 <div class="literalblock">
@@ -1267,8 +1264,17 @@ and associated requested information, each separated by a single space.</p>
 </div>
 <div class="literalblock">
 <div class="content">
-<pre>obj-info = obj-id SP obj-size</pre>
+<pre>obj-size = 1*DIGIT</pre>
 </div>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>obj-info = obj-id [SP [obj-size]]</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If the server does not recognize the OID, the response will be <em>&lt;oid&gt;</em> <code>SP</code>
+regardless of the number of attributes requested.</p>
 </div>
 </div>
 <div class="sect2">
@@ -1664,7 +1670,7 @@ objects from.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-06 18:29:57 -0700
+Last updated 2026-07-30 13:26:13 -0700
 </div>
 </div>
 </body>
