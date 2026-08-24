@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="generator" content="Asciidoctor 2.0.26"/>
-<title>git-cat-file(1)</title>
+<title>Merge-Base Computation and paint_down_to_common()</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"/>
 <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
@@ -433,651 +433,225 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
-<style>
-pre>code {
-   display: inline;
-}
-</style>
 </head>
-<body class="manpage">
+<body class="article">
 <div id="header">
-<h1>git-cat-file(1) Manual Page</h1>
-<h2 id="_name">NAME</h2>
-<div class="sectionbody">
-<p>git-cat-file - Provide contents or details of repository objects</p>
-</div>
+<h1>Merge-Base Computation and paint_down_to_common()</h1>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="_synopsis">SYNOPSIS</h2>
+<div id="preamble">
 <div class="sectionbody">
-<div class="verseblock">
-<pre class="content"><em>git cat-file</em> &lt;type&gt; &lt;object&gt;
-<em>git cat-file</em> (-e | -p | -t | -s) &lt;object&gt;
-<em>git cat-file</em> (--textconv | --filters)
-             [&lt;rev&gt;:&lt;path|tree-ish&gt; | --path=&lt;path|tree-ish&gt; &lt;rev&gt;]
-<em>git cat-file</em> (--batch | --batch-check | --batch-command) [--batch-all-objects]
-             [--buffer] [--follow-symlinks] [--unordered]
-             [--textconv | --filters] [-Z]</pre>
+<div class="paragraph">
+<p>The function <code>paint_down_to_common</code>() in <code>commit-reach.c</code> computes merge
+bases by walking the commit graph backwards from two sets of tips and
+finding where their ancestry meets.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_description">DESCRIPTION</h2>
+<h2 id="_use_cases">Use cases</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Output the contents or other properties such as size, type or delta
-information of one or more objects.</p>
+<p>Computing merge bases is used in two different ways:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Finding all merge bases</strong> (<code>merge-base</code> <code>--all</code>, <code>merge-tree</code>,
+<code>merge</code>, <code>rebase</code>). A merge base is a common ancestor that is
+not itself an ancestor of another common ancestor.</p>
+</li>
+<li>
+<p><strong>Ancestry checks</strong> (<code>in_merge_bases</code>, used by <code>merge-base</code>
+<code>--is-ancestor</code>, <code>branch</code> <code>-d</code>, <code>fetch</code>). These ask: "is commit A
+an ancestor of commit B?" If a common ancestor equals one of the
+inputs, that input is necessarily the only merge base&#8201;&#8212;&#8201;no other
+common ancestor can be both as recent and not an ancestor of it.</p>
+</li>
+</ol>
 </div>
 <div class="paragraph">
-<p>This command can operate in two modes, depending on whether an option
-from the <code>--batch</code> family is specified.</p>
-</div>
-<div class="paragraph">
-<p>In non-batch mode, the command provides information on an object
-named on the command line.</p>
-</div>
-<div class="paragraph">
-<p>In batch mode, arguments are read from standard input.</p>
+<p>Both use cases share the same algorithm and implementation.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_options">OPTIONS</h2>
+<h2 id="_algorithm">Algorithm</h2>
 <div class="sectionbody">
-<div class="dlist">
-<dl>
-<dt class="hdlist1">&lt;object&gt;</dt>
-<dd>
-<p>The name of the object to show.
-For a more complete list of ways to spell object names, see
-the "SPECIFYING REVISIONS" section in <a href="gitrevisions.html">gitrevisions(7)</a>.</p>
-</dd>
-<dt class="hdlist1">-t</dt>
-<dd>
-<p>Instead of the content, show the object type identified by
-<em>&lt;object&gt;</em>.</p>
-</dd>
-<dt class="hdlist1">-s</dt>
-<dd>
-<p>Instead of the content, show the object size identified by
-<em>&lt;object&gt;</em>. If used with <code>--use-mailmap</code> option, will show
-the size of updated object after replacing idents using the
-mailmap mechanism.</p>
-</dd>
-<dt class="hdlist1">-e</dt>
-<dd>
-<p>Exit with zero status if <em>&lt;object&gt;</em> exists and is a valid
-object. If <em>&lt;object&gt;</em> is of an invalid format, exit with non-zero
-status and emit an error on stderr.</p>
-</dd>
-<dt class="hdlist1">-p</dt>
-<dd>
-<p>Pretty-print the contents of <em>&lt;object&gt;</em> based on its type.</p>
-</dd>
-<dt class="hdlist1">&lt;type&gt;</dt>
-<dd>
-<p>Typically this matches the real type of <em>&lt;object&gt;</em> but asking
-for a type that can trivially be dereferenced from the given
-<em>&lt;object&gt;</em> is also permitted.  An example is to ask for a
-"tree" with <em>&lt;object&gt;</em> being a commit object that contains it,
-or to ask for a "blob" with <em>&lt;object&gt;</em> being a tag object that
-points at it.</p>
-</dd>
-<dt class="hdlist1">--mailmap</dt>
-<dt class="hdlist1">--no-mailmap</dt>
-<dt class="hdlist1">--use-mailmap</dt>
-<dt class="hdlist1">--no-use-mailmap</dt>
-<dd>
-<p>Use mailmap file to map author, committer and tagger names
-and email addresses to canonical real names and email addresses.
-See <a href="git-shortlog.html">git-shortlog(1)</a>.</p>
-</dd>
-<dt class="hdlist1">--textconv</dt>
-<dd>
-<p>Show the content as transformed by a textconv filter. In this case,
-<em>&lt;object&gt;</em> has to be of the form <em>&lt;tree-ish&gt;</em><code>:</code><em>&lt;path&gt;</em>, or <code>:</code><em>&lt;path&gt;</em> in
-order to apply the filter to the content recorded in the index at
-<em>&lt;path&gt;</em>.</p>
-</dd>
-<dt class="hdlist1">--filters</dt>
-<dd>
-<p>Show the content as converted by the filters configured in
-the current working tree for the given <em>&lt;path&gt;</em> (i.e. smudge filters,
-end-of-line conversion, etc). In this case, <em>&lt;object&gt;</em> has to be of
-the form <em>&lt;tree-ish&gt;</em><code>:</code><em>&lt;path&gt;</em>, or <code>:</code><em>&lt;path&gt;</em>.</p>
-</dd>
-<dt class="hdlist1">--filter=&lt;filter-spec&gt;</dt>
-<dt class="hdlist1">--no-filter</dt>
-<dd>
-<p>Omit objects from the list of printed objects. This can only be used in
-combination with one of the batched modes. Excluded objects that have
-been explicitly requested via any of the batch modes that read objects
-via standard input (<code>--batch</code>, <code>--batch-check</code>) will be reported as
-"filtered". Excluded objects in <code>--batch-all-objects</code> mode will not be
-printed at all. The <em>&lt;filter-spec&gt;</em> may be one of the following:</p>
 <div class="paragraph">
-<p>The form <em>--filter=blob:none</em> omits all blobs.</p>
+<p>Given a commit <code>one</code> and a set of commits <code>twos</code>[], the walk paints
+commits with two colors:</p>
 </div>
-<div class="paragraph">
-<p>The form <em>--filter=blob:limit=&lt;n&gt;[kmg]</em> omits blobs of size at least n
-bytes or units.  n may be zero.  The suffixes k, m, and g can be used to name
-units in KiB, MiB, or GiB.  For example, <em>blob:limit=1k</em> is the same as
-<em>blob:limit=1024</em>.</p>
-</div>
-<div class="paragraph">
-<p>The form <em>--filter=object:type=(tag|commit|tree|blob)</em> omits all objects which
-are not of the requested type.</p>
-</div>
-</dd>
-<dt class="hdlist1">--path=&lt;path&gt;</dt>
-<dd>
-<p>For use with <code>--textconv</code> or <code>--filters</code>, to allow specifying an object
-name and a path separately, e.g. when it is difficult to figure out
-the revision from which the blob came.</p>
-</dd>
-<dt class="hdlist1">--batch</dt>
-<dt class="hdlist1">--batch=&lt;format&gt;</dt>
-<dd>
-<p>Print object information and contents for each object provided
-on stdin. May not be combined with any other options or arguments
-except <code>--textconv</code>, <code>--filters</code>, or <code>--use-mailmap</code>.</p>
-<div class="openblock">
-<div class="content">
 <div class="ulist">
 <ul>
 <li>
-<p>When used with <code>--textconv</code> or <code>--filters</code>, the input lines
-must specify the path, separated by whitespace. See the section
-<code>BATCH</code> <code>OUTPUT</code> below for details.</p>
+<p>PARENT1: reachable from <code>one</code></p>
 </li>
 <li>
-<p>When used with <code>--use-mailmap</code>, for commit and tag objects, the
-contents part of the output shows the identities replaced using the
-mailmap mechanism, while the information part of the output shows
-the size of the object as if it actually recorded the replacement
-identities.</p>
+<p>PARENT2: reachable from any commit in <code>twos</code>[]</p>
 </li>
 </ul>
 </div>
+<div class="paragraph">
+<p>The walk uses a priority queue ordered by generation number
+(highest first), breaking ties by commit date. Each step dequeues
+the highest-priority commit and propagates its paint flags to its
+parents, enqueuing any parent that gained new flags. When a
+commit receives both PARENT1 and PARENT2, it is a merge-base
+candidate. A candidate gains the STALE flag so its ancestors
+propagate staleness&#8201;&#8212;&#8201;any deeper common ancestor is necessarily
+redundant.</p>
 </div>
 </div>
-</dd>
-<dt class="hdlist1">--batch-check</dt>
-<dt class="hdlist1">--batch-check=&lt;format&gt;</dt>
-<dd>
-<p>Print object information for each object provided on stdin. May not be
-combined with any other options or arguments except <code>--textconv</code>, <code>--filters</code>
-or <code>--use-mailmap</code>.</p>
-<div class="openblock">
+</div>
+<div class="sect1">
+<h2 id="generation-regions">Topologically ordered and unordered generation regions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Commits fall into two regions based on whether their generation
+numbers provide a topological ordering guarantee:</p>
+</div>
+<div class="literalblock">
 <div class="content">
+<pre>    +------------------------------------------+
+    |          Unordered region                |
+    |  generation = INFINITY or V1_MAX         |
+    |  queue order: heuristic (commit date)    |
+    +------------------------------------------+
+                      |
+                      v
+    +------------------------------------------+
+    |          Ordered region                  |
+    |  generation = finite, unsaturated        |
+    |  queue order: topological                |
+    +------------------------------------------+</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In the ordered region, a child&#8217;s generation is strictly greater
+than its parent&#8217;s. Same-generation commits are necessarily
+independent, so the queue always processes children before
+their parents.</p>
+</div>
+<div class="paragraph">
+<p>In the unordered region, parent-child pairs can share the same
+generation number, so topological order is not guaranteed. The
+queue uses commit-date as a heuristic, which typically produces
+a reasonable traversal order but may process a parent before
+its child.</p>
+</div>
+<div class="paragraph">
+<p>Commits not in the commit-graph have generation INFINITY; v1
+commit-graphs saturate at V1_MAX. Both place commits in the
+unordered region. Any optimization that depends on generation
+ordering must account for this saturation boundary. The early
+exit gates compare against a topological ceiling&#8201;&#8212;&#8201;<code>GENERATION_NUMBER_V1_MAX</code> for v1 graphs and
+<code>GENERATION_NUMBER_INFINITY</code> for v2 graphs&#8201;&#8212;&#8201;so that saturated
+commits are treated as unordered.</p>
+</div>
+<div class="paragraph">
+<p>With generation ordering, values in the unordered region exceed
+those in the ordered region. The walk may therefore transition
+from the unordered region into the ordered region, but never in
+the reverse direction. Without a commit-graph, every commit has INFINITY
+and the walk operates entirely in the unordered region.</p>
+</div>
+<div class="paragraph">
+<p>In the ordered region, paint on a dequeued commit is final&#8201;&#8212;&#8201;no future step can add flags to it. In the unordered region,
+a dequeued commit may later gain additional paint. Paint flags
+are only added, never removed, bounding the number of
+re-enqueues per commit.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_termination">Termination</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The walk tracks the number of commits of each type in the queue
+(PARENT1-only, PARENT2-only, pending merge-base). The main loop
+ends when one of the following conditions holds:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The queue is empty.</p>
+</li>
+<li>
+<p>The queue contains only stale entries.</p>
+</li>
+<li>
+<p>Generation cutoff: the dequeued commit&#8217;s generation is below
+a caller-supplied <code>min_generation</code> threshold.</p>
+</li>
+<li>
+<p>Single result: the caller only needs one merge base, one has
+been found, and the walk has entered the ordered region.</p>
+</li>
+<li>
+<p>Side exhaustion: no pure PARENT1 or pure PARENT2 commits
+remain in the queue, no pending merge-base candidates exist,
+and the walk has entered the ordered region.</p>
+</li>
+</ol>
+</div>
+<div class="sect2">
+<h3 id="_stale_entry_condition">Stale entry condition</h3>
+<div class="paragraph">
+<p>Once all queued entries are stale, no new merge-base candidates can
+be discovered&#8201;&#8212;&#8201;that requires at least one non-stale commit from
+each side meeting. Continuing the walk could still invalidate
+existing candidates by proving one is an ancestor of another, but
+<code>remove_redundant</code>() handles that as a post-processing step, so it
+is safe to exit early.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_side_exhaustion_condition">Side-exhaustion condition</h3>
+<div class="paragraph">
+<p>A new merge-base requires commits from both sides to meet. When one
+side&#8217;s exclusive counter reaches zero and there are no pending
+merge-base candidates, no future traversal step can produce a new
+candidate. This optimization only activates in the ordered region,
+where paint flags are final at visit time; in the unordered region,
+a side that appears exhausted could reappear through late paint
+propagation.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_generation_cutoff">Generation cutoff</h3>
+<div class="paragraph">
+<p>Some callers (notably <code>remove_redundant</code>()) supply a <code>min_generation</code>
+threshold equal to the minimum generation of the input commits.
+These callers only need to determine reachability among the inputs,
+not find deep merge bases, so the walk can safely terminate when it
+dequeues a commit below this threshold.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_single_result">Single result</h3>
+<div class="paragraph">
+<p>When only one merge base is needed and the walk is in the
+ordered region with generation ordering, the first candidate
+found is necessarily the highest-generation common ancestor.
+No remaining commit in the queue can be a descendant of this
+candidate (generation ordering guarantees children are visited
+first), so it cannot be redundant and the walk can stop
+immediately.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_related_documentation">Related documentation</h2>
+<div class="sectionbody">
 <div class="ulist">
 <ul>
 <li>
-<p>When used with <code>--textconv</code> or <code>--filters</code>, the input lines must
-specify the path, separated by whitespace. See the section
-<code>BATCH</code> <code>OUTPUT</code> below for details.</p>
-</li>
-<li>
-<p>When used with <code>--use-mailmap</code>, for commit and tag objects, the
-printed object information shows the size of the object as if the
-identities recorded in it were replaced by the mailmap mechanism.</p>
+<p><code>Documentation/technical/commit-graph.adoc</code>&#8201;&#8212;&#8201;generation numbers
+and the reachability closure property.</p>
 </li>
 </ul>
-</div>
-</div>
-</div>
-</dd>
-<dt class="hdlist1">--batch-command</dt>
-<dt class="hdlist1">--batch-command=&lt;format&gt;</dt>
-<dd>
-<p>Enter a command mode that reads commands and arguments from stdin. May
-only be combined with <code>--buffer</code>, <code>--textconv</code>, <code>--use-mailmap</code> or
-<code>--filters</code>.</p>
-<div class="openblock">
-<div class="content">
-<div class="ulist">
-<ul>
-<li>
-<p>When used with <code>--textconv</code> or <code>--filters</code>, the input lines must
-specify the path, separated by whitespace. See the section
-<code>BATCH</code> <code>OUTPUT</code> below for details.</p>
-</li>
-<li>
-<p>When used with <code>--use-mailmap</code>, for commit and tag objects, the
-<code>contents</code> command shows the identities replaced using the
-mailmap mechanism, while the <code>info</code> command shows the size
-of the object as if it actually recorded the replacement
-identities.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p><code>--batch-command</code> recognizes the following commands:</p>
-</div>
-<div class="openblock">
-<div class="content">
-<div class="dlist">
-<dl>
-<dt class="hdlist1">contents &lt;object&gt;</dt>
-<dd>
-<p>Print object contents for object reference <em>&lt;object&gt;</em>. This corresponds to
-the output of <code>--batch</code>.</p>
-</dd>
-<dt class="hdlist1">info &lt;object&gt;</dt>
-<dd>
-<p>Print object info for object reference <em>&lt;object&gt;</em>. This corresponds to the
-output of <code>--batch-check</code>.</p>
-</dd>
-<dt class="hdlist1">remote-object-info &lt;remote&gt; &lt;object&gt;&#8230;&#8203;</dt>
-<dd>
-<p>Print object info for object references <em>&lt;object&gt;</em> at specified
-<em>&lt;remote&gt;</em> without downloading objects from the remote.
-Raise an error when the <code>object-info</code> capability is not supported by the remote.
-Raise an error when no object references are provided.
-This command may be combined with <code>--buffer</code>.</p>
-</dd>
-<dt class="hdlist1">flush</dt>
-<dd>
-<p>Used with <code>--buffer</code> to execute all preceding commands that were issued
-since the beginning or since the last flush was issued. When <code>--buffer</code>
-is used, no output will come until a <code>flush</code> is issued. When <code>--buffer</code>
-is not used, commands are flushed each time without issuing <code>flush</code>.</p>
-</dd>
-<dt class="hdlist1"><code>mailmap</code> (<em>&lt;bool&gt;</em>)</dt>
-<dd>
-<p>Enable or disable mailmap for subsequent commands. The <em>&lt;bool&gt;</em>
-argument accepts the same boolean values as <a href="git-config.html">git-config(1)</a>.
-The mailmap data is read upon the first use and only once.</p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-</dd>
-<dt class="hdlist1">--batch-all-objects</dt>
-<dd>
-<p>Instead of reading a list of objects on stdin, perform the
-requested batch operation on all objects in the repository and
-any alternate object stores (not just reachable objects).
-Requires <code>--batch</code> or <code>--batch-check</code> be specified. By default,
-the objects are visited in order sorted by their hashes; see
-also <code>--unordered</code> below. Objects are presented as-is, without
-respecting the "replace" mechanism of <a href="git-replace.html">git-replace(1)</a>.</p>
-</dd>
-<dt class="hdlist1">--buffer</dt>
-<dd>
-<p>Normally batch output is flushed after each object is output, so
-that a process can interactively read and write from
-<code>cat-file</code>. With this option, the output uses normal stdio
-buffering; this is much more efficient when invoking
-<code>--batch-check</code> or <code>--batch-command</code> on a large number of objects.</p>
-</dd>
-<dt class="hdlist1">--unordered</dt>
-<dd>
-<p>When <code>--batch-all-objects</code> is in use, visit objects in an
-order which may be more efficient for accessing the object
-contents than hash order. The exact details of the order are
-unspecified, but if you do not require a specific order, this
-should generally result in faster output, especially with
-<code>--batch</code>.  Note that <code>cat-file</code> will still show each object
-only once, even if it is stored multiple times in the
-repository.</p>
-</dd>
-<dt class="hdlist1">--follow-symlinks</dt>
-<dd>
-<p>With <code>--batch</code> or <code>--batch-check</code>, follow symlinks inside the
-repository when requesting objects with extended SHA-1
-expressions of the form tree-ish:path-in-tree.  Instead of
-providing output about the link itself, provide output about
-the linked-to object.  If a symlink points outside the
-tree-ish (e.g. a link to <code>/foo</code> or a root-level link to <code>..</code><code>/foo</code>),
-the portion of the link which is outside the tree will be
-printed.</p>
-<div class="paragraph">
-<p>This option does not (currently) work correctly when an object in the
-index is specified (e.g. <code>:link</code> instead of <code>HEAD:link</code>) rather than
-one in the tree.</p>
-</div>
-<div class="paragraph">
-<p>This option cannot (currently) be used unless <code>--batch</code> or
-<code>--batch-check</code> is used.</p>
-</div>
-<div class="paragraph">
-<p>For example, consider a git repository containing:</p>
-</div>
-<div class="openblock">
-<div class="content">
-<div class="literalblock">
-<div class="content">
-<pre>f: a file containing "hello\n"
-link: a symlink to f
-dir/link: a symlink to ../f
-plink: a symlink to ../f
-alink: a symlink to /etc/passwd</pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>For a regular file <code>f</code>, <code>echo</code> <code>HEAD:f</code> | <code>git</code> <code>cat-file</code> <code>--batch</code> would print</p>
-</div>
-<div class="openblock">
-<div class="content">
-<div class="literalblock">
-<div class="content">
-<pre>ce013625030ba8dba906f756967f9e9ca394464a blob 6</pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>And <code>echo</code> <code>HEAD:link</code> | <code>git</code> <code>cat-file</code> <code>--batch</code> <code>--follow-symlinks</code> would
-print the same thing, as would <code>HEAD:dir/link</code>, as they both point at
-<code>HEAD:f</code>.</p>
-</div>
-<div class="paragraph">
-<p>Without <code>--follow-symlinks</code>, these would print data about the symlink
-itself.  In the case of <code>HEAD:link</code>, you would see</p>
-</div>
-<div class="openblock">
-<div class="content">
-<div class="literalblock">
-<div class="content">
-<pre>4d1ae35ba2c8ec712fa2a379db44ad639ca277bd blob 1</pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Both <code>plink</code> and <code>alink</code> point outside the tree, so they would
-respectively print:</p>
-</div>
-<div class="openblock">
-<div class="content">
-<div class="literalblock">
-<div class="content">
-<pre>symlink 4
-../f</pre>
-</div>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre>symlink 11
-/etc/passwd</pre>
-</div>
-</div>
-</div>
-</div>
-</dd>
-<dt class="hdlist1">-Z</dt>
-<dd>
-<p>Only meaningful with <code>--batch</code>, <code>--batch-check</code>, or
-<code>--batch-command</code>; input and output is NUL-delimited instead of
-newline-delimited.</p>
-</dd>
-<dt class="hdlist1">-z</dt>
-<dd>
-<p>Only meaningful with <code>--batch</code>, <code>--batch-check</code>, or
-<code>--batch-command</code>; input is NUL-delimited instead of
-newline-delimited. This option is deprecated in favor of
-<code>-Z</code> as the output can otherwise be ambiguous.</p>
-</dd>
-</dl>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_output">OUTPUT</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>If <code>-t</code> is specified, one of the <em>&lt;type&gt;</em>.</p>
-</div>
-<div class="paragraph">
-<p>If <code>-s</code> is specified, the size of the <em>&lt;object&gt;</em> in bytes.</p>
-</div>
-<div class="paragraph">
-<p>If <code>-e</code> is specified, no output, unless the <em>&lt;object&gt;</em> is malformed.</p>
-</div>
-<div class="paragraph">
-<p>If <code>-p</code> is specified, the contents of <em>&lt;object&gt;</em> are pretty-printed.</p>
-</div>
-<div class="paragraph">
-<p>If <em>&lt;type&gt;</em> is specified, the raw (though uncompressed) contents of the <em>&lt;object&gt;</em>
-will be returned.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_batch_output">BATCH OUTPUT</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>If <code>--batch</code> or <code>--batch-check</code> is given, <code>cat-file</code> will read objects
-from stdin, one per line, and print information about them in the same
-order as they have been read. By default, the whole line is
-considered as an object, as if it were fed to <a href="git-rev-parse.html">git-rev-parse(1)</a>.</p>
-</div>
-<div class="paragraph">
-<p>When <code>--batch-command</code> is given, <code>cat-file</code> will read commands from stdin,
-one per line, and print information based on the command given. With
-<code>--batch-command</code>, the <code>info</code> command followed by an object will print
-information about the object the same way <code>--batch-check</code> would, and the
-<code>contents</code> command followed by an object prints contents in the same way
-<code>--batch</code> would. The <code>remote-object-info</code> command followed by a remote and
-object IDs prints object info from the remote without downloading the objects.</p>
-</div>
-<div class="paragraph">
-<p>You can specify the information shown for each object by using a custom
-<em>&lt;format&gt;</em>. The <em>&lt;format&gt;</em> is copied literally to stdout for each
-object, with placeholders of the form <code>%</code>(<code>atom</code>) expanded, followed by a
-newline. The available atoms are:</p>
-</div>
-<div class="dlist">
-<dl>
-<dt class="hdlist1"><code>objectname</code></dt>
-<dd>
-<p>The full hex representation of the object name.</p>
-</dd>
-<dt class="hdlist1"><code>objecttype</code></dt>
-<dd>
-<p>The type of the object (the same as <code>cat-file</code> <code>-t</code> reports).</p>
-</dd>
-<dt class="hdlist1"><code>objectmode</code></dt>
-<dd>
-<p>If the specified object has mode information (such as a tree or
-index entry), the mode expressed as an octal integer. Otherwise,
-empty string.</p>
-</dd>
-<dt class="hdlist1"><code>objectsize</code></dt>
-<dd>
-<p>The size, in bytes, of the object (the same as <code>cat-file</code> <code>-s</code>
-reports).</p>
-</dd>
-<dt class="hdlist1"><code>objectsize:disk</code></dt>
-<dd>
-<p>The size, in bytes, that the object takes up on disk. See the
-note about on-disk sizes in the <code>CAVEATS</code> section below.</p>
-</dd>
-<dt class="hdlist1"><code>deltabase</code></dt>
-<dd>
-<p>If the object is stored as a delta on-disk, this expands to the
-full hex representation of the delta base object name.
-Otherwise, expands to the null OID (all zeroes). See <code>CAVEATS</code>
-below.</p>
-</dd>
-<dt class="hdlist1"><code>rest</code></dt>
-<dd>
-<p>If this atom is used in the output string, input lines are split
-at the first whitespace boundary. All characters before that
-whitespace are considered to be the object name; characters
-after that first run of whitespace (i.e., the "rest" of the
-line) are output in place of the <code>%</code>(<code>rest</code>) atom.</p>
-</dd>
-</dl>
-</div>
-<div class="paragraph">
-<p>The command <code>remote-object-info</code> only supports the <code>%</code>(<code>objectname</code>),
-<code>%</code>(<code>objectsize</code>) and <code>%</code>(<code>objecttype</code>) placeholders. See <code>CAVEATS</code> below for more
-information.</p>
-</div>
-<div class="paragraph">
-<p>If no format is specified, the default format is <code>%</code>(<code>objectname</code>)
-<code>%</code>(<code>objecttype</code>) <code>%</code>(<code>objectsize</code>).</p>
-</div>
-<div class="paragraph">
-<p>If <code>--batch</code> is specified, or if <code>--batch-command</code> is used with the <code>contents</code>
-command, the object information is followed by the object contents (consisting
-of <code>%</code>(<code>objectsize</code>) bytes), followed by a newline.</p>
-</div>
-<div class="paragraph">
-<p>For example, <code>--batch</code> without a custom format would produce:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;oid&gt; SP &lt;type&gt; SP &lt;size&gt; LF
-&lt;contents&gt; LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Whereas <code>--batch-check=</code>'%(<code>objectname</code>) <code>%</code>(<code>objecttype</code>)' would produce:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;oid&gt; SP &lt;type&gt; LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If a name is specified on stdin that cannot be resolved to an object in
-the repository, then <code>cat-file</code> will ignore any custom format and print:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;object&gt; SP missing LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If a name is specified on stdin that is filtered out via <code>--filter=</code>,
-then <code>cat-file</code> will ignore any custom format and print:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;object&gt; SP excluded LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If a name is specified that might refer to more than one object (an ambiguous short sha), then <code>cat-file</code> will ignore any custom format and print:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;object&gt; SP ambiguous LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If a name is specified that refers to a submodule entry in a tree and the
-target object does not exist in the repository, then <code>cat-file</code> will ignore
-any custom format and print (with the object ID of the submodule):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;oid&gt; SP submodule LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If <code>--follow-symlinks</code> is used, and a symlink in the repository points
-outside the repository, then <code>cat-file</code> will ignore any custom format
-and print:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>symlink SP &lt;size&gt; LF
-&lt;symlink&gt; LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The symlink will either be absolute (beginning with a <code>/</code>), or relative
-to the tree root.  For instance, if dir/link points to <code>..</code><code>/</code><code>..</code><code>/foo</code>, then
-<em>&lt;symlink&gt;</em> will be <code>..</code><code>/foo</code>.  <em>&lt;size&gt;</em> is the size of the symlink in bytes.</p>
-</div>
-<div class="paragraph">
-<p>If <code>--follow-symlinks</code> is used, the following error messages will be
-displayed:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>&lt;object&gt; SP missing LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>is printed when the initial symlink requested does not exist.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>dangling SP &lt;size&gt; LF
-&lt;object&gt; LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>is printed when the initial symlink exists, but something that
-it (transitive-of) points to does not.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>loop SP &lt;size&gt; LF
-&lt;object&gt; LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>is printed for symlink loops (or any symlinks that
-require more than 40 link resolutions to resolve).</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>notdir SP &lt;size&gt; LF
-&lt;object&gt; LF</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>is printed when, during symlink resolution, a file is used as a
-directory name.</p>
-</div>
-<div class="paragraph">
-<p>Alternatively, when <code>-Z</code> is passed, the line feeds in any of the above examples
-are replaced with NUL terminators. This ensures that output will be parsable if
-the output itself would contain a linefeed and is thus recommended for
-scripting purposes.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_caveats">CAVEATS</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Note that only <code>%</code>(<code>objectname</code>), <code>%</code>(<code>objectsize</code>) and <code>%</code>(<code>objecttype</code>) are
-currently supported by the <code>remote-object-info</code> command. Using any other
-placeholder in the format string will return an empty string in its position.</p>
-</div>
-<div class="paragraph">
-<p>Note that the sizes of objects on disk are reported accurately, but care
-should be taken in drawing conclusions about which refs or objects are
-responsible for disk usage. The size of a packed non-delta object may be
-much larger than the size of objects which delta against it, but the
-choice of which object is the base and which is the delta is arbitrary
-and is subject to change during a repack.</p>
-</div>
-<div class="paragraph">
-<p>Note also that multiple copies of an object may be present in the object
-database; in this case, it is undefined which copy&#8217;s size or delta base
-will be reported.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_git">GIT</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Part of the <a href="git.html">git(1)</a> suite</p>
 </div>
 </div>
 </div>
