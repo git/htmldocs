@@ -455,7 +455,8 @@ pre>code {
 <pre class="content"><code>git</code> <code>history</code> <code>drop</code> <em>&lt;commit&gt;</em> [<code>--dry-run</code>] [<code>--update-refs=</code>(<code>branches</code>|<code>head</code>)] [<code>--empty=</code>(<code>drop</code>|<code>keep</code>|<code>abort</code>)]
 <code>git</code> <code>history</code> <code>fixup</code> <em>&lt;commit&gt;</em> [<code>--dry-run</code>] [<code>--update-refs=</code>(<code>branches</code>|<code>head</code>)] [<code>--reedit-message</code>] [<code>--empty=</code>(<code>drop</code>|<code>keep</code>|<code>abort</code>)]
 <code>git</code> <code>history</code> <code>reword</code> <em>&lt;commit&gt;</em> [<code>--dry-run</code>] [<code>--update-refs=</code>(<code>branches</code>|<code>head</code>)]
-<code>git</code> <code>history</code> <code>split</code> <em>&lt;commit&gt;</em> [<code>--dry-run</code>] [<code>--update-refs=</code>(<code>branches</code>|<code>head</code>)] [<code>--</code>] [<em>&lt;pathspec&gt;</em>&#8230;&#8203;]</pre>
+<code>git</code> <code>history</code> <code>split</code> <em>&lt;commit&gt;</em> [<code>--dry-run</code>] [<code>--update-refs=</code>(<code>branches</code>|<code>head</code>)] [<code>--</code>] [<em>&lt;pathspec&gt;</em>&#8230;&#8203;]
+<code>git</code> <code>history</code> <code>squash</code> [<code>--dry-run</code>] [<code>--update-refs=</code>(<code>branches</code>|<code>head</code>)] [<code>--</code>[<code>no-</code>]<code>edit</code>] <em>&lt;revision-range&gt;</em></pre>
 </div>
 </div>
 </div>
@@ -506,8 +507,11 @@ at once.</p>
 <h2 id="_limitations">LIMITATIONS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This command does not (yet) work with histories that contain merges. You
-should use <a href="git-rebase.html">git-rebase(1)</a> with the <code>--rebase-merges</code> flag instead.</p>
+<p>This command does not (yet) replay merge commits onto the rewritten
+history: if a commit that would be replayed is a merge, the operation is
+rejected, and you should use <a href="git-rebase.html">git-rebase(1)</a> with the
+<code>--rebase-merges</code> flag instead. The <code>squash</code> subcommand can still fold merges
+that lie inside the selected range, subject to the restrictions below.</p>
 </div>
 <div class="paragraph">
 <p>Furthermore, the command does not support operations that can result in merge
@@ -595,6 +599,58 @@ part of the original commit. For more details, see the <em>pathspec</em> entry i
 one of the commits becoming empty.</p>
 </div>
 </dd>
+<dt class="hdlist1"><code>squash</code> <em>&lt;revision-range&gt;</em></dt>
+<dd>
+<p>Fold all commits in <em>&lt;revision-range&gt;</em> into the oldest commit of that
+range. The resulting commit keeps the oldest commit&#8217;s authorship and
+takes the tree of the range&#8217;s newest commit, so the whole range
+collapses into a single commit. Commits above the range are replayed
+on top of the result.</p>
+<div class="paragraph">
+<p>The range is given in the usual <em>&lt;base&gt;</em><code>..</code><em>&lt;tip&gt;</em> form, where <em>&lt;base&gt;</em> is
+the commit just below the oldest commit to squash. For example, <code>git</code>
+<code>history</code> <code>squash</code> <code>HEAD~3</code><code>..</code><code>HEAD</code> folds the three most recent commits into
+one, and <code>git</code> <code>history</code> <code>squash</code> <code>HEAD~5</code><code>..</code><code>HEAD~2</code> squashes an interior range
+while leaving the two newest commits in place. Several revisions may be
+given, for example <code>HEAD~3</code><code>..</code><code>HEAD</code> <code>^topic</code> to additionally exclude what is
+already on <code>topic</code>. Rev-list options may also be given, but any that would
+change how the range is walked are overridden with a warning.</p>
+</div>
+<div class="paragraph">
+<p>An editor opens pre-filled with the messages of all the folded commits so you
+can combine them. With <code>--no-edit</code>, the oldest commit&#8217;s message is preserved
+instead, except that an <code>amend</code>! commit targeting it replaces its message.</p>
+</div>
+<div class="paragraph">
+<p>The selected commits must form a connected graph with a single tip and must
+not include a root commit. Every parent of a commit after the oldest one must
+either be selected or also be a parent of the oldest commit. When the oldest
+commit is a merge, all of its parents are preserved in the squashed commit.</p>
+</div>
+<div class="paragraph">
+<p>A <code>fixup</code>!, <code>squash</code>!, or <code>amend</code>! commit is refused unless the commit it
+targets is also in the range, so the fold does not silently absorb a
+marker meant for a commit outside it. As an exception, a range made up entirely
+of markers for one target is combined into a single commit. With <code>--no-edit</code>,
+the last <code>amend</code>! message is used if there is one; a <code>squash</code>! or <code>amend</code>! is
+otherwise refused if folding it would discard its message.</p>
+</div>
+<div class="paragraph">
+<p>The editor template mirrors <code>git</code> <code>rebase</code> <code>-i</code> <code>--autosquash</code>: each <code>fixup</code>!,
+<code>squash</code>!, or <code>amend</code>! is grouped under the commit it targets rather than
+shown in commit order. A <code>fixup</code>! message is dropped (commented out in full),
+a <code>squash</code>! keeps its body with only the marker subject commented, and an
+<code>amend</code>! replaces its target&#8217;s message, unless a <code>squash</code>! folded into that
+target first, in which case it keeps its body like a <code>squash</code>!.</p>
+</div>
+<div class="paragraph">
+<p>A local branch descended from a selected commit but not from the range tip
+cannot be rewritten as a descendant of the result, so with the default
+<code>--update-refs=branches</code> the command refuses. Rerun with <code>--update-refs=head</code>
+to rewrite only the current branch and leave such branches unchanged. Tags
+and remote-tracking refs are always left unchanged.</p>
+</div>
+</dd>
 </dl>
 </div>
 </div>
@@ -610,6 +666,13 @@ one of the commits becoming empty.</p>
 format that can be consumed by <a href="git-update-ref.html">git-update-ref(1)</a>. Necessary new
 objects will be written into the repository, so applying these printed
 ref updates is generally safe.</p>
+</dd>
+<dt class="hdlist1"><code>--edit</code></dt>
+<dt class="hdlist1"><code>--no-edit</code></dt>
+<dd>
+<p>For <code>squash</code>, open an editor to combine the messages of the folded commits.
+This is the default; use <code>--no-edit</code> to keep the selected message without
+opening an editor.</p>
 </dd>
 <dt class="hdlist1"><code>--reedit-message</code></dt>
 <dd>
@@ -769,7 +832,7 @@ d1582f3 split-out commit
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-15 13:58:23 -0700
+Last updated 2026-10-01 14:40:13 -0700
 </div>
 </div>
 </body>
