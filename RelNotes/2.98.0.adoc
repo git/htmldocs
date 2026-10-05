@@ -28,6 +28,13 @@ UI, Workflows & Features
    distributions to bundle one binary that adapts to filesystem
    capabilities dynamically.
 
+ * The command-line completion script (in 'contrib/') has been taught
+   to complete the 'repair' subcommand for 'git worktree'.
+
+ * Various documentation files have been updated to use explicit
+   '<<TARGET,TARGET>>' AsciiDoc cross-references instead of plain text
+   references.  This improves rendering on the web and avoids broken
+   links when manual pages are included into other pages.
 
 
 Performance, Internal Implementation, Development Support etc.
@@ -40,6 +47,27 @@ Performance, Internal Implementation, Development Support etc.
  * Updates to Coccinelle semantic patches to correctly handle the
    'FREE_AND_NULL()' macro and avoid generating broken transformations
    for negated pointer checks.
+
+ * The 'Makefile' has been taught to precompile 'git-compat-util.h' to
+   speed up overall compilation, while excluding sources that do not
+   include the compatibility header.
+
+ * The can_all_from_reach() and can_all_from_reach_with_flag()
+   functions have been updated to accept a repository context,
+   preventing bugs where submodule merging incorrectly reads from the
+   superproject's commit-graph.
+
+ * The error reporting machinery in the WinANSI compatibility layer has
+   been simplified to pass the exact Windows error code and correctly
+   format arguments for fatal errors.
+
+ * The Debian 12 CI job has been updated to skip a half-auth clone test
+   that occasionally fails due to a bug in the packaged curl version
+   handling early HTTP/2 responses.
+
+ * The CI script has been updated to check for one-indexed slice numbers
+   when deciding to run unit tests on Windows, mirroring the behaviour in
+   the modern GitHub and GitLab workflows.
 
 
 Fixes since v2.56
@@ -54,3 +82,61 @@ Fixes since v2.56
    the 'packed-refs' file when deleting a root ref (which are never
    packed).
    (merge d8e4585822 ak/refs-files-root-ref-lock later to maint).
+
+ * The server-side protocol v2 response order for 'wanted-refs' and
+   'shallow-info' has been swapped to match the client's expectation,
+   fixing a fetch failure when the server has 'uploadpack.allowRefInWant'
+   enabled and the client performs a shallow fetch.
+   (merge 191740edaa rr/upload-pack-swap-shallow-wanted-ref later to maint).
+
+ * Assorted fixes for code paths that are not careful with boundary and
+   error conditions.
+   (merge c88341b7e1 js/coverity-fixes later to maint).
+
+ * A bug in git diff --no-index that mishandled reverse (-R) output
+   when conflicts existed between a file and a directory has been
+   fixed.
+   (merge 9a13b3742b hd/diff-no-index-reverse-fix later to maint).
+
+ * 'git pull' has been taught to fail more gracefully instead of
+   segfaulting when lookup_commit_reference() fails on unparseable
+   objects.
+   (merge 38bdda17dd jk/pull-null-merge-head later to maint).
+
+ * The sequencer machinery (used by 'git rebase', 'git cherry-pick', and
+   'git revert') has been updated to defer automatic maintenance tasks
+   until the end of the operation, preventing nested 'git commit', 'git
+   merge', and 'exec' commands from triggering GC operations that could
+   contend for locks or delete open packs while the sequence is in
+   progress.
+   (merge eba1a1c5dd tb/rerere-lock-grace later to maint).
+
+ * When 'core.fsyncMethod' is set to 'batch', the ODB transaction
+   failed to properly flush large blob packfiles residing in the
+   temporary directory before migrating the directory's contents to the
+   main object store.  The execution sequence has been corrected by
+   performing the packfile flush before the temporary directory
+   migration, averting failure.
+   (merge ef7faa6350 jt/object-file-batch-fsync-fix later to maint).
+
+ * The default expiry periods for both reachable and unreachable reflog
+   entries have been corrected from a past regression that swapped
+   them.
+   (merge 60cf500551 ps/reflog-expiry-fix later to maint).
+
+ * The directory traversal logic has been updated to correctly evaluate
+   pathspecs for ignored directories containing nested repositories,
+   and has been fortified to gracefully handle null pathspecs during
+   checkout operations.
+   (merge ebc067f3cc rs/dir-skip-nested-repo-fix later to maint).
+
+ * The command-line parsing of revision options has been updated to
+   properly distinguish between malformed and unknown options, and to
+   correctly report the name of unknown options after they have been
+   moved during the option parsing process.
+   (merge da2926c8f5 jk/parse-revision-opt-fixes later to maint).
+
+ * The documentation for 'git-name-rev' has been updated to refer to
+   object IDs instead of SHA-1, to more accurately reflect that the
+   active hash algorithm is used.
+   (merge b2ab8fccc3 jk/name-rev-update-hash-descriptions later to maint).
