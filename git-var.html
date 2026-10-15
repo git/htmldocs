@@ -452,7 +452,8 @@ pre>code {
 <h2 id="_synopsis">SYNOPSIS</h2>
 <div class="sectionbody">
 <div class="verseblock">
-<pre class="content"><code>git</code> <code>var</code> (<code>-l</code> | <em>&lt;variable&gt;</em>)</pre>
+<pre class="content"><code>git</code> <code>var</code> [<code>-z</code>] <code>-l</code>
+<code>git</code> <code>var</code> [<code>-z</code>] <em>&lt;variable&gt;</em>&#8230;&#8203;</pre>
 </div>
 </div>
 </div>
@@ -460,8 +461,26 @@ pre>code {
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Prints a Git logical variable. Exits with code 1 if the variable has
-no value.</p>
+<p>Prints Git logical variables. When a single variable is requested, its
+bare value is printed, and the command exits with code 1 if it has no
+value. When multiple variables are requested, they are printed as
+<code>VARIABLE=value</code> pairs, separated by newlines; a variable that has no
+value is omitted from the output, which is not by itself an error.</p>
+</div>
+<div class="paragraph">
+<p>If <code>-z</code> is given, the output format changes depending on the mode:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>With a single variable, the bare value is terminated by a NUL byte.</p>
+</li>
+<li>
+<p>With multiple variables or with <code>-l</code>, the variable name and value are
+separated by a newline, and each entry is terminated by a NUL byte
+(<code>VARIABLE\nvalue\0</code>), in the same way as <code>git</code> <code>config</code> <code>list</code> <code>-z</code>.</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -477,6 +496,13 @@ variables of the Git configuration file .git/config are listed
 as well. (However, the configuration variables listing functionality
 is deprecated in favor of <code>git</code> <code>config</code> <code>list</code>.)</p>
 </dd>
+<dt class="hdlist1"><code>-z</code></dt>
+<dd>
+<p>Terminate entries with NUL instead of newline. When used with
+<code>-l</code> or when multiple variables are requested, the variable name
+and its value are separated by a newline, and each entry is
+terminated with a NUL byte.</p>
+</dd>
 </dl>
 </div>
 </div>
@@ -484,11 +510,28 @@ is deprecated in favor of <code>git</code> <code>config</code> <code>list</code>
 <div class="sect1">
 <h2 id="_examples">EXAMPLES</h2>
 <div class="sectionbody">
-<div class="literalblock">
+<div class="ulist">
+<ul>
+<li>
+<p>Get the author identity:</p>
+<div class="listingblock">
 <div class="content">
 <pre>$ git var GIT_AUTHOR_IDENT
 Eric W. Biederman &lt;ebiederm@lnxi.com&gt; 1121223278 -0600</pre>
 </div>
+</div>
+</li>
+<li>
+<p>Get the author name and email:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ git var GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL
+GIT_AUTHOR_NAME=Eric W. Biederman
+GIT_AUTHOR_EMAIL=ebiederm@lnxi.com</pre>
+</div>
+</div>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -498,12 +541,28 @@ Eric W. Biederman &lt;ebiederm@lnxi.com&gt; 1121223278 -0600</pre>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>GIT_AUTHOR_IDENT</code></dt>
+<dt class="hdlist1"><code>GIT_AUTHOR_NAME</code></dt>
+<dt class="hdlist1"><code>GIT_AUTHOR_EMAIL</code></dt>
+<dt class="hdlist1"><code>GIT_AUTHOR_DATE</code></dt>
 <dd>
-<p>The author of a piece of code.</p>
+<p>The authorship information that would be recorded in the
+resulting commit object if you ran <code>git</code> <code>commit</code> right now.
+<code>GIT_AUTHOR_IDENT</code> consists of the author&#8217;s name, e-mail
+address, and timestamp+timezone. These three pieces of
+information are available separately as <code>GIT_AUTHOR_NAME</code>,
+<code>GIT_AUTHOR_EMAIL</code>, and <code>GIT_AUTHOR_DATE</code>.</p>
 </dd>
 <dt class="hdlist1"><code>GIT_COMMITTER_IDENT</code></dt>
+<dt class="hdlist1"><code>GIT_COMMITTER_NAME</code></dt>
+<dt class="hdlist1"><code>GIT_COMMITTER_EMAIL</code></dt>
+<dt class="hdlist1"><code>GIT_COMMITTER_DATE</code></dt>
 <dd>
-<p>The person who put a piece of code into Git.</p>
+<p>The committer information that would be recorded in the
+resulting commit object if you ran <code>git</code> <code>commit</code> right now.
+<code>GIT_COMMITTER_IDENT</code> consists of the committer&#8217;s name, e-mail
+address, and timestamp+timezone. These three pieces of
+information are available separately as <code>GIT_COMMITTER_NAME</code>,
+<code>GIT_COMMITTER_EMAIL</code>, and <code>GIT_COMMITTER_DATE</code>.</p>
 </dd>
 <dt class="hdlist1"><code>GIT_EDITOR</code></dt>
 <dd>
@@ -552,15 +611,18 @@ is <code>$GIT_PAGER</code>, then the value of <code>core.pager</code> configurat
 </dd>
 <dt class="hdlist1"><code>GIT_CONFIG_GLOBAL</code></dt>
 <dd>
-<p>The path to the global (per-user) configuration files, if any.</p>
+<p>The path to the global (per-user) configuration files, if any.
+This variable can have multiple values.</p>
 </dd>
 </dl>
 </div>
 <div class="paragraph">
 <p>Most path values contain only one value. However, some can contain multiple
-values, which are separated by newlines, and are listed in order from highest to
-lowest priority.  Callers should be prepared for any such path value to contain
-multiple items.</p>
+values, which are separated by newlines (or NUL bytes if <code>-z</code> is given),
+and are listed in order from highest to lowest priority. When querying
+multiple variables (or using <code>-l</code>), each value is output as a separate
+<code>VARIABLE=value</code> entry (or <code>VARIABLE\nvalue\0</code> with <code>-z</code>). Callers should
+be prepared for any such path value to contain multiple items.</p>
 </div>
 <div class="paragraph">
 <p>Note that paths are printed even if they do not exist, but not if they are
@@ -589,7 +651,7 @@ disabled by other environment variables.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-04-09 14:26:04 -0700
+Last updated 2026-10-15 12:28:43 -0700
 </div>
 </div>
 </body>
