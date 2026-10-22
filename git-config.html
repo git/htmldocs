@@ -10817,6 +10817,70 @@ is intended for the benefit of load-balanced servers which may
 not have the same view of what OIDs their refs point to due to
 replication delay.</p>
 </dd>
+<dt class="hdlist1">uploadpack.lazyFetchTrusted</dt>
+<dd>
+<p>A multi-valued configuration variable, each value of which
+specifies the absolute local path of a repository that
+<code>upload-pack</code> is allowed to lazily fetch missing objects for.</p>
+<div class="paragraph">
+<p>A repository is identified by its git directory, after following any
+.<code>git</code> file and resolving symbolic links. That is the repository
+itself if it is bare, the .<code>git</code> directory of a repository that has a
+worktree, or the directory that a .<code>git</code> file points to, for example
+when the repository was created with <code>--separate-git-dir</code> or for a
+linked worktree (see <a href="git-worktree.html">git-worktree(1)</a>). So a non-bare
+repository served as <code>/srv/repo</code> usually has to be allowlisted as
+<code>/srv/repo/.git</code>. Giving a path with <code>/*</code> appended to it will trust
+all repositories under the named directory. To trust all served
+repositories, set <code>uploadpack.lazyFetchTrusted</code> to the string <code>*</code>.</p>
+</div>
+<div class="paragraph">
+<p>The value of this setting is interpolated, i.e., <code>~/</code><em>&lt;path&gt;</em> expands to
+a path relative to the home directory and <code>%</code>(<code>prefix</code>)<code>/</code><em>&lt;path&gt;</em> expands
+to a path relative to Git&#8217;s (runtime) prefix.</p>
+</div>
+<div class="paragraph">
+<p>By default, <code>upload-pack</code> refuses to lazily fetch (see the description
+of the <code>GIT_NO_LAZY_FETCH</code> environment variable in
+<a href="git-upload-pack.html">git-upload-pack(1)</a>), because doing so would run <code>git</code> <code>fetch</code>,
+which may execute arbitrary commands specified in the configuration
+and hooks of the served repository. Listing a repository here tells
+<code>upload-pack</code> that it is trusted, so lazy fetching from the promisor
+remotes configured in it is allowed. This is similar to setting
+<code>GIT_NO_LAZY_FETCH</code> to <code>0</code>, but only for the matching repositories:
+unlike that environment variable, the trust is not inherited by child
+processes. So if a trusted repository lazily fetches from a promisor
+remote that is itself served by <code>upload-pack</code> on the same machine,
+for example through a local path or a <code>file://</code> URL, lazy fetching is
+allowed there only if that promisor remote is also listed here. An
+explicitly set <code>GIT_NO_LAZY_FETCH</code> takes precedence over this setting.</p>
+</div>
+<div class="paragraph">
+<p>Note that this allows lazy fetching from any promisor remote
+configured in the served repository, not only from the promisor
+remotes that the client accepted using the "promisor-remote" protocol
+v2 capability (see <a href="gitprotocol-v2.html">gitprotocol-v2(5)</a>). The served repository
+is trusted as a whole, including its configuration, so the promisor
+remotes it configures are trusted too. It is the server operator&#8217;s
+responsibility to make sure that the promisor remotes of a trusted
+repository are also trustworthy. In particular, a trusted repository
+should not be configured as its own promisor remote, as <code>upload-pack</code>
+would then try to lazily fetch missing objects from the repository
+itself, which is pointless.</p>
+</div>
+<div class="paragraph">
+<p>As this is a multi-valued setting, you can add more than one
+repository via <code>git</code> <code>config</code> (<code>--global</code>|<code>--system</code>) <code>--add</code>. To reset the
+list of trusted repositories (e.g., to override any such repositories
+specified in the system config), add an <code>uploadpack.lazyFetchTrusted</code>
+entry with an empty value.</p>
+</div>
+<div class="paragraph">
+<p>Note that this configuration variable is only respected when it is
+specified in protected configuration (see <a href="#SCOPES">SCOPES</a>). This prevents
+untrusted repositories from tampering with this value.</p>
+</div>
+</dd>
 <dt class="hdlist1">url.&lt;base&gt;.insteadOf</dt>
 <dd>
 <p>Any URL that starts with this value will be rewritten to
