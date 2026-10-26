@@ -702,9 +702,12 @@ marked with a <code>*</code>. In the porcelain modes, we print <code>ignored</co
 <dd>
 <p>Ignore revisions listed in <em>&lt;file&gt;</em>, which must be in the same format as an
 <code>fsck.skipList</code>.  This option may be repeated, and these files will be
-processed after any files specified with the <code>blame.ignoreRevsFile</code> config
-option.  An empty file name, "", will clear the list of revs from
-previously processed files.</p>
+processed after the default .<code>git-blame-ignore-revs</code> file at the root of
+the working tree (or <code>HEAD:.git-blame-ignore-revs</code> in a bare repository),
+if it exists, and any files specified with the <code>blame.ignoreRevsFile</code>
+configuration variable.  An empty file name, "", or
+<code>--no-ignore-revs-file</code> will clear the list of revs from previously
+processed files, including the default ignore-revs file.</p>
 </dd>
 <dt class="hdlist1"><code>--color-lines</code></dt>
 <dd>
@@ -1095,9 +1098,13 @@ This option defaults to false.</p>
 <dd>
 <p>Ignore revisions listed in the file, one unabbreviated object name per
 line, in <a href="git-blame.html">git-blame(1)</a>.  Whitespace and comments beginning with
-# are ignored.  This option may be repeated multiple times.  Empty
-file names will reset the list of ignored revisions.  This option will
-be handled before the command line option <code>--ignore-revs-file</code>.</p>
+# are ignored.  If .<code>git-blame-ignore-revs</code> exists at the root of the
+working tree (or <code>HEAD:.git-blame-ignore-revs</code> in a bare repository), it
+is added as the initial element in the list of ignore-revs files.
+Other files listed in the configuration are also used, but an empty
+element makes all elements that appeared before in the list forgotten.
+This option will be handled before the command line option
+<code>--ignore-revs-file</code>.</p>
 </dd>
 <dt class="hdlist1">blame.markUnblamableLines</dt>
 <dd>

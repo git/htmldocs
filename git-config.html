@@ -1555,6 +1555,18 @@ a naming scheme that supports more variable-based include conditions,
 but currently Git only supports the exact keyword described above.</p>
 </div>
 </dd>
+<dt class="hdlist1"><code>hostname</code></dt>
+<dd>
+<p>The data that follows the keyword <code>hostname:</code> is taken to be a
+pattern with standard globbing wildcards. If the hostname of
+the machine matches the pattern, the include condition is met.</p>
+<div class="paragraph">
+<p>Depending on how your system is configured, the hostname used for
+matching may be short (e.g., "myhost") or a fully qualified domain
+name ("myhost.example.com"). Run <code>git</code> <code>var</code> <code>GIT_HOSTNAME</code> to see the
+hostname Git uses (see <a href="git-var.html">git-var(1)</a>).</p>
+</div>
+</dd>
 </dl>
 </div>
 <div class="paragraph">
@@ -1649,7 +1661,11 @@ unlikely what you want.</p>
 [includeIf "hasconfig:remote.*.url:https://example.com/**"]
         path = foo.inc
 [remote "origin"]
-        url = https://example.com/git</pre>
+        url = https://example.com/git
+
+; include only if the hostname of the machine matches some-hostname
+[includeIf "hostname:some-hostname"]
+        path = foo.inc</pre>
 </div>
 </div>
 </div>
@@ -2402,9 +2418,13 @@ This option defaults to false.</p>
 <dd>
 <p>Ignore revisions listed in the file, one unabbreviated object name per
 line, in <a href="git-blame.html">git-blame(1)</a>.  Whitespace and comments beginning with
-# are ignored.  This option may be repeated multiple times.  Empty
-file names will reset the list of ignored revisions.  This option will
-be handled before the command line option <code>--ignore-revs-file</code>.</p>
+# are ignored.  If .<code>git-blame-ignore-revs</code> exists at the root of the
+working tree (or <code>HEAD:.git-blame-ignore-revs</code> in a bare repository), it
+is added as the initial element in the list of ignore-revs files.
+Other files listed in the configuration are also used, but an empty
+element makes all elements that appeared before in the list forgotten.
+This option will be handled before the command line option
+<code>--ignore-revs-file</code>.</p>
 </dd>
 <dt class="hdlist1">blame.markUnblamableLines</dt>
 <dd>
