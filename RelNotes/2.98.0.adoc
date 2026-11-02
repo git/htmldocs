@@ -94,6 +94,19 @@ UI, Workflows & Features
    the system's hostname as seen by Git can now be queried using 'git
    var GIT_HOSTNAME'.
 
+ * The hint printed when tracking configuration fails to be written has
+   been corrected to produce a valid remote-tracking branch name.
+
+ * The 'git switch' and 'git checkout' commands have been updated to
+   complete the branch switch instead of aborting when the tracking
+   configuration fails to write, matching the behavior of 'git push -u'.
+
+ * The hook.<event>.enabled configuration variable has been extended to
+   also disable traditional hookdir hooks in addition to configured
+   hooks.  In addition, the hook configuration parser has been updated
+   to treat missing values for boolean variables like enabled and
+   parallel as true.
+
 
 Performance, Internal Implementation, Development Support etc.
 --------------------------------------------------------------
@@ -233,6 +246,31 @@ Performance, Internal Implementation, Development Support etc.
 
  * A test script ('t2104') has been updated to avoid piping the output of
    a 'git' command into another command, which would hide its exit code.
+
+ * The creation of '.keep' lockfiles during object database
+   transactions has been deferred to commit time, explicitly managing
+   the lockfiles within the files backend rather than relying on
+   'git-index-pack', to prevent race conditions that could lead to
+   concurrent lockfiles being erroneously deleted.
+
+ * The connectivity check in 'git fetch' and 'git receive-pack' has
+   been optimized with an alternative incremental mode, available via
+   'transfer.connectivityCheck=incremental'.  Instead of walking the
+   full object closure of the boundary commits, it compares the trees
+   of incoming commits against their trusted parent trees, skipping
+   unchanged subtrees.
+
+ * The verbose "Checking connectivity" message in 'git fsck' has been
+   updated to use the pluralizing translation macro.
+
+ * The messages 'git checkout' prints to describe orphaned commits and
+   multiple references have been updated to use the Q_() macro, allowing
+   translators to use the correct plural forms for numbers greater than
+   one.
+
+ * The 'rerere' subsystem has been libified to remove its dependency on
+   the global 'the_repository' state and global tracking variables,
+   allowing it to operate correctly in multi-repository contexts.
 
 
 Fixes since v2.56

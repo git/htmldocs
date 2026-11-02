@@ -6224,7 +6224,8 @@ the effective job count is greater than 1. See <a href="git-hook.html">git-hook(
 </dd>
 <dt class="hdlist1">hook.&lt;event&gt;.enabled</dt>
 <dd>
-<p>Switch to enable or disable all hooks for the <em>&lt;event&gt;</em> hook event.
+<p>Switch to enable or disable all hooks for the <em>&lt;event&gt;</em> hook event,
+configured hooks and the traditional hook in the hooks directory alike.
 When set to <code>false</code>, no hooks fire for that event, regardless of any
 per-hook <code>hook.</code><em>&lt;friendly-name&gt;</em><code>.enabled</code> settings. Defaults to <code>true</code>.
 See <a href="git-hook.html">git-hook(1)</a>.</p>
@@ -10575,6 +10576,49 @@ of these arguments, if any, will be passed to the command as its
 first argument. This way the command can produce a <em>&lt;value&gt;</em> computed
 from the <em>&lt;value&gt;</em> passed in the <code>--trailer</code> <em>&lt;key-alias&gt;</em><code>=</code><em>&lt;value&gt;</em>
 argument.</p>
+</div>
+</dd>
+<dt class="hdlist1">transfer.connectivityCheck</dt>
+<dd>
+<p>Choose which algorithm to use for the connectivity check
+performed during object transfer operations such as
+<a href="git-fetch.html">git-fetch(1)</a> and <a href="git-receive-pack.html">git-receive-pack(1)</a>.
+The connectivity check verifies that all objects reachable
+from the incoming tips are available locally or, in a partial
+clone, promised by a promisor remote.
+The variants are as follows:</p>
+<div class="openblock">
+<div class="content">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>full</code> (default)</dt>
+<dd>
+<p>Walk the full object closure of the boundary commits.</p>
+</dd>
+<dt class="hdlist1"><code>incremental</code></dt>
+<dd>
+<p>Verify incoming commits by diffing their trees against parent
+trees, recursively descending only into entries that differ.
+The largest benefits occur when incoming commits change a
+small fraction of a large tree closure, and it can be slower
+than <code>full</code> when there are many incoming commits.
+Falls back to <code>full</code> for clones, pushes into an empty
+repository and deepening fetches.</p>
+</dd>
+<dt class="hdlist1"><code>auto</code></dt>
+<dt class="hdlist1"><code>auto=</code><em>&lt;cutoff&gt;</em></dt>
+<dd>
+<p>Choose between <code>full</code> and <code>incremental</code> with a heuristic.
+Currently <code>incremental</code> is used when there are at most
+<em>&lt;cutoff&gt;</em> incoming commits (1000 by default), and <code>full</code>
+otherwise.  The heuristic may change in future versions.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="paragraph">
+<p>Unknown values are treated as <code>full</code>, with a warning.</p>
 </div>
 </dd>
 <dt class="hdlist1">transfer.credentialsInUrl</dt>
