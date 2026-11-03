@@ -1987,101 +1987,6 @@ kidding - be patient!)</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="v2-git-send-email"><a class="anchor" href="#v2-git-send-email"></a>Sending v2</h3>
-<div class="paragraph">
-<p>This section will focus on how to send a v2 of your patchset. To learn what
-should go into v2, skip ahead to <a href="#reviewing">Responding to Reviews</a> for
-information on how to handle comments from reviewers.</p>
-</div>
-<div class="paragraph">
-<p>We&#8217;ll reuse our <code>psuh</code> topic branch for v2. Before we make any changes, we&#8217;ll
-mark the tip of our v1 branch for easy reference:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git checkout psuh
-$ git branch psuh-v1</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Refine your patch series by using <code>git</code> <code>rebase</code> <code>-i</code> to adjust commits based upon
-reviewer comments. Once the patch series is ready for submission, generate your
-patches again, but with some new flags:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git format-patch -v2 --cover-letter -o psuh/ --range-diff master..psuh-v1 master..</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>--range-diff</code> <code>master</code><code>..</code><code>psuh-v1</code> parameter tells <code>format-patch</code> to include a
-range-diff between <code>psuh-v1</code> and <code>psuh</code> in the cover letter (see
-<a href="git-range-diff.html">git-range-diff(1)</a>). This helps tell reviewers about the differences
-between your v1 and v2 patches.</p>
-</div>
-<div class="paragraph">
-<p>The <code>-v2</code> parameter tells <code>format-patch</code> to output your patches
-as version "2". For instance, you may notice that your v2 patches are
-all named like <code>v2-000n-my-commit-subject.patch</code>. <code>-v2</code> will also format
-your patches by prefixing them with "[PATCH v2]" instead of "[PATCH]",
-and your range-diff will be prefaced with "Range-diff against v1".</p>
-</div>
-<div class="paragraph">
-<p>After you run this command, <code>format-patch</code> will output the patches to the <code>psuh/</code>
-directory, alongside the v1 patches. Using a single directory makes it easy to
-refer to the old v1 patches while proofreading the v2 patches, but you will need
-to be careful to send out only the v2 patches. We will use a pattern like
-<code>psuh/v2-*.patch</code> (not <code>psuh/*.patch</code>, which would match v1 and v2 patches).</p>
-</div>
-<div class="paragraph">
-<p>Edit your cover letter again. Now is a good time to mention what&#8217;s different
-between your last version and now, if it&#8217;s something significant. You do not
-need the exact same body in your second cover letter; focus on explaining to
-reviewers the changes you&#8217;ve made that may not be as visible.</p>
-</div>
-<div class="paragraph">
-<p>You will also need to go and find the Message-ID of your first cover letter.
-You can either note it when you send the first series, from the output of <code>git</code>
-<code>send-email</code>, or you can look it up on the
-<a href="https://lore.kernel.org/git">mailing list</a>. Find your cover letter in the
-archives, click on it, then click "permalink" or "raw" to reveal the Message-ID
-header. It should match:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Message-ID: &lt;foo.12345.author@example.com&gt;</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Your Message-ID is &lt;foo.<code>12345.author@example.com</code>&gt;. This example will be used
-below as well; make sure to replace it with the correct Message-ID for your
-<strong>first cover letter</strong> - that is, for any subsequent version that you send,
-always use the Message-ID from v1.</p>
-</div>
-<div class="paragraph">
-<p>While you&#8217;re looking at the email, you should also note who is CC&#8217;d, as it&#8217;s
-common practice in the mailing list to keep all CCs on a thread. You can add
-these CC lines directly to your cover letter with a line like so in the header
-(before the Subject line):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>CC: author@example.com, Othe R &lt;other@example.com&gt;</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Now send the emails again, paying close attention to which messages you pass in
-to the command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git send-email --to=target@example.com
-                 --in-reply-to="&lt;foo.12345.author@example.com&gt;"
-                 psuh/v2-*.patch</pre>
-</div>
-</div>
-</div>
-<div class="sect2">
 <h3 id="single-patch"><a class="anchor" href="#single-patch"></a>Bonus Chapter: One-Patch Changes</h3>
 <div class="paragraph">
 <p>In some cases, your very small change may consist of only one patch. When that
@@ -2192,33 +2097,6 @@ passing <code>--dry-run</code>:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="v2-b4"><a class="anchor" href="#v2-b4"></a>Sending v2</h3>
-<div class="paragraph">
-<p>When you are ready to send a new iteration of your series, refine your
-patches as usual using <a href="git-rebase.html">git-rebase(1)</a>. Note that you typically want to
-rebase on top of the cover letter. You can configure an alias to enable easy
-rebases going forward:</p>
-</div>
-<hr/>
-<div class="paragraph">
-<p>$ git config set alias.b4-rebase <em>rebase "HEAD^{/--- b4-submit-tracking ---}"</em>
-$ git b4-rebase -i
----</p>
-</div>
-<div class="paragraph">
-<p>Before sending out the new version you should also update the cover letter with
-<code>b4</code> <code>prep</code> <code>--edit-cover</code> to note the relevant changes compared to the previous
-version. You can inspect the changes between the two versions with <code>b4</code> <code>prep</code>
-<code>--compare-to=v1</code>.</p>
-</div>
-<div class="paragraph">
-<p>Same as with the first version, you can use <code>b4</code> <code>send</code> to send out the second
-version. <code>b4</code> automatically bumps the version to <code>v2</code>, generates the range-diff
-against the previous iteration, and threads the new series as a reply to the
-cover letter of the first version.</p>
-</div>
-</div>
-<div class="sect2">
 <h3 id="configure-b4"><a class="anchor" href="#configure-b4"></a>Configure b4</h3>
 <div class="paragraph">
 <p><code>b4</code> can be configured via <a href="git-config.html">git-config(1)</a>. In addition to that, projects
@@ -2277,60 +2155,36 @@ previous one" patches over 2 days), reviewers would strongly prefer if a
 single polished version came 2 days later instead, and that version with
 fewer mistakes were the only one they would need to review.</p>
 </div>
-<div class="paragraph">
-<p>This consideration applies not only when going from the initial patch to v2,
-but also to later iterations of the same series. There is no fixed rule for how
-long to wait before sending a new version. A useful default is to send at most
-one new version of the same patch series per day. This gives multiple reviewers
-time to comment, gives reviewers across time zones a fair chance to
-participate, lets you batch feedback together, and gives you time to think
-through the comments you received. Knowing that you should not immediately send
-another version also encourages you to review the patches more carefully before
-sending them, catch small mistakes such as typos and off-by-one errors
-yourself, and let reviewers spend more of their attention on design,
-algorithms, and other substantial issues.</p>
-</div>
-<div class="paragraph">
-<p>The right timing depends on the topic and the feedback. Larger series usually
-need more review time. If the only comments so far are minor, such as typo
-fixes, it often makes sense to wait a little longer in case deeper reviews are
-still coming. If the comments call for substantial rework, do not rush out an
-updated version before you have reviewed the larger changes carefully. Instead,
-reply to the review that prompted the rewrite, say that you are preparing a
-substantial rework, and mention which parts of the current series will become
-obsolete so reviewers can avoid spending time on them until the updated series
-is ready.</p>
-</div>
 <div class="sect2">
 <h3 id="reviewing"><a class="anchor" href="#reviewing"></a>Responding to Reviews</h3>
 <div class="paragraph">
-<p>After a few days, you will hopefully receive a reply to your patchset with some
-comments. Woohoo! Now you can get back to work.</p>
+<p>After a few days, you may receive comments on your patch series.
+Carefully read them to understand the reviewers' perspective, and do
+not hesitate to ask for clarification.</p>
 </div>
 <div class="paragraph">
-<p>It&#8217;s good manners to reply to each comment in the mailing list discussion
-instead of letting the next version of your patch be your only response. Tell
-the reviewer whether you plan to make the suggested change, keep the original,
-or pursue a different approach. This way reviewers can respond to your reasoning
-before you spend time preparing a version they may not agree with, and later do
-not need to inspect your v2 to figure out whether you implemented their comment
-or not.</p>
+<p>Reviewers may also ask about your proposed commit log or the changes.
+Answer these in your response.  They often ask because the patch needs
+clarification; use this feedback to improve your writing, and update
+the patch so the next reader does not have to ask the same question.</p>
 </div>
 <div class="paragraph">
-<p>Reviewers may ask you about what you wrote in the patchset, either in
-the proposed commit log message or in the changes themselves.  You
-should answer these questions in your response messages, but often the
-reason why reviewers asked these questions to understand what you meant
-to write is because your patchset needed clarification to be understood.</p>
+<p>Do not start coding, much less send the next version, until you finish
+discussing the current one and both sides know what to expect.  This
+saves time, lets reviewers respond before you write a patch they have
+to reject, and avoids forcing them to inspect <em>v2</em> only to find their
+concerns unaddressed.</p>
 </div>
 <div class="paragraph">
-<p>Do not be satisfied by just answering their questions in your response
-and hear them say that they now understand what you wanted to say.
-Update your patches to clarify the points reviewers had trouble with,
-and prepare your v2; the words you used to explain your v1 to answer
-reviewers' questions may be useful thing to use.  Your goal is to make
-your v2 clear enough so that it becomes unnecessary for you to give the
-same explanation to the next person who reads it.</p>
+<p>Do not iterate too quickly; at most one iteration per day is good
+practice.  This allows multiple reviewers to comment, gives
+participants in different time zones a fair chance, lets you batch
+feedback, and gives you time to digest comments before coding.</p>
+</div>
+<div class="paragraph">
+<p>Knowing you cannot immediately send another version encourages careful
+self-review, letting you catch small mistakes yourself so reviewers
+can focus on design and other substantive issues.</p>
 </div>
 <div class="paragraph">
 <p>If you are going to push back on a comment, be polite and explain why you feel
@@ -2369,6 +2223,128 @@ v2, you can just ship a v2 with a correct patch A and correct patch B. This is
 changing history, but since it&#8217;s local history which you haven&#8217;t shared with
 anyone, that is okay for now! (Later, it may not make sense to do this; take a
 look at the section below this one for some context.)</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v2-git-send-email"><a class="anchor" href="#v2-git-send-email"></a>Sending v2</h3>
+<div class="paragraph">
+<p>This section will focus on how to send a v2 of your patchset. To learn what
+should go into v2, skip ahead to <a href="#reviewing">Responding to Reviews</a> for
+information on how to handle comments from reviewers.</p>
+</div>
+<div class="paragraph">
+<p>We&#8217;ll reuse our <code>psuh</code> topic branch for v2. Before we make any changes, we&#8217;ll
+mark the tip of our v1 branch for easy reference:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git checkout psuh
+$ git branch psuh-v1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Refine your patch series by using <code>git</code> <code>rebase</code> <code>-i</code> to adjust commits based upon
+reviewer comments. Once the patch series is ready for submission, generate your
+patches again, but with some new flags:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git format-patch -v2 --cover-letter -o psuh/ --range-diff master..psuh-v1 master..</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>--range-diff</code> <code>master</code><code>..</code><code>psuh-v1</code> parameter tells <code>format-patch</code> to include a
+range-diff between <code>psuh-v1</code> and <code>psuh</code> in the cover letter (see
+<a href="git-range-diff.html">git-range-diff(1)</a>). This helps tell reviewers about the differences
+between your v1 and v2 patches.</p>
+</div>
+<div class="paragraph">
+<p>The <code>-v2</code> parameter tells <code>format-patch</code> to output your patches
+as version "2". For instance, you may notice that your v2 patches are
+all named like <code>v2-000n-my-commit-subject.patch</code>. <code>-v2</code> will also format
+your patches by prefixing them with "[PATCH v2]" instead of "[PATCH]",
+and your range-diff will be prefaced with "Range-diff against v1".</p>
+</div>
+<div class="paragraph">
+<p>After you run this command, <code>format-patch</code> will output the patches to the <code>psuh/</code>
+directory, alongside the v1 patches. Using a single directory makes it easy to
+refer to the old v1 patches while proofreading the v2 patches, but you will need
+to be careful to send out only the v2 patches. We will use a pattern like
+<code>psuh/v2-*.patch</code> (not <code>psuh/*.patch</code>, which would match v1 and v2 patches).</p>
+</div>
+<div class="paragraph">
+<p>Edit your cover letter again. Now is a good time to mention what&#8217;s different
+between your last version and now, if it&#8217;s something significant. You do not
+need the exact same body in your second cover letter; focus on explaining to
+reviewers the changes you&#8217;ve made that may not be as visible.</p>
+</div>
+<div class="paragraph">
+<p>You will also need to go and find the Message-ID of your first cover letter.
+You can either note it when you send the first series, from the output of <code>git</code>
+<code>send-email</code>, or you can look it up on the
+<a href="https://lore.kernel.org/git">mailing list</a>. Find your cover letter in the
+archives, click on it, then click "permalink" or "raw" to reveal the Message-ID
+header. It should match:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Message-ID: &lt;foo.12345.author@example.com&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Your Message-ID is &lt;foo.<code>12345.author@example.com</code>&gt;. This example will be used
+below as well; make sure to replace it with the correct Message-ID for your
+<strong>first cover letter</strong> - that is, for any subsequent version that you send,
+always use the Message-ID from v1.</p>
+</div>
+<div class="paragraph">
+<p>While you&#8217;re looking at the email, you should also note who is CC&#8217;d, as it&#8217;s
+common practice in the mailing list to keep all CCs on a thread. You can add
+these CC lines directly to your cover letter with a line like so in the header
+(before the Subject line):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>CC: author@example.com, Othe R &lt;other@example.com&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now send the emails again, paying close attention to which messages you pass in
+to the command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git send-email --to=target@example.com
+                 --in-reply-to="&lt;foo.12345.author@example.com&gt;"
+                 psuh/v2-*.patch</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="v2-b4"><a class="anchor" href="#v2-b4"></a>Sending v2</h3>
+<div class="paragraph">
+<p>When you are ready to send a new iteration of your series, refine your
+patches as usual using <a href="git-rebase.html">git-rebase(1)</a>. Note that you typically want to
+rebase on top of the cover letter. You can configure an alias to enable easy
+rebases going forward:</p>
+</div>
+<hr/>
+<div class="paragraph">
+<p>$ git config set alias.b4-rebase <em>rebase "HEAD^{/--- b4-submit-tracking ---}"</em>
+$ git b4-rebase -i
+---</p>
+</div>
+<div class="paragraph">
+<p>Before sending out the new version you should also update the cover letter with
+<code>b4</code> <code>prep</code> <code>--edit-cover</code> to note the relevant changes compared to the previous
+version. You can inspect the changes between the two versions with <code>b4</code> <code>prep</code>
+<code>--compare-to=v1</code>.</p>
+</div>
+<div class="paragraph">
+<p>Same as with the first version, you can use <code>b4</code> <code>send</code> to send out the second
+version. <code>b4</code> automatically bumps the version to <code>v2</code>, generates the range-diff
+against the previous iteration, and threads the new series as a reply to the
+cover letter of the first version.</p>
 </div>
 </div>
 <div class="sect2">
@@ -2429,7 +2405,7 @@ should generate your diffs from <em>&lt;topic&gt;</em><code>..</code><em>&lt;myb
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-07-19 12:35:41 -0700
+Last updated 2026-11-03 08:05:12 -0800
 </div>
 </div>
 </body>
