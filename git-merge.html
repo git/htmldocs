@@ -501,7 +501,8 @@ a log message from the user describing the changes. Before the operation,
 <p>A merge stops if there&#8217;s a conflict that cannot be resolved
 automatically or if <code>--no-commit</code> was provided when initiating the
 merge. At that point you can run <code>git</code> <code>merge</code> <code>--abort</code> or <code>git</code> <code>merge</code>
-<code>--continue</code>.</p>
+<code>--continue</code>. See <a href="gitmergeconflicts.html">gitmergeconflicts(7)</a>
+(or <code>git</code> <code>help</code> <code>mergeconflicts</code>) for a guide to handling merge conflicts.</p>
 </div>
 <div class="paragraph">
 <p><code>git</code> <code>merge</code> <code>--abort</code> will abort the merge process and try to reconstruct
@@ -975,155 +976,6 @@ your own. e.g.</p>
 git merge v1.2.3^0
 git merge --ff-only v1.2.3</pre>
 </div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_how_conflicts_are_presented">HOW CONFLICTS ARE PRESENTED</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>During a merge, the working tree files are updated to reflect the result
-of the merge.  Among the changes made to the common ancestor&#8217;s version,
-non-overlapping ones (that is, you changed an area of the file while the
-other side left that area intact, or vice versa) are incorporated in the
-final result verbatim.  When both sides made changes to the same area,
-however, Git cannot randomly pick one side over the other, and asks you to
-resolve it by leaving what both sides did to that area.</p>
-</div>
-<div class="paragraph">
-<p>By default, Git uses the same style as the one used by the "merge" program
-from the RCS suite to present such a conflicted hunk, like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Here are lines that are either unchanged from the common
-ancestor, or cleanly resolved because only one side changed,
-or cleanly resolved because both sides changed the same way.
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
-Conflict resolution is hard;
-let's go shopping.
-=======
-Git makes conflict resolution easy.
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
-And here is another line that is cleanly resolved or unmodified.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The area where a pair of conflicting changes happened is marked with markers
-&lt;&lt;&lt;&lt;&lt;&lt;&lt;, <code>=======</code>, and &gt;&gt;&gt;&gt;&gt;&gt;&gt;.  The part before the <code>=======</code>
-is typically your side, and the part afterwards is typically their side.</p>
-</div>
-<div class="paragraph">
-<p>The default format does not show what the original said in the conflicting
-area.  You cannot tell how many lines are deleted and replaced with
-Barbie&#8217;s remark on your side.  The only thing you can tell is that your
-side wants to say it is hard and you&#8217;d prefer to go shopping, while the
-other side wants to claim it is easy.</p>
-</div>
-<div class="paragraph">
-<p>An alternative style can be used by setting the <code>merge.conflictStyle</code>
-configuration variable to either <code>diff3</code> or <code>zdiff3</code>.  In <code>diff3</code>
-style, the above conflict may look like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Here are lines that are either unchanged from the common
-ancestor, or cleanly resolved because only one side changed,
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
-or cleanly resolved because both sides changed the same way.
-Conflict resolution is hard;
-let's go shopping.
-||||||| base:sample.txt
-or cleanly resolved because both sides changed identically.
-Conflict resolution is hard.
-=======
-or cleanly resolved because both sides changed the same way.
-Git makes conflict resolution easy.
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
-And here is another line that is cleanly resolved or unmodified.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>while in <code>zdiff3</code> style, it may look like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>Here are lines that are either unchanged from the common
-ancestor, or cleanly resolved because only one side changed,
-or cleanly resolved because both sides changed the same way.
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; yours:sample.txt
-Conflict resolution is hard;
-let's go shopping.
-||||||| base:sample.txt
-or cleanly resolved because both sides changed identically.
-Conflict resolution is hard.
-=======
-Git makes conflict resolution easy.
-&gt;&gt;&gt;&gt;&gt;&gt;&gt; theirs:sample.txt
-And here is another line that is cleanly resolved or unmodified.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>In addition to the &lt;&lt;&lt;&lt;&lt;&lt;&lt;, <code>=======</code>, and &gt;&gt;&gt;&gt;&gt;&gt;&gt; markers, it uses
-another ||||||| marker that is followed by the original text.  You can
-tell that the original just stated a fact, and your side simply gave in to
-that statement and gave up, while the other side tried to have a more
-positive attitude.  You can sometimes come up with a better resolution by
-viewing the original.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_how_to_resolve_conflicts">HOW TO RESOLVE CONFLICTS</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>After seeing a conflict, you can do two things:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Decide not to merge.  The only clean-ups you need are to reset
-the index file to the <code>HEAD</code> commit to reverse 2. and to clean
-up working tree changes made by 2. and 3.; <code>git</code> <code>merge</code> <code>--abort</code>
-can be used for this.</p>
-</li>
-<li>
-<p>Resolve the conflicts.  Git will mark the conflicts in
-the working tree.  Edit the files into shape and
-<code>git</code> <code>add</code> them to the index.  Use <code>git</code> <code>commit</code> or
-<code>git</code> <code>merge</code> <code>--continue</code> to seal the deal. The latter command
-checks whether there is a (interrupted) merge in progress
-before calling <code>git</code> <code>commit</code>.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>You can work through the conflict with a number of tools:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Use a mergetool.  <code>git</code> <code>mergetool</code> to launch a graphical
-mergetool which will work through the merge with you.</p>
-</li>
-<li>
-<p>Look at the diffs.  <code>git</code> <code>diff</code> will show a three-way diff,
-highlighting changes from both the <code>HEAD</code> and <code>MERGE_HEAD</code>
-versions. <code>git</code> <code>diff</code> <code>AUTO_MERGE</code> will show what changes you&#8217;ve
-made so far to resolve textual conflicts.</p>
-</li>
-<li>
-<p>Look at the diffs from each branch. <code>git</code> <code>log</code> <code>--merge</code> <code>-p</code> <em>&lt;path&gt;</em>
-will show diffs first for the <code>HEAD</code> version and then the
-<code>MERGE_HEAD</code> version.</p>
-</li>
-<li>
-<p>Look at the originals.  <code>git</code> <code>show</code> <code>:1:filename</code> shows the
-common ancestor, <code>git</code> <code>show</code> <code>:2:filename</code> shows the <code>HEAD</code>
-version, and <code>git</code> <code>show</code> <code>:3:filename</code> shows the <code>MERGE_HEAD</code>
-version.</p>
-</li>
-</ul>
 </div>
 </div>
 </div>
@@ -1750,7 +1602,8 @@ See <a href="gitattributes.html">gitattributes(5)</a> for details.</p>
 <a href="git-reset.html">git-reset(1)</a>,
 <a href="git-diff.html">git-diff(1)</a>, <a href="git-ls-files.html">git-ls-files(1)</a>,
 <a href="git-add.html">git-add(1)</a>, <a href="git-rm.html">git-rm(1)</a>,
-<a href="git-mergetool.html">git-mergetool(1)</a></p>
+<a href="git-mergetool.html">git-mergetool(1)</a>
+<a href="gitmergeconflicts.html">gitmergeconflicts(7)</a></p>
 </div>
 </div>
 </div>
@@ -1765,7 +1618,7 @@ See <a href="gitattributes.html">gitattributes(5)</a> for details.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-07-14 12:11:05 -0700
+Last updated 2026-11-04 12:45:45 -0800
 </div>
 </div>
 </body>
