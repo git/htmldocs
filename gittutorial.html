@@ -444,7 +444,7 @@ pre>code {
 <h1>gittutorial(7) Manual Page</h1>
 <h2 id="_name">NAME</h2>
 <div class="sectionbody">
-<p>gittutorial - A tutorial introduction to Git</p>
+<p>gittutorial - Introduction to Git for beginners</p>
 </div>
 </div>
 <div id="content">
@@ -452,64 +452,260 @@ pre>code {
 <h2 id="_description">DESCRIPTION</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This tutorial explains how to import a new project into Git, make
-changes to it, and share changes with other developers.</p>
+<p>Git is a program that lets you collaborate with others on code, back up
+your code, roll back to an earlier version of your project, track how
+your project has changed over time, and much more.</p>
 </div>
 <div class="paragraph">
-<p>If you are instead primarily interested in using Git to fetch a project,
-for example, to test the latest version, you may prefer to start with
-the first two chapters of <a href="user-manual.html">The Git User&#8217;s Manual</a>.</p>
+<p>This tutorial explains how to create a new Git project, make
+changes to it, and upload the project to the Internet. It usually takes
+less than an hour if you have a little previous experience with Git, and
+1-2 hours if not.</p>
 </div>
 <div class="paragraph">
-<p>First, note that you can get documentation for a command such as
-<code>git</code> <code>log</code> <code>--graph</code> with:</p>
+<p>We&#8217;ll show you how to use the commands <code>git</code> <code>commit</code>, <code>git</code> <code>add</code>,
+<code>git</code> <code>diff</code>, <code>git</code> <code>status</code>, and <code>git</code> <code>push</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_what_well_be_doing">What we&#8217;ll be doing</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Git lets you take snapshots of your code, like a checkpoint in a video
+game. These snapshots are called "commits". Which files to save in a
+commit is up to you.</p>
+</div>
+<div class="paragraph">
+<p>When Git stores a commit, it stores a copy of every file in the commit
+in a database in a folder called .<code>git</code>. This is called a "Git repository".</p>
+</div>
+<div class="paragraph">
+<p>In this tutorial we&#8217;re going to show you how to:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a Git repository in a folder with the command <code>git</code> <code>init</code>.
+This creates the .<code>git</code> folder where Git stores all your commits.</p>
+</li>
+<li>
+<p>Tell Git which files you want to put in a commit</p>
+</li>
+<li>
+<p>Make a commit</p>
+</li>
+<li>
+<p>Change a file and make a new commit with the new version</p>
+</li>
+<li>
+<p>Make experimental changes and throw them away</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>We&#8217;ll also explain how to use Git to put your code on the Internet.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_command_line_vs_graphical_interfaces">Command line vs graphical interfaces</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Git is a command line program, but there are many graphical interfaces
+for Git built by the community. Your text editor might even have a
+built-in Git integration.</p>
+</div>
+<div class="paragraph">
+<p>In this tutorial, we&#8217;ll give instructions for using Git from the
+command line. We can&#8217;t give you instructions for how to do it in your
+graphical interface because there are so many of them.</p>
+</div>
+<div class="paragraph">
+<p>You can always switch back and forth between using the command line and
+a graphical interface at any time.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_1_make_sure_git_is_installed">Step 1: Make sure Git is installed</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To do this tutorial, you&#8217;ll need:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Git to be installed. You might already have it installed,
+and if not there are directions at <a href="https://git-scm.com/install/" class="bare">https://git-scm.com/install/</a></p>
+</li>
+<li>
+<p>A terminal to use. On Windows, you can use Git Bash which comes
+when you install Git.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>You can check if Git is installed by running this in your terminal:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ man git-log</pre>
+<pre>$ git --version</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>or:</p>
+<p>It should output something like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git help log</pre>
+<pre>git version 2.54.0</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>With the latter, you can use the manual viewer of your choice; see
-<a href="git-help.html">git-help(1)</a> for more information.</p>
+<p>The exact version isn&#8217;t too important: this tutorial is designed to work
+with any version of Git after 2.23.0.</p>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step_2">Step 2: Introduce yourself to Git</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>It is a good idea to introduce yourself to Git with your name and
-public email address before doing any operation.  The easiest
-way to do so is:</p>
+<p>The first time you use Git on a computer, it&#8217;s a good idea to tell Git
+your name and public email address. If you don&#8217;t, you&#8217;ll get a lot of
+warnings from Git. To do this, run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git config --global user.name "Your Name Comes Here"
-$ git config --global user.email you@yourdomain.example.com</pre>
+<pre>$ git config --global user.name "Namey McName"
+$ git config --global user.email you@example.com</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The name and email is so that other people you&#8217;re collaborating with
+can know who made the changes. You can set them to anything you want.</p>
+</div>
+<div class="paragraph">
+<p>To check if the name and email have been set, you can run these
+commands. They should display your name and email:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git config user.name
+$ git config user.email</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, configure Git to set the default branch name to <code>main</code> (instead
+of <code>master</code>) by running this command. We can&#8217;t explain what a branch is
+yet, but Git is going to
+<a href="https://sfconservancy.org/news/2020/jun/23/gitbranchname/">make <code>main</code> the default soon</a>,
+and setting this avoids some extremely annoying problems in Step 14.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git config --global init.defaultBranch main</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If there&#8217;s no output, then it succeeded.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+It&#8217;s also possible to set a different email address for every project,
+but we&#8217;re not covering that here.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_3_create_an_empty_folder_and_1_file">Step 3: Create an empty folder and 1 file</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In your terminal, create an empty folder and move into it.
+Later on you could follow the same steps in this tutorial to take an
+existing project and start managing it with Git, but we&#8217;re going to use
+an empty project so that everyone following this tutorial has the exact
+same files.</p>
+</div>
+<div class="paragraph">
+<p>For example, run these commands to make a folder called <code>myproject</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ mkdir myproject
+$ cd myproject</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Next, using your text editor, create a file in this folder, so we
+have something to work with.</p>
+</div>
+<div class="paragraph">
+<p>Make a file called README.md, with these contents:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>We're doing a Git tutorial!
+We need 2 lines in this file so here's a second one</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Save <code>README.md</code> and keep it open in your text editor so you can
+easily edit it later. The exact contents aren&#8217;t too important, but
+we&#8217;ll use those contents in the example output later.</p>
+</div>
+<div class="paragraph">
+<p>You can check that the file is in the right place by running <code>ls</code>,
+like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ls</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The output should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>README.md</pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_importing_a_new_project">Importing a new project</h2>
+<h2 id="_step_4_create_a_git_repository">Step 4: Create a Git repository</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Assume you have a tarball <code>project.tar.gz</code> with your initial work.  You
-can place it under Git revision control as follows.</p>
+<p>A Git repository lets you save snapshots of your code. Every time you make a
+snapshot, Git stores a copy of the contents of every file in the snapshot.</p>
+</div>
+<div class="paragraph">
+<p>This might feel unbelievable, but Git uses compression so you can easily
+store tens of thousands of snapshots without using too much disk space.</p>
+</div>
+<div class="paragraph">
+<p>You can create a Git repository for any folder in your computer by
+running the command <code>git</code> <code>init</code>.</p>
+</div>
+<div class="paragraph">
+<p>Run <code>git</code> <code>init</code> in the folder you just created, like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ tar xzf project.tar.gz
-$ cd project
-$ git init</pre>
+<pre>$ git init</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Git will reply</p>
+<p>Git will reply:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -517,12 +713,36 @@ $ git init</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You&#8217;ve now initialized the working directory&#8212;&#8203;you may notice a new
-directory created, named .<code>git</code>.</p>
+<p>You might notice a new hidden folder was created, named .<code>git</code>.
+You don&#8217;t need to use this folder directly in any way, but it&#8217;s where
+your commits will be stored.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_5_make_your_first_commit">Step 5: Make your first commit</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Next, we&#8217;re going to take a snapshot of all the files in the directory
+and tell Git to store them. Git calls these snapshots "commits".
+Making a commit in Git is a two step process: first you need to run <code>git</code>
+<code>add</code> and then <code>git</code> <code>commit</code>.</p>
 </div>
 <div class="paragraph">
-<p>Next, tell Git to take a snapshot of the contents of all files under the
-current directory (note the .), with <code>git</code> <code>add</code>:</p>
+<p>The reason it&#8217;s a two step process is that sometimes you might not
+actually want Git to store a commit with <em>all</em> the files in a folder.
+For example, if you&#8217;re compiling your program to a binary, you might
+want Git to put the program&#8217;s source code in your commit but not
+compiled binary. You can also use a .<code>gitignore</code> file to help with this.</p>
+</div>
+<div class="paragraph">
+<p>For now, we&#8217;re going to store a commit with every file in your folder,
+as well as in every subfolder.</p>
+</div>
+<div class="paragraph">
+<p>The first step of making a commit is to tell Git which files you
+want to include in the commit using <code>git</code> <code>add</code>. To tell Git
+"include all files", run this command:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -530,214 +750,112 @@ current directory (note the .), with <code>git</code> <code>add</code>:</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This snapshot is now stored in a temporary staging area which Git calls
-the "index".  You can permanently store the contents of the index in the
-repository with <code>git</code> <code>commit</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git commit</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will prompt you for a commit message.  You&#8217;ve now stored the first
-version of your project in Git.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_making_changes">Making changes</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Modify some files, then add their updated contents to the index:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git add file1 file2 file3</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You are now ready to commit.  You can see what is about to be committed
-using <code>git</code> <code>diff</code> with the <code>--cached</code> option:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git diff --cached</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>(Without <code>--cached</code>, <code>git</code> <code>diff</code> will show you any changes that
-you&#8217;ve made but not yet added to the index.)  You can also get a brief
-summary of the situation with <code>git</code> <code>status</code>:</p>
+<p>To check if it succeeded, you can run <code>git</code> <code>status</code>.
+The output should look like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre>$ git status
-On branch master
-Changes to be committed:
-  (use "git restore --staged &lt;file&gt;..." to unstage)
+On branch main
 
-        modified:   file1
-        modified:   file2
-        modified:   file3</pre>
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached &lt;file&gt;..." to unstage)
+        new file:   README.md</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you need to make any further adjustments, do so now, and then add any
-newly modified content to the index.  Finally, commit your changes with:</p>
+<p>Next you can create the commit using the <code>git</code> <code>commit</code> command, like
+this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git commit</pre>
+<pre>$ git commit -m "Initial commit"</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>This will again prompt you for a message describing the change, and then
-record a new version of the project.</p>
+<p>The <code>-m</code> flag stands for "message", and it lets you set a reminder
+for your future self of what you were doing. The message
+("Initial commit" in this example) can say anything you want.</p>
 </div>
 <div class="paragraph">
-<p>Alternatively, instead of running <code>git</code> <code>add</code> beforehand, you can use</p>
+<p>The output should look like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git commit -a</pre>
+<pre>[main (root-commit) 4a7e367] Initial commit
+ 1 file changed, 2 insertions(+)
+ create mode 100644 README.md</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>which will automatically notice any modified (but not new) files, add
-them to the index, and commit, all in one step.</p>
-</div>
-<div class="paragraph">
-<p>A note on commit messages: Though not required, it&#8217;s a good idea to
-begin the commit message with a single short (no more than 50
-characters) line summarizing the change, followed by a blank line and
-then a more thorough description. The text up to the first blank line in
-a commit message is treated as the commit title, and that title is used
-throughout Git.  For example, <a href="git-format-patch.html">git-format-patch(1)</a> turns a
-commit into email, and it uses the title on the Subject line and the
-rest of the commit in the body.</p>
+<p>You&#8217;ve now stored the first version of your project in Git!</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_git_tracks_content_not_files">Git tracks content not files</h2>
+<h2 id="_git_status_is_very_important"><code>git</code> <code>status</code> is very important</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Many revision control systems provide an <code>add</code> command that tells the
-system to start tracking changes to a new file.  Git&#8217;s <code>add</code> command
-does something simpler and more powerful: <code>git</code> <code>add</code> is used both for new
-and newly modified files, and in both cases it takes a snapshot of the
-given files and stages that content in the index, ready for inclusion in
-the next commit.</p>
+<p><code>git</code> <code>status</code> shows you the current state of your Git repository.
+It can give a huge amount of different information that takes
+practice to interpret, so this tutorial has several examples of
+how to interpret the output of <code>git</code> <code>status</code> in different situations.</p>
+</div>
+<div class="paragraph">
+<p>It&#8217;s often useful to run <code>git</code> <code>status</code> before and after running a Git
+command to see how it changed things.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_viewing_project_history">Viewing project history</h2>
+<h2 id="_step_6_make_a_change">Step 6: Make a change</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>At any point you can view the history of your changes using</p>
+<p>Now, let&#8217;s learn how to make a change to a file and review the change you made.
+In this example, we&#8217;ll update the file <code>README.md</code>, but you can edit a
+different file.</p>
+</div>
+<div class="paragraph">
+<p>First open <code>README.md</code> in your favourite text editor, make a tiny or
+silly change, and save it. In our example, we&#8217;ll edit the first line to
+add more exclamation marks:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git log</pre>
+<pre>We're doing a Git tutorial!!!!</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you also want to see complete diffs at each step, use</p>
+<p>Next, in the terminal, run the command <code>git</code> <code>status</code> to get a summary of
+what you changed since the last Git commit.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git log -p</pre>
+<pre>$ git status</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Often the overview of the change is useful to get a feel of
-each step</p>
+<p>The output will look something like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git log --stat --summary</pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_managing_branches">Managing branches</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>A single Git repository can maintain multiple branches of
-development.  To create a new branch named <code>experimental</code>, use</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git branch experimental</pre>
+<pre>On branch main
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+        modified:   README.md</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>If you now run</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git branch</pre>
-</div>
+<p>This output says that we&#8217;ve changed <code>README.md</code> since the last time
+we committed.</p>
 </div>
 <div class="paragraph">
-<p>you&#8217;ll get a list of all existing branches:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>  experimental
-* master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>The <code>experimental</code> branch is the one you just created, and the
-<code>master</code> branch is a default branch that was created for you
-automatically.  The asterisk marks the branch you are currently on;
-type</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git switch experimental</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>to switch to the <code>experimental</code> branch.  Now edit a file, commit the
-change, and switch back to the <code>master</code> branch:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>(edit file)
-$ git commit -a
-$ git switch master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Check that the change you made is no longer visible, since it was
-made on the <code>experimental</code> branch and you&#8217;re back on the <code>master</code> branch.</p>
-</div>
-<div class="paragraph">
-<p>You can make a different change on the <code>master</code> branch:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>(edit file)
-$ git commit -a</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>at this point the two branches have diverged, with different changes
-made in each.  To merge the changes made in <code>experimental</code> into <code>master</code>, run</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git merge experimental</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If the changes don&#8217;t conflict, you&#8217;re done.  If there are conflicts,
-markers will be left in the problematic files showing the conflict;</p>
+<p>Next, if you want to see the details of how you&#8217;ve changed <code>README.md</code>,
+you can run <code>git</code> <code>diff</code>.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -745,534 +863,681 @@ markers will be left in the problematic files showing the conflict;</p>
 </div>
 </div>
 <div class="paragraph">
-<p>will show this.  Once you&#8217;ve edited the files to resolve the
-conflicts,</p>
+<p>The output will look something like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git commit -a</pre>
+<pre>diff --git a/README.md b/README.md
+index ffa8b85..a49e4b0 100644
+--- a/README.md
++++ b/README.md
+@@ -1,2 +1,2 @@
+-We're doing a Git tutorial!
++We're doing a Git tutorial!!!!
+ We need 2 lines in this file so here's a second one</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>will commit the result of the merge. Finally,</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ gitk</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>will show a nice graphical representation of the resulting history.</p>
-</div>
-<div class="paragraph">
-<p>At this point you could delete the <code>experimental</code> branch with</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git branch -d experimental</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This command ensures that the changes in the <code>experimental</code> branch are
-already in the current branch.</p>
-</div>
-<div class="paragraph">
-<p>If you develop on a branch <code>crazy-idea</code>, then regret it, you can always
-delete the branch with</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git branch -D crazy-idea</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Branches are cheap and easy, so this is a good way to try something
-out.</p>
+<p>This output says that we deleted one line (<code>We</code>'re <code>doing</code> <code>a</code> <code>Git</code>
+<code>tutorial</code>!) and added one line (<code>We</code>'re <code>doing</code> <code>a</code> <code>Git</code> <code>tutorial</code>!!!!). By
+default Git will show the lines you removed in red, and the lines you
+added in green. Removed lines start with a minus <code>-</code> and added lines
+start with a plus <code>+</code>.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_using_git_for_collaboration">Using Git for collaboration</h2>
+<h2 id="_step_7a_make_a_second_commit">Step 7a: Make a second commit</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Suppose that Alice has started a new project with a Git repository in
-<code>/home/alice/project</code>, and that Bob, who has a home directory on the
-same machine, wants to contribute.</p>
-</div>
-<div class="paragraph">
-<p>Bob begins with:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>bob$ git clone /home/alice/project myrepo</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This creates a new directory <code>myrepo</code> containing a clone of Alice&#8217;s
-repository.  The clone is on an equal footing with the original
-project, possessing its own copy of the original project&#8217;s history.</p>
-</div>
-<div class="paragraph">
-<p>Bob then makes some changes and commits them:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>(edit files)
-bob$ git commit -a
-(repeat as necessary)</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>When he&#8217;s ready, he tells Alice to pull changes from the repository
-at <code>/home/bob/myrepo</code>.  She does this with:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ cd /home/alice/project
-alice$ git pull /home/bob/myrepo master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This merges the changes from Bob&#8217;s <code>master</code> branch into Alice&#8217;s
-current branch.  If Alice has made her own changes in the meantime,
-then she may need to manually fix any conflicts.</p>
-</div>
-<div class="paragraph">
-<p>The <code>pull</code> command thus performs two operations: it fetches changes
-from a remote branch, then merges them into the current branch.</p>
-</div>
-<div class="paragraph">
-<p>Note that in general, Alice would want her local changes committed before
-initiating this <code>pull</code>.  If Bob&#8217;s work conflicts with what Alice did since
-their histories forked, Alice will use her working tree and the index to
-resolve conflicts, and existing local changes will interfere with the
-conflict resolution process (Git will still perform the fetch but will
-refuse to merge&#8201;&#8212;&#8201;Alice will have to get rid of her local changes in
-some way and pull again when this happens).</p>
-</div>
-<div class="paragraph">
-<p>Alice can peek at what Bob did without merging first, using the <code>fetch</code>
-command; this allows Alice to inspect what Bob did, using a special
-symbol <code>FETCH_HEAD</code>, in order to determine if he has anything worth
-pulling, like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ git fetch /home/bob/myrepo master
-alice$ git log -p HEAD..FETCH_HEAD</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This operation is safe even if Alice has uncommitted local changes.
-The range notation <code>HEAD</code><code>..</code><code>FETCH_HEAD</code> means "show everything that is reachable
-from the <code>FETCH_HEAD</code> but exclude anything that is reachable from <code>HEAD</code>".
-Alice already knows everything that leads to her current state (<code>HEAD</code>),
-and reviews what Bob has in his state (<code>FETCH_HEAD</code>) that she has not
-seen with this command.</p>
-</div>
-<div class="paragraph">
-<p>If Alice wants to visualize what Bob did since their histories forked
-she can issue the following command:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ gitk HEAD..FETCH_HEAD</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This uses the same two-dot range notation we saw earlier with <code>git</code> <code>log</code>.</p>
-</div>
-<div class="paragraph">
-<p>Alice may want to view what both of them did since they forked.
-She can use three-dot form instead of the two-dot form:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ gitk HEAD...FETCH_HEAD</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This means "show everything that is reachable from either one, but
-exclude anything that is reachable from both of them".</p>
-</div>
-<div class="paragraph">
-<p>Please note that these range notations can be used with both <code>gitk</code>
-and <code>git</code> <code>log</code>.</p>
-</div>
-<div class="paragraph">
-<p>After inspecting what Bob did, if there is nothing urgent, Alice may
-decide to continue working without pulling from Bob.  If Bob&#8217;s history
-does have something Alice would immediately need, Alice may choose to
-stash her work-in-progress first, do a <code>pull</code>, and then finally unstash
-her work-in-progress on top of the resulting history.</p>
-</div>
-<div class="paragraph">
-<p>When you are working in a small closely knit group, it is not
-unusual to interact with the same repository over and over
-again.  By defining <em>remote</em> repository shorthand, you can make
-it easier:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ git remote add bob /home/bob/myrepo</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>With this, Alice can perform the first part of the <code>pull</code> operation
-alone using the <code>git</code> <code>fetch</code> command without merging them with her own
-branch, using:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ git fetch bob</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Unlike the longhand form, when Alice fetches from Bob using a
-remote repository shorthand set up with <code>git</code> <code>remote</code>, what was
-fetched is stored in a remote-tracking branch, in this case
-<code>bob/master</code>.  So after this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ git log -p master..bob/master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>shows a list of all the changes that Bob made since he branched from
-Alice&#8217;s <code>master</code> branch.</p>
-</div>
-<div class="paragraph">
-<p>After examining those changes, Alice
-could merge the changes into her <code>master</code> branch:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ git merge bob/master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This <code>merge</code> can also be done by <em>pulling from her own remote-tracking
-branch</em>, like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>alice$ git pull . remotes/bob/master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that git pull always merges into the current branch,
-regardless of what else is given on the command line.</p>
-</div>
-<div class="paragraph">
-<p>Later, Bob can update his repo with Alice&#8217;s latest changes using</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>bob$ git pull</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note that he doesn&#8217;t need to give the path to Alice&#8217;s repository;
-when Bob cloned Alice&#8217;s repository, Git stored the location of her
-repository in the repository configuration, and that location is
-used for pulls:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>bob$ git config --get remote.origin.url
-/home/alice/project</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>(The complete configuration created by <code>git</code> <code>clone</code> is visible using
-<code>git</code> <code>config</code> <code>list</code>, and the <a href="git-config.html">git-config(1)</a> man page
-explains the meaning of each option.)</p>
-</div>
-<div class="paragraph">
-<p>Git also keeps a pristine copy of Alice&#8217;s <code>master</code> branch under the
-name <code>origin/master</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>bob$ git branch -r
-  origin/master</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>If Bob later decides to work from a different host, he can still
-perform clones and pulls using the ssh protocol:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>bob$ git clone alice.org:/home/alice/project myrepo</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Alternatively, Git has a native protocol, or can use http;
-see <a href="git-pull.html">git-pull(1)</a> for details.</p>
-</div>
-<div class="paragraph">
-<p>Git can also be used in a CVS-like mode, with a central repository
-that various users push changes to; see <a href="git-push.html">git-push(1)</a> and
-<a href="gitcvs-migration.html">gitcvs-migration(7)</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_exploring_history">Exploring history</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Git history is represented as a series of interrelated commits.  We
-have already seen that the <code>git</code> <code>log</code> command can list those commits.
-Note that first line of each <code>git</code> <code>log</code> entry also gives a name for the
-commit:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git log
-commit c82a22c39cbc32576f64f5c6b3f24b99ea8149c7
-Author: Junio C Hamano &lt;junkio@cox.net&gt;
-Date:   Tue May 16 17:18:22 2006 -0700
-
-    merge-base: Clarify the comments on post processing.</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We can give this name to <code>git</code> <code>show</code> to see the details about this
+<p>Now that we&#8217;ve changed <code>README.md</code>, let&#8217;s make another commit.
+We&#8217;re going to follow the same steps as before when we made our first
 commit.</p>
 </div>
-<div class="listingblock">
-<div class="content">
-<pre>$ git show c82a22c39cbc32576f64f5c6b3f24b99ea8149c7</pre>
-</div>
-</div>
 <div class="paragraph">
-<p>But there are other ways to refer to commits.  You can use any initial
-part of the name that is long enough to uniquely identify the commit:</p>
+<p>First, tell Git that we want to include the new version of <code>README.md</code>
+in the next commit:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git show c82a22c39c   # the first few characters of the name are
-                        # usually enough
-$ git show HEAD         # the tip of the current branch
-$ git show experimental # the tip of the "experimental" branch</pre>
+<pre>$ git add README.md</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Every commit usually has one "parent" commit
-which points to the previous state of the project:</p>
+<p>and then run <code>git</code> <code>commit</code>, like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git show HEAD^  # to see the parent of HEAD
-$ git show HEAD^^ # to see the grandparent of HEAD
-$ git show HEAD~4 # to see the great-great grandparent of HEAD</pre>
+<pre>$ git commit -m "Update README"</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Note that merge commits may have more than one parent:</p>
+<p>The output should look like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git show HEAD^1 # show the first parent of HEAD (same as HEAD^)
-$ git show HEAD^2 # show the second parent of HEAD</pre>
+<pre>[main 32e0171] Update README
+ 1 file changed, 1 insertion(+), 1 deletion(-)</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can also give commits names of your own; after running</p>
+<p>This says that the new commit is the same as the previous commit,
+except that we changed 1 line of 1 file.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_7b_make_a_second_commit_the_short_way">Step 7b: Make a second commit (the short way)</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Instead of running the two commands in Step 7a above, you
+could also run this command as a shortcut. It will:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Get a list of every file in the most recent commit</p>
+</li>
+<li>
+<p>Commit the current version of all of those files</p>
+</li>
+</ol>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git tag v2.5 1b2e1d63ff</pre>
+<pre>$ git commit -am "Update README"</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>you can refer to <code>1b2e1d63ff</code> by the name <code>v2.5</code>.  If you intend to
-share this name with other people (for example, to identify a release
-version), you should create a "tag" object, and perhaps sign it; see
-<a href="git-tag.html">git-tag(1)</a> for details.</p>
+<p>The <code>-a</code> stands for "all".</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_understanding_git_status_output_untracked_files">Understanding <code>git</code> <code>status</code> output: "untracked files"</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now let&#8217;s talk about a term you&#8217;ll see in the <code>git</code> <code>status</code> output:
+"untracked files".</p>
 </div>
 <div class="paragraph">
-<p>Any Git command that needs to know a commit can take any of these
-names.  For example:</p>
+<p>First create a new file called <code>example.txt</code>. It can be empty.</p>
+</div>
+<div class="paragraph">
+<p>Then run the command <code>git</code> <code>status</code>. You should see this output:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git diff v2.5 HEAD     # compare the current HEAD to v2.5
-$ git branch stable v2.5 # start a new branch named "stable" based
-                         # at v2.5
-$ git reset --hard HEAD^ # reset your current branch and working
-                         # directory to its state at HEAD^</pre>
+<pre>On branch main
+
+Untracked files:
+  (use "git add &lt;file&gt;..." to include in what will be committed)
+        example.txt
+
+nothing added to commit but untracked files present (use "git add" to track)</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Be careful with that last command: in addition to losing any changes
-in the working directory, it will also remove all later commits from
-this branch.  If this branch is the only branch containing those
-commits, they will be lost.  Also, don&#8217;t use <code>git</code> <code>reset</code> on a
-publicly-visible branch that other developers pull from, as it will
-force needless merges on other developers to clean up the history.
-If you need to undo changes that you have pushed, use <code>git</code> <code>revert</code>
-instead.</p>
+<p>This has a list of "untracked files". An untracked file is a file which
+was not part of the latest commit. By default Git will ignore these
+files.</p>
 </div>
 <div class="paragraph">
-<p>The <code>git</code> <code>grep</code> command can search for strings in any version of your
-project, so</p>
+<p>If you want to commit an untracked file, you can add it like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git grep "hello" v2.5</pre>
+<pre>$ git add example.txt</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>searches for all occurrences of "hello" in <code>v2.5</code>.</p>
+<p>Then you can run <code>git</code> <code>commit</code> to commit it (though see the warning in
+the next section!).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_warning_about_terminal_text_editors">Warning about terminal text editors</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you run <code>git</code> <code>commit</code> without any arguments, Git will open a
+text editor in the terminal for you to use to edit your commit message.
+This lets you write a longer commit message with more details.
+By default, Git uses the <code>vi</code> text editor, which is extremely difficult
+to use if you&#8217;re not used to it. On Windows, the Git installer asks you
+to set your text editor during the install to avoid this problem.</p>
 </div>
 <div class="paragraph">
-<p>If you leave out the commit name, <code>git</code> <code>grep</code> will search any of the
-files it manages in your current directory.  So</p>
+<p>Some signs that you&#8217;re trapped in <code>vi</code>: suddenly typing doesn&#8217;t work
+anymore, and there are tilde <code>~</code> characters on the bottom left of the
+screen.</p>
+</div>
+<div class="paragraph">
+<p>If Git opens <code>vi</code> and you&#8217;d rather use a different editor, you can
+handle it like this:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Quit by pressing the <code>Escape</code> key, then typing <code>:q</code>! and then <code>Enter</code></p>
+</li>
+<li>
+<p>Run <code>git</code> <code>config</code> <code>--global</code> <code>core.editor</code> <code>YOUR_PREFERRED_EDITOR</code>
+to configure which editor to use. For example, <code>nano</code> is available
+on a lot of systems and has basic instructions on the screen for how
+to use it. Here is a list of
+<a href="https://git-scm.com/book/en/v2/Appendix-C:-Git-Commands-Setup-and-Config#ch_core_editor">how to configure some common editors</a>.</p>
+</li>
+<li>
+<p>Run <code>git</code> <code>commit</code> again</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t want to set up a text editor yet, you can also just use
+<code>git</code> <code>commit</code> <code>-m</code>"your <code>message</code>" like we did earlier in this tutorial.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_8_make_a_change_and_throw_it_away">Step 8: Make a change and throw it away</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the most useful things about Git is that it lets you safely
+experiment: you never need to be scared to change your code because you
+can always go back to the old version.</p>
+</div>
+<div class="paragraph">
+<p>Before starting to experiment, run <code>git</code> <code>status</code> to check the current
+state of your Git repository:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git grep "hello"</pre>
+<pre>$ git status
+On branch main
+
+nothing to commit, working tree clean</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>is a quick way to search just the files that are tracked by Git.</p>
+<p>This "working tree clean" message means that there haven&#8217;t been any
+changes since your last commit.</p>
 </div>
 <div class="paragraph">
-<p>Many Git commands also take sets of commits, which can be specified
-in a number of ways.  Here are some examples with <code>git</code> <code>log</code>:</p>
+<p>Now make a change to <code>README.md</code>, and run <code>git</code> <code>status</code> again. Like last
+time, you should see a message like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git log v2.5..v2.6            # commits between v2.5 and v2.6
-$ git log v2.5..                # commits since v2.5
-$ git log --since="2 weeks ago" # commits from the last 2 weeks
-$ git log v2.5.. Makefile       # commits since v2.5 which modify
-                                # Makefile</pre>
+<pre>$ git status
+On branch main
+
+Changes not staged for commit:
+  (use "git add &lt;file&gt;..." to update what will be committed)
+  (use "git restore &lt;file&gt;..." to discard changes in working directory)
+        modified:   README.md</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can also give <code>git</code> <code>log</code> a "range" of commits where the first is not
-necessarily an ancestor of the second; for example, if the tips of
-the branches <code>stable</code> and <code>master</code> diverged from a common
-commit some time ago, then</p>
+<p>This tells us that <code>README.md</code> has been changed since the last commit.
+But we don&#8217;t actually want this change, so let&#8217;s undo it! We can restore
+<code>README.md</code> back to how it was at the most recent commit using the <code>git</code>
+<code>restore</code> command.</p>
+</div>
+<div class="paragraph">
+<p><strong>WARNING</strong>: <code>git</code> <code>restore</code> can&#8217;t be reversed! Any time you run it it&#8217;s
+important to be absolutely sure that you&#8217;re okay with throwing away your
+changes since the last commit.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git log stable..master</pre>
+<pre>$ git restore README.md</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>will list commits made in the <code>master</code> branch but not in the
-stable branch, while</p>
+<p>Now open <code>README.md</code> again. You should see that your changes have been undone.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_you_can_stop_here">You can stop here!</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The commands we&#8217;ve learned so far (<code>git</code> <code>init</code>, <code>git</code> <code>add</code>, <code>git</code> <code>commit</code>,
+<code>git</code> <code>diff</code>, <code>git</code> <code>status</code>, and <code>git</code> <code>restore</code>) are enough to get a lot out
+of Git on their own.</p>
+</div>
+<div class="paragraph">
+<p>With these commands, you can keep copies of past versions of your code
+on your computer and safely experiment with big changes to your code.</p>
+</div>
+<div class="paragraph">
+<p>When using Git this way, all of your code just lives on your computer.
+But if you want to put your code on the Internet so that other people
+can use it or back it up, then you&#8217;ll need to learn about one more
+command: <code>git</code> <code>push</code>.</p>
+</div>
+<div class="paragraph">
+<p>The rest of this tutorial is about how to upload your code to a Git
+repository on the Internet. The high level process is:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create an account on the Git host</p>
+</li>
+<li>
+<p>Configure Git so that it can login to the Git host to make changes</p>
+</li>
+<li>
+<p>Run <code>git</code> <code>push</code> <code>origin</code> <code>main</code> to upload your code</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Navigating the Git host&#8217;s UI can be tricky, and it&#8217;s hard for us to
+give you exact directions because the UIs change a lot.
+There&#8217;s a rich tradition of people learning Git from their "Git friend"
+who already knows Git, and if you have one of those it might be useful
+to ask them if you get stuck. There are many ways to do things in Git,
+so they might suggest a slightly different way.
+There&#8217;s also a troubleshooting guide at the end with the most common
+issues folks have run into while doing this tutorial.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_9_create_an_account_on_a_git_host">Step 9: Create an account on a Git host</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To put your code on the Internet, you need it to be hosted somewhere.
+The easiest way to do this is to sign up with a Git host. There&#8217;s a list
+of Git hosts (many of them offer free accounts) at
+<a href="https://git-scm.com/tools/hosting" class="bare">https://git-scm.com/tools/hosting</a>. GitHub and GitLab are two popular hosts.</p>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re comfortable running a server, there are other ways to host
+a Git repository on the internet, like connecting through SSH or open
+source Git forge software to your server.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_10_maclinux_only_create_an_ssh_key_if_needed">Step 10 (Mac/Linux only): Create an SSH key if needed</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For Git to upload changes to another Git repository, it needs a way to
+login to that repository. One of the most popular ways to do this is
+with an SSH key.</p>
+</div>
+<div class="paragraph">
+<p>On Windows, you can skip this step and the next one because Git for
+Windows comes with
+<a href="https://github.com/git-ecosystem/git-credential-manager">Git Credential Manager</a>
+to handle logging in.</p>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t already have an SSH key, you&#8217;ll need to create one.
+You can check if you already have an SSH key by running:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git log master..stable</pre>
+<pre>$ ls ~/.ssh/*.pub</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>will show the list of commits made on the stable branch but not
-the <code>master</code> branch.</p>
-</div>
-<div class="paragraph">
-<p>The <code>git</code> <code>log</code> command has a weakness: it must present commits in a
-list.  When the history has lines of development that diverged and
-then merged back together, the order in which <code>git</code> <code>log</code> presents
-those commits is meaningless.</p>
-</div>
-<div class="paragraph">
-<p>Most projects with multiple contributors (such as the Linux kernel,
-or Git itself) have frequent merges, and <code>gitk</code> does a better job of
-visualizing their history.  For example,</p>
+<p>If you don&#8217;t already have an SSH key, run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ gitk --since="2 weeks ago" drivers/</pre>
+<pre>$ ssh-keygen</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>allows you to browse any commits from the last 2 weeks of commits
-that modified files under the <code>drivers</code> directory.  (Note: you can
-adjust gitk&#8217;s fonts by holding down the control key while pressing
-"-" or "+".)</p>
+<p><code>ssh-keygen</code> will ask you for some details.
+The easiest way to do this is to just press Enter at every prompt until
+it&#8217;s done.</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+All of the advice about how to use SSH in this tutorial is aimed
+at getting it to work as quickly as possible. Setting up SSH in a secure
+way is very far outside the scope of this tutorial. If you have a
+security team in your organization, they might have very different
+opinions about the appropriate way to configure authentication with Git.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_11_maclinux_only_tell_the_git_host_your_ssh_public_key">Step 11 (Mac/Linux only): Tell the Git host your SSH public key</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>Finally, most commands that take filenames will optionally allow you
-to precede any filename by a commit, to specify a particular version
-of the file:</p>
+<p>First, find your SSH key like this:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git diff v2.5:Makefile HEAD:Makefile.in</pre>
+<pre>$ ls ~/.ssh/*.pub</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You can also use <code>git</code> <code>show</code> to see any such file:</p>
+<p>That will output something like this. The exact filename depends on the type
+of key. The important thing is that you&#8217;re looking for a filename that
+ends in .<code>pub</code> ("pub" stands for "public"):</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre>$ git show v2.5:Makefile</pre>
+<pre>/home/alice/.ssh/id_ed25519.pub</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the contents of that file to your clipboard. One way to do that is
+to run this command (replacing the filename with the right filename),
+and then copy the output.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>cat /home/alice/.ssh/id_ed25519.pub</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then login to your account on the Git host you chose and paste the SSH
+key into the appropriate place. Depending on the Git host, it&#8217;s likely
+under "SSH keys" in your settings. If it asks you what type of SSH key,
+look for something like "Authentication Key".</p>
+</div>
+<div class="paragraph">
+<p>Once you&#8217;ve done this, you&#8217;re done! Git will automatically use your SSH
+key to try to connect.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="step_12">Step 12: Create an empty Git repository on the Git host</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Go to the Git host&#8217;s website and create a new Git repository. If there&#8217;s
+an option to "create a README.md", "add a license", or something
+similar, make sure to say no to all of them.</p>
+</div>
+<div class="paragraph">
+<p><strong>WARNING</strong>: If you create a public repository and push your repository
+to it, then your name and email address, as well as the contents of
+any files you committed and every previous version of those files, will
+be on the public internet. Some Git hosts have the option to create
+a private repository instead, to keep your information private.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_13_find_the_address_of_the_repository">Step 13: Find the address of the repository</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now, find the address of the repository on your Git host.</p>
+</div>
+<div class="paragraph">
+<p>If you followed the Mac/Linux instructions to set up an SSH key, look
+for an "SSH" address like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>git@git.example.com:username/repo.git</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re on Windows, look for an "HTTPS" address like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>https://git.example.com/username/repo.git</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(where <code>example.com</code>, <code>username</code> and <code>repo</code> will be replaced with the
+actual values).</p>
+</div>
+<div class="paragraph">
+<p>If you can only find an address starting with <code>https://</code> and you need
+an SSH address then you can often translate it to the SSH format by
+replacing <code>https://</code> with <code>git@</code> and replacing the <code>/</code> after the domain
+name with an <code>:</code>. Here&#8217;s how:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>https://git.example.com/username/repo
+^^^^^^^^               ^
+replace with "git@"    replace with ":"</pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_next_steps">Next Steps</h2>
+<h2 id="step_14">Step 14: Push your changes</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This tutorial should be enough to perform basic distributed revision
-control for your projects.  However, to fully understand the Git
-documentation, it&#8217;s useful to learn how Git stores the history of
-your project in its database. See <a href="gitdatamodel.html">gitdatamodel(7)</a> for an
-explanation.</p>
+<p>Finally, we&#8217;re ready to send the information in your local Git repository
+to the one on the internet!</p>
 </div>
 <div class="paragraph">
-<p>A few other commands that may be interesting:</p>
+<p>First, tell Git about the other repository by running <code>git</code> <code>remote</code> <code>add</code>
+in your terminal
+(replace <code>git@example.com:username/repo.git</code> with the address from Step 13):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git remote add origin git@example.com:username/repo.git</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This tells Git to save the URL <code>git@example.com:username/repo.git</code> in
+your Git repository&#8217;s configuration under the name <code>origin</code>, so that you
+can use it later. If you make a mistake while doing this, you can run
+<code>git</code> <code>remote</code> <code>remove</code> <code>origin</code> and try again.</p>
+</div>
+<div class="paragraph">
+<p>Then tell Git to send the information, with <code>git</code> <code>push</code>
+(if this doesn&#8217;t work, read the "Troubleshooting <code>git</code> <code>push</code>" section for advice!):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git push --set-upstream origin main</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On Windows, this should pop up a dialog from Git Credential Manager
+asking you to log in to the Git host in your browser.</p>
+</div>
+<div class="paragraph">
+<p>Let&#8217;s break down this <code>git</code> <code>push</code> command:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="git-format-patch.html">git-format-patch(1)</a>, <a href="git-am.html">git-am(1)</a>: These convert
-series of git commits into emailed patches, and vice versa,
-useful for projects such as the Linux kernel which rely heavily
-on emailed patches.</p>
+<p><code>origin</code> refers to the Git repository that we just added with
+<code>git</code> <code>remote</code> <code>add</code> (<code>git@example.com:username/repo.git</code>).
+You can use any name (not just <code>origin</code>), but using <code>origin</code> often
+makes things easier because it&#8217;s the default for <code>git</code> <code>push</code> and <code>git</code> <code>pull</code>.</p>
 </li>
 <li>
-<p><a href="git-bisect.html">git-bisect(1)</a>: When there is a regression in your
-project, one way to track down the bug is by searching through
-the history to find the exact commit that&#8217;s to blame.  <code>git</code> <code>bisect</code>
-can help you perform a binary search for that commit.  It is
-smart enough to perform a close-to-optimal search even in the
-case of complex non-linear history with lots of merged branches.</p>
+<p><code>main</code> is the name of your current Git branch.
+We haven&#8217;t covered branches yet, but <code>main</code> is the default branch name.</p>
 </li>
 <li>
-<p><a href="gitworkflows.html">gitworkflows(7)</a>: Gives an overview of recommended
-workflows.</p>
-</li>
-<li>
-<p><a href="giteveryday.html">giteveryday(7)</a>: Everyday Git with 20 Commands Or So.</p>
-</li>
-<li>
-<p><a href="gitcvs-migration.html">gitcvs-migration(7)</a>: Git for CVS users.</p>
+<p><code>--set-upstream</code> tells Git to make this the default for <code>git</code> <code>push</code> for
+the <code>main</code> branch. After you set the upstream, <code>git</code> <code>status</code> will
+also tell you if you have commits that haven&#8217;t been pushed.</p>
 </li>
 </ul>
+</div>
+<div class="paragraph">
+<p>The output should look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>Enumerating objects: 7, done.
+Counting objects: 100% (7/7), done.
+Delta compression using up to 8 threads
+Compressing objects: 100% (6/6), done.
+Writing objects: 100% (7/7), 662 bytes | 662.00 KiB/s, done.
+Total 7 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
+To example.com:username/repo
+ * [new branch]      main -&gt; main
+branch 'main' set up to track 'origin/main'.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Any time you want to set up a new repository, you can repeat steps
+12-14, with one exception: you only need to pass <code>--set-upstream</code> the first time
+you push. Afterwards you can just run the command:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git push origin main</pre>
+</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_see_also">SEE ALSO</h2>
+<h2 id="_troubleshooting_git_push">Troubleshooting <code>git</code> <code>push</code></h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><a href="gitcvs-migration.html">gitcvs-migration(7)</a>,
-<a href="gitcore-tutorial.html">gitcore-tutorial(7)</a>,
-<a href="gitglossary.html">gitglossary(7)</a>,
-<a href="git-help.html">git-help(1)</a>,
-<a href="gitworkflows.html">gitworkflows(7)</a>,
-<a href="giteveryday.html">giteveryday(7)</a>,
-<a href="user-manual.html">The Git User&#8217;s Manual</a></p>
+<p>There are 3 main errors you might run into when running <code>git</code> <code>push</code> <code>origin</code> <code>main</code>.
+Getting errors when running <code>git</code> <code>push</code> is actually a big part of using
+Git, so congratulations! If you get to this part of the tutorial, you
+get a little bonus experience in debugging.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a guide to why they&#8217;re happening and how to fix them.</p>
+</div>
+<div class="paragraph">
+<p><strong>Problem 1: You pushed to <code>main</code>, but your branch actually isn&#8217;t called <code>main</code></strong></p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s the error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git push origin main
+error: src refspec main does not match any</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This might happen if you didn&#8217;t set <code>init.defaultBranch</code> to <code>main</code> in
+<a href="#step_2">Step 2</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you want to check the name of your current branch, you can run <code>git</code>
+<code>status</code>. For example, in this output, the current branch is "master".</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git status
+On branch master
+
+...</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To push your branch, you have a few options:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>rename your branch to <code>main</code>, by running <code>git</code> <code>branch</code> <code>-m</code> <code>main</code>
+and then run <code>git</code> <code>push</code> <code>origin</code> <code>main</code></p>
+</li>
+<li>
+<p>run <code>git</code> <code>push</code> <code>origin</code> <code>master</code>
+(where <code>master</code> is the name of your actual current branch)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Problem 2: SSH error</strong></p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s the error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git push origin main
+The authenticity of host 'github.com (140.82.116.3)' can't be established.
+ED25519 key fingerprint is: SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])?</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Git uses SSH to connect during <code>git</code> <code>push</code>, and this message happens when
+SSH connects to a new site that you haven&#8217;t connected to before.</p>
+</div>
+<div class="paragraph">
+<p>The easiest way to handle this is to type "yes" and press Enter.</p>
+</div>
+<div class="paragraph">
+<p><strong>Problem 3: the repository already has commits in it</strong></p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s the error:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ git push origin main
+! [rejected]        main -&gt; main (fetch first)
+error: failed to push some refs to 'example.com:username/repo.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally.</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you see an error like this, it means that when you created the
+repository on your Git host, it added a commit to try to help you out.
+That&#8217;s the "work that you do not have locally" in the error message.</p>
+</div>
+<div class="paragraph">
+<p>You should be able to fix this by redoing <a href="#step_12">Step 12</a>.
+Then <a href="#step_14">Step 14</a> should work.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_more_useful_git_commands">More useful Git commands</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We&#8217;re not going to cover collaboration at all in this tutorial, but here are a
+few more commands that might be useful when using Git on your own:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>To download a Git repository to use on your computer you can run
+<code>git</code> <code>clone</code> <code>https://example.com/some/repo</code> (<a href="git-clone.html">git-clone(1)</a>).</p>
+</li>
+<li>
+<p>To tell Git to "un-add" a file that you added by accident, run
+<code>git</code> <code>rm</code> <code>--cached</code> <code>FILENAME</code> (<a href="git-rm.html">git-rm(1)</a>)</p>
+</li>
+<li>
+<p>To get a list of past commits, run <code>git</code> <code>log</code> (<a href="git-log.html">git-log(1)</a>)</p>
+</li>
+<li>
+<p>Every commit has an ID that looks something like this:
+<code>497588f53141b531a59ed888c7d2d9b8f8a6742d</code>.
+If you see a commit with <code>git</code> <code>log</code> that you want more details about,
+you can run <code>git</code> <code>show</code> <code>COMMIT_ID</code> to see what changes that made since
+the previous commit (<a href="git-show.html">git-show(1)</a>)</p>
+</li>
+<li>
+<p>To get a list of common Git commands, run <code>git</code> <code>help</code> (<a href="git-help.html">git-help(1)</a>)</p>
+</li>
+</ul>
 </div>
 </div>
 </div>
@@ -1287,7 +1552,7 @@ workflows.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-11-04 12:45:45 -0800
+Last updated 2026-11-09 19:51:07 -0800
 </div>
 </div>
 </body>
