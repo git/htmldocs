@@ -635,6 +635,18 @@ this flag.</p>
 turns it off and allows one to add custom handlers for these
 options, or to just leave them unknown.</p>
 </dd>
+<dt class="hdlist1"><code>PARSE_OPT_ONE_SHOT</code></dt>
+<dd>
+<p>Process only the first option (and its value, if any) and return
+the number of arguments processed, leaving <code>argv</code>[] untouched.
+<code>argv</code>[<code>0</code>] is taken to be the first option, not the program name.
+An unknown option stops processing without an error.</p>
+</dd>
+<dt class="hdlist1"><code>PARSE_OPT_SHELL_EVAL</code></dt>
+<dd>
+<p>Wrap the usage output in a heredoc followed by an <code>exit</code> <code>0</code>,
+so that a shell can <code>eval</code> it.</p>
+</dd>
 <dt class="hdlist1"><code>PARSE_OPT_SUBCOMMAND_OPTIONAL</code></dt>
 <dd>
 <p>Don&#8217;t error out when no subcommand is specified.</p>
@@ -765,7 +777,7 @@ with <code>flags</code> set to <code>0</code>.</p>
 <dd>
 <p>Add <code>-n,</code> <code>--dry-run</code>.</p>
 </dd>
-<dt class="hdlist1"><code>OPT__FORCE</code>(&amp;int_var, <code>description</code>)</dt>
+<dt class="hdlist1"><code>OPT__FORCE</code>(&amp;int_var, <code>description,</code> <code>flags</code>)</dt>
 <dd>
 <p>Add <code>-f,</code> <code>--force</code>.</p>
 </dd>
@@ -773,9 +785,21 @@ with <code>flags</code> set to <code>0</code>.</p>
 <dd>
 <p>Add <code>-q,</code> <code>--quiet</code>.</p>
 </dd>
+<dt class="hdlist1"><code>OPT__SUPER_PREFIX</code>(&amp;str_var)</dt>
+<dd>
+<p>Add hidden <code>--super-prefix=</code><em>&lt;prefix&gt;</em>, which stores the prefixed
+path to the initial superproject in <code>str_var</code>.</p>
+</dd>
 <dt class="hdlist1"><code>OPT__VERBOSE</code>(&amp;int_var, <code>description</code>)</dt>
 <dd>
 <p>Add <code>-v,</code> <code>--verbose</code>.</p>
+</dd>
+<dt class="hdlist1"><code>OPT__VERBOSITY</code>(&amp;int_var)</dt>
+<dd>
+<p>Add <code>-v,</code> <code>--verbose</code> and <code>-q,</code> <code>--quiet</code>, sharing <code>int_var</code>.
+Each <code>-v</code> increments <code>int_var</code> (a <code>-v</code> after <code>-q</code> sets it to 1)
+and each <code>-q</code> decrements it (a <code>-q</code> after <code>-v</code> sets it to -1).
+<code>--no-verbose</code> and <code>--no-quiet</code> reset it to zero.</p>
 </dd>
 <dt class="hdlist1"><code>OPT_GROUP</code>(<code>description</code>)</dt>
 <dd>
@@ -817,6 +841,12 @@ negative after parse_options(), then neither <code>--option</code> nor
 <p>Introduce a boolean option.
 If used, <code>int_var</code> is bitwise-ored with <code>mask</code>.</p>
 </dd>
+<dt class="hdlist1"><code>OPT_BITOP</code>(<code>short,</code> <code>long,</code> &amp;int_var, <code>description,</code> <code>set,</code> <code>clear</code>)</dt>
+<dd>
+<p>Introduce a boolean option.
+If used, <code>int_var</code> is bitwise-anded with the inverted <code>clear</code> and
+then bitwise-ored with <code>set</code>. Cannot be used in the negated form.</p>
+</dd>
 <dt class="hdlist1"><code>OPT_NEGBIT</code>(<code>short,</code> <code>long,</code> &amp;int_var, <code>description,</code> <code>mask</code>)</dt>
 <dd>
 <p>Introduce a boolean option.
@@ -838,6 +868,18 @@ The string argument is put into <code>str_var</code>.</p>
 <p>Introduce an option with string argument.
 The string argument is stored as an element in <code>string_list</code>.
 Use of <code>--no-option</code> will clear the list of preceding values.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_STRVEC</code>(<code>short,</code> <code>long,</code> &amp;struct <code>strvec,</code> <code>arg_str,</code> <code>description</code>)</dt>
+<dd>
+<p>Introduce an option with string argument.
+The string argument is appended to the provided <code>strvec</code>.
+Use of <code>--no-option</code> will clear the list of preceding values.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_UYN</code>(<code>short,</code> <code>long,</code> &amp;int_var, <code>description</code>)</dt>
+<dd>
+<p>Introduce a ternary option.
+<code>--option</code> sets <code>int_var</code> to <code>1</code> and <code>--no-option</code> sets it to <code>2</code>.
+If neither is given, <code>int_var</code> is left unchanged.</p>
 </dd>
 <dt class="hdlist1"><code>OPT_INTEGER</code>(<code>short,</code> <code>long,</code> &amp;int_var, <code>description</code>)</dt>
 <dd>
@@ -896,6 +938,19 @@ works like <code>--long=never</code>; it cannot take an argument.  If
 Use it to hide deprecated options that are still to be recognized
 and ignored silently.</p>
 </dd>
+<dt class="hdlist1"><code>OPT_NOOP_ARG</code>(<code>short,</code> <code>long</code>)</dt>
+<dd>
+<p>Introduce an option that takes one argument but has no effect.
+Use it to hide deprecated options that are still to be recognized
+and ignored silently.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_COLUMN</code>(<code>short,</code> <code>long,</code> &amp;unsigned_int_var, <code>description</code>)</dt>
+<dd>
+<p>Introduce an option that takes an optional argument and sets
+<code>unsigned_int_var</code> as per the column layout modes specified in
+<a href="../git-config.html">git-config(1)</a>. <code>--option</code> and <code>--no-option</code> without
+arguments are equivalent to <code>always</code> and <code>never</code> respectively.</p>
+</dd>
 <dt class="hdlist1"><code>OPT_PASSTHRU</code>(<code>short,</code> <code>long,</code> &amp;char_var, <code>arg_str,</code> <code>description,</code> <code>flags</code>)</dt>
 <dd>
 <p>Introduce an option that will be reconstructed into a char* string,
@@ -925,6 +980,76 @@ In new commands consider using subcommands instead.</p>
 <p>Define a subcommand.  <code>subcommand_fn</code> is put into <code>fn_ptr</code> when
 this subcommand is used. The subcommand is not listed in the
 usage output.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_CONTAINS</code>(&amp;commit_list_var, <code>description</code>)</dt>
+<dd>
+<p>Introduce a <code>--contains=</code><em>&lt;commit&gt;</em> option. The argument is parsed
+as a commit and inserted into <code>commit_list_var</code>. If the option is
+the last token on the command line and has no argument, <code>HEAD</code>
+is used. Cannot be negated.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_NO_CONTAINS</code>(&amp;commit_list_var, <code>description</code>)</dt>
+<dd>
+<p>Like <code>OPT_CONTAINS</code>(), but introduces <code>--no-contains=</code><em>&lt;commit&gt;</em>.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_WITH</code>(&amp;commit_list_var, <code>description</code>)</dt>
+<dd>
+<p>Like <code>OPT_CONTAINS</code>(), but introduces a hidden <code>--with=</code><em>&lt;commit&gt;</em>.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_WITHOUT</code>(&amp;commit_list_var, <code>description</code>)</dt>
+<dd>
+<p>Like <code>OPT_CONTAINS</code>(), but introduces a hidden
+<code>--without=</code><em>&lt;commit&gt;</em>.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_CLEANUP</code>(&amp;str_var)</dt>
+<dd>
+<p>Introduce a string option with <code>--cleanup</code> long name. Commonly
+used to parse cleanup mode as specified in <a href="../git-commit.html">git-commit(1)</a>.
+The option does not do any parsing itself and simply stores the
+argument in <code>str_var</code>.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_PATHSPEC_FROM_FILE</code>(&amp;str_var)</dt>
+<dd>
+<p>Introduce a <code>--pathspec-from-file=</code><em>&lt;file&gt;</em> option. Commonly used
+to read the pathspec from a file instead of the command-line
+arguments. See <a href="../git-commit.html">git-commit(1)</a> for more details.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_PATHSPEC_FILE_NUL</code>(&amp;int_var)</dt>
+<dd>
+<p>Introduce a boolean <code>--pathspec-file-nul</code> option. Commonly
+accompanies <code>OPT_PATHSPEC_FROM_FILE</code>() to denote that the
+pathspec elements are separated with <code>NUL</code> characters.
+See <a href="../git-commit.html">git-commit(1)</a> for more details.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_AUTOSTASH</code>(&amp;int_var)</dt>
+<dd>
+<p>Introduce a boolean <code>--autostash</code> option. Commonly used to
+automatically create a stash entry before the operation and
+restore it after. See <a href="../git-merge.html">git-merge(1)</a> for more details.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_DIFF_UNIFIED</code>(&amp;int_var)</dt>
+<dd>
+<p>Introduce an integer option with <code>-U</code> short name and <code>--unified</code>
+long name. Commonly used to denote lines of context for generating
+diffs. Cannot be negated. See <a href="../git-add.html">git-add(1)</a> for more details.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_DIFF_INTERHUNK_CONTEXT</code>(&amp;int_var)</dt>
+<dd>
+<p>Introduce an integer option with <code>--inter-hunk-context</code> long name.
+Commonly used to show the context between diff hunks up to the
+specified number. Cannot be negated. See <a href="../git-add.html">git-add(1)</a> for
+more details.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_IPVERSION</code>(&amp;family_var)</dt>
+<dd>
+<p>Introduce <code>-4,</code> <code>--ipv4</code> and <code>-6,</code> <code>--ipv6</code> for selecting the IP
+protocol to use. Neither takes an argument or can be negated.
+<code>family_var</code> (an <code>enum</code> <code>transport_family</code>) is set to
+<code>TRANSPORT_FAMILY_IPV4</code> or <code>TRANSPORT_FAMILY_IPV6</code> respectively.</p>
+</dd>
+<dt class="hdlist1"><code>OPT_ALIAS</code>(<code>short,</code> <code>long,</code> <code>source_long_name</code>)</dt>
+<dd>
+<p>Introduce an alias to another existing <code>source_long_name</code> option.</p>
 </dd>
 </dl>
 </div>
@@ -1033,7 +1158,7 @@ for real-world examples.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-11-15 15:02:18 -0800
+Last updated 2026-11-19 16:27:10 -0800
 </div>
 </div>
 </body>
