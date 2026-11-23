@@ -470,6 +470,10 @@ between the index and a tree, changes between two trees, changes resulting
 from a merge, changes between two blob objects, or changes between two
 files on disk.</p>
 </div>
+<div class="paragraph">
+<p>The <a href="#EXAMPLES">EXAMPLES</a> section has examples of the most common ways
+to diff.</p>
+</div>
 <div class="dlist">
 <dl>
 <dt class="hdlist1"><code>git</code> <code>diff</code> [<em>&lt;options&gt;</em>] [<code>--</code>] [<em>&lt;path&gt;</em>...]</dt>
@@ -706,7 +710,7 @@ non-default value and want to use the default one, then you
 have to use <code>--diff-algorithm=default</code> option.</p>
 </div>
 </dd>
-<dt class="hdlist1"><code>--stat</code>[<code>=</code><em>&lt;width&gt;</em>[<code>,</code><em>&lt;name-width&gt;</em>[<code>,</code><em>&lt;count&gt;</em>]]]</dt>
+<dt class="hdlist1"><code>--stat</code>[<code>=</code><em>&lt;width&gt;</em>[<code>,</code><em>&lt;name-width&gt;</em>[<code>,</code><em>&lt;count&gt;</em>]]]<a id="stat"></a></dt>
 <dd>
 <p>Generate a diffstat. By default, as much space as necessary
 will be used for the filename part, and the rest for the graph
@@ -839,14 +843,14 @@ explained for the configuration variable <code>core.quotePath</code> (see
 <a href="git-config.html">git-config(1)</a>).</p>
 </div>
 </dd>
-<dt class="hdlist1"><code>--name-only</code></dt>
+<dt class="hdlist1"><code>--name-only</code><a id="name_only"></a></dt>
 <dd>
 <p>Show only the name of each changed file in the post-image tree.
 The file names are often encoded in UTF-8.
 For more information see the discussion about encoding in the <a href="git-log.html">git-log(1)</a>
 manual page.</p>
 </dd>
-<dt class="hdlist1"><code>--name-status</code></dt>
+<dt class="hdlist1"><code>--name-status</code><a id="name_status"></a></dt>
 <dd>
 <p>Show only the name(s) and status of each changed file. See the description
 of the <code>--diff-filter</code> option on what the status letters mean.
@@ -986,7 +990,7 @@ other modes.</p>
 used to override configuration settings. It is the same as
 <code>--color-moved-ws=no</code>.</p>
 </dd>
-<dt class="hdlist1"><code>--word-diff</code>[<code>=</code><em>&lt;mode&gt;</em>]</dt>
+<dt class="hdlist1"><code>--word-diff</code>[<code>=</code><em>&lt;mode&gt;</em>]<a id="word_diff"></a></dt>
 <dd>
 <p>By default, words are delimited by whitespace; see
 <code>--word-diff-regex</code> below.  The <em>&lt;mode&gt;</em> defaults to <code>plain</code>, and
@@ -1392,7 +1396,7 @@ at line end, and considers all other sequences of one or
 more whitespace characters to be equivalent.</p>
 </dd>
 <dt class="hdlist1"><code>-w</code></dt>
-<dt class="hdlist1"><code>--ignore-all-space</code></dt>
+<dt class="hdlist1"><code>--ignore-all-space</code><a id="ignore_all_space"></a></dt>
 <dd>
 <p>Ignore whitespace when comparing lines.  This ignores
 differences even if one line has whitespace where the other
@@ -2201,136 +2205,107 @@ the pathname, but if that is <code>NUL</code>, the record will show two paths.</
 </div>
 </div>
 <div class="sect1">
-<h2 id="_examples">EXAMPLES</h2>
+<h2 id="EXAMPLES">EXAMPLES</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_diff_uncommitted_changes">Diff uncommitted changes</h3>
 <div class="dlist">
 <dl>
-<dt class="hdlist1">Various ways to check your working tree</dt>
+<dt class="hdlist1">Show unstaged changes</dt>
 <dd>
-<div class="listingblock">
-<div class="content">
-<pre>$ git diff            <b class="conum">(1)</b>
-$ git diff --cached   <b class="conum">(2)</b>
-$ git diff HEAD       <b class="conum">(3)</b>
-$ git diff AUTO_MERGE <b class="conum">(4)</b></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Changes in the working tree not yet staged for the next commit.</p>
-</li>
-<li>
-<p>Changes between the index and your last commit; what you
-would be committing if you run <code>git</code> <code>commit</code> without <code>-a</code> option.</p>
-</li>
-<li>
-<p>Changes in the working tree since your last commit; what you
-would be committing if you run <code>git</code> <code>commit</code> <code>-a</code></p>
-</li>
-<li>
-<p>Changes in the working tree you&#8217;ve made to resolve textual
-conflicts so far.</p>
-</li>
-</ol>
-</div>
+<p><code>git</code> <code>diff</code></p>
 </dd>
-<dt class="hdlist1">Comparing with arbitrary commits</dt>
+<dt class="hdlist1">Show staged changes</dt>
 <dd>
-<div class="listingblock">
-<div class="content">
-<pre>$ git diff test            <b class="conum">(1)</b>
-$ git diff HEAD -- ./test  <b class="conum">(2)</b>
-$ git diff HEAD^ HEAD      <b class="conum">(3)</b></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Instead of using the tip of the current branch, compare with the
-tip of "test" branch.</p>
-</li>
-<li>
-<p>Instead of comparing with the tip of "test" branch, compare with
-the tip of the current branch, but limit the comparison to the
-file "test".</p>
-</li>
-<li>
-<p>Compare the version before the last commit and the last commit.</p>
-</li>
-</ol>
-</div>
+<p><code>git</code> <code>diff</code> <code>--staged</code> or <code>git</code> <code>diff</code> <code>--cached</code></p>
 </dd>
-<dt class="hdlist1">Comparing branches</dt>
+<dt class="hdlist1">Show all changes since the latest commit</dt>
 <dd>
-<div class="listingblock">
-<div class="content">
-<pre>$ git diff topic master    <b class="conum">(1)</b>
-$ git diff topic..master   <b class="conum">(2)</b>
-$ git diff topic...master  <b class="conum">(3)</b></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Changes between the tips of the topic and the master branches.</p>
-</li>
-<li>
-<p>Same as above.</p>
-</li>
-<li>
-<p>Changes that occurred on the master branch since when the topic
-branch was started off it.</p>
-</li>
-</ol>
-</div>
+<p><code>git</code> <code>diff</code> <code>HEAD</code></p>
 </dd>
-<dt class="hdlist1">Limiting the diff output</dt>
+<dt class="hdlist1">Show changes made to resolve a merge conflict</dt>
 <dd>
-<div class="listingblock">
-<div class="content">
-<pre>$ git diff --diff-filter=MRC            <b class="conum">(1)</b>
-$ git diff --name-status                <b class="conum">(2)</b>
-$ git diff arch/i386 include/asm-i386   <b class="conum">(3)</b></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Show only modification, rename, and copy, but not addition
-or deletion.</p>
-</li>
-<li>
-<p>Show only names and the nature of change, but not actual
-diff output.</p>
-</li>
-<li>
-<p>Limit diff output to named subtrees.</p>
-</li>
-</ol>
-</div>
-</dd>
-<dt class="hdlist1">Munging the diff output</dt>
-<dd>
-<div class="listingblock">
-<div class="content">
-<pre>$ git diff --find-copies-harder -B -C  <b class="conum">(1)</b>
-$ git diff -R                          <b class="conum">(2)</b></pre>
-</div>
-</div>
-<div class="colist arabic">
-<ol>
-<li>
-<p>Spend extra cycles to find renames, copies and complete
-rewrites (very expensive).</p>
-</li>
-<li>
-<p>Output diff in reverse.</p>
-</li>
-</ol>
-</div>
+<p><code>git</code> <code>diff</code> <code>AUTO_MERGE</code></p>
 </dd>
 </dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_diff_a_specific_filedirectory">Diff a specific file/directory</h3>
+<div class="paragraph">
+<p>You can usually put a filename or directory at the end to restrict the
+diff to that file/directory. You don&#8217;t always need to put a <code>--</code>, but it
+makes it unambiguous.</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Show how <code>file.txt</code> has changed since <code>main</code></dt>
+<dd>
+<p><code>git</code> <code>diff</code> <code>main</code> <code>--</code> <code>file.txt</code></p>
+</dd>
+<dt class="hdlist1">Show unstaged changes for <code>file.txt</code></dt>
+<dd>
+<p><code>git</code> <code>diff</code> <code>--</code> <code>file.txt</code></p>
+</dd>
+<dt class="hdlist1">Show unstaged changes in <code>dir/</code></dt>
+<dd>
+<p><code>git</code> <code>diff</code> <code>--</code> <code>./dir</code></p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_diff_branches_or_commits">Diff branches or commits</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Show changes on the <code>topic</code> branch since it branched off <code>main</code></dt>
+<dd>
+<p><code>git</code> <code>diff</code> <code>--merge-base</code> <code>main</code> <code>topic</code></p>
+</dd>
+<dt class="hdlist1">Show changes between the <code>topic</code> branch and the <code>main</code> branch</dt>
+<dd>
+<p><code>git</code> <code>diff</code> <code>main</code> <code>topic</code></p>
+</dd>
+<dt class="hdlist1">Show changes between commit <code>ff11cc</code> and <code>HEAD</code></dt>
+<dd>
+<p><code>git</code> <code>diff</code> <code>ff11cc</code> <code>HEAD</code></p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_options_to_summarize_the_output">Options to summarize the output</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Show how many lines in each file were changed</dt>
+<dd>
+<p><code>git</code> <code>diff</code> <a href="#stat"><code>--stat</code></a></p>
+</dd>
+<dt class="hdlist1">Only show names of changed files</dt>
+<dd>
+<p><code>git</code> <code>diff</code> <a href="#name_only"><code>--name-only</code></a></p>
+</dd>
+<dt class="hdlist1">Only show filenames and whether they were modified/deleted/added</dt>
+<dd>
+<p><code>git</code> <code>diff</code> <a href="#name_status"><code>--name-status</code></a></p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_options_to_display_the_diff_in_another_way">Options to display the diff in another way</h3>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">Ignore all whitespace changes</dt>
+<dd>
+<p><code>git</code> <code>diff</code> <a href="#ignore_all_space"><code>--ignore-all-space</code></a></p>
+</dd>
+<dt class="hdlist1">Show which individual words changed instead of the whole line</dt>
+<dd>
+<p><code>git</code> <code>diff</code> <a href="#word_diff"><code>--word-diff</code></a></p>
+</dd>
+</dl>
+</div>
 </div>
 </div>
 </div>
@@ -2698,7 +2673,7 @@ For details of valid modes see <code>--color-moved-ws</code> in <a href="git-dif
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-06-24 11:24:02 -0700
+Last updated 2026-11-23 09:57:14 -0800
 </div>
 </div>
 </body>
