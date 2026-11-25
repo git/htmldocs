@@ -523,10 +523,13 @@ each commit introduces are shown.</p>
 <div class="sectionbody">
 <div class="dlist">
 <dl>
-<dt class="hdlist1"><code>--follow</code></dt>
+<dt class="hdlist1"><code>--follow</code>[<code>=merges</code>]</dt>
 <dd>
 <p>Continue listing the history of a file beyond renames
-(works only for a single file).</p>
+(works only for a single file). This does not work well on
+non-linear history, unless <code>merges</code> is given: then the path is
+followed separately for each parent of a merge, which is more
+expensive.</p>
 </dd>
 <dt class="hdlist1"><code>--no-decorate</code></dt>
 <dt class="hdlist1"><code>--decorate</code>[<code>=</code>(<code>short</code>|<code>full</code>|<code>auto</code>|<code>no</code>)]</dt>
@@ -1093,8 +1096,8 @@ See also <a href="git-reflog.html">git-reflog(1)</a>.</p>
 <dt class="hdlist1"><code>--merge</code></dt>
 <dd>
 <p>Show commits touching conflicted paths in the range <code>HEAD</code><code>...</code><em>&lt;other&gt;</em>,
-where <em>&lt;other&gt;</em> is the first existing pseudoref in <code>MERGE_HEAD</code>,
-<code>CHERRY_PICK_HEAD</code>, <code>REVERT_HEAD</code> or <code>REBASE_HEAD</code>. Only works
+where <em>&lt;other&gt;</em> is the first one of <code>MERGE_HEAD</code>, <code>CHERRY_PICK_HEAD</code>,
+<code>REVERT_HEAD</code> or <code>REBASE_HEAD</code> that exists. Only works
 when the index has unmerged entries. This option can be used to show
 relevant commits when resolving conflicts from a 3-way merge.</p>
 </dd>
@@ -4424,7 +4427,10 @@ details. Defaults to <code>separate</code>.</p>
 <dd>
 <p>If <code>true</code>, <code>git</code> <code>log</code> will act as if the <code>--follow</code> option was used when
 a single &lt;path&gt; is given.  This has the same limitations as <code>--follow</code>,
-i.e. it cannot be used to follow multiple files.</p>
+i.e. it cannot be used to follow multiple files and does not work well
+on non-linear history.  If <code>merges</code>, <code>git</code> <code>log</code> will act as if the
+<code>--follow=merges</code> option was used, which follows the path separately
+for each parent of a merge, but is more expensive.</p>
 </dd>
 <dt class="hdlist1"><code>log.graphColors</code></dt>
 <dd>
@@ -4553,7 +4559,7 @@ See <code>notes.rewrite.</code><em>&lt;command&gt;</em> above for a further desc
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-05-20 21:46:40 -0700
+Last updated 2026-11-25 13:18:53 -0800
 </div>
 </div>
 </body>

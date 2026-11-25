@@ -11,12 +11,15 @@ SYNOPSIS
 [verse]
 'git ls-remote' [--branches] [--tags] [--refs] [--upload-pack=<exec>]
 	      [-q | --quiet] [--exit-code] [--get-url] [--sort=<key>]
-	      [--symref] [<repository> [<patterns>...]]
+	      [--symref] [--show-object-format]
+	      [<repository> [<patterns>...]]
 
 DESCRIPTION
 -----------
 Displays references available in a remote repository along with the associated
-commit IDs.
+object IDs. By default, `HEAD` and all refs under `refs/` are shown.
+Annotated tags are also shown peeled, i.e. recursively resolved to the objects
+they point at.
 
 
 OPTIONS
@@ -35,7 +38,7 @@ OPTIONS
 	with other git subcommands.
 
 --refs::
-	Do not show peeled tags or pseudorefs like `HEAD` in the output.
+	Do not show `HEAD` or peeled tags in the output.
 
 -q::
 --quiet::
@@ -63,6 +66,14 @@ OPTIONS
 	ref pointed by it when showing a symbolic ref.  Currently,
 	upload-pack only shows the symref HEAD, so it will be the only
 	one shown by ls-remote.
+
+--show-object-format::
+	Before the references, print the object format (hash algorithm)
+	of the remote on a line of its own, in the form
+	`object-format: <format>`, e.g. `object-format: sha256`. This
+	also works for remotes without any refs, so it can be used to
+	find out which object format a local repository needs before
+	fetching from or pushing to the remote.
 
 --sort=<key>::
 	Sort based on the key given. Prefix `-` to sort in descending order
@@ -118,8 +129,7 @@ line shows the name of the object the tag points at.
 EXAMPLES
 --------
 
-* List all references (including symbolics and pseudorefs), peeling
-  tags:
+* List `HEAD` and all refs under `refs/`, peeling tags:
 +
 ----
 $ git ls-remote

@@ -3532,22 +3532,41 @@ Cute name for programs and program suites depending on
 core Git. Porcelains expose more of a <a class="link" href="#def_SCM">SCM</a>
 interface than the <a class="link" href="#def_plumbing">plumbing</a>.
 </dd><dt><span class="term"><a name="def_per_worktree_ref"></a>per-worktree ref</span></dt><dd>
-Refs that are per-<a class="link" href="#def_worktree">worktree</a>, rather than
-global.  This is presently only <a class="link" href="#def_HEAD">HEAD</a> and any refs
-that start with <code class="literal">refs/bisect/</code>, but might later include other
-unusual refs.
+<p class="simpara">A <a class="link" href="#def_ref">ref</a> that is specific to a <a class="link" href="#def_worktree">worktree</a>,
+rather than shared between all worktrees. All <a class="link" href="#def_root_ref">root refs</a>,
+for example <a class="link" href="#def_HEAD">HEAD</a> and <code class="literal">ORIG_HEAD</code>, are per-worktree, as are
+refs with the following prefixes:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<code class="literal">refs/bisect/</code>
+</li><li class="listitem">
+<code class="literal">refs/rewritten/</code>
+</li><li class="listitem">
+<code class="literal">refs/worktree/</code>
+</li></ul></div>
+<p class="simpara">This list will not be extended in future. Any new per-worktree refs shall be
+created under <code class="literal">refs/worktree/</code>.</p>
+<p class="simpara">Even though they are not refs, <a class="link" href="#def_pseudoref">pseudorefs</a> are also
+specific to each worktree.</p>
+<p class="simpara">See "REFS" in <a class="ulink" href="git-worktree.html" target="_top">git-worktree(1)</a> for how to access the
+per-worktree refs of other worktrees.</p>
 </dd><dt><span class="term"><a name="def_pseudoref"></a>pseudoref</span></dt><dd>
-<p class="simpara">A ref that has different semantics than normal refs. These refs can be
-read via normal Git commands, but cannot be written to by commands like
-<a class="ulink" href="git-update-ref.html" target="_top">git-update-ref(1)</a>.</p>
+<p class="simpara">A name that can be used like a <a class="link" href="#def_ref">ref</a> to refer to an
+<a class="link" href="#def_object">object</a>, but that has additional semantics: it can
+record more than one object ID and may carry extra metadata.
+Therefore, pseudorefs are not stored or handled by the ref backend.</p>
+<p class="simpara">Pseudorefs can be passed to commands such as <a class="ulink" href="git-log.html" target="_top">git-log(1)</a> or
+<a class="ulink" href="git-diff.html" target="_top">git-diff(1)</a>, but cannot be written by <a class="ulink" href="git-update-ref.html" target="_top">git-update-ref(1)</a>
+or listed by <a class="ulink" href="git-for-each-ref.html" target="_top">git-for-each-ref(1)</a>. When a pseudoref contains more
+than one object ID, using it to refer to an object yields the first one.</p>
 <p class="simpara">The following pseudorefs are known to Git:</p>
 <div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-<code class="literal">FETCH_HEAD</code> is written by <a class="ulink" href="git-fetch.html" target="_top">git-fetch(1)</a> or <a class="ulink" href="git-pull.html" target="_top">git-pull(1)</a>. It
-may refer to multiple object IDs. Each object ID is annotated with metadata
-indicating where it was fetched from and its fetch status.
+<code class="literal">FETCH_HEAD</code> is written by <a class="ulink" href="git-fetch.html" target="_top">git-fetch(1)</a> or <a class="ulink" href="git-pull.html" target="_top">git-pull(1)</a>
+to record the objects that have been fetched. Each object is annotated
+with the ref and repository it was fetched from and whether it is to be
+merged when pulling.
 </li><li class="listitem">
-<code class="literal">MERGE_HEAD</code> is written by <a class="ulink" href="git-merge.html" target="_top">git-merge(1)</a> when resolving merge
-conflicts. It contains all commit IDs which are being merged.
+<code class="literal">MERGE_HEAD</code> is written by <a class="ulink" href="git-merge.html" target="_top">git-merge(1)</a> or <a class="ulink" href="git-pull.html" target="_top">git-pull(1)</a>
+to record the commits being merged while a merge is in progress.
 </li></ul></div>
 </dd><dt><span class="term"><a name="def_pull"></a>pull</span></dt><dd>
 Pulling a <a class="link" href="#def_branch">branch</a> means to <a class="link" href="#def_fetch">fetch</a> it and
@@ -3592,29 +3611,11 @@ for details.
 Refs are stored in the <a class="link" href="#def_repository">repository</a>.</p>
 <p class="simpara">The ref namespace is hierarchical.
 Ref names must either start with <code class="literal">refs/</code> or be located in the root of
-the hierarchy. For the latter, their name must follow these rules:</p>
-<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-The name consists of only upper-case characters or underscores.
-</li><li class="listitem">
-The name ends with "<code class="literal">_HEAD</code>" or is equal to "<code class="literal">HEAD</code>".
-</li></ul></div>
-<p class="simpara">There are some irregular refs in the root of the hierarchy that do not
-match these rules. The following list is exhaustive and shall not be
-extended in the future:</p>
-<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
-<code class="literal">AUTO_MERGE</code>
-</li><li class="listitem">
-<code class="literal">BISECT_EXPECTED_REV</code>
-</li><li class="listitem">
-<code class="literal">NOTES_MERGE_PARTIAL</code>
-</li><li class="listitem">
-<code class="literal">NOTES_MERGE_REF</code>
-</li><li class="listitem">
-<code class="literal">MERGE_AUTOSTASH</code>
-</li></ul></div>
+the hierarchy, in which case they must follow the naming rules for
+<a class="link" href="#def_root_ref">root refs</a>.</p>
 <p class="simpara">Different subhierarchies are used for different purposes. For example,
-the <code class="literal">refs/heads/</code> hierarchy is used to represent local branches whereas
-the <code class="literal">refs/tags/</code> hierarchy is used to represent local tags..</p>
+local branches are stored under <code class="literal">refs/heads/</code>, remote-tracking branches
+under <code class="literal">refs/remotes/</code>, and tags under <code class="literal">refs/tags/</code>.</p>
 <p class="simpara">See also "REFERENCES" in <a class="ulink" href="gitdatamodel.html" target="_top">gitdatamodel(7)</a>.</p>
 </dd><dt><span class="term"><a name="def_reflog"></a>reflog</span></dt><dd>
 <p class="simpara">A reflog shows the local "history" of a ref.  In other words,
@@ -3655,6 +3656,28 @@ Synonym for <a class="link" href="#def_commit">commit</a> (the noun).
 </dd><dt><span class="term"><a name="def_rewind"></a>rewind</span></dt><dd>
 To throw away part of the development, i.e. to assign the
 <a class="link" href="#def_head">head</a> to an earlier <a class="link" href="#def_revision">revision</a>.
+</dd><dt><span class="term"><a name="def_root_ref"></a>root ref</span></dt><dd>
+<p class="simpara">A <a class="link" href="#def_ref">ref</a> located in the root of the ref hierarchy, outside
+<code class="literal">refs/</code>. Root ref names must follow these rules:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+The name consists of only upper-case characters or underscores.
+</li><li class="listitem">
+The name ends with "<code class="literal">_HEAD</code>" or is equal to "<code class="literal">HEAD</code>".
+</li></ul></div>
+<p class="simpara">The following irregular root refs are exceptions to these rules. This
+list is exhaustive and shall not be extended in future:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+<code class="literal">AUTO_MERGE</code>
+</li><li class="listitem">
+<code class="literal">BISECT_EXPECTED_REV</code>
+</li><li class="listitem">
+<code class="literal">NOTES_MERGE_PARTIAL</code>
+</li><li class="listitem">
+<code class="literal">NOTES_MERGE_REF</code>
+</li><li class="listitem">
+<code class="literal">MERGE_AUTOSTASH</code>
+</li></ul></div>
+<p class="simpara">See <a class="ulink" href="gitrevisions.html" target="_top">gitrevisions(7)</a> for descriptions of commonly used root refs.</p>
 </dd><dt><span class="term"><a name="def_SCM"></a>SCM</span></dt><dd>
 Source code management (tool).
 </dd><dt><span class="term"><a name="def_SHA1"></a>SHA-1</span></dt><dd>
@@ -3768,8 +3791,8 @@ more worktrees attached to it. One "worktree" consists of a
 "working tree" and repository metadata, most of which are
 shared among other worktrees of a single repository, and
 some of which are maintained separately per worktree
-(e.g. the index, HEAD and pseudorefs like MERGE_HEAD,
-per-worktree refs and per-worktree configuration file).
+(e.g. the index, <a class="link" href="#def_per_worktree_ref">per-worktree refs</a>, and the
+per-worktree configuration file).
 </dd></dl></div>
 </div>
 </div>

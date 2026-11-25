@@ -454,7 +454,8 @@ pre>code {
 <div class="verseblock">
 <pre class="content"><em>git ls-remote</em> [--branches] [--tags] [--refs] [--upload-pack=&lt;exec&gt;]
               [-q | --quiet] [--exit-code] [--get-url] [--sort=&lt;key&gt;]
-              [--symref] [&lt;repository&gt; [&lt;patterns&gt;&#8230;&#8203;]]</pre>
+              [--symref] [--show-object-format]
+              [&lt;repository&gt; [&lt;patterns&gt;&#8230;&#8203;]]</pre>
 </div>
 </div>
 </div>
@@ -463,7 +464,9 @@ pre>code {
 <div class="sectionbody">
 <div class="paragraph">
 <p>Displays references available in a remote repository along with the associated
-commit IDs.</p>
+object IDs. By default, <code>HEAD</code> and all refs under <code>refs/</code> are shown.
+Annotated tags are also shown peeled, i.e. recursively resolved to the objects
+they point at.</p>
 </div>
 </div>
 </div>
@@ -488,7 +491,7 @@ with other git subcommands.</p>
 </dd>
 <dt class="hdlist1">--refs</dt>
 <dd>
-<p>Do not show peeled tags or pseudorefs like <code>HEAD</code> in the output.</p>
+<p>Do not show <code>HEAD</code> or peeled tags in the output.</p>
 </dd>
 <dt class="hdlist1">-q</dt>
 <dt class="hdlist1">--quiet</dt>
@@ -521,6 +524,15 @@ exit without talking to the remote.</p>
 ref pointed by it when showing a symbolic ref.  Currently,
 upload-pack only shows the symref HEAD, so it will be the only
 one shown by ls-remote.</p>
+</dd>
+<dt class="hdlist1">--show-object-format</dt>
+<dd>
+<p>Before the references, print the object format (hash algorithm)
+of the remote on a line of its own, in the form
+<code>object-format:</code> <em>&lt;format&gt;</em>, e.g. <code>object-format:</code> <code>sha256</code>. This
+also works for remotes without any refs, so it can be used to
+find out which object format a local repository needs before
+fetching from or pushing to the remote.</p>
 </dd>
 <dt class="hdlist1">--sort=&lt;key&gt;</dt>
 <dd>
@@ -592,8 +604,7 @@ line shows the name of the object the tag points at.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>List all references (including symbolics and pseudorefs), peeling
-tags:</p>
+<p>List <code>HEAD</code> and all refs under <code>refs/</code>, peeling tags:</p>
 <div class="listingblock">
 <div class="content">
 <pre>$ git ls-remote
@@ -650,7 +661,7 @@ d4ca2e3147b409459955613c152220f4db848ee1        refs/tags/v2.40.0
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-06-20 18:10:42 -0700
+Last updated 2026-11-25 13:18:53 -0800
 </div>
 </div>
 </body>
